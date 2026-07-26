@@ -45,6 +45,19 @@ report's own date and any later report that references it) and some of which may
 still be open. Treat report content as a point-in-time engineering record, not a
 current security or production-readiness statement.
 
+## Downloads
+
+| File | Variant | Link |
+|---|---|---|
+| `app-arm64-v8a-fullproduction-release.apk` | arm64-v8a, full | [Download](https://github.com/abd2508/tawa-remediation-reports/raw/master/artifacts/app-arm64-v8a-fullproduction-release.apk) |
+| `app-arm64-v8a-liteproduction-release.apk` | arm64-v8a, lite | [Download](https://github.com/abd2508/tawa-remediation-reports/raw/master/artifacts/app-arm64-v8a-liteproduction-release.apk) |
+| `app-armeabi-v7a-fullproduction-release.apk` | armeabi-v7a, full | [Download](https://github.com/abd2508/tawa-remediation-reports/raw/master/artifacts/app-armeabi-v7a-fullproduction-release.apk) |
+| `app-armeabi-v7a-liteproduction-release.apk` | armeabi-v7a, lite | [Download](https://github.com/abd2508/tawa-remediation-reports/raw/master/artifacts/app-armeabi-v7a-liteproduction-release.apk) |
+| `app-full-production-release.aab` | Android App Bundle, full (LFS) | [Download](https://github.com/abd2508/tawa-remediation-reports/raw/master/artifacts/app-full-production-release.aab) |
+| `app-lite-production-release.aab` | Android App Bundle, lite (LFS) | [Download](https://github.com/abd2508/tawa-remediation-reports/raw/master/artifacts/app-lite-production-release.aab) |
+
+Verify each download against `artifacts/SHA256SUMS.txt` after downloading — see below.
+
 ## Verifying the release binaries
 
 ```bash
