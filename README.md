@@ -1,5 +1,14 @@
 # Tawa Platform — Remediation & Audit Reports
 
+![topic: audit-reports](https://img.shields.io/badge/topic-audit--reports-blue)
+![topic: remediation-plan](https://img.shields.io/badge/topic-remediation--plan-blue)
+![topic: delivery-platform](https://img.shields.io/badge/topic-delivery--platform-blue)
+![topic: arabic](https://img.shields.io/badge/topic-arabic-blue)
+![topic: documentation](https://img.shields.io/badge/topic-documentation-blue)
+![topic: android](https://img.shields.io/badge/topic-android-blue)
+![topic: engineering-reports](https://img.shields.io/badge/topic-engineering--reports-blue)
+![license: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey)
+
 This repository is an archive of technical audit, remediation-planning, and execution
 reports produced during ongoing engineering work on the **Tawa** (توا) delivery
 platform (`tawanow.com`), spanning roughly **2026-05 through 2026-07**.
