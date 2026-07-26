@@ -22,6 +22,7 @@ build/review/deploy execution cycle for a specific numbered phase or report seri
 - [What's in here](#whats-in-here)
 - [Nature of this archive](#nature-of-this-archive)
 - [Downloads](#downloads)
+- [Changelog](CHANGELOG.md)
 - [Verifying the release binaries](#verifying-the-release-binaries)
 - [Contact](#contact)
 
