@@ -32,6 +32,8 @@ numbered report series and `561-tawa-remediation-build-spec-v2.md`.
 | `27c53a9` | Add this `CHANGELOG.md`, link it from the README's Table of Contents. |
 | `f6f689f` | CHANGELOG: backfill the actual commit hash for the changelog-adding commit. |
 | `e1c324f` | README: fix the 8 badges — they were plain images with no destination link; wrap each in a link to its real `github.com/topics/<name>` page (license badge links to `LICENSE`). |
+| `5f7a4cc` | CHANGELOG: backfill commit hash for the badge-link fix. |
+| `274133e` | README: add a `License` entry to the Table of Contents (it referenced `LICENSE` inline in Contact, but had no TOC entry of its own; `Changelog` already did). |
 
 ### Verification performed
 - Fresh-clone checksum verification: all 6 release binaries match `SHA256SUMS.txt`
