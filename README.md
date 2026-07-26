@@ -1,13 +1,13 @@
 # Tawa Platform — Remediation & Audit Reports
 
-![topic: audit-reports](https://img.shields.io/badge/topic-audit--reports-blue)
-![topic: remediation-plan](https://img.shields.io/badge/topic-remediation--plan-blue)
-![topic: delivery-platform](https://img.shields.io/badge/topic-delivery--platform-blue)
-![topic: arabic](https://img.shields.io/badge/topic-arabic-blue)
-![topic: documentation](https://img.shields.io/badge/topic-documentation-blue)
-![topic: android](https://img.shields.io/badge/topic-android-blue)
-![topic: engineering-reports](https://img.shields.io/badge/topic-engineering--reports-blue)
-![license: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey)
+[![topic: audit-reports](https://img.shields.io/badge/topic-audit--reports-blue)](https://github.com/topics/audit-reports)
+[![topic: remediation-plan](https://img.shields.io/badge/topic-remediation--plan-blue)](https://github.com/topics/remediation-plan)
+[![topic: delivery-platform](https://img.shields.io/badge/topic-delivery--platform-blue)](https://github.com/topics/delivery-platform)
+[![topic: arabic](https://img.shields.io/badge/topic-arabic-blue)](https://github.com/topics/arabic)
+[![topic: documentation](https://img.shields.io/badge/topic-documentation-blue)](https://github.com/topics/documentation)
+[![topic: android](https://img.shields.io/badge/topic-android-blue)](https://github.com/topics/android)
+[![topic: engineering-reports](https://img.shields.io/badge/topic-engineering--reports-blue)](https://github.com/topics/engineering-reports)
+[![license: All Rights Reserved](https://img.shields.io/badge/license-All%20Rights%20Reserved-lightgrey)](LICENSE)
 
 This repository is an archive of technical audit, remediation-planning, and execution
 reports produced during ongoing engineering work on the **Tawa** (توا) delivery
