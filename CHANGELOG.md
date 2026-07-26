@@ -29,7 +29,7 @@ numbered report series and `561-tawa-remediation-build-spec-v2.md`.
 | `3bb862e` | README: add direct download links (GitHub raw URLs) for all 4 `.apk` variants and both `.aab` bundles. |
 | `563c664` | README: add a Table of Contents. |
 | `cf4c0fc` | README: add a Contact section (GitHub account only — no external contribution model, per `LICENSE`). |
-| *(next)* | Add this `CHANGELOG.md`. |
+| `27c53a9` | Add this `CHANGELOG.md`, link it from the README's Table of Contents. |
 
 ### Verification performed
 - Fresh-clone checksum verification: all 6 release binaries match `SHA256SUMS.txt`
