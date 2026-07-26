@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقرير المفصّل — التدقيق العدائيّ لمسار المحفظة</title>
+<style>
+  :root{
+    --green:#1f7a4d; --green-d:#14532d; --amber:#b45309; --gray:#64748b;
+    --bg:#f5f8f6; --card:#fff; --border:#dbe5df; --ink:#16201c; --muted:#566860;
+    --ok:#15803d; --okbg:#e7f6ec; --warnbg:#fef4e4; --err:#b91c1c; --errbg:#fdeceb;
+    --code-bg:#0f1c17; --code-ink:#e6f3ec;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:0;line-height:1.85;font-size:15px}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 80px}
+  header.hd{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:18px;padding:30px 30px;box-shadow:0 10px 30px rgba(20,83,45,.20)}
+  header.hd h1{margin:0 0 8px;font-size:25px;line-height:1.45}
+  header.hd .sub{opacity:.93;font-size:15.5px}
+  .pill{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:4px 14px;font-size:12.5px;margin:9px 5px 0 0}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin:18px 0}
+  nav.toc strong{color:var(--green-d);display:block;margin-bottom:8px}
+  nav.toc ol{margin:0;padding-inline-start:22px;columns:2;font-size:14px}
+  nav.toc a{color:var(--green);text-decoration:none} nav.toc a:hover{text-decoration:underline}
+  section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin:18px 0;box-shadow:0 2px 9px rgba(20,83,45,.05)}
+  h2{color:var(--green-d);font-size:20px;margin:2px 0 16px;padding-bottom:10px;border-bottom:2px solid #e9f2ec}
+  h3{color:var(--green);font-size:16.5px;margin:20px 0 9px}
+  p{margin:9px 0}
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13.8px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#edf5f0;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafcfb}
+  code,.mono{font-family:"SF Mono",Consolas,monospace;background:#eaf0ed;color:#0f2a1e;padding:1.5px 6px;border-radius:5px;font-size:12.8px;direction:ltr;display:inline-block}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:15px 17px;overflow:auto;font-family:"SF Mono",Consolas,monospace;font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;margin:11px 0}
+  pre .c{color:#7fa890} pre .k{color:#7fb0ff} pre .s{color:#9ee6a8} pre .del{color:#e06c75} pre .add{color:#9ee6a8}
+  .ok{color:var(--ok);font-weight:700} .err{color:var(--err);font-weight:700}
+  .badge-ok{background:var(--okbg);color:var(--ok);border:1px solid #bfe6cb;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  .sev{background:var(--errbg);color:var(--err);border:1px solid #f3c0bc;border-radius:999px;padding:2px 10px;font-size:11.5px;font-weight:700;white-space:nowrap}
+  ul.clean{margin:8px 0;padding-inline-start:22px} ul.clean li{margin:6px 0}
+  .kv{display:grid;grid-template-columns:230px 1fr;gap:7px 16px;font-size:14px;margin:9px 0}
+  .kv .k{color:var(--muted)}
+  .note{background:var(--warnbg);border:1px solid #f4d9a8;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .seal{background:var(--okbg);border:1px solid #bfe6cb;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .danger{background:var(--errbg);border:1px solid #f3c0bc;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin:10px 0}
+  .flow span{background:#edf5f0;border:1px solid var(--border);border-radius:8px;padding:6px 11px}
+  .flow .arr{background:none;border:none;color:var(--green);font-weight:800}
+  .race{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:11px 0}
+  .race .col{background:#fbfdfc;border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px}
+  .race .col h4{margin:0 0 7px;color:var(--err);font-size:13.5px}
+  .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:28px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <h1>التقرير المفصّل — التدقيق العدائيّ لمسار المحفظة<br>دورة حياة الحجز: سباق خطير أُصلح بثلاثة أقفال</h1>
+  <div class="sub">المال الرقميّ الموازي للنقد — استكمال اتّجاه التدقيق العدائيّ</div>
+  <div>
+    <span class="pill">قراءة-فقط + 3 أقفال</span>
+    <span class="pill">FIN-COR PASS · NEW=0</span>
+    <span class="pill">بلا migration / بلا تغيير مبلغ</span>
+    <span class="pill">منشور</span>
+    <span class="pill">2026-06-12</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>محتويات التقرير</strong>
+  <ol>
+    <li><a href="#s1">الخلاصة</a></li>
+    <li><a href="#s2">السلسلة المُدقَّقة</a></li>
+    <li><a href="#s3">العيب (تحليل السباق)</a></li>
+    <li><a href="#s4">الإصلاح + أمان الجمود</a></li>
+    <li><a href="#s5">المؤكَّدات الإيجابيّة</a></li>
+    <li><a href="#s6">الاختبارات (توضيح التلوّث)</a></li>
+    <li><a href="#s7">البوّابة والنشر</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2>① الخلاصة</h2>
+  <p>
+    استكمالًا لاتّجاه التدقيق العدائيّ (بعد مسار النقد)، دقّقتُ <strong>مسار المحفظة</strong> (المال الرقميّ الموازي).
+    وجدتُ عيبًا <strong>أخطر من عيب النقد</strong>: دورة حياة الحجز (commit/release/adjust) كانت
+    <strong>check-then-act على حالة الحجز بلا قفل صفّ</strong> — تحت التزامن قد تُحدِث <strong>قيدًا محاسبيًّا مزدوجًا أو تسريب مال</strong>.
+    أصلحتُه بثلاثة أقفال آمنة (نفس نمط بقيّة المسارات)، بلا تغيير مبلغ/منطق.
+  </p>
+  <div class="kv">
+    <div class="k">النتيجة</div><div>عيب تزامن حقيقيّ (أخطر) أُصلح · حرّاس الحالة والقيود سليمة</div>
+    <div class="k">طبيعة الإصلاح</div><div>قفول صفّ <code>with_for_update</code> (no-op على SQLite، تشاؤميّ على PG) — بلا تغيير مبلغ</div>
+    <div class="k">القلب الماليّ</div><div>مصون — <span class="ok">FIN-COR PASS</span> · بلا migration</div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2>② السلسلة المُدقَّقة</h2>
+  <div class="flow">
+    <span>شحن<br><code>topup</code></span><span class="arr">←</span>
+    <span>حجز<br><code>reserve_wallet</code> (مقفل✓)</span><span class="arr">←</span>
+    <span>تثبيت/إفراج/تعديل<br><code>commit / release / adjust</code></span><span class="arr">←</span>
+    <span>صرف<br><code>spend_from_wallet</code> (مقفل✓)</span><span class="arr">←</span>
+    <span>القيود المحاسبيّة</span>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2>③ العيب — دورة حياة الحجز بلا قفل <span class="sev">تزامن · خطير</span></h2>
+  <p>
+    الدوال الثلاث (<code>commit_reservation</code>/<code>release_reservation</code>/<code>adjust_reservation</code>) كانت تقرأ
+    صفّ الحجز <strong>بلا <code>with_for_update</code></strong> ثمّ تفحص <code>state == "HELD"</code> ثمّ تنتقل. حارس الحالة يحمي
+    النداء <em>التسلسليّ</em> فقط؛ والمُستدعون (order_service · dispatch_service · accept_timeout · provider_service)
+    <strong>لا يقفلون صفّ الطلب</strong>. فالفحص-ثمّ-الفعل غير ذرّيّ.
+  </p>
+  <div class="race">
+    <div class="col">
+      <h4>سباق أ — تثبيت مزدوج</h4>
+      خيطان (إعادة نداء) يريان HELD ⇒ كلاهما يثبّت ⇒ <span class="err">قيد محاسبيّ مزدوج</span> (إيراد + ذمم مضاعفة)
+    </div>
+    <div class="col">
+      <h4>سباق ب — تثبيت + إفراج</h4>
+      تسليم (commit) يزامن إلغاءً (release) ⇒ كلاهما يرى HELD ⇒ <span class="err">العميل يُسترَدّ + المزوّد يُدفَع = تسريب مال</span>
+    </div>
+  </div>
+  <p>هذا أخطر من عيب النقد (الذي كان انزياح عدّاد): هنا قيد مزدوج فعليّ أو تسريب مال.</p>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2>④ الإصلاح + أمان الجمود</h2>
+  <pre><span class="c"># commit / release / adjust — قفل صفّ الحجز ⇒ الفحص-والانتقال ذرّيّ</span>
+reservation = await session.scalar(
+    select(WalletReservation).where(... order_id ...)<span class="add">.with_for_update()</span>
+)
+if reservation is None or reservation.state != "HELD": return reservation
+
+<span class="c"># release / adjust يعدّلان balance_minor ⇒ اقفل المحفظة أيضًا (مثل reserve/spend)</span>
+wallet = (await session.execute(
+    select(WalletAccount).where(... id ...)<span class="add">.with_for_update()</span>
+)).scalar_one_or_none()</pre>
+  <table>
+    <tr><th>الدالّة</th><th>قفل الحجز</th><th>قفل المحفظة</th><th>السبب</th></tr>
+    <tr><td><code>commit_reservation</code></td><td>✅</td><td>—</td><td>لا يعدّل الرصيد (القيد فقط)</td></tr>
+    <tr><td><code>release_reservation</code></td><td>✅</td><td>✅</td><td>يردّ الرصيد <code>balance += amount</code></td></tr>
+    <tr><td><code>adjust_reservation</code></td><td>✅</td><td>✅</td><td>يعدّل الرصيد ±delta</td></tr>
+  </table>
+  <div class="note">
+    <strong>أمان الجمود (deadlock):</strong> ترتيب القفل ثابت — <em>الحجز ثمّ المحفظة</em>. <code>reserve</code> يقفل المحفظة فقط
+    (الحجز صفّ جديد)؛ لا دورة انتظار دائريّة بين الحجز والمحفظة على نفس الزوج ⇒ لا جمود.
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2>⑤ المؤكَّدات الإيجابيّة</h2>
+  <ul class="clean">
+    <li><strong>حارس الحالة:</strong> <code>HELD</code>-only صحيح (مع القفل صار ذرّيًّا) — لا تثبيت/إفراج بعد التغيّر.</li>
+    <li><strong>القيود متوازنة:</strong> <code>record_wallet_reservation_commit</code> / <code>_release</code> متوازنة (WALLET_HELD يبقى = إجماليّ الطلب).</li>
+    <li><strong>مسارات مقفلة أصلًا:</strong> <code>reserve_wallet</code> · <code>spend_from_wallet</code> · <code>apply_debit</code> تقفل المحفظة (CHECK رصيد ≥ 0 قائم).</li>
+  </ul>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2>⑥ الاختبارات — توضيح تلوّث الحزمة الجزئيّة</h2>
+  <p>
+    تشغيل <code>-k</code> الجزئيّ أظهر 4 فشل، لكنّها <strong>ليست من تغييري</strong>: اختبار المحفظة <code>test_phase457_wallet_search</code>
+    <strong>نجح بالعزل 10/10</strong> (الفشل في الحزمة = تلوّث DB المشترك StaticPool)؛ والثلاثة الأخرى
+    (<code>phase372</code> بحث المزوّد · <code>phase11</code> مقاييس · <code>phase457</code>) كلّها <strong>ضمن الأساس المسموح به (allow-listed baseline)</strong>
+    وغير متعلّقة بأقفال المحفظة. التحقّق الحاسم = البوّابة الكاملة: <span class="ok">NEW=0</span>.
+  </p>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2>⑦ البوّابة والنشر</h2>
+  <table>
+    <tr><th>الفحص</th><th>النتيجة</th></tr>
+    <tr><td>FIN-COR</td><td><span class="badge-ok">PASS</span></td></tr>
+    <tr><td>الحزمة الخلفيّة</td><td>2205 ناجح · أساس 29 / حاليّ 29 · <span class="ok">NEW=0</span></td></tr>
+    <tr><td>النشر</td><td><code>deploy_be_gated.sh</code> — backend-core صحّية</td></tr>
+    <tr><td>القفول في الصورة المنشورة</td><td>8 <code>with_for_update</code> (3 أصليّة + 5 جديدة) · 4 علامات FIN-AUDIT</td></tr>
+    <tr><td>تفعيل الفحص المحلّيّ</td><td><span class="ok">باقٍ</span> (is_enabled=True بعد إعادة الإنشاء)</td></tr>
+  </table>
+  <div class="seal">
+    ✅ دورة حياة الحجز صارت ذرّيّة (لا تثبيت مزدوج/تسريب). قراءة-فقط + 3 أقفال آمنة متّسقة مع بقيّة المسارات ·
+    FIN-COR PASS · بلا migration/commit · رأس المستودع aa29.
+  </div>
+  <div class="danger">
+    <strong>درس الجلسة:</strong> التدقيق العدائيّ التقط <strong>عيبين ماليّين حقيقيّين في مسارين متوازيين</strong> — النقد (انزياح عدّاد العُهدة)
+    والمحفظة (تثبيت مزدوج / تسريب مال). كلاهما سباق فحص-ثمّ-فعل بلا قفل، أُصلح بنفس النمط. صحّة المال أوّلًا.
+  </div>
+</section>
+
+<div class="foot">
+  تووا — منصّة التوصيل الليبيّة · تقرير التدقيق العدائيّ لمسار المحفظة · 2026-06-12<br>
+  دورة حياة الحجز (commit/release/adjust) قُفِلت · بقيّة المسار سليم · FIN-COR PASS · NEW=0 · بلا migration/commit · رأس المستودع aa29
+</div>
+
+</div>
+</body>
+</html>

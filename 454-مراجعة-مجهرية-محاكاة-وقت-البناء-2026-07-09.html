@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>مراجعة مجهرية إضافية — محاكاة وقت البناء لنقاط 2 / 10-12 / 13 / 14 / 16</title>
+<style>
+  :root {
+    --bg: #0f1420; --panel: #161d2e; --text: #e7ecf5; --muted: #9aa7bd;
+    --border: #2a3348; --accent: #5aa9ff; --ok: #35c98f; --p1: #ff5d5d;
+    --p2: #ffb454; --p3: #8ea0ff; --code-bg: #0b0f18; --new: #ff7ac6;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f5f7fb; --panel:#ffffff; --text:#1a2233; --muted:#5b667a;
+      --border:#dbe1ee; --accent:#1f6feb; --ok:#12805c; --p1:#c62828;
+      --p2:#a05a00; --p3:#3a4bb8; --code-bg:#eef1f8; --new:#a3237a; }
+  }
+  :root[data-theme="dark"] { --bg:#0f1420; --panel:#161d2e; --text:#e7ecf5; --muted:#9aa7bd;
+    --border:#2a3348; --accent:#5aa9ff; --ok:#35c98f; --p1:#ff5d5d; --p2:#ffb454; --p3:#8ea0ff; --code-bg:#0b0f18; --new:#ff7ac6; }
+  :root[data-theme="light"] { --bg:#f5f7fb; --panel:#ffffff; --text:#1a2233; --muted:#5b667a;
+    --border:#dbe1ee; --accent:#1f6feb; --ok:#12805c; --p1:#c62828; --p2:#a05a00; --p3:#3a4bb8; --code-bg:#eef1f8; --new:#a3237a; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", Tahoma, Arial, sans-serif; line-height: 1.85; max-width: 1080px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  h1 { font-size: 1.8rem; border-bottom: 3px solid var(--accent); padding-bottom: .6rem; }
+  h2 { font-size: 1.4rem; margin-top: 2.8rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: .35rem; }
+  h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+  h4 { font-size: 1.02rem; margin-top: 1.2rem; }
+  a { color: var(--accent); }
+  code, pre { font-family: Consolas, Monaco, monospace; direction: ltr; unicode-bidi: embed; }
+  code { background: var(--code-bg); padding: .1rem .4rem; border-radius: 4px; font-size: .85em; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: .8rem; text-align: left; }
+  .banner { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; margin: 1rem 0; }
+  .banner.warn { border-right: 5px solid var(--p2); }
+  .banner.verdict { border-right: 5px solid var(--accent); font-weight: 700; font-size: 1.05rem; }
+  .banner.ok { border-right: 5px solid var(--ok); }
+  .banner.new { border-right: 5px solid var(--new); }
+  .banner.crit { border-right: 6px solid var(--p1); font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .88rem; }
+  th, td { border: 1px solid var(--border); padding: .5rem .65rem; text-align: right; vertical-align: top; }
+  th { background: var(--panel); }
+  tr:nth-child(even) { background: color-mix(in srgb, var(--panel) 60%, transparent); }
+  .sev-P0 { color: var(--p1); font-weight: 900; }
+  .sev-P1 { color: var(--p1); font-weight: 800; }
+  .sev-P2 { color: var(--p2); font-weight: 800; }
+  .sev-P3 { color: var(--p3); font-weight: 800; }
+  .sev-OK { color: var(--ok); font-weight: 800; }
+  .sev-NEW { color: var(--new); font-weight: 800; }
+  .muted { color: var(--muted); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.4rem; margin: 1rem 0; }
+  .toc a { display: block; padding: .16rem 0; font-size: .92rem; }
+  .fix-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1.3rem 1.5rem; margin: 1.5rem 0; }
+  .fix-card.p0 { border-right: 6px solid var(--p1); box-shadow: 0 0 0 1px color-mix(in srgb, var(--p1) 30%, transparent); }
+  .fix-card.p1 { border-right: 5px solid var(--p1); }
+  .fix-card.p2 { border-right: 5px solid var(--p2); }
+  .fix-card.new { border-right: 5px solid var(--new); }
+  .fix-card.notdefect { border-right: 5px solid var(--ok); }
+  .badge { display: inline-block; padding: .15rem .6rem; border-radius: 20px; font-size: .78rem; font-weight: 700; margin-inline-end: .4rem; }
+  .badge.p0 { background: color-mix(in srgb, var(--p1) 30%, transparent); color: var(--p1); }
+  .badge.p1 { background: color-mix(in srgb, var(--p1) 20%, transparent); color: var(--p1); }
+  .badge.new { background: color-mix(in srgb, var(--new) 20%, transparent); color: var(--new); }
+  .badge.ok { background: color-mix(in srgb, var(--ok) 20%, transparent); color: var(--ok); }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+  details { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: .6rem 1rem; margin: .8rem 0; }
+  summary { cursor: pointer; font-weight: 700; }
+  .ref-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: .9rem 1.2rem; margin: .8rem 0; border-right: 4px solid var(--accent); }
+  .evid { font-size: .85rem; color: var(--muted); direction: ltr; text-align: left; unicode-bidi: plaintext; }
+  .jc { background: color-mix(in srgb, var(--accent) 8%, transparent); border-right: 4px solid var(--accent); border-radius: 6px; padding: .7rem 1rem; margin: .6rem 0; font-size: .92rem; }
+  .bt-list li { margin: .5rem 0; }
+  .section-tag { display:inline-block; font-size:.75rem; font-weight:800; padding:.15rem .55rem; border-radius:6px; background:color-mix(in srgb, var(--accent) 18%, transparent); color:var(--accent); margin-inline-end:.5rem; }
+</style>
+</head>
+
+<h1>مراجعة مجهرية إضافية — تحقّق عدائي + محاكاة "وقت البناء" لنقاط 2 / 10‑12 / 13 / 14 / 16</h1>
+
+<div class="banner verdict">
+  <strong>الخلاصة بجملة واحدة:</strong> تحقّق مباشر (قراءة كود حيّة، لا نقل عن الخطة) لكل ادّعاء تقني في أقسام 2 و10/12 و13 و14 و15/16 من وثيقة <code>453</code>، زائد طبقة تحليل جديدة تمامًا لم تكن موجودة سابقًا: <strong>محاكاة سيناريوهات "وقت البناء"</strong> (ماذا يُمكن أن ينكسر أثناء الكتابة/الدمج/النشر، وليس أثناء استخدام العميل الحقيقي لاحقًا). الاكتشاف الأهم: نقطتا 2 و14 تعتمدان فعليًا على نفس نقطة النهاية المكسورة اليوم (<code>GET /providers/me</code> محصورة بالمالك فقط) — وهذا عطل حيّ حاليًا، مكتشَف أثناء هذه المراجعة، وليس افتراضًا نظريًا.
+</div>
+
+<nav class="card toc">
+  <strong>فهرس المحتويات</strong>
+  <a href="#global">تصحيحات عامّة (تخصّ أكثر من نقطة)</a>
+  <a href="#p2">النقطة 2 — اسم المزوّد في الشريط العلوي</a>
+  <a href="#p1012">النقطتان 10/12 — نطاق بيانات وسجلّ الموظف</a>
+  <a href="#p13">النقطة 13 — سجلّ الأدمن وتوثيق المسؤول</a>
+  <a href="#p14">النقطة 14 — إخفاء إعدادات المزوّد الحسّاسة</a>
+  <a href="#p16">النقطة 15/16 — صفحة "صلاحياتي" للموظف</a>
+  <a href="#req4">الفصل بين "وقت البناء" و"وقت الاستخدام" — هل وُجد خلط في الخطة الأصلية؟</a>
+  <a href="#refs">المراجع الخارجية المُستشهَد بها</a>
+</nav>
+
+<h2 id="global">تصحيحات عامّة (تخصّ أكثر من نقطة)</h2>
+
+<div class="banner crit">
+  🚨 <strong>الاكتشاف الأهمّ في كامل هذه المراجعة:</strong> <code class="evid">backend/app/modules/providers/provider_router.py:1352-1354</code> — نقطة النهاية <code>GET /providers/me</code> محروسة بـ<code>require_role(PlatformRole.PROVIDER_ADMIN)</code> فقط، أي <strong>محصورة بالمالك حصرًا</strong>. هذا يناقض مباشرةً ادّعاء الخطة الأصلية في النقطة 2 أن هذه النقطة "مُحدَّدة بالجلسة أصلًا وتعمل تلقائيًا للمالك والموظف معًا". والأخطر: هذا عطل <strong>حيّ فعليًا اليوم</strong> — <code class="evid">ProviderSettings.tsx:105-111</code> يستدعي هذه النقطة بلا أي تمييز للدور، ونتيجته مرئية بالفعل لكل موظف يفتح صفحة الإعدادات (تفصيل كامل تحت النقطة 14). نفس الجذر يعطّل حل النقطة 2 كما هو مخطَّط له حرفيًا.
+</div>
+
+<table>
+<tr><th>الادّعاء في وثيقة 453</th><th>المسار/السطر المذكور</th><th>الحالة الفعلية (تحقّق مباشر اليوم)</th></tr>
+<tr><td>رأس الترحيل (alembic head) الحالي</td><td><code>CLAUDE.md</code>: <code>aa15_order_messages</code></td><td><span class="sev-P1">قديم بشدّة</span> — الرأس الفعلي المُتحقَّق عبر <code>.venv/bin/alembic heads -v</code> هو <code>ab24_provider_approved_at</code> (أبوها <code>ab23</code>)، بتاريخ اليوم 2026-07-09، ضمن موجة إصلاحات DEF-01..DEF-16 منفصلة تمامًا عن خطة 453 (commits <code class="evid">0464f3a</code> و<code class="evid">1f1d8be</code>) لمست بعض نفس الملفات (roles.py، provider_router.py، operations_router.py). يجب إعادة المقارنة (diff) ضدّ HEAD الحالي قبل أي تنفيذ، لا ضدّ اللقطة التي استندت إليها 453.</td></tr>
+<tr><td>مسار <code>roles.py</code></td><td>افتراض <code>backend/app/modules/providers/roles.py</code></td><td><span class="sev-P2">تصحيح مسار</span> — الملف الفعلي <code class="evid">backend/app/core/roles.py</code>.</td></tr>
+<tr><td>مسار <code>dependencies.py</code></td><td>افتراض <code>backend/app/modules/providers/dependencies.py</code></td><td><span class="sev-P2">تصحيح مسار</span> — الملف الفعلي <code class="evid">backend/app/modules/identity/dependencies.py</code> (فيه <code>require_provider_permission</code> و<code>require_role</code>).</td></tr>
+<tr><td>مسار <code>account_permission_service.py</code></td><td>افتراض تحت <code>modules/providers/</code></td><td><span class="sev-P2">تصحيح مسار</span> — الملف الفعلي <code class="evid">backend/app/modules/identity/account_permission_service.py</code>.</td></tr>
+<tr><td>"AuditLog يُكتَب في كل نقطة تحوّل" (نقطة 13)</td><td>عام</td><td><span class="sev-OK">مؤكَّد ومُحسَّن</span> — يُكتَب عبر <code>AuditEvent</code>/<code>AuditLogger</code> (وليس استدعاء مباشر لـ<code>AuditLog(...)</code>) من ≥28 ملف وحدة، ويغطي فعليًا <code>order.provider_accepted/rejected/preparation_started/ready_for_pickup/self_pickup_collected</code> + <code>dispatch.offer_accepted/rejected/driver_arrived/delivery_proof_submitted</code> + <code>cash.collected</code> — أوسع ممّا افترضته الخطة (تغطي جانب السائق أيضًا لا الطلب فقط).</td></tr>
+</table>
+
+<div class="jc">
+<strong>تصادم تسمية "Point 2" (تحذير توثيقي، ليس عيبًا وظيفيًا):</strong> اسم "Point 2" مُستخدَم فعليًا اليوم في <strong>أربعة</strong> مواضع كود سابقة، غير مرتبطة إطلاقًا بنقطة "اسم المزوّد في الشريط" الجديدة:
+<ul>
+<li><code class="evid">web/src/router.tsx:315</code> — تعليق فوق مسار <code>/provider-portal/staff</code>: "Point 2 — staff & permissions console (owner-only...)"</li>
+<li><code class="evid">backend/app/core/roles.py:27</code> — عنوان قسم: "── Point 2 (provider employee permissions) ──"</li>
+<li><code class="evid">backend/app/modules/identity/dependencies.py:256</code> — تعليق توثيقي لدالة <code>require_provider_permission</code>: "Point 2 — the composite guard for every provider-staff action."</li>
+<li><code class="evid">web/src/pages/provider/ProviderStaff.tsx:2</code> — عنوان الملف نفسه: "Point 2 — Provider Staff console (owner-driven)."</li>
+</ul>
+أي commit أو PR يُسمَّى "Point 2" بلا سياق إضافي لن يكون قابلًا للتمييز عبر grep في تاريخ هذا المستودع. التوصية: تسمية العمل الجديد صراحةً "Point 2 (خطة 453) — اسم المزوّد في الشريط" في كل رسالة commit وعنوان PR.
+</div>
+
+<h2 id="p2">النقطة 2 — اسم المزوّد في الشريط العلوي</h2>
+
+<div class="fix-card p1">
+<h3>التصحيحات</h3>
+<p><strong>1) دقّة رقم السطر:</strong> الخطة تستشهد بـ<code>Layout.tsx:226-229</code> كـ"الحل الجاهز" لدى العميل. هذا صحيح جزئيًا فقط — <code class="evid">226-229</code> هو منطق <em>العرض</em> (الشرط الثلاثي الذي يعرض الاسم الحقيقي أو نصًّا احتياطيًا)، بينما منطق <em>الجلب</em> الفعلي (<code>useEffect</code> + <code>customerApi.me()</code>) يقع في سطر منفصل تمامًا: <code class="evid">Layout.tsx:72-79</code>. أي تطبيق حرفي للنمط يحتاج نسخ الكتلتين معًا، لا كتلة واحدة. قسم المزوّد المجاور صحيح كما وُصف: <code class="evid">Layout.tsx:231</code> — نص ثابت دائمًا "بوابة المزوّدين" بلا أي استثناء.</p>
+<p><strong>2) تعليق مضلِّل موجود بالفعل في الكود:</strong> <code class="evid">Layout.tsx:69-71</code> يقول حرفيًا: "the provider/driver portals are already labelled + named in the menu" — هذا <strong>غير صحيح</strong> فعليًا (تحقّق مباشر: القسمان يعرضان فقط نصًّا عامًّا ثابتًا، لا اسمًا حقيقيًا في أي مكان). يجب تصحيح/حذف هذا التعليق ضمن نفس commit الإصلاح، وإلا يبقى مضلِّلًا للقارئ التالي.</p>
+<p><strong>3) عطل حاجز الدور المكتشَف (الأهم):</strong> راجع البانر الحرِج أعلاه — <code>GET /providers/me</code> owner-only يكسر الادّعاء الأساسي للخطة أن هذه النقطة تعمل "تلقائيًا لكليهما". لا يمكن البناء على هذا الافتراض كما هو مكتوب.</p>
+<p><strong>4) تأكيد إيجابي:</strong> <code>isProvider</code> في Layout.tsx (<code class="evid">سطر 64</code>) يغطّي <code>PROVIDER_ADMIN</code> و<code>PROVIDER_STAFF</code> معًا بشكل صحيح — إن أُصلح مصدر البيانات (نقطة 3 أعلاه)، بقية المنطق (شرط isProvider) سليم فعلًا ولا يحتاج تعديلًا.</p>
+
+<h3>سيناريوهات وقت البناء (12)</h3>
+<ul class="bt-list">
+<li><strong>عطل حاجز الدور يمنع البناء "كما هو مخطَّط":</strong> إعادة استخدام <code>GET /providers/me</code> حرفيًا (كما تفترض الخطة) تعني أن نصف الميزة (الموظف) سيفشل من أول تجربة يدوية — قرار تصميمي (تخفيف الحارس مقابل نقطة نهاية جديدة أخفّ) يجب اتخاذه <em>قبل</em> كتابة أي كود Frontend، لا أثناءه.</li>
+<li><strong>تسرّب حقول حسّاسة إذا خُفِّف الحارس ببساطة:</strong> <code>GET /me</code> يعيد اليوم <code>owner_fields</code> (lat/lng/address_text/social_links/self_delivery_pricing/over_threshold_*) — تخفيف الحارس بلا تصفية حسب الدور يُسرّب هذه الحقول لكل موظف، وهذا يتصادم مباشرة مع هدف النقطة 14 (إخفاء الحسّاس عن الموظف). إن بُنيت النقطتان في PR منفصلتين بلا تنسيق، إحداهما قد تُعيد فتح ما تُغلقه الأخرى بصمت.</li>
+<li><strong>استدعاء "ميت" موجود مسبقًا بنفس الجذر:</strong> <code>ProviderDashboard.tsx:145-165</code> يستدعي <code>/providers/me</code> بلا شرط دور أصلًا، ويُبتلَع الخطأ بصمت (<code>.catch(() => {/* keep last-known state */})</code>)، لكن نتيجته محجوبة عن العرض بالكامل خلف <code>{isAdmin && (...)}</code> — أي طلب شبكة فاشل صامت بلا أثر مرئي اليوم؛ من يلمس حارس هذه النقطة يجب أن يلاحظ هذا الاستدعاء الثالث الميت ويوحّده بدل إضافة موضع رابع بنفس المشكلة.</li>
+<li><strong>لا اختبار يحمي الميزة:</strong> <code class="evid">Layout.test.tsx</code> موجود وله نمط ثابت (<code>renderLayout("ROLE")</code>) لكن لا يوجد أي اختبار حالي يتحقّق من <code>data-testid="topbar-identity"</code> أو نص بوابة المزوّدين — قد ينكسر الإصلاح بصمت في CI ما لم يُضَف اختبار جديد بنفس النمط ضمن نفس PR.</li>
+<li><strong>عدم تطابق شكل بيانات الاختبار الوهمية (MSW):</strong> <code class="evid">web/src/test/handlers/provider.ts:222</code> يعيد حقلًا مسطّحًا <code>name</code>/<code>business_name</code>، بينما نموذج Provider الحقيقي يخزّن <code>display_name</code> ككائن JSON ثنائي اللغة <code>{ar, en}</code>. إن قرأ الإصلاح <code>data.display_name.ar</code> فسيمرّ ضدّ Mock قديم الشكل بينما قد يختلف الواقع — يجب تحديث الـMock ضمن نفس PR وإلا فالاختبار "الأخضر" يفحص عقدًا وهميًا لا العقد الحقيقي.</li>
+<li><strong>إعادة استخدام مفتاح ترجمة غير مناسب:</strong> نمط "مرحبًا {name}" (<code>t("nav.greeting")</code>) مصمَّم لاسم شخص؛ إعادة استخدامه حرفيًا لاسم منشأة تجارية تقرأ بشكل غريب في العربية — يحتاج مفتاح i18n مستقل أو مراجعة لغوية، لا نسخًا صامتًا.</li>
+<li><strong>قاعدة حوكمة CLAUDE.md بشأن النصوص المرئية:</strong> إضافة نص مرئي جديد (اسم المزوّد/الترحيب) هي تغيير نص مستخدم يقع تحت قاعدة "لا تغييرات نصوص مستخدم بلا طلب صريح" — الإذن هنا محصور بالضبط بما تطلبه النقطة 2، وليس ترخيصًا لتحسين نصوص مجاورة (مثل إعادة صياغة نص بوابة السائقين) في نفس commit.</li>
+<li><strong>تصادم تسمية "Point 2":</strong> انظر القسم العام أعلاه — أربعة مواضع كود سابقة تحمل نفس التسمية لعمل مختلف تمامًا.</li>
+<li><strong>خطأ محتمل في شرط الجلب (نسخ-لصق):</strong> إن اعتمد المطوّر خطأً على متغيّر محلّي شبيه بـ"isOwner" (منسوخ من قسم آخر مجاور في نفس الملف مخصَّص للمالك فقط) بدل <code>isProvider</code> الصحيح (المُغطّي للدورين)، سيبقى الموظف يرى النص الثابت بصمت تام دون أي خطأ يُشير لذلك.</li>
+<li><strong>فقدان الاحتياطي البصري أثناء التحميل:</strong> يجب الحفاظ على نمط الاحتياطي (نص ثابت عند الفشل/التحميل) كما في فرع العميل؛ حذف الاحتياطي وعرض نص فارغ أثناء التحميل يُدخِل وميضًا بصريًا (تراجعًا) غير موجود اليوم.</li>
+<li><strong>مالك متعدّد المتاجر (X-Provider-Id):</strong> اسم المزوّد المعروض يجب أن يتفاعل مع محدِّد المتجر النشِط (<code>active_provider_id_var</code>). إن كانت مصفوفة الاعتماديات في الـ<code>useEffect</code> الجديد فارغة <code>[]</code> فقط (نسخًا حرفيًا لنمط العميل الذي لا يواجه هذا التعقيد أصلًا)، فسيبقى اسم المزوّد المعروض قديمًا (متجر سابق) بعد تبديل المالك للمتجر النشط دون تحديث الصفحة كاملة — تراجع خاص بالمزوّدين لا يظهر في اختبار نسخ نمط العميل حرفيًا.</li>
+<li><strong>تصادم PR مع نقطة 14 على نفس السطور:</strong> كلتا النقطتين تحتاجان لمس <code>GET /me</code> بطريقة ما — إن عمل عليهما مطوّران مختلفان بالتوازي بلا تنسيق، الأرجح تعارض دمج (merge conflict) حرفي على نفس الدالة، أو أسوأ: مسارا قراءة مختلفان يتعايشان دائمًا (أحدهما يستخدمه Layout.tsx والآخر ProviderSettings.tsx) بدل حلّ موحَّد.</li>
+</ul>
+
+<h3>ملاحظات أفضل الممارسات (مُعمَّقة)</h3>
+<div class="ref-card">Stripe وShopify (كما تذكر الخطة أصلًا) يعرضان هوية الحساب الحقيقية دائمًا في الشريط العلوي. البحث الإضافي لم يجد مصدرًا منشورًا يخصّ هذه النقطة تحديدًا بأكثر ممّا استشهدت به الخطة أصلًا — لا استشهاد جديد إضافي هنا يستحقّ الذكر بما يتجاوز التكرار.</div>
+</div>
+
+<h2 id="p1012">النقطتان 10/12 — نطاق بيانات وسجلّ الموظف</h2>
+
+<div class="fix-card p1">
+<h3>التصحيحات</h3>
+<p><strong>1) تأكيد قوي لادّعاء "نفس الخلل بالضبط":</strong> <code>ProviderOrderHistory.tsx:56</code> يستدعي <code>ordersApi.listProviderOrders("DELIVERED")</code> — وهذا فعليًا نفس نقطة النهاية <code>GET /providers/orders</code> (<code class="evid">provider_router.py:483-497</code>) التي تستدعي <code>ProviderService.get_provider_order_queue</code> (<code class="evid">provider_service.py:748-767</code>)، بفلتر حالة فقط. مؤكَّد تمامًا بالكود، وليس افتراضًا.</p>
+<p><strong>2) اكتشاف يتجاوز ادّعاء الخطة:</strong> نفس الدالة <code>get_provider_order_queue</code> ليست مستهلَكة من موضعين (اللوحة والسجلّ) بل من <strong>ثلاثة</strong> فعليًا: طابور الطلبات (بلا فلتر حالة)، سجلّ الطلبات (فلتر DELIVERED)، <strong>و</strong>بطاقة "مكتمل اليوم" في لوحة القيادة (<code class="evid">ProviderDashboard.tsx:117-125</code>، تفلتر DELIVERED من نفس القائمة الكاملة على جهة العميل). هذا يؤكّد الاكتشاف الجانبي للخطة ("مكتمل اليوم = كل الوقت فعليًا") بدليل مباشر: <code>/providers/orders</code> بلا فلتر حالة ولا فلتر تاريخ إطلاقًا (<code class="evid">provider_service.py:758-764</code>) — العدّاد يحسب كل الطلبات المُسلَّمة منذ إنشاء الحساب.</p>
+<p><strong>3) تصحيح دقيق لموضع الخطر:</strong> <code>get_provider_order_queue</code> لها مستدعٍ Python واحد فقط (<code class="evid">provider_router.py:494</code>) — فالمخاطرة الحقيقية ليست "عدّة مستدعين خلفيّين" بل ثلاث واجهات أمامية مختلفة تتشارك نقطة نهاية HTTP واحدة.</p>
+<p><strong>4) endpoint منفصل owner-only لا علاقة له بهذه النقطة:</strong> <code>GET /me/orders/archive</code> (<code class="evid">provider_router.py:2441-2484</code>) محصور <code>require_role(PROVIDER_ADMIN)</code> — هذا أرشيف مختلف تمامًا (owner فقط، تصدير محاسبي)، وليس ما تستخدمه صفحة سجلّ الموظف. لا خلط بينهما.</p>
+
+<h3>سيناريوهات وقت البناء (15 — أعلى عدد لأعلى مخاطرة)</h3>
+<ul class="bt-list">
+<li><strong>إعادة تصنيف صريحة:</strong> "الفخ التنفيذي" (فلتر <code>assigned_staff_id == أنا</code> يكسر القبول) هو سيناريو <strong>صحّة وقت استخدام/تصميم</strong> (يظهر أثناء استخدام موظف حقيقي للطابور)، وليس سيناريو وقت بناء بحدّ ذاته — راجع القسم 4 أسفل الوثيقة لتصنيف دقيق.</li>
+<li><strong>التناقض الثلاثي (أهم سيناريو في هذا القسم):</strong> توجد اليوم <strong>ثلاثة</strong> تعريفات مستقلّة لـ"طلبات هذا الموظف": <code>get_provider_order_queue</code> (بلا نطاق موظف ولا تاريخ إطلاقًا) و<code>my-stats.completed_by_me</code> (<code class="evid">provider_router.py:3153-3206</code>، مُنطَّق فعليًا بـ<code>assigned_staff_id</code> + <code>business_day_id</code>) وبطاقة اللوحة (كل الوقت، فلترة جانب العميل من نفس الاستعلام الكامل). نطاق الفلترة على <code>get_provider_order_queue</code> وحدها يُغيّر فورًا معنى بطاقة اللوحة وسجلّ الطلبات بينما يبقى منطق <code>my-stats</code> الصحيح أصلًا بلا تغيير — هذا يُعيد إنتاج بالضبط عطل "اللوحة والسجلّ يتعارضان" الذي تقول الخطة إنها تمنعه، ما لم يُوفَّق المطوّر بين المواضع الثلاثة في نفس الدفعة عمدًا لا بالصدفة.</li>
+<li><strong>مزامنة أربع ملفات لأي صلاحية جديدة:</strong> إضافة <code>provider_order:view_all</code> تتطلّب تعديلًا متزامنًا في: (أ) <code class="evid">core/roles.py</code> — <code>PROVIDER_PERMS_GRANTABLE</code> (أبدًا ليس <code>PROVIDER_STAFF_BASELINE</code>)؛ (ب) <code class="evid">identity/account_permission_service.py</code> — قائمة <code>DEFAULT_PERMISSION_CATALOG</code> (code/category/description_ar/description_en) وإلا فواجهة منح المالك (<code>GET /me/permissions/catalog</code>) لن تعرضها أبدًا؛ (ج) <code class="evid">web/src/api/providerStaff.ts</code> — قاموس <code>PERMISSION_HELP</code> وإلا ظهر tooltip فارغ؛ (د) <code class="evid">tools/agent_scenarios/seed_parts/staff.py</code> — قائمة <code>GRANTS_BY_CATEGORY</code> وإلا لن توجد شخصية اختبار مزروعة تملك الصلاحية لفحصها عبر أدوات الاختبار الحيّ للمشروع.</li>
+<li><strong>هذا النمط من الفجوة موجود فعليًا اليوم، لا افتراضيًا:</strong> تحقّق مباشر (مقارنة القائمتين برمجيًا) وجد أن 3 صلاحيات قابلة للمنح فعلًا (<code>provider_store:open_close</code>، <code>provider_store:pause</code>، <code>provider_staff:self_availability</code>) <strong>لا تملك</strong> إدخالًا في <code>PERMISSION_HELP</code> اليوم. هذه ليست مخاطرة نظرية — هي عطل متكرّر ومُثبَت في هذا الكود تحديدًا؛ يرفع احتمال تكراره للصلاحية الخامسة ما لم يُدرَج فحص صريح في مراجعة الـPR.</li>
+<li><strong>خاصية أمان جزئي فعلية (تُخفّض المخاطرة المفترَضة):</strong> <code>ensure_catalog_codes()</code> إضافية idempotent، تعمل كسلًا عند أول طلب لـ<code>GET /me/permissions/catalog</code> بعد النشر — لا حاجة لترحيل قاعدة بيانات لبذر الصف، وهو يُشفى ذاتيًا. الخطر الحقيقي معكوس الاتجاه: منح الصلاحية عبر واجهة برمجية خام قبل نشر كود التطبيق (enforcement) هو حالة نشر جزئي كلاسيكية أخطر ممّا افترضته الفرضية الأصلية.</li>
+<li><strong>سابقة ترحيل حقيقية غير مُستخدَمة هنا:</strong> ترحيل <code>ab13</code> (مذكور في <code class="evid">roles.py:100-102</code>) رحّل صلاحيات موظفين موجودين فعليًا عند نقل ضوابط المتجر من baseline إلى grant-only، لتفادي قفل مفاجئ يوم النشر. الإصلاح الجديد يُغيّر سلوك <em>كل</em> موظف نشط حاليًا (رؤية غير محدودة → رؤية "لي + غير مُسنَد" فقط) بلا أي منح افتراضي مذكور في الخطة — قرار صريح مطلوب: هل يُقبَل تضييق مفاجئ بلا إشعار، أم يحتاج ترحيل ترحيل-تلقائي بنمط <code>ab13</code>؟</li>
+<li><strong>لا اختبار حماية اليوم:</strong> <code>test_owner_baseline_holds_every_provider_permission</code> و<code>test_staff_baseline_is_basic_only</code> (<code class="evid">test_phaseC1_provider_permissions.py:51-61</code>) تستخدمان تأكيدات عضوية محدَّدة، لا عدًّا شاملًا — لن تنكسرا بإضافة الصلاحية (تصحيح لفرضية "كسر اختبار عدّ صلاحيات" الأصلية). لكن لا يوجد أي اختبار اليوم يتحقّق من رؤية طلبات متعدّدة الموظفين عبر <code>/providers/orders</code> — الإصلاح يُشحَن بلا شبكة أمان انحدار ما لم يُكتَب اختبار جديد بنفس نمط <code class="evid">test_wave3_staff_abac.py</code>.</li>
+<li><strong>سلوك fail-safe عند عطل Redis:</strong> توثيق <code>require_provider_permission</code> (<code class="evid">identity/dependencies.py:271</code>) يقول صراحة إن عطل محرّك الصلاحيات الإضافية يعود إلى baseline الدور. لصلاحية جديدة بلا حامل baseline بين الموظفين، عطل Redis يوم النشر يعني تضييق الطابور لكل الموظفين دفعة واحدة (fail-closed للقراءة) — الاتجاه الآمن هنا فعلًا، لكن يجب تأكيده كقرار واعٍ لا نتيجة جانبية للسلك العام.</li>
+<li><strong>تحديث ذاكرة مؤقّتة (60 ثانية) في مسار منح غير قياسي:</strong> إن نُفِّذ ترحيل تلقائي جماعي (سيناريو #6) عبر سكربت/كتابة DB مباشرة بدل نقطة النهاية القياسية <code>/me/staff/{id}/permissions</code>، فلن يُستدعى <code>invalidate_overrides_cache</code>، وقد يرى موظفون حديثو المنح استجابات قديمة حتى 60 ثانية بعد الترحيل.</li>
+<li><strong>ترتيب المعالجة الفرعي (VIP/الشيخوخة) يتأثّر بصمت:</strong> منطق فرز الطابور (VIP + aging fairness) يعمل اليوم على القائمة الكاملة قبل أي فلترة (<code class="evid">provider_router.py:540-574</code>). بعد فلترة الموظف، هل يُحسَب الترتيب على الطابور الكامل ثم يُعرَض المصفَّى فقط (نفس الترتيب النسبي)، أم يُعاد حسابه على المجموعة المرئية فقط (ترتيب مختلف فعليًا)؟ قرار غير محدَّد في الخطة، ونتيجتاه مختلفتان فعليًا.</li>
+<li><strong>خطر ترتيب التنفيذ داخل الدالة:</strong> الخرائط المجمَّعة (أسماء الأصناف، هوية عملاء self-pickup، VIP) تُبنى من القائمة الكاملة <em>قبل</em> أي فلترة منطقية محتملة (<code class="evid">provider_router.py:498-538</code>). فلترة في الموضع الخاطئ من هذا الأنبوب (بعد بناء الخرائط بدل قبلها) إمّا لا تُغيّر شيئًا فعليًا أو تُهدر استعلامات مجمَّعة لطلبات ستُستبعَد لاحقًا.</li>
+<li><strong>تناسق مع نقطة تفاصيل الطلب:</strong> <code>ProviderOrderHistory.tsx:84</code> يوثّق بالفعل أن نقطة التفاصيل "role-aware... a fetch failure e.g. a staff member" — أي طبقة ABAC للتفاصيل واعية بالفعل لاحتمال رفض الموظف. إصلاح القائمة فقط بلا إعادة اختبار صريح لتفاصيل طلب أصبح مخفيًا عن الموظف (مثلًا من إشعار push قديم) قد يترك تعارضًا غير مختبَر بين القائمة والتفاصيل.</li>
+<li><strong>إعادة استخدام نمط الاختبار الحالي بدل اختراع جديد:</strong> <code class="evid">test_wave3_staff_abac.py:217</code> (<code>test_staff_can_verify_pickup_but_other_store_cannot</code>) يُرسي نمط تثبيتات (fixtures) موظفَين بنفس المتجر لاختبارات ABAC عبر-متاجر — الاختبار الجديد لرؤية-عبر-الموظفين نفس المتجر يجب أن يتبع هذا النمط تحديدًا (موظف بمنحة + موظف بلا منحة، نفس المتجر) للاتساق.</li>
+<li><strong>تجميع إصلاحين في commit واحد يُضعِف قابلية التتبّع:</strong> إصلاح "كل الوقت بدل اليوم" (اكتشاف جانبي) وإصلاح نطاق الموظف يقعان في نفس الدالة بالضبط — تجميعهما في تغيير سلوك واحد يصعّب عزو أي فشل اختبار انحدار لاحق لسبب محدَّد؛ يُفضَّل commit-ان منفصلان قابلان للتراجع الفردي ضمن نفس الدفعة.</li>
+</ul>
+
+<h3>ملاحظات أفضل الممارسات (مُعمَّقة)</h3>
+<div class="ref-card">
+<strong>Shopify — تقسيم صلاحية "Products" الواحدة إلى 10 مفاتيح دقيقة</strong> (<a href="https://changelog.shopify.com/posts/more-granular-staff-permissions-for-products">changelog.shopify.com</a>): فصل صريح بين قراءة/تعديل/رؤية-التكلفة — يُطابق تمامًا الفرق المطلوب بين <code>provider_order:view</code> و<code>provider_order:view_all</code> و<code>provider_order:prepare</code>. الأهمّ: آلية الطرح ("rollout") الموثَّقة حرفيًا — <em>"All existing staff members who have previously been given the singular Products permission will automatically have all the new permissions selected by default"</em> — أي عند تفكيك صلاحية عريضة إلى صلاحيات دقيقة، يُمنَح الحاملون الحاليون المجموعة الجديدة كاملةً تلقائيًا، ثم يُضيّق المالك لاحقًا يدويًا. هذا سابقة مباشرة تدعم خيار "ترحيل تلقائي" (سيناريو #6 أعلاه) بدل تضييق مفاجئ بلا إشعار.
+</div>
+<div class="ref-card">
+<strong>Stripe — Restricted API Keys</strong> (<a href="https://docs.stripe.com/keys/restricted-api-keys">docs.stripe.com</a>): مبدأ "الحد الأدنى اللازم لكل مفتاح، ولا أكثر" — لكن توثيق Stripe لا يتناول نمط "رؤية خاصتي مقابل رؤية الكل" على الإطلاق (فجوة توثيقية اعترف بها البحث صراحة) — يعني أن تصميم <code>view</code>/<code>view_all</code> هنا اجتهاد داخلي بلا سابقة Stripe مباشرة، بعكس نموذج Shopify الأقرب فعليًا.
+</div>
+<div class="ref-card">
+<strong>AWS — Access Analyzer "راقب ثم ضيّق"</strong> (<a href="https://aws.amazon.com/blogs/security/refine-unused-access-using-iam-access-analyzer-recommendations/">aws.amazon.com/blogs/security</a>): توجّه AWS الحالي هو منح ثم مراقبة الاستخدام الفعلي عبر نافذة زمنية ثم تضييق — عكس اتجاه مخاطرة Tawa هنا (مخاطرتهم الإفراط في المنح؛ مخاطرة Tawa هي كسر رؤية طابور مشترك)، لكن انضباط "التحقّق قبل الفرض الصارم" ينطبق بنفس القوة على قرار الترحيل التلقائي.
+</div>
+</div>
+
+<h2 id="p13">النقطة 13 — سجلّ الأدمن وتوثيق المسؤول</h2>
+
+<div class="fix-card p1">
+<h3>التصحيحات</h3>
+<p><strong>1) تخفيض تقدير التكلفة لنصف "متى":</strong> جدول <code>Order</code> يملك بالفعل أعمدة توقيت مخصَّصة لكل مرحلة (<code class="evid">backend/app/models/order.py</code>: <code>provider_responded_at</code> سطر 74، <code>preparation_started_at</code> سطر 81، <code>prepared_at</code> سطر 84، <code>driver_assigned_at</code> سطر 138، <code>picked_up_at</code> سطر 144، <code>delivered_at</code> سطر 149). وهذه مُصدَّرة بالفعل عبر <code>GET /orders/{id}</code> (<code class="evid">order_router.py:811-880</code>)، وأدوار العمليات (<code>OPERATIONS_AGENT, SUPER_ADMIN, FINANCE_AGENT, ADMIN, SUPERVISOR</code>) لديها بالفعل صلاحية قراءة-الكل على هذه النقطة (<code class="evid">order_service.py:1847-1854</code>، <code>pass  # O5: read-all for ops/super...</code>). أي: نصف "متى" من الخط الزمني موجود ورخيص وقابل للوصول لطاقم العمليات <strong>اليوم</strong> — تخفيض حقيقي لتقدير الخطة الأصلية.</p>
+<p><strong>2) لكن نصف "من" غير موجود، والخطة محقّة بشأنه:</strong> <code>_serialize_order</code> لا يتضمّن <code>assigned_staff_id</code> ولا اسم الموظف الفاعل في أي مرحلة. الأعمدة تعطي "متى" فقط، لا "من" — و"من" (توثيق المسؤول، جوهر النقطة 13) يحتاج فعليًا JOIN مع <code>AuditLog.actor_id</code> كما اقترحت الخطة أصلًا. الصياغة الدقيقة: "الوقت رخيص وموجود؛ الفاعل هو العمل الجديد الحقيقي".</p>
+<p><strong>3) نقطة نهاية موجودة يجب عدم الخلط معها:</strong> <code>GET /operations/orders/{order_id}/detail</code> (<code class="evid">operations_router.py:6150-6206</code>، <code>order_financial_detail</code>) موجودة فعلًا لكنها <strong>مالية فقط</strong> (تسويات + تحصيل نقدي)، تُستهلَك اليوم فقط من داخل <code>OpsStuckOrders.tsx</code> كلوحة فرعية، وليست صفحة مستقلّة. صفحة/نقطة نهاية جديدة لتفاصيل الطلب (الخط الزمني) يجب ألّا تتصادم اسميًا أو وظيفيًا مع هذه.</p>
+<p><strong>4) موضع التعديل الدقيق لطبقة (أ) الرخيصة:</strong> <code>GET /operations/orders</code> (<code class="evid">operations_router.py:6027-6069</code>) لا يحتوي <code>assigned_staff_id</code> إطلاقًا في القاموس المُصدَّر — تعديل حقل واحد فعلًا، بالضبط كما وصفت الخطة، بموضع مؤكَّد.</p>
+
+<h3>سيناريوهات وقت البناء (11)</h3>
+<ul class="bt-list">
+<li><strong>فخ إعادة الاستخدام السريع:</strong> ربط صفحة تفاصيل OPS الجديدة بـ<code>GET /orders/{id}</code> العام (المُغري لأنه مسموح لـOPS بالفعل) بدل نطاق <code>/operations/...</code> يعني وراثة تفرّع <code>_serialize_order</code> حسب <code>actor_role</code> (مصمَّم أصلًا لعرض آمن للعميل/السائق) — أي حقل خاص بـOPS يُضاف هناك يحتاج تحققًا دقيقًا من مساره داخل التفرّع، لا افتراض سقوطه في مسار معقول تلقائيًا.</li>
+<li><strong>عدم تصادم مع نقطة النهاية المالية الموجودة:</strong> أي تسمية قريبة من <code>/operations/orders/{id}/detail</code> الحالية تخاطر بتصادم مسار صامت أو بازدواجية وظيفية تُربك الصيانة لاحقًا — يجب فحص هذه النقطة أولًا (كما فعلت هذه المراجعة) قبل تسمية أي جديد.</li>
+<li><strong>نمط lazy-import في opsRouter.tsx:</strong> كل صفحة OPS مُسجَّلة عبر <code>lazy(() => import(...))</code> — نسيان هذا النمط (استيراد ثابت عادي لأنها "صفحة أخيرة صغيرة" في نهاية PR) يكسر تقسيم الحزم (code-splitting) المُتَّبع في هذا الملف، وقد يزيد حجم حزمة OPS الأولية دون أي فشل بناء أو اختبار يُشير لذلك.</li>
+<li><strong>لا تصادم مسارات فعليًا، لكن يجب التأكّد يدويًا:</strong> <code>opsRouter.tsx</code> يملك اليوم <code>ops/orders</code> (قائمة) و<code>ops/stuck-orders</code> و<code>ops/cp/orders</code> — لا يوجد <code>ops/orders/:id</code> بعد، فمسار متداخل جديد آمن، لكن يجب التحقّق الصريح من عدم التصادم بدل الافتراض.</li>
+<li><strong>"الطبقة الرخيصة" (أ) تتضخّم بصمت إن طُلب اسم لا معرّف:</strong> إضافة <code>assigned_staff_id</code> الخام رخيصة (تعديل قاموس سطر واحد)، لكن عرض <em>اسم</em> الموظف (لا UUID خام) لعميل OPS بشري يحتاج تحميلًا مُجمَّعًا لهويات المستخدمين (بنفس نمط <code class="evid">provider_router.py:509-524</code> الموجود لعملاء self-pickup) — إن لم يُحسَب هذا مسبقًا، يتضخّم تقدير "طبقة رخيصة" فعليًا أثناء التنفيذ.</li>
+<li><strong>فخ الكتابة الصامتة على جهة الواجهة (TypeScript البنيوي):</strong> <code>OrderListRow</code> (<code class="evid">web/src/api/operations.ts:748-757</code>) واجهة TS بنيوية عادية — إضافة حقل خلفي جديد لا تُسبّب أي خطأ تصريف؛ الحقل ببساطة <strong>غير مرئي</strong> لكود TS حتى تُحدَّث الواجهة يدويًا. الخطر الحقيقي ليس كسر التحقّق النوعي (كما افترضت فرضية أوّلية) بل عدم-تفعيل صامت: الحقل يصل فعليًا في الـJSON لكن لا كود يقرأه ولا اختبار يفشل.</li>
+<li><strong>الإسناد (actor_id) يحتاج تحقّقًا موضعيًا لا افتراضًا شاملًا:</strong> كتابات <code>AuditEvent</code> موزَّعة على ≥3 ملفات خدمة مختلفة (provider_service.py، dispatch_service.py، order_service.py) — التحقّق المباشر أكّد أن قبول/رفض/تحضير/جاهزية الطلب في <code>provider_service.py</code> تمرّر <code>actor_id</code> الصحيح (عبر <code>get_provider_for_user</code> المدعوم للموظف)، لكن هذا يحتاج تحقّقًا فرديًا لكل نوع تحوّل (dispatch، تحصيل نقدي...) لا افتراض تعميم من موضعين تمّ فحصهما فقط.</li>
+<li><strong>الميزة الجديدة أول من "يُظهِر" أي خلل إسناد كامن سابق:</strong> لا اختبار حالي يتحقّق من صحة <code>AuditLog.actor_id</code> لكل نوع تحوّل — صفحة الخط الزمني ستكون أول مستهلك يعرض <code>actor_id</code> لإنسان فعليًا؛ أي خطأ إسناد كامن (مثلًا موضع يُمرّر معرّف المالك بدل الموظف الفعلي) سيصبح مرئيًا ومُبلَّغًا لأول مرّة، لا لأنه عيب جديد بل لأن أحدًا لم يكن يراه سابقًا.</li>
+<li><strong>لا اختبار أداء/ترقيم لحجم سجلّ طويل:</strong> <code>AuditLog</code> مفهرَس جيدًا (<code class="evid">audit.py:39-40</code>، <code>idx_audit_target</code>) لكن لا وجود لتثبيتات تزرع حجمًا واقعيًا من السجلّات لكل طلب — قرار الترقيم/الحدّ الأقصى للصفوف يجب أن يُحسَم قبل الشحن، لا يُكتَشَف بعد بطء صفحة أمام موظف عمليات فعلي.</li>
+<li><strong>خطر انجراف مجموعة أدوار الحارس (guard-tuple drift):</strong> النقطة الجديدة يجب أن تستورد نفس ثابت الأدوار (<code>_OPS_ROLES</code>) المُستخدَم في الشقيقتين <code>/operations/orders</code> و<code>/operations/orders/{id}/detail</code> — كتابة يدوية لقائمة أدوار جديدة بدل الاستيراد قد تستبعد بصمت <code>ADMIN</code>/<code>SUPERVISOR</code>/<code>FINANCE_AGENT</code> ممّن لديهم وصول للشقيقتين، وقد لا يُلاحَظ هذا في المراجعة لأن مختبِر عادةً هو <code>SUPER_ADMIN</code> فقط.</li>
+<li><strong>خطر زحف النطاق أثناء التنفيذ:</strong> الخطة تستثني عمدًا "تقارير نشاط الموظف عبر كل الطلبات" من الإصدار الأول — لكن <code>AuditLog</code> مفهرَس بـ<code>actor_id</code> أيضًا (<code class="evid">idx_audit_actor</code>)، أي استعلام واحد فقط يفصل بين "خط زمني لطلب واحد" و"كل ما فعله موظف عبر كل الطلبات" — إغراء حقيقي لتوسيع النطاق أثناء التنفيذ بصمت لأن الاستعلام "جاهز تقريبًا"، بعكس القرار المُراجَع صراحة.</li>
+</ul>
+
+<h3>ملاحظات أفضل الممارسات (مُعمَّقة)</h3>
+<div class="ref-card">
+<strong>Linear — Audit Log</strong> (<a href="https://linear.app/docs/audit-log">linear.app/docs</a>): يسجّل actor (هوية + بريد) + IP + بلد لكل حدث، محتفَظ به 90 يومًا، والواجهة "سطح قراءة مبسَّط فوق سجلّ أغنى قابل للاستعلام" — الاستعلامات المعقّدة (متعدّدة الأبعاد) تُدفَع لواجهة GraphQL منفصلة بدل تعقيد الـUI نفسه. الوصول للسجلّ نفسه مقصور على مالكي مساحة العمل نظرًا لحساسيته — يدعم مباشرة القرار بأن صفحة الخط الزمني هنا يجب أن تبقى OPS-only (مؤكَّد بالفعل عبر <code>_OPS_ROLES</code>).
+</div>
+<div class="ref-card">
+<strong>Martin Fowler — نمط Audit Log</strong> (<a href="https://martinfowler.com/eaaDev/AuditLog.html">martinfowler.com</a>) <strong>+ Microsoft Learn — Event Sourcing</strong> (<a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing">learn.microsoft.com</a>): السجلّ الإلحاقي (append-only) يُعاد بناء الخط الزمني منه عبر نموذج قراءة مُجسَّد (materialized read model) بدل إعادة تشغيل السجلّ الخام في كل طلب. هذا بالضبط ما تُقدّمه أعمدة التوقيت الجاهزة على <code>Order</code> اليوم (تصحيح #1 أعلاه) — التصميم الأمثل المدعوم بهذا المرجع: استخدام أعمدة Order المُجسَّدة لـ"متى" (سريعة، بلا إعادة تشغيل)، واستعلام <code>AuditLog</code> المُفهرَس فقط لإثراء "من" — لا إعادة بناء الخط الزمني بالكامل من الصفر عبر AuditLog كما تقترح صياغة الخطة الأصلية حرفيًا.
+</div>
+</div>
+
+<h2 id="p14">النقطة 14 — إخفاء إعدادات المزوّد الحسّاسة عن الموظف</h2>
+
+<div class="fix-card p1">
+<h3>التصحيحات</h3>
+<div class="banner crit">
+<strong>تصحيح جوهري لصورة المشكلة بالكامل:</strong> <code>ProviderSettings.tsx:105-111</code> يستدعي <code>GET /providers/me</code> بلا أي فرع دور — ونظرًا لأن هذه النقطة <code>require_role(PROVIDER_ADMIN)</code> فقط (التصحيح العام أعلاه)، فإن أي <code>PROVIDER_STAFF</code> يفتح الإعدادات <strong>اليوم</strong> يحصل على 403 عند التحميل. الخطأ يُلتقَط (<code>.catch((err) => setError(extractError(err)))</code>) لكنه <strong>لا يُخفي النموذج</strong> — <code class="evid">السطر 243-248</code>: <code>ErrorMessage</code> يُعرَض <em>فوق</em> النموذج، والنموذج بأكمله يُكمِل الرسم أسفله بقيمه الافتراضية الفارغة (<code>""</code>، <code>null</code>، <code>{}</code>). أي أن تجربة الموظف الفعلية <strong>اليوم ليست</strong> "نموذج مملوء يبدو قابلًا للتعديل ثم يُرفَض عند الحفظ" كما تصف الخطة — بل <strong>لافتة خطأ محيّرة فوق نموذج فارغ تمامًا</strong> يبدو قابلًا للتعديل ويُرفَض مرّتين (عند التحميل وعند الحفظ). المشكلة الفعلية أسوأ وأكثر إرباكًا ممّا افترضته الخطة، وجذرها مطابق تمامًا لجذر النقطة 2.</div>
+<p><strong>تأكيد:</strong> <code>PUT/PATCH /me</code> (<code class="evid">provider_router.py:1978-1982</code>) محمي فعلًا <code>require_role(PROVIDER_ADMIN)</code> — لا ثغرة حفظ كما قالت الخطة، مؤكَّد بالكود.</p>
+<p><strong>تأكيد:</strong> رابط "الموظفون والصلاحيات" (<code class="evid">ProviderSettings.tsx:640-648</code>) بلا أي غلاف شرطي دور اليوم — يظهر للموظف كما هو للمالك تمامًا، ويقود لمسار <code>/provider-portal/staff</code> المحصور فعليًا <code>allowedRoles: ["PROVIDER_ADMIN"]</code> (<code class="evid">router.tsx:315-321</code>) — رابط بلا وجهة فعلية للموظف، مؤكَّد بدقّة.</p>
+
+<h3>سيناريوهات وقت البناء (10)</h3>
+<ul class="bt-list">
+<li><strong>لا يمكن بناء "تعطيل مع شرح" قبل إصلاح مسار التحميل:</strong> تصميم Stripe/Shopify المُختار (حقل مرئي، مُعطَّل، بقيمته الحقيقية) يفترض أن القيمة الحقيقية وصلت أصلًا — وهذا غير ممكن طالما التحميل نفسه يفشل 403 قبل أي رسم. التسلسل الإلزامي: (أ) إصلاح مسار القراءة الآمن للموظف أولًا (على الأرجح بنية مشتركة مع حلّ النقطة 2) ثم (ب) إضافة <code>disabled</code> + tooltip لكل حقل — عكس هذا الترتيب يُشحِن حقولًا مُعطَّلة "بصريًا صحيحة" لكنها فارغة من أي بيانات حقيقية.</li>
+<li><strong>خطر توسيع الصلاحية بالخطأ:</strong> مسار الحفظ owner-only مؤكَّد سليم؛ خطر بناء حقيقي هو أن يُغرى من يُصلح مسار القراءة بـ"تخفيف الحفظ أيضًا للاتساق" — يجب استبعاد هذا صراحةً من النطاق؛ تحويل مشكلة قراءة إلى ثغرة كتابة تراجع أمني حقيقي.</li>
+<li><strong>تناقض حقول "الرؤية مع التعطيل" مقابل "الإخفاء الكامل" يحتاج قرارًا لكل حقل لا افتراضًا موحّدًا:</strong> إن أعاد إصلاح مسار القراءة كل <code>owner_fields</code> (lat/lng/address_text/social_links/self_delivery_pricing/over_threshold_*) للموظف لتعبئة الحقول المُعطَّلة، فبعض هذه الحقول (مثل تركيبة تسعير التوصيل الذاتي) قد تُعتبَر معلومة تنافسية حسّاسة يفضِّل المالك عدم كشفها حتى معطَّلة — قرار منتج صريح لكل حقل، لا نمط موحَّد "أظهر الكلّ معطَّلًا".</li>
+<li><strong>إخفاء الرابط ليس تعديلًا بسطر واحد كما تصف الخطة:</strong> لا يوجد اليوم أي متغيّر <code>isOwner</code>/فحص دور داخل هذا المكوّن أصلًا — إخفاء الرابط يحتاج استيراد سياق الدور لأوّل مرّة في هذا الملف تحديدًا + تعريف متغيّر مشتقّ جديد، وليس تبديل سطر واحد — لا يزال Frontend-only بلا لمسة خلفية (صحيح كما قالت الخطة)، لكنه ليس بالبساطة الموصوفة، خصوصًا مع اشتراطه إصلاح مسار التحميل (سيناريو 1) في نفس الملف أولًا.</li>
+<li><strong>لا حاجة لتحصين خلفي إضافي:</strong> مسار <code>/provider-portal/staff</code> محمي فعلًا وبشكل صحيح على مستوى الموجّه — إخفاء الرابط تحسين اكتشاف بصري بلا أي مخاطرة أمنية حقيقية؛ خطر بناء هو معاملته خطأً كـ"إصلاح أمني" وإضافة تحصين خلفي زائد لا داعي له.</li>
+<li><strong>لا اختبار يحمي أيًّا من السلوكين (الحالي أو بعد الإصلاح):</strong> لا وجود لاختبار Settings يتحقّق من تعطيل حقل حسب الدور أو ظهور/اختفاء رابط الموظفين — يحتاج 3 اختبارات جديدة على الأقل: تحميل ناجح بلا لافتة خطأ لموظف، حقول حسّاسة معطَّلة، رابط الموظفين غائب للموظف وحاضر للمالك.</li>
+<li><strong>عمى بنية الاختبار (MSW) عن هذا الصنف من الأعطال:</strong> Mock <code>GET /api/providers/me</code> يعيد 200 دائمًا بصرف النظر عن دور المستدعي في الاختبارات — أي اختبار حالي أو مستقبلي يستخدم هذا الـMock القياسي لن يُعيد إنتاج عطل 403 الحقيقي إطلاقًا، ما لم يُضَف Handler خاص بدور الموظف صراحةً لاختبار هذه النقطة تحديدًا — فجوة بنية اختبار حقيقية.</li>
+<li><strong>حافة قيم فارغة يجب اختبارها حتى بعد الإصلاح:</strong> اليوم، فشل التحميل (403) يترك <code>openingHours=null</code> و<code>socialLinks={}</code> — بعد إصلاح مسار القراءة، يجب التأكّد أن حالة "الرسم مع بيانات فارغة" (فشل شبكة عابر، لا 403) لا تزال تُعالَج بلطف، لا افتراض أنها لم تعد ممكنة لمجرّد أن 403 اختفى.</li>
+<li><strong>تسلسل تنسيق مع النقطة 2 (خطر تصادم PR):</strong> كلتا النقطتين تحتاجان لمس نفس الحارس على <code>GET /me</code> — تنفيذهما بمعزل عن بعضهما في نفس النافذة الزمنية يخاطر بحلَّين متعارضين (تخفيف حارس واسع من جهة، نقطة نهاية أخفّ منفصلة من جهة أخرى) يتعايشان دائمًا لاحقًا بدل حلّ موحَّد واحد يُستخدَم من كلا الملفين — قرار حوكمة/تسلسل يجب اتخاذه قبل بدء أيّ من الفرعين، لا اكتشافه عند الدمج.</li>
+<li><strong>خطر معالجة الرابط "أثناء الوجود بالملف" بلا مراجعة مستقلّة كافية:</strong> نظرًا لبساطتها الظاهرية، قد يُدمَج إخفاء الرابط داخل نفس commit إصلاح مسار التحميل بلا اهتمام مراجعة مساوٍ — لكنه يتقاطع مكانيًا مع صفحة "صلاحياتي" الجديدة المحتملة (نقطة 16، أدناه) في نفس المنطقة البصرية من صفحة الإعدادات؛ يستحقّ تنسيقًا صريحًا مع تلك النقطة أيضًا لا معالجة منعزلة.</li>
+</ul>
+
+<h3>ملاحظات أفضل الممارسات (مُعمَّقة)</h3>
+<div class="ref-card">
+<strong>Stripe — الأدوار الخمسة في اللوحة</strong> (<a href="https://stripe.com/blog/new-roles-and-permissions-in-the-dashboard">stripe.com/blog</a>): دور "Support Specialist" يرى معظم البيانات التشغيلية ويستطيع استرداد المبالغ، لكن وصوله محدود صراحة للبيانات المالية المجمَّعة (حجم الإجمالي، الدفعات) — فصل متعمَّد بين الرؤية التشغيلية والرؤية المالية. هذا يدعم مباشرة القرار المطروح في سيناريو #3 أعلاه: بعض حقول Settings (كالتسعير) قد تستحقّ معاملة أقرب لتصنيف Stripe المالي المقيَّد، لا نفس معاملة الحقول التشغيلية البحتة (اسم المتجر، ساعات العمل).
+</div>
+</div>
+
+<h2 id="p16">النقطة 15/16 — صفحة "صلاحياتي" للموظف</h2>
+
+<div class="fix-card p2">
+<h3>التصحيحات</h3>
+<p><strong>تصحيح لإطار "إعادة الاستخدام":</strong> الخطة تصف الحلّ كـ"إعادة استخدام نفس البيانات الموجودة فعلًا للمالك" — هذا صحيح على مستوى <em>النموذج</em> فقط. نقطة النهاية الفعلية التي يراها المالك (<code>GET /me/staff</code>، <code class="evid">provider_router.py:3034-3037</code>) محروسة بصلاحية <code>provider_staff:view</code> — وهي صلاحية <strong>قابلة للمنح، لا baseline</strong> (موجودة في <code>PROVIDER_PERMS_GRANTABLE</code> لا <code>PROVIDER_STAFF_BASELINE</code>). أي موظف عادي بلا هذا المنح المحدَّد سيحصل على 403 من هذه النقطة ذاتها — فلا يمكن "إعادة استخدامها" بفلتر جانب العميل لـ"أنا فقط" كما توحي الصياغة؛ الوصول نفسه يحتاج مسارًا جديدًا منفصل الحراسة (self-scoped)، حتى لو كانت البيانات المفهومية واحدة.</p>
+<p><strong>لبنة بناء جاهزة ورخيصة:</strong> <code>account_permission_service.get_overrides(db, user_id)</code> (<code class="evid">سطر 398-...</code>) يعيد مجموعتَي (منح، سحب) لأي <code>user_id</code>، مُخزَّن مؤقتًا في Redis (60 ثانية) فعلًا — تمامًا الأساس اللازم لصفحة "صلاحياتي" self-scoped بنفس نمط IDOR-proof المُستخدَم في <code>my-stats</code> (اشتقاق الهوية من التوكن حصرًا).</p>
+
+<h3>سيناريوهات وقت البناء (10)</h3>
+<ul class="bt-list">
+<li><strong>لا يمكن "فلترة جانب العميل" على بيانات المالك — يلزم مسار خلفي جديد فعليًا:</strong> راجع التصحيح أعلاه؛ خطأ بناء متوقَّع هو محاولة تمرير معرّف الموظف نفسه لـ<code>GET /me/staff</code> ظنًّا أنه سيعمل "لأنه نفس البيانات" فيُفاجَأ المطوّر بـ403 من الموظف نفسه أثناء الاختبار اليدوي الأول.</li>
+<li><strong>خطر استنساخ منطق التحليل الفعّال بدل إعادة استخدامه:</strong> إعادة بناء منطق "ما الذي أملكه فعليًا" (دمج baseline الدور + المنح - السحب) يدويًا بدل استدعاء <code>get_overrides</code>/<code>has_effective_permission</code> الموجودتين يخاطر بالانجراف عن سلوك fail-safe الموثَّق (العودة لـbaseline عند عطل المحرّك) الموصوف في <code class="evid">dependencies.py:269-274</code>.</li>
+<li><strong>فخ صحّة حقيقي: نسيان دمج baseline الدور مع المنح الصريح:</strong> إن أعادت الصفحة الجديدة مجموعتَي (منح/سحب) الخام فقط بلا دمجها مع صلاحيات baseline الموظف (<code>provider_order:view</code>، <code>order:update_preparation_state</code>، <code>provider_item:report_unavailable/substitute</code>، <code>provider_staff:self_availability</code>)، فسيرى موظف لم يُمنَح أي صلاحية صراحةً أن "صلاحياتي" فارغة تمامًا رغم امتلاكه حقوقًا تشغيلية أساسية فعليًا — خطأ صحّة منفصل تمامًا عن لبنة get_overrides وسهل الخلط معها.</li>
+<li><strong>فجوة موجودة مسبقًا ستُصبح مرئية لأوّل مرّة عبر هذه الصفحة تحديدًا:</strong> إعادة استخدام <code>PERMISSION_HELP</code> حرفيًا يعني أن أي موظف يملك (بالـbaseline افتراضيًا) <code>provider_staff:self_availability</code> سيرى نص شرح فارغ/undefined لهذه الصلاحية تحديدًا — لأنها إحدى الصلاحيات الثلاث المفقودة من القاموس (مؤكَّد بالتصحيح العام لنقطة 10/12). يجب إصلاح هذا ضمن نفس الـPR، لا اعتباره خللًا منفصلًا مؤجَّلًا.</li>
+<li><strong>مسار موجّه جديد بالكامل — خطر نسخ allowedRoles الخاطئ:</strong> يحتاج تسجيلًا جديدًا في <code>router.tsx</code> بـ<code>allowedRoles: ["PROVIDER_ADMIN", "PROVIDER_STAFF"]</code> (كلاهما، لأنها صفحة ذاتية) — نسخ <code>allowedRoles: ["PROVIDER_ADMIN"]</code> من المسار المجاور (<code>/provider-portal/staff</code>) بالخطأ (سطر قريب جدًا في نفس الملف) يحجب الميزة بالضبط عن جمهورها المستهدَف (الموظف) بينما تبقى متاحة فقط لمن لا يحتاجها (المالك، الذي يملك العرض الكامل أصلًا).</li>
+<li><strong>موضع رابط جديد يتقاطع بصريًا مع تغيير النقطة 14:</strong> النقطة 14 تُخفي رابط "الموظفون والصلاحيات" عن الموظف في نفس منطقة الصفحة تقريبًا؛ النقطة 16 تُضيف رابطًا ذاتيًّا جديدًا في نفس الجوار — دمجهما بلا تنسيق (خصوصًا إن نُفِّذا في نفس الأسبوع من مطوّرَين مختلفين) يخاطر بصفحة إعدادات تبدو نتاج تعديلين غير مترابطين بدل تجربة متماسكة.</li>
+<li><strong>لا بنية اختبار اليوم لهذا النوع من الصفحات:</strong> لا يوجد أي تثبيت (fixture) اليوم يزرع موظفًا ويتحقّق من عرض صفحة صلاحيات ذاتية (لأنها غير موجودة بعد) — الاختبار الجديد يجب أن يستخدم فئتين على الأقل من فئات البذر الموجودة فعلًا في هذا المشروع (<code class="evid">tools/agent_scenarios/seed_parts/staff.py</code>: <code>view_only</code> و<code>full_permission</code>) للتأكّد أن الصفحة تعكس مجموعات صلاحيات <em>مختلفة فعليًا</em>، لا شخصية سعيدة واحدة فقط.</li>
+<li><strong>خطر معاملتها كـ"إضافة سريعة أثناء تواجدي بالملف" رغم أولويتها P3:</strong> نظرًا لاكتشاف فجوة tooltip حقيقية (سيناريو #4) ستُصبح مرئية للمستخدم لأول مرّة عبر هذه الصفحة تحديدًا، فهي تستحقّ مراجعة PR مستقلّة بنفس الجدّية رغم تصنيفها منخفض الأولوية، لا "إلحاقًا" بصامتًا بـPR نقطة 14.</li>
+<li><strong>قرار تفرّع دور غير محسوم لصلاحيات Tier-S:</strong> إن استخدم المالك نفس الصفحة (منطقي لو سُجِّلت لكلا الدورين)، يجب أن تظهر له صلاحيات Tier-S (owner-only) كمملوكة بالـbaseline؛ أمّا الموظف فيجب ألّا يرى قائمة Tier-S في تكراره إطلاقًا (لأنه لا يمكن أن يملكها بنيويًا) — مسار كود واحد مشترك بلا تفرّع دور صريح يخاطر إمّا بإخفاء صلاحيات المالك الحقيقية أو بعرض معرِّفات Tier-S بلا داعٍ للموظف.</li>
+<li><strong>افتراض عدم التحقّق من التقادم (staleness) للذاكرة المؤقتة بعد منح فوري:</strong> منح صلاحية جديدة لموظف أثناء نوبة عمله ثم فتحه فورًا لصفحة "صلاحياتي" قد يعرض قائمة قديمة حتى 60 ثانية (نافذة TTL) ما لم يُختبَر المسار صراحةً — من المرجَّح أن آلية إبطال الذاكرة المؤقتة الموجودة (<code>invalidate_overrides_cache</code>) تكفي تلقائيًا بحكم اشتراك نفس المفتاح، لكن هذا افتراض يستحقّ اختبارًا صريحًا لا افتراضًا صامتًا.</li>
+</ul>
+
+<h3>ملاحظات أفضل الممارسات (مُعمَّقة)</h3>
+<div class="ref-card">
+<strong>Shopify — حسابات المتعاونين (Collaborator Accounts)</strong> (<a href="https://help.shopify.com/en/manual/your-account/users/security/collaborator-accounts">help.shopify.com</a>): تُبنى من تركيب صلاحيات دقيقة موجودة أصلًا في دور مخصَّص، لا نظام صلاحيات منفصل — يدعم مباشرة تصميم صفحة "صلاحياتي" كعرض مُركَّب (baseline + منح صريح) للنموذج الموجود أصلًا، لا نظام عرض جديد مستقل.
+</div>
+</div>
+
+<h2 id="req4">الفصل بين "وقت البناء" و"وقت الاستخدام" — فحص الخطة الأصلية بحثًا عن خلط</h2>
+
+<div class="banner ok">
+<strong>الخلاصة:</strong> لا يوجد في وثيقة 453 الأصلية أي سيناريو مُصنَّف خطأً <em>كـ</em>"وقت بناء" — ببساطة لأن مفهوم "وقت البناء" (ماذا ينكسر أثناء الكتابة/الاختبار/الدمج/النشر، قبل وصول أي مستخدم حقيقي) لم يكن مستخدَمًا في الوثيقة الأصلية إطلاقًا كفئة تحليل مستقلّة. كل محاكاة السيناريوهات الموجودة فعلًا في 453 — الـ32 سيناريو لإعادة تصميم السلة (نقطة 9)، الـ40+ سيناريو لخريطة التتبّع وزر القبول (نقطة 5/6)، سيناريو "الطلب العالق إلى ما لا نهاية" في الإغلاق المتدرّج (نقطة 3)، و"الفخ التنفيذي" لفلتر الموظف الساذج (نقطة 10/12) — كلّها <strong>سيناريوهات وقت استخدام</strong> بامتياز: ماذا يحدث لعميل حقيقي، أو موظف حقيقي، أو طلب حقيقي، <em>بعد</em> نشر الكود وأثناء تشغيله الفعلي. لا خلط تصنيفي بالمعنى الصارم — هذه الوثيقة (454) هي طبقة تحليل جديدة تمامًا تضاف بجانب الطبقة الموجودة، لا تصحيح لتصنيف خاطئ سابق.
+</div>
+
+<div class="jc">
+<strong>الحالة الوحيدة القابلة للالتباس — ويجب تصنيفها بدقّة:</strong> عبارة "فخ تنفيذي حقيقي" (<span dir="ltr" class="evid">فخ تنفيذي</span>) في قسم 10/12 قد تُقرَأ للوهلة الأولى كأنها "وقت بناء" بسبب كلمة "تنفيذي" (قريبة لـ"تطبيق/implementation"). لكن بالفحص الدقيق: هذا السيناريو يصف ما يحدث حين يحاول <strong>موظف حقيقي، في نوبة عمل حقيقية</strong>، قبول طلب جديد بعد أن يكون الفلتر (المُطبَّق خطأً بصيغته الساذجة) قد أخفى عنه الطابور المشترك غير المُسنَد. هذا عطل <strong>صحّة منطقية في وقت التشغيل (usage-time correctness)</strong> — وليس شيئًا ينكسر أثناء التصريف (compile) أو الدمج (merge) أو النشر (deploy) بحدّ ذاتها. الأدق: هو خطأ تصميمي <em>قابل للالتقاط</em> في مرحلة اختبار ما قبل الدمج (لو وُجد اختبار يدوي/آلي مناسب) — لكن طبيعته الجوهرية تبقى "صحّة استخدام"، لا "ميكانيكا بناء". هذه الوثيقة تُصنّفه صراحةً هنا لإزالة أي لَبْس عند الدمج مع 453.
+</div>
+
+<h2 id="refs">المراجع الخارجية المُستشهَد بها</h2>
+<ul>
+<li>Shopify Changelog — <a href="https://changelog.shopify.com/posts/more-granular-staff-permissions-for-products">More granular staff permissions for Products</a></li>
+<li>Shopify Help Center — <a href="https://help.shopify.com/en/manual/your-account/users/roles/permissions">Permissions</a></li>
+<li>Shopify Help Center — <a href="https://help.shopify.com/en/manual/your-account/users/security/collaborator-accounts">Collaborator accounts</a></li>
+<li>Stripe Blog — <a href="https://stripe.com/blog/new-roles-and-permissions-in-the-dashboard">New roles and permissions in the Dashboard</a></li>
+<li>Stripe Docs — <a href="https://docs.stripe.com/get-started/account/teams/roles">User roles</a></li>
+<li>Stripe Docs — <a href="https://docs.stripe.com/keys/restricted-api-keys">Restricted API keys</a></li>
+<li>Linear Docs — <a href="https://linear.app/docs/audit-log">Audit log</a></li>
+<li>Martin Fowler — <a href="https://martinfowler.com/eaaDev/AuditLog.html">Audit Log pattern</a></li>
+<li>Microsoft Learn — <a href="https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing">Event Sourcing pattern</a></li>
+<li>AWS IAM Docs — <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_managed-versioning.html">Versioning IAM policies</a></li>
+<li>AWS Well-Architected — <a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/sec_permissions_least_privileges.html">SEC03-BP02 Grant least privilege access</a></li>
+<li>AWS Security Blog — <a href="https://aws.amazon.com/blogs/security/refine-unused-access-using-iam-access-analyzer-recommendations/">Refine unused access using IAM Access Analyzer recommendations</a></li>
+</ul>
+
+<footer>
+تحقّق مباشر من الكود الحيّ بتاريخ 2026-07-09 على <code>/home/a/Desktop/APP/platform</code> (رأس alembic المُتحقَّق: <code>ab24_provider_approved_at</code>). لا تعديل على أي كود تمّ في إطار هذه المراجعة — وثيقة قراءة/تحليل فقط، لتُدمَج يدويًا في أقسام <code>453-...html</code> المقابلة.
+</footer>
+
+</html>

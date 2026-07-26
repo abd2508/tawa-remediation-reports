@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>صقل المنصّة (دفعة 5 · 1/3) — OPS تشغيلي · تووا</title>
+<style>
+  :root{--g:#0a7d4d;--gd:#075c39;--gl:#e6f4ec;--goldl:#fcf3dd;--red:#b3261e;--ink:#1c2b25;--muted:#5b6b63;--line:#d9e4dd;--bg:#f4f8f5}
+  *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.85;font-size:15.5px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 18px 90px}
+  header.hero{background:linear-gradient(135deg,#7a1212,#b3261e 50%,#075c39);color:#fff;padding:46px 30px;border-radius:0 0 26px 26px}
+  header.hero h1{margin:0 0 9px;font-size:23px;font-weight:800}.badge{display:inline-block;background:rgba(255,255,255,.18);padding:7px 15px;border-radius:30px;font-size:13px;margin-top:13px}
+  .live{background:#16a34a;color:#fff;padding:3px 11px;border-radius:20px;font-size:13px;font-weight:700}
+  h2{color:var(--gd);font-size:19px;margin:32px 0 11px;padding:12px 15px;background:linear-gradient(90deg,var(--gl),transparent);border-radius:12px;display:flex;align-items:center;gap:10px;border-right:5px solid var(--g)}
+  h2 .n{background:var(--g);color:#fff;min-width:32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto}
+  .summary{background:var(--gl);border:1px solid #bfe0cd;border-radius:16px;padding:22px 26px;margin:22px 0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--g);color:#fff;font-weight:700;font-size:13px}
+  .tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:700}.ok{background:var(--gl);color:var(--gd)}
+  .simple{background:#eef6ff;border-right:5px solid #1565c0;border-radius:10px;padding:12px 16px;margin:11px 0}.simple b{color:#1565c0}
+  .danger{background:#fdecea;border-right:5px solid var(--red);border-radius:10px;padding:12px 16px;margin:11px 0}.danger b{color:var(--red)}
+  code{background:#eef3f0;padding:1px 6px;border-radius:5px;font-size:12px;direction:ltr;display:inline-block}ul{margin:6px 0;padding-right:22px}li{margin:5px 0}
+  footer{margin-top:40px;padding-top:18px;border-top:2px solid var(--line);font-size:12.5px;color:var(--muted)}.lead{font-size:16.5px}
+</style></head>
+<body>
+<header class="hero">
+  <h1>🛰️ صقل المنصّة (دفعة 5) — المنطقة 1/3: OPS التشغيلي</h1>
+  <p>6 تحسينات متنوّعة بدقّة أعلى — تعريب الحوادث · حارس تصدير · تأكيدات على المُتلِف فعلًا (لا تأكيدات عشوائيّة)</p>
+  <span class="badge">📅 27 يونيو 2026 · <span class="live">منشورة وحيّة</span> · واجهة فقط · عربيّة أولًا · لا commits · العقود المختومة سليمة · الدفعة 5 · المنطقة 1</span>
+</header>
+<div class="wrap">
+
+<div class="simple"><b>المنهج (دقّة أعلى):</b> لم أرشّ تأكيدات. تتبّعتُ الجذور وميّزت <b>المُتلِف فعلًا</b> من المُبوَّب أصلًا، فوجدتُ تنوّعًا: تضارب تعريب + خلل تصدير + 3 أفعال خطرة بلا تأكيد فقط.</div>
+
+<h2><span class="n">①</span> تعريب حالة/نوع الحادث (مركز الحوادث)</h2>
+<div class="danger"><b>عَرَض جانبيّ:</b> <code>OpsIncidentCenter</code> كان يعرض <code>status</code> و<code>incident_type</code> خامًا إنجليزيًّا (<code>OPEN/RESOLVED/PLATFORM_OUTAGE…</code>) — بينما <code>OpsDriverEmergencies</code> يُعرّبها (تضارب). <b>الحلّ:</b> خرائط عربيّة «مفتوح/قيد التحقيق/محلول…» و«تعطّل المنصّة/فشل الدفع…».</div>
+
+<h2><span class="n">②</span> حارس تصدير CSV للحوادث</h2>
+<div class="danger"><b>خلل L-4 حقيقيّ:</b> التصدير لم يكن يفحص <code>res.ok</code> — فعند 403/500 <b>يُنزَّل جسم الخطأ كملفّ CSV فاسد</b>، والفشل يُبتلَع. <b>الحلّ:</b> فحص <code>res.ok</code> قبل الـblob + إظهار «تعذّر تصدير الحوادث» (نفس نمط OpsComplaints الصحيح).</div>
+
+<h2><span class="n">③</span> تعريب أزرار تحوّل الحالة</h2>
+<div class="simple"><b>الخلل:</b> أزرار التحوّل كانت «<code>→ RESOLVED</code>» خامًا. <b>الحلّ:</b> «→ محلول» (متّسق مع ①).</div>
+
+<h2><span class="n">④</span> تأكيد تعطيل قاعدة كشف الاحتيال</h2>
+<div class="danger"><b>الخطر:</b> تعطيل قاعدة يوقف رصدها — بنقرة. <b>الحلّ:</b> «تعطيل قاعدة كشف الاحتيال؟ سيتوقّف رصدها» (عند التعطيل فقط).</div>
+
+<h2><span class="n">⑤</span> تأكيد تصعيد الطوارئ للشرطة</h2>
+<div class="danger"><b>الخطر:</b> التصعيد للشرطة فعل خارجيّ جادّ. <b>الحلّ:</b> «تأكيد تصعيد بلاغ الطوارئ إلى الشرطة؟» (لهذا الإجراء فقط).</div>
+
+<h2><span class="n">⑥</span> تأكيد شطب استثناء نقديّ</h2>
+<div class="danger"><b>الخطر:</b> «شطب» يقبل خسارةً نقديّةً حقيقيّة (تتحمّلها المنصّة/المتجر). <b>الحلّ:</b> «شطب هذا المبلغ نهائيًّا؟» (لـWRITTEN_OFF فقط).</div>
+
+<h2>تتبّع الجذور + فحص قبل الإضافة + محاكاة (دقّة أعلى)</h2>
+<table>
+<tr><td>الجذور</td><td>OpsIncidentCenter يعرض رموزًا خامًا + تصدير بلا <code>res.ok</code> + catch صامت · 3 أفعال خطرة بنقرة (تعطيل قاعدة · تصعيد شرطة · شطب).</td></tr>
+<tr><td>فحص قبل الإضافة (لا افتراض)</td><td><b>حلّ حادث P0/P1 مُبوَّب أصلًا</b> (تقرير ما بعد الحادث إجباريّ >10 أحرف/حقل) ← لم أُضِف تأكيدًا · <b>OpsDriverEmergencies يُعرّب kind أصلًا</b> ← تُرِك · <b>OpsComplaints يحرس CSV (L-4)</b> ← هو النموذج، وOpsIncidentCenter كان الشاذّ.</td></tr>
+<tr><td>أعراض جانبية</td><td>التأكيدات مشروطة بالإجراء الخطر فقط (تعطيل/شرطة/شطب) لا بكلّ الأفعال · التعريب يحافظ على fallback الرمز الخام إن غاب.</td></tr>
+<tr><td>محاكاة تشغيليّة</td><td>مشغّل يصدّر وقد انتهت جلسته (403) → لا ملفّ فاسد بل رسالة · يعطّل قاعدةً/يصعّد للشرطة/يشطب خطأً → تأكيد · يقرأ حادثًا → عربيّة مفهومة.</td></tr>
+</table>
+
+<h2>الجودة والحوكمة</h2>
+<table>
+<tr><td>الستّ في الحزمة الحيّة (4 صفحات OPS)</td><td><span class="tag ok">مُثبَت ✓</span></td></tr>
+<tr><td>typecheck · OPS tests</td><td><span class="tag ok">0 · 18 ✓</span></td></tr>
+<tr><td>الخلفية · العقود المختومة</td><td><span class="tag ok">دون تغيير · 25ddf010… · لا commits · site 200</span></td></tr>
+</table>
+
+<div class="summary">
+<h3 style="margin-top:0">خلاصة (دفعة 5 · المنطقة 1 — OPS تشغيلي)</h3>
+<p class="lead">صار مركز الحوادث عربيًّا ومُحكَم التصدير، والأفعال الخطرة (تعطيل كشف · شرطة · شطب) مؤكَّدة — دون إثقال الأفعال العاديّة. <b>6 تحسينات متنوّعة · واجهة فقط · لا commits.</b></p>
+<p style="font-size:14px;margin-top:8px"><b>التالي مباشرةً:</b> المنطقة 2 (الدخول/التسجيل) ثمّ المنطقة 3 (الدفع/سجلّ الطلبات) — 6 لكلٍّ، لإكمال 18.</p>
+</div>
+
+<footer><p><b>التحقّق:</b> 5+ علامات عربيّة في الحزمة الحيّة · typecheck 0 · OPS 18/18 · الخلفية دون تغيير · <code>25ddf010…</code> دون تغيير · لا commits · https://test.tawanow.com.</p>
+<p style="margin-top:10px">📄 صقل المنصّة (دفعة 5 · 1/3) — OPS التشغيلي · <b>تووا</b> · 27 يونيو 2026 · New Folder 10</p></footer>
+</div></body></html>

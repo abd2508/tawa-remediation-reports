@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تقرير فحص عميق موجّه للباني — tawa-platform</title>
+<style>
+body{margin:0;background:#e5e7eb;color:#111827;font-family:Tahoma,Arial,sans-serif;line-height:1.75}
+header{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:32px;border-bottom:6px solid #60a5fa}
+main{max-width:1220px;margin:24px auto;padding:0 18px 70px}
+section{background:#fff;border:1px solid #dbe2ea;border-radius:18px;margin:18px 0;padding:24px;box-shadow:0 8px 24px rgba(15,23,42,.07)}
+h1{margin:0 0 8px;font-size:30px} h2{font-size:24px;margin:0 0 16px;border-bottom:2px solid #e2e8f0;padding-bottom:8px} h3{font-size:19px;margin:22px 0 8px} h4{font-size:16px;margin:16px 0 6px;color:#334155}
+table{border-collapse:collapse;width:100%;margin:12px 0} th,td{border:1px solid #e2e8f0;padding:10px;vertical-align:top} th{background:#f1f5f9}
+pre{background:#0b1220;color:#d1e7ff;padding:14px;border-radius:12px;overflow:auto;direction:ltr;text-align:left;line-height:1.55}
+code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:6px;padding:1px 5px;direction:ltr;display:inline-block}
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:bold;color:#fff}
+.crit{background:#7f1d1d}.high{background:#b91c1c}.med{background:#b45309}.low{background:#0369a1}.ok{background:#047857}.info{background:#475569}
+.callout{padding:14px 16px;border-radius:14px;margin:14px 0;border:1px solid}
+.critical{background:#fef2f2;border-color:#fecaca}.warn{background:#fffbeb;border-color:#fde68a}.good{background:#ecfdf5;border-color:#bbf7d0}.infobox{background:#eff6ff;border-color:#bfdbfe}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px}.kpi{grid-column:span 3;text-align:center}.kpi strong{display:block;font-size:28px}
+.issue{border-right:6px solid #94a3b8}.issue.critical{border-right-color:#7f1d1d}.issue.high{border-right-color:#b91c1c}.issue.medium{border-right-color:#b45309}
+.evidence{font-size:13px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 10px;margin-top:8px}
+.diagram{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:12px;margin:16px 0;overflow:auto}
+.footer{color:#64748b;text-align:center;font-size:13px;margin-top:30px}
+@media(max-width:800px){.kpi{grid-column:span 6}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<header>
+<h1>تقرير فحص عميق موجّه للباني — tawa-platform</h1>
+<p>تقرير عملي مبني على أدلة GitHub المتاحة: PRs، review threads، workflows، العقود، وملفات الكود الحرجة.</p>
+<p>التاريخ: 2026-07-06 · المستودع: <span dir="ltr">abd2508/tawa-platform</span></p>
+</header>
+<main>
+
+<section>
+<h2>0) حدود ومنهجية الفحص</h2>
+<div class="callout warn"><b>ملاحظة دقة:</b> هذا التقرير لا يدّعي تشغيل clone كامل محلياً أو أدوات filesystem scanners داخل بيئة runner دائمة. الدليل المستخدم هنا مباشر من GitHub: PR #11، ملفات current branch، review threads، workflows، والعقود. لذلك كل نقطة إما مثبتة بدليل أو موسومة كفجوة إثبات.</div>
+<table>
+<tr><th>نوع الحكم</th><th>المعنى</th></tr>
+<tr><td><span class="badge ok">مثبت</span></td><td>مرتبط بمصدر GitHub مباشر: ملف، أسطر، PR، أو review thread.</td></tr>
+<tr><td><span class="badge high">عيب مثبت</span></td><td>توجد فجوة أو تناقض أو سلوك خطر مثبت من المصدر.</td></tr>
+<tr><td><span class="badge med">فجوة إثبات</span></td><td>هناك ادعاء أو حاجة تحقق، لكن لا يوجد artifact/CI/log ظاهر كافٍ.</td></tr>
+<tr><td><span class="badge info">توصية</span></td><td>تحسين معماري أو CI أو حوكمة يجب تنفيذه عبر PR واختبارات.</td></tr>
+</table>
+</section>
+
+<section>
+<h2>1) الخلاصة التنفيذية</h2>
+<div class="grid">
+<div class="card kpi"><strong>73</strong><span>ملفاً تغيّر في PR #11</span></div>
+<div class="card kpi"><strong>8048</strong><span>إضافة في PR #11</span></div>
+<div class="card kpi"><strong>7</strong><span>بوابات إطلاق حاجبة مفتوحة</span></div>
+<div class="card kpi"><strong>2</strong><span>تعليقات P2 غير محلولة</span></div>
+</div>
+<div class="callout critical"><b>الحكم:</b> المشروع أصبح backend قوياً ومتوسعاً، لكنه ليس Production-ready. لا يجوز إطلاقه كمنصة عامة قبل حل تناقض FIN-COR، إغلاق launch gates أو توثيق waivers، إصلاح staff metrics، تشديد stats authorization، وإدخال web/E2E/PostgreSQL integration إلى CI.</div>
+<pre>حالة المشروع:
+- Backend قوي بعد PR #11.
+- CI backend/contracts موجود.
+- Smoke Docker موجود.
+- Launch gates مفتوحة.
+- Frontend CI غير موجود.
+- E2E غير حاجب.
+- Mobile غير مبني.
+- توجد عيوب موثقة في wallet_peer_transfer، self-claim metrics، وmy-stats guard.</pre>
+</section>
+
+<section>
+<h2>2) رسم توضيحي: خريطة الجاهزية الحالية</h2>
+<div class="diagram">
+<svg width="1080" height="350" viewBox="0 0 1080 350" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#334155"/></marker></defs>
+<rect x="20" y="20" width="1040" height="310" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="540" y="55" text-anchor="middle" font-size="22" fill="#0f172a">خريطة الجاهزية</text>
+<rect x="70" y="105" width="190" height="80" rx="12" fill="#dcfce7" stroke="#16a34a"/>
+<text x="165" y="137" text-anchor="middle" font-size="16">Backend</text><text x="165" y="162" text-anchor="middle" font-size="12">قوي ومتوسع</text>
+<rect x="305" y="105" width="190" height="80" rx="12" fill="#fef3c7" stroke="#d97706"/>
+<text x="400" y="137" text-anchor="middle" font-size="16">CI</text><text x="400" y="162" text-anchor="middle" font-size="12">Backend فقط تقريباً</text>
+<rect x="540" y="105" width="190" height="80" rx="12" fill="#fee2e2" stroke="#dc2626"/>
+<text x="635" y="137" text-anchor="middle" font-size="16">Launch Gates</text><text x="635" y="162" text-anchor="middle" font-size="12">تمنع الإطلاق</text>
+<rect x="775" y="105" width="190" height="80" rx="12" fill="#fee2e2" stroke="#dc2626"/>
+<text x="870" y="137" text-anchor="middle" font-size="16">Mobile</text><text x="870" y="162" text-anchor="middle" font-size="12">غير مبني</text>
+<line x1="260" y1="145" x2="305" y2="145" stroke="#334155" stroke-width="2" marker-end="url(#a)"/>
+<line x1="495" y1="145" x2="540" y2="145" stroke="#334155" stroke-width="2" marker-end="url(#a)"/>
+<line x1="730" y1="145" x2="775" y2="145" stroke="#334155" stroke-width="2" marker-end="url(#a)"/>
+<rect x="160" y="245" width="760" height="50" rx="12" fill="#eff6ff" stroke="#60a5fa"/>
+<text x="540" y="276" text-anchor="middle" font-size="16" fill="#1e3a8a">النتيجة: Pre-production قوي، وليس جاهزاً للإنتاج العام</text>
+</svg>
+</div>
+</section>
+
+<section>
+<h2>3) العيوب الحرجة والمشاكل المثبتة</h2>
+
+<div class="card issue critical">
+<h3>F-01 — تناقض FIN-COR حول <span dir="ltr">wallet_peer_transfer</span></h3>
+<p><span class="badge crit">Critical</span></p>
+<div class="evidence"><b>الدليل:</b> PR #11 يقول إن sealed flags unchanged وتشمل <span dir="ltr">wallet_peer_transfer=false</span>. لكن <span dir="ltr">contracts/feature_flags.yaml</span> الحالي يحتوي <span dir="ltr">wallet_peer_transfer: true</span>. و<span dir="ltr">feature_flags.py</span> لا يضعها داخل <span dir="ltr">SEALED_FLAGS</span>.</div>
+<h4>شرح مبسط</h4><p>تقرير الدمج يقول إن باب التحويلات المالية مغلق، لكن ملف التشغيل يقول إنه مفتوح. هذا تضارب في منطقة مالية.</p>
+<h4>التأثير</h4><ul><li>ضعف الثقة في FIN-COR.</li><li>إمكانية تشغيل ميزة مالية قبل اكتمال legal/AML gates.</li><li>صعوبة قبول المشروع في مراجعة امتثال.</li></ul>
+<h4>الحل</h4><pre>الخيار المحافظ:
+contracts/feature_flags.yaml
+wallet_peer_transfer: false
+
+أو:
+إنشاء docs/WALLET_PEER_TRANSFER_DECISION_RECORD.md
+مع موافقة صريحة وحدود KYC/AML/OPS review.</pre>
+<h4>الأعراض الجانبية</h4><ul><li>تعطيلها قد يكسر UI/tests التي تتوقعها.</li><li>إبقاؤها true يبقي خطر الحوكمة إذا لم تغلق gates.</li></ul>
+<h4>اختبارات القبول</h4><pre>python _ai_tools/bin/contract_flag_hash_check.py
+pytest backend/tests/*transfer* -q
+pytest backend/tests/*feature* -q</pre>
+</div>
+
+<div class="card issue critical">
+<h3>F-02 — Launch Gates تمنع الإطلاق رسمياً</h3>
+<p><span class="badge crit">Critical</span></p>
+<div class="evidence"><b>الدليل:</b> <span dir="ltr">contracts/launch_gates.yaml</span> يقول: <span dir="ltr">No soft launch until all blocking gates are CLOSED</span>. لكن GATE_LEGAL وGATE_PAYMENT_SANDBOX وGATE_SECURITY_PENTEST وGATE_DR_RUNBOOK وGATE_OPERATIONS_READINESS وغيرها ما زالت open وblocking.</div>
+<h4>شرح مبسط</h4><p>المشروع نفسه كتب شرطاً: لا تطلق قبل إغلاق البوابات. والبوابات ما زالت مفتوحة.</p>
+<h4>التأثير</h4><ul><li>أي إطلاق عام يخالف عقد المشروع.</li><li>خطر قانوني وتشغيلي ومالي.</li><li>لا توجد أدلة كافية لجاهزية السوق.</li></ul>
+<h4>الحل</h4><pre>docs/launch_evidence/GATE_LEGAL.md
+docs/launch_evidence/GATE_PAYMENT_SANDBOX.md
+docs/launch_evidence/GATE_SECURITY_PENTEST.md
+docs/launch_evidence/GATE_DR_RUNBOOK.md
+docs/launch_evidence/GATE_OPERATIONS_READINESS.md</pre>
+<h4>الأعراض الجانبية</h4><p>إغلاق البوابات شكلياً بلا دليل أخطر من تركها مفتوحة. أضف CI يمنع status=closed بدون evidence.</p>
+</div>
+
+<div class="card issue high">
+<h3>F-03 — self-claim للموظف لا يزيد عدّاد الحمل <span dir="ltr">active_orders</span></h3>
+<p><span class="badge high">High</span></p>
+<div class="evidence"><b>الدليل:</b> في <span dir="ltr">provider_service.py</span> عند self-claim يتم تعيين <span dir="ltr">assigned_staff_id</span> و<span dir="ltr">assigned_at</span>. في <span dir="ltr">distribution_service.py</span> خوارزمية الاختيار تعتمد على <span dir="ltr">active_orders &lt; DEFAULT_CONCURRENCY_CAP</span>، والدالة <span dir="ltr">record_assignment()</span> هي التي تزيد <span dir="ltr">active_orders</span>.</div>
+<h4>شرح مبسط</h4><p>الموظف يمسك الطلب، لكن عدّاد “كم طلب عنده الآن” لا يزيد. فيظهر للنظام كأنه أقل انشغالاً من الحقيقة.</p>
+<h4>التأثير</h4><ul><li>توزيع غير عادل.</li><li>تكدس طلبات على موظف واحد.</li><li>SLA أسوأ وتأخير في التحضير.</li></ul>
+<h4>الحل</h4><pre>if actor_role == "PROVIDER_STAFF" and order.assigned_staff_id is None:
+    order.assigned_staff_id = provider_user_id
+    order.assigned_at = now
+    await distribution_service.record_assignment(
+        self.session, order.provider_id, provider_user_id, now
+    )</pre>
+<h4>الأعراض الجانبية</h4><p>قد يحصل double increment إذا كان الطلب محسوباً سابقاً. الحل: زد العداد فقط عند الانتقال من unassigned إلى assigned، واختبر complete/cancel/reject decrement.</p>
+</div>
+
+<div class="card issue high">
+<h3>F-04 — مسار <span dir="ltr">/providers/me/staff/my-stats</span> لا يستخدم guard المزود المركب</h3>
+<p><span class="badge high">High</span></p>
+<div class="evidence"><b>الدليل:</b> المسار يستخدم <span dir="ltr">require_active_role</span>. بينما <span dir="ltr">require_provider_permission</span> هو الذي يفحص <span dir="ltr">OperationalProfile.is_suspended</span> إضافة إلى الدور والصلاحية.</div>
+<h4>شرح مبسط</h4><p>هناك حارس بسيط وحارس قوي. هذا المسار يستخدم الحارس البسيط، لذلك قد لا يحترم إيقاف الموظف التشغيلي.</p>
+<h4>التأثير</h4><ul><li>موظف موقوف قد يقرأ إحصائيات المتجر.</li><li>نموذج الصلاحيات يصبح غير موحد.</li></ul>
+<h4>الحل</h4><pre>أضف permission:
+provider_staff:self_stats
+
+ثم:
+Depends(require_provider_permission("provider_staff:self_stats"))</pre>
+<h4>الأعراض الجانبية</h4><p>قد يحصل 403 للموظفين الحاليين. الحل: اجعلها baseline-held أو أضف migration grandfather.</p>
+</div>
+
+<div class="card issue high">
+<h3>F-05 — Frontend وE2E ليسا حاجزين في CI الرئيسي</h3>
+<p><span class="badge high">High</span></p>
+<div class="evidence"><b>الدليل:</b> <span dir="ltr">ci.yml</span> يحتوي contracts/lint/revision/backend-tests. أما <span dir="ltr">web/package.json</span> فيحتوي build/typecheck/lint/test/E2E scripts لكنها ليست ضمن CI.</div>
+<h4>شرح مبسط</h4><p>الباكند يُفحص، لكن الواجهة قد تنكسر ولا يمنعها CI من الدمج.</p>
+<h4>الحل</h4><pre>web:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+        cache: npm
+        cache-dependency-path: web/package-lock.json
+    - run: cd web && npm ci
+    - run: cd web && npm run typecheck
+    - run: cd web && npm run lint
+    - run: cd web && npm run test
+    - run: cd web && npm run build</pre>
+</div>
+
+</section>
+
+<section>
+<h2>4) تحسينات مثبتة يجب الحفاظ عليها</h2>
+<table>
+<tr><th>التحسين</th><th>الدليل العملي</th><th>لماذا مهم؟</th></tr>
+<tr><td>Address ownership</td><td><span dir="ltr">_resolve_delivery</span> يرفض العنوان غير الموجود أو غير المملوك برسالة موحدة.</td><td>يمنع location/address oracle.</td></tr>
+<tr><td>Drop-pin source of truth</td><td><span dir="ltr">override_lat/lng</span> يدخل في fee/distance/ETA.</td><td>يوحد السعر والنقطة التي يذهب إليها السائق.</td></tr>
+<tr><td>Cart idempotency scoped</td><td>idempotency key + customer_id.</td><td>يمنع replay/collision بين عملاء مختلفين.</td></tr>
+<tr><td>Error redaction</td><td><span dir="ltr">INTERNAL_ERROR</span> يصبح <span dir="ltr">Internal error</span> في production.</td><td>يمنع تسريب الاستثناءات.</td></tr>
+<tr><td>Provider permission guard</td><td><span dir="ltr">require_provider_permission</span> يفحص role/status/suspension/permission.</td><td>نموذج أذونات أقوى من role فقط.</td></tr>
+</table>
+</section>
+
+<section>
+<h2>5) الرسم التوضيحي: خطأ self-claim metrics</h2>
+<div class="diagram">
+<svg width="1050" height="330" viewBox="0 0 1050 330" xmlns="http://www.w3.org/2000/svg">
+<rect x="20" y="20" width="1010" height="290" rx="18" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="525" y="55" text-anchor="middle" font-size="21" fill="#0f172a">كيف يظهر خطأ self-claim؟</text>
+<rect x="70" y="105" width="190" height="70" rx="12" fill="#e0f2fe" stroke="#0284c7"/>
+<text x="165" y="135" text-anchor="middle" font-size="15">موظف يقبل الطلب</text>
+<text x="165" y="158" text-anchor="middle" font-size="12">self-claim</text>
+<rect x="310" y="105" width="210" height="70" rx="12" fill="#fef3c7" stroke="#d97706"/>
+<text x="415" y="135" text-anchor="middle" font-size="15">assigned_staff_id يُكتب</text>
+<text x="415" y="158" text-anchor="middle" font-size="12">لكن active_orders لا يزيد</text>
+<rect x="570" y="105" width="210" height="70" rx="12" fill="#fee2e2" stroke="#dc2626"/>
+<text x="675" y="135" text-anchor="middle" font-size="15">خوارزمية التوزيع</text>
+<text x="675" y="158" text-anchor="middle" font-size="12">تراه أقل انشغالاً</text>
+<rect x="820" y="105" width="160" height="70" rx="12" fill="#fee2e2" stroke="#dc2626"/>
+<text x="900" y="135" text-anchor="middle" font-size="15">تكدس العمل</text>
+<text x="900" y="158" text-anchor="middle" font-size="12">SLA أسوأ</text>
+<line x1="260" y1="140" x2="310" y2="140" stroke="#334155" stroke-width="2"/>
+<line x1="520" y1="140" x2="570" y2="140" stroke="#334155" stroke-width="2"/>
+<line x1="780" y1="140" x2="820" y2="140" stroke="#334155" stroke-width="2"/>
+<rect x="180" y="230" width="690" height="48" rx="12" fill="#ecfdf5" stroke="#10b981"/>
+<text x="525" y="260" text-anchor="middle" font-size="15" fill="#065f46">الحل: عند أول self-claim فقط، نفّذ record_assignment() مرة واحدة</text>
+</svg>
+</div>
+</section>
+
+<section>
+<h2>6) خطة عمل للباني حسب الأولوية</h2>
+<table>
+<tr><th>الأولوية</th><th>المهمة</th><th>ملفات مرجحة</th><th>قبول التنفيذ</th></tr>
+<tr><td>1</td><td>حل تناقض wallet_peer_transfer</td><td>contracts/feature_flags.yaml، feature_flags.py، docs decision record</td><td>FIN-COR PASS + tests</td></tr>
+<tr><td>2</td><td>إصلاح self-claim metrics</td><td>provider_service.py، distribution_service.py</td><td>active_orders يزيد وينقص بدقة</td></tr>
+<tr><td>3</td><td>تشديد my-stats guard</td><td>provider_router.py، roles.py، account_permission_service.py</td><td>suspended operational profile يرجع 403</td></tr>
+<tr><td>4</td><td>إضافة Web CI</td><td>.github/workflows/ci.yml</td><td>typecheck/lint/test/build blocking</td></tr>
+<tr><td>5</td><td>إضافة E2E container</td><td>ci.yml، playwright configs</td><td>سيناريو طلب كامل يعمل قبل الدمج</td></tr>
+<tr><td>6</td><td>إغلاق launch gates بدليل</td><td>contracts/launch_gates.yaml، docs/launch_evidence</td><td>كل gate له owner/evidence/status</td></tr>
+</table>
+</section>
+
+<section>
+<h2>7) أدوات الفحص “حرفاً حرفاً” التي يجب تشغيلها على clone كامل</h2>
+<div class="callout infobox">هذه الأوامر هي التي تعطي مستوى الفحص الحقيقي للكود حرفاً حرفاً على مستوى الملفات، الاعتمادات، الأسرار، الأنماط الأمنية، والاختبارات. يجب إضافتها إلى CI أو تشغيلها محلياً من الباني.</div>
+<pre># Python quality/security
+ruff check backend/
+mypy backend/app
+bandit -r backend/app -x backend/tests
+semgrep scan --config auto backend/
+
+# Dependency/security
+pip-audit
+npm audit --prefix web --audit-level=moderate
+trivy fs --severity HIGH,CRITICAL .
+gitleaks detect --source . --redact
+
+# Backend tests
+cd backend && pytest tests/ -q --tb=short
+
+# PostgreSQL integration
+APP_ENV=test DATABASE_URL=postgresql+asyncpg://... pytest tests/ -q -m postgres
+
+# Web
+cd web
+npm ci
+npm run typecheck
+npm run lint
+npm run test
+npm run build
+npm run test:e2e:container
+
+# Alembic proof
+cd backend
+alembic heads
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head</pre>
+</section>
+
+<section>
+<h2>8) تحديثات تقنية حديثة مقترحة</h2>
+<table>
+<tr><th>التقنية</th><th>الفائدة</th><th>طريقة إدخالها</th></tr>
+<tr><td>Policy-as-Code للـlaunch gates</td><td>منع إغلاق بوابة بلا دليل</td><td>سكريبت Python في CI يقرأ YAML ويتحقق من evidence files</td></tr>
+<tr><td>Semgrep custom rules</td><td>كشف patterns مثل str(exc)، fail-open، missing permission guard</td><td>ابدأ بقواعد قليلة مخصصة للمشروع</td></tr>
+<tr><td>Testcontainers PostgreSQL</td><td>اختبار locks وtransactions بقاعدة حقيقية</td><td>subset tests موسوم postgres</td></tr>
+<tr><td>OpenAPI contract diff</td><td>منع كسر الواجهة عند تعديل API</td><td>openapi-diff في CI</td></tr>
+<tr><td>Playwright trace artifacts</td><td>فهم فشل E2E بصور وtrace</td><td>رفع artifacts عند الفشل فقط</td></tr>
+<tr><td>SBOM + Trivy/Syft</td><td>سلسلة توريد واعتمادات</td><td>job أسبوعي وحاجب للـcritical</td></tr>
+<tr><td>Mutation testing للمال</td><td>إثبات أن اختبارات wallet تكشف تغييرات خطرة</td><td>طبّقه على wallet/ledger فقط أولاً</td></tr>
+</table>
+</section>
+
+<section>
+<h2>9) تعريف النجاح بعد تنفيذ التقرير</h2>
+<ol>
+<li>كل عيب F-01 إلى F-05 له PR مستقل أو commit واضح.</li>
+<li>كل إصلاح معه test جديد يثبت أن العيب لا يعود.</li>
+<li>CI يتضمن backend + web + E2E + migration + FIN-COR.</li>
+<li>لا يتم إغلاق launch gate بلا evidence file وowner واضح.</li>
+<li>تحديث docs/PRODUCTION_READINESS_MATRIX.md بعد كل تغيير.</li>
+</ol>
+</section>
+
+<section>
+<h2>10) Evidence Ledger</h2>
+<table>
+<tr><th>ID</th><th>المصدر</th><th>ما يثبته</th></tr>
+<tr><td>E01</td><td>PR #11 metadata</td><td>PR مدموج، 7 commits، 73 ملفاً، 8048 إضافة.</td></tr>
+<tr><td>E02</td><td>PR #11 body</td><td>يدعي 7 phases وFIN-COR وmigrations ab12→ab20.</td></tr>
+<tr><td>E03</td><td>PR #11 review threads</td><td>تعليقان P2 غير محلولين: self-claim metrics وmy-stats suspension.</td></tr>
+<tr><td>E04</td><td>.github/workflows/ci.yml</td><td>CI يغطي backend/contracts/Ruff وليس web/E2E.</td></tr>
+<tr><td>E05</td><td>.github/workflows/tawa-smoke-run.yml</td><td>Smoke يشغل stack ويفحص backend/web فقط.</td></tr>
+<tr><td>E06</td><td>contracts/launch_gates.yaml</td><td>بوابات launch الأساسية مفتوحة.</td></tr>
+<tr><td>E07</td><td>contracts/feature_flags.yaml</td><td>wallet_peer_transfer=true.</td></tr>
+<tr><td>E08</td><td>feature_flags.py</td><td>SEALED_FLAGS لا تشمل wallet_peer_transfer.</td></tr>
+<tr><td>E09</td><td>provider_service.py</td><td>self-claim يكتب assigned_staff_id فقط في المواضع المفحوصة.</td></tr>
+<tr><td>E10</td><td>distribution_service.py</td><td>active_orders هو أساس concurrency cap.</td></tr>
+<tr><td>E11</td><td>provider_router.py</td><td>my-stats يستخدم require_active_role.</td></tr>
+<tr><td>E12</td><td>identity/dependencies.py</td><td>require_provider_permission يفحص operational suspension.</td></tr>
+<tr><td>E13</td><td>order_service.py</td><td>address ownership وdrop-pin authoritative.</td></tr>
+<tr><td>E14</td><td>carts/service.py</td><td>cart quote وcheckout idempotency scoped.</td></tr>
+<tr><td>E15</td><td>mobile/FLUTTER_PLACEHOLDER.md</td><td>Mobile غير مبني.</td></tr>
+</table>
+</section>
+
+<div class="footer">هذا التقرير موجّه للباني كقائمة عمل تنفيذية. يجب تحويله إلى PRs واختبارات، لا الاكتفاء بقراءته.</div>
+</main>
+</body>
+</html>

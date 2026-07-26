@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقرير المفصّل — E5: المُحوِّل الخارجيّ (ML liveness) جاهز للتفعيل وخامل</title>
+<style>
+  :root{
+    --green:#1f7a4d; --green-d:#14532d; --amber:#b45309; --gray:#64748b;
+    --bg:#f5f8f6; --card:#fff; --border:#dbe5df; --ink:#16201c; --muted:#566860;
+    --ok:#15803d; --okbg:#e7f6ec; --warnbg:#fef4e4; --err:#b91c1c; --errbg:#fdeceb;
+    --code-bg:#0f1c17; --code-ink:#e6f3ec;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);
+       margin:0;padding:0;line-height:1.85;font-size:15px}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 80px}
+  header.hd{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:18px;
+       padding:30px 30px;box-shadow:0 10px 30px rgba(20,83,45,.20)}
+  header.hd h1{margin:0 0 8px;font-size:25px;line-height:1.45}
+  header.hd .sub{opacity:.93;font-size:15.5px}
+  .pill{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);
+       border-radius:999px;padding:4px 14px;font-size:12.5px;margin:9px 5px 0 0}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin:18px 0}
+  nav.toc strong{color:var(--green-d);display:block;margin-bottom:8px}
+  nav.toc ol{margin:0;padding-inline-start:22px;columns:2;font-size:14px}
+  nav.toc a{color:var(--green);text-decoration:none} nav.toc a:hover{text-decoration:underline}
+  section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin:18px 0;
+       box-shadow:0 2px 9px rgba(20,83,45,.05)}
+  h2{color:var(--green-d);font-size:20px;margin:2px 0 16px;padding-bottom:10px;border-bottom:2px solid #e9f2ec}
+  h3{color:var(--green);font-size:16.5px;margin:20px 0 9px}
+  p{margin:9px 0}
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13.8px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#edf5f0;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafcfb}
+  code,.mono{font-family:"SF Mono",Consolas,monospace;background:#eaf0ed;color:#0f2a1e;
+       padding:1.5px 6px;border-radius:5px;font-size:12.8px;direction:ltr;display:inline-block}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:15px 17px;overflow:auto;
+       font-family:"SF Mono",Consolas,monospace;font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;margin:11px 0}
+  pre .c{color:#7fa890} pre .k{color:#7fb0ff} pre .s{color:#9ee6a8} pre .n{color:#e6c07b}
+  .ok{color:var(--ok);font-weight:700} .err{color:var(--err);font-weight:700}
+  .badge-ok{background:var(--okbg);color:var(--ok);border:1px solid #bfe6cb;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  .badge-dormant{background:#eef2f0;color:var(--gray);border:1px solid #d6ddda;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  .badge-gate{background:var(--errbg);color:var(--err);border:1px solid #f3c0bc;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  ul.clean{margin:8px 0;padding-inline-start:22px} ul.clean li{margin:6px 0}
+  .kv{display:grid;grid-template-columns:240px 1fr;gap:7px 16px;font-size:14px;margin:9px 0}
+  .kv .k{color:var(--muted)}
+  .note{background:var(--warnbg);border:1px solid #f4d9a8;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .danger{background:var(--errbg);border:1px solid #f3c0bc;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .seal{background:var(--okbg);border:1px solid #bfe6cb;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .gates{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin:10px 0}
+  .gates .g{background:#fff;border:2px solid var(--err);border-radius:10px;padding:7px 12px;color:var(--err);font-weight:700}
+  .gates .amp{font-weight:800;color:var(--muted)}
+  .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:28px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <h1>التقرير المفصّل — E5: المُحوِّل الخارجيّ (ML liveness)<br>مبنيّ جاهزًا للتفعيل · خامل خلف بوّابة خصوصيّة مُنفَّذة</h1>
+  <div class="sub">الدفاع الحقيقيّ عن الانتحال — لا تغادر أيّ صورة المنصّة دون اعتمادات المالك + إقرار الخصوصيّة</div>
+  <div>
+    <span class="pill">النطاق: tawanow.com</span>
+    <span class="pill">نشر باكند خامل</span>
+    <span class="pill">بلا migration (جدول aa29)</span>
+    <span class="pill">FIN-COR PASS · NEW=0</span>
+    <span class="pill">لم يُفعَّل مزوّد حقيقيّ</span>
+    <span class="pill">2026-06-12</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>محتويات التقرير</strong>
+  <ol>
+    <li><a href="#s1">الخلاصة والقرار الحاكم</a></li>
+    <li><a href="#s2">لماذا لا تفعيل فعليّ هنا</a></li>
+    <li><a href="#s3">تصميم البوّابات الأربع</a></li>
+    <li><a href="#s4">المُحوِّل بالكود</a></li>
+    <li><a href="#s5">توزيع _run_vendor</a></li>
+    <li><a href="#s6">الاختبارات (نداء مُموَّه)</a></li>
+    <li><a href="#s7">البوّابة والنشر الخامل</a></li>
+    <li><a href="#s8">التحقّق الحيّ على الإنتاج</a></li>
+    <li><a href="#s9">خطوات التفعيل المتبقّية لك</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2>① الخلاصة والقرار الحاكم</h2>
+  <p>
+    نفّذتُ «الانتقال إلى تفعيل المزوّد الخارجيّ» بالقرار الموصى به المنضبط بالحوكمة: بنيتُ المُحوِّل الخارجيّ
+    (الدفاع الحقيقيّ عن الانتحال/liveness بالـML) <strong>كاملًا وجاهزًا للتفعيل، لكنّه خامل</strong> خلف
+    <strong>أربع بوّابات صريحة</strong> آخرها <strong>إقرار خصوصيّة مُنفَّذ</strong>. هذا نفس نمط FCM/الدفع في المشروع:
+    التكامل جاهز، والتشغيل الفعليّ مرهون باعتمادات المالك واجتياز بوّابة الخصوصيّة.
+  </p>
+  <div class="kv">
+    <div class="k">على الإنتاج (افتراضيًّا)</div><div><span class="badge-dormant">خامل — is_external_configured=False</span> (الأربعة فارغة) ⇒ لا تغادر أيّ صورة</div>
+    <div class="k">ما يلزم للتفعيل</div><div>اسم مزوّد (≠local) + <code>api_url</code> + <code>api_key</code> + <code>privacy_ack=true</code> — الأربعة معًا</div>
+    <div class="k">القلب الماليّ / الترحيل</div><div>لا مساس — <span class="ok">FIN-COR PASS</span> · بلا migration (جدول aa29)</div>
+    <div class="k">حالة التفعيل</div><div><span class="err">لم يُفعَّل مزوّد حقيقيّ</span> — يحتاج حساب/اعتمادات المالك + DPA</div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2>② لماذا لا تفعيل فعليّ من هنا (الحدود الصلبة)</h2>
+  <div class="danger">
+    <strong>المزوّد الخارجيّ يُرسل صور هويّة المواطنين الليبيّين خارج المنصّة.</strong> هذا قرار قانونيّ/خصوصيّ
+    يخصّ المالك، لا يصحّ تجاوزه.
+  </div>
+  <table>
+    <tr><th>الحاجز</th><th>التفصيل</th></tr>
+    <tr><td>لا حساب / اعتمادات</td><td>خدمات Incode/Paravision تجاريّة تتطلّب عقدًا ومفاتيح API لا تُنشأ هنا</td></tr>
+    <tr><td>بوّابة الخصوصيّة</td><td>الحوكمة تنصّ صراحةً: التفعيل «بعد اجتياز بوّابة الخصوصيّة» — يلزمه DPA + مراجعة قانونيّة + موافقة</td></tr>
+    <tr><td>PILOT-GAP-PRIVACY</td><td>مفتوحة (OPEN_BLOCKING) في حالة المشروع</td></tr>
+  </table>
+  <p>لذا: بُني المُحوِّل جاهزًا، والتشغيل مُؤمَّن خلف بوّابة الخصوصيّة المُنفَّذة برمجيًّا.</p>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2>③ تصميم البوّابات الأربع (الحارس الأساس)</h2>
+  <p>لا تغادر أيّ صورة المنصّة إلا إذا تحقّقت <strong>الأربع</strong> معًا — وأهمّها الرابعة (بوّابة الخصوصيّة):</p>
+  <div class="gates">
+    <span class="g">vendor ≠ "local"</span><span class="amp">&amp;</span>
+    <span class="g">api_url</span><span class="amp">&amp;</span>
+    <span class="g">api_key</span><span class="amp">&amp;</span>
+    <span class="g">privacy_ack = true</span>
+  </div>
+  <table>
+    <tr><th>المفتاح (config)</th><th>الافتراضيّ</th><th>الدور</th></tr>
+    <tr><td><code>doc_verify_vendor</code></td><td><code>""</code></td><td>اسم المزوّد؛ <code>local</code>=المدمج، فارغ=خامل، غيرهما=خارجيّ</td></tr>
+    <tr><td><code>doc_verify_api_url</code></td><td><code>""</code></td><td>نقطة نهاية PAD للمزوّد</td></tr>
+    <tr><td><code>doc_verify_api_key</code></td><td><code>""</code></td><td>سرّ المزوّد (Bearer)</td></tr>
+    <tr><td><code>doc_verify_timeout_seconds</code></td><td><code>8.0</code></td><td>مهلة HTTP</td></tr>
+    <tr><td><strong><code>doc_verify_external_privacy_ack</code></strong></td><td><code>False</code></td><td><span class="badge-gate">بوّابة الخصوصيّة المُنفَّذة</span> — تُضبط true فقط بعد DPA/الإذن القانونيّ</td></tr>
+  </table>
+  <div class="note">
+    <strong>حزام وحمّالة:</strong> حتى لو ضُبطت الاعتمادات (url+key)، فبدون <code>privacy_ack</code> يبقى
+    <code>is_external_configured()=False</code> ⇒ لا نداء. هذا يحوّل «بوّابة الخصوصيّة» من توثيق إلى مفتاح مُدقَّق مفروض.
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2>④ المُحوِّل بالكود — <code>modules/kyc/external_doc_adapter.py</code> (جديد)</h2>
+  <h3>أ — حارس التهيئة (يفرض الأربع)</h3>
+  <pre><span class="k">def</span> is_external_configured() -> bool:
+    vendor = (settings.doc_verify_vendor <span class="k">or</span> <span class="s">""</span>).strip().lower()
+    <span class="k">return</span> bool(
+        vendor <span class="k">and</span> vendor != <span class="s">"local"</span>
+        <span class="k">and</span> (settings.doc_verify_api_url <span class="k">or</span> <span class="s">""</span>).strip()
+        <span class="k">and</span> (settings.doc_verify_api_key <span class="k">or</span> <span class="s">""</span>).strip()
+        <span class="k">and</span> bool(settings.doc_verify_external_privacy_ack)   <span class="c"># بوّابة الخصوصيّة</span>
+    )</pre>
+
+  <h3>ب — نقطة الدخول (لا تُرسل صورة دون التهيئة الكاملة)</h3>
+  <pre><span class="k">async def</span> run_external_verification(object_key) -> dict:
+    <span class="k">if not</span> is_external_configured():
+        <span class="k">raise</span> RuntimeError(<span class="s">"external … not configured (vendor/url/key/privacy-ack)"</span>)
+    data = <span class="k">await</span> run_in_threadpool(_fetch_object_bytes, object_key)  <span class="c"># من MinIO، خارج الحلقة</span>
+    <span class="k">if</span> data <span class="k">is</span> None: <span class="k">return</span> {<span class="s">"score"</span>: 0, <span class="s">"flags"</span>: <span class="s">"MISSING_OBJECT"</span>}
+    payload = <span class="k">await</span> _call_vendor(data, object_key)                  <span class="c"># httpx POST متعدّد الأجزاء</span>
+    <span class="k">return</span> _map_response(payload)</pre>
+
+  <h3>ج — نداء المزوّد + المطابقة</h3>
+  <pre><span class="k">async def</span> _call_vendor(image, object_key) -> dict:    <span class="c"># نمط geo_providers</span>
+    <span class="k">async with</span> httpx.AsyncClient(timeout=doc_verify_timeout_seconds) <span class="k">as</span> c:
+        resp = <span class="k">await</span> c.post(url, headers={<span class="s">"Authorization"</span>: <span class="s">f"Bearer {key}"</span>},
+                              files={<span class="s">"file"</span>: (name, image)})
+        resp.raise_for_status(); <span class="k">return</span> resp.json()
+
+<span class="k">def</span> _map_response(payload) -> dict:                    <span class="c"># → {score 0..100, flags}</span>
+    score = clamp(int(payload.get(<span class="s">"score"</span>)), 0, 100)   <span class="c"># متين على الغياب</span>
+    flags = join(payload.get(<span class="s">"flags"</span>))               <span class="c"># قائمة أو نصّ → نصّ</span>
+    <span class="k">return</span> {<span class="s">"score"</span>: score, <span class="s">"flags"</span>: flags}</pre>
+  <p>fail-open: أيّ خطأ HTTP/شبكة يُرفَع ويُلتقط أعلى السلسلة ⇒ <code>ERROR</code> غير حاجب (لا يعطّل الاعتماد).</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2>⑤ توزيع <code>_run_vendor</code></h2>
+  <pre>vendor = (settings.doc_verify_vendor <span class="k">or</span> <span class="s">""</span>).strip().lower()
+<span class="k">if</span> vendor == <span class="s">"local"</span>:        <span class="k">return await</span> run_local_verification(object_key)   <span class="c"># المدمج</span>
+<span class="k">if</span> is_external_configured(): <span class="k">return await</span> run_external_verification(object_key) <span class="c"># الخارجيّ</span>
+<span class="k">raise</span> NotImplementedError(<span class="s">"external vendor not fully configured …"</span>)   <span class="c"># ناقص ⇒ ERROR</span></pre>
+  <table>
+    <tr><th>الحالة</th><th>النتيجة</th></tr>
+    <tr><td>vendor فارغ</td><td>خامل (is_enabled=False) — لا تحقّق</td></tr>
+    <tr><td>vendor=local</td><td>المُحوِّل المدمج (جودة الصورة داخل المنصّة)</td></tr>
+    <tr><td>vendor خارجيّ + الأربعة مكتملة</td><td>المُحوِّل الخارجيّ (نداء ML) ⇒ DONE+درجة</td></tr>
+    <tr><td>vendor خارجيّ ناقص (بلا url/key/ack)</td><td><span class="err">ERROR</span> غير حاجب — لا تغادر أيّ صورة</td></tr>
+  </table>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2>⑥ الاختبارات (نداء المزوّد مُموَّه — بلا شبكة)</h2>
+  <table>
+    <tr><th>المجموعة</th><th>التغطية</th></tr>
+    <tr><td>البوّابات الأربع</td><td>غير مهيّأ افتراضيًّا · <strong>privacy_ack مطلوب</strong> (url+key بلا ack ⇒ False) · غياب key ⇒ False · الأربعة ⇒ True</td></tr>
+    <tr><td>المطابقة</td><td>flags قائمة→نصّ · قصّ الدرجة 250→100 · غياب المفاتيح → None</td></tr>
+    <tr><td>طرف-إلى-طرف (مُموَّه)</td><td>مهيّأ ⇒ DONE+درجة+vendor · <strong>بوّابة الخصوصيّة تمنع النداء فعليًّا</strong> (المزوّد لا يُستدعى) · خطأ المزوّد ⇒ fail-open ERROR · كائن مفقود ⇒ MISSING_OBJECT · المسار المحلّيّ/الخامل غير متأثّر</td></tr>
+  </table>
+  <p><span class="badge-ok">11/11 المُحوِّل الخارجيّ</span> + بقيّة E5 سليمة (4 أ + 11 ب + 3 تغطية = <strong>29 اختبار E5 إجمالًا</strong>).</p>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2>⑦ البوّابة والنشر الخامل</h2>
+  <table>
+    <tr><th>البند</th><th>النتيجة</th></tr>
+    <tr><td>FIN-COR</td><td><span class="badge-ok">PASS</span></td></tr>
+    <tr><td>الحزمة الخلفيّة</td><td>2205 ناجح (2194 + 11 جديدة) · أساس 29 / حاليّ 29 · <span class="ok">NEW=0</span></td></tr>
+    <tr><td>النشر</td><td><code>deploy_be_gated.sh</code> — backend-core صحّية · <strong>خامل</strong> (لا اعتمادات على الإنتاج)</td></tr>
+    <tr><td>الترحيل / الواجهة</td><td>بلا migration (جدول aa29) · بلا تغيير واجهة</td></tr>
+  </table>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2>⑧ التحقّق الحيّ على الإنتاج</h2>
+  <pre>  --- الحالة الافتراضيّة على الإنتاج (إعداد الخادم الحيّ) ---
+  is_enabled (any vendor)      : <span class="s">False</span>
+  is_external_configured       : <span class="s">False</span>
+  env vendor/url/key/ack       : <span class="s">''</span> <span class="s">''</span> <span class="s">''</span> <span class="s">False</span>
+
+  --- منطق البوّابة (عمليّة رمَويّة، لا تمسّ الخادم الحيّ، بلا نداء خارجيّ) ---
+  vendor+url+key, ack=False  -> is_external_configured = <span class="s">False</span>  (يجب False — بوّابة الخصوصيّة)
+  vendor+url+key, ack=True   -> is_external_configured = <span class="s">True</span>   (تتفعّل فقط الآن)
+  _map_response({score:250, flags:[FACE_MISMATCH]}) = {score:100, flags:'FACE_MISMATCH'}</pre>
+  <div class="seal">
+    ✅ المُحوِّل الخارجيّ في الصورة المنشورة، <strong>خامل افتراضيًّا</strong> على الإنتاج (الأربعة فارغة ⇒ لا نداء)،
+    و<strong>بوّابة الخصوصيّة مُثبَتة حيًّا</strong>: حتى مع الاعتمادات الكاملة، <code>ack=False</code> يمنع التهيئة.
+    لم تُمسّ إعدادات الخادم الحيّ ولم يُجرَ أيّ نداء خارجيّ فعليّ. الحاويتان صحّيتان.
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2>⑨ خطوات التفعيل المتبقّية لك (عند الجاهزيّة)</h2>
+  <ol class="clean">
+    <li>اختيار مزوّد ML وفتح حساب والحصول على <code>api_url</code> + <code>api_key</code>.</li>
+    <li><strong>اجتياز بوّابة الخصوصيّة</strong> (DPA + مراجعة قانونيّة لنقل صور الهويّة) ثمّ ضبط <code>doc_verify_external_privacy_ack=true</code>.</li>
+    <li>مواءمة <code>_map_response</code> مع مخطّط استجابة المزوّد المختار.</li>
+    <li>ضبط <code>doc_verify_vendor=&lt;اسم المزوّد&gt;</code>.</li>
+  </ol>
+  <p>عند اكتمالها يبدأ التقييم الحيّ بالـML ويبقى <strong>استشاريًّا (لا يحجب)</strong>. للدفاع عن هجمات <strong>الحقن</strong>
+  (كاميرا افتراضيّة/تزييف): SDK جهة العميل وقت الالتقاط — طبقة إضافيّة مستقبليّة.</p>
+  <div class="note">
+    <strong>طبقات E5 المكتملة:</strong> أ (هيكل + شارة) · ب (مُحوِّل محلّيّ ذاتيّ الاستضافة) · توسعة التغطية
+    (AGENT+DRIVER+PROVIDER) · المُحوِّل الخارجيّ (هذا التقرير — جاهز خامل). كلّها خاملة افتراضيًّا، FIN-COR PASS، رأس المستودع aa29.
+  </div>
+</section>
+
+<div class="foot">
+  تووا — منصّة التوصيل الليبيّة · تقرير E5 المُحوِّل الخارجيّ (مبنيّ جاهز للتفعيل · خامل) · 2026-06-12<br>
+  النطاق الحيّ tawanow.com · بوّابة خصوصيّة مُنفَّذة · لم يُفعَّل مزوّد حقيقيّ · FIN-COR PASS · NEW=0 · بلا migration · بلا commit
+</div>
+
+</div>
+</body>
+</html>

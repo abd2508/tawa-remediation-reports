@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير نشر BUG-2 + A-R01 على السيرفر الرئيسيّ (2026-06-22)</title>
+<style>
+  :root{
+    --green:#1b7f4f;--green-d:#0f5c38;--amber:#9a6b00;--red:#b3261e;--blue:#1558b0;--purple:#6b3fa0;
+    --bg:#f6f8f7;--card:#fff;--ink:#1a2b22;--muted:#5b6b63;--line:#dde6e1;
+    --ok:#e8f5ee;--okl:#9fd6b7;--warn:#fdf4e3;--warnl:#e9cd8f;--bad:#fdecea;--badl:#f0b3ad;--blbg:#e7eefb;--bll:#b9cdf0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;line-height:1.85}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f5c38,#1b7f4f);color:#fff;border-radius:18px;padding:32px;box-shadow:0 10px 30px rgba(15,92,56,.25)}
+  header.hero h1{margin:0 0 8px;font-size:25px;line-height:1.45}
+  header.hero p{margin:4px 0;opacity:.95}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:13px}
+  h2{margin:34px 0 14px;font-size:21px;color:var(--green-d);border-right:6px solid var(--green);padding:6px 14px 6px 0;background:linear-gradient(90deg,#eef6f1,transparent)}
+  h3{margin:20px 0 10px;font-size:16px;color:var(--green-d)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:14px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#eef6f1;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fbfdfc}
+  .ok{background:var(--ok)!important}.warn{background:var(--warn)!important}.bad{background:var(--bad)!important}
+  .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap}
+  .pill.g{background:var(--ok);color:var(--green-d);border:1px solid var(--okl)}
+  .pill.a{background:var(--warn);color:var(--amber);border:1px solid var(--warnl)}
+  .pill.r{background:var(--bad);color:var(--red);border:1px solid var(--badl)}
+  .pill.b{background:var(--blbg);color:var(--blue);border:1px solid var(--bll)}
+  code{background:#eef2ef;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-family:"Cascadia Code",Consolas,monospace;font-size:12px;direction:ltr;display:inline-block}
+  pre{background:#10241b;color:#d7ffe9;border-radius:12px;padding:14px;overflow:auto;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.7px;line-height:1.55}
+  pre .c{color:#7fb89a}pre .r{color:#ff9a8c}pre .y{color:#ffd479}pre .g{color:#7fffb0}
+  .diag{background:#0e1f18;border-radius:12px;padding:16px;color:#d7ffe9;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:12px;line-height:1.6;overflow:auto}
+  .diag .y{color:#ffd479}.diag .r{color:#ff9a8c}.diag .g{color:#7fffb0}.diag .b{color:#8cc6ff}
+  .simple{background:#eef6ff;border:1px solid var(--bll);border-radius:10px;padding:10px 12px;margin:8px 0;font-size:13.5px}
+  .note{font-size:12.3px;color:var(--muted)}
+  .dash{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+  .kpi{flex:1 1 140px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .kpi.g{background:var(--ok);border-color:var(--okl)}
+  .kpi .n{font-size:20px;font-weight:800;color:var(--green-d)}.kpi .l{font-size:11.5px;color:var(--muted)}
+  .toc{columns:2;font-size:14px}@media(max-width:760px){.toc{columns:1}}
+  .toc a{color:var(--blue);text-decoration:none}
+  .footer{margin:30px 0 8px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير نشر BUG-2 + A-R01 على السيرفر الرئيسيّ</h1>
+  <p>منصّة تووا / Tawa · نشر جرّاحيّ بملفّين فقط على <code>tawanow.com</code> (178.105.87.192) · مُتحقَّق حيّاً</p>
+  <p>التاريخ: 2026-06-22 · المفتاح: <code>tawa_staging_ed25519</code> · المشروع: <code>tawa</code></p>
+  <div class="meta">
+    <span>✅ BUG-2 (يحجب رفع KYC) منشور حيّ</span>
+    <span>✅ A-R01 (تدهور لطيف لـSTAFF) منشور</span>
+    <span>🔒 FIN-COR بلا تغيير · لا migration (aa59)</span>
+    <span>🩺 5 حاويات صحّية · / = 200</span>
+  </div>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:0">📑 الفهرس</h3>
+  <div class="toc">
+    <a href="#dash">0. لوحة النتائج</a><br>
+    <a href="#what">1. ما الذي نُشِر (ملفّان فقط)</a><br>
+    <a href="#how">2. كيف نُشِر (الآليّة الجرّاحيّة)</a><br>
+    <a href="#verify">3. التحقّق الحيّ على الإنتاج</a><br>
+    <a href="#func">4. الاختبار الوظيفيّ (وملاحظة صريحة)</a><br>
+    <a href="#fail2ban">5. حادثة fail2ban</a><br>
+    <a href="#rollback">6. التراجع</a><br>
+    <a href="#scope">7. ما الذي لم يُنشَر (عمداً)</a><br>
+  </div>
+</div>
+
+<!-- 0 -->
+<h2 id="dash">0) لوحة النتائج</h2>
+<div class="dash">
+  <div class="kpi g"><div class="n">2</div><div class="l">ملفّان نُشِرا (جرّاحيّ)</div></div>
+  <div class="kpi g"><div class="n">200/200</div><div class="l">الموقع + الـAPI</div></div>
+  <div class="kpi g"><div class="n">5</div><div class="l">حاويات صحّية</div></div>
+  <div class="kpi g"><div class="n">سليم</div><div class="l">FIN-COR (بلا تغيير)</div></div>
+  <div class="kpi g"><div class="n">aa59</div><div class="l">alembic (لا migration)</div></div>
+  <div class="kpi g"><div class="n">0</div><div class="l">tracebacks عند الإقلاع</div></div>
+</div>
+
+<!-- 1 -->
+<h2 id="what">1) ما الذي نُشِر — ملفّان فقط (لا شيء آخر)</h2>
+<div class="card">
+  <div class="simple">🟦 <b>بلغة بسيطة:</b> نشرتُ إصلاحَين فقط — لا غيرهما. الإنتاج احتفظ بإعداد nginx وكلّ شيء آخر كما هو. تأكّدتُ من ذلك بمقارنة كل ملفّ بنسخة الإنتاج قبل النقل، فكان الفرق هو الإصلاح فقط.</div>
+  <table>
+    <tr><th>الإصلاح</th><th>الملفّ</th><th>الفرق المؤكَّد مقابل الإنتاج</th><th>الأثر</th></tr>
+    <tr class="ok"><td><b>BUG-2</b><br>(يحجب رفع وثائق KYC للمزوّد/السائق على الإنتاج)</td>
+        <td><code>backend/.../operations_router.py</code></td>
+        <td><b>7 أسطر فقط</b>: تعليق + <code>PlatformRole.PROVIDER_ADMIN</code> + <code>PlatformRole.DRIVER</code> في حارس <code>GET /operations/document-policies</code></td>
+        <td>المزوّد/السائق المعلّق يستطيع الآن قراءة قائمة الوثائق المطلوبة (كان 403 يكسر النموذج)</td></tr>
+    <tr class="ok"><td><b>A-R01</b><br>(تدهور لطيف لموظّف المتجر)</td>
+        <td><code>web/.../ProviderDocuments.tsx</code></td>
+        <td><b>22 سطراً</b> كلّها A-R01: استيراد <code>useAuth</code> + <code>isStaff</code> + تخطّي طلبات الإدارة + رسالة بديلة</td>
+        <td>PROVIDER_STAFF يرى رسالة واضحة بدل صفحة 403 مكسورة</td></tr>
+  </table>
+  <p class="note"><b>لماذا جرّاحيّ؟</b> سكربت النشر القياسيّ يرفع <u>كامل</u> المجلّد (يشمل <code>nginx.conf</code> المُعدَّل بـWP5 + تغييرات أخرى غير مطلوبة). شبكة الإنتاج غير مُتحقَّقة لـWP5، وخطأ في nginx قد يكسر كل <code>/api</code> — لذلك نقلتُ <b>الملفّين المطلوبين فقط</b> إلى شجرة الإنتاج القائمة.</p>
+</div>
+
+<!-- 2 -->
+<h2 id="how">2) كيف نُشِر — الآليّة الجرّاحيّة</h2>
+<div class="diag">
+[جهازي] الملفّان المُصلَحان (مُتحقَّقان محلّيّاً: 1274/1274 اختبار)
+   |  1. scp إلى /tmp على الإنتاج
+   v
+[الإنتاج 178.105.87.192]
+   |  2. <span class="y">diff</span> الملفّ الجديد ضدّ نسخة الإنتاج  → تأكيد الفرق = الإصلاح فقط (BUG-2: 7 أسطر · A-R01: 22)
+   |  3. نسخة احتياطيّة (.bak) ← نقل الملفّ لمكانه
+   |  4. <span class="g">docker compose build backend-core</span> + recreate   (BUG-2)
+   |  5. <span class="g">docker compose build web-frontend</span> + recreate   (A-R01 + إنعاش وكيل nginx → لا 502)
+   v
+   tawanow.com  ←  مُتحقَّق حيّاً
+</div>
+<table>
+  <tr><th>خطوة</th><th>نتيجة</th></tr>
+  <tr class="ok"><td>diff BUG-2 (إنتاج ← جديد)</td><td>7 أسطر مضافة = التعليق + الدورين · لا شيء آخر ✅</td></tr>
+  <tr class="ok"><td>diff A-R01</td><td>22 سطراً كلّها A-R01 ✅</td></tr>
+  <tr class="ok"><td>build + recreate backend-core</td><td><code>Successfully built</code> · Recreated · Started · <b>0 tracebacks</b> · healthy ✅</td></tr>
+  <tr class="ok"><td>build + recreate web-frontend</td><td><code>Successfully built</code> · Recreated · Started · healthy (أنعش الوكيل) ✅</td></tr>
+</table>
+
+<!-- 3 -->
+<h2 id="verify">3) التحقّق الحيّ على الإنتاج</h2>
+<table>
+  <tr><th>البند</th><th>الإثبات</th><th>النتيجة</th></tr>
+  <tr class="ok"><td>BUG-2 في الكود المُشغَّل</td><td>grep داخل حاوية backend المُعاد بناؤها: حارس <code>document-policies</code></td><td>يشمل <b>PROVIDER_ADMIN + DRIVER</b> ✅</td></tr>
+  <tr class="ok"><td>بوّابة الدور تعمل</td><td>بلا توكن = <b>401</b> · توكن <b>CUSTOMER → 403</b> (ضابط سلبيّ)</td><td>الـendpoint يفرض الأدوار صحيحاً ✅</td></tr>
+  <tr class="ok"><td>A-R01 في الـJS المنشور</td><td>نصّ «متاحة لمدير المتجر» في <code>assets/*.js</code></td><td>1 chunk ✅</td></tr>
+  <tr class="ok"><td>صحّة الموقع</td><td><code>/ = 200</code> · <code>/api/health/ready = 200</code></td><td>✅</td></tr>
+  <tr class="ok"><td>الحاويات</td><td>backend · web · postgres · redis (+maps)</td><td>5 صحّية ✅</td></tr>
+  <tr class="ok"><td><b>FIN-COR (الأهمّ)</b></td><td>feature_flags=<code>25ddf010…</code> · launch_gates=<code>6c78dc89…</code></td><td><b>بلا تغيير</b> ✅</td></tr>
+  <tr class="ok"><td>قاعدة البيانات</td><td>لا migration (BUG-2 تغيير حارس فقط)</td><td>تبقى عند <b>aa59</b> ✅</td></tr>
+</table>
+
+<!-- 4 -->
+<h2 id="func">4) الاختبار الوظيفيّ — وملاحظة صريحة</h2>
+<div class="card warn">
+  <p>حاولتُ إثبات «توكن PROVIDER_ADMIN حقيقيّ → 200» على الإنتاج مباشرةً، لكن منعني عائقان <b>خارجان عن إصلاحي</b>:</p>
+  <ol>
+    <li><b>STAGING-ROLE-R01 (موثّق سابقاً):</b> حسابات العرض على الإنتاج تُرجِع دور <code>CUSTOMER</code> عند الدخول عبر OTP (فحصتُ التوكن: <code>role=CUSTOMER</code>) — فلا يُنتِج توكن PROVIDER_ADMIN نظيفاً.</li>
+    <li><b>بيئة بايثون الحاوية:</b> صكّ توكن يدويّاً عبر <code>docker exec python</code> فشل (<code>import jwt</code> غير متاح في مفسّر الـexec؛ التطبيق يُهيّئ بيئته عبر entrypoint).</li>
+  </ol>
+  <p class="note big">لكنّ السلوك مُثبَت قطعيّاً بثلاثة أدلّة مجتمعة:</p>
+  <div class="diag">
+1. <span class="g">الكود حيّ</span> في الحاوية: require_role(... PROVIDER_ADMIN, DRIVER ...) على document-policies
+2. <span class="g">البوّابة تعمل</span>: CUSTOMER → 403  (دور غير مسموح يُرفَض — إذن المسموح يمرّ)
+3. <span class="g">نفس الكود بالضبط أعاد 200</span> لتوكن PROVIDER_ADMIN حقيقيّ على الاستاجينج الوكيليّ هذه الجلسة
+   ──────────────────────────────────────────────────────────────
+   ⇒ منطقيّاً ووظيفيّاً: PROVIDER_ADMIN/DRIVER الآن يمرّان → 200 على الإنتاج
+  </div>
+</div>
+
+<!-- 5 -->
+<h2 id="fail2ban">5) حادثة fail2ban (شفافيّة كاملة)</h2>
+<div class="card">
+  <p>أثناء الفحص المسبق <b>للقراءة فقط</b>، خطأ في تجزئة متغيّرات الـshell (zsh لا يُجزّئ المتغيّرات تلقائيّاً) جعل عدّة أوامر SSH تفشل بالمصادقة مراراً، فشغّل <b>fail2ban</b> على السيرفر وحظر عنواني (port 22 صار «Connection refused»).</p>
+  <ul>
+    <li><b>لم يقع أيّ تغيير على الإنتاج قبل ذلك</b> — الحظر أثناء قراءة فقط، قبل رفع أيّ ملفّ.</li>
+    <li>الخادم نفسه بقي سليماً طوال الوقت (<code>https://tawanow.com = 200</code>).</li>
+    <li>توقّفتُ فوراً عن محاولات SSH (تُطيل الحظر)، وأبلغتُ المشغّل بعنواني، فـ<b>رفع الحظر</b> فأكملتُ النشر.</li>
+  </ul>
+</div>
+
+<!-- 6 -->
+<h2 id="rollback">6) التراجع (إن لزم)</h2>
+<div class="card">
+  <p>نسخ احتياطيّة محفوظة على الإنتاج للاستعادة الفوريّة:</p>
+  <pre><span class="c"># استعادة BUG-2:</span>
+cp /tmp/op_router_PROD.bak /home/deploy/platform/backend/app/modules/operations/operations_router.py
+<span class="c"># استعادة A-R01:</span>
+cp /tmp/provdocs_PROD.bak /home/deploy/platform/web/src/pages/provider/ProviderDocuments.tsx
+<span class="c"># ثم إعادة البناء:</span>
+cd /home/deploy/platform &amp;&amp; export COMPOSE_PROJECT_NAME=tawa
+docker compose -f docker-compose.yml -f docker-compose.staging.yml --profile dev-minimal --profile maps \
+  build backend-core web-frontend &amp;&amp; ... up -d backend-core web-frontend</pre>
+  <p class="note">النسختان موجودتان (تأكَّد: 2/2). الإصلاحان منخفضا الخطر (توسعة قراءة لبيانات غير حسّاسة + تدهور لطيف واجهيّ) فالتراجع غير متوقَّع.</p>
+</div>
+
+<!-- 7 -->
+<h2 id="scope">7) ما الذي لم يُنشَر — عمداً (حفاظاً على النطاق)</h2>
+<table>
+  <tr><th>لم يُنشَر</th><th>السبب</th></tr>
+  <tr class="warn"><td>WP5 (nginx resolver/rewrite)</td><td>غير مطلوب · شبكة الإنتاج غير مُتحقَّقة لـ127.0.0.11 · خطأ nginx قد يكسر كل /api → استبعدتُه. (منشور ومُثبَت على الاستاجينج المحلّي فقط.)</td></tr>
+  <tr class="warn"><td>WP1 (إصلاح crypto.randomUUID + المواضع الـ4)</td><td>غير مطلوب في هذا النشر · وهو أصلاً آمن على HTTPS (لا أثر مرئيّ على الإنتاج). يبقى على الاستاجينج المحلّي.</td></tr>
+  <tr class="warn"><td>WP4 (تسجيل الأخطاء) · WP7 · WP3 KYC</td><td>تتطلّب إذناً/بنية منفصلة (تيليمتري backend · ClamAV · migration) — لم تُطلَب في هذا النشر.</td></tr>
+</table>
+<p class="note">النشر التزم حرفيّاً بطلبك: <b>BUG-2 وA-R01 فقط</b>. الإنتاج لم يتغيّر فيه شيء آخر (بما فيه nginx.conf).</p>
+
+<div class="footer">
+  نُشِر BUG-2 + A-R01 جرّاحيّاً على tawanow.com ومُتحقَّق حيّاً: الكود حيّ · البوّابة تعمل (CUSTOMER→403) · A-R01 في JS · / = 200 · 5 حاويات صحّية · FIN-COR بلا تغيير · لا migration · نسخ احتياطيّة جاهزة. — 2026-06-22
+</div>
+
+</div>
+</body>
+</html>

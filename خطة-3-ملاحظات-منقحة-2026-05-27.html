@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الخطة المنقَّحة — 24 عَيباً اكتُشف قَبل التَّنفيذ</title>
+<style>
+  :root{
+    --green:#0e7a4f; --green-bg:#e8f4ee; --green-soft:#dcefe5;
+    --red:#b3261e; --red-bg:#fde7e6;
+    --amber:#b86e00; --amber-bg:#fff3df;
+    --blue:#1a73e8; --blue-bg:#e8f1fe;
+    --purple:#7c3aed; --purple-bg:#f3eafd;
+    --gray-900:#1f1f1f; --gray-700:#4a4a4a; --gray-500:#7a7a7a;
+    --gray-300:#d8d8d8; --gray-100:#f3f3f3; --gray-50:#fafafa; --border:#d8d8d8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font-family:"Noto Naskh Arabic","Amiri","Segoe UI",sans-serif; background:#f7f7f8; color:var(--gray-900); line-height:1.7; font-size:14.5px}
+  .wrap{max-width:1180px; margin:0 auto; padding:24px 18px 80px}
+
+  header{background:linear-gradient(135deg, var(--red) 0%, #7a1714 100%); color:white; border-radius:14px; padding:30px 32px; margin-bottom:24px; box-shadow:0 4px 16px rgba(0,0,0,.08)}
+  header h1{margin:0 0 8px; font-size:1.7rem; font-weight:800}
+  header .sub{font-size:1rem; opacity:.92}
+  header .meta{font-size:.82rem; opacity:.85; margin-top:10px; display:flex; gap:18px; flex-wrap:wrap}
+
+  h2{color:var(--green); font-size:1.4rem; font-weight:800; border-bottom:3px solid var(--green); padding-bottom:6px; margin:38px 0 14px}
+  h3{color:var(--gray-900); font-size:1.1rem; font-weight:700; margin:22px 0 10px; padding-right:8px; border-right:4px solid var(--green-bg)}
+  h4{color:var(--gray-700); font-size:.98rem; font-weight:700; margin:14px 0 8px}
+
+  .card{background:white; border:1px solid var(--border); border-radius:12px; padding:16px 20px; margin:12px 0; box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card.green{border-right:5px solid var(--green); background:var(--green-bg)}
+  .card.red{border-right:5px solid var(--red); background:var(--red-bg)}
+  .card.amber{border-right:5px solid var(--amber); background:var(--amber-bg)}
+  .card.blue{border-right:5px solid var(--blue); background:var(--blue-bg)}
+  .card.purple{border-right:5px solid var(--purple); background:var(--purple-bg)}
+
+  .danger-banner{background:linear-gradient(135deg, var(--red-bg) 0%, #fad6d3 100%); border:3px solid var(--red); border-radius:14px; padding:20px 24px; margin:18px 0; box-shadow:0 4px 12px rgba(179, 38, 30, 0.15)}
+  .danger-banner h3{color:var(--red); margin:0 0 8px; border:none; padding:0; font-size:1.15rem}
+
+  table{width:100%; border-collapse:collapse; background:white; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:10px 0; font-size:.88rem}
+  th,td{text-align:right; padding:10px 13px; border-bottom:1px solid var(--gray-100); vertical-align:top}
+  th{background:var(--gray-50); font-weight:700; color:var(--gray-700); font-size:.85rem}
+  tr:last-child td{border-bottom:none}
+  td.center{text-align:center}
+  td.mono, .mono{font-family:"Courier New",monospace; font-size:.78rem; color:var(--gray-700); direction:ltr; text-align:left}
+
+  .file-ref{background:var(--gray-100); padding:2px 6px; border-radius:4px; font-family:"Courier New",monospace; font-size:.76rem; color:var(--gray-900); direction:ltr; display:inline-block; border:1px solid var(--gray-300)}
+
+  pre{background:#1f1f1f; color:#e8e8e8; padding:12px 14px; border-radius:6px; overflow-x:auto; font-size:.78rem; line-height:1.55; direction:ltr; margin:8px 0; font-family:"Courier New",monospace}
+  pre.add{background:#1a3a25; border-right:3px solid var(--green)}
+  pre.del{background:#3a1a1a; border-right:3px solid var(--red)}
+
+  .key-fact{padding:10px 14px; margin:12px 0; border-radius:8px; font-weight:600; border-right:5px solid}
+  .key-fact.green{background:var(--green-bg); border-right-color:var(--green)}
+  .key-fact.amber{background:var(--amber-bg); border-right-color:var(--amber); color:#7c4a00}
+  .key-fact.red{background:var(--red-bg); border-right-color:var(--red); color:#7a1714}
+  .key-fact.blue{background:var(--blue-bg); border-right-color:var(--blue)}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin:14px 0}
+  .stat{background:white; border:1px solid var(--border); border-radius:10px; padding:14px 16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--green); display:block; line-height:1.1}
+  .stat .num.red{color:var(--red)}
+  .stat .num.amber{color:var(--amber)}
+  .stat .num.blue{color:var(--blue)}
+  .stat .label{font-size:.82rem; color:var(--gray-700); margin-top:4px}
+
+  .defect-card{
+    background:white; border:1px solid var(--border); border-radius:10px;
+    padding:14px 18px; margin:10px 0;
+    border-right:5px solid var(--gray-300);
+  }
+  .defect-card.crit{border-right-color:var(--red); background:#fffafa}
+  .defect-card.med{border-right-color:var(--amber); background:#fffbf3}
+  .defect-card.low{border-right-color:var(--green); background:#f7fbf9}
+  .defect-card .id{display:inline-block; background:var(--gray-100); padding:2px 10px; border-radius:5px; font-weight:800; font-size:.85rem; color:var(--gray-700)}
+  .defect-card .id.crit{background:var(--red); color:white}
+  .defect-card .id.med{background:var(--amber); color:white}
+  .defect-card .id.low{background:var(--green); color:white}
+  .defect-card h4{margin:6px 0 4px}
+
+  .topic-card{background:white; border:1px solid var(--border); border-radius:14px; padding:0; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.06); overflow:hidden}
+  .topic-head{padding:16px 22px; background:linear-gradient(135deg, var(--purple-bg) 0%, #ede4f8 100%); border-bottom:2px solid var(--purple)}
+  .topic-head h3{margin:0; border:none; padding:0; color:var(--purple); font-size:1.15rem; font-weight:800}
+  .topic-tag{display:inline-block; background:var(--purple); color:white; padding:3px 10px; border-radius:6px; font-size:.78rem; font-weight:700; margin-bottom:6px}
+  .topic-body{padding:18px 24px}
+
+  .ok{color:var(--green); font-weight:700}
+  .bad{color:var(--red); font-weight:700}
+  .warn{color:var(--amber); font-weight:700}
+
+  ul.clean{list-style:none; padding:0; margin:8px 0}
+  ul.clean li{padding:5px 0 5px 28px; position:relative}
+  ul.clean li::before{content:"◉"; color:var(--green); position:absolute; right:8px; top:5px; font-size:.85rem}
+  ul.clean.amber li::before{color:var(--amber); content:"⚠"}
+  ul.clean.red li::before{color:var(--red); content:"✗"}
+
+  .approval-box{background:linear-gradient(135deg, #fff8e1 0%, #fff3c4 100%); border:3px solid var(--amber); border-radius:14px; padding:24px 28px; margin:32px 0}
+  .approval-box h2{color:var(--amber); border:none; margin:0 0 12px; padding:0}
+  .approval-box .checklist{margin:14px 0; padding:0; list-style:none}
+  .approval-box .checklist li{padding:8px 0 8px 32px; position:relative; font-weight:600}
+  .approval-box .checklist li::before{content:"☐"; position:absolute; right:0; top:8px; color:var(--amber); font-size:1.4rem; line-height:1}
+
+  .toc{background:var(--gray-50); border:1px solid var(--border); border-radius:10px; padding:14px 22px; margin-bottom:24px}
+  .toc h3{margin-top:0; color:var(--green); border-right:none}
+  .toc ol{margin:0; padding-right:24px}
+  .toc li{padding:3px 0}
+  .toc a{color:var(--blue); text-decoration:none; font-weight:600}
+
+  footer{text-align:center; color:var(--gray-500); font-size:.82rem; margin-top:40px; padding-top:20px; border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>الخطة المنقَّحة — 24 عَيباً اكتُشف قَبل التَّنفيذ</h1>
+  <div class="sub">المراجعة الدقيقة كَشَفت 4 عُيوب حَرجة في G-1 (offline) + 4 في G-2 (handoff) + 3 في G-5 (email). تَأجيل بعض الإصلاحات وإعادة تَرتيب الأَولويات</div>
+  <div class="meta">
+    <span>📅 2026-05-27</span>
+    <span>🔍 5 سيناريوهات stress-test</span>
+    <span>🚨 11 عَيب حَرج اكتُشف</span>
+    <span>⚠️ التَّرتيب القديم خَطير — تَغَيَّر</span>
+  </div>
+</header>
+
+<div class="toc">
+  <h3>فهرس الخطة المنقَّحة</h3>
+  <ol>
+    <li><a href="#sec0">٠. التَّحذير الكبير — لماذا الخطة الأَصلية خَطيرة</a></li>
+    <li><a href="#sec1">١. ملخّص الـ24 عَيباً المُكتشَفة</a></li>
+    <li><a href="#sec2">٢. القَرارات الجَذرية المَطلوبة منك</a></li>
+    <li><a href="#sec3">٣. الترتيب الجَديد للموجات (A→B→D→C)</a></li>
+    <li><a href="#sec4">٤. تَفاصيل كل عَيب + إصلاحه (R-1..R-24)</a></li>
+    <li><a href="#sec5">٥. الخطة المُنفَّذة الآمنة (5 موجات بدل 4)</a></li>
+    <li><a href="#sec6">٦. صَندوق الموافقة المُحَدَّث</a></li>
+  </ol>
+</div>
+
+<!-- ════════════════════ 0 — الخطر ════════════════════ -->
+<h2 id="sec0">٠. التَّحذير الكبير</h2>
+
+<div class="danger-banner">
+<h3>🚨 الخطة الأَصلية (الـ4 موجات A→B→C→D) فيها 3 عُيوب أَمنية حَرجة لو نُفِّذت كَما هي:</h3>
+<ol>
+  <li><strong>HMAC على 4 أرقام = أَمن وَهْمي:</strong> السائق يَفتح DevTools، يَنسخ الـhash + salt، يَكتب JS صَغير يُجرّب كل 10,000 احتمال (0000-9999) في <strong>10 مللي ثانية</strong>. الـHMAC ليس KDF — لا scrypt، لا bcrypt. الـcode يَنكشف فوراً.</li>
+  <li><strong>User row مُنشَأ قَبل email verify:</strong> أي شخص يَستطيع تَسجيل email لشخص آخر بـtypo (<code>user@gmial.com</code>) → الـattacker الحقيقي مالك <code>user@gmial.com</code> يَستلم الـOTP → يَدخل ويَتحكَّم بالـaccount.</li>
+  <li><strong>G-2 reassign لا يُجَدِّد الـcodes:</strong> سائق A يَطلب reassign، OPS يُوافق، الـorder يَنتقل لـB، لكنّ <code>pickup_token</code> و <code>delivery_handoff_code</code> يَبقَيان كَما هما → السائق A يَستطيع نَظرياً التَّسليم بِشَريك (لو احتفظ بالـcode + بنفس offer قَبل revoke).</li>
+</ol>
+<p><strong>اِكتشف الإيجنت أيضاً عَيباً موجوداً سابقاً (قبل الخطة):</strong> <code>verify_handoff</code> لا يَفحص حالة الـorder — حتى لو الـorder ألغاه العميل، الـverify يَنجح. هذا bug قديم يَحتاج إصلاح ضِمن G-2.</p>
+</div>
+
+<div class="card amber">
+<strong>الخلاصة:</strong> الخطة الأَصلية ابتدأت بـA (آمن) → C (عُيوب أَمنية) → D (عُيوب أَكثر). الخطة الجديدة تَبدأ بـ<strong>A → B (مع 3 إصلاحات أمنية) → D (مع 4 إصلاحات أمنية)</strong> ثم تَتوقَّف قَبل C لِقَرار جَذري: هل نَستبدل HMAC بـed25519 QR cryptographic؟
+</div>
+
+<!-- ════════════════════ 1 — ملخص العيوب ════════════════════ -->
+<h2 id="sec1">١. ملخّص الـ24 عَيباً</h2>
+
+<div class="stat-grid">
+  <div class="stat"><span class="num red">11</span><span class="label">حَرجة (R-1..R-11)</span></div>
+  <div class="stat"><span class="num amber">8</span><span class="label">متوسّطة (R-12..R-19)</span></div>
+  <div class="stat"><span class="num">5</span><span class="label">تحسينات (R-20..R-24)</span></div>
+  <div class="stat"><span class="num blue">5</span><span class="label">سيناريوهات اختُبرت</span></div>
+</div>
+
+<table>
+  <thead>
+    <tr><th>الكود</th><th>الفئة</th><th>الإصلاح</th><th>المرحلة المُتأثَّرة</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>R-1</strong></td><td class="bad">🔴 حَرج</td><td>brute-force محلي لـHMAC 4 digits (10ms)</td><td>G-1</td></tr>
+    <tr><td><strong>R-2</strong></td><td class="bad">🔴 حَرج</td><td>local counter غَير مُتزامن مع server</td><td>G-1</td></tr>
+    <tr><td><strong>R-3</strong></td><td class="bad">🔴 حَرج</td><td>persistence split (IndexedDB vs localStorage)</td><td>G-1</td></tr>
+    <tr><td><strong>R-4</strong></td><td class="bad">🔴 حَرج</td><td>pre-check failure → action يَتابع رغم state-conflict</td><td>G-1</td></tr>
+    <tr><td><strong>R-5</strong></td><td class="bad">🔴 حَرج</td><td>pickup_token لا يُجَدَّد عند reassign</td><td>G-2</td></tr>
+    <tr><td><strong>R-6</strong></td><td class="bad">🔴 حَرج</td><td>verify_pickup لا يَفحص driver_id الحالي (bug قديم)</td><td>G-2</td></tr>
+    <tr><td><strong>R-7</strong></td><td class="bad">🔴 حَرج</td><td>handoff_code لا يُجَدَّد + العميل لا يَعرف</td><td>G-2</td></tr>
+    <tr><td><strong>R-8</strong></td><td class="bad">🔴 حَرج</td><td>A's bundle لا يُسحب على reassign</td><td>G-2</td></tr>
+    <tr><td><strong>R-9</strong></td><td class="bad">🔴 حَرج</td><td>User row مُنشَأ قَبل email_verify = privilege escalation</td><td>G-5</td></tr>
+    <tr><td><strong>R-10</strong></td><td class="bad">🔴 حَرج</td><td>enumeration via 404 على /email/verify-request</td><td>G-5</td></tr>
+    <tr><td><strong>R-11</strong></td><td class="bad">🔴 حَرج</td><td>لا زر "تَغيير البريد" في email_verify step</td><td>G-5</td></tr>
+    <tr><td>R-12</td><td class="warn">🟡 متوسّط</td><td>bundle expiry بعد background 5min يَفقد verify</td><td>G-1</td></tr>
+    <tr><td>R-13</td><td class="warn">🟡 متوسّط</td><td>settlement attribution غير مُعرَّف عند reassign</td><td>G-2</td></tr>
+    <tr><td>R-14</td><td class="warn">🟡 متوسّط</td><td>لا auto-hide للـpassword toggle (5s + on blur)</td><td>G-3</td></tr>
+    <tr><td>R-15</td><td class="warn">🟡 متوسّط</td><td>لا diff-viewer عند password mismatch</td><td>G-3</td></tr>
+    <tr><td>R-16</td><td class="warn">🟡 متوسّط</td><td>backend envelope لا يَدعم <code>details.fields</code> اليوم</td><td>G-4</td></tr>
+    <tr><td>R-17</td><td class="warn">🟡 متوسّط</td><td>rate-limit غائب لـ/email/verify-request</td><td>G-5</td></tr>
+    <tr><td>R-18</td><td class="warn">🟡 متوسّط</td><td>Redis fail يَترك state عالِق</td><td>G-5</td></tr>
+    <tr><td>R-19</td><td class="warn">🟡 متوسّط</td><td>zero-width characters في paste لا تُكشف</td><td>G-3</td></tr>
+    <tr><td>R-20</td><td>🟢 تَحسين</td><td>inline live "✓ مُتطابقتان" بَدلاً من toggle فقط</td><td>G-3</td></tr>
+    <tr><td>R-21</td><td>🟢 تَحسين</td><td>typo-detector (Levenshtein) لـtop-100 domains</td><td>G-5</td></tr>
+    <tr><td>R-22</td><td>🟢 تَحسين</td><td>telemetry لـbrute-force signals</td><td>G-1</td></tr>
+    <tr><td>R-23</td><td>🟢 تَحسين</td><td>state-machine صَريح للـreassignment</td><td>G-2</td></tr>
+    <tr><td>R-24</td><td>🟢 تَحسين</td><td>WebAuthn-bound bundle (biometric unlock)</td><td>G-1</td></tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════ 2 — قَرارات جَذرية ════════════════════ -->
+<h2 id="sec2">٢. قَرارات جَذرية مَطلوبة منك (قَبل التَّنفيذ)</h2>
+
+<div class="card amber">
+<h3 style="margin-top:0">قَرار #1: نَموذج verify offline للسائق</h3>
+<p>المُشكلة: HMAC على 4 أرقام يَنكسر في 10ms بـbrute-force محلي. ثلاث خيارات:</p>
+<table>
+  <thead><tr><th>الخيار</th><th>الوصف</th><th>المَخاطر</th><th>الجُهد</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>أ — لا offline verify للسائق</strong> (الأَأمن)</td>
+      <td>السائق يَكتب الـcode، يَنتظر النِّت. لو لا نِت، يَفتح <code>driver_emergency(kind=NO_INTERNET_AT_DELIVERY)</code> → OPS يُؤكِّد يَدوياً</td>
+      <td>✅ صفر مَخاطر أمنية. ⚠️ UX سَيء في مناطق ضَعيفة</td>
+      <td>~1 ساعة (driver emergency kind + UI)</td>
+    </tr>
+    <tr>
+      <td><strong>ب — زيادة الـcode إلى 6 أرقام + Argon2id</strong></td>
+      <td>backend يُولِّد 6 أرقام. الـapp تَستخدم Argon2id بـcost عالٍ (100ms/hash). brute-force = 1M × 100ms = 27 ساعة</td>
+      <td>⚠️ Argon2id على هواتف ضَعيفة قد يُجَمِّد الـUI لـ500ms على verify المَشروع</td>
+      <td>~5 ساعات + اختبار أَداء</td>
+    </tr>
+    <tr>
+      <td><strong>ج — QR cryptographic بـed25519</strong></td>
+      <td>backend يُولِّد key-pair للـorder، private للعميل (في QR)، public للسائق. السائق يَمسح QR من شاشة العميل → التَّوقيع يُتحقَّق محلياً بـpublic key</td>
+      <td>✅ آمن cryptographically. ⚠️ يَحتاج العميل أن يَعرض QR (ليس فقط 4 أرقام)</td>
+      <td>~8 ساعات (تَصميم جَديد كامل)</td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>تَوصيتي:</strong> الخيار أ (الأَبسط + الأَأمن). G-1 يَتقلَّص إلى "F-15 queue + UX feedback صَريح" بدون verify محلي.</p>
+</div>
+
+<div class="card amber">
+<h3 style="margin-top:0">قَرار #2: email verify كـgate أم اختياري؟</h3>
+<table>
+  <tbody>
+    <tr><td><strong>أ</strong></td><td>إجباري للكل قبل أيّ نشاط</td><td>أَأمن — حلّ R-9</td></tr>
+    <tr><td><strong>ب</strong></td><td>إجباري لـprovider/driver/staff فقط</td><td>متوازن</td></tr>
+    <tr><td><strong>ج</strong></td><td>اختياري للجميع</td><td>تَجربة أَسهل لكن R-9 يَبقى</td></tr>
+  </tbody>
+</table>
+<p><strong>تَوصيتي:</strong> ب (إجباري لـprovider/driver/staff، اختياري لـcustomer). لو ج، نَحتاج حَلاً مُختلفاً لـR-9 (مثل عَدم سَماح password reset عَبر email حتى verify).</p>
+</div>
+
+<div class="card amber">
+<h3 style="margin-top:0">قَرار #3: مَنطق تَبديل السائق (Settlement)</h3>
+<p>إذا سائق A قَبل offer + استلم بَضائع + تَعَطَّلت دَرّاجته + سائق B أَكمل التَّسليم:</p>
+<ul class="clean">
+  <li><strong>أ:</strong> B يَتقاضى كل الأَجر، A لا شيء</li>
+  <li><strong>ب:</strong> A يَتقاضى distance(A→provider→A_stop)، B يَتقاضى distance(A_stop→customer)</li>
+  <li><strong>ج:</strong> A يَتقاضى نِسبة ثابتة (مثلاً 30%) بِغَضّ النَّظر عن المَسافة</li>
+</ul>
+<p><strong>تَوصيتي:</strong> ج (الأَبسط). توَثَّق السياسة في policy doc.</p>
+</div>
+
+<!-- ════════════════════ 3 — الترتيب الجديد ════════════════════ -->
+<h2 id="sec2">٣. الترتيب الجَديد للموجات</h2>
+
+<div class="card green">
+<h3 style="margin-top:0">القَديم (خَطير): A → B → C → D</h3>
+<p>كان يَفترض أنّ C (offline verify) أَسرع تَطبيقاً، لكن R-1..R-4 تَكشف أنّه فعلياً الأَخطر.</p>
+</div>
+
+<div class="card blue">
+<h3 style="margin-top:0">الجَديد (آمن): A → B → D → (قَرار) → C</h3>
+<table>
+  <thead><tr><th>الموجة</th><th>الترتيب</th><th>backend؟</th><th>وَقت</th><th>المَخاطر</th></tr></thead>
+  <tbody>
+    <tr style="background:#e8f4ee"><td><strong>A</strong> (G-3 + G-4)</td><td>الأَولى — آمنة تماماً</td><td class="ok">لا (G-3) + tweak صَغير (G-4)</td><td>~3 ساعات</td><td>صفر</td></tr>
+    <tr style="background:#fff3df"><td><strong>B</strong> (G-5 + R-9..R-11)</td><td>الثانية — مع 3 إصلاحات أمنية</td><td><span class="warn">نعم — Redis-pending-registration + always-200 + PATCH email</span></td><td>~4 ساعات</td><td>متوسّطة</td></tr>
+    <tr style="background:#fff3df"><td><strong>D</strong> (G-2 + R-5..R-8)</td><td>الثالثة — مع 4 إصلاحات أمنية</td><td><span class="warn">نعم — migration aa18 + ops_reassign + bundle revocation SSE</span></td><td>~6 ساعات</td><td>عالية</td></tr>
+    <tr><td><strong>قَرار #1</strong></td><td>توَقُّف للحَسم</td><td>—</td><td>—</td><td>—</td></tr>
+    <tr style="background:#fde7e6"><td><strong>C</strong> (G-1 المُعَدَّل)</td><td>حسب القَرار #1</td><td>حسب الخَيار</td><td>1-8 ساعات</td><td>تَعتمد على القَرار</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ════════════════════ 4 — تَفاصيل العُيوب ════════════════════ -->
+<h2 id="sec4">٤. تَفاصيل كل عَيب + إصلاحه</h2>
+
+<h3>🔴 العُيوب الحَرجة (11)</h3>
+
+<div class="defect-card crit">
+<span class="id crit">R-1</span> <span class="bad">G-1</span>
+<h4>brute-force محلي لـHMAC 4 digits = أَمن وَهْمي</h4>
+<p><strong>المشكلة:</strong> الخطة تَخزن <code>handoff_code_hash</code> على جهاز السائق. السائق يَفتح DevTools → IndexedDB → يَنسخ {hash, salt}. يَكتب JS: <code>for (let i=0; i&lt;10000; i++) compute_hmac(String(i).padStart(4,'0'), salt)</code>. <strong>SubtleCrypto.digest('SHA-256') = 1µs/hash → 10,000 hash = 10ms.</strong> الـcode يَنكشف فوراً.</p>
+<p><strong>الإصلاح:</strong> اِنظر القَرار #1 أعلاه. التَّوصية: لا offline verify (الخيار أ).</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-2</span> <span class="bad">G-1</span>
+<h4>local counter غَير مُتزامن مع server</h4>
+<p><strong>المشكلة:</strong> backend عَدّاد <code>handoff_attempts</code> max=3 (<span class="file-ref">delivery_handoff_router.py:59</span>). لو السائق جَرَّب 100 محاولة offline (local hash-compare) ثم وَجد الـcode → يُرسَل واحدة فقط للـbackend مع <code>attempts=0</code>. الـ3-attempt cap يَصبح بلا مَعنى.</p>
+<p><strong>الإصلاح:</strong> أَرسل <code>local_attempts_count</code> مَع الـpayload. الـbackend يَدمج: <code>max(server_attempts, local_attempts)</code>. لو &gt; 5 → freeze + alert.</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-3</span> <span class="bad">G-1</span>
+<h4>persistence split (IndexedDB ↔ localStorage)</h4>
+<p><strong>المشكلة:</strong> الخطة تَقول "نَحفظ في IndexedDB". لكنّ <code>useOfflineQueue</code> المَوجود يَستخدم <code>localStorage["tawa-offline-queue-v1"]</code>. الـbundle (في IndexedDB) قد يُمسح بَينما الـqueue (في localStorage) يَبقى → السائق يُرسل verify بدون bundle مَوجود.</p>
+<p><strong>الإصلاح:</strong> وَحِّد على IndexedDB (مكتبة <code>idb-keyval</code>). تَعديل <code>useOfflineQueue.ts</code> ليَستخدم نَفس الـstore.</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-4</span> <span class="bad">G-1</span>
+<h4>pre-check failure → action يَتابع رغم state-conflict</h4>
+<p><strong>المشكلة:</strong> <span class="file-ref">useOfflineQueue.ts:117</span> — لو الـ<code>stateCheckUrl</code> يَفشل في pre-check (مثلاً 404 لأنّ الـorder ألغي)، الـcatch يُكمل (continue) ويُرسل أيّ حال. الـorder المُلغى يَنجح في verify (bug).</p>
+<p><strong>الإصلاح:</strong> فَرِّق بين network-fail (continue) و state-conflict-error (drop). إذا 404/410 على pre-check → اِحذف الـaction + إشعار السائق "الطلب ألغي".</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-5</span> <span class="bad">G-2</span>
+<h4>pickup_token لا يُجَدَّد عند reassign</h4>
+<p><strong>المشكلة:</strong> <code>order.pickup_token</code> يُولَّد مَرَّة عند <code>request_pickup_token</code> (<span class="file-ref">pickup_verify_router.py:104</span>). لو سائق A استلمه + حَدَث reassign لـB، الـtoken باقٍ. A يَستطيع verify بِه إن كان الـorder في <code>DRIVER_AT_PROVIDER</code>.</p>
+<p><strong>الإصلاح:</strong> <code>ops_reassign_driver</code> يُصفِّر <code>order.pickup_token = None</code> ذرّياً. B يَجلب token جَديد عند فَتح الـapp.</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-6</span> <span class="bad">G-2 (bug قَديم)</span>
+<h4>verify_pickup لا يَفحص driver_id الحالي</h4>
+<p><strong>المشكلة:</strong> <span class="file-ref">pickup_verify_router.py:155-165</span> يَفحص فقط: token signature صحيح + order_id يَتطابق + token لم يَنتهِ. <strong>لا يَفحص</strong> أنّ <code>token_driver_id == order.driver_id الحالي</code>. لو الـorder.driver_id تَغيَّر، الـtoken القديم يَعمل!</p>
+<p><strong>الإصلاح:</strong> أَضِف فحص <code>if token_driver_id != str(order.driver_id): raise 403 "outdated token"</code>.</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-7</span> <span class="bad">G-2</span>
+<h4>handoff_code لا يُجَدَّد + العميل لا يَعرف</h4>
+<p><strong>المشكلة:</strong> <code>delivery_handoff_code</code> يُولَّد مَرَّة عند create (<span class="file-ref">order_service.py:804</span>). لو reassign + جَدَّدنا الـcode، العميل عنده الـcode القَديم في الـUI (cached). السائق B يَأتي، العميل يَقول رَمز قَديم → mismatch دائم.</p>
+<p><strong>الإصلاح:</strong> <code>ops_reassign_driver</code> يُجَدِّد <code>delivery_handoff_code = generate_handoff_code()</code> + يُرسل push notification للعميل + frontend customer يُلتَقَط الـpush ويُعيد جلب <code>/handoff-code</code>.</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-8</span> <span class="bad">G-2</span>
+<h4>A's bundle لا يُسحب على reassign</h4>
+<p><strong>المشكلة:</strong> سائق A عنده IndexedDB cached bundle (في حال نَفَّذنا G-1). reassign يَحدث، لكن A's device لا يَعرف. A يَستطيع verify-local-match ثم queue → backend يَرفض 403 (لا offer ACCEPTED) → action يُحذَف صامتاً.</p>
+<p><strong>الإصلاح:</strong> publish "bundle_revoked" event عَبر SSE/FCM للسائق A → التطبيق يَحذف IndexedDB + يَعرض رسالة "الطلب نُقل لسائق آخر".</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-9</span> <span class="bad">G-5</span>
+<h4>User row مُنشَأ قَبل email_verify = privilege escalation</h4>
+<p><strong>المشكلة:</strong> POST /auth/register يُنشئ User + Role + Profile (<span class="file-ref">registration_router.py:333+</span>). الـuser يُمكنه login بـphone+password حتى لو الـemail غير مُتحَقَّق منه. لو الـemail خَطأ (typo سَلَب email شخص آخر)، الـattacker الحقيقي يَستلم OTP ويَكتسب الـaccount.</p>
+<p><strong>الإصلاح:</strong> اِحجز الـregistration كـ"pending-registration" في Redis (TTL 30 دقيقة) بدلاً من إنشاء User row. الـrow يُنشأ فقط بعد email_verify ناجح. اِسترداد على timeout = الـpending يُحذف، المُسجِّل يُعيد التَّسجيل.</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-10</span> <span class="bad">G-5</span>
+<h4>enumeration via 404</h4>
+<p><strong>المشكلة:</strong> <span class="file-ref">registration_router.py:723</span> — <code>if not db_user: raise 404 "Email not found"</code>. أيّ شخص يَستطيع POST /email/verify-request مع أيّ email ويَعرف هل هي مُسجَّلة (404 vs 200). enumeration attack.</p>
+<p><strong>الإصلاح:</strong> always return 200 (مع fake delay عَشوائي 100-500ms). انتظار لو الـuser غير موجود = simulate التَّقدُّم.</p>
+</div>
+
+<div class="defect-card crit">
+<span class="id crit">R-11</span> <span class="bad">G-5</span>
+<h4>لا زر "تَغيير البريد" في email_verify step</h4>
+<p><strong>المشكلة:</strong> المُستخدم كَتب <code>user@gmial.com</code>، لا يَستلم OTP. لا يُمكنه تَغيير الـemail (لا UI). محاولات: حذف الـaccount (لا login بَعد)، إعادة التَّسجيل (409 "phone already registered"). عالِق إلى الأَبد.</p>
+<p><strong>الإصلاح:</strong> الـstep email_verify يَعرض زر "البريد خاطئ؟ تَغيير" → يَعود لـstep "form" مع الـemail مَفتوحاً للتَّعديل. لو نَفَّذنا R-9 (pending-registration in Redis)، الـUpdate سَهل.</p>
+</div>
+
+<h3>🟡 العُيوب المتوسّطة (8)</h3>
+
+<details open>
+<summary>عرض الـ8 المتوسّطة</summary>
+
+<div class="defect-card med">
+<span class="id med">R-12</span> bundle expiry بعد background 5min يَفقد verify · <strong>الإصلاح:</strong> اِزد TTL أَو persist خارج queue cleanup
+</div>
+
+<div class="defect-card med">
+<span class="id med">R-13</span> settlement attribution غير مُعرَّف عند reassign · <strong>الإصلاح:</strong> اِنظر قَرار #3
+</div>
+
+<div class="defect-card med">
+<span class="id med">R-14</span> لا auto-hide للـpassword toggle · <strong>الإصلاح:</strong> timeout 5s + on blur + visibility-change
+</div>
+
+<div class="defect-card med">
+<span class="id med">R-15</span> لا diff-viewer عند password mismatch · <strong>الإصلاح:</strong> character-by-character diff عند الفَشل
+</div>
+
+<div class="defect-card med">
+<span class="id med">R-16</span> backend envelope لا يَدعم <code>details.fields</code> اليوم · <strong>الإصلاح:</strong> <code>make_error(code, ..., details={"field": "email"})</code> — توسعة مَوجودة بالفعل (<code>details: Optional[dict]</code> في <span class="file-ref">error_envelope.py:16</span>)
+</div>
+
+<div class="defect-card med">
+<span class="id med">R-17</span> rate-limit غائب لـ/email/verify-request · <strong>الإصلاح:</strong> 3 OTP/ساعة لكل (email + IP)
+</div>
+
+<div class="defect-card med">
+<span class="id med">R-18</span> Redis fail يَترك state عالِق · <strong>الإصلاح:</strong> try/except + 503 صريح
+</div>
+
+<div class="defect-card med">
+<span class="id med">R-19</span> zero-width characters في paste لا تُكشف · <strong>الإصلاح:</strong> <code>value.replace(/​-‏﻿/g, '')</code>
+</div>
+
+</details>
+
+<h3>🟢 التَّحسينات (5)</h3>
+
+<details>
+<summary>عرض الـ5 التَّحسينات</summary>
+
+<div class="defect-card low">
+<span class="id low">R-20</span> inline live "✓ مُتطابقتان" بَدلاً من toggle فقط
+</div>
+<div class="defect-card low">
+<span class="id low">R-21</span> typo-detector (Levenshtein) لـtop-100 domains
+</div>
+<div class="defect-card low">
+<span class="id low">R-22</span> telemetry لـbrute-force signals (local_attempts spike)
+</div>
+<div class="defect-card low">
+<span class="id low">R-23</span> state-machine صَريح للـreassignment
+</div>
+<div class="defect-card low">
+<span class="id low">R-24</span> WebAuthn-bound bundle (biometric unlock)
+</div>
+
+</details>
+
+<!-- ════════════════════ 5 — الخطة المُنفَّذة ════════════════════ -->
+<h2 id="sec5">٥. الخطة المُنفَّذة الآمنة (5 موجات)</h2>
+
+<div class="topic-card">
+<div class="topic-head" style="background:linear-gradient(135deg, var(--green-bg) 0%, var(--green-soft) 100%); border-bottom-color:var(--green)">
+  <span class="topic-tag" style="background:var(--green)">الموجة 1 (آمنة)</span>
+  <h3 style="color:var(--green)">G-3 + G-4 + R-14, R-15, R-19, R-20 — show password + per-field errors + diff</h3>
+</div>
+<div class="topic-body">
+<table>
+  <tbody>
+    <tr><td>الجُهد</td><td>~3 ساعات</td></tr>
+    <tr><td>backend</td><td class="ok">لا (G-3) + tweak مَوجود (G-4 — `details` field مَوجود)</td></tr>
+    <tr><td>المَخاطر</td><td>صفر — frontend فقط، لا قرار جَذري</td></tr>
+    <tr><td>الإصلاحات الإضافية</td><td>auto-hide للـtoggle + diff-viewer عند mismatch + zero-width strip + live "✓ مُتطابقتان"</td></tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+<div class="topic-card">
+<div class="topic-head" style="background:linear-gradient(135deg, var(--amber-bg) 0%, #ffd8a0 100%); border-bottom-color:var(--amber)">
+  <span class="topic-tag" style="background:var(--amber)">الموجة 2 (مَع 3 إصلاحات أمنية)</span>
+  <h3 style="color:var(--amber)">G-5 + R-9, R-10, R-11, R-17, R-18 + R-21 — email OTP آمن</h3>
+</div>
+<div class="topic-body">
+<table>
+  <tbody>
+    <tr><td>الجُهد</td><td>~4 ساعات</td></tr>
+    <tr><td>backend</td><td><span class="warn">نعم — Redis pending-registration + always-200 + rate-limit + PATCH endpoint</span></td></tr>
+    <tr><td>المَخاطر</td><td>متوسّطة (تَغيير في تَدفُّق التَّسجيل)</td></tr>
+    <tr><td>الإصلاحات الإضافية</td><td>R-9 (pending registration) + R-10 (anti-enumeration) + R-11 (تَغيير البريد) + R-17 (rate-limit) + R-18 (Redis health) + R-21 (typo detector)</td></tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+<div class="topic-card">
+<div class="topic-head" style="background:linear-gradient(135deg, var(--red-bg) 0%, #fad6d3 100%); border-bottom-color:var(--red)">
+  <span class="topic-tag" style="background:var(--red)">الموجة 3 (مَع 4 إصلاحات أمنية)</span>
+  <h3 style="color:var(--red)">G-2 + R-5, R-6, R-7, R-8, R-13, R-23 — Driver handoff آمن</h3>
+</div>
+<div class="topic-body">
+<table>
+  <tbody>
+    <tr><td>الجُهد</td><td>~6 ساعات</td></tr>
+    <tr><td>backend</td><td><span class="warn">نعم — migration aa18 + ops_reassign + bundle revocation SSE + verify_pickup يَفحص driver الحالي</span></td></tr>
+    <tr><td>المَخاطر</td><td>عالية (يَلمس state machine للـorder)</td></tr>
+    <tr><td>الإصلاحات الإضافية</td><td>R-5 (regen pickup_token) + R-6 (verify_pickup يَفحص driver الحالي — bug قَديم) + R-7 (regen handoff_code + push customer) + R-8 (revocation SSE) + R-13 (settlement policy) + R-23 (state machine)</td></tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+<div class="topic-card">
+<div class="topic-head" style="background:linear-gradient(135deg, #f3f3f3 0%, #e0e0e0 100%); border-bottom-color:var(--gray-500)">
+  <span class="topic-tag" style="background:var(--gray-500)">قَرار #1 — توَقُّف</span>
+  <h3 style="color:var(--gray-700)">قَرار جَذري قَبل C: ما هو نَموذج verify offline؟</h3>
+</div>
+<div class="topic-body">
+<p>اِنظر قَرار #1 في القسم 2. اختر:</p>
+<ul class="clean">
+  <li><strong>أ:</strong> لا offline verify (الأَأمن) → الموجة 4a</li>
+  <li><strong>ب:</strong> 6 digits + Argon2id → الموجة 4b</li>
+  <li><strong>ج:</strong> ed25519 QR cryptographic → الموجة 4c</li>
+</ul>
+</div>
+</div>
+
+<div class="topic-card">
+<div class="topic-head" style="background:linear-gradient(135deg, var(--blue-bg) 0%, #c7dcf5 100%); border-bottom-color:var(--blue)">
+  <span class="topic-tag" style="background:var(--blue)">الموجة 4 (حسب القَرار)</span>
+  <h3 style="color:var(--blue)">G-1 المُعَدَّل (offline verify) + R-1..R-4 (إن نَفَّذنا) + R-12</h3>
+</div>
+<div class="topic-body">
+<table>
+  <tbody>
+    <tr><td>الجُهد</td><td>1 ساعة (خَيار أ) / 5 ساعات (ب) / 8 ساعات (ج)</td></tr>
+    <tr><td>backend</td><td>حسب الخَيار</td></tr>
+    <tr><td>المَخاطر</td><td>أ: صفر · ب: متوسّطة · ج: عالية</td></tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+<!-- ════════════════════ 6 — صَندوق الموافقة ════════════════════ -->
+<h2 id="sec6">٦. صَندوق الموافقة المُحَدَّث</h2>
+
+<div class="approval-box">
+<h2>✅ موافقتك على الخطة المُنقَّحة</h2>
+<p>قَرارات يَجب اتِّخاذها قَبل أيّ كود:</p>
+
+<ul class="checklist">
+  <li><strong>قَرار #1 (G-1 offline verify):</strong>
+    <br>أ — لا offline verify (موصى به، الأَأمن، 1 ساعة)
+    <br>ب — 6 digits + Argon2id (متوسّط، 5 ساعات)
+    <br>ج — ed25519 QR (الأَأمن cryptographically، 8 ساعات)
+  </li>
+  <li><strong>قَرار #2 (G-5 email gate):</strong>
+    <br>أ — إجباري للكل
+    <br>ب — إجباري لـprovider/driver/staff فقط (موصى به)
+    <br>ج — اختياري للجميع
+  </li>
+  <li><strong>قَرار #3 (G-2 settlement attribution):</strong>
+    <br>أ — B يَتقاضى كل شيء
+    <br>ب — حسب المَسافة (مُعَقَّد)
+    <br>ج — A يَتقاضى نِسبة ثابتة 30% (موصى به)
+  </li>
+  <li><strong>قَرار #4 (إذن backend changes):</strong>
+    <br>الـ3 موجات (B + D + C-إن-كانت-ب-أو-ج) كلها تَحتاج backend.
+    <br>هل تَأذن؟ نعم / لا
+  </li>
+  <li><strong>قَرار #5 (التَّرتيب):</strong>
+    <br>أ — ابدأ الموجة 1 فقط (آمن جداً، 3 ساعات)
+    <br>ب — الموجات 1+2 معاً (~7 ساعات)
+    <br>ج — الموجات 1+2+3 (~13 ساعة)
+    <br>د — الكل بَعد القَرارات الجَذرية
+  </li>
+</ul>
+
+<p style="margin-top:18px; font-weight:700">عند اختياراتك، أَبدأ التَّنفيذ بِنفس النَّمَط المُجَرَّب: قراءة → تَعديل دَقيق → typecheck → Vitest → build → نَشر → Playwright بصري.</p>
+</div>
+
+<div class="card green">
+<strong>التَّوصية الإجمالية:</strong>
+<ol>
+  <li>قَرار #1 = <strong>أ</strong> (لا offline verify) — يَحلّ R-1, R-2, R-3, R-4 جَذرياً</li>
+  <li>قَرار #2 = <strong>ب</strong> (إجباري لـprovider/driver/staff) — يَحلّ R-9 جزئياً</li>
+  <li>قَرار #3 = <strong>ج</strong> (30% ثابت) — يَحلّ R-13 بِبَساطة</li>
+  <li>قَرار #4 = <strong>نعم</strong> (backend مَطلوب لكنّه مَدروس)</li>
+  <li>قَرار #5 = <strong>ج</strong> (الموجات 1+2+3 معاً) — يَحلّ 8 من 11 عَيب حَرج، ثم نُقَرِّر C لاحقاً</li>
+</ol>
+<p>إجمالي مَع هذه التَّوصيات: <strong>~14 ساعة عَمل</strong>، حلّ <strong>8/11 عُيوب حَرجة</strong> + <strong>7/8 متوسّطة</strong> + <strong>3/5 تَحسينات</strong>.</p>
+</div>
+
+<footer>
+الخطة المُنقَّحة بعد 5 سيناريوهات stress-test · 24 عَيباً اكتُشف · 5 قَرارات تَحتاج موافقتك
+<br>2026-05-27 · منصّة تووا
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,880 @@
+<title>559 — الخطة التنفيذية: إصلاحات مُحاكاة بالكامل + جاهزية السلة المجمّعة</title>
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74;
+  --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  direction:rtl;line-height:1.7;max-width:1040px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:74ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.88em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.84em}
+a{color:var(--accent2)}
+
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.9em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:130px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.7em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.82em}
+
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+.callout.danger{border-inline-start:5px solid var(--bad)}
+
+section{margin:44px 0}
+section > h2{font-size:1.4em;padding-bottom:10px;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:10px}
+section > h2 .n{font-family:var(--mono);color:var(--sub);font-size:.7em}
+h3.sub{font-size:1.12em;margin-top:30px}
+
+.chip{display:inline-block;font-size:.72em;font-weight:700;padding:2px 9px;border-radius:999px;margin-inline-end:5px;white-space:nowrap}
+.chip.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.good{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.chip.info{background:color-mix(in srgb,var(--info) 16%,transparent);color:var(--info)}
+.chip.build{background:color-mix(in srgb,var(--build) 16%,transparent);color:var(--build)}
+.chip.corr{background:color-mix(in srgb,var(--corr) 16%,transparent);color:var(--corr)}
+
+.finding{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:16px 0}
+.finding h4{margin:0 0 6px;font-size:1.05em;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.finding h4 .id{font-family:var(--mono);color:var(--sub);font-size:.75em;font-weight:600}
+.finding .meta-row{color:var(--sub);font-size:.85em;margin-bottom:8px}
+.finding .files{font-family:var(--mono);font-size:.82em;color:var(--sub);direction:ltr;text-align:left}
+.finding .simple{background:color-mix(in srgb,var(--info) 6%,transparent);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:.94em}
+
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.86em}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;vertical-align:top}
+th{background:var(--line);font-weight:700}
+tr:nth-child(even) td{background:color-mix(in srgb,var(--line) 35%,transparent)}
+td.idcol{font-family:var(--mono);font-size:.85em;white-space:nowrap;color:var(--sub)}
+
+.stat-row{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}
+.stat-card{flex:1;min-width:140px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-align:center}
+.stat-card b{display:block;font-size:1.8em}
+.stat-card span{color:var(--sub);font-size:.82em}
+
+.bar-chart{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-row .lbl{width:110px;font-size:.85em;color:var(--sub);flex:none;text-align:left;direction:ltr}
+.bar-row .track{flex:1;background:var(--line);border-radius:6px;height:22px;position:relative;overflow:hidden}
+.bar-row .fill{position:absolute;inset:0;border-radius:6px}
+.bar-row .num{width:36px;text-align:center;font-weight:700;flex:none}
+
+.wave{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:18px 0;
+  border-inline-start:6px solid var(--accent)}
+.wave.gated{border-inline-start-color:var(--warn)}
+.wave.danger{border-inline-start-color:var(--bad)}
+.wave h3{margin-top:0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:baseline}
+.wave ul{margin:8px 0;padding-inline-start:22px}
+.wave li{margin-bottom:6px}
+
+.seq-item{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:10px 0;
+  border-inline-start:4px solid var(--corr)}
+.seq-item b{color:var(--corr)}
+
+.correction-box{background:color-mix(in srgb,var(--corr) 7%,var(--panel));border:1px dashed var(--corr);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.correction-box b{color:var(--corr)}
+.decision-box{background:color-mix(in srgb,var(--warn) 8%,var(--panel));border:1px solid var(--warn);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.decision-box b{color:var(--warn)}
+
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin:10px 0}
+details summary{cursor:pointer;font-weight:700}
+details[open] summary{margin-bottom:10px}
+
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+.top{position:fixed;bottom:18px;left:18px;background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:8px 16px;font-size:.82em;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+</style>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 559 · من نتائج التدقيق (558) إلى خطة تنفيذية مُحاكاة بالكامل</div>
+  <h1>الخطّة التنفيذية: 112 إصلاحًا مُصمَّمًا، كل واحد مُحاكى وقت النشر ووقت التشغيل</h1>
+  <div class="meta">
+    مبنيّة على التقرير 558 (274 نتيجة حقيقية مؤكَّدة). لكل إصلاح: التصميم الدقيق، محاكاة ذهنية لِما يحدث أثناء النشر
+    عبر الأهداف الأربعة، محاكاة لِما يحدث أثناء التشغيل الحيّ (حالات نجاح/تزامن/فشل)، الآثار الجانبية التي يُحدثها
+    الإصلاح نفسه وكيفية معالجتها، وتقنية حديثة مقترحة حيث تناسب المنصّة فعلًا. + فحص جاهزية ميزة "السلة المجمّعة".
+    · 11 وكيل تصميم متوازٍ + 2 وكيل تركيب · 2026-07-25
+  </div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>112</b><span>مجموعة إصلاح مصمَّمة بالكامل</span></div>
+  <div class="stat"><b>30</b><span>قيد تسلسل حرج بين الإصلاحات</span></div>
+  <div class="stat"><b>7</b><span>إصلاحات بمستوى خطورة CRITICAL</span></div>
+  <div class="stat"><b>~45</b><span>سيناريو تشغيل ونشر مفصَّل بالدليل</span></div>
+  <div class="stat"><b>2</b><span>علمين للسلة المجمّعة، فُحصا وحُكم عليهما منفصلين</span></div>
+</div>
+
+<div class="callout method">
+  <b>لم يُنفَّذ أي كود بعد.</b> هذا مستند تصميم وتخطيط بحت، متّسق مع حوكمة المشروع المرحلية — لا التزام بتنفيذ أي بند
+  دون إذن تشغيلي صريح. كل مجموعة إصلاح مرّت بخمس خطوات: (1) التصميم الدقيق (ملف/دالة/سطر)، (2) محاكاة ذهنية لوقت
+  النشر عبر الأهداف الأربعة (Production/test1/test/.194/GitHub)، (3) محاكاة لوقت التشغيل الحيّ بعدّة سيناريوهات
+  واقعية، (4) آثار جانبية جديدة يُحدثها الإصلاح نفسه ومعالجتها، (5) تقنية حديثة إن كانت مناسبة فعلًا لحجم المنصّة —
+  لا ابتكار لمجرّد الابتكار.
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li>الخلاصة التنفيذية بالأرقام</li>
+    <li>خريطة التسلسل الحرجة — 30 قيدًا يجب احترامها</li>
+    <li>المرحلة صفر — إصلاحات آمنة تُنفَّذ فورًا بلا شروط</li>
+    <li>المرحلة الأولى — تدقيق حيّ ثم تنفيذ (الأخطر على الإطلاق)</li>
+    <li>المرحلة الثانية — تضييق تدريجي عبر Shadow Mode</li>
+    <li>المرحلة الثالثة — السلامة المالية</li>
+    <li>مجموعة A — النشر والـCI وسلسلة التوريد</li>
+    <li>مجموعة B — الهوية والمصادقة والصلاحيات</li>
+    <li>مجموعة C — الطلبات والكتالوج والمزوّدين</li>
+    <li>مجموعة D — التوصيل والسائقون</li>
+    <li>مجموعة E — المحفظة والدفتر المالي</li>
+    <li>مجموعة F — الإشعارات والأحداث ونقطة البيع</li>
+    <li>مجموعة G — الخصوصية والملفّات ولوحة العمليات</li>
+    <li>مجموعة H — Tawa Trade الكاملة</li>
+    <li>مجموعة I — الموبايل</li>
+    <li>مجموعة J — الويب وقاعدة البيانات</li>
+    <li>فحص خاص: هل السلة المجمّعة جاهزة للفتح؟</li>
+    <li>لا حاجة للتدخّل — ما هو صحيح كما هو</li>
+    <li>الخلاصة والتوصية النهائية</li>
+  </ol>
+</div>
+
+<section id="s1">
+  <h2><span class="n">§1</span> الخلاصة التنفيذية بالأرقام</h2>
+  <p>وُزِّعت 112 مجموعة إصلاح على 10 مجالات هندسية، بدرجات خطورة تعكس <b>اتساع الأثر</b> (كم مستخدمًا/عملية تتأثر)
+  و<b>عدد الأفخاخ التسلسلية</b> المكتشفة لكل إصلاح — وليس فقط شدّة العيب الأصلي.</p>
+
+  <h3 class="sub">توزيع درجة الخطورة عبر كل الإصلاحات الـ112</h3>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="lbl">CRITICAL — 7</div><div class="track"><div class="fill" style="width:6.3%;background:var(--bad)"></div></div><div class="num">7</div></div>
+    <div class="bar-row"><div class="lbl">HIGH — 32</div><div class="track"><div class="fill" style="width:28.6%;background:var(--warn)"></div></div><div class="num">32</div></div>
+    <div class="bar-row"><div class="lbl">MEDIUM — 44</div><div class="track"><div class="fill" style="width:39.3%;background:var(--info)"></div></div><div class="num">44</div></div>
+    <div class="bar-row"><div class="lbl">LOW — 29</div><div class="track"><div class="fill" style="width:25.9%;background:var(--good)"></div></div><div class="num">29</div></div>
+  </div>
+
+  <h3 class="sub">توزيع الإصلاحات حسب المجال</h3>
+  <div class="stat-row">
+    <div class="stat-card"><b>10</b><span>A · نشر/CI</span></div>
+    <div class="stat-card"><b>15</b><span>B · هوية/صلاحيات</span></div>
+    <div class="stat-card"><b>16</b><span>C · طلبات/كتالوج</span></div>
+    <div class="stat-card"><b>10</b><span>D · توصيل/سائقون</span></div>
+    <div class="stat-card"><b>14</b><span>E · محفظة/دفتر</span></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card"><b>9</b><span>F · إشعارات/POS</span></div>
+    <div class="stat-card"><b>15</b><span>G · خصوصية/OPS</span></div>
+    <div class="stat-card"><b>6</b><span>H · Trade</span></div>
+    <div class="stat-card"><b>7</b><span>I · موبايل</span></div>
+    <div class="stat-card"><b>10</b><span>J · ويب/DB</span></div>
+  </div>
+
+  <div class="callout danger">
+    <b>أهمّ درس واحد من كل هذا العمل:</b> الخطر الأكبر ليس في العيوب نفسها (معظمها تصحيحات مباشرة) بل في <b>تسلسل
+    تنفيذها</b>. ثلاثة إصلاحات CRITICAL بالذات (تصنيف tawanow ضمن البيئات الصارمة، إيقاف MinIO الصلب، قيد
+    order_state) قادرة على إسقاط الإنتاج الحيّ فورًا إن نُفِّذت دون تدقيق مباشر على البيانات الحيّة أوّلًا — راجع
+    §4 قبل أي تنفيذ فعلي.
+  </div>
+</section>
+
+<section id="s2">
+  <h2><span class="n">§2</span> خريطة التسلسل الحرجة — 30 قيدًا يجب احترامها</h2>
+  <p>هذه القيود مُستخرجة من كل تقارير التصميم الفرعية ومُدمجة هنا في مكان واحد، حتى لا تُنفَّذ خطة مستقبلية إصلاحين
+  متعارضين بترتيب خاطئ. رُقِّمت هنا لتُقتبَس من أي مكان في هذا التقرير.</p>
+
+  <div class="seq-item"><b>ت١.</b> لا تُحوَّل أي بوّابة CI/فحص متساهلة إلى صارمة في نفس التغيير الذي يُصلح أو يُقلِّم
+  الإخفاقات القديمة التي ستكتشفها حديثًا. ينطبق على: A1 (فحص exit code لـpytest مقابل قائمة الإخفاقات المسموحة)،
+  A7(a) (إزالة continue-on-error عن E2E مقابل إصلاح بيانات الدخول القديمة)، A7(e) (بيانات اختبار عدائية لفحوصات
+  قاعدة البيانات). نفّذ التشديد أولًا على أساس نظيف، راقب، ثم عالج القديم — أو العكس، لكن ليس الاثنين في نفس التغيير.</div>
+
+  <div class="seq-item"><b>ت٢.</b> A6 (تصنيف tawanow ضمن البيئات الصارمة) — <b>الأعلى خطورة في كامل هذه الوثيقة</b>:
+  يجب تشغيل تحقّق مباشر (dry-run) على متغيّرات البيئة الفعلية للإنتاج الحيّ قبل هذا التغيير بسطر واحد، ولا يُدمَج مع
+  أي تغيير آخر في نفس النشرة. نفس الانضباط ينطبق على B7 (إيقاف MinIO الصلب — تحقّق من بيانات اعتماد الإنتاج الفعلية
+  أولًا) وA3 (توسعة فحص الصحّة — يجب أن يعمل منتج نبضة العامل الخلفي أوّلًا على الأهداف الأربعة قبل أن يبدأ المستهلك
+  بالاعتماد عليه).</div>
+
+  <div class="seq-item"><b>ت٣.</b> أي قيد CHECK/مفتاح خارجي على جداول كبيرة حيّة يجب أن يسبقه تدقيق مباشر شامل
+  للبيانات الفعلية على كل الأهداف الأربعة، الإنتاج فوق الجميع — لا الاستدلال من بيانات test1/test الأنظف. ينطبق
+  على: 043 (أعمدة الحالة)، C7 (order_state)، 168 (SubstitutionOffer)، E12 (فترة التسوية)، E11 (حالة حساب المحفظة).
+  استخدم نمط <code>NOT VALID</code> + <code>VALIDATE CONSTRAINT</code> المؤجَّل بعد تأكيد صفر انتهاكات.</div>
+
+  <div class="seq-item"><b>ت٤.</b> C1 وC2 (حقول بصمة idempotency) يجب أن يُشحنا معًا لا منفصلين — إزالة كود خصم غير
+  صالح وإعادة المحاولة (C3) تحتاج كليهما لتجربة استرجاع نظيفة. الترتيب: العميل أوّلًا ثم الخادم لِC2 تحديدًا (عكس
+  المعتاد) لأن الحقول الجديدة اختيارية بقيم افتراضية متوافقة خلفيًا.</div>
+
+  <div class="seq-item"><b>ت٥.</b> C4 (بوّابة OTP للنقد) وC12/156 (رسم التوصيل يُحل مرّتين) يتشاركان نفس السبب
+  الجذري وموضع الكود بالضبط — نُفَّذا كتغيير واحد لا اثنين.</div>
+
+  <div class="seq-item"><b>ت٦.</b> 167 (InventoryItem من Float إلى Numeric) يجب أن يُشحن <b>قبل</b> 061 (خصم المخزون
+  الذرّي) — كتابة حساب Decimal جديد فوق عمود ما زال Float يُنتج خطأ خلط أنواع لن يظهر إلا أوّل مرّة يُنفَّذ فيها
+  المسار النادر التنفيذ.</div>
+
+  <div class="seq-item"><b>ت٧.</b> D1+D2 (حدّ النقد الاستباقي + سقف التزامن) يُشحنان معًا كطلب دمج واحد على
+  create_offer، وD3 (الدالة المشتركة check_driver_dispatch_eligibility) يعتمد على اكتمال الاثنين أولًا — وسؤال
+  المنتج (من يملك حق التجاوز؟ هل السبب إلزامي؟) يجب حسمه مع المشغّل <b>قبل الدمج</b> لا قبل النشر فقط.</div>
+
+  <div class="seq-item"><b>ت٨.</b> B4 (نطاق موارد Trade)، B6 (هجرة require_role→require_permission)، وD1 (وعي
+  SPLIT) تتبع كلّها نمط "تضييق صلاحية واسعة قد يتحوّل بذاته إلى عطل" — يجب أن يسبقها نافذة رصد Shadow Mode (بإعادة
+  استخدام permission_shadow.py الموجود فعلًا) لا قطع مباشر، أينما غيّر الإصلاح من يستطيع فعل ماذا اليوم. هذا أكثر
+  نمط خطر هيكلي تكرارًا في كامل هذه الوثيقة.</div>
+
+  <div class="seq-item"><b>ت٩.</b> إضافة علم ميزة Trade (B3) تُغيّر بصمة SHA256 الخاصة بـ<code>contracts/feature_flags.yaml</code>
+  — يجب إعادة حساب أساس FIN-COR المثبَّت في CLAUDE.md في <b>نفس التغيير</b>، تمامًا كما حدث في إعادة تأسيس
+  2026-07-02 لعلم wallet_peer_transfer.</div>
+
+  <div class="seq-item"><b>ت١٠.</b> B8 يجب ألا يمسّ سلوك D-60 (حدّ OTP للنقد) التحذيري — يبقى معطَّلًا حتى يُصلَح خطأ
+  إعادة استخدام OTP في الطلبات المجمّعة/المقسَّمة المذكور في "Operator Activations Pending"، أوّلًا.</div>
+
+  <div class="seq-item"><b>ت١١.</b> E1 (Maker-Checker لفاتورة Trade) وB15 (تحكّم ثنائي لـSUPER_ADMIN) يحملان نفس
+  الشرط التشغيلي المسبق: تأكيد وجود ≥2 موظفين فعليين يحملان الصلاحية المعنيّة <b>قبل</b> الشحن — تفعيل أيّ منهما
+  بلا موافِق ثانٍ حقيقي يحوّل الإصلاح إلى مسار عمل عالق نهائيًا أو مسار طوارئ غير قابل للاستخدام.</div>
+
+  <div class="seq-item"><b>ت١٢.</b> H4 (حدّ ائتمان Trade) — <b>أعلى خطر ارتداد على إنتاج حيّ في كامل وثيقة Trade</b>:
+  يجب تعبئة سياسة ائتمان (ولو "بلا حدّ") لكل مشترٍ حالي قبل تفعيل الفرض — لا يمكن أن يكون التعبئة والتفعيل نفس خطوة
+  النشر.</div>
+
+  <div class="seq-item"><b>ت١٣.</b> H5 (أحداث/إشعارات Trade) يجب أن يتسلسل <b>بعد</b> H2 (تثبيت آلة الحالة)، ويُطلَق
+  للموظفين أولًا ثم للمشترين لاحقًا بإعداد افتراضي "معطَّل/ملخّص" — إطلاق سنوات من الصمت كسيل إشعارات فجأة يبدو
+  كعطل لا كميزة.</div>
+
+  <div class="seq-item"><b>ت١٤.</b> تفعيل outbox الإشعارات (F1) يحتاج معالجة سقف إنتاجية الـrelay (~400 حدث/دقيقة
+  خلف قفل Redis واحد + نوم 60 ثانية بعد كل إقلاع) <b>قبل</b> أي قلب لعلم <code>notifications_outbox_enabled</code> في
+  أي بيئة — وإلا تأخّرت إشعارات حسّاسة زمنيًا مثل عرض التوصيل (نافذة انتهاء 60 ثانية) وراء موعدها.</div>
+
+  <div class="seq-item"><b>ت١٥.</b> F2 (فشل KMS مغلَق) وإصلاح فترة تداخل تدوير سرّ POS في F9 يلمسان نفس عائلة
+  الدوال ويجب مراجعتهما معًا — منطق الفشل المغلَق يجب ألا يمنع بالخطأ مسار التراجع الشرعي للسرّ السابق أثناء نافذة
+  التداخل.</div>
+
+  <div class="seq-item"><b>ت١٦.</b> F5 (نصوص push محلّية) وF8 (توحيد قوائم الاستثناء) يلمسان نفس الدالة ونطاقات
+  أسطر متداخلة — نُفَّذا كتغيير منسَّق واحد لتفادي تعارض الدمج وتكرار قراءات قاعدة البيانات.</div>
+
+  <div class="seq-item"><b>ت١٧.</b> إصلاح إعادة تحقّق سعر outbox الموبايل (I4) <b>لا يحتاج أي تنسيق مع الخادم</b> —
+  الحقل الجديد إضافي ومتوافق خلفيًا في الاتجاهين، لأن /carts/quote موجود وحيّ بالفعل والخادم يتعامل بالفعل مع غياب
+  الحقل بأمان. الحالة الوحيدة المؤكَّدة بلا أي خطر تسلسل نشر في هذه الوثيقة كلّها.</div>
+
+  <div class="seq-item"><b>ت١٨.</b> I4 وI5 (ملكية outbox القديمة) يتشاركان نفس الملف ونفس المسار البرمجي ويجب أن
+  يُشحنا معًا لا بالتتابع.</div>
+
+  <div class="seq-item"><b>ت١٩.</b> J1 (تغطية OpenAPI) وJ5 (غلاف أخطاء pos_router/استيرادات operations_router/الترقيم)
+  يجب أن يُنفَّذا معًا وحدة تلو الأخرى — نفس طلب الدمج الذي يوثّق مسارات pos_router.py هو المكان الطبيعي لإصلاح
+  استثناءاته الخام أيضًا (يتقاطع مباشرة مع إصلاح الغلاف الموحَّد في F9 — لا تُنفِّذ غلاف خطأ POS مرّتين تحت اسمين
+  مختلفين).</div>
+
+  <div class="seq-item"><b>ت٢٠.</b> J6's عمود target_type متعدد الأشكال يحتاج تعبئة جدول سجلّ بكل قيمة موجودة فعليًا
+  <b>قبل</b> تفعيل قيد CHECK — تخطّي هذه الخطوة يكسر بيانات قائمة عند الترحيل.</div>
+
+  <div class="seq-item"><b>ت٢١.</b> هجرة UUID الأصلي (J6/136) يجب أن تُرحِّل المفتاح الأساسي لجدول وكل عمود مفتاح
+  خارجي يشير إليه في <b>نفس</b> الترحيل/طلب الدمج — حالة نصف مُرحَّلة تجعل Postgres يرفض قيد المفتاح الخارجي بسبب
+  تعارض النوع.</div>
+
+  <div class="seq-item"><b>ت٢٢.</b> قفل J3 المُسيَّج آمن كتغيير مرحلة واحدة فقط لأن المنصّة تشغّل نسخة خادم واحدة لكل
+  بيئة اليوم — إن انتقلت المنصّة مستقبلًا لتعدّد النُسخ الحقيقي، يجب أن يُشحن الاستحواذ المُسيَّج والتحرير المُسيَّج
+  في نشرتين منفصلتين (الاستحواذ أولًا) لإغلاق نافذة تداخل النشر المتدرّج بالكامل.</div>
+
+  <div class="seq-item"><b>ت٢٣.</b> إيقاف قائمة IP الإدارية الصلب (J8) يحتاج تدقيقًا مسبقًا على الأهداف الأربعة
+  الحيّة كلّها قبل الدمج — إن كانت أيّ بيئة تعتمد اليوم على قائمة فارغة بتحذير فقط، فقلب هذا لإيقاف إقلاع صلب يمنعها
+  من البدء في النشرة التالية.</div>
+
+  <div class="seq-item"><b>ت٢٤.</b> توسعة تغطية Maker-Checker (G-G) وطيّ H-09 معها يجب أن تُسلسَل مع تأكيد وجود هوية
+  موافِق ثانٍ فعلية لكل مجال (مراجعة KYC، تفعيل أعلام الميزات، اعتماد حساب OPS جديد) <b>قبل</b> تفعيل البوّابة — إطلاق
+  التغيير البرمجي وحده دون تأكيد التوظيف يحوّل تصحيحًا صحيحًا إلى عائق تشغيلي غير قابل للاستخدام من اليوم الأوّل.</div>
+
+  <div class="seq-item"><b>ت٢٥.</b> ترتيب تنظيف G-A (حذف MinIO) وG-B (فحص أهليّة التزامات Trade) — مؤكَّد صحيحًا
+  بالفعل في الترتيب الحالي (فحص الأهليّة يسبق أي إجراء تدميري ما لم يكن <code>force=True</code>) — يستحقّ ذكرًا
+  صريحًا كقاعدة ثابتة لا يجوز لأي إصلاح مستقبلي عكسها.</div>
+
+  <div class="seq-item"><b>ت٢٦.</b> مجموعة Trade H1 (توسعة مفتاح idempotency) يجب أن تُشحن وحدها أوّلًا — لا شيء آخر
+  في خطة Trade يعتمد عليها، لكنها تُقلِّل مخاطرة كل مجموعة Trade الأخرى في مسارات إعادة المحاولة/التكرار مجانًا، وهي
+  وH4's إصلاح انحراف التوثيق (كلاهما شبه معدوم الخطر) الأنسب للشحن في الأسبوع الأوّل بغضّ النظر عمّا سواهما.</div>
+
+  <div class="seq-item"><b>ت٢٧.</b> إصلاح بصمة idempotency للسلة المجمّعة (§16) يجب أن يسبق كتابة اختبارات التعارض —
+  الاختبارات يجب أن تُثبت السلوك <b>بعد</b> الإصلاح، لا قبل.</div>
+
+  <div class="seq-item"><b>ت٢٨.</b> B10's 042 (تشفير سرّ TOTP) وB7 (KMS) يتشاركان نفس البنية التحتية — يجب أن يكون
+  مفتاح KMS مُهيَّأ فعليًا قبل أن يكون لأيّ من هذين الإصلاحين أثر حقيقي؛ كلاهما آمن للشحن بلا مفتاح كسقالة خاملة.</div>
+
+  <div class="seq-item"><b>ت٢٩.</b> C6، 066، و173 (كلّها إعادة هيكلة "تقسيم ملف/جدول متضخّم") يجب ألا تُدمَج أبدًا مع
+  إصلاح صوابيّة في نفس الفرق — كل واحدة تُنفَّذ كسلسلة طلبات دمج صغيرة يُتحقَّق من اخضرار كل مجموعة الاختبارات بعدها،
+  خصوصًا على ملفّات حرجة للإيرادات مثل order_service.py وProvider.</div>
+
+  <div class="seq-item"><b>ت٣٠.</b> بوّابات قرار مستقلّة يجب أن تذهب للمشغّل <b>قبل</b> كتابة أي كود، لا فقط قبل
+  النشر: B5 (تضييق ميراث ADMIN)، B9's 040 (قلب registration_require_otp)، C13's 065 (تخفيف قيد موظف-متجر-واحد)،
+  D9 (بوّابة مراجعة قبل التعليق التلقائي)، D5 (تتبّع موقع خلفي + تسجيل Apple Developer)، E5 (إشعار المحاسبة قبل
+  إعادة تصنيف COA لا بعده).</div>
+</section>
+
+<section id="s3">
+  <h2><span class="n">§3</span> المرحلة صفر — إصلاحات آمنة تُنفَّذ فورًا بلا شروط مسبقة</h2>
+  <p>هذه المجموعة الأولى للتنفيذ: مخاطرة منخفضة، لا تدقيق بيانات حيّة مطلوب، ولا اعتماديات تشغيلية (توظيف/موافقة
+  مشغّل) معلَّقة.</p>
+  <table>
+    <tr><th>المعرّف</th><th>الإصلاح</th><th>لماذا آمن الآن</th></tr>
+    <tr><td class="idcol">H1</td><td>توسعة idempotency لمسارات Trade (سطران في _GUARDED_PATHS)</td><td>متوافق خلفيًا بالكامل، يفشل بأمان بلا رأس idempotency</td></tr>
+    <tr><td class="idcol">H4 (جزء التوثيق)</td><td>تصحيح contracts/internal_api.md عن ترحيل فاتورة Trade</td><td>تصحيح نصّ توثيقي بحت، صفر خطر كود</td></tr>
+    <tr><td class="idcol">I1/I2/I6/I7</td><td>مهلة فحص التحديث الإجباري، تجميد توليد أنواع الموبايل، جلب حدّ الجدولة من الخادم، UUID حقيقي للمفتاح</td><td>جانب العميل بحت، لا تنسيق خادم</td></tr>
+    <tr><td class="idcol">I4 (جزء expectedUnitPriceMinor)</td><td>إضافة الحقل لطلبات الموبايل</td><td>مؤكَّد بلا أي تبعية نشر في أي اتجاه (ت١٧)</td></tr>
+    <tr><td class="idcol">E4/E6/E7</td><td>نسخ نمط SAVEPOINT، رفض عدم تطابق مبلغ الحجز، تصحيح فحص النزاع UNDER_REVIEW</td><td>نسخ أنماط مُثبَتة بالفعل في نفس قاعدة الكود</td></tr>
+    <tr><td class="idcol">B1/B2</td><td>منع إعادة إحياء DELETED، إلغاء مسار provider_id الخام</td><td>فحوصات حرّاسة بحتة، بعد التحقق من عدم اعتماد أي واجهة على المسار القديم</td></tr>
+    <tr><td class="idcol">D10</td><td>حذف سطر مكرّر</td><td>تنظيف كود صرف</td></tr>
+    <tr><td class="idcol">G-N (تخفيف 2)</td><td>تنبيه حقيقي على مسار تدقيق بلا جلسة</td><td>إضافة رصد صرفة، صفر تغيير سلوك</td></tr>
+    <tr><td class="idcol">J2/J4</td><td>تعمية رسائل خطأ /ready، إعادة توليد schema.sql من ORM الفعلي</td><td>تصحيحات توثيق/تسريب معلومات بحتة</td></tr>
+    <tr><td class="idcol">F3/F7</td><td>معرّفات ارتباط، attempt_no في سجلّ التسليم</td><td>حقول إضافية، صفر تغيير سلوك</td></tr>
+    <tr><td class="idcol">C9/C11/C15</td><td>تتبّع أخطاء الديون لكل بند، اختبار إجهاد للخصم، توحيد حاسبة السعر</td><td>تحسينات اختبار/UX بلا تغيير منطق مالي</td></tr>
+    <tr><td class="idcol">A4/A10</td><td>سكربت بوّابة دمج ذاتي الاستضافة، تتبّع تدريجي لفجوة OpenAPI</td><td>إضافات مراقبة، لا تغيير سلوك تشغيلي</td></tr>
+  </table>
+</section>
+
+<section id="s4">
+  <h2><span class="n">§4</span> المرحلة الأولى — تدقيق حيّ ثم تنفيذ (الأخطر على الإطلاق)</h2>
+  <p>كل بند هنا يمسّ بيانات حيّة أو بيئة إنتاج مباشرة. القاعدة الذهبية الواحدة لكل هذه المرحلة: <b>لا تنفيذ قبل تدقيق
+  مباشر (ليس تقريرًا سابقًا) على كل هدف من الأهداف الأربعة.</b></p>
+
+  <div class="wave danger">
+    <h3>A6 — تصنيف tawanow ضمن البيئات الصارمة <span class="chip bad">CRITICAL</span></h3>
+    <div class="files">backend/app/config.py:28 — _PRODUCTION_STRICT_ENVS</div>
+    <p><b>الإصلاح:</b> إضافة "tawanow" لمجموعة واحدة. هذا يرفع كل فحص تحذيري مبني على عضوية هذه المجموعة (مزوّد OTP،
+    قائمة IP الإدارية CR-04) من "سجّل وتابع" إلى "أوقف الإقلاع" — على بيئة الإنتاج الحيّة تحديدًا.</p>
+    <p><b>محاكاة النشر:</b> إن وُجدت فجوة حقيقية اليوم (مثل OTP_PROVIDER بقيمة غير آمنة)، هذا السطر الواحد يحوّل
+    تحذيرًا صامتًا إلى توقّف كامل للإنتاج في النشرة التالية مباشرة. التسلسل الإلزامي: (١) فحص .env الفعلي على خادم
+    Production عبر SSH مباشرة (أو أداة تحقّق --validate-only)، (٢) إصلاح أي فجوة حقيقية تُكتشف في نشرة منفصلة أولًا،
+    (٣) شحن هذا السطر وحده في نشرة تالية منفصلة — لا تدمجه أبدًا مع تغيير آخر حتى يبقى سبب أي فشل إقلاع واضحًا
+    بلا لبس.</p>
+    <p><b>محاكاة التشغيل:</b> مهاجم افتراضي تمكّن من تعديل بيئة Production ليجعل OTP قابلًا للتنبؤ — بعد الإصلاح
+    يرفض التطبيق الإقلاع بهذا الإعداد المتلاعَب به بدل السماح به صامتًا.</p>
+    <p><b>أثر جانبي:</b> صفر تأثير على test1/test/.194 (ليست ضمن هذه المجموعة ولن تُضاف).</p>
+  </div>
+
+  <div class="wave danger">
+    <h3>B7 — إيقاف MinIO الصلب عند بيانات اعتماد افتراضية <span class="chip bad">CRITICAL</span></h3>
+    <div class="files">backend/app/modules/files/file_router.py:39-59 + config.py</div>
+    <p><b>الإصلاح:</b> مركزة فحص "هل MinIO يستخدم minioadmin/minioadmin123؟" كإيقاف صلب في البيئات الصارمة، بدل
+    تحذير سجلّ متفرّق في مكانين.</p>
+    <p><b>محاكاة النشر:</b> تعليق الكود نفسه يقول إن ملفّ compose الخاص بالإنتاج <b>لا يضبط</b> هذين المتغيّرين —
+    يعتمد على .env الخادم نفسه. يجب التحقّق المباشر (ليس افتراضًا من قراءة الملف) عبر SSH/<code>docker exec env</code>
+    أن القيم الحقيقية مضبوطة فعلًا قبل إضافة هذا الإيقاف. إن لم تكن كذلك: اضبط بيانات اعتماد حقيقية أولًا، تأكّد أن
+    الرفع/التنزيل ما زال يعمل، ثم فقط انشر الإيقاف الصلب في نشرة تالية منفصلة.</p>
+    <p><b>محاكاة التشغيل:</b> نشرة مستقبلية تنسى تدوير .env بالخطأ — قبل الإصلاح: عودة صامتة لبيانات اعتماد ضعيفة
+    معروفة؛ بعده: رفض الإقلاع فورًا، يكشف الخطأ التشغيلي بدل خدمة صامتة بتخزين ضعيف.</p>
+  </div>
+
+  <div class="wave danger">
+    <h3>C7 — قيد CHECK على order_state <span class="chip bad">CRITICAL</span></h3>
+    <div class="files">backend/app/modules/orders/state_transitions.py + migration جديدة</div>
+    <p><b>الإصلاح:</b> قيد CHECK يعدّد 27 قيمة حالة معروفة، بنفس نمط kyc_tier الموجود مسبقًا.</p>
+    <p><b>محاكاة النشر — الأخطر في كامل الوثيقة على جدول حيّ عالي القيمة:</b> القائمة تحقّقت مقابل الكود، لا مقابل
+    البيانات الحيّة. أي صفّ قديم/استثنائي بقيمة خاطئة يجعل <code>ALTER TABLE ADD CONSTRAINT</code> المباشر يفشل
+    فورًا، وربما يمنع ترحيلات لاحقة — خصوصًا على Production حيث تعيش بيانات حقيقية من حقبة استعادة تلف القرص.
+    التسلسل الآمن الإلزامي: تدقيق قراءة فقط (<code>SELECT DISTINCT order_state, count(*)</code>) على كل هدف مستقلًا؛
+    عند صفر انتهاكات، استخدم <code>ADD CONSTRAINT ... NOT VALID</code> ثم <code>VALIDATE CONSTRAINT</code> منفصلة
+    في نافذة صيانة — لا تُضِف قيدًا مُتحقِّقًا مباشرة من أول محاولة.</p>
+    <p><b>محاكاة التشغيل:</b> كود مستقبلي يُدخل حالة جديدة فعليًا بلا تحديث القيد يفشل بصوت عالٍ (IntegrityError) بدل
+    النجاح الصامت — هذا هو جوهر الفائدة. أي سكربت دعم/OPS يعتمد على قيمة استثنائية غير موثَّقة سيُحجَب أيضًا — تأكّد
+    أوّلًا أن لا دليل عمل يعتمد عليها.</p>
+  </div>
+
+  <div class="wave gated">
+    <h3>بنود إضافية بنفس القاعدة <span class="chip warn">HIGH</span></h3>
+    <ul>
+      <li><b>B10's 043</b> — قيود CHECK على User/Role/Device/Address.status، بعد grep شامل لكل قيمة مكتوبة + تدقيق حيّ مستقلّ على الأهداف الأربعة.</li>
+      <li><b>C14's 167</b> — ترحيل InventoryItem من Float إلى Numeric(10,3)، ويجب أن يسبق C10's 061 (ت٦).</li>
+      <li><b>E12</b> — قيد CHECK(period_start&lt;=period_end) على Settlement، بعد تدقيق حيّ.</li>
+      <li><b>J8 (إيقاف قائمة IP الإدارية)</b> — تدقيق مسبق على الأهداف الأربعة الحيّة، وإلا توقّف إقلاع أي بيئة تعتمد اليوم على القائمة الفارغة.</li>
+      <li><b>A3</b> — توسعة فحص الصحّة لتشمل العمّال الخلفيين — يجب أن يعمل "المُنتِج" (نبضة العامل) ويُؤكَّد تدفّقه على الأهداف الأربعة قبل أن يعتمد عليه "المستهلك" (فحص /ready)، وإلا بدأت عمليات نشر سليمة بالفشل بسبب مهلة فحص صحّة.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="s5">
+  <h2><span class="n">§5</span> المرحلة الثانية — تضييق تدريجي عبر Shadow Mode</h2>
+  <p>هذه الإصلاحات تُضيِّق صلاحيات كانت واسعة عمدًا أو سهوًا. القاعدة: <b>لا تفرض شيئًا فورًا</b> — راقب أوّلًا بنفس
+  آلية <code>permission_shadow.py</code> الموجودة فعلًا في المشروع، ثم افرض فقط بعد تأكيد أن سجلّات الرصد لا تُظهر
+  استخدامًا شرعيًا واسعًا سيُكسَر.</p>
+
+  <div class="finding">
+    <h4><span class="id">B4</span> نطاق موارد Trade — صلاحية واحدة تمنح وصولًا عالميًا <span class="chip warn">HIGH</span></h4>
+    <div class="files">backend/app/modules/identity/dependencies.py — require_trade_permission</div>
+    <p>الفحص الحالي (دور+حالة+صلاحية) لا يتحقّق أبدًا من <i>أيّ</i> مورّد/أمر شراء/فاتورة يستهدفه الطلب. الإصلاح
+    يحتاج <b>مفهوم بيانات جديدًا</b> (جدول نطاق موظف-OPS↔مورّد)، لا مجرّد شرط إضافي. <b>محاكاة النشر:</b> إن كان
+    الواقع اليوم "فريق OPS مركزي صغير يخدم كل الموردين"، فرض النطاق فورًا يقفل موظفين اعتادوا العمل عبر كل الموردين
+    — فحوّل إصلاحًا أمنيًا إلى عطل تشغيلي. التسلسل الإلزامي: رصد Shadow أوّلًا، راقب نافذة حقيقية، فقط بعدها افرض —
+    وإن أظهر الرصد نشاطًا عابرًا للموردين معتادًا وشرعيًا، اقرن الفرض بمنح صلاحيات صريحة أوّلًا لكل موظف حالي، لا
+    الفرض ثم المنح لاحقًا.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">B6</span> 110 require_role() مقابل 8 require_permission() <span class="chip warn">HIGH</span></h4>
+    <p>ليست رقعة واحدة — خطة مرحلية: عزّز الـratchet فورًا (سقف يتقلّص لا يمنع الزيادة فقط)، حوِّل نقاط الاستدعاء
+    تدريجيًا (المالية والحسّاسة أوّلًا) بنفس نمط Shadow Mode، ثم أضِف نطاق الموارد لاحقًا. المخاطرة المتكرّرة: دور
+    يملك وصولًا <i>عرضيًا</i> فقط عبر الوراثة (ROLE_INHERITS) قد يفقده صمتًا عند التحويل لصلاحية مسمّاة.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">D1+D2+D3</span> توحيد بوّابات التوصيل <span class="chip warn">HIGH</span></h4>
+    <p>D1 (حدّ نقد استباقي + وعي SPLIT) وD2 (سقف تزامن يُعيد استخدام دالة busy_driver_ids_subquery الموجودة فعلًا —
+    <b>لا تُضِف حالة عرض جديدة</b>، فهي مقروءة في ~20 موضعًا آخر) يُشحنان معًا كطلب دمج واحد. D3 يستخرج دالة مشتركة
+    <code>check_driver_dispatch_eligibility()</code> تُستخدَم في المسارين التلقائي واليدوي معًا — لكن <b>يجب</b> أن
+    تحمل مخرجًا صريحًا لتجاوز الطوارئ (override_gates + سبب إلزامي) وإلّا فقدت غرفة العمليات القدرة الوحيدة الحالية
+    (وإن كانت غير مقصودة) على دفع طلب عالق لسائق في حالة طارئة حقيقية.</p>
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="n">§6</span> المرحلة الثالثة — السلامة المالية</h2>
+
+  <div class="finding">
+    <h4><span class="id">E1</span> Maker-Checker لفاتورة Trade <span class="chip warn">HIGH</span></h4>
+    <div class="files">backend/app/modules/trade/po_router.py — create_invoice</div>
+    <p><b>الإصلاح:</b> استخراج <i>شكل</i> نظام الموافقة المزدوجة الموجود فعلًا في ManualJournal (وليس الصنف نفسه) —
+    عمود <code>ledger_status</code> جديد (NOT_APPLICABLE/PENDING_APPROVAL/POSTED)، منفصل تمامًا عن حقل <code>status</code>
+    الحالي (الذي يحمل نتيجة المطابقة الثلاثية MATCHED/DISCREPANCY). عند MATCHED، لا تُرحَّل القيود فورًا؛ يحتاج
+    موظف ثانٍ مختلف اعتماد صريح.</p>
+    <p><b>محاكاة النشر:</b> ترحيل إضافي بحت (أعمدة جديدة قابلة للـNULL). الفواتير القديمة المطابقة تُعبَّأ رجعيًا
+    كـ POSTED باعتماد ذاتي (نفس التسوية التي طبّقها الفريق فعلًا في ترحيل C-11 للقيود اليدوية — أعِد استخدامها لا
+    تخترع أخرى). لا خطر لطلبات قيد التنفيذ عبر حدود النشر لأن الترحيل القديم كان يُرحِّل القيد ضمن نفس معاملة تعيين
+    MATCHED.</p>
+    <p><b>الأثر الجانبي الحاسم:</b> فاتورة MATCHED لن تنعكس فورًا في الدفتر — نافذة حقيقية بين "المطابقة" و"الترحيل
+    الفعلي". <b>يجب تأكيد وجود ≥2 موظفين يحملان صلاحية trade:invoice_manage قبل الشحن</b> — وإلّا عَلِقت كل فاتورة
+    مطابَقة مستقبلية عند PENDING_APPROVAL للأبد.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">H4</span> حدّ ائتمان المشترين في Trade <span class="chip bad">CRITICAL</span></h4>
+    <p><b>الأخطر ماليًا على إنتاج حيّ في هذه الوثيقة كلّها:</b> جدول <code>TradeBuyerCreditPolicy</code> جديد وفحص
+    قبل تقديم أمر الشراء — لكن أيّ مشترٍ حالي بمديونية <code>TRADE_BUYER_RECEIVABLE</code> تتجاوز أيّ حدّ يُضبَط
+    سيُمنَع فورًا من تقديم أوامر جديدة <b>بلا أي تحذير</b> ما لم تُعبَّأ سياسة (ولو "بلا حدّ") لكل مشترٍ حالي <b>قبل</b>
+    تفعيل الفرض. التعبئة والفرض لا يمكن أن يكونا نفس خطوة النشر.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">G-I</span> تجميد عمولة Trade عند تأكيد أمر الشراء <span class="chip warn">HIGH</span></h4>
+    <p>العمولة تُحسب اليوم عند إصدار الفاتورة، لا عند تأكيد الاتفاق — تغيير الإعداد العام بينهما يُعيد تسعير صفقات
+    قديمة رجعيًا. الإصلاح: تجميد النسبة في PO عند CONFIRMED، مع جسر تراجعي إلزامي (<code>if commission_bps is None:
+    resolve كالمعتاد</code>) لأوامر الشراء المؤكَّدة قبل هذا الترحيل ولم تُفوتَر بعد — تخطّي هذا الجسر يعني إمّا
+    كسرًا فوريًا أو، أسوأ، عمولة صفر صامتة.</p>
+  </div>
+</section>
+
+<section id="s7">
+  <h2><span class="n">§7</span> مجموعة A — النشر والـCI وسلسلة التوريد (10 مجموعات)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">A1</td><td>فحص exit code الفعلي لـpytest + timeout بدل الاعتماد على grep نصّي فقط</td><td><span class="chip warn">MED</span></td></tr>
+    <tr><td class="idcol">A2</td><td>عدم ابتلاع فشل compose up؛ مقارنة digest الصورة؛ قفل git نظيف + وسم SHA</td><td><span class="chip bad">HIGH</span></td></tr>
+    <tr><td class="idcol">A3</td><td>فحص صحّة يغطّي العمّال الخلفيين/outbox/KMS/MinIO لا DB+Redis فقط</td><td><span class="chip warn">MED</span></td></tr>
+    <tr><td class="idcol">A4</td><td>بوّابة دمج ذاتية الاستضافة تعوّض غياب حماية الفرع المدفوعة</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">A5</td><td>هجرة نقاط استدعاء الأعلام لِلمُحلِّل ثلاثي الطبقات + فحص صحّة اعتماديات عند التفعيل</td><td><span class="chip warn">MED</span></td></tr>
+    <tr><td class="idcol">A6</td><td>تصنيف tawanow ضمن البيئات الصارمة (انظر §4)</td><td><span class="chip bad">CRITICAL</span></td></tr>
+    <tr><td class="idcol">A7</td><td>إصلاح ثبات E2E ثم إزالة continue-on-error؛ توسعة اختبارات PostgreSQL؛ بناء موبايل أصلي؛ بيانات عدائية لفحص القاعدة</td><td><span class="chip bad">HIGH</span></td></tr>
+    <tr><td class="idcol">A8</td><td>تحديث المستندات الراكدة (رأس alembic، "40/40")؛ تحويل pos_router لغلاف الخطأ الموحَّد</td><td><span class="chip warn">MED</span></td></tr>
+    <tr><td class="idcol">A9</td><td>إزالة تعليقات "Phase" الراكدة؛ رفع الاستيرادات الداخلية دالة-دالة مع فحص إقلاع فعلي لكل واحد</td><td><span class="chip warn">MED</span></td></tr>
+    <tr><td class="idcol">A10</td><td>تتبّع تدريجي لإغلاق فجوة OpenAPI (524 مسارًا)؛ تحديث schema.sql</td><td><span class="chip good">LOW</span></td></tr>
+  </table>
+</section>
+
+<section id="s8">
+  <h2><span class="n">§8</span> مجموعة B — الهوية والمصادقة والصلاحيات (15 مجموعة)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">B1</td><td>منع reinstate_driver من إحياء DELETED + التحقّق من كون الهدف سائقًا فعلًا</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">B2</td><td>إلغاء مسار provider_id الخام لتسجيل الموظفين، إلزام كود الدعوة</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">B3</td><td>مفتاح إيقاف طارئ + جدول أهليّة لصلاحيات Trade الجانب المشتري</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">B4</td><td>نطاق موارد لصلاحيات Trade (انظر §5)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">B5</td><td>كشف/تقرير تركيبات ADMIN السامّة (بلا تقييد ميراث فوري — قرار مشغّل منفصل)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">B6</td><td>هجرة require_role→require_permission (انظر §5)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">B7</td><td>إيقاف MinIO الصلب (انظر §4)</td><td><span class="chip bad">CRITICAL</span></td></tr>
+    <tr><td class="idcol">B8</td><td>أعلام إنفاذ اختيارية لـMFA/outbox (باستثناء صريح لـD-60/COD-OTP)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">B9</td><td>إعادة ترتيب حذف رمز OTP بعد الالتزام؛ قلب registration_require_otp (قرار مشغّل)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">B10</td><td>إعادة استخدام getOrCreateDeviceId؛ تشفير TOTP عبر kms_envelope؛ قيود CHECK بعد تدقيق حيّ</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">B11</td><td>انتظار تسجيل الخروج بمهلة؛ تمييز فشل الشبكة العابر عن انتهاء الجلسة الحقيقي</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">B12</td><td>تصحيح توقيت تسجيل نجاح OTP؛ تجزئة الهاتف في AuditEvent مثل OtpEvent</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">B13</td><td>تقرير معدّل الإنذار الكاذب لمشاركة الجهاز + مسار استئناف خفيف</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">B14</td><td>منع SUPERVISOR من إنشاء أدوار مالية/امتثال (قائمة حظر صريحة)</td><td><span class="chip bad">CRITICAL</span></td></tr>
+    <tr><td class="idcol">B15</td><td>إشعار المستخدم الفوري عند إعادة تعيين/تعطيل TOTP؛ تحكّم ثنائي لاحقًا (شرط: ≥2 SUPER_ADMIN)</td><td><span class="chip warn">HIGH</span></td></tr>
+  </table>
+
+  <div class="finding">
+    <h4><span class="id">B14</span> SUPERVISOR ينشئ أدوار مالية <span class="chip bad">CRITICAL</span></h4>
+    <div class="files">backend/app/core/roles.py — can_create_role</div>
+    <p>مقارنة رتب رقمية بحتة تسمح لأيّ منشئ فوق الرتبة 40 (SUPERVISOR=60) بإنشاء FINANCE_AGENT/COMPLIANCE_AGENT
+    (رتبتهما 40 أيضًا). الإصلاح: قائمة حظر صريحة بالاسم تشترط ADMIN/SUPER_ADMIN فقط للدورين الحسّاسين، بنفس نمط
+    _ACTOR_ID_VISIBLE_ROLES المُصلَح فعلًا في نفس الملف. <b>محاكاة التشغيل:</b> ADMIN/SUPER_ADMIN غير متأثّرين؛
+    SUPERVISOR يُحظَر بنفس فرع الـ403 المُستخدَم فعلًا في create_ops_account؛ SUPERVISOR الذي ينشئ OPERATIONS_AGENT
+    (قدرته الحقيقية) غير متأثّر. صفر خطر — نسخ مباشر لنمط مُثبَت في نفس الملف.</p>
+  </div>
+</section>
+
+<section id="s9">
+  <h2><span class="n">§9</span> مجموعة C — الطلبات والكتالوج والمزوّدين (16 مجموعة)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">C1</td><td>إضافة tenders/promo_code/tip لبصمة idempotency (ويب)؛ إعادة حساب المفتاح عند أي تغيير (موبايل)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">C2</td><td>إضافة اسم/هاتف/ملاحظات المستلم لبصمة idempotency</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">C3</td><td>رفض صريح لكود خصم غير صالح بدل خصم صفري صامت</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">C4</td><td>فشل مغلَق (لا "بلا رسم") عند تعذّر حساب رسم التوصيل لبوّابة OTP</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">C5</td><td>فحص قدرة استلام ذاتي لكل متجر؛ عرض سعر توصيل حقيقي بالموبايل؛ محفظة كطريقة دفع كاملة بالموبايل</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">C6</td><td>تقسيم order_service.py/CheckoutPage.tsx تدريجيًا (بلا مزج مع إصلاح صوابيّة، ت٢٩)</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">C7</td><td>قيد CHECK على order_state (انظر §4)</td><td><span class="chip bad">CRITICAL</span></td></tr>
+    <tr><td class="idcol">C8</td><td>جلب حدّ الجدولة من إعداد حقيقي؛ حظر الإرسال عند فشل معاينة الرسم</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">C9</td><td>تتبّع نجاح/فشل كل دين في حلقة السداد</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">C10</td><td>خصم ذرّي حقيقي لمخزون المكوّنات (InventoryItem)، بعد C14</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">C11</td><td>اختبار إجهاد Postgres حقيقي لحدّ استخدام الخصم + خصم المخزون معًا</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">C12</td><td>تفكيك price_snapshot لحقول إضافية (subtotal/discount/fee/net) بلا إعادة تعريف الحقول القديمة</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">C13</td><td>إشارة UX عند عودة X-Provider-Id لأقدم متجر؛ تفكيك نموذج Provider تدريجيًا</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">C14</td><td>ترحيل InventoryItem من Float إلى Numeric (قبل C10، ت٦)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">C15</td><td>توحيد حاسبة معاينة السعر بين الويب والموبايل (لا خطر صوابيّة، تحسين احتكاك فقط)</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">C16</td><td>تسجيل تحذير عند فشل إشعار رفض المزوّد؛ توسعة طول cancel_reason؛ مؤشّر متجر نشط دائم</td><td><span class="chip good">LOW</span></td></tr>
+  </table>
+</section>
+
+<section id="s10">
+  <h2><span class="n">§10</span> مجموعة D — التوصيل والسائقون (10 مجموعات)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">D1</td><td>حدّ نقد استباقي + وعي SPLIT (انظر §5)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">D2</td><td>سقف تزامن يُعيد استخدام busy_driver_ids_subquery الموجودة (لا حالة عرض جديدة)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">D3</td><td>دالة بوّابة مشتركة لإعادة الإسناد اليدوي، مع تجاوز طوارئ صريح مُدقَّق (انظر §5)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">D4</td><td>لا إصلاح — قرار مقصود موثَّق (SSE fire-and-forget، مخفَّف باستطلاع احتياطي)</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">D5</td><td>لا إصلاح كود — قرار سياسة/موافقة مشغّل (خلفية الموقع، حساب Apple Developer)</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">D6</td><td>تسجيل تدقيق لوصول مواقع الأسطول الحيّة</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">D7</td><td>مهمّة حذف مُجمَّعة لبيانات المواقع القديمة (بلا إعادة كتابة دورة الانتهاء بالكامل)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">D8</td><td>رابط مباشر لإعدادات الجهاز عند رفض إذن الموقع</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">D9</td><td>فصل مفتاح AI لسياستين؛ بوّابة مراجعة قبل التعليق التلقائي (يحتاج موافقة مشغّل صريحة)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">D10</td><td>حذف سطر مكرّر</td><td><span class="chip good">LOW</span></td></tr>
+  </table>
+</section>
+
+<section id="s11">
+  <h2><span class="n">§11</span> مجموعة E — المحفظة والدفتر المالي (14 مجموعة)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">E1</td><td>Maker-Checker لفاتورة Trade (انظر §6)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">E2</td><td>لا تغيير منطقي — توثيق القرار المتعمَّد + تقرير قراءة فقط</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">E3</td><td>جدول Journal Header موحَّد (قراءة فقط)، صفر خطر على القيود الحالية</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">E4</td><td>نمط SAVEPOINT لإنشاء حساب دفتر أستاذ (انظر §3)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">E5</td><td>مدخلات COA لحسابات Trade (يحتاج إشعار محاسبة مسبق، ت٣٠)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">E6</td><td>رفض عدم تطابق مبلغ حجز المحفظة (انظر §3)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">E7</td><td>تصحيح فحص نزاع المحفظة ليشمل UNDER_REVIEW (انظر §3)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">E8</td><td>مفتاح خارجي مكتوب النوع لـSettlement.beneficiary_id (LedgerEntry يبقى متعدد الأشكال عمدًا)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">E9</td><td>توثيق نطاق FIN-COR الحقيقي في كل مكان يُستشهَد به</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">E10</td><td>اختبار قيمة ذهبية مشترك لتقريب النقد عبر الثلاث لغات (مخفَّف بالفعل خادميًا)</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">E11</td><td>قيد CHECK شامل لحالة حساب المحفظة بعد تدقيق حيّ</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">E12</td><td>قيد ترتيب فترة التسوية (انظر §4)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">E13</td><td>schema_version داخل lines_json للقيد اليدوي</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">E14</td><td>تقصير التعليقات الطويلة (أسلوبي بحت)</td><td><span class="chip good">LOW</span></td></tr>
+  </table>
+</section>
+
+<section id="s12">
+  <h2><span class="n">§12</span> مجموعة F — الإشعارات والأحداث ونقطة البيع (9 مجموعات)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">F1</td><td>إرسال الإشعار بعد الالتزام دائمًا (post-commit hook)، بغضّ النظر عن حالة علم outbox</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">F2</td><td>فشل KMS مغلَق لا مفتوح؛ مسار طوارئ صريح مُدقَّق ومحدود بوقت</td><td><span class="chip bad">CRITICAL</span></td></tr>
+    <tr><td class="idcol">F3</td><td>معرّفات ارتباط/سببيّة عبر الأحداث</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">F4</td><td>SELECT FOR UPDATE SKIP LOCKED فعلي (التوثيق يدّعيه، الكود لا ينفّذه)؛ فشل قناة يُعيد المحاولة لا "منشور" صامت</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">F5</td><td>نصوص push محلّية حقيقية بثلاث لغات بدل تحويل نصّي من اسم المفتاح</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">F6</td><td>فشل مغلَق (لا مفتوح) عند خطأ قراءة إعداد تفعيل القناة</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">F7</td><td>attempt_no ومعرّف رسالة فريد في سجلّ التسليم</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">F8</td><td>توحيد قائمة تجاوز إيقاف الإشعارات كإعداد قاعدة بيانات؛ إلغاء تفعيل تلقائي لتوكن ميت</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">F9</td><td>غلاف خطأ POS موحَّد؛ فترة تداخل لتدوير السرّ؛ إظهار العناصر المتخطّاة بدل نجاح صامت</td><td><span class="chip warn">HIGH</span></td></tr>
+  </table>
+
+  <div class="finding">
+    <h4><span class="id">F2</span> فشل KMS يعود للنصّ الصريح <span class="chip bad">CRITICAL</span></h4>
+    <div class="files">backend/app/modules/integrations/pos_router.py:65-88</div>
+    <p>عند فشل فكّ تشفير KMS، الكود يسجّل تحذيرًا ويكمل بالسرّ غير المشفَّر — يُبطل غرض التشفير كليًا. الإصلاح: فشل
+    مغلَق حقيقي (503 مميَّز) بدل التراجع الصامت، مع مسار طوارئ صريح منفصل (عمود انتهاء صلاحية + بوّابة SUPER_ADMIN +
+    تبرير مكتوب + تنبيه فوري) لحالة انقطاع KMS الحقيقي مع حاجة تشغيلية ماسّة لاستمرار تدفّق ويبهوك مزوّد حرج. هذا
+    يختلف جوهريًا عن الثغرة الحالية: اليوم التراجع صامت وغير مشروط؛ مسار الطوارئ المقترح اختياري، منتهي الصلاحية،
+    وقابل للتتبّع لقرار محدَّد.</p>
+  </div>
+</section>
+
+<section id="s13">
+  <h2><span class="n">§13</span> مجموعة G — الخصوصية والملفّات ولوحة العمليات (15 مجموعة)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">G-A</td><td>حذف DeviceToken، محو محتوى NotificationRecord، تطهير ملفّات MinIO عند حذف الهوية + جدول إعادة محاولة</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">G-B</td><td>إضافة وعي Trade لفحص أهليّة الحذف (يحظر حذفًا كان ينجح صامتًا من قبل)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">G-C</td><td>توسعة بوّابة الكشف بسبب لتنزيل الملفّات؛ رسائل خطأ عامّة بدل تسريب الاستثناء الخام</td><td><span class="chip bad">CRITICAL</span></td></tr>
+    <tr><td class="idcol">G-D</td><td>قبول دفعة مستندات قانونية كمعاملة ذرّية واحدة</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">G-E</td><td>تصحيح استعلام إجمالي الشكاوى ليطابق فلاتر القائمة؛ إكمال 9 مجالات ناقصة في CP</td><td><span class="chip good">LOW/MED</span></td></tr>
+    <tr><td class="idcol">G-F</td><td>إخفاء رابط تنقّل Trade عن الأدوار التي لا تملك المنحة الفعلية</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">G-G</td><td>توحيد فحوصات الموافقة الذاتية على دالة مشتركة واحدة + سدّ 6 تركيبات سامّة غير محمية</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">G-H</td><td>حقول تعيين/شدّة/SLA/فريق/قفل تفاؤلي لـWorkItem</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">G-I</td><td>تجميد عمولة Trade (انظر §6)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">G-J</td><td>عرض موحَّد للقضايا المالية (قراءة فقط)؛ نقل التسوية المحاسبية خارج عملية الـAPI</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">G-K</td><td>StreamingResponse لتنزيل الملفّات؛ تسجيل خطأ إنشاء الـbucket؛ تحذير عند MINIO_SECURE معطَّل</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">G-L</td><td>تطهير recipient PII من الطلبات المحفوظة قانونيًا بعد حذف صاحبها (لا تغيير على fail-open المُصرَّح به)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">G-M</td><td>غلاف أخطاء آمن مشترك في operations_router؛ تحويل استعلامات SQL خام مختارة</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">G-N</td><td>تقليل زمن حجز قفل سلسلة التدقيق العالمي؛ تنبيه حقيقي على مسار الفشل الصامت (لا تجزئة السلسلة)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">G-O</td><td>توسعة إخفاء PII لتشمل الجهاز/الجلسة/المحفظة؛ بقية بنود H-01/02/05/07/09 القديمة</td><td><span class="chip info">MED</span></td></tr>
+  </table>
+
+  <div class="finding">
+    <h4><span class="id">G-C</span> تجاوز صلاحية تنزيل الملفّات + تسريب استثناء خام <span class="chip bad">CRITICAL</span></h4>
+    <div class="files">backend/app/modules/files/file_router.py</div>
+    <p>أدوار OPS/Compliance/Super تتجاوز فحص ملكية الملفّات كليًا — يمكنها تنزيل أيّ object_key بمعرفة المسار فقط،
+    بلا ربط بقضية حقيقية. الإصلاح: توسعة نفس آلية "الكشف بسبب" (D-50) المبنيّة فعلًا لبيانات الهاتف/البريد لتشمل
+    تنزيل الملفّات — موظف مُشرِف يجب أن يفتح نافذة كشف صريحة موثَّقة بسبب/قضية قبل التنزيل. <b>أثر جانبي حاسم:</b>
+    أي واجهة OPS حالية تربط مباشرة لرابط تنزيل ملفّ (بدل المرور عبر خطوة الكشف أوّلًا) ستبدأ بالفشل بـ403 فور
+    الشحن — يجب تحديث كل نقطة دخول حالية (شاشة مراجعة KYC، عارض العقد الإلكتروني) في <b>نفس طلب الدمج</b>، لا بعده.</p>
+  </div>
+</section>
+
+<section id="s14">
+  <h2><span class="n">§14</span> مجموعة H — Tawa Trade الكاملة (6 مجموعات)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">H1</td><td>توسعة idempotency + جدولة انتهاء الحجوزات/أوامر الشراء العالقة (انظر §3)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">H2</td><td>آلة حالة مضبوطة لحالة المورّد/المنتج؛ منع الاستلام الزائد؛ ربط الفاتورة بحلّ القضية</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">H3</td><td>خطوة مراجعة قبل تقديم أمر الشراء؛ حالة انشغال منفصلة لكل إجراء؛ مسار تغيير الكمّية</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">H4</td><td>حدّ الائتمان + مسار تصحيح الفاتورة (انظر §6)</td><td><span class="chip bad">CRITICAL</span></td></tr>
+    <tr><td class="idcol">H5</td><td>دورة حياة أحداث/إشعارات Trade عبر EventOutbox الموجود فعلًا (بعد H2، ت١٣)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">H6</td><td>/trade/overview حقيقي؛ إصلاح N+1؛ ترقيم مؤشّري؛ اختبار PostgreSQL/E2E كامل</td><td><span class="chip good">LOW</span></td></tr>
+  </table>
+
+  <div class="finding">
+    <h4><span class="id">H5</span> Trade تصمت تمامًا اليوم — أول إشعار على الإطلاق <span class="chip info">MED</span></h4>
+    <p>لا نظام أحداث في Trade إطلاقًا — الموافقة/الرفض/الشحن/الاستلام/الفوترة تحدث بصمت تام. الإصلاح: إعادة استخدام
+    <code>EventOutbox</code> الموجود فعلًا (نفس الجدول الذي يستخدمه dispatch/payments) — بلا بنية تحتية جديدة.
+    <b>الأثر الجانبي الأهم:</b> موظفو OPS والمشترون المعتادون على صمت تامّ منذ إطلاق Trade سيبدؤون فجأة بتلقّي
+    إشعارات لكل حدث دورة حياة — بلا تدرّج، يبدو هذا كعطل لا كميزة. التخفيف: إعداد افتراضي "معطَّل/ملخّص" للمستخدمين
+    الحاليين، إطلاق للموظفين أوّلًا (حجم أقلّ، جمهور مهني) قبل المشترين، وإعلان صريح بدل قلب صامت.</p>
+  </div>
+</section>
+
+<section id="s15">
+  <h2><span class="n">§15</span> مجموعة I — الموبايل (7 مجموعات)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">I1</td><td>مهلة زمنية محدودة لفحص التحديث الإجباري بدل انتظار غير محدود</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">I2</td><td>تجميد توليد أنواع API ضد لقطة محلّية بدل استدعاء tawanow.com الحيّ</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">I3</td><td>نقل النصوص العربية المباشرة لملفّات i18n؛ إصلاح ApiError أحادي اللغة (فرنسية خارج النطاق حاليًا)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">I4</td><td>TTL + إعادة تحقّق سعر عبر /carts/quote الموجود + عدّاد محاولات/تأخير تصاعدي + expectedUnitPriceMinor</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">I5</td><td>حجر إدخالات outbox القديمة مجهولة المالك بدل نسبها التلقائي (يُشحن مع I4)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">I6</td><td>جلب حدّ الجدولة من استجابة فحص الإصدار الموجودة فعلًا</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">I7</td><td>UUID حقيقي (expo-crypto) بدل Date.now()+Math.random</td><td><span class="chip good">LOW</span></td></tr>
+  </table>
+
+  <div class="finding">
+    <h4><span class="id">I4</span> الموبايل لا يرسل expectedUnitPriceMinor إطلاقًا <span class="chip warn">HIGH</span></h4>
+    <div class="files">apps/mobile/src/services/outbox.ts + checkout.tsx</div>
+    <p><b>اكتشاف حاسم:</b> الخادم يملك بالفعل حارس ارتفاع سعر (revalidate_cart_pricing) يتجاهل الفحص عمدًا عند غياب
+    هذا الحقل ("توافق خلفي مع بناء موبايل أقدم") — لكن الموبايل لم يرسله <b>قط</b>، فحارس السعر معطَّل فعليًا لكل
+    طلب موبايل، حيّ أو مؤجَّل. إضافة الحقل تُعيد تفعيل حماية موجودة فعلًا بلا أي عمل خادم جديد. <b>لا تبعية نشر في
+    أي اتجاه</b> (ت١٧) — الحقل إضافي متوافق خلفيًا تمامًا. يُضاف أيضًا: مهلة صلاحية ساعتين لعناصر outbox، استدعاء
+    /carts/quote الحيّ فعلًا لإعادة التحقّق قبل إعادة الإرسال، سقف 10 عناصر للطابور، وتأخير تصاعدي عند الفشل
+    المتكرّر.</p>
+  </div>
+</section>
+
+<section id="s16-web">
+  <h2><span class="n">§16</span> مجموعة J — الويب وقاعدة البيانات (10 مجموعات)</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>خطورة</th></tr>
+    <tr><td class="idcol">J1</td><td>إغلاق فجوة OpenAPI عبر ratchet لكل وحدة (20-30 طلب دمج مرتَّبة بالمخاطرة، لا دفعة واحدة)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">J2</td><td>رسالة عامّة ثابتة بدل نصّ الاستثناء الخام في /ready</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">J3</td><td>قفل مُسيَّج (fencing token) + نبضة قلب لكل حلقة خلفية بدل قفل Redis بسيط (انظر التفصيل أدناه)</td><td><span class="chip warn">HIGH</span></td></tr>
+    <tr><td class="idcol">J4</td><td>إعادة توليد schema.sql من مخرجات ORM/Alembic الفعلية</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">J5</td><td>غلاف خطأ pos_router (مع F9)؛ رفع استيرادات operations_router قسمًا قسمًا؛ ثوابت ترقيم موحَّدة</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">J6</td><td>قرار لكل عمود متعدّد الأشكال (قيد CHECK أو جدول سجلّ)؛ schema_version لأعمدة JSON؛ now_utc() مركزية</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">J7</td><td>حقن trace_id في السجلّات؛ توسعة العدّادين الموجودين بأبعاد Label؛ تعريف 2-3 SLO</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">J8</td><td>توسعة تحديد المعدّل حسب الفاعل للمسارات الموثَّقة إضافيًا (دفاع بالعمق، لا استبدال IP)</td><td><span class="chip info">MED</span></td></tr>
+    <tr><td class="idcol">J9</td><td>تصحيح اسم المنتج في /health/ready (يحتاج إذن مشغّل)؛ تحويل الأنماط الداخلية تدريجيًا</td><td><span class="chip good">LOW</span></td></tr>
+    <tr><td class="idcol">J10</td><td>فلتر نصّي جانب العميل لقائمة موردي Trade (تأجيل البحث الخادمي حتى دليل حاجة فعلي)</td><td><span class="chip good">LOW</span></td></tr>
+  </table>
+
+  <div class="finding">
+    <h4><span class="id">J3</span> 27 حلقة خلفية بقفل Redis بسيط بلا رمز تسييج <span class="chip warn">HIGH</span></h4>
+    <p>إن انتهت صلاحية القفل أثناء تنفيذ بطيء، نسخة ثانية قد تبدأ نفس المسح بلا أي حماية على مستوى قاعدة البيانات.
+    الإصلاح: <code>acquire_fenced</code>/<code>release_fenced</code> برمز فريد + تحقّق <code>still_holds</code>
+    قبل كل التزام. <b>محاكاة النشر:</b> الحالة الخطرة الوحيدة هي أن حذف نسخة قديمة غير المشروط (Lua compare-and-delete
+    الجديد يحلّها) قد يحذف قفل نسخة جديدة استحوذت عليه فعلًا أثناء نافذة تداخل نشر متدرّج — لكن بما أن المنصّة تشغّل
+    نسخة واحدة لكل بيئة اليوم (مؤكَّد من تعليق الكود نفسه)، هذه النافذة عمليًا محصورة بلحظة تبديل الحاوية القصيرة فقط،
+    لا تزامنًا حقيقيًا متعدّد النُسخ.</p>
+  </div>
+</section>
+
+<section id="s17">
+  <h2><span class="n">§17</span> فحص خاص: هل السلة المجمّعة جاهزة للفتح أو فكّ الختم؟</h2>
+
+  <div class="callout danger">
+    <b>تصحيح إطار حاسم قبل أي شيء آخر:</b> افتراض أن "السلة المجمّعة" تعني عدّة أشخاص مختلفين يساهمون في سلّة واحدة
+    ويقسّمون الفاتورة <b>لا يصف أي شيء مبنيّ فعليًا في هذا الكود</b>. يوجد علمان منفصلان تمامًا في
+    <code>contracts/feature_flags.yaml</code> يتشاركان كلمة "group" فقط:
+  </div>
+
+  <table>
+    <tr><th>العلم</th><th>ماذا يعني فعليًا</th><th>الحكم</th></tr>
+    <tr><td class="idcol">group_order_enabled</td><td>عميل واحد يبني عدّة سلال من متاجر مختلفة، ثم دفعة واحدة تُنشئ طلبًا فرعيًا لكل متجر معًا — لا يوجد أي مشارك بشري آخر</td><td><span class="chip warn">NOT_READY_MAJOR_GAPS</span></td></tr>
+    <tr><td class="idcol">group_order_participant_split</td><td>ميزة تقسيم الفاتورة الحقيقية بين عدّة أشخاص — <b>غير مبنيّة إطلاقًا</b></td><td><span class="chip bad">NOT_READY_ARCHITECTURAL_REDESIGN_NEEDED</span></td></tr>
+  </table>
+
+  <h3 class="sub">ما هو مبنيّ فعليًا (group_order_enabled)</h3>
+  <p>العميل يضيف أصنافًا من ≥2 متاجر → <code>CartPage.tsx</code> يوجّه لـ<code>/checkout-group</code> فقط عند وجود
+  متجرين مختلفين فأكثر والعلم مفعَّل → <code>CartGroupCheckoutPage.tsx</code> بحدّ أقصى 10 (يطابق حدّ الخادم) →
+  <code>POST /carts/quote</code> يعطي معاينة سعر لكل متجر ويُعلِم بالعناصر غير المتوفّرة → <code>POST /carts/checkout-group</code>
+  ينفّذ العمل الحقيقي: فحص تكرار بصمة الطلب، فحص مسبق للقراءة فقط عبر كل الطلبات الفرعية <b>قبل</b> إنشاء أو تحصيل
+  أيّ منها (لتفادي حجز محفظة على طلب أوّل قبل اكتشاف رفض سعر/مخزون لطلب لاحق)، إنشاء المجموعة ثم تكرار
+  <code>create_order</code> نفسه (المسار الفردي ذاته) لكل طلب فرعي، وأيّ استثناء يُلغي المعاملة بالكامل — مؤكَّد
+  ذرّيًا فعليًا بقراءة معالجة الاستثناء مباشرة لا افتراضًا. الإلغاء الجزئي/الكلّي بعد الدفع يُعيد استخدام حرّاس
+  cancel_order الحالية. أكثر من 20 اختبارًا عبر 5 ملفّات خلفية + مجموعتي اختبار أمامية تغطّي: المسار السعيد، إعادة
+  التشغيل المتطابقة (idempotent replay)، التراجع الذرّي عند الفشل، فرض الملكية، الإلغاء الجزئي/الكلّي، رفض ارتفاع
+  السعر (بما فيها اختبار خاص يؤكّد أن الفحص المسبق يُلغي <b>المجموعة كاملة</b> عند تغيّر سعر الطلب الفرعي الثاني تحديدًا).</p>
+
+  <h3 class="sub">الفجوات الأربع التي تمنع الفتح الآن (group_order_enabled)</h3>
+
+  <div class="finding">
+    <h4>الفجوة 1 — بصمة idempotency على مستوى المجموعة أضعف من نظيرتها الفردية <span class="chip bad">حاسمة</span></h4>
+    <div class="files">carts/service.py:146-178 (_hash_sub_orders) مقابل orders/idempotency.py:21-83</div>
+    <p>الدالة لا تُدرج <code>address_id</code>، <code>fulfillment_type</code>، <code>scheduled_for</code>،
+    <code>tenders</code>، أو <code>promo_code</code> — بينما بصمة الطلب الفردي الشقيقة تُدرج الستّة جميعًا فعلًا (بعد
+    إصلاحات CUST-02 وFIN-I1 التاريخية). <b>النتيجة الملموسة:</b> لو نجح طلب checkout-group فعليًا بالخادم لكن ضاعت
+    الاستجابة للعميل (واقعي على شبكات محمول ليبية)، ثم غيّر العميل عنوان التوصيل أو تقسيم الدفع وأعاد الإرسال بنفس
+    المفتاح — الخادم يرى نفس البصمة (العنوان/التحويلات غير مُدرَجة فيها) ويعتبره تكرارًا حقيقيًا فيُرجع المجموعة
+    القديمة بالعنوان/التقسيم <b>القديمين، بلا أي خطأ أو إشارة</b> أن القيم الجديدة أُهملت. <b>الإصلاح الأدنى:</b>
+    مطابقة قائمة حقول compute_request_hash، أو الأفضل: استدعاء الدالة المشتركة نفسها مباشرة بدل صيانة تطبيق تجزئة
+    مستقلّ ثانٍ عرضة للانحراف.</p>
+  </div>
+
+  <div class="finding">
+    <h4>الفجوة 2 — صفر تغطية اختبار لمسار تعارض التكرار نفسه <span class="chip warn">HIGH</span></h4>
+    <p>بحث شامل عبر كل ملفّات الاختبار الخمسة لم يجد أي إشارة لـ<code>GroupIdempotencyConflictError</code> أو سيناريو
+    "نفس المفتاح بعنوان/تقسيم مختلف". يجب إضافة اختبارات لهذا السيناريو تحديدًا فور إصلاح الفجوة 1 (ت٢٧).</p>
+  </div>
+
+  <div class="finding">
+    <h4>الفجوة 3 — لا اختبار لمسار التزامن الحقيقي (إرسال مزدوج فعلي) <span class="chip info">MED</span></h4>
+    <p>معالج IntegrityError في <code>carts/router.py:186-205</code> (تعارض قيد uq_order_groups_idem) موثَّق بتعليق
+    فقط، بلا اختبار آلي فعلي لمحاكاة طلبين متزامنين حقيقيين بنفس المفتاح.</p>
+  </div>
+
+  <div class="finding">
+    <h4>الفجوة 4 — كود خصم صامت الفشل كامن، غير قابل للوصول اليوم <span class="chip good">منخفضة الآن</span></h4>
+    <p>سلوك order_service.py الموثَّق (كود خصم سيّئ يمرّ صامتًا بلا خصم) ينطبق تقنيًا على كل طلب فرعي في checkout-group،
+    لكن <code>CartGroupCheckoutPage.tsx</code> لا تحتوي أي حقل إدخال كود خصم إطلاقًا (تحقّق كامل عبر قراءة الملف
+    الكامل 1399 سطرًا + بحث نصّي). ليست عائقًا اليوم، لكن يجب إصلاحها <b>قبل</b> أي إضافة مستقبلية لحقل كود خصم لهذه
+    الصفحة، وإلّا ظهرت الثغرة حيّة فورًا بلا أي محفّز مراجعة إضافي يكتشفها.</p>
+  </div>
+
+  <div class="callout method">
+    <b>ليست علّة (مؤكَّد، بلا حاجة إصلاح) — صحّة تقسيم/تقريب المبالغ:</b> <code>distributeGroupTenders</code>
+    (web/src/api/carts.ts:91-118) يستخدم عدّادًا صحيحًا واحدًا متناقصًا مرتَّبًا حتميًا حسب معرّف المزوّد (لا ترتيب
+    الإدخال، تحديدًا لتفادي تحكّم عشوائي بأيّ سلّة تُقسَّم أوّلًا)؛ كل حصّة تُقتطَع (<code>Math.trunc</code>)
+    والنقد يمتصّ الباقي الدقيق تمامًا — مسار تنازلي صحيح حسابيًا بلا قسمة، فلا يمكن أن ينحرف أو يُحصِّل أكثر/أقلّ من
+    اللازم. هذا استبدل فعليًا علّة قديمة ("سقف مستقلّ يُعاد تطبيقه لكل سلّة فرعية" كان يمكن أن يُراكم فوق الإجمالي).</p>
+  </div>
+
+  <h3 class="sub">القسم الثاني: group_order_participant_split — لا يوجد شيء لتقييمه</h3>
+  <p><code>backend/app/modules/advanced/group_order_split.py</code> (77 سطرًا فقط) عبارة عن هيكل مرحلة-3 معلَن صراحة
+  في توثيقه الداخلي: "محظور في المرحلتين 1 و2 (المنظّم يدفع الكل فقط)". دالّتاه (حساب حصص المشاركين، فحص خصوصية
+  المشاركين) نقيّتان بلا حالة، وكلتاهما تُطلقان استثناء حظر فور أن يكون العلم مغلَقًا — و<b>لا تُستدعى أيّ منهما من
+  أي راوتر أو خدمة أو نموذج في كامل قاعدة الكود</b>. لا يوجد نموذج بيانات لسلّة متعدّدة المستخدمين على الإطلاق —
+  <code>OrderGroup</code> يملك عمود <code>customer_id</code> واحدًا فقط، بلا قائمة مشاركين، بلا جدول دعوات.
+  الاختباران الوحيدان يؤكّدان فقط أن بوّابة العلم ترفع الخطأ المحظور — لا شيء يفحص سلوك مشارك حقيقي، لأن لا شيء
+  منه موجود.</p>
+
+  <p>كل سؤال حول هذا العلم (ماذا يحدث لو غادر مشارك بعد الالتزام بالدفع؟ هل يوجد مسار استرداد لمنظّم يُلغي بعد دفع
+  آخرين؟ هل يوجد قفل للتحرير المتزامن؟ ما قصّة التخلّي عن سلّة متعدّدة الدافعين؟) له نفس الجواب الصادق: <b>لا يوجد
+  مسار كود لتقييمه.</b> هذا هو الوضع المُعلَن والمقصود للوحدة، لا عيبًا مكتشَفًا.</p>
+
+  <h3 class="sub">الحكم النهائي</h3>
+  <div class="stat-row">
+    <div class="stat-card" style="background:color-mix(in srgb,var(--warn) 10%,var(--panel))"><b>group_order_enabled</b><span>NOT_READY_MAJOR_GAPS — مبنيّة ومُحصَّنة جوهريًا لكن ليست READY_WITH_MINOR_FIXES بعد</span></div>
+    <div class="stat-card" style="background:color-mix(in srgb,var(--bad) 10%,var(--panel))"><b>group_order_participant_split</b><span>NOT_READY_ARCHITECTURAL_REDESIGN_NEEDED — لا نموذج بيانات، لا تصميم لإعادة البناء منه أصلًا</span></div>
+  </div>
+  <p>مقارنةً بمعيار فتح <code>wallet_peer_transfer</code> في 2026-06-19 (قنوات مبنية + مُحصَّنة بـAML/KYC + مُختبَرة قبل الفتح):
+  علم <code>group_order_enabled</code> قريب من هذا المعيار لكن لا يبلغه بعد — الفجوة الوحيدة الحقيقية المانعة هي آلية
+  إعادة التشغيل المتطابقة (بالضبط الآلية التي يُفترَض أن تمنع الدفع/الشحن المزدوج عند إعادة المحاولة)، وهي أضعف
+  قياسًا من نظيرتها الفردية وبلا أي دليل اختبار يثبت سلامتها. لا فجوة من الأربع معماريّة — كلّها إصلاح دالة تجزئة
+  (مطابقة أو استدعاء compute_request_hash مباشرة) + اختبارات جديدة لمسارات الكود الصحيح أصلًا الذي ينقصه فقط الإثبات.
+  أمّا <code>group_order_participant_split</code> فليس مقارَنًا بمعيار wallet_peer_transfer إطلاقًا — ذلك العلم كان
+  يملك قنوات عاملة قبل الفتح؛ هذا العلم يملك توثيقًا داخليًا ودالّتين نقيّتين لا يستدعيهما أحد.</p>
+</section>
+
+<section id="s18">
+  <h2><span class="n">§18</span> لا حاجة للتدخّل — ما هو صحيح كما هو</h2>
+  <p>بنود صُنِّفت صراحة عبر كل التقارير الفرعية بأنها موسّعة النطاق، أو مصمَّمة بشكل صحيح فعلًا، أو قرارًا سابقًا
+  متعمَّدًا وموثَّقًا لا يستحقّ إعادة فتحه هنا:</p>
+  <ul>
+    <li><b>E2</b> (enforce_period_lock معطَّل افتراضيًا) — متعمَّد وموثَّق صراحة في تعليق الكود نفسه ("إغلاق فترة لا
+    يجب أن يكسر توصيلة قيد التنفيذ"). قلب الافتراض سيكون الإصلاح <i>الخاطئ</i>، لا تحسينًا.</li>
+    <li><b>E8's LedgerEntry.reference_id</b> — متعدّد الأشكال بتصميم صحيح؛ إضافة مفتاح خارجي واحد هنا خطأ معماري لا
+    مجرّد صعوبة تنفيذية.</li>
+    <li><b>C12's 157</b> (انخفاض السعر أثناء الدفع غير مُعلَن صراحة) — مؤكَّد كسلوك مقصود وصحيح؛ حظر أو طلب تأكيد
+    عند انخفاض السعر سيكون معاديًا للعميل.</li>
+    <li><b>D4/D5</b> (دفع SSE فوري بلا ضمان؛ نبضة تواجد بالمقدّمة فقط؛ push أندرويد فقط) — قرارات منتج/سياسة
+    موثَّقة صراحة، لا سهوًا هندسيًا.</li>
+    <li><b>H2's سباق فحص-ثم-إدراج لفاتورة Trade</b> — محميّ فعلًا بقيد قاعدة بيانات فريد + معالج IntegrityError عام
+    يحوّله لـ409 نظيف؛ لا حاجة لقفل SELECT FOR UPDATE إضافي يزيد التنافس بلا فائدة سلوكية.</li>
+    <li><b>G-J's قرار عدم توحيد ChargebackCase/FinancialDispute/IncidentRecord/Complaint في WorkItem واحد</b> —
+    توثيق work_item.py نفسه يرفض هذا صراحة ويطلب إذن مشغّل صريح؛ هذه الخطة تتّفق ولا تراجع هذا التقييم.</li>
+    <li><b>G-N's رفض تجزئة سلسلة التدقيق</b> — القرار الصحيح فعلًا لا فرصة ضائعة: التجزئة تُضحّي بخاصية إثبات عدم
+    التلاعب الحقيقية مقابل مكسب أداء، عكس الغرض الأساسي لسجلّ التدقيق.</li>
+    <li><b>G-L's بوّابات القبول القانوني المعطَّلة (191)</b> — موثَّقة صراحة كـ"تدرّج مقصود لا سهو"، ومؤمَّنة بهاش
+    FIN-COR؛ لا إصلاح مقترح، خارج النطاق ويحتاج إذن مشغّل صريح لإعادة فتحه.</li>
+    <li><b>J4's انحراف schema.sql</b> — ليس علّة تشغيلية (الملف توثيقي مرجعي فقط، لا يُنفَّذ أبدًا مقابل القاعدة
+    الحقيقية المبنيّة عبر Alembic) — تصحيح دقّة توثيقي بحت، بلا خطر وظيفي.</li>
+    <li><b>J8's قاطع الدارة الحالي لدلو auth</b> — يتعامل بالفعل بشكل صحيح مع اضطراب Redis أثناء موجة دخول عبر
+    التحويل لعدّاد احتياطي محلّي؛ سلوك مؤكَّد يعمل، يُتحقَّق منه لا يُعاد اختراعه.</li>
+    <li><b>J10's تأجيل بحث/ترقيم خادمي لموردي Trade</b> — فلتر جانب العميل هو الحجم الصحيح للمرحلة الحالية؛ بناء
+    بحث خادمي مسبقًا بلا دليل حجم فعلي يخالف قاعدة المشروع نفسها ضدّ التجريدات الاستباقية.</li>
+    <li><b>Group-order's تقسيم/تقريب المبالغ ومسار الذرّية والحالة الحيّة والمفتاح القاتل (kill switch)</b> — الأربعة
+    مؤكَّدة صحيحة بقراءة الكود المباشرة، لا افتراضًا؛ لا إصلاح مطلوب لأيّ منها.</li>
+  </ul>
+</section>
+
+<section id="s19">
+  <h2><span class="n">§19</span> الخلاصة والتوصية النهائية</h2>
+  <p>الترتيب الموصى به لبدء التنفيذ الفعلي (بعد إذن تشغيلي صريح لكل مرحلة):</p>
+  <ol>
+    <li><b>المرحلة صفر (§3)</b> — ابدأ فورًا، صفر شرط مسبق.</li>
+    <li><b>المرحلة الأولى (§4)</b> — نفّذ تدقيق البيانات الحيّة على الأهداف الأربعة أوّلًا لكل بند فيها، قبل أي سطر
+    كود يُشحن — تحديدًا A6 وB7 وC7، الثلاثة الأخطر في كامل هذه الوثيقة.</li>
+    <li><b>المرحلتان الثانية والثالثة (§5-6)</b> — Shadow Mode أوّلًا لكل تضييق صلاحية، وتأكيد التوظيف (≥2 موافقين)
+    قبل أي بوّابة Maker-Checker جديدة.</li>
+    <li><b>بقية المجموعات (§7-16)</b> حسب أولوية كل فريق، مع احترام قيود التسلسل الثلاثين في §2 بدقّة — هي التي
+    تمنع تنفيذًا صحيحًا فرديًا من التحوّل لعطل حين يلتقي بإصلاح آخر بترتيب خاطئ.</li>
+    <li><b>السلة المجمّعة (§17)</b> — أصلح الفجوة 1 (بصمة idempotency) فورًا بغضّ النظر عن أي قرار فتح؛ لا تفتح
+    <code>group_order_enabled</code> حتى تُثبَت الفجوات 1-3 باختبار حقيقي؛ لا تقترب من
+    <code>group_order_participant_split</code> إلّا كمشروع تصميم جديد كامل.</li>
+  </ol>
+  <div class="decision-box">
+    <b>ما يحتاج قرار مشغّل صريح قبل أي كود على الإطلاق (لا مجرّد قبل النشر):</b> تضييق ميراث ADMIN (B5)، قلب
+    registration_require_otp (B9)، تخفيف قيد موظف-متجر-واحد (C13)، بوّابة مراجعة قبل التعليق التلقائي (D9)، تتبّع
+    الموقع الخلفي وتسجيل Apple Developer (D5)، إشعار المحاسبة قبل إعادة تصنيف COA (E5). هذه ليست تفاصيل هندسية —
+    اختيارات منتج/سياسة لا يحسمها أي فحص كود.
+  </div>
+</section>
+
+<footer>
+  تقرير 559 · مبنيّ على التقرير 558 (274 نتيجة حقيقية) · 11 وكيل تصميم متوازٍ + 2 وكيل تركيب · كل إصلاح مُصمَّم
+  وليس منفَّذًا — بانتظار إذن تشغيلي مرحلي · 2026-07-25
+</footer>
+
+<a class="top" href="#top">↑ الأعلى</a>

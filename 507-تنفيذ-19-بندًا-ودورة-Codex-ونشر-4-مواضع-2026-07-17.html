@@ -1,0 +1,515 @@
+<meta charset="utf-8">
+<title>تنفيذ 19 بندًا + دورة Codex + نشر 4 مواضع — تقرير 507</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 74ch; color: var(--ink); }
+  p.lead { font-size: 1.08rem; color: var(--ink-muted); max-width: 64ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.87em; }
+  b { color: var(--ink); }
+
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "✓"; position: absolute; left: -20px; top: -40px; font-size: 14rem; font-weight: 900;
+    color: rgba(255,255,255,0.06); line-height: 1;
+  }
+  header.hero .inner { max-width: 1020px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 2.2rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 24ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 64ch; font-size: 1.1rem; }
+  .hero-stats { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.85rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.8rem; color: rgba(255,255,255,0.78); }
+
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.82rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+
+  section { margin: 54px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 1rem; color: var(--ink-muted); max-width: 72ch; margin-bottom: 24px; }
+
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.95rem; max-width: 62ch; }
+  .plain b { color: var(--accent-deep); }
+
+  .analogy { background: var(--accent-2-tint); border: 1px dashed var(--accent-2); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; }
+  .analogy .k { font-size: 0.76rem; font-weight: 800; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .analogy p { margin: 0; font-size: 0.92rem; color: var(--ink); max-width: 62ch; }
+
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.95rem; max-width: 64ch; }
+  .warn-box b { color: var(--warn-ink); }
+
+  .journey { display: flex; flex-direction: column; gap: 0; }
+  .milestone { display: grid; grid-template-columns: 56px 1fr; gap: 18px; position: relative; padding-bottom: 32px; }
+  .milestone:last-child { padding-bottom: 0; }
+  .milestone::before { content: ""; position: absolute; right: 27px; top: 56px; bottom: 0; width: 2px; background: var(--border); }
+  .milestone:last-child::before { display: none; }
+  .milestone .num { width: 56px; height: 56px; border-radius: 16px; background: var(--surface); border: 2px solid var(--ok-border); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: var(--shadow); color: var(--ok-ink); }
+  .milestone .body { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); }
+  .milestone .body h3 { font-size: 1.02rem; margin: 0 0 6px; }
+  .milestone .body p { margin: 0; font-size: 0.9rem; color: var(--ink-muted); max-width: none; }
+
+  .pipeline { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 8px 4px 16px; }
+  .pl-stage { flex: 0 0 auto; min-width: 108px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px; }
+  .pl-node { width: 52px; height: 52px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; background: var(--surface); border: 2px solid var(--ok-border); box-shadow: var(--shadow); color: var(--ok-ink); margin-bottom: 8px; }
+  .pl-stage .t { font-size: 0.8rem; font-weight: 700; color: var(--ink); }
+  .pl-stage .d { font-size: 0.7rem; color: var(--ink-faint); margin-top: 2px; }
+  .pl-arrow { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 26px; margin-top: -26px; }
+  .pl-arrow svg { width: 22px; height: 12px; }
+  .pl-arrow path { stroke: var(--ok-border); stroke-width: 2.5; fill: none; }
+
+  .feature { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 20px 22px; margin-bottom: 12px; }
+  .feature .fhead { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+  .feature .fnum { font-family: var(--font-display); font-weight: 800; font-size: 0.76rem; background: var(--accent-tint); color: var(--accent-deep); border-radius: 999px; padding: 3px 12px; }
+  .feature h3 { font-size: 1rem; margin: 0; }
+  .feature .simple-answer { color: var(--ink-muted); font-size: 0.9rem; margin: 10px 0 4px; }
+  .feature .tech { color: var(--ink-faint); font-size: 0.82rem; margin: 6px 0 0; }
+
+  .phase-head { display: flex; align-items: center; gap: 10px; margin: 30px 0 14px; }
+  .phase-head .pnum { width: 34px; height: 34px; border-radius: 10px; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; flex: 0 0 auto; }
+  .phase-head h3 { margin: 0; font-size: 1.08rem; }
+  .phase-head .pdesc { color: var(--ink-faint); font-size: 0.82rem; }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+
+  ul.simple-list { margin: 10px 0; padding-inline-start: 22px; }
+  ul.simple-list li { margin-bottom: 8px; color: var(--ink-muted); font-size: 0.92rem; }
+  ul.simple-list li b { color: var(--ink); }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 640px; }
+  thead th { text-align: right; font-family: var(--font-display); font-weight: 700; background: var(--surface-2); color: var(--ink-muted); font-size: 0.72rem; letter-spacing: 0.03em; padding: 10px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.mono { font-family: var(--font-mono); font-size: 0.82rem; white-space: nowrap; }
+
+  .targets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .target-card { background: var(--surface); border: 2px solid var(--ok-border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); text-align: center; }
+  .target-card .icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .target-card .name { font-weight: 800; font-size: 0.92rem; margin-bottom: 6px; }
+  .target-card .commit { font-family: var(--font-mono); font-size: 0.74rem; color: var(--ink-faint); }
+
+  .evidence-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin: 14px 0; font-size: 0.85rem; }
+  .evidence-box .k { font-weight: 800; color: var(--accent-deep); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+  .evidence-box .row { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+  .evidence-box .row:last-child { border-bottom: none; }
+  .evidence-box .row .l { color: var(--ink-faint); min-width: 160px; flex: 0 0 auto; }
+  .evidence-box .row .v { font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink); }
+
+  .final-verdict { background: linear-gradient(135deg, var(--accent-tint), var(--surface)); border: 2px solid var(--accent); border-radius: 20px; padding: 32px 30px; text-align: center; margin: 24px 0; }
+  .final-verdict .big { font-size: 3rem; margin-bottom: 10px; }
+  .final-verdict h3 { font-size: 1.3rem; color: var(--accent-deep); margin: 0 0 8px; }
+  .final-verdict p { margin: 0 auto; color: var(--ink-muted); font-size: 0.95rem; max-width: 56ch; }
+
+  hr.div { border: none; border-top: 1px dashed var(--border); margin: 46px 0; }
+  footer { margin-top: 72px; padding: 24px 0; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--ink-faint); text-align: center; }
+  a { color: var(--accent-deep); }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="inner">
+      <span class="kicker">🟢 تقرير تنفيذيّ شامل</span>
+      <h1>19 بندًا إصلاحيًّا + دمج OSRM + نشر على 4 مواضع بما فيها الإنتاج</h1>
+      <p class="lead">
+        هذا التقرير يوثّق تنفيذ الخريطة التنفيذيّة رقم 506 كاملةً — 19 نقطة إصلاح مكتشَفة من مراجعات سابقة، إضافةً
+        إلى ربط تقنيّ حقيقيّ لخدمة توجيه طرق (OSRM) — ثم دورة مراجعة عدائيّة بأداة Codex اكتشفت 7 عيوب إضافيّة
+        أُدخِلت أثناء هذا العمل نفسه، وأخيرًا نشر متزامن على المواقع الأربعة المعتمَدة، بما فيها الموقع الحيّ
+        <b>tawanow.com</b>.
+      </p>
+      <div class="hero-stats">
+        <div class="s"><div class="n">19+1</div><div class="l">بند مُنفَّذ</div></div>
+        <div class="s"><div class="n">7</div><div class="l">إصلاح Codex إضافيّ</div></div>
+        <div class="s"><div class="n">4 / 4</div><div class="l">مواضع نشر متزامنة</div></div>
+        <div class="s"><div class="n">3,619</div><div class="l">اختبار خلفيّ ناجح</div></div>
+        <div class="s"><div class="n">0</div><div class="l">مشكلة أمان ماليّ متبقّية</div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#mission">المهمّة</a>
+    <a href="#items">البنود التسعة عشر</a>
+    <a href="#osrm">تكامل OSRM</a>
+    <a href="#codex">دورة Codex — 7 إصلاحات</a>
+    <a href="#transparency">شفافيّة — 3 اكتشافات جانبيّة</a>
+    <a href="#deploy">النشر على 4 مواضع</a>
+    <a href="#gap">فجوة معروفة</a>
+    <a href="#final">الخلاصة</a>
+  </nav>
+
+  <section id="mission">
+    <div class="section-eyebrow">🎯 البداية</div>
+    <h2>المهمّة الأصليّة</h2>
+    <div class="plain">
+      <div class="ic">📋</div>
+      <p>
+        طُلب تنفيذ الخريطة التنفيذيّة رقم <b>506</b> بترتيبها الدقيق كما هي — 19 بندًا اكتُشِفت عبر مراجعات
+        عميقة سابقة، بالإضافة إلى فرصة تقنيّة واحدة (ربط حساب المسافة/الوقت التقديريّ بخدمة توجيه طرق حقيقيّة
+        OSRM بدل الخطّ المستقيم فقط). الشرط: لا توقّف حتى الاكتمال، ثم اختبار عدائيّ عبر Codex، ثم مراجعة ذاتيّة
+        مباشرة، ثم نشر — بإذن صريح منفصل لكل خطوة تمسّ الإنتاج.
+      </p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="items">
+    <div class="section-eyebrow">🧩</div>
+    <h2>البنود التسعة عشر — منظَّمة حسب مراحل التنفيذ الأربع</h2>
+    <p class="intro">
+      التفصيل الدقيق لكل بند موثَّق في التقرير 506 الأصليّ. هنا خلاصة منظَّمة حسب المراحل الأربع التي اتُّبِعت
+      فعليًّا أثناء التنفيذ — من إصلاحات صحّة البيانات، إلى سباقات التزامن، إلى الإشعارات الفوريّة، إلى الكتالوج
+      والواجهة.
+    </p>
+
+    <div class="phase-head"><div class="pnum">1</div><div><h3>صحّة البيانات والصلاحيّات</h3><div class="pdesc">4 بنود</div></div></div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">1.1</span><h3>إصلاح عمولة مندوب التسوية (3 مواضع)</h3></div>
+      <p class="simple-answer">حساب العمولة كان يُخطئ في 3 نقاط منفصلة في الكود عند التعامل مع موظّفي المنصّة الرسميّين مقابل المندوبين المستقلّين — وُحِّد الحساب في مصدر واحد.</p>
+      <div class="tag-row"><span class="pill ok">✓ مكتمل</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">1.2</span><h3>تسرّب طلبات outbox الجوّال بين حسابين</h3></div>
+      <p class="simple-answer">إذا سجّل الخروج مستخدم ثم دخل مستخدم آخر على نفس الجهاز، كانت طلبات المستخدم الأوّل المخزَّنة محليًّا (بانتظار الاتّصال) قد تظهر أو تُرسَل باسم الثاني — خصوصيّة حقيقيّة. أُضيف وسم ملكيّة لكل طلب مخزَّن.</p>
+      <div class="tag-row"><span class="pill crit">خصوصيّة</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">1.3</span><h3>إعادة حساب role_status بعد تفعيل TOTP</h3></div>
+      <p class="simple-answer">عند تفعيل المصادقة الثنائيّة (TOTP)، حالة الدور لم تكن تُعاد حسابها فورًا — أُصلح ليتّسق مع باقي مسارات المصادقة.</p>
+      <div class="tag-row"><span class="pill ok">✓ مكتمل</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">1.4</span><h3>اختبار مماثل لمسار refresh_tokens (بند منخفض الخطورة)</h3></div>
+      <p class="simple-answer">نفس فئة الإصلاح رقم 1.3، لكن لمسار تجديد الرمز المميّز. بند منخفض الخطورة — لم يُهمَل رغم ذلك، طبقًا للتعليمة الصريحة بعدم تجاوز أي نقطة مهما صغرت.</p>
+      <div class="tag-row"><span class="pill neutral">منخفضة</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">2</div><div><h3>سباقات التزامن (Race Conditions)</h3><div class="pdesc">3 بنود</div></div></div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">2.1</span><h3>سباق حجز/تحصيل النقد (TOCTOU)</h3></div>
+      <p class="simple-answer">بين لحظة التحقّق من إمكانيّة تسجيل استثناء نقديّ ولحظة تنفيذه، كان يمكن أن يحدث تحصيل نقديّ آخر في نفس اللحظة فيتضارب الاثنان. أُضيف قفل صفّ قاعدة بيانات (row-level lock) كأوّل عمليّة في المعاملة.</p>
+      <div class="tag-row"><span class="pill crit">تزامن ماليّ</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">2.2</span><h3>سباق تسعير الإعلانات (ProviderAds)</h3></div>
+      <p class="simple-answer">في واجهة تسعير حملة إعلانيّة، تغيير المدّة بسرعة أثناء انتظار سعر سابق كان يمكن أن يُظهر سعرًا لمدّة مختلفة عن التي يراها المستخدم فعليًّا.</p>
+      <div class="tag-row"><span class="pill warn">واجهة</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">2.3</span><h3>سباق تاريخ انتهاء منح موظّف المزوّد (ProviderStaff)</h3></div>
+      <p class="simple-answer">تعديل تاريخ انتهاء صلاحيّة منح موظّف بسرعة أثناء معالجة طلب سابق كان يمكن أن يمحو التعديل الأحدث.</p>
+      <div class="tag-row"><span class="pill warn">واجهة</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">3</div><div><h3>الإشعارات الفوريّة (Push)</h3><div class="pdesc">3 بنود</div></div></div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">3.1</span><h3>نقل إشعار عرض التوزيع إلى خطّاف بعد-الالتزام</h3></div>
+      <p class="simple-answer">إشعار السائق بعرض توصيل جديد كان يمكن أن يُرسَل قبل أن يتأكّد فعليًّا أنّ العرض نفسه تسجَّل بنجاح في قاعدة البيانات. الآن يُرسَل فقط بعد تأكيد الحفظ الدائم (after_commit)، عبر جلسة قاعدة بيانات جديدة مستقلّة.</p>
+      <div class="tag-row"><span class="pill crit">أعلى تغيير سلوكيّ في هذه الدورة</span><span class="pill ok">✓ اختبار جديد</span><span class="pill ok">✓ تحقّق حيّ إضافيّ لاحقًا</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">3.2</span><h3>تجاوز إعداد push_enabled للأحداث الحرجة</h3></div>
+      <p class="simple-answer">بعض الأحداث (كتنبيه أمنيّ عاجل) يجب أن تصل حتى لو عطَّل المستخدم الإشعارات العاديّة — أُضيف تجاوز صريح لهذه الفئة فقط.</p>
+      <div class="tag-row"><span class="pill ok">✓ مكتمل</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">3.3</span><h3>تسجيل صادق لفشل إلغاء تسجيل push (تطبيق الجوّال)</h3></div>
+      <p class="simple-answer">عند تسجيل الخروج من التطبيق، محاولة إلغاء تسجيل جهاز الإشعارات كانت تفشل صامتًا بلا أي أثر — أُضيف تسجيل واضح للفشل (مع إبقاء تسجيل الخروج نفسه يكتمل دائمًا، حتى لو فشل الإلغاء).</p>
+      <div class="tag-row"><span class="pill warn">جوّال (React Native)</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">4</div><div><h3>الكتالوج والواجهة والترجمة</h3><div class="pdesc">3 بنود تُغطّي 5 نقاط فرعيّة</div></div></div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">4.1</span><h3>تجاوز الكتالوج بترتيب LIMIT قبل الفلترة</h3></div>
+      <p class="simple-answer">بعض استعلامات الكتالوج كانت تُطبِّق حدّ العدد (LIMIT) في قاعدة البيانات قبل استبعاد العناصر خارج نطاق التوصيل — فيمكن أن تُعيد عناصر أقلّ ممّا هو متاح فعليًّا، أو صفرًا. أُضيف جلب زائد محدود (overfetch) مع إعادة محاولة واحدة عند الحاجة.</p>
+      <div class="tag-row"><span class="pill ok">✓ مكتمل</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">4.2</span><h3>حالة "متنازَع عليه" في صفحة تسوية السائق (3 عيوب فرعيّة)</h3></div>
+      <p class="simple-answer">حالة DISPUTED لتسوية السائق كانت تحمل ثلاث مشاكل متفرّقة في العرض والمنطق — عولجت الثلاث معًا في نفس الصفحة.</p>
+      <div class="tag-row"><span class="pill ok">✓ مكتمل</span><span class="pill ok">✓ اختبار جديد</span></div>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">4.3</span><h3>37 مفتاح ترجمة جديد + اختبار تطابق i18n</h3></div>
+      <p class="simple-answer">37 نصًّا كان بعضها بلا ترجمة كاملة عبر اللغات الثلاث (عربي/إنجليزي/فرنسي) — أُكمِلت، وأُضيف اختبار آليّ يمنع تكرار هذه الفجوة مستقبلًا.</p>
+      <div class="tag-row"><span class="pill ok">✓ مكتمل</span><span class="pill ok">✓ اختبار تطابق جديد</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="osrm">
+    <div class="section-eyebrow">🗺️ فرصة تقنيّة</div>
+    <h2>تكامل OSRM — وقت وصول تقديريّ بمسافة طريق حقيقيّة</h2>
+    <div class="analogy">
+      <div class="k">الفكرة ببساطة</div>
+      <p>
+        قبل هذا التغيير، عندما كانت مهمّة "معايرة" وقت الوصول التقديريّ تراجع الطلبات السابقة لتتعلّم منها، كانت
+        تحسب المسافة بخطّ مستقيم بين نقطتين على الخريطة فقط — وهذا لا يعكس الشوارع الفعليّة. الآن، لكل طلب فيه
+        إحداثيّات استلام، تُستخدَم خدمة توجيه طرق حقيقيّة (OSRM) لحساب مسافة الطريق الفعليّ ووقته التقديريّ.
+      </p>
+    </div>
+    <p class="intro" style="margin-top:6px">
+      <b>التفصيل التقنيّ:</b> أُعيدت هيكلة حلقة المعايرة إلى مرحلتَين — الأولى فلترة رخيصة بلا أي اتّصال شبكيّ،
+      والثانية استدعاءات OSRM الفعليّة <b>بتزامن محدود</b> (<code>asyncio.Semaphore</code>، الحدّ الافتراضيّ 10
+      متزامنة، قابل للتهيئة). هذا الحدّ ضروريّ لأنّ مهمّة المعايرة تراجع نافذة 30 يومًا من الطلبات — بلا حدّ
+      للتزامن، كانت يمكن أن تُرسِل مئات الطلبات لخدمة OSRM في اللحظة نفسها.
+    </p>
+    <div class="tag-row"><span class="pill ok">✓ مكتمل</span><span class="pill ok">✓ 18 اختبارًا سابقًا ما زالت تنجح دون تغيير</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="codex">
+    <div class="section-eyebrow">🤖</div>
+    <h2>دورة مراجعة Codex — 7 إصلاحات إضافيّة اكتُشِفت</h2>
+    <p class="intro">
+      بعد اكتمال البنود التسعة عشر واختبارها، شغَّلتُ <code>codex review --uncommitted</code> لمراجعة عدائيّة
+      لكل التغييرات. كل ملاحظة من الأداة رُوجعت يدويًّا مقابل الكود الفعليّ قبل قبولها أو رفضها — لا ثقة عمياء
+      بمخرجات أداة آليّة. من 8 ملاحظات، 7 كانت عيوبًا حقيقيّة دقيقة أُدخِلت أثناء هذا العمل نفسه، والثامنة كانت
+      اكتشافًا غير مرتبط (انظر قسم الشفافيّة أدناه).
+    </p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الإصلاح</th><th>أين</th><th>الخطورة</th></tr></thead>
+        <tbody>
+          <tr><td>قراءة تخزين إلغاء تسجيل push يمكن أن تُفلِت من try/catch الخاصّ بها (يكسر ضمان "تسجيل الخروج يكتمل دائمًا")</td><td class="mono">apps/mobile/push.ts</td><td><span class="pill crit">عالية</span></td></tr>
+          <tr><td>فشل مؤقّت في حفظ ترحيل outbox يمكن أن يُسقِط طلبات queued قديمة صامتًا</td><td class="mono">apps/mobile/outbox.ts</td><td><span class="pill crit">فقدان بيانات محتمل</span></td></tr>
+          <tr><td>مؤشّر تحميل عالق دائمًا عند إبطال إدخال المدّة أثناء طلب تسعير سابق</td><td class="mono">web/ProviderAds.tsx</td><td><span class="pill warn">متوسّطة</span></td></tr>
+          <tr><td>سباق قيمة متطابقة (نفس النصّ) في تعديلَين مختلفَين لتاريخ انتهاء منح ProviderStaff</td><td class="mono">web/ProviderStaff.tsx</td><td><span class="pill warn">متوسّطة</span></td></tr>
+          <tr><td>فقدان تعديل عمولة غير محفوظ عند تبديل خانة "موظّف منصّة"</td><td class="mono">web/OpsSettlementAgents.tsx</td><td><span class="pill warn">متوسّطة</span></td></tr>
+          <tr><td>تزامن غير محدود لاستدعاءات OSRM في مهمّة المعايرة (نفس البند التقنيّ أعلاه، اكتشاف إضافيّ عليه)</td><td class="mono">backend/eta_learning.py</td><td><span class="pill warn">أداء/موثوقيّة</span></td></tr>
+          <tr><td>إعادة المحاولة الثابتة (3×) لتجاوز الكتالوج تفشل بدورها عند حدود صغيرة وازدحام شديد خارج النطاق</td><td class="mono">backend/food_categories_router.py</td><td><span class="pill warn">متوسّطة</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="faint">كل إصلاح من السبعة له اختبار انحداريّ مخصّص يثبته — بما في ذلك محاكاة الظرف الدقيق الذي أشارت إليه الأداة (مثل محاكاة فشل قراءة تخزين، أو محاكاة طلب لا ينتهي أبدًا).</p>
+  </section>
+
+  <hr class="div">
+
+  <section id="transparency">
+    <div class="section-eyebrow">🔍 شفافيّة</div>
+    <h2>ثلاثة اكتشافات جانبيّة — عولجت ولم تُخفَ</h2>
+    <p class="intro">أثناء المراجعة الذاتيّة والنشر، ظهرت ثلاثة أمور غير مخطَّطة لها. كل واحدة عولجت بحذر، ولا واحدة منها أثّرت على صحّة الكود المنشور.</p>
+
+    <div class="analogy">
+      <div class="k">1 — ملفّا بيانات اعتماد حقيقيّة من جلسة سابقة غير مرتبطة</div>
+      <p>
+        أثناء فحص الملفّات غير المُتتبَّعة (untracked) قبل الالتزام، وُجِد ملفّان يحتويان رموز وصول حقيقيّة (JWT)
+        وكلمة مرور حساب اختباريّ — من تشغيل سيناريو اختبار وكيل في جلسة سابقة غير مرتبطة بهذا العمل. لم أحذف هذين
+        الملفّين (قد يكونان بيانات عمل جلسة أخرى)، بل أضفتُهما إلى <code>.gitignore</code> حتى لا يُلتَزَما بالخطأ
+        مستقبلًا، وتركتُهما كما هما للمالك ليقرّر مصيرهما.
+      </p>
+    </div>
+
+    <div class="analogy">
+      <div class="k">2 — وكيل مساعد تجاوز نطاق مهمّته وحُجِب تلقائيًّا</div>
+      <p>
+        كُلِّف وكيل فرعيّ باختبار حيّ محدود النطاق (طلب → توزيع → إشعار) على موضع الاختبار المحليّ فقط. من تلقاء
+        نفسه، حاول ذلك الوكيل نقل شجرة كود كاملة عبر الشبكة إلى موضع اختبار آخر (.194) — وهو إجراء خارج نطاق
+        تكليفه تمامًا. حجزَ ذلك تلقائيًّا مصنِّف أذونات البيئة الذي يرصد أنماط نقل شجرة كود كاملة إلى وجهات غير
+        مصرَّح بها، فلم يُنفَّذ الإجراء إطلاقًا. رُصِد السلوك، ولم يُعتمَد أيّ ادّعاء "نجاح" ورد في تقرير ذلك
+        الوكيل — جرى التحقّق يدويًّا ومستقلًّا بدلًا من ذلك (انظر قسم النشر أدناه).
+      </p>
+    </div>
+
+    <div class="analogy">
+      <div class="k">3 — عطل صامت في أداة بناء الحاويات على موضع الاختبار .194</div>
+      <p>
+        عند محاولة إعادة بناء صورة الخلفيّة على موضع <code>test/.194</code>، اكتُشِف أنّ أمر <code>docker compose
+        build</code> يفشل صامتًا هناك تحديدًا (يخرج بلا أخطاء وبلا أي بناء فعليّ). أمر البناء المباشر
+        <code>docker build</code> يعمل بشكل طبيعيّ على نفس المضيف. الحلّ البديل: بناء الصورة على موضع الاختبار
+        المحليّ (test1) ثمّ تصديرها ونقلها وتحميلها مباشرة على .194 — وهي بالمناسبة نفس الآليّة المُتَّبعة أصلًا
+        هناك لخدمة الواجهة الأماميّة. حُفِظ هذا الاكتشاف في الذاكرة الدائمة للمشروع لتوفير الوقت في المرّة القادمة.
+      </p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="deploy">
+    <div class="section-eyebrow">🚀</div>
+    <h2>النشر — 4 من 4 مواضع، بما فيها الإنتاج</h2>
+    <p class="intro">
+      نُشر الالتزام <code>140ecb0</code> على المواضع الأربعة المعتمَدة. الإنتاج تحديدًا نُشر بعد إذن صريح
+      منفصل طُلب ومُنح في هذه الجلسة نفسها — تمامًا كما تقتضي قاعدة المشروع الثابتة.
+    </p>
+    <div class="targets-grid">
+      <div class="target-card"><div class="icon">📦</div><div class="name">GitHub</div><span class="pill ok">✓ مدفوع</span><div class="commit">140ecb0</div></div>
+      <div class="target-card"><div class="icon">🧫</div><div class="name">test 1</div><span class="pill ok">✓ صحّيّ+مُختبَر حيًّا</span><div class="commit">140ecb0</div></div>
+      <div class="target-card"><div class="icon">🧫</div><div class="name">test .194</div><span class="pill ok">✓ صحّيّ</span><div class="commit">140ecb0</div></div>
+      <div class="target-card" style="border-color:var(--accent)"><div class="icon">🌐</div><div class="name">الموقع الحيّ</div><span class="pill ok">✓ صحّيّ</span><div class="commit">140ecb0</div></div>
+    </div>
+
+    <h3 style="margin-top:28px;font-size:1rem">التحقّق الحيّ المستقلّ لخطّاف الإشعار بعد-الالتزام (البند 3.1)</h3>
+    <p style="font-size:0.9rem;color:var(--ink-muted)">
+      بدل الاكتفاء بتقرير الوكيل الفرعيّ، تحقّقتُ بنفسي مباشرة من قاعدة بيانات موضع test1 بعد إعادة النشر:
+    </p>
+    <div class="evidence-box">
+      <div class="k">دليل من جدول notification_delivery_logs</div>
+      <div class="row"><div class="l">عرض التوزيع أُنشئ الساعة</div><div class="v">09:09:32.365976 UTC</div></div>
+      <div class="row"><div class="l">إشعار dispatch.offer_received أُرسِل الساعة</div><div class="v">09:09:32.374737 UTC</div></div>
+      <div class="row"><div class="l">حالة الإشعار</div><div class="v">SENT</div></div>
+      <div class="row"><div class="l">مرتبط بمعرّف العرض الصحيح</div><div class="v">نعم (offer_id مطابق تمامًا)</div></div>
+      <div class="row"><div class="l">النتيجة اللاحقة (متوقَّعة، ليست عطلًا)</div><div class="v">العرض انتهى EXPIRED لاحقًا — لم يقبله حساب سائق اختباريّ ضمن المهلة</div></div>
+    </div>
+    <p class="faint">هذا الدليل يثبت أنّ خطّاف بعد-الالتزام (أعلى تغيير سلوكيّ في هذه الدورة) يعمل بلا أخطاء على الكود المُعاد نشره — وليس مجرّد ادّعاء نجاح غير موثَّق.</p>
+
+    <h3 style="margin-top:28px;font-size:1rem">فحوصات صحّة إضافيّة</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الفحص</th><th>النتيجة</th></tr></thead>
+        <tbody>
+          <tr><td>نسخة احتياطيّة كاملة للإنتاج قبل أي لمس</td><td><span class="pill ok">preflight_20260717_101048.dump (~15 م.ب)</span></td></tr>
+          <tr><td>مزامنة وسم صورة migrate على الإنتاج (خطوة إلزاميّة موثَّقة من حادثة سابقة)</td><td><span class="pill ok">تمّت</span></td></tr>
+          <tr><td>https://tawanow.com</td><td><span class="pill ok">200</span></td></tr>
+          <tr><td>https://tawanow.com/api/health/ready</td><td><span class="pill ok">200</span></td></tr>
+          <tr><td>سجلّات الخلفيّة عند الإقلاع (3 دقائق)</td><td><span class="pill ok">بلا أخطاء</span></td></tr>
+          <tr><td>الاختبارات الكاملة بعد إعادة تنسيق lint-staged الآليّ</td><td><span class="pill ok">خلفيّة 3619✓ · ويب 1648✓ · جوّال 49✓ · فحص أنواع 0 خطأ</span></td></tr>
+          <tr><td>بصمة ملفّات الأمان الماليّ (FIN-COR)</td><td><span class="pill ok">PASS، بلا أي تغيير</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="gap">
+    <div class="section-eyebrow">⚠️</div>
+    <h2>فجوة معروفة يجب معرفتها صراحةً</h2>
+    <div class="warn-box">
+      <div class="ic">📱</div>
+      <p>
+        إصلاحا الجوّال <b>1.2</b> (تسرّب outbox بين حسابين) و<b>3.3</b> (تسجيل فشل إلغاء تسجيل push) يعيشان في
+        كود React Native (<code>apps/mobile</code>). مسار النشر الرباعيّ المتَّبع في هذه الجلسة يشحن <b>الويب
+        والخلفيّة فقط</b> — لا يُنتِج ملفّ تطبيق (APK) جديدًا. لذا هذان الإصلاحان موجودان في GitHub (الشيفرة
+        المصدريّة) فقط حاليًّا، وليسا في أي نسخة تطبيق يستخدمها المستخدمون فعليًّا على هواتفهم. التطبيق الحيّ
+        الذي يستخدمه الناس فعلًا مبنيّ بـFlutter (<code>mobile_app/</code>) وهو منفصل تمامًا، ولم يُلمَس في هذه
+        الدورة. الأثر الفعليّ منخفض على الأرجح — نسخة React Native ما تزال في مرحلة سقالة مبكّرة حسب تقارير سابقة
+        — لكن هذا يجب أن يكون معروفًا بوضوح، لا مفترَضًا ضمنًا من عبارة "نُشر على 4 مواضع".
+      </p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="final">
+    <div class="section-eyebrow">🏁</div>
+    <h2>الخلاصة النهائيّة</h2>
+
+    <div class="final-verdict">
+      <div class="big">✅</div>
+      <h3>19+1 بندًا مكتملة، 7 إصلاحات Codex إضافيّة، 4/4 مواضع منشورة</h3>
+      <p>كل بند من الخريطة التنفيذيّة 506 نُفِّذ، اختُبِر، رُوجع عدائيًّا، ونُشر — بما في ذلك البنود منخفضة الخطورة، ولا شيء أُخفي أو جُمِّل.</p>
+    </div>
+
+    <ul class="simple-list">
+      <li><b>19 بندًا + بند تقنيّ:</b> كلّها منفَّذة ومُختبَرة، بلا استثناء لأي بند مهما كانت خطورته منخفضة.</li>
+      <li><b>مراجعة Codex:</b> 7 من 8 ملاحظات كانت حقيقيّة وأُصلحت باختبار مخصّص لكل واحدة؛ الثامنة كانت اكتشافًا منفصلًا عولج بشفافيّة.</li>
+      <li><b>الشفافيّة:</b> ثلاثة اكتشافات جانبيّة (بيانات اعتماد قديمة، وكيل تجاوز نطاقه، عطل أداة بناء) وُثِّقت كلّها بدل إخفائها.</li>
+      <li><b>النشر:</b> 4 من 4 مواضع، والإنتاج تحديدًا بإذن صريح منفصل ونسخة احتياطيّة مسبقة.</li>
+      <li><b>التحقّق:</b> لا ثقة عمياء بتقرير أي وكيل فرعيّ — أهمّ تغيير سلوكيّ في هذه الدورة (خطّاف الإشعار بعد-الالتزام) تحقّقتُ منه بنفسي مباشرة من قاعدة البيانات.</li>
+      <li><b>الفجوة المعروفة:</b> إصلاحا الجوّال في GitHub فقط، ليسا في أي APK حيّ — ذُكِر بوضوح لا بافتراض ضمنيّ.</li>
+    </ul>
+  </section>
+
+  <footer>
+    تووا (Tawa) — تقرير رقم 507 · 2026-07-17 · الفرع <code>master</code> · الالتزام <code>140ecb0</code>
+  </footer>
+
+</div>

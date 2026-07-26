@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نقل التست إلى جهاز الأوبونتو — شرح مبسّط</title>
+<style>
+  :root{--bg:#0e1726;--card:#16223a;--card2:#1d2c49;--line:#2c3f63;--ink:#eef3fb;--mut:#9fb3d0;
+    --grn:#34d399;--red:#f87171;--amb:#fbbf24;--blu:#60a5fa;--vio:#a78bfa;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;line-height:1.95;font-size:16.5px}
+  .wrap{max-width:1000px;margin:0 auto;padding:30px 20px 90px}
+  h1{font-size:26px;margin:0 0 6px}
+  .lead{color:var(--mut);font-size:14.5px;margin-bottom:20px}
+  h2{font-size:22px;margin:38px 0 12px;display:flex;align-items:center;gap:10px}
+  h2 .e{font-size:26px}
+  .hero{background:linear-gradient(135deg,#16314a,#0e1726);border:1px solid var(--line);border-radius:18px;padding:26px;margin-bottom:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px 24px;margin:18px 0}
+  .mono{font-family:"JetBrains Mono",Consolas,monospace;direction:ltr;unicode-bidi:embed;display:inline-block}
+  code{background:#0a1120;padding:2px 8px;border-radius:6px;font-size:13.5px;color:#7dd3fc}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
+  th,td{text-align:right;padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);background:#0a1120;font-weight:600}
+  .pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap}
+  .ok{background:rgba(52,211,153,.16);color:var(--grn)}
+  .bad{background:rgba(248,113,113,.16);color:var(--red)}
+  .warn{background:rgba(251,191,36,.16);color:var(--amb)}
+  .vio{background:rgba(167,139,250,.16);color:var(--vio)}
+  .analogy{border-right:5px solid var(--vio);background:#1a1830;padding:14px 18px;border-radius:10px;margin:16px 0}
+  .analogy b{color:var(--vio)}
+  .good{border-right:5px solid var(--grn);background:#0e2a1e;padding:13px 17px;border-radius:10px;margin:14px 0}
+  .note{border-right:5px solid var(--blu);background:#10203a;padding:13px 17px;border-radius:10px;margin:14px 0}
+  .warnbox{border-right:5px solid var(--amb);background:#2a230e;padding:13px 17px;border-radius:10px;margin:14px 0}
+  ul{margin:8px 0}li{margin:7px 0}
+  .foot{margin-top:48px;color:var(--mut);font-size:12.5px;text-align:center;border-top:1px solid var(--line);padding-top:18px}
+  .diagram{background:#0a1120;border:1px solid var(--line);border-radius:14px;padding:22px;margin:18px 0;overflow-x:auto}
+  .box{border:2px solid var(--line);border-radius:12px;padding:12px 14px;min-width:210px;background:var(--card2);font-size:13.5px}
+  .tag{font-size:11.5px;padding:2px 7px;border-radius:5px;background:#0a1120;color:var(--mut);direction:ltr;display:inline-block}
+  .stepnum{display:inline-flex;width:30px;height:30px;border-radius:50%;background:var(--blu);color:#04121f;align-items:center;justify-content:center;font-weight:800;margin-left:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>🚚 نقل «موقع التست» إلى جهاز الأوبونتو — شرح مبسّط</h1>
+  <div class="lead">ماذا فعلتُ الآن بالضبط · بتاريخ 2026-06-30 · بلغة سهلة لأي شخص + رسوم</div>
+</div>
+
+<!-- GOAL -->
+<h2><span class="e">🎯</span> الهدف</h2>
+<div class="card">
+  <p>كان «موقع التست» يعمل على <b>جهازك (Kali)</b>، وفي نفس الوقت عندك <b>جهاز أوبونتو</b> في الشبكة مخصّص له. المطلوب:</p>
+  <ul>
+    <li>نجعل <b>جهاز الأوبونتو</b> هو موقع التست الرسمي (<span class="mono">test.tawanow.com</span>).</li>
+    <li>نأخذ نسخة كاملة من بيانات التست وننقلها إليه.</li>
+    <li>نجعله <b>مستقلًّا</b> لا يعتمد على بقاء جهازك شغّالًا.</li>
+    <li>نضمن أن كل شيء <b>يعود تلقائيًا</b> بعد إعادة تشغيل الأجهزة.</li>
+  </ul>
+</div>
+
+<!-- ANALOGY -->
+<h2><span class="e">🍽️</span> تشبيه بسيط</h2>
+<div class="analogy">
+  تخيّل «موقع التست» مطعمًا. كان يطبخ في <b>مطبخ بيتك (Kali)</b>. الآن نقلناه إلى <b>مطبخ مستقلّ (جهاز الأوبونتو)</b>:
+  <ul>
+    <li><b>نسخنا كل الوصفات والمخزون</b> (بيانات قاعدة البيانات) إلى المطبخ الجديد.</li>
+    <li>أعطينا المطبخ الجديد <b>بابه الخاص على الشارع</b> (نفق إنترنت مستقلّ) — لم يعد يدخل عبر بيتك.</li>
+    <li>جعلنا المطبخين <b>يفتحان تلقائيًا</b> كل صباح (خدمة دائمة) حتى لو انقطعت الكهرباء وعادت.</li>
+  </ul>
+</div>
+
+<!-- THE 4 STEPS -->
+<h2><span class="e">🛠️</span> الخطوات الأربع التي نفّذتها</h2>
+
+<div class="card">
+  <p><span class="stepnum">1</span><b>نقل عنوان التست إلى جهاز الأوبونتو</b></p>
+  <p>غيّرتُ في Cloudflare وجهة <span class="mono">test.tawanow.com</span> من جهازك (Kali) إلى <b>جهاز الأوبونتو</b>. الآن أي زائر للتست يصل للأوبونتو مباشرة.</p>
+</div>
+
+<div class="card">
+  <p><span class="stepnum">2</span><b>نسخ بيانات التست (المزامنة)</b></p>
+  <p>أخذتُ نسخة كاملة من قاعدة بيانات التست على جهازك ونقلتُها إلى الأوبونتو. النتيجة: <b>نفس البيانات تمامًا</b> (٦٣ مستخدمًا على الجهازين) ونفس إصدار البرنامج (<span class="mono">ab01</span>).</p>
+</div>
+
+<div class="card">
+  <p><span class="stepnum">3</span><b>نفق إنترنت مستقلّ على الأوبونتو</b></p>
+  <p>ثبّتُّ برنامج النفق (cloudflared) على <b>جهاز الأوبونتو نفسه</b> وأنشأت له نفقه الخاص <span class="mono">tawa-194</span>. هكذا أصبح الأوبونتو يتصل بالإنترنت <b>بنفسه</b>، ولم يعد يعتمد على جهازك إطلاقًا.</p>
+</div>
+
+<div class="card">
+  <p><span class="stepnum">4</span><b>جعل النفقين خدمة دائمة</b></p>
+  <p>حوّلتُ النفقين إلى «خدمات» تعمل تلقائيًا وتعيد نفسها عند أي خلل، <b>وتعود وحدها بعد إعادة تشغيل الجهاز</b> (دون أي تدخّل يدوي).</p>
+</div>
+
+<!-- BEFORE / AFTER -->
+<h2><span class="e">🔄</span> قبل وبعد (رسم)</h2>
+<div class="diagram">
+  <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center">
+    <div style="text-align:center">
+      <div style="color:var(--amb);font-weight:700;margin-bottom:8px">قبل ❌</div>
+      <div class="box" style="border-color:var(--amb)">
+        ☁️ Cloudflare<br><span style="color:var(--mut)">test + test1 ↓</span><br>💻 جهاز Kali فقط<br><span class="tag">كل شيء يعتمد على جهازك</span>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div style="color:var(--grn);font-weight:700;margin-bottom:8px">بعد ✅</div>
+      <div style="display:flex;gap:10px">
+        <div class="box" style="border-color:var(--grn)">
+          💻 Kali<br><span class="tag">test1.tawanow.com</span><br>نفقه الخاص
+        </div>
+        <div class="box" style="border-color:var(--vio)">
+          🖥️ Ubuntu<br><span class="tag">test.tawanow.com</span><br>نفقه المستقلّ
+        </div>
+      </div>
+      <div style="color:var(--mut);font-size:12.5px;margin-top:8px">كل جهاز مستقلّ بنفقه الخاص</div>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL STATE -->
+<h2><span class="e">🌐</span> الوضع النهائي (كله يعمل)</h2>
+<div class="card">
+<table>
+  <thead><tr><th>العنوان</th><th>الجهاز</th><th>الدور</th><th>الحالة</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">tawanow.com</td><td>Hetzner (سحابي)</td><td>الموقع الرسمي</td><td><span class="pill ok">200 ✅</span></td></tr>
+    <tr><td class="mono">test1.tawanow.com</td><td>Kali (جهازك)</td><td>test 1</td><td><span class="pill ok">200 ✅</span></td></tr>
+    <tr><td class="mono">test.tawanow.com</td><td>Ubuntu (.194)</td><td>التست الرسمي</td><td><span class="pill ok">200 ✅</span></td></tr>
+    <tr><td class="mono">test2.tawanow.com</td><td>Ubuntu (.194)</td><td>اسم بديل للتست</td><td><span class="pill ok">200 ✅</span></td></tr>
+  </tbody>
+</table>
+<div class="good">الأربعة عناوين تعمل بثبات (تحقّقتُ منها 5 مرّات متتالية، كلها 200). والنفقان خدمتان دائمتان تصمدان بعد إعادة الإقلاع.</div>
+</div>
+
+<!-- WHAT WAS NOT TOUCHED -->
+<h2><span class="e">🛡️</span> ما لم يُمَس (كما طلبت)</h2>
+<div class="card">
+  <ul>
+    <li>🖥️ <b>سيرفر Hetzner</b> — لم أقترب منه (تحديثه آخر خطوة).</li>
+    <li>🌐 <b>WordPress</b> على جهاز الأوبونتو (المنفذ 80) — يعمل كما هو.</li>
+    <li>📦 <b>النسخة القديمة</b> على الأوبونتو (المنفذ 8090) — لم تُمسح؛ نشرتُ التست الجديد <b>بجانبها</b> على منفذ مختلف (8091).</li>
+    <li>📧 <b>إعدادات البريد</b> في Cloudflare — لم تُمَس.</li>
+  </ul>
+</div>
+
+<!-- REMAINING -->
+<h2><span class="e">🔜</span> المتبقّي الوحيد</h2>
+<div class="warnbox">
+  <b>تحديث سيرفر Hetzner</b> من النسخة القديمة (<span class="mono">aa60</span>) إلى الأحدث (<span class="mono">ab01</span>) — مؤجّل بطلبك إلى <b>آخر شيء</b>، بعد أن يستقرّ كل شيء ونقرّر ماذا نفعل به.
+</div>
+
+<!-- SMALL NOTES -->
+<h2><span class="e">📌</span> ملاحظات صغيرة</h2>
+<div class="card">
+  <ul>
+    <li>«test2» كان اسمًا مؤقّتًا للتجربة، وهو الآن مجرّد اسم بديل يشير لنفس جهاز الأوبونتو.</li>
+    <li>سجّلتُ كل التفاصيل (العناوين، الأنفاق، طريقة التشغيل) في ملف مرجعي وفي ذاكرة المشروع حتى لا نبحث عنها مرّة أخرى.</li>
+  </ul>
+</div>
+
+<div class="foot">تقرير مبني على تنفيذ فعلي وتحقّق حيّ · 2026-06-30 · لم يُمَس Hetzner ولا الأنظمة القائمة على جهاز الأوبونتو.</div>
+
+</div>
+</body>
+</html>

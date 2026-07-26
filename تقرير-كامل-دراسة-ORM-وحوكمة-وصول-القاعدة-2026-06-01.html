@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>التقرير الكامل — دراسة ORM وحوكمة وصول قاعدة البيانات — 2026-06-01</title>
+<style>
+  :root{--bg:#fafafa;--fg:#1a1a1a;--muted:#5b5b5b;--card:#fff;--border:#e3e3e3;
+        --green:#146e44;--green-soft:#e8f3ec;--red:#b3261e;--red-soft:#fde7e5;
+        --amber:#aa5500;--amber-soft:#fff6e2;--blue:#0f5b9e;--blue-soft:#e8f2fb;
+        --purple:#6b3aa0;--purple-soft:#f0e8fb}
+  body{font-family:-apple-system,"Segoe UI","Tajawal","Noto Naskh Arabic",sans-serif;background:var(--bg);color:var(--fg);margin:0;line-height:1.75;font-size:15px}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px 22px 80px}
+  header{padding:24px 28px;background:linear-gradient(135deg,#13322a 0%,#0c1f1a 100%);color:#fff;border-radius:12px;margin-bottom:22px}
+  header h1{margin:0 0 6px;font-size:22px}
+  header .sub{opacity:.92;font-size:13.5px}
+  h2{font-size:20px;margin:34px 0 10px;border-bottom:2px solid var(--border);padding-bottom:6px}
+  h3{font-size:16.5px;margin:20px 0 6px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:12px 0}
+  .crit{border-inline-start:5px solid var(--red);background:var(--red-soft)}
+  .high{border-inline-start:5px solid var(--amber);background:var(--amber-soft)}
+  .med{border-inline-start:5px solid var(--blue);background:var(--blue-soft)}
+  .ok{border-inline-start:5px solid var(--green);background:var(--green-soft)}
+  code{background:#f0f0f0;padding:1px 6px;border-radius:4px;font-size:12.6px;font-family:"JetBrains Mono",monospace;direction:ltr;display:inline-block}
+  pre{background:#1e1e1e;color:#eee;padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:12.3px;line-height:1.6;direction:ltr;text-align:left}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  th,td{padding:8px 10px;border:1px solid var(--border);text-align:right;font-size:13.3px;vertical-align:top}
+  th{background:#f0f0f0}
+  ul,ol{padding-inline-start:22px}li{margin:4px 0}
+  .filepath{background:#ececec;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:12px;direction:ltr}
+  .big{font-size:15.5px;font-weight:700;padding:12px 18px;border-radius:8px;margin:12px 0}
+  .big.green{background:var(--green-soft);border:1px solid var(--green);color:var(--green)}
+  .big.amber{background:var(--amber-soft);border:1px solid var(--amber);color:var(--amber)}
+  .metric{display:inline-block;background:#13322a;color:#fff;border-radius:8px;padding:8px 14px;margin:4px;font-size:13px}
+  .metric b{font-size:20px;display:block}
+  .toc{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 22px;margin:14px 0}
+  small{color:var(--muted)}
+  .pass{color:var(--green);font-weight:700}.no{color:var(--red);font-weight:700}
+  .pill{display:inline-block;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:700}
+  .pill-keep{background:var(--green);color:#fff}.pill-review{background:var(--amber);color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>📊 التقرير الكامل — دراسة ORM وحوكمة وصول قاعدة البيانات (DB Access Boundary)</h1>
+  <div class="sub">
+    منصّة تووا / tawanow.com · 2026-06-01 · من تقييم اقتراح خارجيّ بتحويل المشروع إلى ORM → جرد كامل بالكود → سياسة حوكمة + golden tests. كل رقم مُستخرَج من الكود الفعلي (291 ملفّ Python).
+  </div>
+</header>
+
+<div class="big green">الخلاصة في سطر: المشروع <strong>ORM أصلاً (~96%)</strong>؛ لا «مشروع تحويل» مطلوب. بدل ذلك أنجزتُ ما له قيمة حقيقيّة فعلاً: <strong>جرد كامل للـraw SQL + سياسة DB Access Boundary + golden tests</strong> — بلا أي مساس بكود الأعمال أو المنطق الماليّ.</div>
+
+<div style="text-align:center;margin:16px 0">
+  <div class="metric"><b>291</b> ملفّ Python فُحص</div>
+  <div class="metric"><b>0</b> psycopg2/cursor خام</div>
+  <div class="metric"><b>122</b> ملفّ ORM <code>select()</code></div>
+  <div class="metric"><b>48</b> model</div>
+  <div class="metric"><b>20</b> موضع <code>text()</code> (4 ملفّات)</div>
+  <div class="metric"><b>0</b> raw SQL ماليّ</div>
+</div>
+
+<div class="toc">
+<strong>المحتويات:</strong>
+<ol>
+  <li>السياق: ما الذي طُلب ولماذا</li>
+  <li>المرحلة 1 — تقييم الاقتراح (هل ينفع؟)</li>
+  <li>المرحلة 2 — الجرد الكامل بالكود</li>
+  <li>المرحلة 3 — سياسة DB Access Boundary</li>
+  <li>المرحلة 4 — golden tests</li>
+  <li>المخرجات (الملفّات) + التحقّق</li>
+  <li>التوصيات والخطوات المستقبليّة</li>
+</ol>
+</div>
+
+<!-- 1 -->
+<h2>1) السياق — ما الذي طُلب ولماذا</h2>
+<div class="card">
+<p>ورد تقرير خارجيّ يقترح <strong>«تحويل مشروع تووا إلى ORM على مراحل»</strong>، مصنِّفاً العمل «متوسط إلى صعب»، ومحذّراً من خطورة المناطق المالية (wallet/ledger/payment)، وموصياً بـ: جرد → تصنيف → تحويل الآمن فقط → golden tests، مع إبقاء المالية أخيراً.</p>
+<p>طُلب منّي: قراءة التقرير بعمق + النظر في الأكواد + الإجابة بصدق: <strong>هل ينفعنا؟ هل نستفيد؟ كيف نبدأ؟</strong> — على أن يكون كل شيء مبنيّاً على الكود الصحيح الدقيق.</p>
+</div>
+
+<!-- 2 -->
+<h2>2) المرحلة 1 — تقييم الاقتراح (هل ينفع؟)</h2>
+<div class="big amber">الحكم: التقرير <strong>سليم كمبادئ عامّة عن ORM</strong>، لكن <strong>فرضيّته الأساسيّة لا تنطبق على تووا</strong> — يصف مشروعاً «مليئاً بـraw SQL»، وهذا ليس تووا.</div>
+<div class="card">
+<table>
+<thead><tr><th>ادّعاء التقرير</th><th>الواقع في الكود</th></tr></thead>
+<tbody>
+<tr><td>«حوّلوا المشروع إلى ORM على مراحل»</td><td><span class="no">لا ينطبق</span> — 122 ملفّ <code>select()</code>، 48 model، علاقات <code>relationship()</code>. ORM أصلاً.</td></tr>
+<tr><td>«ابحث عن psycopg2/cursor/raw SQL»</td><td><span class="no">صفر</span> psycopg2/cursor في كود الأعمال.</td></tr>
+<tr><td>«wallet/ledger صعبة جداً وخطرة للتحويل»</td><td><span class="no">مُحوَّلة أصلاً</span> — <code>ledger_service</code> 0 <code>text()</code>، <code>settlement/service</code> 0، كلّ <code>finance/*</code> ORM.</td></tr>
+<tr><td>«control room/analytics أحياناً الأفضل raw SQL»</td><td><span class="pass">صحيح ومُطبَّق</span> — الـ<code>text()</code> الموجودة معظمها COUNT تحليليّ.</td></tr>
+<tr><td>«migrations لا تُحوَّل»</td><td><span class="pass">صحيح ومُطبَّق</span> — 99 ملفّ Alembic منفصل.</td></tr>
+<tr><td>«AI يسرّع لا يُؤمّن؛ مراحل صغيرة + اختبارات»</td><td><span class="pass">مبدأ ذهبيّ</span> — وهو نهجي فعلاً (TDD).</td></tr>
+</tbody>
+</table>
+<p><strong>تحذير صريح سجّلتُه:</strong> لو أُخذ التقرير حرفيّاً وبدأ «تحويل» المالية، يتحقّق الخطر الذي يحذّر منه التقرير نفسه (كسر صامت للـledger/idempotency) <strong>بلا أي مكسب</strong> — لأنّنا سنعيد كتابة كود ORM سليم بكود ORM آخر.</p>
+<p><small>التقييم الكامل في: <span class="filepath">New Folder 10/تقرير-تقييم-اقتراح-تحويل-ORM-مبني-على-الكود-2026-06-01.html</span></small></p>
+</div>
+
+<!-- 3 -->
+<h2>3) المرحلة 2 — الجرد الكامل بالكود</h2>
+<div class="card ok">
+<p>جردتُ <strong>كل المواضع الـ20</strong> لـ<code>text()</code> عبر 4 ملفّات فقط:</p>
+<table>
+<thead><tr><th>الملفّ</th><th>عدد المواضع</th><th>الطبيعة</th><th>الحكم</th></tr></thead>
+<tbody>
+<tr><td><span class="filepath">app/health.py</span></td><td>1</td><td><code>SELECT 1</code> فحص صحّة</td><td><span class="pill pill-keep">KEEP</span></td></tr>
+<tr><td><span class="filepath">sse/sse_router.py</span></td><td>7</td><td>COUNT للوحة الحالة الحيّة</td><td><span class="pill pill-keep">KEEP</span></td></tr>
+<tr><td><span class="filepath">operations/operations_router.py</span></td><td>~11</td><td>تحليلات/تقارير + 2 INSERT خام (حساب OPS)</td><td><span class="pill pill-keep">KEEP</span> + <span class="pill pill-review">2 REVIEW</span></td></tr>
+<tr><td><span class="filepath">dispatch/location_router.py</span></td><td>1</td><td>GEO <code>DISTINCT ON</code> (أداء)</td><td><span class="pill pill-keep">KEEP</span></td></tr>
+<tr><td><span class="filepath">fraud/strategies/*.py</span></td><td>3</td><td>نوافذ إحصائيّة (<code>GROUP BY … HAVING</code>)</td><td><span class="pill pill-keep">KEEP</span></td></tr>
+</tbody>
+</table>
+<h4>نتائج الجرد</h4>
+<ul>
+<li><strong>18/20: KEEP</strong> — تحليلات/GEO/احتيال/صحّة مُبرَّرة، كلّها parameterized.</li>
+<li><strong>2/20: REVIEW (أولويّة منخفضة)</strong> — <code>operations_router.py:2572/2581</code>: <code>INSERT</code> خام لتدفّق إنشاء حساب OPS (يتجاوز models الـORM). admin-only + parameterized + غير ماليّ → <strong>آمن كما هو</strong>، تحويله لـORM تحسين لا ضرورة.</li>
+<li><strong>0 في القلب الماليّ</strong> (ledger/wallet/settlement/finance) — كلّها ORM.</li>
+<li><strong>0 ثغرة حقن</strong> — كل <code>text()</code> parameterized؛ الـf-string الوحيد (سطر 3602) يُدرج ثابتاً مُبرمَجاً فقط (<code>role_clause</code>) والقيمة عبر <code>:role</code> المربوط → <strong>آمن</strong>.</li>
+</ul>
+</div>
+
+<!-- 4 -->
+<h2>4) المرحلة 3 — سياسة DB Access Boundary</h2>
+<div class="card">
+<p>أُنشئت وثيقة سياسة مكتوبة (<span class="filepath">contracts/db_access_boundary.md</span>) بـ6 قواعد تحفظ الحدّ نظيفاً مستقبلاً:</p>
+<ol>
+<li><strong>ORM افتراضيّ</strong> لكل كود أعمال جديد؛ <code>text()</code> جديد ممنوع افتراضيّاً.</li>
+<li><code>text()</code> مسموح <strong>فقط</strong> لـ: فحص صحّة · تحليلات/لوحة تشغيل (COUNT/AVG/GROUP BY) · قراءات أداء حسّاسة (GEO/pg_trgm) · نوافذ كشف احتيال.</li>
+<li>كل <code>text()</code> <strong>parameterized إلزاميّاً</strong>؛ الإدراج النصّي ممنوع إلا لثابت مُبرمَج (لا مدخلات مستخدم) مع تعليق.</li>
+<li><strong>القلب الماليّ ORM-only ولا يُحوَّل/يُعاد كتابته</strong> (محميّ بـFIN-COR + double-entry).</li>
+<li>migrations تبقى في Alembic.</li>
+<li>أي استعلام تحليليّ يغذّي لوحة/تقرير تشغيليّ <strong>يجب أن يملك golden test</strong>.</li>
+</ol>
+</div>
+
+<!-- 5 -->
+<h2>5) المرحلة 4 — golden tests</h2>
+<div class="card ok">
+<p>أُنشئ <span class="filepath">backend/tests/test_db_boundary_golden.py</span> — شبكة أمان تُثبّت <strong>النتيجة الدقيقة</strong> لكل استعلام تحليليّ قابل للنقل، تكشف أي كسر صامت مستقبليّ للأرقام التشغيليّة:</p>
+<ul>
+<li><strong>عدّ السائقين المتاحين</strong> (<code>WHERE available</code>) → 2 من 3.</li>
+<li><strong>حدّ النقد العالي</strong> (<code>cash_outstanding_minor > 200000</code>) → اختبار حدّ «أكبر من تماماً» (250k نعم، 200k لا، 10k لا).</li>
+<li><strong>الشكاوى المفتوحة</strong> (<code>state NOT IN (RESOLVED,CLOSED)</code>) → 3 من 5.</li>
+<li><strong>نافذة زمنيّة</strong> بـparameter (<code>created_at >= :s</code>) → 1 من 2.</li>
+<li>استعلامات Postgres-only (<code>NOW()-INTERVAL</code>/<code>DISTINCT ON</code>/<code>similarity</code>) <strong>مُبوّبة بـskipif</strong> — تعمل على PG، تُتخطّى على SQLite.</li>
+</ul>
+<p><strong>النتيجة:</strong> <span class="pass">4 ناجح + 1 متخطّى (PG-only) ✓</span> على بيئة الاختبار SQLite.</p>
+</div>
+
+<!-- 6 -->
+<h2>6) المخرجات + التحقّق</h2>
+<div class="card">
+<table>
+<thead><tr><th>المخرَج</th><th>النوع</th><th>الحجم</th></tr></thead>
+<tbody>
+<tr><td><span class="filepath">contracts/db_access_boundary.md</span></td><td>سياسة + جرد (جديد)</td><td>97 سطراً</td></tr>
+<tr><td><span class="filepath">backend/tests/test_db_boundary_golden.py</span></td><td>golden tests (جديد)</td><td>114 سطراً</td></tr>
+<tr><td><span class="filepath">New Folder 10/تقرير-تقييم-اقتراح-تحويل-ORM-*.html</span></td><td>تقرير التقييم</td><td>—</td></tr>
+</tbody>
+</table>
+<h4>ضمانات السلامة</h4>
+<ul>
+<li><strong>صفر مساس بكود الأعمال</strong> — المهمّة = جرد (قراءة) + وثيقة جديدة + ملفّ اختبار جديد فقط. لم يُعدَّل أيّ ملفّ في <code>app/</code>.</li>
+<li><strong>FIN-COR: PASS</strong> — لم يُمسّ أيّ ملفّ مختوم (<code>db_access_boundary.md</code> ليس من ملفّات FIN-COR).</li>
+<li>لا commit · لا migration · لا نشر (عمل توثيق/اختبار محليّ).</li>
+</ul>
+</div>
+
+<!-- 7 -->
+<h2>7) التوصيات والخطوات المستقبليّة</h2>
+<div class="card ok">
+<h4>افعل</h4>
+<ul>
+<li>اعتمد سياسة <code>db_access_boundary.md</code> كمرجع: ORM افتراضيّ، <code>text()</code> استثناء مدروس.</li>
+<li>وسّع golden tests لاحقاً لتغطية بقيّة استعلامات لوحة OPS التحليليّة (قيمة تراكميّة).</li>
+<li>عند أيّ كود قاعدة جديد: ORM؛ وإن لزم <code>text()</code> فبشرط القواعد الستّ + golden test.</li>
+</ul>
+<h4>لا تفعل</h4>
+<ul>
+<li><strong>لا تبدأ «مشروع تحويل ORM»</strong> — لا يوجد ما يُحوَّل.</li>
+<li><strong>لا تعِد كتابة wallet/ledger/settlement</strong> — خطر صامت بلا مكسب (ORM + محميّة بـFIN-COR).</li>
+<li>لا تُحوّل التحليلات الـPostgres-only (NOW/INTERVAL, DISTINCT ON, similarity) إلى ORM — مكسب تجميليّ، خطر تغيير نتائج التقارير.</li>
+</ul>
+<h4>اختياريّ (أولويّة منخفضة جدّاً)</h4>
+<ul>
+<li>مراجعة الـ2 INSERT الخام في <code>operations_router.py:2572/2581</code> (تدفّق حساب OPS) → تحويلها لـ<code>session.add(User(...))</code>/<code>Role(...)</code> لمحاذاة الـORM الافتراضيّ. غير عاجل، غير ماليّ، آمن كما هو.</li>
+</ul>
+</div>
+
+<div class="big green">النتيجة النهائيّة: بدل «مشروع تحويل متوسط إلى صعب وخطر»، أنجزنا <strong>مهمّة حوكمة صغيرة آمنة</strong> حصّنت ما هو قائم (96% ORM) بسياسة مكتوبة + golden tests، بلا أي خطر على المنطق الماليّ — وهو بالضبط الجزء الصحيح والقابل للتنفيذ من التقرير الأصليّ.</div>
+
+<p style="margin-top:30px;text-align:center;color:var(--muted);font-size:12.5px">
+كل رقم مُستخرَج بالـ<code>grep</code>/الجرد من الكود الفعلي (291 ملفّ): 0 psycopg2 · 122 ملفّ select() · 48 model · 20 موضع text() (18 KEEP / 2 REVIEW / 0 ماليّ / 0 حقن). golden tests 4✓/1 متخطّى. FIN-COR PASS · بلا commit/migration/نشر · صفر مساس بكود الأعمال.
+</p>
+
+</div>
+</body>
+</html>

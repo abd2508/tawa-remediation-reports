@@ -1,0 +1,370 @@
+<meta charset="utf-8">
+<title>تقرير 542 — هل نُفِّذت خطة 538؟ فحص دقيق جدًّا لكل بند مقابل الكود الحيّ</title>
+<style>
+  :root {
+    --bg:#f5f8f4; --surface:#ffffff; --surface-2:#eef3ec; --surface-3:#e4ede1;
+    --ink:#16241c; --ink-muted:#55655a; --ink-faint:#8a978c; --border:#d8e2d4;
+    --accent:#146c34; --accent-deep:#0b4a23; --accent-tint:#e3f0e6;
+    --accent-2:#b8862f; --accent-2-tint:#faf1de;
+    --ok-bg:#e4f4e8; --ok-ink:#1f7a3a; --ok-border:#b7ddc2;
+    --warn-bg:#fbf0dc; --warn-ink:#8a5a06; --warn-border:#eccf94;
+    --crit-bg:#fbe4e1; --crit-ink:#a02a1f; --crit-border:#f0b8b0;
+    --info-bg:#e3edf8; --info-ink:#1f5590; --info-border:#b9d3ee;
+    --shadow:0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius:12px;
+    --font-display:"Segoe UI","Dubai","Tahoma","Arial",sans-serif;
+    --font-body:"Segoe UI","Tahoma","Arial",sans-serif;
+    --font-mono:ui-monospace,"Cascadia Code","SFMono-Regular",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0d1611; --surface:#131f17; --surface-2:#182a1f; --surface-3:#1d3324;
+      --ink:#e9f2ea; --ink-muted:#a7bcac; --ink-faint:#6f8577; --border:#24392c;
+      --accent:#3ecb75; --accent-deep:#6fe39a; --accent-tint:#17301f;
+      --accent-2:#e0b563; --accent-2-tint:#2e2716;
+      --ok-bg:#163524; --ok-ink:#6fe39a; --ok-border:#245239;
+      --warn-bg:#372c12; --warn-ink:#e8b64a; --warn-border:#5b4a1c;
+      --crit-bg:#3a1a16; --crit-ink:#f19488; --crit-border:#5c2a22;
+      --info-bg:#172a3a; --info-ink:#8ec1f2; --info-border:#274763;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0d1611; --surface:#131f17; --surface-2:#182a1f; --surface-3:#1d3324;
+    --ink:#e9f2ea; --ink-muted:#a7bcac; --ink-faint:#6f8577; --border:#24392c;
+    --accent:#3ecb75; --accent-deep:#6fe39a; --accent-tint:#17301f;
+    --accent-2:#e0b563; --accent-2-tint:#2e2716;
+    --ok-bg:#163524; --ok-ink:#6fe39a; --ok-border:#245239;
+    --warn-bg:#372c12; --warn-ink:#e8b64a; --warn-border:#5b4a1c;
+    --crit-bg:#3a1a16; --crit-ink:#f19488; --crit-border:#5c2a22;
+    --info-bg:#172a3a; --info-ink:#8ec1f2; --info-border:#274763;
+  }
+  :root[data-theme="light"] {
+    --bg:#f5f8f4; --surface:#ffffff; --surface-2:#eef3ec; --surface-3:#e4ede1;
+    --ink:#16241c; --ink-muted:#55655a; --ink-faint:#8a978c; --border:#d8e2d4;
+    --accent:#146c34; --accent-deep:#0b4a23; --accent-tint:#e3f0e6;
+    --accent-2:#b8862f; --accent-2-tint:#faf1de;
+    --ok-bg:#e4f4e8; --ok-ink:#1f7a3a; --ok-border:#b7ddc2;
+    --warn-bg:#fbf0dc; --warn-ink:#8a5a06; --warn-border:#eccf94;
+    --crit-bg:#fbe4e1; --crit-ink:#a02a1f; --crit-border:#f0b8b0;
+    --info-bg:#e3edf8; --info-ink:#1f5590; --info-border:#b9d3ee;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; }
+  body { background:var(--bg); color:var(--ink); font-family:var(--font-body); direction:rtl; line-height:1.75; font-size:16px; }
+  .wrap { max-width:1280px; margin:0 auto; padding:0 20px 100px; }
+  h1,h2,h3,h4 { font-family:var(--font-display); text-wrap:balance; color:var(--ink); }
+  p { margin:0 0 14px; max-width:92ch; color:var(--ink); }
+  p.lead { font-size:1.04rem; color:var(--ink-muted); max-width:78ch; }
+  .muted { color:var(--ink-muted); }
+  code,.mono { font-family:var(--font-mono); font-variant-numeric:tabular-nums; }
+  code { background:var(--surface-2); border:1px solid var(--border); border-radius:5px; padding:1px 6px; font-size:.85em; direction:ltr; unicode-bidi:isolate; display:inline-block; }
+  b { color:var(--ink); }
+  header.hero {
+    background:linear-gradient(160deg,var(--accent-deep),var(--accent) 65%);
+    color:#fff; margin:0 -20px 40px; padding:60px 20px 44px; border-radius:0 0 30px 30px;
+    position:relative; overflow:hidden;
+  }
+  header.hero::after { content:"🔍"; position:absolute; left:-10px; top:-50px; font-size:12rem; opacity:.08; line-height:1; }
+  header.hero .inner { max-width:1100px; margin:0 auto; position:relative; }
+  header.hero .kicker { display:inline-flex; align-items:center; gap:8px; font-size:.8rem; font-weight:700; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32); padding:5px 14px; border-radius:999px; margin-bottom:18px; }
+  header.hero h1 { font-size:1.5rem; font-weight:800; color:#fff; margin:0 0 10px; max-width:64ch; }
+  header.hero p.lead { color:rgba(255,255,255,.92); max-width:88ch; font-size:1rem; }
+  .hero-stats { display:flex; gap:22px; flex-wrap:wrap; margin-top:28px; }
+  .hero-stats .s .n { font-size:1.3rem; font-weight:800; font-family:var(--font-display); }
+  .hero-stats .s .l { font-size:.7rem; color:rgba(255,255,255,.78); }
+  nav.toc { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:42px; position:sticky; top:0; background:var(--bg); z-index:5; padding:10px 0; }
+  nav.toc a { font-size:.72rem; text-decoration:none; color:var(--ink-muted); background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:6px 12px; }
+  nav.toc a:hover { color:var(--accent-deep); border-color:var(--accent); }
+  section { margin:50px 0; }
+  .section-eyebrow { display:inline-flex; align-items:center; gap:8px; font-size:.75rem; font-weight:700; color:var(--accent-deep); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
+  section h2 { font-size:1.2rem; font-weight:800; margin-bottom:6px; }
+  section > p.intro { font-size:.94rem; color:var(--ink-muted); max-width:90ch; margin-bottom:20px; }
+  .plain { background:var(--accent-tint); border:1px solid var(--ok-border); border-radius:var(--radius); padding:16px 20px; margin:14px 0; display:flex; gap:12px; align-items:flex-start; }
+  .warn-box { background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:var(--radius); padding:16px 20px; margin:14px 0; display:flex; gap:12px; align-items:flex-start; }
+  .crit-box { background:var(--crit-bg); border:1px solid var(--crit-border); border-radius:var(--radius); padding:16px 20px; margin:14px 0; display:flex; gap:12px; align-items:flex-start; }
+  .info-box { background:var(--info-bg); border:1px solid var(--info-border); border-radius:var(--radius); padding:16px 20px; margin:14px 0; display:flex; gap:12px; align-items:flex-start; }
+  .plain .ic,.warn-box .ic,.crit-box .ic,.info-box .ic { font-size:1.3rem; line-height:1; margin-top:2px; }
+  .plain p,.warn-box p,.crit-box p,.info-box p { margin:0; font-size:.92rem; max-width:84ch; }
+  .plain p,.plain b { color:var(--accent-deep); }
+  .warn-box p,.warn-box b { color:var(--warn-ink); }
+  .crit-box p,.crit-box b { color:var(--crit-ink); }
+  .info-box p,.info-box b { color:var(--info-ink); }
+  .pill { display:inline-flex; align-items:center; gap:5px; font-size:.71rem; font-weight:700; border-radius:999px; padding:3px 11px; border:1px solid transparent; white-space:nowrap; }
+  .pill.ok { background:var(--ok-bg); color:var(--ok-ink); border-color:var(--ok-border); }
+  .pill.warn { background:var(--warn-bg); color:var(--warn-ink); border-color:var(--warn-border); }
+  .pill.crit { background:var(--crit-bg); color:var(--crit-ink); border-color:var(--crit-border); }
+  .pill.info { background:var(--info-bg); color:var(--info-ink); border-color:var(--info-border); }
+  .pill.neutral { background:var(--surface-2); color:var(--ink-muted); border-color:var(--border); }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px 24px; box-shadow:var(--shadow); margin-bottom:18px; }
+  pre { background:#0d1611; color:#d7e6da; border-radius:10px; padding:12px 14px; overflow-x:auto; font-size:.72rem; direction:ltr; text-align:left; margin:8px 0 14px; border:1px solid #1d3324; }
+  pre code { background:none; border:none; padding:0; color:inherit; }
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:.83rem; }
+  table th,table td { border:1px solid var(--border); padding:8px 12px; text-align:right; vertical-align:top; }
+  table th { background:var(--surface-2); font-weight:700; color:var(--ink-muted); font-size:.72rem; text-transform:uppercase; letter-spacing:.03em; }
+  .table-wrap { overflow-x:auto; }
+  .stat-row { display:flex; gap:14px; flex-wrap:wrap; margin:16px 0; }
+  .stat-mini { background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:12px 18px; min-width:130px; }
+  .stat-mini .n { font-size:1.3rem; font-weight:800; color:var(--accent-deep); font-family:var(--font-mono); }
+  .stat-mini.crit .n { color:var(--crit-ink); }
+  .stat-mini .l { font-size:.72rem; color:var(--ink-muted); }
+  .fix-card { border-radius:var(--radius); box-shadow:var(--shadow); border:1px solid var(--border); background:var(--surface); padding:18px 20px; margin-bottom:14px; }
+  .fix-card.crit { border-color:var(--crit-border); background:linear-gradient(180deg, var(--crit-bg) 0%, var(--surface) 12%); }
+  .fix-card .f-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .fix-card .f-id { font-family:var(--font-mono); font-weight:800; font-size:.8rem; background:var(--surface-2); border-radius:6px; padding:2px 8px; }
+  .fix-card .f-title { font-weight:800; font-size:.94rem; }
+  .fix-card .f-loc { font-size:.78rem; color:var(--ink-muted); margin-bottom:10px; }
+  .flow { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:14px; margin:16px 0; }
+  @media (max-width:760px) { .flow { grid-template-columns:1fr; } .flow .arrow { transform:rotate(90deg); } }
+  .flow .box { border-radius:10px; padding:12px 14px; font-size:.82rem; border:1px solid; }
+  .flow .box.before { background:var(--crit-bg); border-color:var(--crit-border); color:var(--crit-ink); }
+  .flow .box.after { background:var(--ok-bg); border-color:var(--ok-border); color:var(--ok-ink); }
+  .flow .box .k { font-size:.68rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; opacity:.75; margin-bottom:4px; }
+  .flow .arrow { font-size:1.4rem; color:var(--ink-faint); text-align:center; }
+  .layer-tag { display:inline-block; font-size:.68rem; font-weight:700; padding:2px 8px; border-radius:6px; margin-inline-end:4px; }
+  .layer-tag.be { background:#dbe9f5; color:#1f5590; }
+  .layer-tag.fe { background:#f5e3db; color:#a0521f; }
+  .layer-tag.db { background:#e8dbf5; color:#5a1fa0; }
+  :root[data-theme="dark"] .layer-tag.be, @media (prefers-color-scheme: dark) { .layer-tag.be{background:#1a2c3a;color:#8ec1f2;} .layer-tag.fe{background:#3a2a1a;color:#f2ab8e;} .layer-tag.db{background:#2a1a3a;color:#c68ef2;} }
+  footer { text-align:center; padding:40px 0 10px; color:var(--ink-faint); font-size:.8rem; }
+  .verdict-row.done td:first-child { border-inline-start:4px solid var(--ok-ink); }
+  .verdict-row.partial td:first-child { border-inline-start:4px solid var(--warn-ink); }
+  .verdict-row.missing td:first-child { border-inline-start:4px solid var(--crit-ink); }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">🔍 تقرير 542 · فحص تنفيذ خطة 538 · 2026-07-20</span>
+    <h1>هل نُفِّذت خطة 538؟ الجواب المباشر: لا — ليس كخطّة. فُحص كل بند من الـ30 مقابل الكود الحيّ اليوم</h1>
+    <p class="lead">خطّة 538 كانت "مادّة قرار جاهزة، لا أمر تنفيذ" (بنصّها الخاص في خاتمتها). هذا التقرير يتحقّق: هل تحوّلت فعلًا إلى كود؟ ست فرق تحقيق مستقلّة قرأت الملفّات الفعلية اليوم (خلفي، واجهة، قاعدة بيانات) وقارنت كل بند بدليل مباشر — لا افتراض، ولا تصديق لأي تقرير سابق بلا تحقّق.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">30</div><div class="l">بندًا فرعيًّا فُحص، كل واحد بدليل كود مباشر</div></div>
+      <div class="s"><div class="n">6</div><div class="l">منجَز فعليًّا (أغلبها بعمل مختلف تمامًا، لا بتنفيذ 538 نفسها)</div></div>
+      <div class="s"><div class="n">1</div><div class="l">جزئيّ</div></div>
+      <div class="s"><div class="n">23</div><div class="l">غير منفَّذ إطلاقًا — من أصل 30</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#answer">الجواب المباشر</a>
+  <a href="#init9">🚨 INIT-9 — الأخطر</a>
+  <a href="#table">جدول الـ30 بندًا كاملًا</a>
+  <a href="#done">ما تمّ فعلًا</a>
+  <a href="#missing-financial">المجموعة الماليّة — غير منفَّذة</a>
+  <a href="#missing-other">باقي البنود غير المنفَّذة</a>
+  <a href="#methodology">منهجية الفحص</a>
+  <a href="#summary">الخلاصة والتوصية</a>
+</nav>
+
+<section id="answer">
+  <span class="section-eyebrow">📋 الجواب المباشر على سؤالك</span>
+  <h2>هل نُفِّذت خطة 538 كاملة؟ لا. هل رُفِع كل شيء (خلفي + واجهة + قاعدة بيانات) بدقّة؟ لا — معظمه لم يُبدأ أصلًا</h2>
+  <div class="card">
+    <p>خطّة 538 كتبت 24 فجوة (مقسَّمة على 75+ نقطة فرعية) بناءً على تحقيق سابق (تقرير 537). من أصل <b>30 بندًا فرعيًّا محدَّدًا بدقّة</b> فُحصت اليوم مباشرة من الكود:</p>
+    <ul>
+      <li>✅ <b>6 بنود منجزة فعليًّا</b> — لكن الأهمّ: <b>معظمها لم يُنجَز كتنفيذ لخطّة 538 نفسها</b>، بل صودف أنها أُنجزت بعمل منفصل تمامًا في نفس اليوم (إمّا خطّة 540/541 التي نفّذتها اليوم بعنوان "D-XX"، أو التزام سابق في نفس الجلسة بعنوان "C-05/C-09/C-11/C-12/C-16/INIT-0" — commit <code>717b8e1</code> — الذي حدث <b>قبل</b> نشر خطّة 538 بساعات، بمعنى أن مؤلّف 538 لم يكن يعرف بها بعد، أو ذكرها في سياق آخر).</li>
+      <li>🟡 <b>بند واحد جزئيّ</b> (INIT-4) — البنية التحتية موجودة، لكن صفر من 14 موضعًا فعليًّا رُحِّل.</li>
+      <li>❌ <b>23 بندًا لم يُنفَّذ إطلاقًا</b> — بلا أي أثر بالكود، بما في ذلك <b>أخطر بند أمنيّ في كل الخطّة (INIT-9)</b>، وكل المجموعة الماليّة الحرجة (C-10، C-11، C-12).</li>
+    </ul>
+    <div class="crit-box">
+      <div class="ic">⚠️</div>
+      <p><b>بالمعنى العمليّ: خطّة 538 لم تُنفَّذ كخطّة على الإطلاق.</b> ما ظهر "منجزًا" في الفحص هو تقاطع صدفة مع أعمال أخرى — لا تنفيذ متعمَّد لبنودها. لم يُرفَع أي شيء خاصّ بهذه الخطّة تحديدًا على أي بيئة (لا test1، ولا .194، ولا الإنتاج) لأنه لم يُبنَ أصلًا.</p>
+    </div>
+  </div>
+</section>
+
+<section id="init9">
+  <span class="section-eyebrow">🚨 أخطر اكتشاف في هذا الفحص</span>
+  <h2>INIT-9 — الثغرة الأمنية التي وصفتها خطّة 538 نفسها بأنها "الأخطر في كل التقرير" — لا تزال حيّة اليوم، بلا أي تغيير</h2>
+  <div class="fix-card crit">
+    <div class="f-head"><span class="f-id">INIT-9</span><span class="f-title">فحص نزاع الدفع أثناء حذف الحساب يفشل بصمت ويسمح بالحذف</span><span class="pill crit" style="margin-inline-start:auto">🔴 غير مُصلَح — ثغرة حيّة اليوم</span></div>
+    <div class="f-loc">📍 <code>backend/app/modules/identity/deletion_eligibility.py</code> — دالة <code>check_identity_deletion_eligibility</code> — نقطة العبور المشتركة الوحيدة لكل مسارات حذف الحساب</div>
+
+    <p>هذا البند وحده حصل على أعمق فحص من فريق التحقّق نظرًا لخطورته — قُرئ الكود سطرًا سطرًا، وقُورن بمسارَي الحذف الحقيقيَّين معًا (الحذف اليدويّ من المستخدم، والمهمّة اليوميّة المجدولة).</p>
+
+    <div class="subhead" style="font-weight:800;font-size:.85rem;margin:16px 0 6px">الكود الفعليّ اليوم — بلا أي تغيير عن وصف خطّة 538 له</div>
+    <pre><code>try:
+    from app.models.operations import FinancialDispute
+
+    dispute = (
+        await db.execute(
+            select(FinancialDispute.id)
+            .where(
+                FinancialDispute.state == "OPEN",
+                FinancialDispute.order_id.in_(
+                    select(Order.id).where(Order.customer_id == user.id)
+                ),
+            )
+            .limit(1)
+        )
+    ).scalar_one_or_none()
+    if dispute:
+        return ("OPEN_DISPUTE", "user has an open financial dispute")
+except Exception:  # noqa: BLE001
+    pass   # ← أي عطل هنا = المتابعة كأن لا نزاع موجودًا، الحذف يُسمَح به</code></pre>
+
+    <div class="flow">
+      <div class="box before"><div class="k">ما وصفته خطّة 538 في الساعة 12:51</div>هذا بالضبط الكود المعطوب — استثناء صامت يسمح بتجاوز فحص النزاع المفتوح</div>
+      <div class="arrow">=</div>
+      <div class="box before"><div class="k">الكود الآن (بعد ~9 ساعات من كتابة هذا التقرير)</div>لم يتغيّر حرف واحد. نفس <code>except Exception: pass</code> بالضبط، في نفس الملفّ، في نفس السطر تقريبًا.</div>
+    </div>
+
+    <div class="crit-box">
+      <div class="ic">🔓</div>
+      <p><b>لماذا هذا خطير فعليًّا وليس نظريًّا:</b> هذه الدالة هي <b>نقطة العبور المشتركة الوحيدة</b> لكل مسارات حذف الحساب الثلاثة في المنصّة — تأكَّد ذلك بقراءة الاستدعاءات مباشرة:</p>
+    </div>
+    <ul>
+      <li><b>المسار اليدويّ</b> (المستخدم يطلب حذف حسابه بنفسه) — <code>account_deletion_router.py</code> يستدعي هذه الدالة مباشرة.</li>
+      <li><b>المسار المجدوَل</b> (مهمّة يوميّة تلقائية تنظّف الحسابات، <code>account_deletion_cron.py</code>) — يستدعي نفس الدالة، <b>ولا يراقبها أحد سطرًا بسطر</b> بخلاف المسار اليدويّ حيث قد يلاحظ إنسان خطأً ظاهرًا.</li>
+      <li><b>نقطة المحو الفعليّة</b> (<code>anonymization.py::anonymize_user</code>) — تستدعي نفس الدالة مجدَّدًا كحارس أخير، ما لم يُمرَّر <code>force=True</code> صراحة.</li>
+    </ul>
+    <p><b>السيناريو الفعليّ للاستغلال:</b> أي عطل عابر بقاعدة البيانات (انقطاع اتصال، مهلة استعلام، حتى خطأ استيراد) أثناء تنفيذ هذا الاستعلام تحديدًا — سواء حدث بالصدفة أو استُغِلّ توقيته عمدًا — يجعل النظام يتابع الحذف <b>وكأنه تحقَّق من عدم وجود نزاع مفتوح، بينما لم يتحقَّق فعليًّا من شيء</b>. حساب عليه نزاع دفع مفتوح (مبلغ متنازَع عليه، شكوى مالية لم تُحسَم) يمكن حذفه وإخفاء بياناته، رغم وجود نزاع ماليّ حيّ يعتمد على تلك البيانات.</p>
+
+    <div class="plain">
+      <div class="ic">💡</div>
+      <p><b>الإصلاح رخيص جدًّا مقارنةً بخطورة تركه:</b> خطّة 538 نفسها أكّدت أن هذا لا يحتاج ترحيل قاعدة بيانات، ولا تغيير توقيع دالّة، ولا بوابة تشغيلية — مجرّد تغيير هذا الاستثناء الصامت ليُرجِع نفس نتيجة "نزاع مفتوح، ارفض الحذف" بدل <code>pass</code>. المبدأ نفسه (الفشل يُعامَل كرفض لا كموافقة) مُطبَّق فعلًا بنجاح في مكان آخر من المنصّة (الصلاحيات عالية الخطورة في <code>identity/dependencies.py</code>) — فهو نمط مُختبَر ومُثبَت، لا تصميمًا جديدًا يحتاج مخاطرة.</p>
+    </div>
+  </div>
+</section>
+
+<section id="table">
+  <span class="section-eyebrow">📊 الجدول الكامل</span>
+  <h2>كل الـ30 بندًا الفرعيّة — الحالة، الطبقة، والدليل</h2>
+  <p class="intro">🔵 = قاعدة بيانات · 🟠 = واجهة أماميّة (frontend) · 🔷 = خلفيّ (backend). الأعمدة الملوَّنة على اليمين تُظهر الحالة الفعليّة بعد الفحص المباشر، لا ما تدّعيه أي وثيقة سابقة.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>الرمز</th><th>الموضوع</th><th>الطبقة</th><th>الحالة الفعليّة</th><th>الدليل المختصر</th></tr></thead>
+    <tbody>
+      <tr class="verdict-row done"><td class="mono">C-01(a)</td><td>رفض نشر إصدار متزامن بلا خطأ 500</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill ok">✅ منجَز (بآلية مختلفة)</span></td><td>إعادة محاولة مرّة واحدة + معالج <code>IntegrityError</code> عامّ في main.py يُرجِع 409 — ليس التقاطًا محليًّا كما وصفته الخطّة، لكن النتيجة العمليّة مطابقة</td></tr>
+      <tr class="verdict-row done"><td class="mono">C-01(b)</td><td>فهرس فريد جزئيّ لإصدارات التطبيق</td><td><span class="layer-tag db">قاعدة بيانات</span></td><td><span class="pill ok">✅ منجَز (= D-01 اليوم)</span></td><td>هجرة <code>ab52</code> موجودة بالضبط كما وُصفت — لكن أُنجزت اليوم تحت اسم "D-01" ضمن خطّة 540، لا كتنفيذ لخطّة 538</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-03(a)</td><td>نتائج لكل عنصر في دفعة POS</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>قرار مضادّ اتُّخذ فعلًا: الدفعة كلّها SAVEPOINT واحد (الكل أو لا شيء)، لا مصفوفة نتائج لكل عنصر</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-03(c)</td><td>قفل تفاؤليّ (عمود version) على الكتالوج</td><td><span class="layer-tag be">خلفي</span> <span class="layer-tag db">قاعدة بيانات</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا عمود <code>version</code> على <code>catalog_items</code> ولا <code>item_variants</code> في النماذج ولا في أي هجرة — كلا مساري الكتابة (POS واليدويّ) غير محميَّين كما هما اليوم</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-04(a)</td><td>خيار "لصالح المنصّة" الناقص بشاشتَي الحلّ</td><td><span class="layer-tag fe">واجهة</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>غائب من <code>OpsBulkActions.tsx</code> و<code>OpsComplaints.tsx</code> رغم دعم الخادم الكامل له</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-06(c)</td><td>علم ميزة لإرسال SMS الحقيقيّ</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا مفتاح "sms" في <code>feature_flags.yaml</code>، وبصمته لم تتغيّر عن الأساس الموثَّق — الإرسال الحقيقيّ مفعَّل فعلًا لكن عبر متغيّر بيئة منفصل، لا عبر هذا الملفّ</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-07(a)</td><td>دمج رمز OTP والغرض بمفتاح واحد ذرّيّ</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا يزال مفتاحان منفصلان بـRedis (<code>otp:</code> و<code>otp_purpose:</code>)؛ عولج الخطر بمعالجة "رفض عند الفراغ" بدل الدمج الفعليّ</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-08</td><td>حقل استجابة "سُجِّل خروجك من الأجهزة الأخرى"</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>الخادم يُلغي الجلسات الأخرى فعلًا عند إعادة تعيين كلمة المرور، لكن الاستجابة تُرجِع فقط <code>{"message": "..."}</code> بلا أي تأكيد لذلك</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-10(a)</td><td>فحص هويّة لموافقة الاسترجاع الثانية</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ — فجوة ماليّة حيّة</span></td><td><code>finance_second_approve_refund</code> لا يفحص أنّ المعتمِد ليس هو الطالب نفسه — الاعتماد النهائيّ يفحص هذا، الثاني لا يفحصه إطلاقًا</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-11(e)</td><td>مسار قيد طوارئ لـSUPER_ADMIN</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا وجود لأي نقطة نهاية "طوارئ" في <code>manual_journal_router.py</code> — فقط المسارات العاديّة الأربعة (إضافة/اعتماد/عكس/سرد)</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-12(f)</td><td>حالة "يحتاج إصلاحًا ماليًّا" رسميّة</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ (لكن انظر ملاحظة)</span></td><td>لا حالة كهذه بجدول المرتجعات — لكن تتبّع فشل عكس العمولة نفسه أُصلِح فعلًا بآلية أخرى (C-12b، سجلّ استثناء تسوية) في وقت سابق من نفس اليوم</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-13.1–13.5</td><td>5 مواضع صلاحيات واجهة (استثناءات النقد)</td><td><span class="layer-tag fe">واجهة</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>FINANCE_AGENT لا يزال مستبعَدًا من كل قوائم الأدوار المتحكِّمة بشاشة استثناءات النقد رغم امتلاكه الصلاحية الفعليّة بالخادم</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-14.1</td><td>تسجيل/مقياس على مسار الفشل الصامت للصلاحيات</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا استدعاء تسجيل (logger) داخل معالج الاستثناء في <code>dependencies.py</code></td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-14.3</td><td>قاطع دائرة لمحرّك الصلاحيات</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>النمط موجود فقط في <code>rate_limiter.py</code>، لم يُستنسَخ لمحرّك الصلاحيات</td></tr>
+      <tr class="verdict-row missing"><td class="mono">C-15.1</td><td>توقيع HMAC بدل SHA-256 لسلسلة التدقيق</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td><code>_chain_link</code> لا يزال <code>hashlib.sha256</code> صرفًا، بلا مفتاح HMAC، بلا أي نقطة قطع (epoch)</td></tr>
+      <tr class="verdict-row done"><td class="mono">C-15.2/15.3</td><td>تسجيل تدقيق للقيد اليدويّ والنزاع</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill ok">✅ منجَز (سابقًا لخطّة 538 نفسها)</span></td><td>أُنجز الساعة 07:18 من نفس اليوم (commit <code>717b8e1</code>) تحت اسمَي "C-11/C-12" — أي قبل نشر خطّة 538 (12:51) بخمس ساعات ونصف</td></tr>
+      <tr class="verdict-row done"><td class="mono">INIT-0</td><td>مشغِّل قاعدة بيانات يمنع تعديل/حذف سجلّ التدقيق</td><td><span class="layer-tag db">قاعدة بيانات</span></td><td><span class="pill ok">✅ منجَز (سابقًا لخطّة 538 نفسها)</span></td><td>هجرة <code>ab51</code> — نفس commit <code>717b8e1</code> السابق لخطّة 538</td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-1</td><td>واجهة القدرات الموحَّدة (تسجيل خفيف لـ500 موضع)</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا وجود لأي <code>capability_gate</code> بالمستودع كلّه — صفر من الـ500 موضع مُسجَّل</td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-2</td><td>استخراج فحص «الطالب≠المعتمِد» كقطعة مشتركة</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا تزال الفحص مكرَّرة يدويًّا بـ5 مواضع منفصلة على الأقلّ، وغائبة كليًّا من مسار حلّ النزاع</td></tr>
+      <tr class="verdict-row done"><td class="mono">INIT-3(a)</td><td>حسابات فريق العمليات بدعوة لا بكلمة مرور</td><td><span class="layer-tag be">خلفي</span> <span class="layer-tag fe">واجهة</span></td><td><span class="pill ok">✅ الهدف منجَز (= D-11 اليوم)</span></td><td>أُنجز اليوم تحت اسم "D-11" ضمن خطّة 540 — آلية مختلفة عن نمط دعوة طاقم المزوّد المذكور بخطّة 538 (رمز فرديّ عبر SMS بدل رمز جماعيّ دوّار)، لكن الهدف الجوهريّ محقَّق</td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-3(b)</td><td>معرّف جهاز عشوائيّ مشفَّر (جوّال)</td><td><span class="layer-tag fe">جوّال</span></td><td><span class="pill ok">✅ منجَز (= D-69 اليوم)</span></td><td><code>Crypto.randomUUID()</code> — أُنجز اليوم أيضًا تحت اسم "D-69"</td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-3(d)</td><td>كشف <code>expires_at</code> بواجهة العمليّات</td><td><span class="layer-tag fe">واجهة</span></td><td><span class="pill crit">❌ غير منفَّذ، وفرضية الخطّة خاطئة أيضًا</span></td><td>ليس فقط غائب من صفحة حسابات العمليّات — حتى الصفحة "المرجعية" (دعوة طاقم المزوّد) التي افترضت الخطّة أنها تعرضه بالفعل لا تعرضه أيضًا</td></tr>
+      <tr class="verdict-row partial"><td class="mono">INIT-4</td><td>مصدر حقيقة واحد للأعلام — ترحيل وحدة المدفوعات</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill warn">🟡 جزئيّ — البنية جاهزة، الترحيل 0%</span></td><td><code>is_enabled_3layer</code> موجودة وتعمل في 4 وحدات أخرى، لكن صفر من 14 موضعًا بوحدة المدفوعات/الماليّة رُحِّل إليها</td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-5</td><td>دمج صفحات لوحة العمليّات المتشظّية</td><td><span class="layer-tag fe">واجهة</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا تزال نحو 75 صفحة منفصلة بمجلّد العمليّات، بلا أي دمج</td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-6(a)</td><td>تعميم وحدة رفع ملفّات KYC</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>الدلو ونوع الملفّ لا يزالان ثابتَين بالكود، لا معاملات</td></tr>
+      <tr class="verdict-row partial"><td class="mono">INIT-6(b)</td><td>تطبيق ترحيل مستحقّات السائقين فعليًّا</td><td><span class="layer-tag be">خلفي</span> <span class="layer-tag db">قاعدة بيانات</span></td><td><span class="pill warn">🟡 لا يزال مؤجَّلًا كما كان</span></td><td>السكربت مُختبَر (تجربة بلا تنفيذ) فقط — لا دليل على أي تشغيل فعليّ (<code>--apply</code>) بأي مكان بالمستودع</td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-7</td><td>جرد 27 مهمّة خلفية + دفعة تجريبية</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>لا ملفّات مهام خلفية جديدة أو مُعدَّلة اليوم إطلاقًا</td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-8</td><td>استدعاء محجوب داخل سياق غير متزامن</td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td><code>urllib.request.urlopen</code> لا يزال محجوبًا داخل <code>async def</code> — لكن لا مستدعٍ إنتاجيّ اليوم (اختبارات فقط)</td></tr>
+      <tr class="verdict-row missing" style="background:var(--crit-bg)"><td class="mono"><b>INIT-9</b></td><td><b>فحص نزاع الدفع أثناء حذف الحساب يفشل بصمت</b></td><td><span class="layer-tag be">خلفي</span></td><td><span class="pill crit">🔴 غير مُصلَح — ثغرة أمنية حيّة</span></td><td><b>راجع القسم المخصَّص أعلاه — أخطر بند في كل الفحص، بلا أي تغيير عن وصف الخطّة</b></td></tr>
+      <tr class="verdict-row missing"><td class="mono">INIT-10</td><td>مفتاح سياسة منفصل لكل نوع قرار</td><td><span class="layer-tag be">خلفي</span> <span class="layer-tag db">قاعدة بيانات</span></td><td><span class="pill crit">❌ غير منفَّذ</span></td><td>جدول الأعلام لا يزال بمنطق ثنائيّ بسيط، بلا عمود لقيم مركَّبة</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="done">
+  <span class="section-eyebrow">✅ ما تمّ فعلًا</span>
+  <h2>6 بنود منجزة — لكن بالصدفة، لا بتنفيذ خطّة 538</h2>
+  <p class="intro">هذا التمييز مهمّ جدًّا لفهم الصورة الحقيقية: لا يوجد أي commit، أي تنفيذ، أي جلسة عمل تحمل اسم "538" أو نفّذت بنودها بالحرف. ما حدث هو تقاطع صدفة مع أعمال أخرى — بعضها سابق لنشر 538 (Commit 717b8e1، الساعة 07:18)، وبعضها لاحق ومن خطّة منفصلة تمامًا (خطّة 540، نُفِّذت اليوم بأمر مستقلّ من المشغّل بعنوان "D-XX").</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>البند بترقيم 538</th><th>أُنجز فعليًّا تحت اسم</th><th>متى</th><th>هل هو نفس التنفيذ الموصوف بخطّة 538؟</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">C-01(b)</td><td>D-01 (خطّة 540)</td><td>اليوم، بعد الظهر</td><td>نعم، مطابق حرفيًّا (نفس ملفّ الهجرة، نفس منطق التنظيف الذاتيّ)</td></tr>
+      <tr><td class="mono">C-15.2/C-15.3</td><td>C-11/C-12 (commit 717b8e1)</td><td>اليوم، الساعة 07:18 — قبل نشر 538</td><td>نعم من ناحية الهدف (تسجيل تدقيق للقيد اليدويّ والنزاع)، لكن ليس تنفيذًا لخطّة 538 (كُتب قبلها)</td></tr>
+      <tr><td class="mono">INIT-0</td><td>نفسه (commit 717b8e1)</td><td>اليوم، الساعة 07:18 — قبل نشر 538</td><td>نعم، مطابق (مشغِّل قاعدة بيانات يمنع تعديل سجلّ التدقيق)</td></tr>
+      <tr><td class="mono">INIT-3(a)</td><td>D-11 (خطّة 540)</td><td>اليوم، بعد الظهر</td><td>الهدف نعم (لا كلمة مرور يضبطها المدير)؛ الآلية التقنية مختلفة عن النمط المرجعيّ الذي اقترحته 538</td></tr>
+      <tr><td class="mono">INIT-3(b)</td><td>D-69 (خطّة 540)</td><td>اليوم، بعد الظهر</td><td>نعم، مطابق (معرّف جهاز عشوائيّ مشفَّر حقيقيّ)</td></tr>
+      <tr><td class="mono">C-01(a)</td><td>—</td><td>غير معروف، موجود مسبقًا في الكود القائم</td><td>النتيجة العمليّة مطابقة (409 لا 500) لكن بآلية مختلفة عن الالتقاط المحليّ الذي وصفته 538</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="missing-financial">
+  <span class="section-eyebrow">💰 الأخطر ماليًّا بعد INIT-9</span>
+  <h2>المجموعة الماليّة (C-10، C-11، C-12) — لا شيء منها نُفِّذ</h2>
+  <div class="warn-box">
+    <div class="ic">💰</div>
+    <p>خطّة 538 وصفت هذه المجموعة بأنها تحمل "الاكتشاف الأخطر في كل الخطة" (C-10a: موافقة الاسترجاع الثانية بلا أي فحص هويّة). الفحص المباشر اليوم يؤكّد: <b>الفجوة لا تزال مفتوحة تمامًا</b>.</p>
+  </div>
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-10(a)</span><span class="f-title">موافقة الاسترجاع الثانية — لا يزال بلا فحص هويّة</span><span class="pill crit" style="margin-inline-start:auto">فجوة حيّة اليوم</span></div>
+    <p>الاعتماد النهائيّ (<code>finance_approve_refund</code>) يفحص بالفعل أنّ المعتمِد ليس هو الطالب، وأنّ المعتمِد الثاني ليس هو نفسه المعتمِد الأوّل. لكن نقطة الاعتماد الثاني ذاتها (<code>finance_second_approve_refund</code>) لا تفحص أبدًا أنّ الشخص المسجِّل للموافقة الثانية ليس هو من طلب الاسترجاع أصلًا. <b>الأثر العمليّ:</b> شخص واحد يمكنه طلب استرجاع كبير، ثمّ تسجيل "الموافقة الثانية" عليه بنفسه — يتبقّى فقط اعتماد نهائيّ من طرف ثالث، بدل ثلاثة أطراف مستقلّة كما يُفترَض بالتصميم.</p>
+  </div>
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-11(e)</span><span class="f-title">مسار قيد الطوارئ لـSUPER_ADMIN غير موجود إطلاقًا</span><span class="pill crit" style="margin-inline-start:auto">لم يُبنَ</span></div>
+    <p>لا وجود لأي نقطة نهاية بهذا الوصف. القيد اليدويّ لا يزال يمرّ فقط عبر المسارات الأربعة العاديّة (إنشاء/اعتماد/عكس/سرد)، بلا مسار طوارئ ولا آلية مراجعة لاحقة إلزامية.</p>
+  </div>
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-12(f)</span><span class="f-title">حالة "يحتاج إصلاحًا ماليًّا" غير موجودة — لكن التتبّع الأساسي أُصلِح بطريقة أخرى</span><span class="pill warn" style="margin-inline-start:auto">جزء مرتبط منجَز مسبقًا</span></div>
+    <p>لا حالة (state) رسمية بهذا الاسم على مستوى قضية المرتجع نفسها. لكن ملاحظة مهمّة أنصف بها الفحص خطّة 538: فشل عكس العمولة (الجزء الأخطر عمليًّا) <b>لم يعد صامتًا</b> — أُصلِح سابقًا بآلية مختلفة (بند شقيق "C-12b") تُسجِّل كل فشل كسجلّ تسوية استثنائيّ عالي الأولوية بدل مجرّد سطر تسجيل (log) لا يراقبه أحد. الفجوة المتبقّية أضيق ممّا صوَّرته 538 أصلًا: تصنيف الحالة على مستوى القضية نفسها، لا غياب التتبّع بالكامل.</p>
+  </div>
+</section>
+
+<section id="missing-other">
+  <span class="section-eyebrow">📁 باقي البنود غير المنفَّذة</span>
+  <h2>19 بندًا إضافيًّا — من صلاحيات الواجهة إلى المحرّكات المعماريّة الكبرى</h2>
+  <p class="intro">القائمة الكاملة موجودة بالجدول أعلاه بأدلّتها؛ هذا القسم يجمع أهمّ الأنماط المتكرّرة عبر هذه البنود.</p>
+  <div class="info-box">
+    <div class="ic">🔁</div>
+    <p><b>نمط متكرّر لافت:</b> عدّة بنود (C-04a، C-13، INIT-3d) تشترك بنفس الشكل: <b>الخادم/الخلفيّ جاهز ويدعم الميزة بالفعل، لكن الواجهة الأماميّة وحدها لم تُحدَّث لتستخدمها.</b> هذه فجوات "رخيصة" نسبيًّا — لا حاجة لأي عمل خلفيّ أو ترحيل قاعدة بيانات، فقط تحديث واجهة.</p>
+  </div>
+  <div class="info-box">
+    <div class="ic">🏗️</div>
+    <p><b>المحرّكات المعماريّة الثلاثة الكبرى (INIT-1، INIT-2، INIT-4)</b> — التي أوصت خطّة 538 نفسها بعدم بنائها كاملة والاكتفاء بأجزاء صغيرة منخفضة المخاطر — لم يُبنَ منها حتى الجزء الصغير المُوصى به: صفر من 500 موضع لـINIT-1، صفر استخراج للفحص المشترك في INIT-2، وصفر ترحيل فعليّ من أصل 14 موضعًا في INIT-4 (رغم أنّ بنيته التحتية جاهزة أصلًا).</p>
+  </div>
+  <div class="info-box">
+    <div class="ic">🧹</div>
+    <p><b>مبادرات واسعة النطاق (INIT-5 دمج لوحة العمليّات، INIT-7 جرد المهام الخلفية)</b> لم تُلمَس إطلاقًا — وهذا متوقَّع منطقيًّا؛ هذه مشاريع كبيرة تحتاج دورة عمل مستقلّة خاصّة بها، لا تُنجَز كأثر جانبيّ لخطّة أخرى.</p>
+  </div>
+</section>
+
+<section id="methodology">
+  <span class="section-eyebrow">🔬 منهجية الفحص</span>
+  <h2>كيف جرى التحقّق — ست فرق مستقلّة، كل بند بدليل مباشر</h2>
+  <div class="card">
+    <p>هذا الفحص لم يعتمد على قراءة تقرير 538 وتصديقه، ولا على الذاكرة من جلسات سابقة. سُلِّم كل فريق تحقّق مجموعة بنود محدَّدة مع المواقع الدقيقة (الملفّ والدالّة) التي ذكرتها خطّة 538، وطُلب منه:</p>
+    <ul>
+      <li>قراءة الملفّ الفعليّ اليوم مباشرة (لا الاعتماد على وصف الخطّة).</li>
+      <li>البحث عن أي عمل بديل قد يكون أنجز نفس الهدف تحت اسم مختلف (خصوصًا خطّة 540 المُنفَّذة اليوم بعنوان D-XX).</li>
+      <li>الإبلاغ بحكم صريح واحد لكل بند: <span class="pill ok">منجَز</span> / <span class="pill crit">غير منفَّذ</span> / <span class="pill warn">جزئيّ</span> / <span class="pill info">منجَز بعمل آخر</span> — مع اقتباس الكود الفعليّ كدليل، لا وصفًا عامًّا.</li>
+      <li>التنبيه الصريح لأي التباس بدل التخمين — حدث هذا فعلًا في بندَي C-12(f) وINIT-9، وأُدرِج بوضوح بهذا التقرير.</li>
+    </ul>
+    <p>لم يُعدَّل أي ملفّ أثناء هذا الفحص — قراءة فقط. رأس الهجرات الحاليّ للمنصّة <code>ab57</code> (مؤكَّد على test1 و.194 والإنتاج اليوم، منفصل تمامًا عن هذا الفحص).</p>
+  </div>
+</section>
+
+<section id="summary">
+  <span class="section-eyebrow">📋 الخلاصة والتوصية</span>
+  <h2>الوضع الفعليّ اليوم، وما يستحقّ الأولوية إن قرَّرت المتابعة</h2>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="n">30</div><div class="l">بندًا فُحص</div></div>
+    <div class="stat-mini"><div class="n">6</div><div class="l">منجَز (بعمل آخر، لا بتنفيذ 538)</div></div>
+    <div class="stat-mini"><div class="n">1</div><div class="l">جزئيّ</div></div>
+    <div class="stat-mini crit"><div class="n">23</div><div class="l">غير منفَّذ إطلاقًا</div></div>
+    <div class="stat-mini crit"><div class="n">1</div><div class="l">ثغرة أمنية حيّة غير مُصلَحة (INIT-9)</div></div>
+  </div>
+  <div class="crit-box">
+    <div class="ic">🚨</div>
+    <p><b>إن كنت ستبدأ بشيء واحد فقط من كل هذه الخطّة: ابدأ بـ INIT-9.</b> هو الأرخص تنفيذًا في كل الـ30 بندًا (تغيير سطر واحد، بلا ترحيل، بلا بوّابة تشغيلية)، والأخطر أثرًا لو تُرِك — وقد بقي بلا أي مساس منذ أن وُصِف بأنه "الأخطر" قبل نحو 9 ساعات من كتابة هذا التقرير.</p>
+  </div>
+  <div class="plain">
+    <div class="ic">✅</div>
+    <p>كل حكم في هذا التقرير مصدره قراءة مباشرة للملفّ المذكور اليوم — لا افتراض، ولا نقل عن أي تقرير سابق بلا تحقّق مستقلّ. القرار بشأن أيّ بند يُنفَّذ أوّلًا، ومتى، يبقى للمشغّل. هذا التقرير أداة قرار دقيقة، لا أمر تنفيذ.</p>
+  </div>
+</section>
+
+<footer>تقرير 542 · تووا (Tawa) — منصّة التوصيل الليبيّة · فحص تنفيذ خطّة 538 · 2026-07-20</footer>
+
+</div>

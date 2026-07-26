@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tawa Platform — Stage-2 &amp; Multi-Device Synthesis Plan</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:          #F3F5FC;
+  --surface:     #FFFFFF;
+  --surface-2:   #EAECF7;
+  --border:      #C8CCE0;
+  --border-2:    #D8DCEE;
+  --navy:        #0D3270;
+  --navy-mid:    #1A52BA;
+  --ink:         #0F1A2E;
+  --ink-2:       #424E6A;
+  --ink-3:       #7A84A0;
+  --crit:        #C0181A;
+  --crit-bg:     #FEF1F1;
+  --high:        #B84500;
+  --high-bg:     #FFF4EC;
+  --med:         #896000;
+  --med-bg:      #FFFBEC;
+  --ok:          #0A6845;
+  --ok-bg:       #EDFBF5;
+  --decided-border: #0D3270;
+  --decided-bg:     #EEF3FD;
+  --code-bg:     #111827;
+  --code-text:   #CDD5F0;
+  --code-comment:#5A6A88;
+  --code-keyword:#7EC8E3;
+  --code-string: #A8D8A8;
+  --code-op:     #F0A070;
+  --nav-w:       220px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ── NAV ──────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: var(--nav-w);
+  background: var(--navy);
+  overflow-y: auto;
+  padding: 24px 0 40px;
+  z-index: 100;
+}
+nav .nav-logo {
+  padding: 0 18px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  margin-bottom: 12px;
+}
+nav .nav-logo .project { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45); }
+nav .nav-logo .title   { font-size: 14px; font-weight: 700; color: #FFF; line-height: 1.3; margin-top: 4px; }
+
+nav a {
+  display: block;
+  padding: 5px 18px;
+  font-size: 12.5px;
+  color: rgba(255,255,255,.62);
+  text-decoration: none;
+  transition: color .15s;
+}
+nav a:hover, nav a.active { color: #FFF; }
+nav .nav-group { padding: 14px 18px 4px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.28); }
+
+/* ── MAIN ─────────────────────────────────── */
+main {
+  margin-left: var(--nav-w);
+  padding: 48px 40px 80px;
+  max-width: calc(var(--nav-w) + 880px);
+}
+
+/* ── TYPOGRAPHY ───────────────────────────── */
+h1 {
+  font-size: 28px; font-weight: 800; letter-spacing: -.02em;
+  color: var(--navy); margin-bottom: 8px;
+  text-wrap: balance;
+}
+.doc-meta {
+  font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-3); margin-bottom: 36px;
+}
+
+h2 {
+  font-size: 20px; font-weight: 700; color: var(--navy);
+  margin-top: 52px; margin-bottom: 16px;
+  padding-bottom: 8px; border-bottom: 2px solid var(--navy);
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+h3 {
+  font-size: 15px; font-weight: 700; color: var(--ink);
+  margin-top: 28px; margin-bottom: 10px;
+  text-wrap: balance;
+}
+h4 {
+  font-size: 13px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-3);
+  margin-top: 20px; margin-bottom: 8px;
+}
+
+p { margin-bottom: 12px; max-width: 72ch; }
+
+.eyebrow {
+  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 600; margin-bottom: 6px;
+}
+
+/* ── SECTION ANCHOR ───────────────────────── */
+.section-anchor { scroll-margin-top: 24px; }
+
+/* ── CODE ─────────────────────────────────── */
+.code-wrap { overflow-x: auto; border-radius: 8px; margin: 16px 0; }
+pre {
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace;
+  font-size: 12.5px; line-height: 1.65;
+  padding: 20px 22px;
+  white-space: pre;
+  border-radius: 8px;
+  tab-size: 2;
+}
+.code-label {
+  background: #0D1B2F; color: var(--ink-3);
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  padding: 6px 22px 5px;
+  border-radius: 8px 8px 0 0;
+  font-family: 'SF Mono', Consolas, monospace;
+  border-bottom: 1px solid #1E2D45;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.code-label + pre { border-radius: 0 0 8px 8px; }
+code {
+  font-family: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+  font-size: 12px;
+  background: var(--surface-2);
+  color: var(--navy);
+  padding: 1px 5px; border-radius: 3px;
+}
+pre code { background: none; color: inherit; padding: 0; border-radius: 0; }
+
+/* syntax color hints */
+.kw  { color: var(--code-keyword); }
+.str { color: var(--code-string); }
+.cm  { color: var(--code-comment); font-style: italic; }
+.op  { color: var(--code-op); }
+.num { color: #B5CEA8; }
+
+/* ── DECIDED CARD ─────────────────────────── */
+.decided {
+  border-left: 4px solid var(--decided-border);
+  background: var(--decided-bg);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  margin: 20px 0;
+}
+.decided .decided-label {
+  font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+  font-weight: 700; color: var(--navy); margin-bottom: 6px;
+}
+.decided .decided-title { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.decided p { margin-bottom: 4px; font-size: 14px; max-width: none; }
+
+/* ── SEVERITY CHIP ───────────────────────── */
+.chip {
+  display: inline-block;
+  font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 3px;
+  font-family: 'SF Mono', Consolas, monospace;
+  vertical-align: middle;
+}
+.chip-crit { background: var(--crit-bg); color: var(--crit); border: 1px solid #F5C2C2; }
+.chip-high { background: var(--high-bg); color: var(--high); border: 1px solid #F5D4B8; }
+.chip-med  { background: var(--med-bg);  color: var(--med);  border: 1px solid #EEE0A0; }
+.chip-ok   { background: var(--ok-bg);   color: var(--ok);   border: 1px solid #A8E6CC; }
+
+/* ── SCENARIO TABLE ──────────────────────── */
+.scenario-list { margin: 16px 0; display: flex; flex-direction: column; gap: 10px; }
+.scenario {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+.scenario-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.scenario-id { font-size: 11px; font-weight: 700; font-family: 'SF Mono', Consolas, monospace; color: var(--ink-3); min-width: 80px; }
+.scenario-title { font-size: 14px; font-weight: 600; color: var(--ink); flex: 1; }
+.scenario-trigger { font-size: 13px; color: var(--ink-2); margin-bottom: 4px; }
+.scenario-mit { font-size: 13px; color: var(--ok); }
+.scenario-mit::before { content: "✓ "; font-weight: 700; }
+
+/* ── CHECKLIST ───────────────────────────── */
+.checklist { margin: 16px 0; display: flex; flex-direction: column; gap: 8px; list-style: none; }
+.checklist li {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 14px;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 14px;
+}
+.checklist li .ck {
+  width: 18px; height: 18px; border: 2px solid var(--border);
+  border-radius: 4px; flex-shrink: 0; margin-top: 2px;
+}
+.checklist li code { font-size: 11.5px; }
+
+/* ── STEPS ───────────────────────────────── */
+.steps { counter-reset: step; display: flex; flex-direction: column; gap: 16px; margin: 16px 0; }
+.step {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px 20px;
+  counter-increment: step;
+  position: relative; padding-left: 52px;
+}
+.step::before {
+  content: counter(step);
+  position: absolute; left: 16px; top: 16px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--navy); color: #FFF;
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.step h3 { margin-top: 0; }
+
+/* ── TABLE ───────────────────────────────── */
+.table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th {
+  background: var(--surface-2); text-align: left;
+  padding: 9px 14px; font-size: 11px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td { padding: 9px 14px; border-bottom: 1px solid var(--border-2); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--bg); }
+
+/* ── CALLOUT ─────────────────────────────── */
+.callout {
+  border-radius: 6px; padding: 12px 16px;
+  margin: 16px 0; font-size: 14px;
+  border: 1px solid;
+}
+.callout-warn { background: var(--high-bg); border-color: #F5D4B8; color: #7A3000; }
+.callout-crit { background: var(--crit-bg); border-color: #F5C2C2; color: #7A0A0A; }
+.callout-info { background: var(--decided-bg); border-color: #B8C8EE; color: #0A2060; }
+.callout-ok   { background: var(--ok-bg); border-color: #A8E6CC; color: #065035; }
+.callout strong { font-weight: 700; }
+
+/* ── TWO-COL ─────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+.col-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 16px;
+}
+.col-card h4 { margin-top: 0; }
+
+/* ── DIVIDER ─────────────────────────────── */
+.divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+/* ── CROSS-CUTTING RISK TABLE ───────────── */
+.risk-row-crit td:first-child { border-left: 3px solid var(--crit); }
+.risk-row-high td:first-child { border-left: 3px solid var(--high); }
+.risk-row-med  td:first-child { border-left: 3px solid var(--med); }
+
+/* ── TOP BANNER ───────────────────────────── */
+.page-banner {
+  background: var(--navy); color: #FFF;
+  padding: 28px 32px; border-radius: 10px;
+  margin-bottom: 40px; display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+}
+.page-banner .banner-tag {
+  font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+  background: rgba(255,255,255,.15); padding: 3px 9px; border-radius: 3px;
+  margin-bottom: 8px; display: inline-block;
+}
+.page-banner h1 { color: #FFF; margin-bottom: 4px; font-size: 22px; }
+.page-banner .banner-sub { color: rgba(255,255,255,.62); font-size: 13px; }
+.banner-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.banner-chip {
+  font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 4px;
+  background: rgba(255,255,255,.14); color: rgba(255,255,255,.85);
+}
+
+/* ── RESPONSIVE ───────────────────────────── */
+@media (max-width: 800px) {
+  nav { display: none; }
+  main { margin-left: 0; padding: 24px 18px 60px; }
+  .two-col { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* ── FOCUS ─────────────────────────────────── */
+a:focus-visible {
+  outline: 2px solid var(--navy-mid);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+</style>
+</head>
+<body>
+
+<!-- ── LEFT NAV ────────────────────────────── -->
+<nav aria-label="Document sections">
+  <div class="nav-logo">
+    <div class="project">Tawa Platform</div>
+    <div class="title">Stage-2 &amp; Multi-Device Synthesis</div>
+  </div>
+
+  <div class="nav-group">Stage-2: Postgres Init</div>
+  <a href="#s2-approach">Recommended Approach</a>
+  <a href="#s2-steps">Implementation Steps</a>
+  <a href="#s2-files">SQL Files (01 / 02 / 03)</a>
+  <a href="#s2-dockerfile">Dockerfile</a>
+  <a href="#s2-scenarios">Top 15 Scenarios</a>
+  <a href="#s2-checklist">Verification Checklist</a>
+  <a href="#s2-rollback">Rollback Plan</a>
+  <a href="#s2-d1">DECIDED: Multi-file vs Single</a>
+  <a href="#s2-d2">DECIDED: Update Policy</a>
+
+  <div class="nav-group">Multi-Device: group_id</div>
+  <a href="#md-approach">Recommended Approach</a>
+  <a href="#md-code">Complete Code (4 Files)</a>
+  <a href="#md-imports">Import Changes</a>
+  <a href="#md-msw">MSW Handler</a>
+  <a href="#md-scenarios">Top 15 Scenarios</a>
+  <a href="#md-checklist">Verification Checklist</a>
+  <a href="#md-d1">DECIDED: localStorage Cleanup</a>
+  <a href="#md-d2">DECIDED: Cart Write Removal</a>
+  <a href="#md-d3">DECIDED: Pydantic v2 Syntax</a>
+
+  <div class="nav-group">Cross-Cutting</div>
+  <a href="#cc-deploy">Deployment Order</a>
+  <a href="#cc-testing">Testing Strategy</a>
+  <a href="#cc-risk">Risk Matrix</a>
+  <a href="#cc-auth">Operator Authorization</a>
+</nav>
+
+<!-- ── MAIN ────────────────────────────────── -->
+<main>
+
+<div class="page-banner">
+  <div>
+    <div class="banner-tag">Principal Architect Synthesis · 2026-07-06</div>
+    <h1>Stage-2 &amp; Multi-Device Implementation Plan</h1>
+    <div class="banner-sub">Tawa Libya Delivery Platform &nbsp;·&nbsp; Migration head: <code style="background:rgba(255,255,255,.15);color:#fff;font-size:11px">ab20_staff_evaluation</code></div>
+  </div>
+  <div class="banner-chips">
+    <span class="banner-chip">Stage-2 Postgres Init</span>
+    <span class="banner-chip">group_id API Migration</span>
+    <span class="banner-chip">120 + 120 Scenarios</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STAGE-2 SECTION
+════════════════════════════════════════════ -->
+
+<h2 id="s2-approach" class="section-anchor">1. Stage-2 Postgres Init — Recommended Approach</h2>
+
+<p>The recommended strategy combines the <strong>pg_dump --schema-only snapshot</strong> (rank 1) with the <strong>alembic stamp pattern</strong> (rank 2) and a <strong>separate migrate service</strong> in Docker Compose. This is the industry standard for platforms that have reached schema stabilisation.</p>
+
+<div class="two-col">
+  <div class="col-card">
+    <h4>Why not full migration run (current state)</h4>
+    <p style="font-size:13.5px">171 migrations take 20–45 s on a cold SSD. The current <code>start_period: 20s</code> healthcheck fires before migrations complete, causing the <code>condition: service_healthy</code> chain to fail. There is zero retry logic in <code>entrypoint.sh</code> — one transient postgres hiccup during the 171-migration window crashes the container permanently (no restart policy).</p>
+  </div>
+  <div class="col-card">
+    <h4>Why pg_dump + stamp</h4>
+    <p style="font-size:13.5px">pg_dump captures the <em>final state</em> of all 171 migrations in ~3–5 seconds of init time. The alembic stamp pattern makes alembic own the version record without re-running any DDL. Subsequent new migrations (ab21, ab22 …) still apply correctly via the normal <code>upgrade head</code> path in the entrypoint.</p>
+  </div>
+</div>
+
+<div class="callout callout-info">
+  <strong>Key invariant:</strong> The pg_dump snapshot and the revision string in 03_stamp.sql must be taken from the same database state at the same instant. A mismatch between the schema in 02_schema.sql and the stamp in 03_stamp.sql causes alembic to either skip real migrations or re-run already-applied ones.
+</div>
+
+<h3>Architecture Overview</h3>
+<div class="code-wrap">
+<div class="code-label">Container startup sequence</div>
+<pre>
+postgres:16-alpine (custom image)
+  ├── /docker-entrypoint-initdb.d/01_extensions.sql  → CREATE EXTENSION pg_trgm
+  ├── /docker-entrypoint-initdb.d/02_schema.sql       → full DDL (functions, triggers, tables, indexes)
+  └── /docker-entrypoint-initdb.d/03_stamp.sql        → INSERT alembic_version
+
+  Only fires on empty /var/lib/postgresql/data
+  ~5–8 seconds total; postgres healthcheck fires after this completes
+
+migrate service (one-shot)
+  └── alembic stamp head  (if alembic_version row absent)
+       OR
+      alembic upgrade head (applies any new migrations since the image was cut)
+  exits 0 → triggers service_completed_successfully
+
+backend-core
+  depends_on: migrate (service_completed_successfully)
+  → uvicorn starts; start_period: 30s is ample (no migrations here)
+</pre>
+</div>
+
+<!-- ───── STEP-BY-STEP ───── -->
+<h2 id="s2-steps" class="section-anchor">2. Stage-2 — Complete Implementation Steps</h2>
+
+<div class="steps">
+  <div class="step">
+    <h3>Verify the source database is at the correct head</h3>
+    <p>Run against the fully-migrated local or staging DB before taking the dump. This must match exactly what will be stamped.</p>
+    <div class="code-wrap">
+<pre>
+<span class="cm"># Against the running container</span>
+docker exec tawalocal-postgres-1 psql -U postgres -d libya_platform \
+  -c "SELECT version_num FROM public.alembic_version;"
+<span class="cm"># Must return: ab20_staff_evaluation</span>
+
+<span class="cm"># Alembic side</span>
+cd /home/a/Desktop/APP/platform
+alembic current
+<span class="cm"># Must show: ab20_staff_evaluation (head)</span>
+alembic heads
+<span class="cm"># Must show exactly one head (linear chain)</span>
+</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>Create the output directory</h3>
+    <div class="code-wrap">
+<pre>
+mkdir -p /home/a/Desktop/APP/platform/docker/postgres-init
+</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>Generate 01_extensions.sql (manual — not from pg_dump)</h3>
+    <p>Write by hand. pg_dump emits <code>COMMENT ON EXTENSION</code> which fails if the extension is absent. This file runs first and must be idempotent.</p>
+    <div class="code-wrap">
+<div class="code-label">docker/postgres-init/01_extensions.sql</div>
+<pre>
+<span class="cm">-- Tawa Stage-2: Extensions
+-- Runs first; must execute before 02_schema.sql</span>
+SET search_path = public;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>Generate 02_schema.sql via pg_dump</h3>
+    <div class="code-wrap">
+<pre>
+docker exec tawalocal-postgres-1 pg_dump \
+  --schema-only \
+  --no-owner \
+  --no-acl \
+  --no-comments \
+  --no-tablespaces \
+  --clean \
+  --if-exists \
+  --encoding=UTF8 \
+  -U postgres \
+  -d libya_platform \
+  > /home/a/Desktop/APP/platform/docker/postgres-init/02_schema.sql
+</pre>
+    </div>
+    <div class="callout callout-warn">
+      <strong>After generating:</strong> verify the dump captured <code>arabic_normalize()</code>, <code>check_journal_balanced()</code>, and the <code>ledger_journal_balanced</code> trigger:
+      <code>grep -c "arabic_normalize\|check_journal_balanced\|ledger_journal_balanced" docker/postgres-init/02_schema.sql</code> — must return 3 or more.
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>Create 03_stamp.sql (manual — exact revision string)</h3>
+    <div class="code-wrap">
+<div class="code-label">docker/postgres-init/03_stamp.sql</div>
+<pre>
+<span class="cm">-- Tawa Stage-2: Alembic version stamp
+-- Must match the head revision of the db state captured in 02_schema.sql
+-- ON CONFLICT DO NOTHING = idempotent; safe to re-run</span>
+INSERT INTO public.alembic_version (version_num)
+VALUES (<span class="str">'ab20_staff_evaluation'</span>)
+ON CONFLICT DO NOTHING;
+</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>Write the Dockerfile for the custom postgres image</h3>
+    <p>See Section 4 below for the exact Dockerfile content.</p>
+  </div>
+
+  <div class="step">
+    <h3>Update entrypoint.sh with the stamp-detect pattern</h3>
+    <p>Replaces the current unconditional <code>alembic upgrade head</code>. The entrypoint now checks whether alembic_version is empty and stamps vs. upgrades accordingly.</p>
+    <div class="code-wrap">
+<div class="code-label">backend/entrypoint.sh (full replacement)</div>
+<pre>
+#!/bin/sh
+set -e
+
+<span class="cm"># Detect whether this is a fresh schema (init.sql just ran) or an existing DB.</span>
+<span class="cm"># alembic_version empty → init.sql schema is already correct → stamp head only.</span>
+<span class="cm"># alembic_version present → apply any new migrations since the image was cut.</span>
+COUNT=$(psql "$DATABASE_SYNC_URL" -tAc \
+  <span class="str">"SELECT COUNT(*) FROM public.alembic_version"</span> 2>/dev/null || echo 0)
+
+if [ <span class="str">"$COUNT"</span> -eq 0 ]; then
+  echo <span class="str">"[entrypoint] Fresh schema detected — stamping head (ab20_staff_evaluation)"</span>
+  alembic stamp head
+else
+  echo <span class="str">"[entrypoint] Existing DB — running alembic upgrade head"</span>
+  alembic upgrade head
+fi
+
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+</pre>
+    </div>
+    <div class="callout callout-warn">
+      <strong>Requires psql in the backend container.</strong> Verify: <code>docker exec tawalocal-backend-core-1 which psql</code>. If absent, add <code>libpq-dev</code> or <code>postgresql-client</code> to the backend Dockerfile's apk/apt install step, or use the Python-psycopg2 count query variant below as a fallback.
+    </div>
+    <div class="code-wrap">
+<div class="code-label">Python fallback (if psql unavailable in container)</div>
+<pre>
+<span class="cm"># Replace the COUNT=$(psql ...) block with:</span>
+COUNT=$(python3 -c <span class="str">"
+import os, psycopg2
+url = os.environ.get('DATABASE_SYNC_URL','')
+try:
+    conn = psycopg2.connect(url)
+    cur = conn.cursor()
+    cur.execute('SELECT COUNT(*) FROM public.alembic_version')
+    print(cur.fetchone()[0])
+    conn.close()
+except: print(0)
+"</span>)
+</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>Update docker-compose.yml healthchecks and add migrate service</h3>
+    <div class="code-wrap">
+<div class="code-label">docker-compose.yml — relevant changes</div>
+<pre>
+<span class="cm"># postgres service — extend start_period to cover init.sql execution</span>
+postgres:
+  image: tawa-postgres:ab20  <span class="cm"># custom image with baked schema</span>
+  healthcheck:
+    test: [<span class="str">"CMD"</span>, <span class="str">"pg_isready"</span>, <span class="str">"-U"</span>, <span class="str">"postgres"</span>]
+    interval: 5s
+    timeout: 5s
+    retries: 10
+    start_period: 20s   <span class="cm"># covers init.sql ~5-8 s; was "not set" (0 s)</span>
+  restart: unless-stopped  <span class="cm"># was: not specified → stays crashed on failure</span>
+
+<span class="cm"># NEW: one-shot migrate service</span>
+migrate:
+  image: backend:latest
+  command: [<span class="str">"sh"</span>, <span class="str">"-c"</span>, <span class="str">"alembic upgrade head"</span>]
+  environment:
+    DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/libya_platform
+    DATABASE_SYNC_URL: postgresql://postgres:postgres@postgres:5432/libya_platform
+  depends_on:
+    postgres:
+      condition: service_healthy
+  restart: <span class="str">"no"</span>
+
+<span class="cm"># backend-core — depends on migrate completing, not just postgres being healthy</span>
+backend-core:
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+    postgres:
+      condition: service_healthy
+  healthcheck:
+    test: [<span class="str">"CMD"</span>, <span class="str">"python3"</span>, <span class="str">"-c"</span>,
+           <span class="str">"import urllib.request; urllib.request.urlopen('http://localhost:8000/health/live', timeout=2)"</span>]
+    interval: 10s
+    timeout: 5s
+    retries: 5
+    start_period: 30s  <span class="cm"># was 20s; 30s ample since no migrations here</span>
+  restart: unless-stopped
+</pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <h3>Create rebuild script</h3>
+    <div class="code-wrap">
+<div class="code-label">scripts/rebuild-db-image.sh</div>
+<pre>
+#!/bin/bash
+set -e
+REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+
+<span class="cm"># 1. Get current alembic head</span>
+HEAD=$(python3 -c "
+from alembic.config import Config
+from alembic.script import ScriptDirectory
+cfg = Config('backend/alembic.ini')
+sd = ScriptDirectory.from_config(cfg)
+print(sd.get_current_head())
+")
+echo "[rebuild] Head: $HEAD"
+
+<span class="cm"># 2. Verify source DB matches head</span>
+DB_HEAD=$(docker exec tawalocal-postgres-1 psql -U postgres -d libya_platform \
+  -tAc "SELECT version_num FROM public.alembic_version" 2>/dev/null)
+if [ "$DB_HEAD" != "$HEAD" ]; then
+  echo "ERROR: source DB is at $DB_HEAD, expected $HEAD. Run migrations first."
+  exit 1
+fi
+
+<span class="cm"># 3. Regenerate schema dump</span>
+docker exec tawalocal-postgres-1 pg_dump \
+  --schema-only --no-owner --no-acl \
+  --no-comments --no-tablespaces \
+  --clean --if-exists --encoding=UTF8 \
+  -U postgres -d libya_platform \
+  > docker/postgres-init/02_schema.sql
+
+<span class="cm"># 4. Update stamp file</span>
+cat > docker/postgres-init/03_stamp.sql &lt;&lt; EOF
+-- Tawa Stage-2: Alembic version stamp (auto-generated by rebuild-db-image.sh)
+-- Head: $HEAD  Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)
+INSERT INTO public.alembic_version (version_num)
+VALUES ('$HEAD')
+ON CONFLICT DO NOTHING;
+EOF
+
+<span class="cm"># 5. Build image tagged with head revision</span>
+docker build -f docker/postgres-init/Dockerfile \
+  -t tawa-postgres:$HEAD \
+  -t tawa-postgres:latest \
+  docker/postgres-init/
+
+echo "[rebuild] tawa-postgres:$HEAD built successfully"
+echo "[rebuild] Update docker-compose.yml image: tawa-postgres:$HEAD"
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ───── SQL FILES ───── -->
+<h2 id="s2-files" class="section-anchor">3. The Three SQL Files — Purpose and Rules</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Source</th>
+      <th>Purpose</th>
+      <th>Update Trigger</th>
+      <th>Must Be Idempotent?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>01_extensions.sql</code></td>
+      <td>Hand-written</td>
+      <td>CREATE EXTENSION IF NOT EXISTS pg_trgm. Runs before schema — pg_trgm must exist before the GIN trgm indexes in 02_schema.sql are created.</td>
+      <td>Never (unless a new extension is added to migrations)</td>
+      <td>Yes — <code>IF NOT EXISTS</code></td>
+    </tr>
+    <tr>
+      <td><code>02_schema.sql</code></td>
+      <td>pg_dump --schema-only from a fully-migrated live DB</td>
+      <td>All DDL: tables, constraints, indexes, sequences, functions (arabic_normalize, check_journal_balanced), triggers (ledger_journal_balanced), views. Automatically includes alembic_version TABLE DDL but NOT its rows.</td>
+      <td>Every new Alembic migration. Run rebuild script.</td>
+      <td>Yes — <code>--clean --if-exists</code> prepends DROP IF EXISTS before each object</td>
+    </tr>
+    <tr>
+      <td><code>03_stamp.sql</code></td>
+      <td>Hand-written (auto-updated by rebuild script)</td>
+      <td>INSERT the current head revision into alembic_version so alembic finds the correct state on first startup. Must match the DB state captured in 02_schema.sql exactly.</td>
+      <td>Every new Alembic migration (same trigger as 02). Rebuild script auto-updates this.</td>
+      <td>Yes — <code>ON CONFLICT DO NOTHING</code></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout callout-crit">
+  <strong>Critical: search_path is empty after pg_dump header.</strong> pg_dump emits <code>SELECT pg_catalog.set_config('search_path', '', false);</code>. Every SQL statement in 02_schema.sql that pg_dump generated is fully schema-qualified (<code>public.tablename</code>). The hand-written 03_stamp.sql must also be schema-qualified — use <code>public.alembic_version</code>, never bare <code>alembic_version</code>. 01_extensions.sql runs in a separate psql session so it is unaffected.
+</div>
+
+<h3>What pg_dump captures (relevant to Tawa)</h3>
+<ul style="margin: 8px 0 12px 20px; font-size: 14px; line-height: 2;">
+  <li>All 171 migrations' final DDL state — tables, columns, constraints, indexes</li>
+  <li><code>arabic_normalize(TEXT)</code> IMMUTABLE plpgsql function</li>
+  <li><code>check_journal_balanced()</code> trigger function</li>
+  <li><code>ledger_journal_balanced</code> CONSTRAINT TRIGGER (DEFERRABLE INITIALLY DEFERRED)</li>
+  <li>pg_trgm GIN indexes (assuming 01_extensions.sql ran first)</li>
+  <li>All feature_toggle seed rows — NO (schema-only; data is NOT captured)</li>
+  <li>alembic_version TABLE — YES; alembic_version ROW — NO</li>
+</ul>
+
+<div class="callout callout-warn">
+  <strong>Feature toggle seeded rows are NOT in 02_schema.sql.</strong> 60 migrations use <code>op.execute()</code> for INSERT statements — these are data, not schema. On a fresh Stage-2 container, the backend will start without any feature_toggle rows. Verify on first boot: <code>SELECT name, enabled FROM feature_toggles ORDER BY name;</code>. If toggles control critical behavior (split_payment, loyalty), they must be seeded separately or via a post-init migration. The preferred approach is a dedicated <code>04_seed_feature_toggles.sql</code> generated from the live DB with <code>pg_dump --data-only --table=feature_toggles</code>.
+</div>
+
+<!-- ───── DOCKERFILE ───── -->
+<h2 id="s2-dockerfile" class="section-anchor">4. Dockerfile — Exact Content</h2>
+
+<div class="code-wrap">
+<div class="code-label">docker/postgres-init/Dockerfile</div>
+<pre>
+<span class="cm"># Tawa Stage-2 — Custom postgres image with baked-in schema
+# Build: docker build -f docker/postgres-init/Dockerfile -t tawa-postgres:ab20 docker/postgres-init/
+# Tag convention: tawa-postgres:{alembic_head}
+# Rebuild trigger: every new Alembic migration (use scripts/rebuild-db-image.sh)</span>
+
+FROM postgres:16-alpine@sha256:4e6e670bb069649261c9c18031f0aded7bb249a5b6664ddec29c013a89310d50
+
+<span class="cm"># Encoding args only apply on first init (empty data directory).
+# These match the values used when the source DB was initialized.</span>
+ENV POSTGRES_INITDB_ARGS="--encoding=UTF8 --lc-collate=C --lc-ctype=C"
+
+<span class="cm"># Docker executes .sql files in /docker-entrypoint-initdb.d/ in
+# lexicographic order (01 → 02 → 03). Each file runs in a separate
+# psql session with -v ON_ERROR_STOP=1 — any SQL error stops init.</span>
+COPY 01_extensions.sql /docker-entrypoint-initdb.d/
+COPY 02_schema.sql     /docker-entrypoint-initdb.d/
+COPY 03_stamp.sql      /docker-entrypoint-initdb.d/
+
+<span class="cm"># Optional: include seed data for feature_toggles
+# COPY 04_seed_feature_toggles.sql /docker-entrypoint-initdb.d/</span>
+</pre>
+</div>
+
+<div class="callout callout-info">
+  <strong>The digest pin is mandatory.</strong> <code>postgres:16-alpine</code> without a digest is a mutable tag — a CI rebuild six months from now could silently pull a different image. The digest <code>sha256:4e6e670bb069649261c9c18031f0aded7bb249a5b6664ddec29c013a89310d50</code> was verified from the existing docker-compose.yml. Keep it pinned here.
+</div>
+
+<!-- ───── TOP 15 SCENARIOS ───── -->
+<h2 id="s2-scenarios" class="section-anchor">5. Top 15 Critical Scenarios</h2>
+
+<div class="scenario-list">
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">BUILD-05</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">02_schema.sql generated but 03_stamp.sql left at old revision</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Developer runs pg_dump manually, forgets to update 03_stamp.sql. Image built and deployed.</div>
+    <div class="scenario-trigger"><strong>Impact:</strong> alembic finds e.g. <code>aa15</code> stamped, attempts to run migrations aa16–ab20. Tables already exist → crash-loop.</div>
+    <div class="scenario-mit">Use <code>scripts/rebuild-db-image.sh</code> which atomically updates both files and verifies they match before building.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">BUILD-06</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">02_schema.sql generated without 01_extensions.sql running first</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> pg_dump run against a DB that had pg_trgm active; dump includes GIN trgm indexes. On a fresh container, 02_schema.sql executes before 01_extensions.sql (wrong sort order).</div>
+    <div class="scenario-trigger"><strong>Impact:</strong> <code>CREATE INDEX USING gin(... gin_trgm_ops)</code> fails — extension not yet loaded. Full init fails.</div>
+    <div class="scenario-mit">File naming guarantees order: 01 always before 02. Verify with <code>ls docker/postgres-init/</code> — must be 01 &lt; 02 &lt; 03. The <code>--clean --if-exists</code> flag makes 02 self-repairing on re-run.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">STARTUP-02</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">alembic_version empty on a non-fresh DB (corrupt state)</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Someone manually deletes the alembic_version row or truncates the table on a running deployment.</div>
+    <div class="scenario-trigger"><strong>Impact:</strong> Entrypoint sees COUNT=0, stamps head. But the schema is not guaranteed to match ab20 if this is a database that was at a different revision. Silent mismatch.</div>
+    <div class="scenario-mit">The stamp path should also verify: <code>SELECT COUNT(*) FROM information_schema.tables WHERE table_name='orders'</code> &gt; 0 as a secondary check. Add this guard to entrypoint.sh for production.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">STARTUP-17</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">pg_isready returns true before initdb.d scripts finish</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> postgres accepts connections (pg_isready = success) while 02_schema.sql is still executing. The migrate service starts, sees alembic_version empty, stamps or upgrades against a half-initialized schema.</div>
+    <div class="scenario-trigger"><strong>Impact:</strong> Race condition. Intermittent failures on fast hardware.</div>
+    <div class="scenario-mit">The <code>start_period: 20s</code> on postgres healthcheck covers initdb (~5–8 s). The first successful pg_isready probe only counts after start_period elapses, by which time initdb is complete. Do not reduce start_period below 15s.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">OPS-14</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">Team uses 02_schema.sql as a production backup/restore mechanism</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Developer sees 02_schema.sql and assumes it is a full backup. Restores from it during incident. All data is lost.</div>
+    <div class="scenario-trigger"><strong>Impact:</strong> Complete data loss on production.</div>
+    <div class="scenario-mit">Add a prominent comment at the top of 02_schema.sql: <code>-- SCHEMA DDL ONLY — NO DATA. Use pg_dump without --schema-only for backups.</code> Document this in ops runbook.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">OPS-04</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">Feature toggle rows absent on fresh container</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Stage-2 init creates schema without data. split_payment_enabled, loyalty_redemption_enabled are missing from feature_toggles. Backend code reads them on startup and crashes or defaults to wrong state.</div>
+    <div class="scenario-mit">Generate <code>04_seed_feature_toggles.sql</code> from live DB: <code>docker exec postgres pg_dump --data-only --table=feature_toggles -U postgres -d libya_platform</code>. Include in custom image. Re-generate alongside 02_schema.sql.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">OPS-24</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">New migration ab21 deployed without rebuilding custom postgres image</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Developer adds migration ab21, deploys backend, but the postgres image is still baked at ab20. Backend entrypoint stamps ab20, alembic skips ab21 (COUNT &gt; 0 path runs upgrade head → applies ab21 correctly). Actually this is fine — this is the designed path. Only fails if the stamp path fires on a non-fresh DB.</div>
+    <div class="scenario-mit">The designed behavior handles this correctly. The entrypoint only stamps on COUNT=0 (fresh DB). Existing DBs always run upgrade head, which applies ab21. Document this in team onboarding.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">RECOVERY-04</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">docker compose down -v on production</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Anyone runs <code>docker compose down -v</code>. The pg_data named volume is deleted. All data is lost. init.sql recreates the schema on next start but all orders, users, providers are gone.</div>
+    <div class="scenario-mit">The custom image with baked schema makes recovery fast (fresh schema in 8 s) but does NOT replace backups. Implement pg_dump cron backup BEFORE Stage-2 deploy. Restrict <code>docker compose down -v</code> to documented disaster-recovery runbook only.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">BUILD-11</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">CONCURRENTLY index added to a future migration causes initdb failure</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> A future migration uses CREATE INDEX CONCURRENTLY. This requires being outside a transaction. Docker's initdb runs each file in a transaction. The index creation fails with "ERROR: CREATE INDEX CONCURRENTLY cannot run inside a transaction block."</div>
+    <div class="scenario-mit">The analysis confirms zero CONCURRENTLY indexes in current 171 migrations. Add a lint check to CI: <code>grep -r CONCURRENTLY backend/alembic/versions/ &amp;&amp; echo "WARN: CONCURRENTLY index found — requires special handling in init.sql"</code>. For any future CONCURRENTLY index, the rebuild script must add a post-transaction <code>CREATE INDEX CONCURRENTLY</code> call outside the main DDL block.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">STARTUP-09</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">postgres container has no restart policy — stays crashed</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> postgres OOM killed or disk full. Current config has no restart policy (Docker default = no). Container stays dead. All services that depend on it are stuck. Manual intervention required.</div>
+    <div class="scenario-mit">Add <code>restart: unless-stopped</code> to postgres service in docker-compose.yml. This is a one-line change. Also add to backend-core and redis.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">TEAM-21</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">Manual pg_dump taken at wrong moment (partial transaction)</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> pg_dump run while an alembic upgrade is in progress. The dump captures a schema at an intermediate migration state. The stamp in 03_stamp.sql claims ab20 but schema is actually at ab18.</div>
+    <div class="scenario-mit">The rebuild script verifies source DB head BEFORE running pg_dump. Never run pg_dump manually for init.sql — always use the rebuild script which enforces this order.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">BUILD-14</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">02_schema.sql committed but not rebuilt after 3 migrations</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Developer adds ab21, ab22, ab23 over 3 days but only rebuilds the image after ab23. The commit history shows 02_schema.sql updated once for ab23. Team member tries to set up dev env between ab21 and ab22.</div>
+    <div class="scenario-mit">The upgrade head path in entrypoint handles this: the entrypoint stamps only COUNT=0. If someone spins up against an image at ab20 and the backend is at ab22, upgrade head runs ab21+ab22. The init image is a performance optimization, not a correctness dependency.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">OPS-12</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">arabic_normalize function lost — not captured in pg_dump</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> pg_dump run with a flag that excludes functions, or against a DB where the function was never created. GIN trgm indexes that depend on arabic_normalize fail at query time.</div>
+    <div class="scenario-mit">Verify after dump generation: <code>grep -c "arabic_normalize" docker/postgres-init/02_schema.sql</code> must return ≥ 2 (definition + at least one usage). Add this check to the rebuild script.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">STARTUP-22</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">DATABASE_SYNC_URL not set — entrypoint psql call fails silently</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> New environment missing DATABASE_SYNC_URL env var. The <code>psql "$DATABASE_SYNC_URL"</code> call in entrypoint.sh uses an empty URL, fails, the <code>|| echo 0</code> catches it, COUNT=0, and the entrypoint stamps on an existing DB.</div>
+    <div class="scenario-mit">Add explicit env check at top of entrypoint.sh: <code>[ -z "$DATABASE_SYNC_URL" ] &amp;&amp; echo "ERROR: DATABASE_SYNC_URL not set" &amp;&amp; exit 1</code>. Document required env vars in docker-compose.yml comments.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">BUILD-20</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">ledger_journal_balanced trigger missing from dump — function defined after trigger</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> pg_dump dependency ordering puts the trigger before the function definition (should not happen but possible with --clean). The function CREATE fails because the trigger references it.</div>
+    <div class="scenario-mit">pg_dump handles dependency ordering correctly — function definitions always precede the triggers that reference them. Verify: <code>grep -n "check_journal_balanced\|ledger_journal_balanced" 02_schema.sql</code> — function definition line number must be lower than trigger definition line number.</div>
+  </div>
+
+</div>
+
+<!-- ───── VERIFICATION CHECKLIST ───── -->
+<h2 id="s2-checklist" class="section-anchor">6. Stage-2 Verification Checklist (10 items)</h2>
+
+<ul class="checklist">
+  <li><div class="ck"></div><span>Source DB is at correct head: <code>SELECT version_num FROM public.alembic_version;</code> returns <code>ab20_staff_evaluation</code></span></li>
+  <li><div class="ck"></div><span>03_stamp.sql revision string matches: <code>grep ab20 docker/postgres-init/03_stamp.sql</code> returns one match</span></li>
+  <li><div class="ck"></div><span>PG functions captured: <code>grep -c "arabic_normalize\|check_journal_balanced\|ledger_journal_balanced" docker/postgres-init/02_schema.sql</code> ≥ 3</span></li>
+  <li><div class="ck"></div><span>Extensions excluded from schema dump (to avoid COMMENT ON EXTENSION error): <code>grep -c "COMMENT ON EXTENSION" docker/postgres-init/02_schema.sql</code> = 0</span></li>
+  <li><div class="ck"></div><span>Custom image builds without error: <code>docker build -f docker/postgres-init/Dockerfile -t tawa-postgres:ab20 docker/postgres-init/ 2>&amp;1 | tail -3</code> shows "Successfully built"</span></li>
+  <li><div class="ck"></div><span>Fresh container init completes in &lt; 15 s: <code>time docker run --rm -e POSTGRES_PASSWORD=postgres tawa-postgres:ab20</code></span></li>
+  <li><div class="ck"></div><span>alembic_version correct after init: <code>docker exec &lt;container&gt; psql -U postgres -d libya_platform -c "SELECT version_num FROM alembic_version;"</code> = <code>ab20_staff_evaluation</code></span></li>
+  <li><div class="ck"></div><span>alembic upgrade head is a no-op against the custom image: <code>alembic upgrade head</code> output contains "No upgrade needed" or "Running upgrade  -&gt; ab20" (zero migrations applied)</span></li>
+  <li><div class="ck"></div><span>postgres healthcheck passes within start_period: <code>docker inspect &lt;postgres_container&gt; | jq '.[0].State.Health.Status'</code> = "healthy" within 25 s</span></li>
+  <li><div class="ck"></div><span>Backend tests pass against the new image: <code>python -m pytest backend/tests/ -q --tb=no</code> — 1764 pass / 10 pre-existing isolation failures / 0 new failures</span></li>
+</ul>
+
+<!-- ───── ROLLBACK ───── -->
+<h2 id="s2-rollback" class="section-anchor">7. Stage-2 Rollback Plan</h2>
+
+<div class="callout callout-ok">
+  <strong>Rollback is always available</strong> because the Stage-2 changes are in infrastructure only (Dockerfile, SQL files, entrypoint.sh, docker-compose.yml). Application code and database data are untouched.
+</div>
+
+<div class="steps">
+  <div class="step">
+    <h3>Identify failure mode</h3>
+    <p>If the postgres container fails to start: check <code>docker logs &lt;postgres_container&gt;</code> for SQL errors in init.sql execution.<br>
+    If the backend fails to start: check whether alembic_version row is correct and whether migrate service exited 0.</p>
+  </div>
+  <div class="step">
+    <h3>Immediate: revert docker-compose.yml to stock postgres image</h3>
+    <div class="code-wrap">
+<pre>
+<span class="cm"># In docker-compose.yml, change:</span>
+<span class="cm"># image: tawa-postgres:ab20</span>
+<span class="cm"># back to:</span>
+image: postgres:16-alpine@sha256:4e6e670bb069649261c9c18031f0aded7bb249a5b6664ddec29c013a89310d50
+
+<span class="cm"># Also remove the migrate service and restore backend-core depends_on:</span>
+depends_on:
+  postgres:
+    condition: service_healthy
+</pre>
+    </div>
+  </div>
+  <div class="step">
+    <h3>If data volume is intact: restart with original config</h3>
+    <div class="code-wrap">
+<pre>
+docker compose up -d postgres
+<span class="cm"># Wait for healthy, then:</span>
+docker compose up -d backend-core
+<span class="cm"># Alembic upgrade head runs from entrypoint.sh as before</span>
+</pre>
+    </div>
+  </div>
+  <div class="step">
+    <h3>Revert entrypoint.sh</h3>
+    <div class="code-wrap">
+<pre>
+<span class="cm"># Restore original two-line entrypoint:</span>
+#!/bin/sh
+set -e
+alembic upgrade head
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+</pre>
+    </div>
+  </div>
+  <div class="step">
+    <h3>If pg_data volume was lost: restore from backup</h3>
+    <p>The custom image re-creates the schema but cannot restore data. A pg_dump data backup (separate from init.sql) is required. This is a pre-Stage-2 dependency — verify backup exists before deployment.</p>
+  </div>
+</div>
+
+<!-- ───── DECISIONS ───── -->
+<h2 id="s2-d1" class="section-anchor">8. DECIDED: Multi-File vs Single init.sql</h2>
+
+<div class="decided">
+  <div class="decided-label">Decision</div>
+  <div class="decided-title">Multi-file approach: 01_extensions.sql + 02_schema.sql + 03_stamp.sql</div>
+  <p><strong>Rejected:</strong> single init.sql combining all three.</p>
+  <p><strong>Reason 1 — Ordering integrity:</strong> pg_trgm extension must exist before the GIN trgm indexes in the schema dump. Separate files with lexicographic naming (01/02/03) enforce this order unconditionally, with no reliance on careful editing of a monolithic file.</p>
+  <p><strong>Reason 2 — Targeted regeneration:</strong> When a new migration is added, only 02_schema.sql and 03_stamp.sql need regeneration. 01_extensions.sql is stable and never needs to change unless a new extension is introduced. In a single-file setup, the whole file is regenerated and the extension line can drift.</p>
+  <p><strong>Reason 3 — Error isolation:</strong> Docker's initdb runs each file as a separate psql session with <code>-v ON_ERROR_STOP=1</code>. A failure in 02_schema.sql does not silently skip 01_extensions.sql. Error output names the exact failing file.</p>
+  <p><strong>Reason 4 — Diffability:</strong> A schema regeneration produces a clean diff on 02_schema.sql only. Code review can see exactly what changed between ab20 and ab21. A single file changes entirely.</p>
+</div>
+
+<h2 id="s2-d2" class="section-anchor">9. DECIDED: Update Policy After New Migrations</h2>
+
+<div class="decided">
+  <div class="decided-label">Decision</div>
+  <div class="decided-title">Regenerate on every new Alembic migration using scripts/rebuild-db-image.sh</div>
+  <p><strong>Trigger:</strong> Any new migration file added to <code>backend/alembic/versions/</code>.</p>
+  <p><strong>What the rebuild script does atomically:</strong> (1) verifies source DB is at the correct head, (2) pg_dumps to 02_schema.sql, (3) updates 03_stamp.sql with the new head, (4) builds and tags the image as <code>tawa-postgres:{head}</code>.</p>
+  <p><strong>Image tagging convention:</strong> <code>tawa-postgres:ab20</code>, <code>tawa-postgres:ab21</code>, etc. The tag encodes the migration head, making it immediately visible in docker ps or docker images which schema version is running.</p>
+  <p><strong>Why not lazy regeneration (only when performance matters):</strong> The stamp in 03_stamp.sql must always match the schema in 02_schema.sql. Allowing them to drift — even temporarily — creates a class of bugs (scenario BUILD-05) that are extremely hard to diagnose. The rebuild script takes ~30 seconds and prevents an entire category of production incidents.</p>
+  <p><strong>Exception:</strong> If the source DB (the fully-migrated reference DB) is not available at migration time (e.g., the migration is written and reviewed before deployment), defer the image rebuild to immediately before the migration is applied to a live DB. Never commit a 03_stamp.sql pointing to a revision that is not yet in the reference DB.</p>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════
+     MULTI-DEVICE SECTION
+════════════════════════════════════════════ -->
+
+<h2 id="md-approach" class="section-anchor">10. Multi-Device group_id — Recommended Approach</h2>
+
+<p>Remove the localStorage dependency entirely. The <code>group_id</code> column already exists on the <code>Order</code> model and is populated for all group orders. The bug is a pure serialization gap — the data has been in the database since the cart feature shipped; it just was never included in the API response.</p>
+
+<div class="callout callout-crit">
+  <strong>The localStorage approach fails on a second device by design.</strong> localStorage is per-origin per-browser-instance. An order placed on desktop is invisible as a group order on mobile. The server already knows the relationship — it is stored in <code>orders.group_id</code>. Using localStorage to reconstruct this relationship is architecturally incorrect.
+</div>
+
+<div class="two-col">
+  <div class="col-card">
+    <h4>What changes</h4>
+    <ul style="font-size:13.5px; margin-left:16px; line-height:2">
+      <li>Backend: 1 field added to Pydantic schema + 1 line in serializer</li>
+      <li>Frontend: 2 hooks deleted, 1 render expression changed, 1 type updated</li>
+      <li>Tests: MSW mock updated, new Vitest tests for badge render</li>
+    </ul>
+  </div>
+  <div class="col-card">
+    <h4>What does NOT change</h4>
+    <ul style="font-size:13.5px; margin-left:16px; line-height:2">
+      <li>No database migration — column already exists</li>
+      <li>No new API endpoint</li>
+      <li>No TanStack Query change — group_id rides on the existing orders query</li>
+      <li>Zero N+1 — group_id is a column on the Order row</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ───── CODE ───── -->
+<h2 id="md-code" class="section-anchor">11. Complete Code — All 4 Files</h2>
+
+<h3>File 1: backend/app/modules/orders/schemas.py</h3>
+<p>Add <code>group_id</code> to the <code>OrderSummary</code> Pydantic model after <code>cancel_reason</code> (line 175).</p>
+
+<div class="code-wrap">
+<div class="code-label">backend/app/modules/orders/schemas.py — add after line 175</div>
+<pre>
+    cancel_reason: Optional[str] = None
+    group_id: str | None = None  <span class="cm"># P14-8: API migration from localStorage; NULL = standalone order</span>
+</pre>
+</div>
+
+<div class="callout callout-warn">
+  <strong>Verify exclude_none is NOT used.</strong> Run: <code>grep -r "exclude_none" backend/app/modules/orders/</code>. If any call to <code>.model_dump(exclude_none=True)</code> is found in the orders serialization path, it will silently omit <code>group_id</code> when it is <code>None</code>, producing a field-absent response instead of <code>"group_id": null</code>. The TypeScript <code>group_id?: string | null</code> handles both, but explicit null is preferred.
+</div>
+
+<h3>File 2: backend/app/modules/orders/order_router.py</h3>
+<p>Add one line inside <code>_serialize_order()</code>, at the end of the <code>OrderSummary(...)</code> constructor call (line 150, just before the closing parenthesis).</p>
+
+<div class="code-wrap">
+<div class="code-label">backend/app/modules/orders/order_router.py — inside _serialize_order(), before .model_dump()</div>
+<pre>
+    <span class="cm"># ... existing fields ...</span>
+    cancel_reason=getattr(order, <span class="str">'cancel_reason'</span>, None),
+    group_id=getattr(order, <span class="str">'group_id'</span>, None),  <span class="cm"># P14-8: server-authoritative group membership</span>
+).model_dump()
+</pre>
+</div>
+
+<p>No changes at any of the four call sites (lines 477, 588, 838, 935). The <code>getattr</code> pattern is defensive and future-proof — all call sites benefit automatically.</p>
+
+<h3>File 3: web/src/api/types.ts</h3>
+<p>Add <code>group_id</code> to the <code>OrderSummary</code> interface after <code>cancel_reason</code> (before line 96).</p>
+
+<div class="code-wrap">
+<div class="code-label">web/src/api/types.ts — add after cancel_reason field</div>
+<pre>
+  cancel_reason?: string | null;
+  <span class="cm">/** P14-8: server-authoritative group_id. null = standalone order. undefined = old backend response. */</span>
+  group_id?: string | null;
+  items?: OrderSummaryItem[];
+</pre>
+</div>
+
+<h3>File 4: web/src/pages/customer/OrderHistoryPage.tsx</h3>
+
+<p><strong>Remove lines 59–79</strong> (the <code>groupByOrderId</code> useMemo and <code>navigateToGroup</code> useCallback blocks).</p>
+
+<div class="code-wrap">
+<div class="code-label">OrderHistoryPage.tsx — REMOVE these lines (59–79)</div>
+<pre>
+<span class="cm">// DELETE — P14-8 localStorage reverse lookup</span>
+const groupByOrderId = useMemo&lt;Record&lt;string, string&gt;&gt;(() => {
+  try {
+    const raw = localStorage.getItem(<span class="str">"tawa_group_map"</span>);
+    if (!raw) return {};
+    const map: Record&lt;string, string[]&gt; = JSON.parse(raw);
+    const reverse: Record&lt;string, string&gt; = {};
+    for (const [gid, oids] of Object.entries(map)) {
+      for (const oid of oids) reverse[oid] = gid;
+    }
+    return reverse;
+  } catch {
+    return {};
+  }
+}, []);
+
+<span class="cm">// DELETE</span>
+const navigateToGroup = useCallback(
+  (groupId: string) =&gt; navigate(`/order-group/${groupId}`),
+  [navigate]
+);
+</pre>
+</div>
+
+<p><strong>Update the render block</strong> (lines 258–281): replace <code>groupByOrderId[order.id]</code> with <code>order.group_id</code> in three places.</p>
+
+<div class="code-wrap">
+<div class="code-label">OrderHistoryPage.tsx — NEW render block (replaces lines 258–281)</div>
+<pre>
+{order.group_id &amp;&amp; (
+  &lt;button
+    onClick={(e) =&gt; {
+      e.stopPropagation();
+      navigate(`/order-group/${order.group_id}`);
+    }}
+    aria-label={`${t(<span class="str">"order.group_badge_label"</span>, { defaultValue: <span class="str">"مجموعة"</span> })} #${order.group_id.slice(-8).toUpperCase()}`}
+    style={{
+      marginInlineStart: <span class="str">"0.4rem"</span>,
+      background: <span class="str">"var(--color-primary-bg, rgba(var(--color-primary-rgb,74,158,255),.12))"</span>,
+      color: <span class="str">"var(--color-primary)"</span>,
+      border: <span class="str">"1px solid var(--color-primary)"</span>,
+      borderRadius: 4,
+      padding: <span class="str">"0.1rem 0.4rem"</span>,
+      fontSize: <span class="str">"0.7rem"</span>,
+      fontWeight: 700,
+      cursor: <span class="str">"pointer"</span>,
+      verticalAlign: <span class="str">"middle"</span>,
+    }}
+  &gt;
+    🛒 {t(<span class="str">"order.group_badge"</span>, { defaultValue: <span class="str">"مجموعة"</span> })}
+  &lt;/button&gt;
+)}
+</pre>
+</div>
+
+<!-- ───── IMPORT CHANGES ───── -->
+<h2 id="md-imports" class="section-anchor">12. Import Changes</h2>
+
+<div class="code-wrap">
+<div class="code-label">OrderHistoryPage.tsx — line 1 (import)</div>
+<pre>
+<span class="cm">// BEFORE</span>
+import { useState, useMemo, useCallback } from <span class="str">"react"</span>;
+
+<span class="cm">// AFTER — useCallback removed (navigateToGroup deleted); useMemo kept (orders + filtered memos)</span>
+import { useState, useMemo } from <span class="str">"react"</span>;
+</pre>
+</div>
+
+<div class="table-wrap" style="margin-top:16px">
+<table>
+  <thead><tr><th>Import</th><th>Before</th><th>After</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td><code>useState</code></td><td>used</td><td>keep</td><td>filter/sort state</td></tr>
+    <tr><td><code>useMemo</code></td><td>3 uses</td><td>keep (2 uses)</td><td><code>orders</code> flat memo (line 139) + <code>filtered</code> memo (line 142) — both kept</td></tr>
+    <tr><td><code>useCallback</code></td><td>1 use</td><td><strong>remove</strong></td><td><code>navigateToGroup</code> deleted; no other useCallback in file</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ───── MSW ───── -->
+<h2 id="md-msw" class="section-anchor">13. MSW Handler Update</h2>
+
+<div class="code-wrap">
+<div class="code-label">web/src/test/handlers/customer.ts — replace the /api/orders handler</div>
+<pre>
+<span class="cm">// ── Factory — export for per-test overrides ────────────────────────────</span>
+export function createMockOrder(overrides: Partial&lt;{
+  id: string;
+  order_state: string;
+  total_minor: number;
+  currency: string;
+  payment_method: string;
+  provider_id: string;
+  group_id: string | null;
+  has_dispute: boolean;
+  fulfillment_type: string;
+  delivered_at: string | null;
+}&gt; = {}) {
+  return {
+    id: overrides.id ?? <span class="str">"ord-00000001"</span>,
+    order_state: overrides.order_state ?? <span class="str">"DELIVERED"</span>,
+    financial_compat_state: <span class="str">"settled"</span>,
+    payment_method: overrides.payment_method ?? <span class="str">"CASH"</span>,
+    recipient_mode: <span class="str">"delivery"</span>,
+    total_minor: overrides.total_minor ?? 2500,
+    currency: overrides.currency ?? <span class="str">"LYD"</span>,
+    items_count: 2,
+    created_at: <span class="str">"2026-05-01T12:00:00Z"</span>,
+    delivered_at: overrides.delivered_at ?? null,
+    price_snapshot: {},
+    allowed_actions: [],
+    provider_id: overrides.provider_id ?? <span class="str">"provider-001"</span>,
+    group_id: overrides.group_id ?? null,   <span class="cm">// null = standalone order; explicit null matches Pydantic behavior</span>
+    has_dispute: overrides.has_dispute ?? false,
+    fulfillment_type: overrides.fulfillment_type ?? <span class="str">"DELIVERY"</span>,
+  };
+}
+
+<span class="cm">// ── Default handler — standalone order (group_id: null) ───────────────</span>
+http.get(<span class="str">"/api/orders"</span>, () =&gt; {
+  return HttpResponse.json({
+    items: [createMockOrder()],
+    next_cursor: null,
+    has_more: false,
+  });
+}),
+</pre>
+</div>
+
+<h3>Per-test override for badge render path</h3>
+<div class="code-wrap">
+<div class="code-label">In test files that need a group order</div>
+<pre>
+server.use(
+  http.get(<span class="str">"/api/orders"</span>, () =&gt;
+    HttpResponse.json({
+      items: [createMockOrder({ group_id: <span class="str">"grp-aabbccdd11223344"</span> })],
+      next_cursor: null,
+      has_more: false,
+    })
+  )
+);
+</pre>
+</div>
+
+<h3>New Vitest tests for the badge</h3>
+<div class="code-wrap">
+<div class="code-label">web/src/pages/customer/OrderHistoryPage.test.tsx — new describe block</div>
+<pre>
+describe(<span class="str">"group badge"</span>, () =&gt; {
+  it(<span class="str">"renders badge when order.group_id is set"</span>, async () =&gt; {
+    server.use(
+      http.get(<span class="str">"/api/orders"</span>, () =&gt;
+        HttpResponse.json({ items: [createMockOrder({ group_id: <span class="str">"grp-aabbccdd11223344"</span> })], next_cursor: null, has_more: false })
+      )
+    );
+    renderPage();
+    await waitFor(() =&gt; expect(screen.getByText(<span class="str">/مجموعة/</span>)).toBeInTheDocument());
+  });
+
+  it(<span class="str">"does not render badge when group_id is null"</span>, async () =&gt; {
+    renderPage();  <span class="cm">// default mock returns group_id: null</span>
+    await waitFor(() =&gt; expect(screen.getByText(<span class="str">/ORD-0000/i</span>)).toBeInTheDocument());
+    expect(screen.queryByRole(<span class="str">"button"</span>, { name: <span class="str">/مجموعة/</span> })).toBeNull();
+  });
+
+  it(<span class="str">"navigates to /order-group/:id on badge click"</span>, async () =&gt; {
+    server.use(
+      http.get(<span class="str">"/api/orders"</span>, () =&gt;
+        HttpResponse.json({ items: [createMockOrder({ group_id: <span class="str">"grp-aabbccdd11223344"</span> })], next_cursor: null, has_more: false })
+      )
+    );
+    const user = userEvent.setup();
+    render(
+      &lt;QueryClientProvider client={makeQC()}&gt;
+        &lt;CartProvider&gt;
+          &lt;MemoryRouter initialEntries={[<span class="str">"/"</span>]}&gt;
+            &lt;Routes&gt;
+              &lt;Route path=<span class="str">"/"</span> element={&lt;OrderHistoryPage /&gt;} /&gt;
+              &lt;Route path=<span class="str">"/order-group/:id"</span> element={&lt;div&gt;GROUP PAGE&lt;/div&gt;} /&gt;
+            &lt;/Routes&gt;
+          &lt;/MemoryRouter&gt;
+        &lt;/CartProvider&gt;
+      &lt;/QueryClientProvider&gt;
+    );
+    await waitFor(() =&gt; screen.getByText(<span class="str">/مجموعة/</span>));
+    await user.click(screen.getByRole(<span class="str">"button"</span>, { name: <span class="str">/مجموعة/</span> }));
+    await waitFor(() =&gt; expect(screen.getByText(<span class="str">"GROUP PAGE"</span>)).toBeInTheDocument());
+  });
+});
+</pre>
+</div>
+
+<!-- ───── MULTI-DEVICE SCENARIOS ───── -->
+<h2 id="md-scenarios" class="section-anchor">14. Multi-Device Top 15 Critical Scenarios</h2>
+
+<div class="scenario-list">
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">DAT-20</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">exclude_none=True in serialization path silently omits group_id</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Any call to <code>.model_dump(exclude_none=True)</code> or <code>.model_dump(mode="json", exclude_none=True)</code> in the orders response pipeline causes group_id=None to be omitted. The field is absent from the JSON response. The badge never renders for standalone orders AND is indistinguishable from a backend that never shipped the field.</div>
+    <div class="scenario-mit">Audit: <code>grep -r "exclude_none" backend/app/modules/orders/</code> must return zero results. Pydantic v2 default: <code>model_dump()</code> includes None as explicit null. Do not add exclude_none anywhere in this path.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">BE-07</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">Explicit column SELECT in list_orders query excludes group_id</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> If the SQLAlchemy query uses <code>select(Order.id, Order.status, Order.total_minor, ...)</code> with explicit column names instead of <code>select(Order)</code>, group_id must be in the list. If it is missing, <code>getattr(order, 'group_id', None)</code> always returns None for all orders, silently breaking all group badges.</div>
+    <div class="scenario-mit">Check the query in <code>order_router.py</code> around the list endpoint (line 477 area). If using <code>select(Order)</code> (full model), no change needed. If using explicit columns, add <code>Order.group_id</code>.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">EDGE-20</span>
+      <span class="chip chip-crit">CRIT</span>
+      <span class="scenario-title">Frontend deployed without backend — group_id undefined, old localStorage removed</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Deploy sequence deploys frontend (removes localStorage, renders order.group_id) before backend (which still returns no group_id field). All badges are gone. The old localStorage fallback is also gone. Worse state than before the migration.</div>
+    <div class="scenario-mit">Deploy backend first, then frontend. Or deploy both atomically. If zero-downtime required, keep the localStorage read path as a transitional fallback during the deploy window (see localStorage cleanup decision).</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">BE-10</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">Alembic downgrade removes group_id column — getattr returns None, badge silently disappears</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Someone runs <code>alembic downgrade</code> to the revision before group_id was added. The column is dropped. <code>getattr(order, 'group_id', None)</code> returns None for every order. No crash — silent data loss.</div>
+    <div class="scenario-mit">The <code>getattr</code> default=None is the correct defensive pattern — it prevents a crash. The behavior (badge disappears) is acceptable during a downgrade. Add to downgrade runbook: "group_id badges will be absent after downgrade past the cart-groups migration."</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">DEP-07</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">docker compose restart picks up new backend code but no schema change is needed</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> This change requires no schema change (group_id column already exists). However, the backend image must be rebuilt with the new schemas.py and order_router.py changes. <code>docker compose restart backend-core</code> does not rebuild the image.</div>
+    <div class="scenario-mit">Use <code>docker compose up --build -d backend-core</code> to rebuild and restart. Verify the new build is running: <code>docker exec &lt;container&gt; python3 -c "from app.modules.orders.schemas import OrderSummary; print(OrderSummary.model_fields.keys())"</code> — must include group_id.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">FE-07</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">e.stopPropagation() removed during migration — click on badge navigates to order detail + group page simultaneously</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> The badge button is inside an order card that has an onClick handler. If stopPropagation is removed, clicking the badge fires both the order card navigation and the group navigation. Two route changes in rapid succession cause unpredictable behavior.</div>
+    <div class="scenario-mit">The new render block includes <code>e.stopPropagation()</code>. Do not remove it. Test: in the Vitest navigation test, verify the order card's onClick is NOT fired when the badge is clicked.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">TEST-03</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">No Vitest tests for group badge — regression invisible</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> The current codebase has zero tests for OrderHistoryPage group badge behavior (confirmed: no test file for this component). A refactor could break the badge render with no test failure.</div>
+    <div class="scenario-mit">Add the three Vitest tests in Section 13. These are the minimum coverage: badge shows, badge hidden, badge navigation. Run <code>cd web &amp;&amp; npm test -- OrderHistoryPage</code> to confirm 3 new passing tests.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">DAT-06</span>
+      <span class="chip chip-high">HIGH</span>
+      <span class="scenario-title">group_id references a deleted CartGroup — OrderGroupPage gets 404</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> A cart group is deleted (admin action, cascade, or bug) but the group_id FK on orders still references it. Navigating to <code>/order-group/{id}</code> gets a 404 from the backend. The frontend OrderGroupPage shows an error.</div>
+    <div class="scenario-mit">The <code>group_id</code> FK uses <code>CASCADE</code> on the order model (verify: <code>grep -A2 "group_id" backend/app/models/order.py</code>). If cascade deletes the group_id when the CartGroup is deleted, <code>order.group_id</code> becomes NULL and the badge disappears cleanly. If not, add a 404 error state to OrderGroupPage.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">BE-18</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">Redis cache returns old OrderSummary without group_id after backend deploy</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> If orders list responses are cached in Redis with the old OrderSummary shape (no group_id field), cached responses will return group_id absent until cache TTL expires.</div>
+    <div class="scenario-mit">On deploy: flush the orders cache key pattern — <code>docker exec tawalocal-redis-1 redis-cli KEYS "*orders*" | xargs redis-cli DEL</code>. Or bump the cache key version. The TypeScript <code>group_id?: string | null</code> handles the absent-field case gracefully (undefined is falsy; badge will not render until cache is warm).</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">TEST-08</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">pytest assertion checks exact OrderSummary dict shape and fails on new field</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> A backend test does <code>assert response.json()["items"][0] == {...expected...}</code> with an exact dict comparison. Adding group_id to the response causes the assertion to fail because the expected dict lacks the new key.</div>
+    <div class="scenario-mit">Find: <code>grep -r "group_id\|OrderSummary" backend/tests/</code>. For any exact-dict assertions on order list/create/detail responses, add <code>"group_id": None</code> (or the expected UUID) to the expected dict. Use <code>assert response.json()["items"][0].items() &gt;= {...}.items()</code> (subset assertion) to future-proof against additional fields.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">FE-12</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">TypeScript strictNullChecks not enabled — group_id type errors missed at compile time</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> If <code>strictNullChecks: false</code> in tsconfig, TypeScript will not catch <code>order.group_id.slice(-8)</code> being called on null outside the guard block. The runtime TypeError will only surface in tests or production.</div>
+    <div class="scenario-mit">Verify: <code>grep "strictNullChecks" web/tsconfig.json</code>. If false or absent, the JSX guard still prevents the runtime error — but TypeScript won't catch accidental uses outside the guard. Run <code>cd web &amp;&amp; npm run typecheck</code> as a required gate before merging.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">FE-18</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">tawa_group_map localStorage data persists across logout — leaks group history on shared devices</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Current code writes tawa_group_map but does not clear it on logout. A second user on a shared device can see the previous user's group order history badges until the cleanup runs.</div>
+    <div class="scenario-mit">Add <code>localStorage.removeItem('tawa_group_map')</code> to the logout handler (alongside other session cleanup). This should be done regardless of the migration timeline. After migration completes and the localStorage write is removed from CartGroupCheckoutPage, this becomes moot.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">DAT-15</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">group_id populated on Order model but cart_groups table empty on test DB</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> Integration tests create orders directly in the DB without going through cart checkout. The order has group_id=NULL. The badge correctly does not render. But if a test asserts that a cart-checkout order DOES show a badge, the test DB needs a cart_groups row too.</div>
+    <div class="scenario-mit">Integration tests that test the group badge must create a CartGroup row and assign its id to the order's group_id. Use the existing cart checkout API endpoint in integration tests rather than direct DB insertion.</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">FE-03</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">aria-label truncation: group_id.slice(-8) may expose meaningful UUID segment</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> The aria-label uses the last 8 characters of the group UUID. For most UUIDs this is a safe partial identifier. However, if group UUIDs are sequential (integer-based), the last 8 chars expose the generation order.</div>
+    <div class="scenario-mit">UUIDs in this codebase use uuid4 (random). Last 8 chars carry no predictive information. The current aria-label pattern is acceptable. For screen reader quality, ensure the label also includes context: "مجموعة طلبات #AABB1122".</div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-header">
+      <span class="scenario-id">DEP-14</span>
+      <span class="chip chip-med">MED</span>
+      <span class="scenario-title">Mobile app reads tawa_group_map from shared WebView storage</span>
+    </div>
+    <div class="scenario-trigger"><strong>Trigger:</strong> If the Flutter mobile app uses a WebView that accesses the same localStorage origin as the PWA, removing the tawa_group_map write from CartGroupCheckoutPage could break mobile badge logic that reads this key.</div>
+    <div class="scenario-mit">Verify: <code>grep -r "tawa_group_map" mobile_app/</code> (mobile_app is a forbidden zone — read-only check only). If found, coordinate mobile release with the CartGroupCheckoutPage write removal. If not found (WebView uses separate storage), removal is safe.</div>
+  </div>
+
+</div>
+
+<!-- ───── MULTI-DEVICE CHECKLIST ───── -->
+<h2 id="md-checklist" class="section-anchor">15. Multi-Device Verification Checklist (8 items)</h2>
+
+<ul class="checklist">
+  <li><div class="ck"></div><span>Backend: <code>OrderSummary</code> schema includes group_id: <code>python3 -c "from app.modules.orders.schemas import OrderSummary; print('group_id' in OrderSummary.model_fields)"</code> returns True</span></li>
+  <li><div class="ck"></div><span>exclude_none not in orders path: <code>grep -r "exclude_none" backend/app/modules/orders/</code> returns no results</span></li>
+  <li><div class="ck"></div><span>API response contains group_id: <code>curl -s http://localhost:8000/api/orders -H "Authorization: Bearer ..." | python3 -m json.tool | grep group_id</code> — field present in all items</span></li>
+  <li><div class="ck"></div><span>TypeScript compiles clean: <code>cd web &amp;&amp; npm run typecheck</code> exits 0</span></li>
+  <li><div class="ck"></div><span>useCallback import removed: <code>grep "useCallback" web/src/pages/customer/OrderHistoryPage.tsx</code> returns no results</span></li>
+  <li><div class="ck"></div><span>tawa_group_map not read in OrderHistoryPage: <code>grep "tawa_group_map\|groupByOrderId" web/src/pages/customer/OrderHistoryPage.tsx</code> returns no results</span></li>
+  <li><div class="ck"></div><span>New Vitest tests pass: <code>cd web &amp;&amp; npm test -- OrderHistoryPage 2>&amp;1 | grep "Tests\|PASS\|FAIL"</code> — all 3 new badge tests pass</span></li>
+  <li><div class="ck"></div><span>Backend tests still pass: <code>python -m pytest backend/tests/ -q --tb=no</code> — same pass count as baseline (1764 / 10 pre-existing / 0 new)</span></li>
+</ul>
+
+<!-- ───── DECISIONS ───── -->
+<h2 id="md-d1" class="section-anchor">16. DECIDED: localStorage Cleanup Strategy</h2>
+
+<div class="decided">
+  <div class="decided-label">Decision</div>
+  <div class="decided-title">Add one-time removeItem in main.tsx; do NOT add transitional dual-source logic</div>
+  <p><strong>Rationale:</strong> Backend and frontend deploy together in this project. There is no window where new frontend talks to old backend (deploy is atomic). The transitional dual-source approach (reading both order.group_id AND localStorage) adds 15+ lines of code that must be reverted in a second PR — this increases risk without benefit in an atomic deploy context.</p>
+  <p><strong>In main.tsx (or auth initialization), add once:</strong></p>
+  <div class="code-wrap" style="margin-top:8px">
+<pre>
+<span class="cm">// One-time cleanup — remove old localStorage group map after API migration</span>
+<span class="cm">// Safe to call on every app start; removeItem on missing key is a no-op</span>
+try {
+  localStorage.removeItem(<span class="str">'tawa_group_map'</span>);
+} catch {
+  <span class="cm">// private browsing / quota errors — silent ignore</span>
+}
+</pre>
+  </div>
+  <p><strong>Also add to logout handler</strong> alongside other session cleanup to prevent cross-user leakage on shared devices.</p>
+</div>
+
+<h2 id="md-d2" class="section-anchor">17. DECIDED: When to Remove CartGroupCheckoutPage localStorage Write</h2>
+
+<div class="decided">
+  <div class="decided-label">Decision</div>
+  <div class="decided-title">Remove the CartGroupCheckoutPage localStorage write after 2 full deployment cycles confirm API group_id is working</div>
+  <p><strong>Current write location:</strong> <code>CartGroupCheckoutPage.tsx</code> lines 392–399. It is inside a try/catch with a 20-entry LRU cap — harmless to leave temporarily.</p>
+  <p><strong>Removal conditions (ALL must be true):</strong></p>
+  <ul style="margin:6px 0 0 16px; font-size:14px; line-height:2">
+    <li>Backend has returned group_id in OrderSummary for at least 2 full deployment cycles</li>
+    <li>OrderHistoryPage no longer reads tawa_group_map (Phase 2 complete — this PR)</li>
+    <li>Mobile app does NOT read tawa_group_map from shared storage (verified via grep)</li>
+    <li>No other component reads tawa_group_map: <code>grep -r "tawa_group_map" web/src/</code> returns only the write location (which you are about to delete)</li>
+  </ul>
+  <p><strong>Removal is a separate, small PR</strong> — do not bundle it with this migration to keep diffs reviewable.</p>
+</div>
+
+<h2 id="md-d3" class="section-anchor">18. DECIDED: Pydantic v2 Syntax</h2>
+
+<div class="decided">
+  <div class="decided-label">Decision</div>
+  <div class="decided-title">Use <code>str | None = None</code> (modern Python 3.10+ union syntax)</div>
+  <p><strong>Rejected:</strong> <code>Optional[str] = None</code> (Pydantic v1 style).</p>
+  <p><strong>Both are runtime-identical in Pydantic v2.</strong> The modern form is preferred because it is shorter, requires no import, and aligns with the Python 3.10+ standard that is active in this codebase. Pydantic v2 documentation uses this form in all examples.</p>
+  <p><strong>If the file already uses Optional throughout:</strong> add the new field with <code>str | None = None</code> regardless. Do not refactor existing Optional fields in the same PR — that is a scope expansion with no functional benefit. Mixed use within the same file is acceptable in Pydantic v2.</p>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════
+     CROSS-CUTTING
+════════════════════════════════════════════ -->
+
+<h2 id="cc-deploy" class="section-anchor">19. Cross-Cutting: Deployment Order</h2>
+
+<div class="callout callout-crit">
+  <strong>Backend must deploy before or simultaneously with frontend.</strong> Never deploy frontend (which reads order.group_id) before the backend returns the group_id field. The reverse (backend deployed first, old frontend still running) is fully safe — old frontend ignores the new field.
+</div>
+
+<div class="steps">
+  <div class="step">
+    <h3>Pre-deploy: build and verify both artifacts</h3>
+    <p>Build backend image. Run <code>python -m pytest backend/tests/ -q --tb=no</code> (1764/10/0).<br>
+    Run <code>cd web &amp;&amp; npm run build &amp;&amp; npm run typecheck &amp;&amp; npm test</code> (all clean).</p>
+  </div>
+  <div class="step">
+    <h3>Pre-deploy: build and push custom postgres image (Stage-2 only)</h3>
+    <p>Run <code>scripts/rebuild-db-image.sh</code>. Tag: <code>tawa-postgres:ab20</code>.<br>
+    Push to all targets that use the custom image.</p>
+  </div>
+  <div class="step">
+    <h3>Deploy backend (Stage-2 + group_id schema change)</h3>
+    <p>Deploy to all 4 targets per MANDATORY DEPLOY RULE (Production only on explicit operator authorization).<br>
+    Wait for backend-core healthcheck to pass.</p>
+  </div>
+  <div class="step">
+    <h3>Smoke test group_id on deployed backend</h3>
+    <p><code>curl -s https://staging.tawanow.com/api/orders -H "Authorization: Bearer ..." | python3 -m json.tool | grep group_id</code> — must appear in response.</p>
+  </div>
+  <div class="step">
+    <h3>Deploy frontend</h3>
+    <p>Deploy built web assets. Run <code>cd web &amp;&amp; npm run test:e2e</code> (40/40).<br>
+    Verify badge renders for a known group order on staging.</p>
+  </div>
+</div>
+
+<!-- ───── TESTING STRATEGY ───── -->
+<h2 id="cc-testing" class="section-anchor">20. Combined Testing Strategy</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Test Layer</th>
+      <th>What It Covers</th>
+      <th>Command</th>
+      <th>Expected Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Backend unit (pytest)</td>
+      <td>OrderSummary.group_id in schema; getattr returns correct value; serialization produces group_id in output</td>
+      <td><code>pytest backend/tests/ -q --tb=no</code></td>
+      <td>1764 pass, 10 pre-existing fail, 0 new fail</td>
+    </tr>
+    <tr>
+      <td>Frontend Vitest</td>
+      <td>Badge shows/hides based on order.group_id; navigation fires on click; MSW mock includes group_id field</td>
+      <td><code>cd web &amp;&amp; npm test</code></td>
+      <td>854 + 3 new badge tests = 857 pass</td>
+    </tr>
+    <tr>
+      <td>TypeScript</td>
+      <td>group_id type correct; useCallback not imported; no unsafe .slice on null</td>
+      <td><code>cd web &amp;&amp; npm run typecheck</code></td>
+      <td>0 errors</td>
+    </tr>
+    <tr>
+      <td>Lint</td>
+      <td>No unused imports (useCallback removed)</td>
+      <td><code>cd web &amp;&amp; npm run lint</code></td>
+      <td>0 errors</td>
+    </tr>
+    <tr>
+      <td>Build</td>
+      <td>Tree-shaking removes dead code; no bundle errors</td>
+      <td><code>cd web &amp;&amp; npm run build</code></td>
+      <td>exit 0</td>
+    </tr>
+    <tr>
+      <td>E2E mocked</td>
+      <td>OrderHistoryPage renders without crash; badge navigates</td>
+      <td><code>cd web &amp;&amp; npm run test:e2e</code></td>
+      <td>40/40 pass</td>
+    </tr>
+    <tr>
+      <td>Stage-2 init</td>
+      <td>Custom postgres image initializes in &lt;15 s; alembic_version correct; alembic upgrade head is no-op</td>
+      <td>Manual: rebuild + spin up fresh container</td>
+      <td>VERSION=ab20, upgrade head 0 migrations applied</td>
+    </tr>
+    <tr>
+      <td>FIN-COR</td>
+      <td>Feature flag contracts unchanged</td>
+      <td><code>python3 platform/_ai_tools/bin/contract_flag_hash_check.py</code></td>
+      <td>PASS</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ───── RISK MATRIX ───── -->
+<h2 id="cc-risk" class="section-anchor">21. Risk Matrix — Top 10</h2>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Risk</th>
+      <th>Severity</th>
+      <th>Likelihood</th>
+      <th>Mitigation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="risk-row-crit">
+      <td>1</td>
+      <td>Stage-2 stamp/schema mismatch → crash-loop on fresh deploy</td>
+      <td><span class="chip chip-crit">CRIT</span></td>
+      <td>Medium (manual process)</td>
+      <td>Always use rebuild-db-image.sh; never update 02/03 independently</td>
+    </tr>
+    <tr class="risk-row-crit">
+      <td>2</td>
+      <td>Frontend deployed before backend → group_id absent, badges broken with no fallback</td>
+      <td><span class="chip chip-crit">CRIT</span></td>
+      <td>Low (procedural)</td>
+      <td>Deploy backend first; smoke test API response before frontend deploy</td>
+    </tr>
+    <tr class="risk-row-crit">
+      <td>3</td>
+      <td>docker compose down -v on production deletes all data</td>
+      <td><span class="chip chip-crit">CRIT</span></td>
+      <td>Low</td>
+      <td>Implement pg_dump backup cron before Stage-2 deploy; restrict -v flag in runbook</td>
+    </tr>
+    <tr class="risk-row-high">
+      <td>4</td>
+      <td>exclude_none in serialization → group_id silently omitted, badges never render</td>
+      <td><span class="chip chip-high">HIGH</span></td>
+      <td>Low</td>
+      <td>Grep audit before deploy; add backend test asserting group_id in response JSON</td>
+    </tr>
+    <tr class="risk-row-high">
+      <td>5</td>
+      <td>Feature toggle rows absent on fresh Stage-2 container → wrong app behavior</td>
+      <td><span class="chip chip-high">HIGH</span></td>
+      <td>High (by design — data not in schema dump)</td>
+      <td>Add 04_seed_feature_toggles.sql to custom image before any production use</td>
+    </tr>
+    <tr class="risk-row-high">
+      <td>6</td>
+      <td>postgres service has no restart policy → stays crashed after OOM</td>
+      <td><span class="chip chip-high">HIGH</span></td>
+      <td>Medium</td>
+      <td>Add restart: unless-stopped to all services in docker-compose.yml</td>
+    </tr>
+    <tr class="risk-row-high">
+      <td>7</td>
+      <td>pg_isready fires before initdb.d completes → migrate service sees empty alembic_version → stamps wrong revision</td>
+      <td><span class="chip chip-high">HIGH</span></td>
+      <td>Low (covered by start_period)</td>
+      <td>Keep postgres start_period ≥ 15s; never reduce below initdb execution time</td>
+    </tr>
+    <tr class="risk-row-high">
+      <td>8</td>
+      <td>Explicit column SELECT in list_orders missing group_id → getattr always returns None</td>
+      <td><span class="chip chip-high">HIGH</span></td>
+      <td>Low</td>
+      <td>Verify query uses select(Order) not explicit column list; add test asserting non-null group_id</td>
+    </tr>
+    <tr class="risk-row-med">
+      <td>9</td>
+      <td>Backend test exact-dict assertions fail on new group_id field</td>
+      <td><span class="chip chip-med">MED</span></td>
+      <td>Medium</td>
+      <td>Run pytest before deploy; update expected dicts with "group_id": None</td>
+    </tr>
+    <tr class="risk-row-med">
+      <td>10</td>
+      <td>tawa_group_map write in CartGroupCheckoutPage removed before API migration is proven stable</td>
+      <td><span class="chip chip-med">MED</span></td>
+      <td>Low (if removal is gated)</td>
+      <td>Keep write for 2 deployment cycles per DECIDED § 17; remove in separate PR</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ───── OPERATOR AUTHORIZATION ───── -->
+<h2 id="cc-auth" class="section-anchor">22. Operator Authorization Requirements</h2>
+
+<div class="callout callout-info">
+  Per the project governance model, the following items require explicit operator authorization before execution. None of the implementation changes below (code edits, test additions, custom image build) require authorization — only the deployment steps do.
+</div>
+
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>Action</th>
+      <th>Authorization Needed?</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Implement code changes (backend schema, serializer, frontend migration)</td>
+      <td><span class="chip chip-ok">NO</span></td>
+      <td>Engineering work only; no data or config changes</td>
+    </tr>
+    <tr>
+      <td>Run tests locally and on CI</td>
+      <td><span class="chip chip-ok">NO</span></td>
+      <td>Standard pre-deploy gate</td>
+    </tr>
+    <tr>
+      <td>Build custom postgres image (tawa-postgres:ab20)</td>
+      <td><span class="chip chip-ok">NO</span></td>
+      <td>Local/CI build; not deployed until authorized</td>
+    </tr>
+    <tr>
+      <td>Deploy to test-1 (Kali local, test.tawanow.com)</td>
+      <td><span class="chip chip-ok">NO</span></td>
+      <td>Per MANDATORY DEPLOY RULE; test targets deploy with every change</td>
+    </tr>
+    <tr>
+      <td>Deploy to staging (staging.tawanow.com)</td>
+      <td><span class="chip chip-ok">NO</span></td>
+      <td>Internal staging trial; no external access</td>
+    </tr>
+    <tr>
+      <td>Deploy to Production (tawanow.com, 178.105.87.192)</td>
+      <td><span class="chip chip-crit">YES — explicit operator authorization required</span></td>
+      <td>Per CLAUDE.md hard stop; must be explicitly authorized per deploy</td>
+    </tr>
+    <tr>
+      <td>Stage-2 deploy (swap postgres image to custom)</td>
+      <td><span class="chip chip-crit">YES — governance-gated</span></td>
+      <td>Mentioned in CLAUDE.md: "Stage-2 deploy (governance-gated; explicit authorization required)"</td>
+    </tr>
+    <tr>
+      <td>Remove CartGroupCheckoutPage localStorage write</td>
+      <td><span class="chip chip-ok">NO</span></td>
+      <td>Pure code cleanup; follow the 2-cycle gate in DECIDED §17</td>
+    </tr>
+    <tr>
+      <td>Enable wallet_cash_out or wallet_peer_transfer flags</td>
+      <td><span class="chip chip-crit">HARD STOP — never without FIN-COR override</span></td>
+      <td>These flags are unrelated to this work. FIN-COR SHA must remain unchanged.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="callout callout-ok" style="margin-top:24px">
+  <strong>Summary:</strong> Both workstreams (Stage-2 init image + group_id API migration) are implementation-ready. All decisions have been made. All code is specified to copy-paste level. The only gate before staging deployment is passing the test suite. Production deployment requires explicit operator authorization per governance.
+</div>
+
+<p style="margin-top:40px; font-size:12px; color:var(--ink-3)">
+  Tawa Platform Synthesis — Generated 2026-07-06 &nbsp;·&nbsp; alembic head: ab20_staff_evaluation &nbsp;·&nbsp; 171 migrations &nbsp;·&nbsp; 3 SQL files &nbsp;·&nbsp; 4 code files &nbsp;·&nbsp; 240 scenarios total
+</p>
+
+</main>
+
+<script>
+// Highlight active nav link on scroll
+const sections = document.querySelectorAll('.section-anchor');
+const navLinks = document.querySelectorAll('nav a');
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(() => {
+    let active = null;
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 60) active = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + active);
+    });
+    ticking = false;
+  });
+}, { passive: true });
+</script>
+</body>
+</html>

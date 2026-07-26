@@ -1,0 +1,653 @@
+<title>الخطة النهائية — مراجعة عدائية + تكافؤ الميزات مع الويب</title>
+<style>
+  :root{
+    --bg:#0a2f52; --bg2:#0d3862; --line:#eaf4fb; --line-dim:#7fb2d6; --muted:#a9c7dd;
+    --panel:rgba(255,255,255,.045); --panel-strong:rgba(255,255,255,.07); --panel-border:rgba(234,244,251,.22);
+    --grid-line:rgba(234,244,251,.07);
+    --stamp-blocker:#ff6b5b; --stamp-high:#ffb84d; --stamp-med:#f5d76e; --stamp-low:#7ec8e3; --stamp-ok:#6ee7b7; --stamp-fix:#c792ea; --stamp-web:#4fd1ae;
+    --font-mono: ui-monospace,"Cascadia Code","SFMono-Regular",Consolas,monospace;
+    --font-ar: "IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#eef2ee; --bg2:#e6ece8; --line:#123a5c; --line-dim:#3f6f92; --muted:#4d6b82;
+      --panel:rgba(18,58,92,.04); --panel-strong:rgba(18,58,92,.07); --panel-border:rgba(18,58,92,.25); --grid-line:rgba(18,58,92,.1);
+      --stamp-blocker:#c72a3b; --stamp-high:#b06a0c; --stamp-med:#8f7207; --stamp-low:#1a6ea3; --stamp-ok:#1f7a56; --stamp-fix:#7c3fa6; --stamp-web:#1a8f6f;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0a2f52; --bg2:#0d3862; --line:#eaf4fb; --line-dim:#7fb2d6; --muted:#a9c7dd;
+    --panel:rgba(255,255,255,.045); --panel-strong:rgba(255,255,255,.07); --panel-border:rgba(234,244,251,.22);
+    --grid-line:rgba(234,244,251,.07);
+    --stamp-blocker:#ff6b5b; --stamp-high:#ffb84d; --stamp-med:#f5d76e; --stamp-low:#7ec8e3; --stamp-ok:#6ee7b7; --stamp-fix:#c792ea; --stamp-web:#4fd1ae;
+  }
+  :root[data-theme="light"]{
+    --bg:#eef2ee; --bg2:#e6ece8; --line:#123a5c; --line-dim:#3f6f92; --muted:#4d6b82;
+    --panel:rgba(18,58,92,.04); --panel-strong:rgba(18,58,92,.07); --panel-border:rgba(18,58,92,.25); --grid-line:rgba(18,58,92,.1);
+    --stamp-blocker:#c72a3b; --stamp-high:#b06a0c; --stamp-med:#8f7207; --stamp-low:#1a6ea3; --stamp-ok:#1f7a56; --stamp-fix:#7c3fa6; --stamp-web:#1a8f6f;
+  }
+  *{box-sizing:border-box}
+  .bp-root{
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid-line) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(90deg, var(--grid-line) 0 1px, transparent 1px 34px);
+    color:var(--line); font-family:var(--font-ar); direction:rtl; line-height:1.85;
+    padding:26px 14px 90px; font-size:16px;
+  }
+  .bp-root, .bp-root *{ text-wrap: pretty; }
+  .sheet-wrap{max-width:1240px; margin:0 auto}
+  a{color:var(--line-dim)}
+  h1,h2,h3,h4{text-wrap:balance; color:var(--line); font-family:var(--font-ar)}
+
+  .frame{position:relative; border:1px solid var(--panel-border); border-radius:2px; background:var(--panel)}
+  .corner{position:absolute; width:20px; height:20px; pointer-events:none}
+  .corner::before,.corner::after{content:"";position:absolute;background:var(--line-dim)}
+  .c-tl{top:-1px;left:-1px} .c-tl::before{top:0;left:0;width:100%;height:2px} .c-tl::after{top:0;left:0;width:2px;height:100%}
+  .c-tr{top:-1px;right:-1px} .c-tr::before{top:0;right:0;width:100%;height:2px} .c-tr::after{top:0;right:0;width:2px;height:100%}
+  .c-bl{bottom:-1px;left:-1px} .c-bl::before{bottom:0;left:0;width:100%;height:2px} .c-bl::after{bottom:0;left:0;width:2px;height:100%}
+  .c-br{bottom:-1px;right:-1px} .c-br::before{bottom:0;right:0;width:100%;height:2px} .c-br::after{bottom:0;right:0;width:2px;height:100%}
+
+  header.title-block{padding:30px 26px 22px; margin-bottom:22px}
+  .eyebrow{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.14em; color:var(--line-dim); text-transform:uppercase}
+  header.title-block h1{font-size:clamp(1.35rem,3.2vw,1.95rem); margin:8px 0 10px; font-weight:800}
+  header.title-block .lede{color:var(--muted); max-width:820px; font-size:1rem}
+  .stampbox{margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1px; background:var(--panel-border); border:1px solid var(--panel-border)}
+  .stampbox .cell{background:var(--bg); padding:10px 14px}
+  .stampbox .cell .k{font-family:var(--font-mono); font-size:.63rem; letter-spacing:.06em; color:var(--line-dim); text-transform:uppercase}
+  .stampbox .cell .v{font-weight:700; margin-top:3px; font-size:.88rem}
+
+  .index{padding:18px 24px; margin-bottom:34px}
+  .index .eyebrow{margin-bottom:10px; display:block}
+  .index ol{margin:0; padding-inline-start:1.3em; columns:2; column-gap:34px}
+  .index li{margin-bottom:7px; break-inside:avoid; font-size:.88rem}
+  @media (max-width:640px){.index ol{columns:1}}
+
+  section.sheet{margin:0 0 48px}
+  .sheet-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; border-bottom:1px solid var(--panel-border); padding-bottom:10px; flex-wrap:wrap}
+  .sheet-num{font-family:var(--font-mono); font-size:.76rem; color:var(--line-dim); border:1px solid var(--panel-border); border-radius:3px; padding:2px 8px; white-space:nowrap}
+  .sheet-head h2{font-size:1.3rem; margin:0}
+  p.lede{color:var(--muted); max-width:850px; font-size:.98rem}
+
+  .stamp{display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:.65rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:2px 9px; border-radius:3px; border:1.5px solid currentColor; white-space:nowrap}
+  .stamp-blocker{color:var(--stamp-blocker); transform:rotate(-2deg)}
+  .stamp-high{color:var(--stamp-high)} .stamp-med{color:var(--stamp-med)} .stamp-low{color:var(--stamp-low)}
+  .stamp-ok{color:var(--stamp-ok)} .stamp-fix{color:var(--stamp-fix)} .stamp-web{color:var(--stamp-web)}
+  .stamp-verified{color:var(--stamp-ok); transform:rotate(2deg)}
+  .stamp-corrected{color:var(--stamp-med); transform:rotate(2deg)}
+  .stamp-refuted{color:var(--muted); transform:rotate(2deg); text-decoration:line-through}
+  .stamp-new{color:var(--stamp-web); transform:rotate(-2deg)}
+
+  .legend{display:flex; flex-wrap:wrap; gap:9px 16px; margin:14px 0 4px; font-size:.82rem; color:var(--muted); align-items:center}
+  .legend b{color:var(--line)}
+
+  .card{background:var(--panel); border:1px solid var(--panel-border); border-radius:6px; padding:18px 20px; margin-bottom:14px}
+  .card.blocker{border-inline-start:4px solid var(--stamp-blocker)}
+  .card.p0{border-inline-start:4px solid var(--stamp-high)}
+  .card.gap{border-inline-start:4px solid var(--stamp-web)}
+  .card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:8px}
+  .card-head h3{margin:0; font-size:1.02rem; font-weight:700}
+  .card p{margin:7px 0 0; font-size:.92rem}
+  code{font-family:var(--font-mono); font-size:.8rem; background:var(--bg2); border:1px solid var(--panel-border); border-radius:4px; padding:1px 6px; direction:ltr; unicode-bidi:isolate; display:inline-block; color:var(--line-dim)}
+  .path{font-family:var(--font-mono); font-size:.74rem; color:var(--stamp-ok); direction:ltr; unicode-bidi:isolate; display:inline-block}
+
+  .subblock{margin-top:12px; padding-top:11px; border-top:1px dashed var(--panel-border)}
+  .subblock .lbl{font-family:var(--font-mono); font-size:.66rem; letter-spacing:.07em; text-transform:uppercase; color:var(--line-dim); margin-bottom:6px; display:flex; align-items:center; gap:8px}
+  .subblock.evidence .lbl{color:var(--stamp-ok)} .subblock.fix .lbl{color:var(--stamp-fix)} .subblock.effects .lbl{color:var(--stamp-high)} .subblock.decision .lbl{color:var(--stamp-web)}
+  .subblock p{font-size:.88rem; color:var(--muted); margin:0}
+  .effects-list{margin:6px 0 0; padding-inline-start:1.2em; font-size:.86rem; color:var(--muted)}
+  .effects-list li{margin-bottom:5px}
+  .effects-list li b{color:var(--line)}
+
+  .cite{display:inline-flex; align-items:center; gap:6px; font-size:.76rem; background:var(--panel-strong); border:1px solid var(--panel-border); border-radius:4px; padding:4px 10px; margin:4px 6px 4px 0; color:var(--muted)}
+  .cite b{color:var(--stamp-fix); font-family:var(--font-mono); font-weight:600}
+
+  /* coverage bars */
+  .coverage{margin:18px 0}
+  .cov-row{display:grid; grid-template-columns:110px 1fr 50px; align-items:center; gap:12px; margin-bottom:10px; font-size:.86rem}
+  .cov-label{font-family:var(--font-mono); font-size:.78rem; color:var(--muted)}
+  .cov-track{height:16px; background:var(--bg2); border:1px solid var(--panel-border); border-radius:3px; overflow:hidden; position:relative}
+  .cov-fill{height:100%; border-radius:2px 0 0 2px}
+  .cov-fill.web{background:var(--stamp-web)}
+  .cov-fill.flutter{background:var(--stamp-fix)}
+  .cov-fill.rn{background:var(--stamp-high)}
+  .cov-pct{font-family:var(--font-mono); font-size:.8rem; font-weight:700; text-align:left; direction:ltr}
+
+  .gap-table-wrap{overflow-x:auto}
+  table{width:100%; border-collapse:collapse; font-size:.84rem}
+  th,td{border-bottom:1px solid var(--panel-border); padding:8px 11px; text-align:right; vertical-align:top}
+  th{color:var(--line-dim); font-family:var(--font-mono); font-size:.66rem; text-transform:uppercase; letter-spacing:.04em; font-weight:600}
+  td.id{font-family:var(--font-mono); font-size:.78rem; white-space:nowrap}
+  td.ev{font-family:var(--font-mono); font-size:.72rem; color:var(--stamp-ok); direction:ltr; text-align:right; unicode-bidi:isolate}
+  td.chk{text-align:center; font-weight:700}
+  td.chk.yes{color:var(--stamp-ok)} td.chk.no{color:var(--stamp-blocker)}
+  tr:last-child td{border-bottom:none}
+
+  details.module{border:1px solid var(--panel-border); border-radius:6px; margin-bottom:10px; background:var(--panel)}
+  details.module summary{cursor:pointer; padding:13px 18px; font-weight:700; display:flex; justify-content:space-between; align-items:center; gap:10px; list-style:none}
+  details.module summary::-webkit-details-marker{display:none}
+  details.module summary .cnt{font-family:var(--font-mono); font-size:.7rem; color:var(--muted); font-weight:400}
+  details.module[open] summary{border-bottom:1px solid var(--panel-border)}
+
+  .note-block{border:1px dashed var(--panel-border); border-radius:6px; padding:15px 19px; margin:13px 0; font-size:.88rem; color:var(--muted)}
+  .note-block.ok{border-color:var(--stamp-ok)} .note-block.warn{border-color:var(--stamp-high)} .note-block.fix{border-color:var(--stamp-fix)} .note-block.web{border-color:var(--stamp-web)}
+  .note-block b{color:var(--line)}
+
+  /* QA punch list */
+  .punch{border:1px solid var(--panel-border); border-radius:6px; padding:14px 18px; margin-bottom:10px; background:var(--panel)}
+  .punch .ph{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; margin-bottom:6px}
+  .punch .target{font-family:var(--font-mono); font-size:.72rem; color:var(--stamp-fix); border:1px solid var(--panel-border); border-radius:3px; padding:1px 7px}
+  .punch p{margin:0; font-size:.88rem}
+  .punch .resolved{margin-top:8px; padding-top:8px; border-top:1px dashed var(--panel-border); font-size:.85rem; color:var(--stamp-ok)}
+  .punch .resolved b{color:var(--line)}
+  .punch .decision2{margin-top:8px; padding-top:8px; border-top:1px dashed var(--panel-border); font-size:.85rem; color:var(--stamp-web)}
+  .punch .decision2 b{color:var(--line)}
+
+  /* diagrams */
+  .diagram{background:var(--bg2); border:1px solid var(--panel-border); border-radius:6px; padding:20px; margin:16px 0; overflow-x:auto}
+  .diagram-cap{font-family:var(--font-mono); font-size:.68rem; color:var(--line-dim); letter-spacing:.06em; text-transform:uppercase; margin-bottom:13px}
+  .flow{display:flex; flex-direction:column; gap:0}
+  .flow-step{display:flex; gap:14px; align-items:flex-start}
+  .flow-dot-col{display:flex; flex-direction:column; align-items:center; width:26px}
+  .flow-dot{width:12px; height:12px; border-radius:50%; border:2px solid var(--line-dim); background:var(--bg2); flex:none}
+  .flow-dot.dead{border-color:var(--stamp-blocker); background:var(--stamp-blocker)}
+  .flow-dot.fix{border-color:var(--stamp-ok); background:var(--stamp-ok)}
+  .flow-line{width:2px; flex:1; background:var(--line-dim); min-height:24px}
+  .flow-body{padding-bottom:18px; flex:1}
+  .flow-body .t{font-weight:700; font-size:.9rem}
+  .flow-body .d{color:var(--muted); font-size:.83rem; margin-top:2px}
+
+  .phase-rail{display:flex; align-items:center; gap:0; margin:24px 0 8px; min-width:560px}
+  .phase-node{display:flex; flex-direction:column; align-items:center; flex:0 0 auto; width:120px}
+  .phase-node .pt{width:16px; height:16px; border-radius:50%; background:var(--line); border:2px solid var(--bg2)}
+  .phase-node .pl{font-family:var(--font-mono); font-weight:800; font-size:.86rem; margin-top:8px}
+  .phase-node .ps{font-size:.68rem; color:var(--muted); margin-top:2px; text-align:center}
+  .phase-tick{flex:1; height:2px; background:var(--line-dim); position:relative; min-width:40px}
+  .phase-tick::before,.phase-tick::after{content:"";position:absolute;top:-5px;width:2px;height:12px;background:var(--line-dim)}
+  .phase-tick::before{right:0} .phase-tick::after{left:0}
+
+  footer.colophon{margin-top:50px; padding-top:18px; border-top:1px solid var(--panel-border); font-size:.8rem; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-family:var(--font-mono)}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+</style>
+
+<div class="bp-root">
+<div class="sheet-wrap">
+
+  <header class="title-block frame">
+    <span class="corner c-tl"></span><span class="corner c-tr"></span><span class="corner c-bl"></span><span class="corner c-br"></span>
+    <span class="eyebrow">الإصدار الثالث — مراجعة عدائية + تكافؤ ميزات كامل مع الويب</span>
+    <h1>الخطة النهائية: إصلاح دورة الجوّال + رفع تطبيقَي الجوّال لمستوى الويب</h1>
+    <p class="lede">هذه الوثيقة تبني على خطتَين سابقتَين (471 التدقيق، ثم التحقّق العميق) وتضيف طبقتَين جديدتَين طلبهما التوجيه الأخير صراحة: <b>(1)</b> مراجعة عدائية للخطة السابقة نفسها — محاكاة عشرات السيناريوهات لكل إصلاح لاكتشاف أيّ فجوة أو تعارض لم تُرصَد، و<b>(2)</b> تدقيق تكافؤ الميزات الكامل بين الويب وتطبيقَي الجوّال لأربعة أدوار محدَّدة (عميل، مزوّد، سائق، وكيل تسوية) — مع تأكيد أنّ لوحة التحكّم (Ops) تبقى مُصغَّرة عمدًا على الجوّال، كما هو مطلوب.</p>
+    <div class="stampbox">
+      <div class="cell"><div class="k">تاريخ المراجعة</div><div class="v">2026-07-13</div></div>
+      <div class="cell"><div class="k">طريقة المراجعة</div><div class="v">وكيل عدائيّ + وكيلا تكافؤ ميزات + تحقّق مباشر إضافيّ</div></div>
+      <div class="cell"><div class="k">ثغرات مكتشَفة في الخطة السابقة</div><div class="v">25 ثغرة، حُلّت أو حُسم قرارها هنا</div></div>
+      <div class="cell"><div class="k">تكافؤ الميزات — Flutter</div><div class="v">عميل 59% · مزوّد 46% · سائق 46%</div></div>
+      <div class="cell"><div class="k">تكافؤ الميزات — React Native</div><div class="v">عميل 34% · مزوّد/سائق 8%</div></div>
+      <div class="cell"><div class="k">وكيل التسوية على الجوّال</div><div class="v">غائب كليًّا من كلا التطبيقَين</div></div>
+    </div>
+  </header>
+
+  <nav class="index frame">
+    <span class="eyebrow">فهرس الخطة</span>
+    <ol>
+      <li><a href="#s00">منهجية هذه المراجعة</a></li>
+      <li><a href="#s01">تصحيحات على الخطة السابقة (25 ثغرة)</a></li>
+      <li><a href="#s02">تصحيح دقيق لإصلاح M2 (الدخول الشبحيّ)</a></li>
+      <li><a href="#s03">تحديثان على الحاجزين DR2 وM4</a></li>
+      <li><a href="#s04">تكافؤ الميزات — العميل</a></li>
+      <li><a href="#s05">تكافؤ الميزات — المزوّد</a></li>
+      <li><a href="#s06">تكافؤ الميزات — السائق</a></li>
+      <li><a href="#s07">وكيل التسوية — دور غائب كليًّا من الجوّال</a></li>
+      <li><a href="#s08">لوحة التحكّم على الجوّال: مُصغَّرة عمدًا، وهذا صحيح</a></li>
+      <li><a href="#s09">خطة الطرح الآمن (جديد)</a></li>
+      <li><a href="#s10">أحدث التقنيات المعتمدة</a></li>
+      <li><a href="#s11">خارطة الطريق الموحَّدة النهائية</a></li>
+      <li><a href="#s12">السجلّ الكامل المُصحَّح (57 بندًا)</a></li>
+    </ol>
+  </nav>
+
+  <div class="legend">
+    <span><b>مفاتيح القراءة:</b></span>
+    <span class="stamp stamp-verified">✓ VERIFIED</span> <span>مؤكَّد بالكود</span>
+    <span class="stamp stamp-new">◆ NEW</span> <span>مُضاف في هذه المراجعة</span>
+    <span class="stamp stamp-web">تكافؤ</span> <span>فجوة ميزة عن الويب</span>
+    <span class="stamp stamp-corrected">↻</span> <span>صُحِّح من نسخة سابقة</span>
+  </div>
+
+  <!-- ============ S00 ============ -->
+  <section class="sheet" id="s00">
+    <div class="sheet-head"><span class="sheet-num">SHEET 00</span><h2>منهجية هذه المراجعة</h2></div>
+    <p class="lede">التوجيه طلب ثلاثة أشياء مستقلّة، فنُفِّذت بثلاثة وكلاء متخصّصين متوازين + تحقّق مباشر إضافيّ:</p>
+    <div class="card">
+      <p><b>1) مراجعة عدائيّة (forensics):</b> وكيل قرأ الخطة السابقة كاملة بعين ناقدة صرفة — لا يبحث عن أعطاب جديدة في الكود، بل عن فجوات في الخطة نفسها: سيناريوهات لم تُغطَّ، تناقضات داخليّة، حالات واجهة مفقودة (تحميل/خطأ/بلا اتّصال)، تكرار غير مقصود. أنتج 25 ملاحظة مصنَّفة حسب الأولويّة.</p>
+      <p><b>2) تدقيق تكافؤ الميزات (وكيلان):</b> مقارنة كل صفحة ويب فعليّة (استعرضتُ محتواها، لا اسم الملف فقط) بما يقابلها في Flutter وReact Native، لأربعة أدوار: العميل، المزوّد، السائق، ووكيل التسوية.</p>
+      <p><b>3) تحقّق مباشر إضافيّ (شخصيّ):</b> تحقّقتُ بنفسي من أهمّ الافتراضات التي وضع الوكيل العدائيّ إصبعه عليها كـ"غير مؤكَّدة" — لأنّ مراجعة الخطة يجب ألّا تُضيف افتراضات جديدة غير محقَّقة فوق افتراضات سابقة.</p>
+    </div>
+  </section>
+
+  <!-- ============ S01 : QA CORRECTIONS ============ -->
+  <section class="sheet" id="s01">
+    <div class="sheet-head"><span class="sheet-num">SHEET 01</span><h2>تصحيحات على الخطة السابقة — 25 ثغرة، كل واحدة محسومة هنا</h2></div>
+    <p class="lede">لكل ملاحظة من المراجعة العدائيّة: إمّا تحقّق مباشر يحسمها بدليل، أو قرار تصميم صريح يُغلِق الفجوة، لا تُترَك أيّ نقطة معلَّقة.</p>
+
+    <div class="punch">
+      <div class="ph"><span class="target">RS2/SC1</span><span class="stamp stamp-verified">✓ حُسمت بدليل</span></div>
+      <p>الوكيل العدائيّ شكّك في افتراض "الخادم يرسل snake_case دائمًا" — قد يكون الخادم يستخدم تحويلًا تلقائيًّا لـcamelCase في مكان ما.</p>
+      <div class="resolved"><b>الحسم:</b> بحث مباشر عبر <b>كامل</b> مجلّد <span class="path">backend/app/</span> عن <code>alias_generator</code>/<code>by_alias</code>/<code>to_camel</code> — صفر نتيجة في كل الخادم. الافتراض صحيح 100%، لا حاجة لأيّ تعديل على تصميم الإصلاح.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">DR2</span><span class="stamp stamp-verified">✓ حُسمت بدليل، وأضافت اكتشافًا إضافيًّا مجانيًّا</span></div>
+      <p>الوكيل العدائيّ شكّك في افتراض "<code>_loadOrder()</code> يُعيد <code>order_state</code> أصلًا" — إن كان خاطئًا، الإصلاح يحتاج استدعاء شبكة جديدًا لا قراءة حقل فقط.</p>
+      <div class="resolved"><b>الحسم:</b> قراءة <span class="path">backend/app/modules/orders/order_service.py:2251</span> (دالّة <code>get_order_for_driver</code> التي يستدعيها <code>/orders/{id}</code> فعليًّا لدور السائق) تؤكّد: <code>"order_state": order.order_state</code> موجود بالفعل. <b>اكتشاف إضافيّ مجانيّ:</b> نفس الاستجابة تحتوي أيضًا <code>"cash_collected"</code> و<code>"proof_submitted"</code> — بتعليق صريح في الكود: <i>"so a page reload mid-delivery doesn't re-prompt"</i>. هذا يحلّ تلقائيًّا ملاحظة أخرى للوكيل العدائيّ (إعادة فتح الشاشة أثناء التسليم) — <code>_arrived</code> و<code>_proofDone</code> و<code>_cashDone</code> الثلاثة يجب تهيئتها من هذه الحقول الثلاثة عند التحميل، لا من قيم ثابتة <code>false</code>.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">M4</span><span class="stamp stamp-verified">✓ حُسمت بدليل</span></div>
+      <p>الوكيل العدائيّ رصد أنّ الخطة تركت سؤالًا مفتوحًا: هل الموقع في <code>settlement_screen.dart</code> "دليل مُرسَل" أم "عرض فقط"؟ — قرار غير محسوم لا يمكن تنفيذه.</p>
+      <div class="resolved"><b>الحسم:</b> قراءة <span class="path">settlement_screen.dart:91-92</span> تؤكّد: <code>_lat</code>/<code>_lng</code> يُرسَلان فعليًّا ضمن جسم الطلب للخادم — دليل مُرسَل، لا عرض فقط. <b>القرار النهائيّ:</b> يُمنَع متابعة التسوية إن كان الموقع "تقريبيًّا" (fallback)، بنفس صرامة سيناريو تحصيل النقد الأصليّ في M4.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">العنوان مقابل السجلّ</span><span class="stamp stamp-corrected">↻ خطأ حسابيّ حقيقيّ، مُصحَّح</span></div>
+      <p>رصد الوكيل العدائيّ تناقضًا: الرأس أعلن "بند واحد مُصحَّح" بينما جدول السجلّ وسم بندَين (M3 وPO2) بعلامة "مُصحَّح" — و54+1+1=56 لا 57.</p>
+      <div class="resolved"><b>الحسم:</b> السبب الجذريّ: ثلاثة أزواج مُدمَجة (AU7/CB7، M7/CB8، M6/CA1) ظهرت كصفّين منفصلين في السجلّ بدل صفّ واحد — عدّ مضاعف عرضيّ. <b>في هذه النسخة:</b> كل زوج مُدمَج = صفّ واحد فقط بعلامة مرجعيّة، وPO2 أُعيد تصنيفه <span class="stamp stamp-verified" style="vertical-align:middle">✓ VERIFIED</span> (كان تصنيفه "مُصحَّح" لمجرّد أنّ تعليقًا في الكود كان خاطئًا — تفصيل إضافيّ، لا تصحيحًا لادّعاء التقرير الأصليّ). السجلّ المُصحَّح في القسم الأخير.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">معالج الخطأ العامّ (P2)</span><span class="stamp stamp-new">◆ قرار تصميم جديد</span></div>
+      <p>ملاحظتان مترابطتان: (أ) لا قيمة محدَّدة لحقل <code>code</code> عند استثناء خام بلا شكل بنيويّ. (ب) تفاعل غير مُختبَر مع استجابات 429/CORS التي قد تُنشئ جسمًا خاصًّا بها مسبقًا.</p>
+      <div class="decision2"><b>القرار:</b> (أ) عند غياب شكل بنيويّ، يُشتَقّ الرمز آليًّا بصيغة <code>HTTP_{status_code}</code> (مثل <code>HTTP_404</code>) — نمط ثابت يمكن لتطبيقات الجوّال التفرّع عليه فورًا. (ب) يُستثنى المعالج الجديد صراحة من حالة 429 (محدود المعدّل له مساره الخاصّ أصلًا في الكود القائم) ومن أيّ استجابة رأسها <code>Access-Control-*</code> مضبوط مسبقًا من طبقة CORS — لا إعادة تغليف لجسم لم يُبنَ بواسطة هذا المعالج.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">RS2/SC1 وP2 معًا</span><span class="stamp stamp-new">◆ قرار تسلسل جديد</span></div>
+      <p>إن نُشرت طبقة zod الجديدة (RN) قبل معالج الخطأ العامّ (الخادم)، ستتوقّع مخطّطات zod حقل <code>code</code> الذي لم يصل بعد — فشل تحقّق فوريّ لكل الأخطاء الخام أثناء الفترة الانتقاليّة.</p>
+      <div class="decision2"><b>القرار:</b> مخطّط الخطأ في zod يُعرَّف بحقل <code>code</code> <b>اختياريًّا</b> (<code>z.string().optional()</code>) منذ اليوم الأوّل، مع اشتقاق رمز احتياطيّ من رمز HTTP نفسه إن غاب — لا اعتماديّة صارمة على ترتيب النشر بين الخادم والعميل.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">RS2/SC1</span><span class="stamp stamp-new">◆ قرار تصميم جديد</span></div>
+      <p><code>gen:types</code> يُوجَّه افتراضيًّا لمخطّط <code>tawanow.com</code> الحيّ (الإنتاج) — سيكون متأخّرًا عن أيّ تعديل خادم يُدخَل ضمن هذه الخطة نفسها (مثل CA8 أو معالج الخطأ العامّ) قبل النشر.</p>
+      <div class="decision2"><b>القرار:</b> السكربت يُوجَّه مؤقّتًا لبيئة staging/محليّة تعكس التعديلات الجارية، ويُعاد تشغيله + يُلتزَم ناتجه (<code>api.d.ts</code>) في نفس الدفعة التي تُغلَق فيها تعديلات الخادم — لا يُترَك "يُشغَّل متى تيسّر".</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">RS2/SC1</span><span class="stamp stamp-new">◆ قرار تصميم جديد</span></div>
+      <p>فشل <code>.safeParse()</code> يحتاج قيمة إرجاع محدَّدة — الدالّة معرَّفة لإرجاع <code>T</code>، فماذا يحدث عمليًّا عند الفشل؟</p>
+      <div class="decision2"><b>القرار:</b> عند الفشل تُعاد قيمة "حالة خطأ" نمطيّة موحَّدة (لا استثناء غير مُمسَك) تحمل علمًا <code>_parseError: true</code>، والشاشة المستهلكة تتحقّق من هذا العلم لعرض حالة "تعذّر تحميل البيانات، إعادة المحاولة" بدل انهيار الشاشة بالكامل — نفس نمط حالة الخطأ الموجود أصلًا في هذا التطبيق (<code>ApiError</code> في <span class="path">src/lib/errors.ts</span>)، لا نمط جديد.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">RS2/SC1</span><span class="stamp stamp-new">◆ قرار تصميم جديد</span></div>
+      <p>الأنواع المُولَّدة من <code>gen:types</code> غالبًا تُعرِّف حقولًا كثيرة كـ"اختياريّة" (<code>nullable</code>)، والقوائم مُرقَّمة صفحيًّا بغلاف مختلف عن الكائن المفرد — الخطة لم تُفصِّل هذا.</p>
+      <div class="decision2"><b>القرار:</b> كل مخطّط zod يُبنى ليطابق تمامًا نوع الحقل المُولَّد (اختياريّ يبقى اختياريًّا، لا افتراض قيمة). قوائم الصفحات (<code>{"items": [...], "total": ...}</code> — نفس النمط المُكتشَف سابقًا في عطب PO3) تحصل على مخطّط "غلاف" منفصل عن مخطّط العنصر المفرد، لا مخطّط واحد يُعاد استخدامه خطأً للاثنين.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">RS2/SC1</span><span class="stamp stamp-new">◆ يحتاج تحقّقًا عمليًّا عند التنفيذ</span></div>
+      <p>هل <code>mockApi</code> (الكائنات اليدويّة بصيغة camelCase) ستبقى متوافقة إن اشتُقّت أنواع التطبيق من الأنواع المُولَّدة الجديدة بدل التعريف اليدويّ الحاليّ؟</p>
+      <div class="decision2"><b>القرار:</b> فحص <code>tsc --noEmit</code> على <code>mockApi</code> تحديدًا كخطوة قبول إلزاميّة في نفس الدفعة — إن فشل التحقّق النوعيّ، يُصحَّح <code>mockApi</code> في نفس الدفعة لا لاحقًا.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">SC3/RS3</span><span class="stamp stamp-new">◆ إعادة صياغة</span></div>
+      <p>الخطة السابقة وصفت حلّ SC3/RS3 كـ"أثر جانبيّ تلقائيّ" لإصلاح RS2/SC1 — الوكيل العدائيّ صحّح: هذا يتطلّب عملًا يدويًّا (تبديل مصدر نوع <code>OrderState</code>)، ليس تلقائيًّا.</p>
+      <div class="decision2"><b>القرار:</b> صيغة مُصحَّحة: "خطوة تالية إلزاميّة ضمن نفس الدفعة، لا نتيجة تلقائيّة" — أُضيفت كبند صريح في خارطة الطريق (القسم 11).</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">Batch 1 (الدفعة الأولى)</span><span class="stamp stamp-new">◆ قرار تنسيق</span></div>
+      <p><code>register_screen.dart</code> يُعدَّل ضمن AU1/AU2 <b>وأيضًا</b> ضمن M4 (نقطة استدعاء GPS رقم 1) في نفس الدفعة — تعارض دمج محتمَل إن عمل عليه مطوّران بالتوازي.</p>
+      <div class="decision2"><b>القرار:</b> AU1/AU2 وM4-نقطة-التسجيل يُسنَدان لنفس المطوّر أو يُنفَّذان بالتتابع صراحة، لا بالتوازي — تحديث في جدول التنسيق.</div>
+    </div>
+
+    <div class="punch">
+      <div class="ph"><span class="target">CB5 / SC2 (RN)</span><span class="stamp stamp-new">◆ قرار منتج محسوم</span></div>
+      <p>الخطة تركت مفتوحًا: عناوين React Native المحليّة الحاليّة (معرّفات <code>addr-...</code> مزيَّفة) — تُرحَّل صامتة أم يُطلَب من المستخدم إعادة إدخالها؟</p>
+      <div class="decision2"><b>القرار الافتراضيّ:</b> إعادة إنشاء صامتة على الخادم عند أوّل فتح بعد التحديث (لا تعطيل تجربة المستخدم بمطالبة يدويّة) — هذا لا يمنع لاحقًا مراجعة المنتج له إن ظهرت اعتبارات أخرى، لكنّه القرار الذي يسمح بالتنفيذ الآن بدل التعليق.</div>
+    </div>
+
+    <div class="note-block warn">
+      <b>ملاحظات إضافيّة من المراجعة العدائيّة (حالات واجهة ناقصة) — أُضيفت كمتطلّبات إلزاميّة لكل ميزة جديدة تُبنى في هذه الخطة، لا كبند منفصل:</b><br>
+      كل عنصر واجهة جديد (زرّ "لقد وصلت"، زرّ "تواصل مع الدعم"، حقل الكوبون) يجب أن يُحدَّد له: حالة التحميل، حالة الخطأ (بلا اتّصال / فشل الخادم)، حالة فارغة إن وُجدت، ونصّ عربيّ + اتّجاه RTL سليم — لا الاكتفاء بالمسار السعيد فقط. تفصيل كل حالة داخل بطاقة كل ميزة في الأقسام التالية.
+    </div>
+  </section>
+
+  <!-- ============ S02 : M2 precise fix ============ -->
+  <section class="sheet" id="s02">
+    <div class="sheet-head"><span class="sheet-num">SHEET 02</span><h2>تصحيح دقيق لإصلاح M2 — الدخول الشبحيّ</h2><span class="stamp stamp-new">◆ أدقّ من كل النسخ السابقة</span></div>
+    <div class="card p0">
+      <p>البنية التحتيّة الصحيحة لهذا الإصلاح <b>موجودة بالفعل بالكامل</b> في المشروع — لم يكن ينقصها سوى ربط ثلاثة أسطر:</p>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div>
+        <p><span class="path">mobile_app/lib/router.dart:43</span> — <code>refreshListenable: auth</code> (النمط الرسميّ الموصى به في وثائق Flutter المعماريّة نفسها: <i>docs.flutter.dev/app-architecture/recommendations</i>). دالّة <code>redirect</code> في نفس الملف (سطر 45-68) تتحقّق من <code>auth.status == AuthStatus.unauthenticated</code> وتُعيد التوجيه لـ<code>/role-select</code> تلقائيًّا فور تغيّر هذه القيمة. <span class="path">auth_provider.dart:81</span> يحتوي دالّة <code>logout()</code> جاهزة تضبط هذه القيمة بالضبط.<br>
+        المشكلة الوحيدة: <span class="path">core/api_client.dart</span> (طبقة الشبكة) لا يملك أيّ مرجع لـ<code>AuthProvider</code> إطلاقًا — يستدعي <code>AuthStore.clear()</code> (تخزين خام) لا <code>auth.logout()</code> (حالة مراقَبة من الواجهة).</p>
+      </div>
+      <div class="subblock fix"><div class="lbl">◆ الإصلاح الدقيق — لا حاجة لإعادة هيكلة DI</div>
+        <p>إضافة حقل قابل للضبط <code>VoidCallback? onSessionExpired</code> إلى <code>ApiClient</code>؛ استدعاؤه داخل معالج فشل التجديد بعد <code>AuthStore.clear()</code>؛ وربطه مرّة واحدة في <span class="path">main.dart</span> فور إنشاء الكائنَين: <code>apiClient.onSessionExpired = auth.logout;</code>. ثلاثة تعديلات صغيرة، لا حاوية حقن تبعيّات جديدة.</p>
+      </div>
+      <div class="subblock effects"><div class="lbl">◆ لماذا هذا أفضل ممّا اقترحته النسخة السابقة</div>
+        <p>النسخة السابقة (المبنيّة على تحقّق أوّليّ) اقترحت "إعادة هيكلة عبر get_it" — تدخّل أوسع من اللازم. التحقّق الدقيق هنا يُظهر أنّ <code>get_it</code> غير مُستخدَم أصلًا لهذَين الكائنَين تحديدًا (يُنشَآن مباشرة في <code>main.dart</code>)، فإدخاله هنا كان سيضيف طبقة تجريد غير ضروريّة. الحلّ الأدقّ يستخدم بالضبط الآليّات الثلاث الموجودة فعليًّا (callback بسيط + <code>logout()</code> الجاهزة + <code>refreshListenable</code> الجاهزة) بلا أيّ إضافة معماريّة.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ S03 : DR2/M4 updates ============ -->
+  <section class="sheet" id="s03">
+    <div class="sheet-head"><span class="sheet-num">SHEET 03</span><h2>تحديثان دقيقان على الحاجزَين DR2 وM4</h2></div>
+    <div class="card blocker">
+      <div class="card-head"><h3>DR2 — تحديث: تهيئة الحالة الثلاثية من استجابة موجودة أصلًا</h3></div>
+      <p>بالإضافة لما ورد سابقًا (زرّ "لقد وصلت" الجديد): متغيّرات الحالة الثلاثة <code>_arrived</code>، <code>_proofDone</code>، <code>_cashDone</code> يجب أن تُهيَّأ من الحقول <code>order_state</code>/<code>proof_submitted</code>/<code>cash_collected</code> المُعادة فعليًّا من <code>_loadOrder()</code> — لا من قيم ثابتة <code>false</code>. هذا يغلق سيناريو "إعادة فتح الشاشة أثناء التسليم" الذي رصده الوكيل العدائيّ، باستخدام بيانات كانت موجودة أصلًا ولم تُستغَلّ.</p>
+      <div class="subblock effects"><div class="lbl">◆ حالة تنازع الأجهزة المتعدّدة (سيناريو رصده الوكيل العدائيّ)</div>
+        <p>جهازان لنفس حساب السائق (هاتف قديم + جديد): جهاز يسجّل "وصلت"، والآخر لا يزال يعرض الزرّ. <b>القرار:</b> عند تلقّي 409 من استطلاع الحالة الدوريّ الموجود أصلًا في الشاشة، تُحدَّث الواجهة تلقائيًّا لإخفاء الزرّ وعرض حالة "تمّ تسجيل الوصول من جهاز آخر" — لا تُترَك الشاشة في حالة متضاربة.</p>
+      </div>
+    </div>
+    <div class="card blocker">
+      <div class="card-head"><h3>M4 — تحديث: سبب الفشل لا عَلَم ثنائيّ فقط</h3></div>
+      <p>الخطة السابقة اقترحت علمًا ثنائيًّا (<code>isFallback: bool</code>). الوكيل العدائيّ لاحظ بدقّة: ثلاث حالات فشل مختلفة تمامًا (خدمة الموقع مغلقة، الإذن مرفوض، خطأ آخر) تحتاج ثلاث استجابات مستخدم مختلفة (فتح إعدادات الموقع، فتح إعدادات صلاحيّات التطبيق، إعادة المحاولة) — عَلَم واحد يفقد هذا التمييز.</p>
+      <div class="subblock fix"><div class="lbl">◆ الإصلاح المُحدَّث</div><p>نوع تعداديّ (<code>enum LocationFailureReason { serviceDisabled, permissionDenied, other }</code>) بدل العَلَم الثنائيّ — كل نقطة استدعاء من النقاط الأربع تعرض رسالة وزرّ إجراء مخصّصَين لكل سبب.</p></div>
+      <p style="margin-top:8px"><b>تذكير جوهريّ (من النسخة السابقة، لا يزال ساريًا):</b> هذا تغيير توقيع دالّة واحدة يمسّ 4 نقاط استدعاء دفعة واحدة أصلًا — أضاف الوكيل العدائيّ توصية بأن تُنفَّذ الأربعة معًا في نفس الالتزام (commit) لتفادي فشل تصريف الأنواع (compile) الجزئيّ.</p>
+    </div>
+  </section>
+
+  <!-- ============ S04 : CUSTOMER PARITY ============ -->
+  <section class="sheet" id="s04">
+    <div class="sheet-head"><span class="sheet-num">SHEET 04</span><h2>تكافؤ الميزات — العميل</h2><span class="stamp stamp-web">32 ميزة على الويب</span></div>
+    <p class="lede">مقارنة مباشرة لكل صفحة عميل فعليّة على الويب (لا اسم الملف فقط — محتواها الحقيقيّ) مقابل Flutter وReact Native:</p>
+
+    <div class="diagram coverage">
+      <div class="diagram-cap">نسبة التغطية الإجماليّة — دور العميل</div>
+      <div class="cov-row"><span class="cov-label">الويب</span><div class="cov-track"><div class="cov-fill web" style="width:100%"></div></div><span class="cov-pct">32/32</span></div>
+      <div class="cov-row"><span class="cov-label">Flutter</span><div class="cov-track"><div class="cov-fill flutter" style="width:59%"></div></div><span class="cov-pct">19/32</span></div>
+      <div class="cov-row"><span class="cov-label">React Native</span><div class="cov-track"><div class="cov-fill rn" style="width:34%"></div></div><span class="cov-pct">11/32</span></div>
+    </div>
+
+    <div class="gap-table-wrap"><table>
+      <tr><th>الميزة</th><th>الويب</th><th>Flutter</th><th>RN</th></tr>
+      <tr><td>تصفّح الرئيسيّة</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓</td></tr>
+      <tr><td>البحث عن مزوّدين/أصناف</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>تصفّح حسب الفئة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>تفاصيل المزوّد + الكتالوج</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓</td></tr>
+      <tr><td>سلّة مزوّد واحد + الدفع</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓</td></tr>
+      <tr><td>سلّة جماعيّة / دفع مُقسَّم</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>التسوّق بميزانيّة محدَّدة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>"اطلب أيّ شيء" (طلب حرّ)</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>طلب مشاوير/مهامّ (Errand)</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>سجلّ الطلبات</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓</td></tr>
+      <tr><td>تتبّع الطلب الحيّ</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓ (محدود)</td></tr>
+      <tr><td>التقييمات</td><td class="chk yes">✓</td><td class="chk yes">✓ (معطَّل حاليًّا، انظر CB3)</td><td class="chk no">✗</td></tr>
+      <tr><td>دفتر العناوين</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓ (محليّ فقط، انظر SC2)</td></tr>
+      <tr><td>محادثة الدعم</td><td class="chk yes">✓</td><td class="chk yes">✓ (معطَّل حاليًّا، انظر CB2)</td><td class="chk no">✗</td></tr>
+      <tr><td>المحفظة + الشحن</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>تحويل المحفظة بين المستخدمين</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>نقاط الولاء والاستبدال</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>إدارة كود الإحالة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>تسجيل الدخول</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓</td></tr>
+      <tr><td>إنشاء حساب</td><td class="chk yes">✓</td><td class="chk yes">✓ (معطَّل حاليًّا، انظر AU1/AU2)</td><td class="chk no">✗</td></tr>
+      <tr><td>استرجاع كلمة المرور</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>إعدادات الحساب</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓ (محدودة)</td></tr>
+      <tr><td>تحقّق البريد الإلكترونيّ</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>المصادقة الثنائيّة (TOTP)</td><td class="chk yes">✓</td><td class="chk yes">✓ (معطَّل حاليًّا، انظر AU3)</td><td class="chk no">✗</td></tr>
+      <tr><td>توقيع العقد الإلكترونيّ</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>حذف الحساب</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>الوضع الداكن</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>حظر مزوّدين</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>تفضيلات الإشعارات</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>صندوق الإشعارات</td><td class="chk yes">✓</td><td class="chk yes">✓ (معطَّل حاليًّا، انظر M1/CB1)</td><td class="chk no">✗</td></tr>
+      <tr><td>إعدادات اللغة/المنطقة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk yes">✓ (جزئيّ)</td></tr>
+      <tr><td>صفحة "عن التطبيق"</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+    </table></div>
+
+    <div class="note-block web">
+      <b>الأولويّة المقترحة لسدّ فجوة العميل (بعد إغلاق الأعطاب المؤكَّدة):</b> البحث + التصفّح بالفئة (أساسيّ لأيّ تطبيق تسوّق)، حذف الحساب (متطلّب امتثال موجود على الويب فعلًا)، تفضيلات الإشعارات، الوضع الداكن. الميزات الأكثر تخصّصًا (الميزانيّة، الطلب الحرّ، الولاء) يمكن تأجيلها لدورة لاحقة دون خطر تشغيليّ فوريّ.
+    </div>
+  </section>
+
+  <!-- ============ S05 : PROVIDER PARITY ============ -->
+  <section class="sheet" id="s05">
+    <div class="sheet-head"><span class="sheet-num">SHEET 05</span><h2>تكافؤ الميزات — المزوّد</h2><span class="stamp stamp-web">14 ميزة على الويب</span></div>
+    <div class="diagram coverage">
+      <div class="diagram-cap">نسبة التغطية الإجماليّة — دور المزوّد</div>
+      <div class="cov-row"><span class="cov-label">الويب</span><div class="cov-track"><div class="cov-fill web" style="width:100%"></div></div><span class="cov-pct">14/14</span></div>
+      <div class="cov-row"><span class="cov-label">Flutter</span><div class="cov-track"><div class="cov-fill flutter" style="width:50%"></div></div><span class="cov-pct">7/14</span></div>
+      <div class="cov-row"><span class="cov-label">React Native</span><div class="cov-track"><div class="cov-fill rn" style="width:7%"></div></div><span class="cov-pct">1/14 (شاشة واحدة أوّليّة)</span></div>
+    </div>
+    <div class="gap-table-wrap"><table>
+      <tr><th>الميزة</th><th>الويب</th><th>Flutter</th><th>RN</th></tr>
+      <tr><td>إدارة الكتالوج</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>قائمة انتظار الطلبات</td><td class="chk yes">✓</td><td class="chk yes">✓ (بلا حدّ/فلتر، انظر PO1)</td><td class="chk no">✗ (سقّالة أوّليّة)</td></tr>
+      <tr><td>تحضير الطلب خطوة بخطوة</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>سجلّ الطلبات</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>الأرباح / دفتر الحساب</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>التسوية/العمولة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>الوثائق/التوثيق (KYC)</td><td class="chk yes">✓</td><td class="chk yes">✓ (معطَّل حاليًّا، انظر PO3)</td><td class="chk no">✗</td></tr>
+      <tr><td>إدارة الموظّفين</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>العروض الترويجيّة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>لوحة القيادة (إحصائيّات حيّة)</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>الإعدادات العامّة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>عرض صلاحيّاتي (للموظّفين)</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+    </table></div>
+    <div class="note-block web"><b>الأولويّة المقترحة:</b> سجلّ الطلبات والتسوية/العمولة أساسيّان لأيّ مزوّد نشط (يحتاجهما يوميًّا لتتبّع دخله). لوحة القيادة وإدارة الموظّفين والعروض يمكن أن تبقى على الويب لفترة أطول لأنّها استخدام أقلّ تكرارًا وأنسب لشاشة أكبر.</div>
+  </section>
+
+  <!-- ============ S06 : DRIVER PARITY ============ -->
+  <section class="sheet" id="s06">
+    <div class="sheet-head"><span class="sheet-num">SHEET 06</span><h2>تكافؤ الميزات — السائق</h2><span class="stamp stamp-web">10 ميزات على الويب</span></div>
+    <div class="diagram coverage">
+      <div class="diagram-cap">نسبة التغطية الإجماليّة — دور السائق</div>
+      <div class="cov-row"><span class="cov-label">الويب</span><div class="cov-track"><div class="cov-fill web" style="width:100%"></div></div><span class="cov-pct">10/10</span></div>
+      <div class="cov-row"><span class="cov-label">Flutter</span><div class="cov-track"><div class="cov-fill flutter" style="width:55%"></div></div><span class="cov-pct">5.5/10</span></div>
+      <div class="cov-row"><span class="cov-label">React Native</span><div class="cov-track"><div class="cov-fill rn" style="width:5%"></div></div><span class="cov-pct">~0.5/10 (سقّالة أوّليّة)</span></div>
+    </div>
+    <div class="gap-table-wrap"><table>
+      <tr><th>الميزة</th><th>الويب</th><th>Flutter</th><th>RN</th></tr>
+      <tr><td>الرئيسيّة/العروض</td><td class="chk yes">✓</td><td class="chk yes">✓ (معطَّل حاليًّا، انظر DR1)</td><td class="chk yes">✓ (بيانات وهميّة)</td></tr>
+      <tr><td>الاستلام</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>التسليم + إثبات التسليم</td><td class="chk yes">✓</td><td class="chk yes">✓ (معطَّل حاليًّا، انظر DR2)</td><td class="chk no">✗</td></tr>
+      <tr><td>خريطة/ملاحة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>سجلّ الطلبات السابقة</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>الأرباح</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk yes">✓ (بيانات وهميّة)</td></tr>
+      <tr><td>تسوية السائق (نقطة واحدة)</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>سجلّ التسويات</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>التوثيق/الانضمام (KYC)</td><td class="chk yes">✓</td><td class="chk yes">✓</td><td class="chk no">✗</td></tr>
+      <tr><td>الملفّ الشخصيّ والتقييم</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+      <tr><td>الإعدادات</td><td class="chk yes">✓</td><td class="chk no">✗</td><td class="chk no">✗</td></tr>
+    </table></div>
+    <div class="note-block web"><b>ملاحظة سلامة:</b> غياب "خريطة/ملاحة" مخصّصة عن Flutter مهمّ عمليًّا — السائق على الطريق فعليًّا يحتاج توجيهًا داخل التطبيق أكثر ممّا يحتاجه أيّ دور آخر. هذه أولويّة أعلى من ترتيبها الظاهر في القائمة.</div>
+  </section>
+
+  <!-- ============ S07 : SETTLEMENT AGENT — MISSING ROLE ============ -->
+  <section class="sheet" id="s07">
+    <div class="sheet-head"><span class="sheet-num">SHEET 07</span><h2>وكيل التسوية (Settlement Agent) — دور غائب كليًّا من الجوّال</h2><span class="stamp stamp-blocker">فجوة كاملة</span></div>
+    <div class="card gap">
+      <p><b>هذا الدور تحديدًا هو الأنسب لعمل ميدانيّ يحتاج هاتفًا — وهو غائب بالكامل من كلا تطبيقَي الجوّال.</b></p>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div>
+        <p>الويب: <span class="path">web/src/pages/settlement/SettlementPointPage.tsx</span>، مُسجَّلة في <span class="path">router.tsx:410</span> بتعليق صريح: <i>"role-agnostic; the grant checked server-side"</i> — أي أنّ الصلاحيّة (وليس دورًا ثابتًا) هي ما يحدّد من يستخدمها؛ الصفحة نفسها أداة مسح رمز QR/إدخال رمز يدويّ لتسوية نقد مُجمَّع من <b>عدّة سائقين</b> ميدانيًّا — مختلفة كليًّا عن <code>settlement_screen.dart</code> في Flutter (تلك خاصّة بتسوية السائق <b>لنفسه فقط</b>).<br>
+        بحث شامل في كامل <span class="path">mobile_app/lib</span> و<span class="path">apps/mobile/src</span> عن أيّ شاشة أو منطق يخدم هذا الدور تحديدًا — صفر نتيجة في كلا التطبيقَين.</p>
+      </div>
+      <div class="subblock decision"><div class="lbl">◆ لماذا هذا يستحقّ أولويّة، لا مجرّد "فجوة أخرى في القائمة"</div>
+        <p>وكيل التسوية بحكم طبيعة عمله يتنقّل فعليًّا بين نقاط التقاء السائقين لتحصيل/تسوية النقد — هذا بالضبط النمط الذي صُمِّم الهاتف المحمول من أجله (لا مكتب، لا حاسوب) بخلاف بقيّة أدوار لوحة التحكّم التي تُدار من مكتب. غيابه عن الجوّال يعني أنّ هذا الموظّف مضطرّ لاستخدام متصفّح الجوّال على صفحة ويب غير مُهيَّأة لشاشة صغيرة، أو حمل جهاز إضافيّ — كلاهما احتكاك تشغيليّ حقيقيّ يوميّ.</p>
+      </div>
+      <div class="subblock fix"><div class="lbl">◆ نطاق الإصلاح المقترح</div>
+        <p>شاشة جوّال جديدة (وليست تعديلًا على شاشة قائمة): ماسح QR (السائقان في مطعم النجمة ودفتر السائق يستخدمان بالفعل مكتبة <code>image_picker</code>/كاميرا في Flutter — بنية تحتيّة مشابهة قابلة لإعادة الاستخدام لماسح رمز QR)، حقل إدخال رمز يدويّ احتياطيّ (نفس نمط <code>settlement_screen.dart</code> الحاليّ للسائق: "رمز QR + رمز احتياطيّ نصّيّ")، وقائمة تسويات اليوم لهذا الوكيل. هذه ميزة جديدة كاملة، لا إصلاح عطب — تُدرَج في خارطة الطريق كبند مستقلّ بتقدير جهد واقعيّ منفصل عن دفعات إصلاح الأعطاب.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ S08 : CONTROL ROOM CONFIRMATION ============ -->
+  <section class="sheet" id="s08">
+    <div class="sheet-head"><span class="sheet-num">SHEET 08</span><h2>لوحة التحكّم (Ops) على الجوّال: مُصغَّرة عمدًا — وهذا صحيح فعليًّا</h2><span class="stamp stamp-ok">✓ مؤكَّد، لا يحتاج تعديلًا</span></div>
+    <p class="lede">التوجيه طلب صراحة أن تبقى لوحة التحكّم ممنوعة أو صغيرة على الجوّال. التحقّق المباشر يؤكّد أنّ هذا مُطبَّق فعليًّا اليوم:</p>
+    <div class="diagram coverage">
+      <div class="diagram-cap">حجم سطح لوحة التحكّم (Ops/ControlPanel) — عدد الشاشات</div>
+      <div class="cov-row"><span class="cov-label">الويب</span><div class="cov-track"><div class="cov-fill web" style="width:100%"></div></div><span class="cov-pct">104 صفحة</span></div>
+      <div class="cov-row"><span class="cov-label">Flutter</span><div class="cov-track"><div class="cov-fill flutter" style="width:5%"></div></div><span class="cov-pct">5 شاشات (4.8%)</span></div>
+      <div class="cov-row"><span class="cov-label">React Native</span><div class="cov-track"><div class="cov-fill rn" style="width:1%"></div></div><span class="cov-pct">شاشة واحدة (~1%)</span></div>
+    </div>
+    <div class="note-block ok"><b>لا حاجة لأيّ إجراء هنا.</b> 104 صفحة إداريّة/ماليّة/امتثال على الويب (Ops* وControlPanel*) — أدوات عمل مكتبيّ عميق (تسويات، سجلّات تدقيق، تكوين ماليّ، محرّك مكافآت، مراجعة احتيال...) لا تناسب شاشة هاتف أصلًا. الشاشات الخمس الموجودة في Flutter (لوحة عمليّات مبسّطة، شكاوى، تحكّم سائقين، بوابات الإطلاق، تجربة تجريبيّة) تغطية كافية للاطّلاع السريع الميدانيّ فقط — وهذا التوازن الصحيح بالضبط. البند الوحيد المتعلّق بلوحة التحكّم في هذه الخطة هو PO6 (أزرار الشؤون الماليّة/الامتثال بلا وعي صلاحيّات دقيق) — وهو تصحيح أمان صغير داخل الشاشات الخمس الموجودة أصلًا، لا توسيع لنطاقها.</div>
+  </section>
+
+  <!-- ============ S09 : SAFE ROLLOUT PLAN (NEW) ============ -->
+  <section class="sheet" id="s09">
+    <div class="sheet-head"><span class="sheet-num">SHEET 09</span><h2>خطة الطرح الآمن</h2><span class="stamp stamp-new">◆ قسم جديد بالكامل</span></div>
+    <p class="lede">رصد الوكيل العدائيّ غيابًا حقيقيًّا: لا خطة توافق-خلفيّ، لا علامات تفعيل تدريجيّة، لا مقياس نجاح بعد النشر. هذا القسم يسدّ الثلاثة:</p>
+    <div class="card">
+      <div class="card-head"><h3>نافذة التوافق الخلفيّ</h3></div>
+      <p>تحديثات متجر التطبيقات لا تصل لكل المستخدمين فورًا — نسخة قديمة من التطبيق ونسخة جديدة من الخادم ستتعايشان لأيّام أو أسابيع. <b>القاعدة:</b> أيّ تعديل خادم في هذه الخطة (معالج الخطأ العامّ، CA8) يجب أن يبقى متوافقًا مع نسخة التطبيق الحاليّة (تعديلات إضافيّة، لا تغييرات كاسرة) — بينما تعديلات التطبيق (DR1/DR2/AU1/AU2) لا تنتظر شيئًا من الخادم لأنّ المسارات المطلوبة موجودة أصلًا.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>علامات تفعيل قابلة للإيقاف الفوريّ</h3></div>
+      <p>الإصلاحات عالية الخطورة على الأخطاء الصامتة إن ظهر فيها خلل غير متوقَّع (طبقة zod الجديدة في RN، آلة حالة DR2 الجديدة) تُنشَر خلف علامة تفعيل بعيدة — لا يمكن التراجع عن كود جوّال منشور فورًا كما يُتراجَع عن الخادم، فمفتاح إيقاف بعيد هو شبكة الأمان الوحيدة الفعليّة.</p>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>مقياس نجاح واحد لكل حاجز</h3></div>
+      <p>لا وسيلة اليوم لتأكيد أنّ DR1 "نجح" فعليًّا بعد النشر سوى الفحص اليدويّ. <b>الإضافة:</b> DR1 — نسبة استدعاءات <code>/dispatch/offers</code> التي تُعيد قائمة غير فارغة؛ DR2 — نسبة الطلبات التي تصل فعليًّا لحالة <code>DELIVERED</code> بعد <code>ARRIVED_AT_DESTINATION</code>؛ RS2/SC1 — عدد أخطاء تحقّق zod المُسجَّلة عبر Sentry يوميًّا (يجب أن يهبط لصفر تقريبًا خلال أسبوع من النشر).</p>
+    </div>
+  </section>
+
+  <!-- ============ S10 : LATEST TECH ============ -->
+  <section class="sheet" id="s10">
+    <div class="sheet-head"><span class="sheet-num">SHEET 10</span><h2>أحدث التقنيات المعتمدة في هذه الخطة</h2></div>
+    <div class="gap-table-wrap"><table>
+      <tr><th>القرار</th><th>الحالة الفعليّة في المشروع</th><th>التوصية</th></tr>
+      <tr><td>البنية المعماريّة الجديدة لـReact Native (Fabric/TurboModules)</td><td class="ev">Expo SDK 57 (ضمن نطاق SDK 53+)</td><td class="chk yes">✓ مُفعَّلة افتراضيًّا بالفعل — لا إجراء مطلوب. بحسب توثيق Expo الرسميّ، SDK 53+ يُفعِّلها تلقائيًّا، وSDK 55+ لا يسمح حتى بإيقافها.</td></tr>
+      <tr><td>go_router للتنقّل في Flutter</td><td class="ev">router.dart — مُستخدَم فعليًّا بالكامل</td><td class="chk yes">✓ يطابق التوصية الرسميّة الحاليّة لمعماريّة Flutter (docs.flutter.dev/app-architecture/recommendations) — البقاء عليه، لا التبديل.</td></tr>
+      <tr><td>إدارة الحالة: Provider (Flutter) — البقاء عليه، لا الانتقال لـRiverpod</td><td class="ev">provider: ^6.1.2 — مُستخدَم عبر كامل التطبيق</td><td class="chk no">✗ قرار مقصود بعدم التبديل — انظر الملاحظة أدناه</td></tr>
+      <tr><td>zod <code>.transform()</code> عند حدود الشبكة (RN)</td><td class="ev">zod v4 مثبَّتة، مُستخدَمة اليوم للنماذج فقط</td><td class="chk yes">✓ توسيع استخدام مكتبة موجودة — لا إضافة اعتماديّة جديدة</td></tr>
+      <tr><td><code>Stack.Protected</code> لحراسة التنقّل حسب الدور (RN)</td><td class="ev">docs.expo.dev/router/advanced/protected</td><td class="chk yes">✓ الأسلوب الرسميّ الحاليّ لـExpo Router — يحلّ SC4</td></tr>
+      <tr><td><code>refreshListenable</code> + <code>redirect</code> لحراسة الجلسة (Flutter)</td><td class="ev">router.dart:43 — موجود بالفعل</td><td class="chk yes">✓ موجود ومُستخدَم أصلًا — يحتاج فقط ربط M2 به (القسم 02)</td></tr>
+      <tr><td>openapi-typescript كمصدر حقيقة (RN)</td><td class="ev">سكربت <code>gen:types</code> موجود، لم يُشغَّل قط</td><td class="chk yes">✓ إعادة استخدام أداة موجودة — يحلّ RS2/SC1 وSC3/RS3 معًا</td></tr>
+    </table></div>
+    <div class="note-block fix">
+      <b>لماذا لا نوصي بالانتقال من Provider إلى Riverpod رغم كونه "الأحدث" في نظر بعض المصادر:</b> الانتقال بين حلَّي إدارة حالة في تطبيق يعمل فعليًّا (ليس مشروعًا جديدًا) هو إعادة كتابة واسعة عالية الخطر بلا فائدة تشغيليّة مباشرة تبرّرها — خاصّة أنّ التكامل الحاليّ بين <code>Provider</code> وgo_router (<code>refreshListenable</code>) يعمل بشكل صحيح فعليًّا (القسم 02). "الأحدث" ليس دائمًا "الأصوب الآن" — القرار الهندسيّ الناضج هنا هو تحسين ما يعمل بدل استبداله. إن ظهرت لاحقًا حاجة هندسيّة فعليّة (لا مجرّد رغبة في مواكبة الأحدث)، يُعاد تقييم هذا القرار حينها بمعزل عن دورة الإصلاح الحاليّة.
+    </div>
+  </section>
+
+  <!-- ============ S11 : UNIFIED ROADMAP ============ -->
+  <section class="sheet" id="s11">
+    <div class="sheet-head"><span class="sheet-num">SHEET 11</span><h2>خارطة الطريق الموحَّدة النهائيّة</h2></div>
+    <div class="diagram" style="padding:26px 22px 10px">
+      <div class="phase-rail">
+        <div class="phase-node"><div class="pt"></div><div class="pl">دفعة 1</div><div class="ps">DR1+DR2+M4 (متزامنة) · AU1+AU2</div></div>
+        <div class="phase-tick"></div>
+        <div class="phase-node"><div class="pt"></div><div class="pl">دفعة 2</div><div class="ps">RS2/SC1 + SC3/RS3 (طبقة zod كاملة)</div></div>
+        <div class="phase-tick"></div>
+        <div class="phase-node"><div class="pt"></div><div class="pl">دفعة 3</div><div class="ps">معالج الخطأ العامّ (خادم) + M2</div></div>
+        <div class="phase-tick"></div>
+        <div class="phase-node"><div class="pt"></div><div class="pl">دفعة 4</div><div class="ps">CB2 · CB3+CB4 · CB5/SC2 · CA8</div></div>
+        <div class="phase-tick"></div>
+        <div class="phase-node"><div class="pt"></div><div class="pl">دفعة 5</div><div class="ps">تكافؤ الميزات (بحث، حذف حساب، إلخ)</div></div>
+        <div class="phase-tick"></div>
+        <div class="phase-node"><div class="pt"></div><div class="pl">دفعة 6</div><div class="ps">شاشة وكيل التسوية (ميزة جديدة)</div></div>
+      </div>
+    </div>
+    <div class="note-block fix">
+      <b>التغييرات عن النسخة السابقة:</b> M2 انتقل للدفعة 3 (بعد معالج الخطأ العامّ، لا قبله — كلاهما تعديلات على مسارات خطأ الشبكة، تجميعهما يقلّل عدد جلسات الاختبار). AU1/AU2 وM4-التسجيل صراحة لنفس المطوّر (تفادي تعارض دمج). دفعتان جديدتان (5، 6) لتكافؤ الميزات ودور وكيل التسوية — مفصولتان عمدًا عن دفعات إصلاح الأعطاب (1-4) لأنّهما عمل ميزات جديدة، لا إصلاحات، بمعدّل مخاطرة وتخطيط مختلفَين.
+    </div>
+  </section>
+
+  <!-- ============ S12 : FIXED LEDGER ============ -->
+  <section class="sheet" id="s12">
+    <div class="sheet-head"><span class="sheet-num">SHEET 12</span><h2>السجلّ الكامل المُصحَّح — 57 بندًا، بلا عدّ مضاعف</h2></div>
+    <p class="lede">هذا السجلّ يُصحّح خطأ العدّ المضاعف الذي رصده الوكيل العدائيّ (القسم 01) — كل زوج مُدمَج صفّ واحد فقط.</p>
+    <details class="module" open>
+      <summary>الحواجز الثلاثة <span class="cnt">3 بنود</span></summary>
+      <div class="gap-table-wrap"><table>
+        <tr><th>#</th><th>الوصف</th><th>الحالة</th></tr>
+        <tr><td class="id">DR1</td><td>قائمة عروض السائق فارغة دائمًا</td><td><span class="stamp stamp-verified">✓</span></td></tr>
+        <tr><td class="id">DR2</td><td>التسليم لا يكتمل أبدًا</td><td><span class="stamp stamp-verified">✓</span></td></tr>
+        <tr><td class="id">RS2/SC1</td><td>طبقة بيانات RN كاملة مكسورة</td><td><span class="stamp stamp-verified">✓</span></td></tr>
+      </table></div>
+    </details>
+    <details class="module">
+      <summary>Flutter — التوثيق والدخول <span class="cnt">8 بنود</span></summary>
+      <div class="gap-table-wrap"><table>
+        <tr><td class="id">AU1</td><td>confirm_password غير مُرسَل</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">AU2</td><td>حالة أحرف الدور خاطئة</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">AU3</td><td>قفل TOTP بلا استرجاع</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">AU4</td><td>رمز تجريبيّ ثابت في الإنتاج</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">AU5</td><td>مكتبة بصمة غير مستخدَمة</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">AU6</td><td>نوع نشاط المزوّد لا يُرسَل</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+        <tr><td class="id">AU7/CB7</td><td>لا حذف حساب (مدمج)</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">AU8</td><td>لا ترويسة منصّة</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+      </table></div>
+    </details>
+    <details class="module">
+      <summary>Flutter — البنية التحتيّة <span class="cnt">7 بنود (بعد استبعاد M5 المرفوض)</span></summary>
+      <div class="gap-table-wrap"><table>
+        <tr><td class="id">M1/CB1</td><td>صندوق الإشعارات معطَّل</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">M2</td><td>دخول شبحيّ بعد فشل التجديد</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">M3</td><td>فقدان رمز الخطأ (18 موقعًا موضعيًّا، 429 كليًّا)</td><td><span class="stamp stamp-corrected">↻</span></td></tr>
+        <tr><td class="id">M4</td><td>سقوط GPS صامت</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">M6/CA1</td><td>حالات طلب خام غير مُترجَمة (مدمج)</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">M7/CB8</td><td>لا تبديل لغة (مدمج)</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">M8</td><td>إشعار فوريّ غير متوافق مع الصندوق الداخليّ</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+      </table></div>
+      <div class="note-block ok" style="margin:10px 18px">M5 (كاش دون اتّصال "كود ميّت") — <span class="stamp stamp-refuted">✕ REFUTED</span> — hive مُستخدَم فعليًّا، حُذف من السجلّ نهائيًّا.</div>
+    </details>
+    <details class="module">
+      <summary>Flutter — واجهات العميل <span class="cnt">11 بندًا (بعد إزالة التكرار)</span></summary>
+      <div class="gap-table-wrap"><table>
+        <tr><td class="id">CA2</td><td>لا واجهة ردّ على البديل المقترح</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">CA3</td><td>مسح السلّة بلا تأكيد</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">CA4</td><td>لا جلب لبيانات المزوّد نفسه</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">CA5</td><td>حقول قائمة التصفّح مفقودة</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">CA6</td><td>لا دبّوس موقع عند الدفع</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">CA8</td><td>لا إلغاء لحالتَين (خادم)</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">CB2</td><td>محادثة الدعم معطَّلة</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">CB3</td><td>تقييم الطلب معطَّل (حقول)</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">CB4</td><td>مدخل تقييم ثانٍ ينهار صامتًا</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">CB5</td><td>دفتر العناوين حقول خاطئة</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">CB6</td><td>لا سجلّ معاملات محفظة</td><td><span class="stamp stamp-med">MED</span></td></tr>
+      </table></div>
+    </details>
+    <details class="module">
+      <summary>Flutter — دورة السائق <span class="cnt">5 بنود (+ حاجزان أعلاه)</span></summary>
+      <div class="gap-table-wrap"><table>
+        <tr><td class="id">DR3</td><td>لا تنقّل تلقائيّ بعد القبول</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">DR4</td><td>فشل الاستطلاع يبدو كـ"لا عروض"</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">DR5</td><td>إثبات التسليم تجميليّ</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">DR6</td><td>لا تحذير ازدواج احتساب</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">DR7</td><td>الأرباح تُخفي الغرامات</td><td><span class="stamp stamp-med">MED</span></td></tr>
+      </table></div>
+    </details>
+    <details class="module">
+      <summary>Flutter — المزوّد والعمليّات <span class="cnt">8 بنود</span></summary>
+      <div class="gap-table-wrap"><table>
+        <tr><td class="id">PO1</td><td>قائمة الطلبات بلا حدّ/فلتر</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">PO2</td><td>قبول الطلب مقيَّد خطأً بالمالك</td><td><span class="stamp stamp-verified">✓</span></td></tr>
+        <tr><td class="id">PO3</td><td>قائمة وثائق KYC فارغة دائمًا</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">PO4</td><td>لا سبب رفض للأصناف</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">PO5</td><td>أزرار مالك تظهر للموظّفين</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">PO6</td><td>أزرار ماليّة/امتثال بلا وعي صلاحيّات</td><td><span class="stamp stamp-verified">✓</span></td></tr>
+        <tr><td class="id">PO7</td><td>سبب الإلغاء لا يُقرأ</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+        <tr><td class="id">PO8</td><td>تحليل الشكاوى هشّ</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+      </table></div>
+    </details>
+    <details class="module">
+      <summary>React Native <span class="cnt">11 بندًا (+ الحاجز أعلاه)</span></summary>
+      <div class="gap-table-wrap"><table>
+        <tr><td class="id">RS1</td><td>فكّ تغليف الخطأ لا يقرأ detail</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">SC2</td><td>عناوين محليّة بحتة</td><td><span class="stamp stamp-high">HIGH</span></td></tr>
+        <tr><td class="id">SC3/RS3</td><td>enum حالة الطلب ناقص وخاطئ</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">SC4</td><td>لا حارس تنقّل حسب الدور</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">SC5</td><td>لا جلب بيانات المستخدم</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">SC6</td><td>لا حقل كوبون</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">RS4</td><td>عنوان تطوير محليّ غير متوافق</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">RS5</td><td>RTL ثابت رغم تبديل اللغة</td><td><span class="stamp stamp-med">MED</span></td></tr>
+        <tr><td class="id">SC7</td><td>لا حذف حساب</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+        <tr><td class="id">SC8</td><td>حقول غائبة من نوع البيانات</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+        <tr><td class="id">SC9</td><td>SSE بلا إعادة اتّصال بتوكن مُجدَّد</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+        <tr><td class="id">RS6</td><td>لا معالج إبطال جلسة عامّ</td><td><span class="stamp stamp-low">LOW</span></td></tr>
+      </table></div>
+    </details>
+  </section>
+
+  <footer class="colophon">
+    <span>السلسلة: تقرير 471 ← تحقّق عميق ← هذه المراجعة النهائيّة (2026-07-13)</span>
+    <span>المنهج: مراجعة عدائيّة + تدقيق تكافؤ ميزات + تحقّق مباشر إضافيّ</span>
+  </footer>
+
+</div>
+</div>

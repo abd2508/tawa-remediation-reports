@@ -1,0 +1,334 @@
+<title>505 — تحقّق شامل + عطل ثالث + نشر إنتاج بلا توقّف</title>
+<style>
+  @font-face {
+    font-family: "TawaSys";
+    src: local("Segoe UI"), local("Tahoma"), local("Noto Sans Arabic"), local("Arial");
+  }
+  :root {
+    --bg: #eef1f3; --surface: #ffffff; --surface-2: #f5f7f9; --text: #17222d; --muted: #5b6b7a;
+    --border: #dbe2e8; --accent: #a8790a; --accent-soft: #fdf3df; --accent2: #2f7d74; --accent2-soft: #e6f3f1;
+    --ok: #1f8a4c; --ok-soft: #e6f6ec; --high: #c73037; --high-soft: #fbe7e8; --med: #b06a17; --med-soft: #fbeedb;
+    --low: #5b6b7a; --low-soft: #edf0f2; --code-bg: #101820; --code-text: #d7e2ea;
+    --shadow: 0 1px 2px rgba(20,30,40,.06), 0 6px 20px rgba(20,30,40,.06);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1720; --surface: #172230; --surface-2: #1c2836; --text: #e8edf3; --muted: #93a4b5;
+    --border: #2a3849; --accent: #d9ad4d; --accent-soft: #2b2416; --accent2: #55b6ab; --accent2-soft: #142523;
+    --ok: #4cc179; --ok-soft: #10281a; --high: #f0666c; --high-soft: #2c1517; --med: #e0a655; --med-soft: #2b2013;
+    --low: #93a4b5; --low-soft: #1c2836; --code-bg: #0a1017; --code-text: #cfe0ea;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1720; --surface: #172230; --surface-2: #1c2836; --text: #e8edf3; --muted: #93a4b5;
+      --border: #2a3849; --accent: #d9ad4d; --accent-soft: #2b2416; --accent2: #55b6ab; --accent2-soft: #142523;
+      --ok: #4cc179; --ok-soft: #10281a; --high: #f0666c; --high-soft: #2c1517; --med: #e0a655; --med-soft: #2b2013;
+      --low: #93a4b5; --low-soft: #1c2836; --code-bg: #0a1017; --code-text: #cfe0ea;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  .report-root {
+    direction: rtl; text-align: right; font-family: "TawaSys", "Segoe UI", Tahoma, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.85; max-width: 1000px; margin: 0 auto; padding: 28px 20px 80px;
+  }
+  .report-root code, .report-root .mono { font-family: "Cascadia Code", "Consolas", monospace; direction: ltr; unicode-bidi: isolate; font-size: .85em; }
+  h1, h2, h3 { text-wrap: balance; font-weight: 800; margin: 0 0 .4em; }
+  h1 { font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.2rem); letter-spacing: -.01em; }
+  h2 { font-size: clamp(1.2rem, 1rem + 1vw, 1.55rem); margin-top: 0; }
+  h3 { font-size: 1.02rem; color: var(--accent2); }
+  p { margin: 0 0 1em; }
+  .muted { color: var(--muted); }
+  header.hero { background: linear-gradient(155deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 18px; padding: 30px 28px; margin-bottom: 24px; box-shadow: var(--shadow); }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 700; color: var(--accent2); background: var(--accent2-soft); border: 1px solid var(--accent2); border-radius: 999px; padding: 4px 14px; margin-bottom: 14px; }
+  header.hero .lede { font-size: 1.03rem; color: var(--muted); max-width: 68ch; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 22px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; text-align: center; }
+  .stat b { display: block; font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: .76rem; color: var(--muted); }
+  .stat.ok b { color: var(--ok); } .stat.high b { color: var(--high); }
+  section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 26px 26px 28px; margin-bottom: 22px; box-shadow: var(--shadow); }
+  section > .section-num { display: inline-block; font-size: .74rem; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 12px; margin-bottom: 10px; }
+  .callout { background: var(--surface-2); border-inline-start: 4px solid var(--accent2); border-radius: 10px; padding: 14px 18px; margin: 16px 0; font-size: .95rem; }
+  .callout.warn { border-inline-start-color: var(--med); }
+  .callout.high { border-inline-start-color: var(--high); background: var(--high-soft); }
+  .callout.ok { border-inline-start-color: var(--ok); }
+  .callout b.tag { color: var(--accent2); }
+  .callout.warn b.tag { color: var(--med); }
+  .callout.high b.tag { color: var(--high); }
+  .callout.ok b.tag { color: var(--ok); }
+
+  .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; margin: 20px 0; overflow-x: auto; padding-bottom: 6px; }
+  .flow-step { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 150px; flex: 1 1 150px; display: flex; flex-direction: column; gap: 4px; }
+  .flow-step .who { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: var(--accent2); }
+  .flow-step .what { font-size: .9rem; font-weight: 700; }
+  .flow-step .detail { font-size: .78rem; color: var(--muted); }
+  .flow-step.bad { border-color: var(--high); background: var(--high-soft); }
+  .flow-step.good { border-color: var(--ok); background: var(--ok-soft); }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; min-width: 30px; color: var(--muted); font-size: 1.2rem; }
+  @media (max-width: 680px) { .flow { flex-direction: column; } .flow-arrow { transform: rotate(90deg); padding: 2px 0; } }
+
+  /* clock comparison diagram */
+  .clock-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .clock-compare { grid-template-columns: 1fr; } }
+  .clock-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: var(--surface-2); text-align: center; }
+  .clock-card.bad { border-color: var(--high); background: var(--high-soft); }
+  .clock-card.good { border-color: var(--ok); background: var(--ok-soft); }
+  .clock-card h4 { margin: 0 0 10px; font-size: .92rem; }
+  .clock-card .val { font-family: "Cascadia Code", monospace; direction: ltr; font-size: 1rem; font-weight: 700; display: block; margin: 4px 0; }
+  .clock-card .lbl { font-size: .74rem; color: var(--muted); }
+
+  .timeline { position: relative; padding-inline-start: 26px; margin: 20px 0; }
+  .timeline::before { content: ""; position: absolute; inset-inline-start: 7px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+  .t-item { position: relative; padding-bottom: 20px; }
+  .t-item:last-child { padding-bottom: 0; }
+  .t-item::before { content: ""; position: absolute; inset-inline-start: -26px; top: 4px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent2); border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--border); }
+  .t-item.warn::before { background: var(--med); }
+  .t-item.ok::before { background: var(--ok); }
+  .t-item b { display: block; font-size: .92rem; }
+  .t-item span.time { font-size: .74rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .t-item p { margin: 4px 0 0; font-size: .87rem; color: var(--muted); }
+
+  .deploy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin: 18px 0; }
+  .deploy-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: var(--surface-2); }
+  .deploy-card .status { font-size: .74rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; color: var(--ok); }
+  .deploy-card .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .deploy-card h4 { margin: 0 0 4px; font-size: .96rem; }
+  .deploy-card p { margin: 0; font-size: .8rem; color: var(--muted); }
+
+  table.simple { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .89rem; }
+  table.simple th, table.simple td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; }
+  table.simple th { background: var(--surface-2); font-weight: 700; }
+  .pill { display:inline-block; background: var(--accent2-soft); color: var(--accent2); border-radius: 999px; padding: 2px 10px; font-size:.76rem; font-weight:700; }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); }
+  ul.plain { margin: 0 0 1em; padding-inline-start: 22px; }
+  ul.plain li { margin-bottom: 6px; }
+  .codebox { background: var(--code-bg); color: var(--code-text); border-radius: 10px; padding: 14px 16px; font-size: .82rem; overflow-x: auto; margin: 12px 0; direction: ltr; text-align: left; }
+  footer { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 30px; }
+</style>
+
+<div class="report-root">
+
+<header class="hero">
+  <span class="eyebrow">تقرير 505 · متابعة تقرير 504 · محدَّث بنتيجة التحقّق النهائي</span>
+  <h1>تحقّق شامل على 3 منصّات، عطل ثالث اكتُشِف حيًّا، ونشر إنتاج بلا أي توقّف</h1>
+  <p class="lede">
+    طلبتَ تشغيل حزمة الاختبارات الكاملة على test1 وtest/.194 والإنتاج للتأكّد. أثناء
+    التنفيذ، تكرّر بالضبط نفس السيناريو الذي حصل مع اختبارات ETA — لكن هذه المرّة اكتشفتُ
+    عطلًا حقيقيًّا **مختلفًا تمامًا** في الكود الإنتاجي نفسه (لا في الاختبار فقط)، أصلحته،
+    ثم نشرت كل شيء على المنصّات الثلاث — وهذه المرّة، بفضل الدرس المستفاد من حادثة الأمس،
+    نشر الإنتاج تمّ **بلا أي ثانية توقّف**.
+  </p>
+  <div class="stat-row">
+    <div class="stat ok"><b>3/3</b><span>منصّات مُتحقَّقة بالكامل</span></div>
+    <div class="stat"><b>1</b><span>عطل حقيقي ثالث اكتُشِف</span></div>
+    <div class="stat ok"><b>1</b><span>أُصلح فورًا ونُشر</span></div>
+    <div class="stat ok"><b>3603</b><span>اختبارًا ناجحًا محليًّا</span></div>
+    <div class="stat danger" style="color:var(--ok)"><b>0</b><span>ثانية توقّف هذه المرّة</span></div>
+  </div>
+</header>
+
+<!-- ================= القسم 1 ================= -->
+<section>
+  <span class="section-num">أولًا</span>
+  <h2>ماذا حصل: نفس السيناريو، عطل مختلف تمامًا</h2>
+  <p>
+    شغّلتُ حزمة الاختبارات الكاملة (3607 اختبارًا) على جهاز test1. أثناء التشغيل — الذي
+    استغرق حوالي 6 دقائق — تحرّك التاريخ الحقيقي من 16 يوليو إلى 17 يوليو في منتصف التشغيل
+    بالضبط. اختبار واحد جديد فشل فجأة: <code>test_f9_daily_settlement_excludes_tip</code>،
+    وهو يفحص ميزة "تسوية السائق اليومية" (كم نقدًا يجب أن يسلّمه السائق للمنصّة كل يوم).
+  </p>
+  <p>
+    بخلاف اختباري ETA السابقَين (اللذَين كانا خللًا في <b>الاختبار نفسه</b> فقط)، هذه المرّة
+    الفحص العميق أثبت أن الخلل موجود في <b>الكود الإنتاجي الحقيقي</b> — وإن كان أثره محدودًا
+    كما سيتّضح.
+  </p>
+</section>
+
+<!-- ================= القسم 2 ================= -->
+<section>
+  <span class="section-num">ثانيًا</span>
+  <h2>التشخيص: خطأ ساعتَين في التعامل مع المنطقة الزمنية</h2>
+  <p>
+    ميزة التسوية اليومية تحسب "بداية اليوم" و"نهايته" بتوقيت ليبيا (+2 ساعة عن غرينتش)، ثم
+    تبحث عن كل عمليّات تحصيل النقد التي وقعت بين هاتين النقطتين. المشكلة: عند تخزين هذه
+    الحدود الزمنية في قاعدة بيانات الاختبار (SQLite)، اكتشفتُ — بالفحص المباشر للقيمة
+    الفعليّة المخزَّنة — أن "الفارق +2 ساعة" الخاص بتوقيت ليبيا كان <b>يُهمَل بالكامل</b> بدل
+    أن يُحوَّل بشكل صحيح لتوقيت غرينتش، ما يُنتج خطأً مقداره ساعتان بالضبط في حدود اليوم.
+  </p>
+  <div class="clock-compare">
+    <div class="clock-card bad">
+      <h4>ما كان يحدث فعليًّا (خطأ)</h4>
+      <span class="lbl">حدّ بداية اليوم بتوقيت ليبيا، كما يُخزَّن بالخطأ</span>
+      <span class="val">2026-07-17 00:00:00</span>
+      <span class="lbl">← فُقِد الفارق +2، وكأنّه توقيت غرينتش مباشرة</span>
+    </div>
+    <div class="clock-card good">
+      <h4>ما كان يجب أن يحدث (صحيح)</h4>
+      <span class="lbl">نفس اللحظة، محوَّلة بشكل صحيح لتوقيت غرينتش</span>
+      <span class="val">2026-07-16 22:00:00</span>
+      <span class="lbl">← هذه هي اللحظة الحقيقية الصحيحة (بعد طرح الفارق +2)</span>
+    </div>
+  </div>
+  <p>
+    نتيجة هذا الخطأ: أي عمليّة تحصيل نقد تقع بين الساعة العاشرة مساءً ومنتصف الليل بتوقيت
+    غرينتش (أي بين منتصف الليل والثانية صباحًا بتوقيت ليبيا) كانت "تسقط خارج" نافذة اليوم
+    المحسوبة، فلا تُحتسَب في تسوية ذلك اليوم إطلاقًا — <b>كل ليلة</b>، وليس فقط اليوم الذي
+    اكتشفتُ فيه المشكلة.
+  </p>
+  <div class="callout ok">
+    <b class="tag">الطمأنينة المهمّة:</b> تحقّقتُ بدقّة أن هذا الخلل خاصّ فقط بقاعدة بيانات
+    الاختبار (SQLite)، ولا يؤثّر إطلاقًا على قاعدة بيانات الإنتاج الحقيقيّة (PostgreSQL) —
+    فهذه الأخيرة تُحوِّل التوقيتات لتوقيت غرينتش بشكل صحيح دائمًا مهما كان التوقيت الأصلي.
+    بمعنى آخر: <b>لم يكن هناك خلل فعليّ في تسويات السائقين الحقيقيّة على الإنتاج أبدًا</b> —
+    لكن الاعتماد الضمنيّ على هذا السلوك بدل كتابة الكود بوضوح كان أمرًا هشًّا يستحقّ
+    الإصلاح، وأصلحتُه.
+  </div>
+</section>
+
+<!-- ================= القسم 3 ================= -->
+<section>
+  <span class="section-num">ثالثًا</span>
+  <h2>الإصلاح</h2>
+  <p>
+    جعلتُ الكود يحوِّل حدود اليوم صراحةً لتوقيت غرينتش قبل استخدامها، بدل الاعتماد الضمنيّ
+    على أن قاعدة البيانات ستفعل ذلك بنفسها بشكل صحيح:
+  </p>
+  <div class="codebox">
+<span style="color:#8fa1b3"># قبل — يعتمد ضمنيًّا على سلوك قاعدة البيانات</span>
+period_start = d
+period_end = d + timedelta(days=1)
+
+<span style="color:#8fa1b3"># بعد — تحويل صريح وواضح، صحيح على كل قاعدة بيانات</span>
+period_start = d.astimezone(timezone.utc)
+period_end = (d + timedelta(days=1)).astimezone(timezone.utc)
+  </div>
+  <div class="callout ok">
+    <b class="tag">التحقّق:</b> الاختبار نجح، كل الاختبارات المرتبطة بنفس الميزة (35 اختبارًا)
+    نجحت، حزمة الاختبارات الكاملة عادت إلى <b>3603 ناجح / صفر فاشل</b>، وفحص سلامة العقود
+    الماليّة (FIN-COR) ناجح. رُفع الإصلاح على GitHub فورًا.
+  </div>
+</section>
+
+<!-- ================= القسم 4 ================= -->
+<section>
+  <span class="section-num">رابعًا</span>
+  <h2>لغز صغير أثناء التحقّق على الخوادم — وحلّه</h2>
+  <p>
+    بعد نشر الإصلاح على test1، شغّلتُ حزمة الاختبارات الكاملة <b>من داخل نفس صورة الخادم
+    المنشورة فعليًّا</b> للتأكّد التام. ظهرت 7 حالات "فشل" جديدة بدت مقلقة للوهلة الأولى.
+  </p>
+  <div class="flow">
+    <div class="flow-step bad">
+      <span class="who">الملاحظة الأولى</span>
+      <span class="what">7 اختبارات "فشلت"</span>
+      <span class="detail">كلها من نوع "توثيق/حوكمة" — تتحقّق من وجود ملفّات مثل README.md</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <span class="who">التحقيق</span>
+      <span class="what">هذه الملفّات غير موجودة أصلًا داخل صورة الخادم</span>
+      <span class="detail">صورة الخادم مبنيّة عمدًا من مجلّدات محدَّدة فقط (الكود التشغيليّ)، لا نسخة كاملة من كل ملفّات المشروع — هذا صحيح ومقصود منذ البداية</span>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step good">
+      <span class="who">الخلاصة</span>
+      <span class="what">لا علاقة لها بأي من إصلاحاتي</span>
+      <span class="detail">3603 (المحليّ) − 7 (تحتاج ملفّات غير موجودة داخل الصورة) = 3596 — تطابق رياضيّ تامّ، ونفس النمط تكرّر مطابقًا 100% على test1 وtest/.194 والإنتاج الثلاثة</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= القسم 5 ================= -->
+<section>
+  <span class="section-num">خامسًا</span>
+  <h2>النشر الكامل على المنصّات الثلاث</h2>
+  <div class="deploy-grid">
+    <div class="deploy-card"><div class="status"><span class="dot"></span>مكتمل ومُتحقَّق</div><h4>test 1</h4><p>أُعيد بناؤه، أُعيد نشره، صحّي، حزمة الاختبارات كاملة داخل الصورة: 3596 ناجح (النمط المفسَّر أعلاه).</p></div>
+    <div class="deploy-card"><div class="status"><span class="dot"></span>مكتمل ومُتحقَّق</div><h4>test / .194</h4><p>نفس الخطوات بالضبط، نفس النتيجة المطابقة تمامًا.</p></div>
+    <div class="deploy-card"><div class="status"><span class="dot"></span>مكتمل ومُتحقَّق</div><h4>الإنتاج (tawanow.com)</h4><p>نفس الخطوات، مع خطوة إضافية تعلّمناها من حادثة الأمس (القسم التالي) — النتيجة مطابقة أيضًا.</p></div>
+  </div>
+
+  <h3>الدرس المستفاد من حادثة الأمس أثبت نفسه اليوم</h3>
+  <p>
+    في التقرير السابق (503)، وثّقتُ حادثة توقّف حقيقية على الإنتاج (~11 دقيقة) سببها نسيان
+    خطوة "ربط صورة تحديث قاعدة البيانات بصورة الخادم الجديدة" — وأصلحتُ سكربت النشر الرسمي
+    ليتضمّن هذه الخطوة إلزاميًّا في كل مرّة مستقبلًا.
+  </p>
+  <div class="timeline">
+    <div class="t-item ok">
+      <b>اليوم: نفس الخطوات بالضبط، لكن بالترتيب الصحيح هذه المرّة</b>
+      <p>طبّقتُ خطوة "ربط الصورتَين" <b>قبل</b> إعادة تشغيل الخادم مباشرة — تمامًا كما يُملي سكربت النشر المُصحَّح.</p>
+    </div>
+    <div class="t-item ok">
+      <b>النتيجة: صفر ثانية توقّف</b>
+      <p>الخادم توقّف وأُعيد تشغيله بالنسخة الجديدة بسلاسة تامّة — الفحص الصحّي نجح من أوّل محاولة، بلا أي تعطّل ملحوظ لأي مستخدم حقيقي.</p>
+    </div>
+  </div>
+  <div class="callout ok">
+    <b class="tag">هذا هو الدليل العمليّ:</b> الإصلاح الذي طُبِّق على سكربت النشر بعد حادثة
+    الأمس لم يكن مجرّد توثيق نظريّ — منع تكرار نفس الحادثة بالضبط اليوم، في أوّل فرصة
+    حقيقيّة لاختباره.
+  </div>
+</section>
+
+<!-- ================= القسم 6 ================= -->
+<section>
+  <span class="section-num">سادسًا</span>
+  <h2>الخلاصة</h2>
+  <table class="simple">
+    <tr><th>البند</th><th>الحالة</th></tr>
+    <tr><td>عطل التوقيت في تسوية السائق اليومية</td><td><span class="pill ok">مُكتشَف ومُصلَح ومُتحقَّق منه</span></td></tr>
+    <tr><td>نشر الإصلاح على test1 / test.194 / الإنتاج</td><td><span class="pill ok">3/3 مكتمل</span></td></tr>
+    <tr><td>حزمة الاختبارات الكاملة (بيئة التطوير)</td><td><span class="pill ok">3603 ناجح / صفر فاشل</span></td></tr>
+    <tr><td>فحص سلامة العقود الماليّة (FIN-COR)</td><td><span class="pill ok">ناجح</span></td></tr>
+    <tr><td>توقّف خدمة أثناء نشر الإنتاج</td><td><span class="pill ok">صفر — لأوّل مرّة منذ حادثة الأمس</span></td></tr>
+    <tr><td>GitHub</td><td><span class="pill ok">كل الإصلاحات مرفوعة</span></td></tr>
+  </table>
+  <p class="muted">لا توجد نقاط معلَّقة تحتاج قرارًا منك في هذا التقرير — كل شيء اكتمل واختُبِر ونُشِر.</p>
+</section>
+
+<!-- ================= القسم 7 (تحديث لاحق) ================= -->
+<section>
+  <span class="section-num">سابعًا · تحديث لاحق</span>
+  <h2>دمج كل العمل في طلب سحب واحد على GitHub، وتحقّق نهائي من تزامن المنصّات الأربع</h2>
+  <p>
+    بطلبك، دمجتُ كل الالتزامات (39 التزامًا، تشمل كل ما ورد في هذا التقرير) في طلب سحب واحد
+    (PR #19) على فرع <code>master</code> الرسمي، ثم حذفتُ فرع العمل المؤقّت بعد التأكّد من
+    اكتمال الدمج بنجاح.
+  </p>
+
+  <div class="callout warn">
+    <b class="tag">شفافية كاملة عن خطأ صغير أثناء التنظيف، ومعالجته الآمنة:</b> أثناء محاولة
+    حذف الفرع محليًّا، انتقلتُ بالخطأ إلى نسخة محليّة قديمة جدًّا من <code>master</code> (لم
+    تُحدَّث منذ 12 يوليو) بدل النسخة الحديثة — ما جعل ملفّات مجلّد العمل تظهر مؤقّتًا بحالتها
+    القديمة. <b>نظام الأمان في الأداة أوقف محاولتي الأولى لإصلاح ذلك تلقائيًّا</b> لأنّها كانت
+    ستحذف تاريخ الفرع المحلي دون إذن صريح منك بالضبط لهذه الخطوة — فتوقّفتُ، شرحتُ لك الموقف
+    كاملًا، وانتظرتُ قرارك. لم يحدث أي فقدان بيانات في أي لحظة: كل العمل كان محفوظًا بأمان
+    على GitHub وعلى الفرع الأصليّ طوال الوقت — الخطأ كان محصورًا في عرض محليّ مؤقّت فقط.
+    بعد موافقتك الصريحة، أصلحتُ النسخة المحليّة وحذفتُ الفرع بأمان.
+  </div>
+
+  <h3>التحقّق النهائي: هل المنصّات الأربع لا تزال متطابقة بعد كل هذا؟</h3>
+  <p>
+    فحصتُ كل منصّة بثلاث طرق مستقلّة: حالة الخدمة الصحّية، وجود نصّ الإصلاح الفعلي داخل
+    الكود المنشور فعليًّا (لا مجرّد افتراض)، نسخة قاعدة البيانات، وفحص خارجي حقيقي عبر
+    الدومين الحيّ لكل بيئة.
+  </p>
+  <table class="simple">
+    <tr><th>المنصّة</th><th>الحالة الصحّية</th><th>الإصلاح موجود فعليًّا؟</th><th>نسخة قاعدة البيانات</th><th>فحص خارجي حيّ</th></tr>
+    <tr><td>GitHub</td><td>—</td><td><span class="pill ok">master يطابق كل شيء</span></td><td>—</td><td>—</td></tr>
+    <tr><td>test1</td><td><span class="pill ok">سليمة</span></td><td><span class="pill ok">نعم</span></td><td>ab36</td><td><span class="pill ok">200</span></td></tr>
+    <tr><td>test / .194</td><td><span class="pill ok">سليمة</span></td><td><span class="pill ok">نعم</span></td><td>ab36</td><td><span class="pill ok">200</span></td></tr>
+    <tr><td>الإنتاج</td><td><span class="pill ok">سليمة</span></td><td><span class="pill ok">نعم</span></td><td>ab36</td><td><span class="pill ok">200</span></td></tr>
+  </table>
+  <div class="callout ok">
+    <b class="tag">النتيجة:</b> كل المنصّات الأربع متطابقة ومتزامنة تمامًا بلا أي انحراف —
+    عمليّات تنظيف الفروع على GitHub (الدمج + الحذف) لم تؤثّر إطلاقًا على أي خادم مباشر، تمامًا
+    كما هو متوقَّع من عمليّة Git بحتة لا تلمس الحاويات المنشورة.
+  </div>
+</section>
+
+<footer>تقرير 505 — تووا (Tawa) · 2026-07-17</footer>
+
+</div>

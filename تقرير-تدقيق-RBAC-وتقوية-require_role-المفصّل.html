@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقرير المفصّل — تدقيق RBAC/الأمان + تقوية require_role</title>
+<style>
+  :root{
+    --green:#1f7a4d; --green-d:#14532d; --amber:#b45309; --gray:#64748b;
+    --bg:#f5f8f6; --card:#fff; --border:#dbe5df; --ink:#16201c; --muted:#566860;
+    --ok:#15803d; --okbg:#e7f6ec; --warnbg:#fef4e4; --err:#b91c1c; --errbg:#fdeceb;
+    --code-bg:#0f1c17; --code-ink:#e6f3ec;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:0;line-height:1.85;font-size:15px}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 80px}
+  header.hd{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:18px;padding:30px 30px;box-shadow:0 10px 30px rgba(20,83,45,.20)}
+  header.hd h1{margin:0 0 8px;font-size:25px;line-height:1.45}
+  header.hd .sub{opacity:.93;font-size:15.5px}
+  .pill{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:4px 14px;font-size:12.5px;margin:9px 5px 0 0}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin:18px 0}
+  nav.toc strong{color:var(--green-d);display:block;margin-bottom:8px}
+  nav.toc ol{margin:0;padding-inline-start:22px;columns:2;font-size:14px}
+  nav.toc a{color:var(--green);text-decoration:none} nav.toc a:hover{text-decoration:underline}
+  section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin:18px 0;box-shadow:0 2px 9px rgba(20,83,45,.05)}
+  h2{color:var(--green-d);font-size:20px;margin:2px 0 16px;padding-bottom:10px;border-bottom:2px solid #e9f2ec}
+  h3{color:var(--green);font-size:16.5px;margin:20px 0 9px}
+  p{margin:9px 0}
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13.8px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#edf5f0;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafcfb}
+  code,.mono{font-family:"SF Mono",Consolas,monospace;background:#eaf0ed;color:#0f2a1e;padding:1.5px 6px;border-radius:5px;font-size:12.8px;direction:ltr;display:inline-block}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:15px 17px;overflow:auto;font-family:"SF Mono",Consolas,monospace;font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;margin:11px 0}
+  pre .c{color:#7fa890} pre .k{color:#7fb0ff} pre .s{color:#9ee6a8} pre .add{color:#9ee6a8}
+  .ok{color:var(--ok);font-weight:700} .err{color:var(--err);font-weight:700}
+  .badge-ok{background:var(--okbg);color:var(--ok);border:1px solid #bfe6cb;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  .badge-block{background:var(--errbg);color:var(--err);border:1px solid #f3c0bc;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  ul.clean{margin:8px 0;padding-inline-start:22px} ul.clean li{margin:6px 0}
+  .kv{display:grid;grid-template-columns:230px 1fr;gap:7px 16px;font-size:14px;margin:9px 0}
+  .kv .k{color:var(--muted)}
+  .note{background:var(--warnbg);border:1px solid #f4d9a8;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .seal{background:var(--okbg);border:1px solid #bfe6cb;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:28px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <h1>التقرير المفصّل — تدقيق RBAC/الأمان + تقوية <code>require_role</code><br>التغطية سليمة · الموقوفون يُحجبون الآن</h1>
+  <div class="sub">مسح دقيق لحُرّاس الأدوار + إصلاح آمن واحد (حجب الأدوار المنتهية بلا كسر الإلحاق)</div>
+  <div>
+    <span class="pill">مسح + إصلاح 1</span>
+    <span class="pill">FIN-COR PASS · NEW=0</span>
+    <span class="pill">بلا migration / بلا DB إضافيّ</span>
+    <span class="pill">منشور + تحقّق حيّ</span>
+    <span class="pill">2026-06-12</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>محتويات التقرير</strong>
+  <ol>
+    <li><a href="#s1">الخلاصة</a></li>
+    <li><a href="#s2">تغطية حُرّاس الأدوار (المسح)</a></li>
+    <li><a href="#s3">الـwebhooks (التوقيع)</a></li>
+    <li><a href="#s4">الملاحظة: require_role vs active</a></li>
+    <li><a href="#s5">القرار المحافظ (denylist)</a></li>
+    <li><a href="#s6">الإصلاح بالكود</a></li>
+    <li><a href="#s7">البوّابة والنشر والتحقّق الحيّ</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2>① الخلاصة</h2>
+  <p>
+    دقّقتُ طبقة RBAC/الأمان (قراءة-فقط). <strong>التغطية سليمة</strong> (0 تجاوز) والـwebhooks موقَّعة. الملاحظة الوحيدة:
+    <code>require_role</code> كان <strong>يتجاهل <code>role_status</code> كليًّا</strong> — فأصلحتُه بإذنك بقرار <strong>محافظ</strong>:
+    يحجب الأدوار <strong>المنتهية (الموقوفة)</strong> فقط، مع إبقاء الإلحاق والاستئناف مسموحَين (لا كسر).
+  </p>
+  <div class="kv">
+    <div class="k">المسح</div><div>كلّ مسار مُعدِّل: محروس · public-by-design · أو webhook موقَّع — 0 ثغرة</div>
+    <div class="k">الإصلاح</div><div>require_role يرفض role_status ∈ {SUSPENDED, BANNED, REVOKED, DELETED} (claim فقط، بلا DB)</div>
+    <div class="k">الأمان</div><div>الإلحاق (PENDING_VERIFICATION) + الاستئناف (REJECTED/INACTIVE) يبقيان مسموحَين — <span class="ok">لا كسر</span></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2>② تغطية حُرّاس الأدوار على المسارات المُعدِّلة (المسح)</h2>
+  <p>
+    استعملتُ أداة جرد المسارات لكنّ علمها <code>[AUTH_REQUIRED]</code> heuristic له <strong>false-negatives</strong> (يُغفل aliases مثل
+    <code>_OPS</code> و<code>require_active_role</code>)، فتحقّقتُ <strong>مباشرةً</strong> من كلّ مسار مشكوك. النتيجة:
+  </p>
+  <table>
+    <tr><th>الفئة</th><th>الحالة</th></tr>
+    <tr><td>محروس (<code>require_role</code> / <code>require_active_role</code> / <code>_OPS</code> …)</td><td><span class="badge-ok">✅ الغالبيّة</span></td></tr>
+    <tr><td>public-by-design (login/register/otp/refresh/totp/password-reset/email-verify — 11)</td><td><span class="badge-ok">✅</span> لا يصحّ طلب توكن لتسجيل الدخول</td></tr>
+    <tr><td>webhook موقَّع (2)</td><td><span class="badge-ok">✅</span> راجع §3</td></tr>
+  </table>
+  <p><strong>0 ثغرة تجاوز</strong> — كلّ مسار POST/PUT/PATCH/DELETE مُغطّى.</p>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2>③ الـwebhooks — التحقّق من التوقيع (لا توكن، لكن لا بدّ من توقيع)</h2>
+  <table>
+    <tr><th>الـwebhook</th><th>التحقّق</th></tr>
+    <tr><td><code>/payments/webhooks/{provider}</code></td><td><code>verify_webhook</code> (HMAC) → 401 عند الفشل + حماية إعادة (<code>WebhookInbox</code>) — <span class="ok">سليم</span></td></tr>
+    <tr><td><code>/integrations/pos/{id}/webhook</code></td><td><code>verify_pos_webhook</code> بسرّ المزوّد + حدّ حجم + <code>event_id</code> — <span class="ok">سليم</span></td></tr>
+  </table>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2>④ الملاحظة — <code>require_role</code> يتجاهل <code>role_status</code></h2>
+  <table>
+    <tr><th>الحارس</th><th>يفحص</th><th>الاستعمال</th></tr>
+    <tr><td><code>require_role</code></td><td>نوع الدور فقط (<code>role_satisfies</code>) — <strong>يتجاهل role_status</strong></td><td>الخدمة الذاتيّة (كتالوج/ملفّ/وثائق — 57 نقطة)</td></tr>
+    <tr><td><code>require_active_role</code></td><td>النوع + <strong>DB: status==ACTIVE</strong></td><td>التشغيليّ/الماليّ (قبول/تسليم/نقد/استلام — 38 نقطة)</td></tr>
+  </table>
+  <p>⇒ مزوّد/سائق <strong>موقوف بتوكن صالح</strong> كان يستطيع الخدمة الذاتيّة (وإن كانت منخفضة الأثر — كتالوجه مخفيّ وهو موقوف).</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2>⑤ القرار المحافظ — denylist لا allowlist (لماذا)</h2>
+  <p>قِيَم role_status: <code>ACTIVE · PENDING_VERIFICATION · REJECTED · INACTIVE · SUSPENDED</code>. القرار الآمن:</p>
+  <table>
+    <tr><th>الحالة</th><th>القرار</th><th>السبب</th></tr>
+    <tr><td>SUSPENDED · BANNED · REVOKED · DELETED</td><td><span class="badge-block">محجوب</span></td><td>منتهية — لا تَعمل</td></tr>
+    <tr><td>ACTIVE</td><td>مسموح</td><td>عاديّ</td></tr>
+    <tr><td>PENDING_VERIFICATION</td><td>مسموح</td><td><strong>الإلحاق</strong> (رفع KYC عبر require_role) — لا يُكسَر</td></tr>
+    <tr><td>REJECTED · INACTIVE</td><td>مسموح</td><td>إعادة التقديم/الاستئناف</td></tr>
+  </table>
+  <div class="note">
+    <strong>لماذا denylist محافظ لا allowlist صارم؟</strong> فحص <code>== ACTIVE</code> صارم كان <strong>يكسر الإلحاق</strong>
+    (مزوّد PENDING_VERIFICATION يحتاج رفع وثائقه قبل الاعتماد). الـdenylist يحجب المنتهي فقط ويترك الإلحاق/الاستئناف يعملان.
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2>⑥ الإصلاح بالكود (<code>dependencies.py</code>)</h2>
+  <pre><span class="add">_BLOCKED_ROLE_STATUSES = frozenset({"SUSPENDED", "BANNED", "REVOKED", "DELETED"})</span>
+
+<span class="k">def</span> require_role(*roles):
+    <span class="k">async def</span> _dep(user = Depends(get_current_user)):
+        <span class="k">if not</span> role_satisfies(user.role, roles): <span class="k">raise</span> HTTPException(403, "Forbidden")
+<span class="add">        if user.role_status in _BLOCKED_ROLE_STATUSES:   # claim الـJWT فقط — بلا DB</span>
+<span class="add">            raise HTTPException(403, "الحساب موقوف")</span>
+        <span class="k">return</span> user
+    <span class="k">return</span> _dep</pre>
+  <p>رخيص (claim الـJWT، بلا استعلام DB)؛ و<code>require_active_role</code> يبقى البوّابة الـDB الموثوقة للأفعال التشغيليّة/الماليّة.</p>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2>⑦ البوّابة والنشر والتحقّق الحيّ</h2>
+  <table>
+    <tr><th>الفحص</th><th>النتيجة</th></tr>
+    <tr><td>اختبار جديد (<code>test_rbac_require_role_suspended.py</code>)</td><td><span class="badge-ok">9 ناجح</span> (حجب الأربعة · سماح الأربعة · عدم تطابق النوع 403)</td></tr>
+    <tr><td>auth/RBAC/الإلحاق</td><td><span class="badge-ok">321 ناجح</span> (الإلحاق غير متأثّر)</td></tr>
+    <tr><td>FIN-COR · الحزمة الكاملة</td><td><span class="badge-ok">PASS</span> · 2214 ناجح · أساس 29/حاليّ 29 · <span class="ok">NEW=0</span></td></tr>
+    <tr><td>النشر</td><td><code>deploy_be_gated.sh</code> — backend-core صحّية</td></tr>
+    <tr><td><strong>تحقّق حيّ بالحاوية</strong></td><td><code>SUSPENDED→403</code> · <code>ACTIVE→سماح</code> · <code>PENDING_VERIFICATION→سماح</code> (الإلحاق سليم) · version_id_col/تفعيل الفحص باقيان</td></tr>
+  </table>
+  <div class="seal">
+    ✅ موقوف بتوكن صالح لم يَعُد يستطيع حتى الخدمة الذاتيّة — دون كسر الإلحاق أو الاستئناف. claim فقط (بلا تكلفة DB) · بلا migration/commit · رأس المستودع aa29.
+  </div>
+  <div class="note">
+    <strong>ملخّص تدقيقات الجلسة:</strong> النقد (قفل) · المحفظة (3 أقفال) · التسوية/الاسترداد/chargeback (سليم) · آلة حالات الطلب
+    (version_id_col) · آلة حالات الشكاوى (3 أقفال) · RBAC (تغطية كاملة + تقوية require_role). كلّها منشورة/متحقَّقة · FIN-COR PASS طوال.
+  </div>
+</section>
+
+<div class="foot">
+  تووا — منصّة التوصيل الليبيّة · تقرير تدقيق RBAC + تقوية require_role · 2026-06-12<br>
+  التغطية سليمة · الموقوفون يُحجبون · الإلحاق سليم · FIN-COR PASS · NEW=0 · بلا migration/commit · رأس المستودع aa29
+</div>
+
+</div>
+</body>
+</html>

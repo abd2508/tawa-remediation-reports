@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>كيف يعمل موقع tawanow — شرح مبسّط</title>
+<style>
+  :root{
+    --bg:#0e1726; --card:#16223a; --card2:#1d2c49; --line:#2c3f63;
+    --ink:#eef3fb; --mut:#9fb3d0; --grn:#34d399; --red:#f87171;
+    --amb:#fbbf24; --blu:#60a5fa; --vio:#a78bfa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;line-height:1.95;font-size:16.5px}
+  .wrap{max-width:1000px;margin:0 auto;padding:30px 20px 90px}
+  h1{font-size:27px;margin:0 0 6px}
+  .lead{color:var(--mut);font-size:15px;margin-bottom:22px}
+  h2{font-size:22px;margin:40px 0 12px;display:flex;align-items:center;gap:10px}
+  h2 .emoji{font-size:26px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px 24px;margin:18px 0}
+  .hero{background:linear-gradient(135deg,#16314a,#0e1726);border:1px solid var(--line);
+    border-radius:18px;padding:26px 26px;margin-bottom:10px}
+  .big-answer{font-size:20px;font-weight:700;line-height:1.7;margin:6px 0}
+  .mono{font-family:"JetBrains Mono",Consolas,monospace;direction:ltr;unicode-bidi:embed;display:inline-block}
+  code{background:#0a1120;padding:2px 8px;border-radius:6px;font-size:13.5px;color:#7dd3fc}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
+  th,td{text-align:right;padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);background:#0a1120;font-weight:600}
+  .pill{display:inline-block;padding:3px 11px;border-radius:20px;font-size:13px;font-weight:700}
+  .ok{background:rgba(52,211,153,.16);color:var(--grn)}
+  .bad{background:rgba(248,113,113,.16);color:var(--red)}
+  .warn{background:rgba(251,191,36,.16);color:var(--amb)}
+  .info{background:rgba(96,165,250,.16);color:var(--blu)}
+  .analogy{border-right:5px solid var(--vio);background:#1a1830;padding:14px 18px;border-radius:10px;margin:16px 0}
+  .analogy b{color:var(--vio)}
+  .note{border-right:5px solid var(--blu);background:#10203a;padding:13px 17px;border-radius:10px;margin:14px 0}
+  .danger{border-right:5px solid var(--red);background:#2a1620;padding:13px 17px;border-radius:10px;margin:14px 0}
+  ul{margin:8px 0}li{margin:7px 0}
+  .foot{margin-top:50px;color:var(--mut);font-size:13px;text-align:center;border-top:1px solid var(--line);padding-top:18px}
+  /* diagram boxes */
+  .diagram{background:#0a1120;border:1px solid var(--line);border-radius:14px;padding:22px;margin:18px 0;overflow-x:auto}
+  .machine{border:2px solid var(--line);border-radius:14px;padding:14px 16px;min-width:250px;background:var(--card2)}
+  .machine.local{border-color:var(--grn)}
+  .machine.remote{border-color:var(--amb)}
+  .machine h4{margin:0 0 10px;font-size:16px;display:flex;align-items:center;gap:8px}
+  .svc{background:#0e1726;border:1px solid var(--line);border-radius:8px;padding:6px 10px;margin:6px 0;font-size:13.5px}
+  .legend span{display:inline-block;margin-left:16px;font-size:13.5px;color:var(--mut)}
+  .dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:6px;vertical-align:middle}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>🌐 كيف يعمل موقع <span class="mono">tawanow.com</span>؟ — شرح مبسّط</h1>
+  <div class="lead">تقرير بلغة سهلة لأي شخص · بتاريخ 2026-06-29 · يشرح بنية المشروع وما الذي أُصلِح اليوم لإعادة الموقع للعمل</div>
+</div>
+
+<!-- THE BIG QUESTION -->
+<h2><span class="emoji">❓</span> سؤالك: هل المشروع على سيرفرين منفصلين؟</h2>
+<div class="card">
+  <p class="big-answer">نعم — المشروع موجود على <span style="color:var(--grn)">جهازين مستقلّين تمامًا</span>، كلٌّ منهما نسخة كاملة بقاعدة بيانات خاصّة به، وهما <span style="color:var(--amb)">غير متّصلين ولا متزامنين</span> مع بعضهما.</p>
+  <p>الأهمّ: عندنا <b>3 عناوين (نطاقات)</b> لكن <b>جهازان فقط</b>. العناوين الثلاثة موزَّعة على الجهازين هكذا:</p>
+  <table>
+    <thead><tr><th>العنوان</th><th>إلى أين يذهب؟</th><th>أي جهاز؟</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">tawanow.com</td><td>الموقع الرسمي (الإنتاج)</td><td><span class="pill ok">جهازك المحلي</span></td></tr>
+      <tr><td class="mono">test.tawanow.com</td><td>موقع التجربة (التست)</td><td><span class="pill ok">جهازك المحلي</span> (نفس المكدّس)</td></tr>
+      <tr><td class="mono">staging.tawanow.com</td><td>عنوان قديم</td><td><span class="pill warn">السيرفر البعيد</span></td></tr>
+    </tbody>
+  </table>
+  <p>يعني: <b>الموقع الرسمي والتست يعيشان حاليًا على نفس الجهاز (جهازك)</b>، بينما السيرفر البعيد يحمل نسخة قديمة ومنفصلة.</p>
+</div>
+
+<!-- THE TWO MACHINES DIAGRAM -->
+<h2><span class="emoji">🗺️</span> الصورة الكاملة (رسم توضيحي)</h2>
+<div class="diagram">
+  <div style="text-align:center;margin-bottom:6px">
+    <div class="svc" style="display:inline-block;background:#3a2c0e;border-color:var(--amb)">📱 الزائر / المستخدم</div>
+    <div style="font-size:22px;color:var(--mut)">↓</div>
+    <div class="svc" style="display:inline-block;background:#0e2a3a;border-color:var(--blu)">☁️ <b>Cloudflare</b> (البوّابة على الإنترنت + الحماية + الشهادة)</div>
+    <div style="font-size:22px;color:var(--mut)">↓</div>
+    <div class="svc" style="display:inline-block;background:#102a1e;border-color:var(--grn)">🔌 <b>نفق Cloudflare</b> (cloudflared) — يعمل على جهازك ويصل الإنترنت بجهازك بأمان دون فتح منافذ</div>
+  </div>
+
+  <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:18px">
+    <!-- LOCAL -->
+    <div class="machine local">
+      <h4>💻 جهازك المحلي <span class="pill ok">حديث · يعمل</span></h4>
+      <div style="font-size:13px;color:var(--mut);margin-bottom:6px">يستقبل: tawanow.com · www · test.tawanow.com</div>
+      <div class="svc">🌍 الواجهة (web) — منفذ <span class="mono">8090</span></div>
+      <div class="svc">⚙️ الخادم الخلفي (backend / FastAPI)</div>
+      <div class="svc">🗄️ قاعدة البيانات PostgreSQL 16</div>
+      <div class="svc">⚡ Redis</div>
+      <div style="font-size:12.5px;color:var(--grn);margin-top:8px">النسخة: ab01 (الأحدث)</div>
+    </div>
+    <!-- REMOTE -->
+    <div class="machine remote">
+      <h4>🖥️ السيرفر البعيد <span class="pill warn">قديم · مُطفأ علنًا</span></h4>
+      <div style="font-size:13px;color:var(--mut);margin-bottom:6px">Hetzner · <span class="mono">178.105.87.192</span> · staging.tawanow.com</div>
+      <div class="svc">🌍 الواجهة (web) — منفذ <span class="mono">8080/8081</span></div>
+      <div class="svc">⚙️ الخادم الخلفي (backend)</div>
+      <div class="svc">🗄️ قاعدة بيانات منفصلة (بيانات أخرى)</div>
+      <div class="svc">⚡ Redis · 📦 MinIO · 🗺️ Nominatim</div>
+      <div style="font-size:12.5px;color:var(--amb);margin-top:8px">النسخة: aa60 (متأخّرة 15 خطوة)</div>
+    </div>
+  </div>
+  <div class="legend" style="text-align:center;margin-top:16px">
+    <span><span class="dot" style="background:var(--grn)"></span>يعمل ويستقبل الزوّار</span>
+    <span><span class="dot" style="background:var(--amb)"></span>حيّ داخليًا لكن لا أحد يصله من الإنترنت</span>
+  </div>
+</div>
+<div class="note">
+  <b>الفكرة باختصار:</b> الإنترنت كله يدخل عبر <b>Cloudflare</b>، ثم عبر <b>نفق</b> صغير يعمل على جهازك، فيصل إلى <b>مكدّس جهازك</b> فقط. السيرفر البعيد لا يصله أحد حاليًا.
+</div>
+
+<!-- ANALOGY -->
+<h2><span class="emoji">🍽️</span> تشبيه بسيط</h2>
+<div class="analogy">
+  تخيّل أن لديك <b>مطبخين</b> يطبخان نفس القائمة:
+  <ul>
+    <li><b>المطبخ الأول (جهازك):</b> جديد ونظيف ويعمل الآن. وضعنا له <b>لافتتين على نفس الباب</b>: «المطعم الرسمي» و«مطعم التجربة» — كلاهما يدخل لنفس المطبخ.</li>
+    <li><b>المطبخ الثاني (السيرفر البعيد):</b> قديم، الطعام فيه وصفة قديمة، وبابه مغلق على الزبائن حاليًا.</li>
+  </ul>
+  المشكلة التي حصلت: لافتة «المطعم الرسمي» كانت تشير إلى <b>باب مسدود</b> (الخطأ 404). نحن اليوم وجّهناها إلى المطبخ الجديد الذي يعمل.
+</div>
+
+<!-- WHAT WAS BROKEN / WHAT WE FIXED -->
+<h2><span class="emoji">🔧</span> ما الذي كان معطّلًا؟ وما الذي أصلحناه؟</h2>
+<div class="card">
+  <table>
+    <thead><tr><th></th><th>قبل الإصلاح</th><th>بعد الإصلاح</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">tawanow.com</td><td><span class="pill bad">404 (باب مسدود)</span></td><td><span class="pill ok">200 يعمل</span></td></tr>
+      <tr><td class="mono">www.tawanow.com</td><td><span class="pill bad">404</span></td><td><span class="pill ok">200 يعمل</span></td></tr>
+      <tr><td class="mono">test.tawanow.com</td><td><span class="pill ok">200 يعمل</span></td><td><span class="pill ok">200 ما زال يعمل</span></td></tr>
+    </tbody>
+  </table>
+  <p><b>السبب الحقيقي:</b> النفق كان يعرف الطريق إلى <code>test.tawanow.com</code> فقط. أي عنوان آخر — ومنه الموقع الرسمي — كان النفق يردّ عليه تلقائيًا بـ «غير موجود (404)». التطبيق نفسه كان سليمًا طوال الوقت؛ المشكلة كانت في <b>دليل العناوين داخل النفق</b>.</p>
+  <p><b>ما فعلناه بالضبط (تعديل بسيط وآمن):</b></p>
+  <ul>
+    <li>أضفنا سطرين في إعداد النفق: <code>tawanow.com</code> و<code>www.tawanow.com</code> → نفس المطبخ (المنفذ 8090).</li>
+    <li>أبقينا سطر التست كما هو تمامًا (لم نلمسه).</li>
+    <li>أخذنا <b>نسخة احتياطية</b> من الإعداد قبل التعديل (يمكن التراجع في ثانية).</li>
+    <li>أعدنا تشغيل النفق (انقطاع لحظي للتست ~10 ثوانٍ فقط).</li>
+    <li>لم نلمس إعدادات Cloudflare ولا DNS — لأن العناوين كانت موجَّهة للنفق أصلًا.</li>
+  </ul>
+</div>
+
+<!-- CURRENT STATUS -->
+<h2><span class="emoji">✅</span> الوضع الآن</h2>
+<div class="card">
+  <table>
+    <thead><tr><th>العنوان</th><th>الحالة</th><th>صحّة الـ API</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">tawanow.com</td><td><span class="pill ok">200 ✅</span> (العنوان: «تووا | Tawa»)</td><td><span class="pill ok">200</span></td></tr>
+      <tr><td class="mono">www.tawanow.com</td><td><span class="pill ok">200 ✅</span></td><td>—</td></tr>
+      <tr><td class="mono">test.tawanow.com</td><td><span class="pill ok">200 ✅</span></td><td><span class="pill ok">200</span></td></tr>
+      <tr><td class="mono">staging.tawanow.com</td><td><span class="pill bad">000 ❌</span> (السيرفر البعيد، عنوان قديم)</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- IMPORTANT NOTES -->
+<h2><span class="emoji">⚠️</span> أمور مهمّة يجب أن تعرفها</h2>
+<div class="danger">
+  <b>1) الموقع الرسمي والتست يتشاركان نفس الجهاز ونفس البيانات حاليًا.</b> هذا حلّ مؤقّت سليم لإعادة الحياة للموقع. الفصل النهائي بينهما يكون عند تحديث السيرفر المخصّص.
+</div>
+<div class="danger">
+  <b>2) الموقع يعتمد على بقاء جهازك شغّالًا.</b> ما دامت البنية هكذا (النفق + المكدّس على جهازك)، فإن إطفاء جهازك أو إغلاقه = توقّف الموقع الرسمي والتست معًا. كما أن النفق ليس «خدمة دائمة» بعد، أي لا يعود تلقائيًا بعد إعادة تشغيل الجهاز.
+</div>
+<div class="danger">
+  <b>3) السيرفر البعيد قديم (متأخّر 15 تحديثًا لقاعدة البيانات).</b> صحيح أنه يعمل داخليًا، لكنه لا يصله أحد من الإنترنت، ونسخته أقدم من نسخة جهازك.
+</div>
+<div class="note">
+  <b>ملاحظة أمنية صغيرة:</b> بصمة مفتاح السيرفر البعيد التي زوّدتني بها لم تطابق المفتاح الفعلي للسيرفر — يُفضّل التأكّد من مصدرها لاحقًا (غالبًا أُعيد توليد المفاتيح).
+</div>
+
+<!-- NEXT STEPS -->
+<h2><span class="emoji">🚀</span> الخطوات المقترحة بعد ذلك</h2>
+<div class="card">
+  <ul>
+    <li><b>(أ) تحديث السيرفر البعيد</b> إلى آخر نسخة (ab01)، ثم تقرير: هل يصبح هو الموقع الرسمي بدل جهازك؟ (الأفضل للاستقرار).</li>
+    <li><b>(ب) جعل النفق خدمة دائمة</b> تعود تلقائيًا بعد إعادة تشغيل الجهاز (متانة).</li>
+    <li><b>(ج) إصلاح <span class="mono">staging.tawanow.com</span></b> (شهادة + توجيه) ضمن مرحلة تحديث السيرفر.</li>
+    <li><b>(د) فصل الإنتاج عن التست</b> ليكون لكلٍّ بياناته (بعد تجهيز السيرفر المخصّص).</li>
+  </ul>
+</div>
+
+<div class="foot">
+  أُعِدّ هذا التقرير بعد إصلاح فعلي وتحقّق حيّ بتاريخ 2026-06-29 · التعديل الوحيد كان إضافة عنواني الإنتاج إلى دليل النفق · نسخة احتياطية محفوظة.
+</div>
+
+</div>
+</body>
+</html>

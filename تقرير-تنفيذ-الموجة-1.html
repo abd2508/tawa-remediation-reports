@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تنفيذ الموجة 1 — منصّة توا</title>
+<style>
+  :root{--green:#0F8056;--green-dark:#0b5f40;--ink:#14231d;--muted:#5b6b64;--line:#dfe7e3;--bg:#f5f8f6;
+    --card:#fff;--red:#b3261e;--red-bg:#fde7e7;--amber:#9a6100;--amber-bg:#fff5df;--ok:#0e7a4f;--ok-bg:#e5f4ec;
+    --info:#1565c0;--info-bg:#eef6ff;--code:#0d2b21;--code-bg:#eef4f1;}
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Noto Sans Arabic",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.85}
+  .wrap{max-width:1040px;margin:0 auto;padding:24px 18px 80px}
+  header.hero{background:linear-gradient(135deg,#0F8056,#0b5f40);color:#fff;border-radius:20px;padding:34px 30px;margin-bottom:22px;box-shadow:0 12px 32px rgba(15,128,86,.28)}
+  header.hero h1{margin:0 0 8px;font-size:1.9rem}
+  header.hero p{margin:4px 0;opacity:.95}
+  .badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:3px 12px;font-size:.8rem;margin:6px 6px 0 0}
+  h2.sec{font-size:1.35rem;margin:36px 0 14px;padding:12px 16px;background:var(--green);color:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(15,128,86,.18)}
+  .note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 18px;margin:13px 0}
+  .ok{background:var(--ok-bg);border:1px solid #bfe6cf;border-radius:12px;padding:15px 18px;color:#0a5a37}
+  .warn{background:var(--amber-bg);border:1px solid #f0d9a0;border-radius:12px;padding:15px 18px;color:#6b4600}
+  code,.mono{font-family:ui-monospace,Consolas,monospace;direction:ltr;unicode-bidi:embed}
+  .fileref{display:inline-block;background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:.8rem;color:var(--code);direction:ltr}
+  .pill{display:inline-block;border-radius:20px;padding:2px 10px;font-size:.74rem;font-weight:800}
+  .p-done{background:var(--ok-bg);color:var(--ok)}.p-gate{background:var(--amber-bg);color:var(--amber)}.p-bug{background:var(--red-bg);color:var(--red)}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.05);font-size:.87rem;margin:10px 0}
+  th{background:var(--green);color:#fff;padding:9px;text-align:right;font-weight:700}
+  td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+  tr:nth-child(even) td{background:#fafcfb}
+  .item{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:14px 0;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.05)}
+  .item>.h{display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(90deg,#eef6f2,#f8fbf9);border-bottom:1px solid var(--line)}
+  .item>.h .id{background:var(--green);color:#fff;border-radius:9px;padding:4px 9px;font-weight:800;font-size:.8rem;white-space:nowrap}
+  .item>.h h3{margin:0;font-size:1.02rem;flex:1}
+  .item>.b{padding:14px 16px}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+  @media(max-width:640px){.ba{grid-template-columns:1fr}}
+  .before,.after{border-radius:10px;padding:9px 12px;font-size:.86rem}
+  .before{background:var(--red-bg);border:1px solid #f3c2be}
+  .after{background:var(--ok-bg);border:1px solid #bfe6cf}
+  .before b,.after b{display:block;margin-bottom:3px}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
+  .kpi .k{flex:1;min-width:110px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .kpi .k b{display:block;font-size:1.6rem;color:var(--green)}.kpi .k span{font-size:.74rem;color:var(--muted)}
+  .diagram{background:#fbfdfc;border:1px dashed var(--green);border-radius:12px;padding:14px;margin:12px 0;overflow-x:auto}
+  .flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+  .box{background:#fff;border:2px solid var(--green);border-radius:10px;padding:6px 11px;font-size:.8rem;font-weight:700;text-align:center}
+  .box.bad{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+  .box.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+  .arrow{font-size:1.2rem;color:var(--green);font-weight:800}
+  ul{margin:6px 0;padding-inline-start:22px}li{margin:2px 0}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير تنفيذ — الموجة 1 (الإصلاحات الفوريّة)</h1>
+  <p>نُفّذت الموجة الأولى بالكامل بأمان، وتحقّقنا منها بالاختبارات قبل أي نشر.</p>
+  <p style="font-size:.9rem;opacity:.85">التاريخ: 2026-07-01 · الحالة: <b>مُنفَّذة ومُتحقَّق منها محليًّا · بانتظار إذن النشر</b></p>
+  <div>
+    <span class="badge">✅ 6 بنود مُنجزة</span>
+    <span class="badge">🧪 66/66 اختبار أخضر</span>
+    <span class="badge">🛡️ صفر مساس بالعقود المالية</span>
+    <span class="badge">🚫 لم يُنشَر بعد (بوّابة إذن)</span>
+  </div>
+</header>
+
+<div class="ok">
+  <b>الخلاصة بلغة بسيطة:</b> بدأنا التنفيذ من <b>أأمن نقطة</b> (الموجة 1): إصلاحات تُحسّن التجربة فورًا دون لمس قاعدة البيانات أو المال.
+  أصلحنا <b>العطب المؤكّد</b> الذي كان يمنع إزالة صلاحيّات الموظّفين، وفصلنا واجهة الموظّف عن المالك، وأنهينا وميض زر «آلي»، وأضفنا المسمّى الوظيفي المخصّص، ووحّدنا التسميات المكرّرة. كل ذلك اجتاز <b>66 اختبارًا</b> + فحص الأنواع + البناء. لم نَنشر بعد — النشر خطوة منفصلة تنتظر موافقتك.
+</div>
+
+<div class="kpi">
+  <div class="k"><b>6</b><span>بنود مُنجزة</span></div>
+  <div class="k"><b>5</b><span>ملفات مُعدّلة</span></div>
+  <div class="k"><b>66/66</b><span>اختبار أخضر</span></div>
+  <div class="k"><b>1</b><span>مسار خادم جديد (آمن)</span></div>
+  <div class="k"><b>0</b><span>هجرات قاعدة بيانات</span></div>
+</div>
+
+<!-- ماذا نفّذنا -->
+<h2 class="sec">✅ ماذا نفّذنا بالتفصيل (قبل ← بعد)</h2>
+
+<div class="item">
+  <div class="h"><span class="id">1.1</span><h3>إصلاح «تعذّر تنفيذ العملية» عند إزالة صلاحية <span class="pill p-bug">عطب مؤكّد → مُصلَح</span></h3></div>
+  <div class="b">
+    <p>كانت الواجهة تطلب حذف الصلاحية عبر <span class="mono">DELETE</span>، لكن الخادم <b>لا يملك هذا المسار</b> → يردّ خطأ 405 → تظهر «تعذّر تنفيذ العملية». أضفنا المسار الناقص في <span class="fileref">provider_router.py</span> (بنفس حرّاس الأمان: المالك فقط + نطاق متجره).</p>
+    <div class="diagram"><div class="flow">
+      <div class="box bad">قبل: DELETE غير موجود → 405 → خطأ</div><span class="arrow">→</span>
+      <div class="box ok">بعد: DELETE يُزيل الصلاحية ويُعيد للأساس</div>
+    </div></div>
+    <div class="ba">
+      <div class="before"><b>قبل</b>منح الصلاحية يعمل، لكن إزالتها تفشل دائمًا برسالة خطأ.</div>
+      <div class="after"><b>بعد</b>الإزالة تعمل (idempotent + حماية عبر-المتاجر + إبطال الكاش عبر <span class="mono">remove_override</span>).</div>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <div class="h"><span class="id">1.2</span><h3>فصل واجهة الموظّف عن المالك <span class="pill p-done">مُنجَز</span></h3></div>
+  <div class="b">
+    <p>الموظّف كان يرى صفحة المالك كاملةً. الآن نُخفي عن الموظّف كل أدوات المالك، ويبقى له ما يخصّه حسب صلاحياته.</p>
+    <div class="ba">
+      <div class="before"><b>قبل (يراه الموظّف)</b>
+        <ul><li>«لوحة تحكم المزوّد»</li><li>كود دعوة الموظفين</li><li>القبول التلقائي للطلبات</li><li>فتح/إغلاق المتجر</li><li>تبديل المتاجر</li></ul></div>
+      <div class="after"><b>بعد (للموظّف)</b>
+        <ul><li>«لوحة الموظّف — مهامك ضمن المتجر»</li><li>تختفي بطاقة الدعوة</li><li>يختفي القبول التلقائي</li><li>تختفي أدوات المتجر</li><li>يبقى: الطلبات/الكتالوج/السجل حسب صلاحياته</li></ul></div>
+    </div>
+    <div class="note" style="font-size:.85rem">يحلّ 4 ملاحظات معًا (22/23/24/25). <b>تحسين لاحق بسيط:</b> إضافة اسم المزوّد ورقم حساب الموظّف في العنوان (يحتاج جلب بيانات إضافيّة).</div>
+  </div>
+</div>
+
+<div class="item">
+  <div class="h"><span class="id">1.3</span><h3>إنهاء وميض زر «آلي» + إظهار الوضع الحالي <span class="pill p-done">مُنجَز</span></h3></div>
+  <div class="b">
+    <p>كل ضغطة كانت تُعيد تحميل اللوحة كاملةً (سبينر) = إحساس «يفتح ويغلق». الآن التحديث صامت في الخلفيّة، والزرّ المُفعّل يظهر بوضوح (✓ آلي / ✓ يدوي).</p>
+    <div class="diagram"><div class="flow">
+      <div class="box bad">قبل: ضغطة → سبينر لكل اللوحة</div><span class="arrow">→</span>
+      <div class="box ok">بعد: تحديث صامت + الزر المُفعّل مُميَّز</div>
+    </div></div>
+  </div>
+</div>
+
+<div class="item">
+  <div class="h"><span class="id">1.4</span><h3>خانة المسمّى الوظيفي المخصّص (إجباري) <span class="pill p-done">مُنجَز</span></h3></div>
+  <div class="b">
+    <div class="ba">
+      <div class="before"><b>قبل</b>قائمة جاهزة فقط — لا يمكن كتابة مسمّى مثل «شيف» أو «مدير فرع».</div>
+      <div class="after"><b>بعد</b>حقل «أو مسمّى مخصّص» + زر «حفظ» مُعطَّل حتى تُكتب قيمة (إجباري)، بحدّ 40 حرفًا كما يقبل الخادم.</div>
+    </div>
+  </div>
+</div>
+
+<div class="item">
+  <div class="h"><span class="id">1.5</span><h3>توحيد المصطلحات المكرّرة <span class="pill p-done">مُنجَز</span></h3></div>
+  <div class="b">
+    <table>
+      <thead><tr><th>الموضع</th><th>قبل</th><th>بعد</th></tr></thead>
+      <tbody>
+        <tr><td>بطاقة اللوحة (كانت بطاقتين)</td><td>«الطلبات» + «التحضير»</td><td>بطاقة واحدة «إدارة الطلبات»</td></tr>
+        <tr><td>بطاقة اللوحة الماليّة</td><td>«الأرباح»</td><td>«المبيعات»</td></tr>
+        <tr><td>عنوان صفحة التحضير (<span class="mono">ar.json</span>)</td><td>«التحضير»</td><td>«إدارة الطلبات»</td></tr>
+        <tr><td>إجراءات الموظّف</td><td>«إيقاف مؤقّت/دائم»</td><td>«تعليق مؤقّت/دائم» (تمييزًا عن إيقاف المتجر)</td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="font-size:.85rem">اكتُشف أثناء التنفيذ أنّ الترجمة العربيّة كانت أصلًا «المبيعات» لبعض المواضع — فاقتصر التغيير على النصوص المكتوبة مباشرةً وعنوان التحضير.</div>
+  </div>
+</div>
+
+<div class="item">
+  <div class="h"><span class="id">1.6</span><h3>إخلاء الشريط السفليّ (الزر المختفي) <span class="pill p-done">مُنجَز (وقائي)</span></h3></div>
+  <div class="b">
+    <p>جعلنا مساحة الإخلاء أسفل الصفحات تراعي «المنطقة الآمنة» للأجهزة الحديثة: <span class="mono">calc(5rem + env(safe-area-inset-bottom))</span> — يمنع اختباء أي زر خلف الشريط. التحديد النهائيّ للزر يحتاج إعادة إنتاج على الجهاز (موثّق في الخطة).</p>
+  </div>
+</div>
+
+<!-- التحقق -->
+<h2 class="sec">🧪 كيف تحقّقنا (كل شيء أخضر)</h2>
+<table>
+  <thead><tr><th>الفحص</th><th>النتيجة</th></tr></thead>
+  <tbody>
+    <tr><td>صياغة الخادم (<span class="mono">py_compile</span>)</td><td>✅ سليمة</td></tr>
+    <tr><td>فحص الأنواع (<span class="mono">tsc --noEmit</span>)</td><td>✅ 0 أخطاء</td></tr>
+    <tr><td>التدقيق (<span class="mono">eslint</span>)</td><td>✅ 0 أخطاء</td></tr>
+    <tr><td>التنسيق (<span class="mono">prettier</span>)</td><td>✅ نظيف</td></tr>
+    <tr><td>البناء (<span class="mono">npm run build</span>)</td><td>✅ نجح (<span class="mono">main-Bkj96S97.js</span>)</td></tr>
+    <tr><td>اختبار لوحة المزوّد</td><td>✅ 9/9</td></tr>
+    <tr><td>اختبارات التحضير + الطلبات + الطابور</td><td>✅ 24/24</td></tr>
+    <tr><td>اختبارات الشريط + المبيعات</td><td>✅ 22/22</td></tr>
+    <tr><td>تكافؤ الترجمة (i18n parity)</td><td>✅ 11/11</td></tr>
+    <tr><td><b>الإجمالي</b></td><td><b>✅ 66/66 اختبار</b></td></tr>
+  </tbody>
+</table>
+
+<!-- الملفات -->
+<h2 class="sec">📁 الملفات المُعدّلة (5)</h2>
+<table>
+  <thead><tr><th>الملف</th><th>التغيير</th></tr></thead>
+  <tbody>
+    <tr><td><span class="fileref">backend/.../provider_router.py</span></td><td>+ مسار DELETE للصلاحيات (1.1) — الوحيد في الخادم، آمن (إضافيّ)</td></tr>
+    <tr><td><span class="fileref">web/.../ProviderDashboard.tsx</span></td><td>فصل الأدوار (1.2) + توحيد البطاقات والتسميات (1.5)</td></tr>
+    <tr><td><span class="fileref">web/.../ProviderStaff.tsx</span></td><td>وميض «آلي» (1.3) + مسمّى مخصّص (1.4) + «تعليق» (1.5)</td></tr>
+    <tr><td><span class="fileref">web/src/i18n/ar.json</span></td><td>«التحضير» → «إدارة الطلبات» (1.5)</td></tr>
+    <tr><td><span class="fileref">web/src/styles/global.css</span></td><td>إخلاء الشريط الآمن (1.6)</td></tr>
+  </tbody>
+</table>
+
+<!-- الأمان -->
+<h2 class="sec">🛡️ ضمانات الأمان في هذه الموجة</h2>
+<div class="ok">
+  <ul>
+    <li><b>لا هجرات قاعدة بيانات</b> — لم نلمس بنية البيانات إطلاقًا.</li>
+    <li><b>لا مساس بالعقود الماليّة</b> (FIN-COR) ولا بأعلام الدفع/المحفظة — لم تُمَس.</li>
+    <li>التغيير الخلفيّ الوحيد (مسار DELETE) <b>إضافيّ</b> ويُكرّر حرّاس الأمان الموجودة (المالك فقط + نطاق متجره + idempotent).</li>
+    <li><b>لم نَنشر</b> على أي سيرفر — الشجرة المحليّة فقط، مُتحقَّق منها بالاختبارات.</li>
+  </ul>
+</div>
+
+<!-- المتبقي -->
+<h2 class="sec">⏭️ الخطوة التالية والمتبقّي (بوّابة إذن)</h2>
+<div class="warn">
+  <b>الخطوة التالية المباشرة:</b> نشر الموجة 1 على الأهداف الأربعة (GitHub → test1 → test → Production) مع نسخة احتياطيّة للإنتاج — <b>تنتظر إذنك الصريح</b> (خاصّة الإنتاج).
+</div>
+<div class="note">
+  <b>لماذا توقّفنا عند الموجة 1؟</b> الموجات 2–5 تمسّ <b>الخادم وقاعدة البيانات</b> (مناطق محظورة تحتاج إذنًا) وتتطلّب <b>هجرات</b> و<b>منحًا تقادُميًّا</b> لا يمكن اختبارها محليًّا دون بنية الاختبار الكاملة. التسلسل الآمن يقتضي: ننشر الموجة 1، نتأكّد على السيرفرات، ثم ننتقل للموجة 2 بإذنٍ لكلّ موجة.
+</div>
+<table>
+  <thead><tr><th>الموجة</th><th>المحتوى</th><th>الحالة</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>الإصلاحات الفوريّة (6 بنود)</td><td><span class="pill p-done">مُنفَّذة ✓</span></td></tr>
+    <tr><td>2</td><td>صلاحية التحضير + شرح الصلاحيات + لوحة إعدادات الموظفين + سجل الطلبات الكامل</td><td><span class="pill p-gate">بانتظار إذن (خادم)</span></td></tr>
+    <tr><td>3</td><td>الإيقاف المؤقّت + شارة الحالة + موافقة العروض + التوصيل الذاتي + صفحة المزوّد</td><td><span class="pill p-gate">بانتظار إذن (هجرات)</span></td></tr>
+    <tr><td>4</td><td>التوزيع العادل + وثائق السائق</td><td><span class="pill p-gate">بانتظار إذن (خطر عالٍ)</span></td></tr>
+    <tr><td>5</td><td>نظام التصميم الموحّد + ترتيب لوحة السائق</td><td><span class="pill p-gate">بعد استقرار المحتوى</span></td></tr>
+  </tbody>
+</table>
+
+<footer>
+  تقرير تنفيذ الموجة 1 — منصّة تُوا · 2026-07-01<br>
+  نُفِّذت محليًّا بأمان ومُتحقَّق منها بـ66 اختبارًا. النشر وباقي الموجات تنتظر إذن المُشغّل.
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>الخطة المنقّحة — إصلاح العيوب الأمنية بعد مراجعة 8 وكلاء ضدّ الكود — 2026-05-31</title>
+<style>
+  :root{--bg:#fafafa;--fg:#1a1a1a;--muted:#5b5b5b;--card:#fff;--border:#e3e3e3;
+        --green:#146e44;--green-soft:#e8f3ec;--red:#b3261e;--red-soft:#fde7e5;
+        --amber:#aa5500;--amber-soft:#fff6e2;--blue:#0f5b9e;--blue-soft:#e8f2fb;
+        --purple:#6b3aa0;--purple-soft:#f0e8fb;--orange:#d2691e;--orange-soft:#ffeed8;
+        --gray:#5b5b5b;--gray-soft:#eaeaea}
+  body{font-family:-apple-system,"Segoe UI","Tajawal","Noto Naskh Arabic",sans-serif;background:var(--bg);color:var(--fg);margin:0;line-height:1.75;font-size:15px}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px 22px 80px}
+  header{padding:22px 26px;background:linear-gradient(135deg,#13322a 0%,#0c1f1a 100%);color:#fff;border-radius:12px;margin-bottom:24px}
+  header h1{margin:0 0 6px;font-size:23px}
+  header .sub{opacity:.92;font-size:13.5px}
+  h2{font-size:20px;margin:34px 0 10px;border-bottom:2px solid var(--border);padding-bottom:6px}
+  h3{font-size:16.5px;margin:20px 0 6px;color:#222}
+  h4{font-size:14.5px;margin:14px 0 4px;color:#333}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:12px 0}
+  .crit{border-inline-start:5px solid var(--red);background:var(--red-soft)}
+  .high{border-inline-start:5px solid var(--amber);background:var(--amber-soft)}
+  .med{border-inline-start:5px solid var(--blue);background:var(--blue-soft)}
+  .ok{border-inline-start:5px solid var(--green);background:var(--green-soft)}
+  .trace{border-inline-start:5px solid var(--purple);background:var(--purple-soft)}
+  .danger{border-inline-start:5px solid var(--red);background:#fff;position:relative;padding-top:18px}
+  .danger::before{content:"⚠ تَنبيه حَرِج";position:absolute;top:-10px;inset-inline-start:14px;background:var(--red);color:#fff;padding:2px 10px;font-size:11px;font-weight:700;border-radius:10px}
+  code,pre{font-family:"JetBrains Mono","Fira Code",ui-monospace,monospace;direction:ltr;text-align:left}
+  code{background:#f0f0f0;padding:1px 6px;border-radius:4px;font-size:12.6px}
+  pre{background:#1e1e1e;color:#eee;padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:12.4px;line-height:1.6}
+  .add{color:#7ee787}.del{color:#ff8b8b}.cmt{color:#9aa0a6}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  th,td{padding:8px 10px;border:1px solid var(--border);text-align:right;font-size:13.3px;vertical-align:top}
+  th{background:#f0f0f0}
+  ul,ol{padding-inline-start:22px}li{margin:4px 0}
+  .badge-p0{background:var(--red);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .badge-p1{background:var(--amber);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .badge-p2{background:var(--blue);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .badge-p3{background:var(--gray);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .v-true{color:var(--green);font-weight:700}.v-false{color:var(--red);font-weight:700}
+  .v-partial{color:var(--amber);font-weight:700}.v-out{color:var(--orange);font-weight:700}
+  .sev-crit{background:var(--red);color:#fff;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+  .sev-high{background:var(--amber);color:#fff;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+  .sev-med{background:var(--blue);color:#fff;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+  .sev-low{background:var(--gray);color:#fff;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+  .filepath{display:inline-block;background:#ececec;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:12.3px;direction:ltr}
+  .sideeffect{padding:6px 12px;margin:4px 0;background:#fff7e0;border-inline-start:3px solid var(--amber);border-radius:0 6px 6px 0;font-size:13.3px}
+  .mit{padding:6px 12px;margin:4px 0;background:#e8f3ec;border-inline-start:3px solid var(--green);border-radius:0 6px 6px 0;font-size:13.3px}
+  .sim{padding:6px 12px;margin:4px 0;background:#f0e8fb;border-inline-start:3px solid var(--purple);border-radius:0 6px 6px 0;font-size:13.3px}
+  .toc{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 22px;margin:14px 0}
+  .verdict-box{font-size:15px;font-weight:700;padding:10px 16px;border-radius:8px;margin:10px 0}
+  .nogo{background:var(--red-soft);border:1px solid var(--red);color:var(--red)}
+  .gocond{background:var(--amber-soft);border:1px solid var(--amber);color:var(--amber)}
+  small{color:var(--muted)}
+  .newchip{background:#6b3aa0;color:#fff;padding:1px 7px;border-radius:4px;font-size:10.5px;font-weight:700}
+  .corrchip{background:#d2691e;color:#fff;padding:1px 7px;border-radius:4px;font-size:10.5px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🛡️ الخطة المنقّحة — إصلاح العيوب الأمنية بعد مراجعة عميقة ضدّ الكود</h1>
+  <div class="sub">
+    tawanow.com · 2026-05-31 · مراجعة الخطة الأصليّة (<code>خطة-إصلاح-العيوب-الأمنية-بعد-التتبع-الجذري-2026-05-31.html</code>) بـ<strong>8 وكلاء تحقّق مكتملين</strong> (2.68M توكن · 604 استدعاء أداة · 32 دقيقة) قرؤوا الكود الفعلي في <code>/home/a/Desktop/APP/platform/backend</code> + <code>web/nginx.conf</code> + <code>deploy/</code>، مع محاكاة ذهنيّة وتحليل أثر وتقاطع. الحُكم الجماعي: <strong>NEEDS_REVISION على الإصلاحات السبعة جميعها</strong>.
+  </div>
+</header>
+
+<div class="verdict-box nogo">⛔ الخطة الأصليّة كما هي: NO-GO — سليمة الاتجاه لكنّها تحوي عيبَين حرجَين يكسران التطبيق + 7 ثغرات عالية + مراجع كود قديمة + 4 اختبارات تنكسر صامتةً.</div>
+<div class="verdict-box gocond">✅ بعد التنقيحات أدناه: GO بشروط — F-3/F-5/F-4 آمنة بشروط · F-1/F-2/F-6 تحتاج إعادة تصميم جزئيّة · بإذن تجاوز المناطق المحظورة.</div>
+
+<div class="card ok" style="font-size:13.5px">
+<strong>منهج التحقّق:</strong> كلّ بند أدناه مُسنَد إمّا إلى قراءتي المباشرة للكود أو إلى أحد وكلاء التحقّق الثمانية (F-1..F-7 + X-INFRA + وكيل التقاطع)، بأرقام أسطر فعليّة. العلامات: <span class="newchip">جديد من الوكلاء</span> = عيب لم يكن في تحليلي اليدويّ الأوّل · <span class="corrchip">تصحيح</span> = موضع صحّحه الوكلاء في تحليلي أو في الخطة الأصليّة.
+</div>
+
+<div class="toc">
+<strong>المحتويات:</strong>
+<ol>
+  <li>جدول الأحكام النهائيّة (7 إصلاحات)</li>
+  <li>سجلّ العيوب (الحرجة والعالية أولاً)</li>
+  <li>ما هو منفَّذ مسبقاً (لا عمل) + تصحيحات وقائعيّة</li>
+  <li>التحقّق المفصّل لكلّ إصلاح + المحاكاة</li>
+  <li>تفاعلات التقاطع</li>
+  <li>الخطّة التنفيذيّة المُصحَّحة + الاختبارات الأربعة التي تنكسر</li>
+  <li>النشر + Rollback + بوّابات الحوكمة</li>
+</ol>
+</div>
+
+<!-- ═══════════ 1 ═══════════ -->
+<h2>1) جدول الأحكام النهائيّة</h2>
+
+<div class="card crit">
+<p><strong>عيبان حرجان يمنعان التنفيذ كما هو:</strong></p>
+<ol>
+<li><strong>F-1 / DEFECT-BODY-CONSUME:</strong> قراءة جسم الطلب (<code>_extract_phone_from_body</code>) داخل <code>BaseHTTPMiddleware.dispatch</code> قبل <code>call_next</code> تستهلك تيّار <code>receive</code> في Starlette ⇒ <strong>كلّ POST لـ/auth (register@259 / login@604 / password-reset/confirm@793) يصل الـhandler بجسم فارغ → 422/تعليق شامل</strong>. الحلّ: حذف قراءة الجسم نهائيّاً + مفتاح <code>rate:auth:{ip}</code>.</li>
+<li><strong>F-1 / DEFECT-FAILOPEN-HEADERS:</strong> إضافة <code>X-RateLimit-Remaining</code> على الاستجابة الناجحة باستخدام <code>count</code> بلا حراسة ⇒ <strong>NameError → 500 على كل الطلبات وقت انقطاع Redis</strong> (يكسر ضمان fail-open و<code>test_redis_error_fails_open</code>). الحلّ: <code>count=None</code> قبل <code>try</code> + إضافة الترويسة فقط إن <code>count is not None</code>.</li>
+</ol>
+</div>
+
+<table>
+<thead><tr><th>الإصلاح</th><th>حُكم المُقدّمة</th><th>الحُكم النهائي</th><th>أخطر عيب</th><th>migration</th><th>FIN-COR</th></tr></thead>
+<tbody>
+<tr><td><strong>F-1</strong> rate-limit auth</td><td class="v-partial">صحيحة جزئيّاً</td><td class="v-false">NO-GO حتى التنقيح</td><td><span class="sev-crit">CRIT×2</span> قراءة الجسم + ترويسة fail-open</td><td>لا</td><td>سليم</td></tr>
+<tr><td><strong>F-2</strong> login lockout</td><td class="v-partial">صحيحة جزئيّاً</td><td class="v-false">NO-GO حتى التنقيح</td><td><span class="sev-high">HIGH×4</span> DoS + fail-open + TOTP + seed</td><td>لا</td><td>سليم</td></tr>
+<tr><td><strong>F-3</strong> HSTS + S-D + S-E</td><td class="v-partial">صحيحة جزئيّاً</td><td class="v-partial">GO بشروط</td><td><span class="sev-med">MED</span> HSTS قد لا يصل عبر host vhost</td><td>لا</td><td>سليم</td></tr>
+<tr><td><strong>F-4</strong> register موحّد</td><td class="v-partial">صحيحة جزئيّاً</td><td class="v-partial">GO بشروط</td><td><span class="sev-high">HIGH</span> يكسر اختبارَين + لا يُغلق enumeration</td><td>لا</td><td>سليم</td></tr>
+<tr><td><strong>F-5</strong> pwd-reset صامت</td><td class="v-partial">صحيحة جزئيّاً</td><td class="v-partial">GO بشروط</td><td><span class="sev-high">HIGH</span> يكسر اختبارَين + /email/verify يبقى يكشف</td><td>لا</td><td>سليم</td></tr>
+<tr><td><strong>F-6</strong> SECRET rotation</td><td class="v-false">خاطئة جوهريّاً</td><td class="v-false">NO-GO حتى إعادة الكتابة</td><td><span class="sev-high">HIGH×2</span> 10 مواقع decode + نافذة 30 يوماً</td><td>لا</td><td>سليم</td></tr>
+<tr><td><strong>F-7</strong> RS256</td><td>—</td><td>مؤجّل (P3)</td><td>يعتمد على توحيد decode من F-6</td><td>لا</td><td>سليم</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════ 2 ═══════════ -->
+<h2>2) سجلّ العيوب — الحرجة والعالية أولاً</h2>
+
+<table>
+<thead><tr><th>المُعرّف</th><th>الخطورة</th><th>العيب (مُتحقَّق بسطر كود)</th><th>التوصية</th></tr></thead>
+<tbody>
+<tr><td><strong>F1-BODY</strong></td><td><span class="sev-crit">CRIT</span></td><td>قراءة الجسم في الـmiddleware (BaseHTTPMiddleware:53) تستهلك stream → كسر كل POST auth</td><td>احذف الفكرة؛ مفتاح <code>rate:auth:{ip}</code> فقط + الحدّ لكل حساب عبر F-2</td></tr>
+<tr><td><strong>F1-HDR</strong> <span class="newchip">جديد</span></td><td><span class="sev-high">HIGH</span></td><td>ترويسة Remaining على النجاح بلا حراسة <code>count</code> → 500 عند انقطاع Redis (rate_limiter:84-86)</td><td><code>count=None</code> قبل try؛ أضف الترويسة فقط إن <code>count is not None</code></td></tr>
+<tr><td><strong>F6-DECODE</strong></td><td><span class="sev-high">HIGH</span></td><td><strong>10 مواقع</strong> <code>jwt.decode</code> مباشرة (5 منها SSE/WS): jwt_service 225/260 · order_tracking 231 · provider_stream 97 · sse_router 152 · fleet_stream 81 · ws_gateway 33 · maintenance_middleware 97 · main 486 · auth_router 566/731</td><td>دالة فكّ مركزيّة واحدة <code>decode_with_rotation</code> توجَّه إليها العشرة <em>قبل</em> أي تدوير</td></tr>
+<tr><td><strong>F6-REFRESH</strong> <span class="corrchip">رُفِعت لـHIGH</span></td><td><span class="sev-high">HIGH</span></td><td>refresh عمره <strong>30 يوماً</strong> (config:51) موقّع بنفس السرّ (jwt_service:141) → حذف legacy بعد 60 دقيقة = خروج جماعي قسري</td><td>نافذة legacy ≥ عمر refresh (30 يوماً)، أو لا تدوّر سرّ refresh</td></tr>
+<tr><td><strong>F2-DoS</strong></td><td><span class="sev-high">HIGH</span></td><td>قفل بمفتاح <code>login_lockout:{user_id}</code> + register يكشف الهاتف (409@290) → مهاجم يقفل أي ضحية بـ5 طلبات</td><td>قفل لكل <code>(user_id+ip)</code> أو backoff تصاعدي/captcha؛ لا تعتمد على حدّ IP العام (fail-open)</td></tr>
+<tr><td><strong>F2-FAILOPEN</strong></td><td><span class="sev-high">HIGH</span></td><td><code>_get_redis</code> كسول لا يرمي عند الإنشاء؛ أول <code>.incr/.get</code> يرمي ConnectionError → كل login = 500 وقت انقطاع Redis</td><td>غلّف <code>_check/_bump/_clear</code> بـtry/except → fail-open + logger.warning</td></tr>
+<tr><td><strong>F2-TOTP</strong> <span class="newchip">جديد</span></td><td><span class="sev-high">HIGH</span></td><td>فرع TOTP في login يعود مبكراً بـ<code>db.commit</code>@711 قبل النجاح@746 → <code>_clear_lockout</code>@746 يترك مستخدم TOTP <strong>مقفولاً للأبد رغم صحّة كلمته</strong></td><td>ضع <code>_clear_lockout</code> بعد نجاح <code>verify_password</code> مباشرة (بعد 662، قبل فرع TOTP@695)</td></tr>
+<tr><td><strong>BE-TESTS</strong> <span class="newchip">جديد</span></td><td><span class="sev-high">HIGH</span></td><td><strong>4 اختبارات تنكسر صامتةً</strong>: <code>test_registration.py:136</code> (<code>"phone" in message_en</code>) و:147 (<code>"email"</code>) لـF-4 · <code>test_phase146:100</code> (confirm 404) و:112 (verify-request 404) لـF-5</td><td>حدّثها في <strong>نفس commit</strong> الإصلاح؛ وإلا تفشل حزمة BE قبل النشر</td></tr>
+<tr><td><strong>F5-EMAIL</strong> <span class="newchip">جديد</span></td><td><span class="sev-high">HIGH</span></td><td><code>email_verify_confirm</code>@862-863 يرفع 404 «Email not found» قبل فحص الرمز → يكشف وجود البريد بأي token. ومسار ثالث <code>email_router.py:208</code> (verify-otp)</td><td>وحّد <code>email_verify_request</code>@842 + <code>email_verify_confirm</code>@862 + افحص email_router:208 — لا verify-request وحده</td></tr>
+<tr><td><strong>F4-ENUM</strong></td><td><span class="sev-med">MED</span></td><td>409 (تعارض@290) مقابل 201 (نجاح@258) يبقى أوراكل وجود الهاتف رغم إخفاء الحقل (=R-062-04 الموثّق INFO)</td><td>صرّح أنّه «تخفيف» لا «إغلاق»؛ الإغلاق الجذري = 200+OTP (قرار مالك)</td></tr>
+<tr><td><strong>F5-OTP-ORACLE</strong></td><td><span class="sev-med">MED</span></td><td>بعد 404→200: هاتف موجود+OTP خاطئ → 422 (811)؛ مجهول → 200 ⇒ أوراكل متبقٍّ</td><td>قرار عقد: قبول التمييز الجزئي أو توحيد 422→200 (يكسر <code>test_..._invalid_otp</code>)</td></tr>
+<tr><td><strong>F4/F5-TIMING</strong></td><td><span class="sev-med">MED</span></td><td>تأخير عشوائي على مسار التعارض/الفشل وحده (دون النجاح السريع@258) يخلق أوراكل توقيت</td><td>تأخير على كل المسارات أو constant-time floor، أو الاستغناء عنه</td></tr>
+<tr><td><strong>F1-LITERAL</strong></td><td><span class="sev-med">MED</span></td><td>مطابقة <code>path == p</code> هشّة مقابل <code>startswith</code> القائم؛ تفوت <code>/api/auth/login</code>/trailing-slash</td><td><code>_AUTH_PREFIXES=("/auth/","/api/auth/")</code> بـstartswith مثل <code>_OPS_PREFIXES</code></td></tr>
+<tr><td><strong>F1-CGNAT</strong> <span class="newchip">جديد</span></td><td><span class="sev-med">MED</span></td><td>حدّ auth IP-فقط منخفض يعاقب CGNAT (Libyana/Almadar) — والعقد نفسه يوصي بمفتاح <code>ip+login_identifier</code></td><td>افصل حدّ register (ip) عن login؛ اعتمد lockout per-account كحماية أساسيّة؛ أعفِ test/seed</td></tr>
+<tr><td><strong>F2-ATOMIC</strong> <span class="newchip">جديد</span></td><td><span class="sev-low">LOW</span></td><td>INCR-ثم-EXPIRE غير ذرّي → انقطاع بينهما يترك مفتاحاً بلا TTL = قفل دائم</td><td>pipeline/transaction أو <code>SET ex</code> مع ضمان EXPIRE في كل bump</td></tr>
+<tr><td><strong>F3-VHOST</strong> <span class="corrchip">تصحيح</span></td><td><span class="sev-med">MED</span></td><td>TLS يُنهى على host vhost (<code>deploy/setup_prod_domain.sh</code>+certbot)؛ <code>add_header</code> في host vhost يُلغي وراثة ترويسة الحاوية → HSTS قد لا يصل المتصفّح</td><td>ضع HSTS في host vhost؛ تحقّق بـ<code>curl -I https://tawanow.com</code> بعد كل مرحلة (security_audit_check.sh:80 يفحصه)</td></tr>
+<tr><td><strong>F2-ERRCODE</strong></td><td><span class="sev-med">MED</span></td><td><code>ACCOUNT_LOCKED</code> غير موجود في <code>ErrorCodes</code> (فقط CONFLICT/UNAUTHORIZED)؛ والواجهة/الجوّال لا يعالجان 429</td><td>أضف <code>ACCOUNT_LOCKED</code>؛ لفّ بـ<code>JSONResponse(429, make_error(...).model_dump())</code>؛ عالج 429 في LoginPage + login_screen + تأكّد أنّ interceptor لا يخلطه بـ401</td></tr>
+<tr><td><strong>VERIFY-SH</strong></td><td><span class="sev-med">MED</span></td><td><code>deploy/verify_security_fixes.sh</code> <strong>غير موجود</strong> (مؤكَّد) رغم افتراض الخطة تشغيله</td><td>أنشئه فعليّاً + اربطه يدويّاً قبل النشر</td></tr>
+<tr><td><strong>SEED</strong></td><td><span class="sev-med">MED</span></td><td>حسابات SEED الحيّة (<code>deploy/expert_*.sh</code>) قابلة للقفل (F-2) أو فشل رموزها (F-6) بلا استثناء</td><td>استثنِ قائمة هواتف SEED من settings، أو احصر القفل/التدوير ببيئة الإنتاج بحذر</td></tr>
+<tr><td><strong>ZONE</strong></td><td><span class="sev-med">MED</span></td><td>كل ملفّات الإصلاح في <strong>مناطق محظورة</strong> (<code>backend/app/modules</code> + <code>backend/tests</code> + <code>contracts/</code> + nginx عبر deploy)</td><td>إذن تجاوز صريح من المالك كما في كل المراحل الخلفيّة منذ 414</td></tr>
+<tr><td><strong>F6-PROD</strong> <span class="newchip">جديد</span></td><td><span class="sev-low">LOW</span></td><td><code>validate_production_settings</code>(config:168) قد ترفض <code>secret_key_legacy</code> الفارغ خارج نافذة التدوير</td><td>افحص legacy فقط حين يكون غير فارغ؛ اسمح بالفراغ بعد انتهاء النافذة</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════ 3 ═══════════ -->
+<h2>3) ما هو منفَّذ مسبقاً (لا عمل) + تصحيحات وقائعيّة</h2>
+
+<div class="card ok">
+<h4>منفَّذ مسبقاً — لا تُعِد بناءه (خطر تكرار/تراجع)</h4>
+<ul>
+<li><strong>S-D (CSP <code>script-src 'self'</code> بلا unsafe-inline):</strong> مطبّق سلفاً (nginx.conf:11)؛ <code>dist/index.html</code> كل سكربتاته module خارجيّة hashed (main + registerSW) ⇒ <strong>S-D no-op توثيقيّ لا إصلاح</strong>. (لا تلمس <code>style-src 'unsafe-inline'</code> — لازم لـleaflet.)</li>
+<li><strong>S-E (إنهاء TLS):</strong> <span class="corrchip">تصحيح لتحليلي</span> البنية <strong>موجودة في الريبو</strong>: <code>deploy/setup_prod_domain.sh</code> يكتب host vhost + <code>certbot --nginx --redirect</code>؛ و<code>deploy/security_audit_check.sh:80</code> يفحص HSTS أصلاً. لا تغيير كود مطلوب لها.</li>
+<li><strong>SEC-03 (منع انتحال IP):</strong> منفَّذ (rate_limiter:96-115 يفضّل X-Real-IP ثم أيمن XFF) + مغطّى بـ3 اختبارات. سيناريو 6 في الخطة مُغلق.</li>
+<li><strong>password-reset/request صامت:</strong> يعود 200 للهاتف المجهول أصلاً + <code>test_..._unknown_phone_silent</code> يؤكّده.</li>
+<li><strong>otp endpoints محميّة:</strong> <code>otp_service</code> يفرض request 3/10د+6/سا و verify 5/15د per phone+device ⇒ <strong>لا تُضِف /auth/otp/verify لبكت auth</strong> (ازدواج + حدّ IP أقل دقّة يحجب CGNAT).</li>
+<li><strong>المكتبة <code>python-jose</code> 3.5.0:</strong> ⇒ <code>except JWTError</code> في الخطة <span class="v-true">صحيح</span> ولا يرمي NameError.</li>
+<li><strong>count متوفّر inline</strong> (rate_limiter:84 <code>results[2]</code>) ⇒ لا حاجة لإعادة هيكلة دوال <code>_check_*</code> (غير موجودة أصلاً).</li>
+<li><strong><code>contracts/rate_limits.yaml</code> موجود</strong> ويحوي <code>auth_login</code> (10/15د+30/سا، مفتاح <code>ip+login_identifier</code>) و<code>auth_register</code> (10/سا) ⇒ زعم الخطة «auth_login غير مذكور» <span class="v-false">خاطئ</span>. (لكنّه عقد توثيقيّ <strong>غير مستورَد</strong> في الكود — المصدر الحقيقي ثوابت Python.)</li>
+</ul>
+</div>
+
+<div class="card high">
+<h4>تصحيحات وقائعيّة (على الخطة الأصليّة وعلى تحليلي اليدويّ)</h4>
+<ul>
+<li><span class="corrchip">تصحيح لخطتي</span> <strong>الجوّال (Flutter) غير متأثّر بـF-4 إطلاقاً:</strong> <code>register_screen.dart:120</code> → <code>friendlyError</code> يعرض «العملية مكررة» ثابتة على 409 ولا يقرأ الجسم. كنتُ قلتُ إنّه يتأثّر — خطأ.</li>
+<li><span class="corrchip">تصحيح لخطتي</span> <strong>الواجهة (web) لا تنكسر بـF-4:</strong> <code>useFieldErrors.ts:107-108</code> backward-compatible؛ غياب <code>details</code> يتراجع بأمان لبانر عام (فقدان تلوين الحقل فقط، لا خطأ JS، لا اختبار FE يكسر).</li>
+<li><span class="corrchip">تصحيح لخطتي (XI-D1)</span> <strong>conftest يعزل لكل اختبار:</strong> fixture <code>redis</code> ينشئ <code>FakeRedis</code> جديدة + <code>flushall</code> لكل اختبار ⇒ لا تراكم inter-test. الخطر الحقيقي <strong>intra-test</strong> فقط (اختبار يكرّر فشلاً ≥5 على نفس المستخدم). لا حاجة لـautouse flush.</li>
+<li><span class="corrchip">تصحيح للخطة</span> <strong>F-5 ليست 204:</strong> <code>password-reset/confirm</code> هو <code>status_code=200</code> ويعيد dict أصلاً (793/816)؛ لا تغيير status_code. الرفع 404 عند <strong>802</strong> (الخطة قالت 798).</li>
+<li><span class="corrchip">تصحيح للخطة</span> <strong>أرقام أسطر قديمة:</strong> register@259 (لا 287-330) · login@604 · الدالة الفعليّة <code>_log_login_attempt</code> (لا <code>_record_login_attempt</code>) · ملف الأخطاء <code>error_envelope.py</code> (لا errors.py).</li>
+<li><span class="corrchip">تصحيح للخطة</span> <strong>الحاوية تستمع :80</strong> (8080 ربط مضيف)؛ تعليق HSTS عند 16-18 وفيه <code>preload</code> (فالخطة بالبدء من 300 أصحّ من التعليق).</li>
+<li><span class="corrchip">تصحيح للخطة</span> <strong>عدد الاختبارات:</strong> topup = 3 ملفّات لا 9؛ والـE2E الحقيقيّة Playwright في <code>web/</code> خارج <code>backend/tests</code>.</li>
+<li><strong>FIN-COR سليم:</strong> يحرس SHA لـ<code>feature_flags.yaml</code>+<code>launch_gates.yaml</code> فقط؛ كل ملفّات F-1..F-7 خارجه (بما فيها <code>config.py</code>). <code>rate_limits.yaml</code> غير مشمول ⇒ تحديثه آمن. لا migration لأيّ إصلاح.</li>
+</ul>
+</div>
+
+<!-- ═══════════ 4 ═══════════ -->
+<h2>4) التحقّق المفصّل لكلّ إصلاح + المحاكاة</h2>
+
+<!-- F-1 -->
+<h3>F-1 — auth rate-limit <span class="badge-p0">P0</span> · <span class="v-false">NEEDS_REVISION</span></h3>
+<div class="card crit">
+<h4>الصيغة الآمنة (بعد حذف العيبَين الحرجَين)</h4>
+<pre><span class="filepath">backend/app/core/rate_limiter.py</span>
+<span class="add">+_MAX_REQUESTS_AUTH = 12
++_AUTH_PREFIXES = ("/auth/login", "/auth/register")   # startswith لا == ؛ بلا otp</span>
+
+def _bucket_for(path):
+    if any(path.startswith(p) for p in _OPS_PREFIXES):
+        return "ops", _MAX_REQUESTS_OPS
+<span class="add">+    if any(path.startswith(p) for p in _AUTH_PREFIXES):
++        return "auth", _MAX_REQUESTS_AUTH</span>
+    return "general", _MAX_REQUESTS_GENERAL
+
+async def dispatch(self, request, call_next):
+    ...
+<span class="add">+    count = None                       # حراسة fail-open (F1-HDR)</span>
+    try:
+        ... pipeline ...
+        count = int(results[2])
+        if count > limit:
+            return JSONResponse(429, headers={... Retry-After/Limit/Window/Bucket ...}, ...)
+    except Exception as exc:
+        logger.warning("Rate limiter Redis error (fail-open): %s", exc)
+    response = await call_next(request)   <span class="cmt"># الجسم سليم — لا قراءة في الـmiddleware</span>
+<span class="add">+    if count is not None:               # لا ترويسة عند fail-open
++        response.headers["X-RateLimit-Remaining"] = str(max(0, limit - count))
++        response.headers["X-RateLimit-Bucket"] = bucket
++        response.headers["X-RateLimit-Limit"] = str(limit)</span>
+    return response
+<span class="cmt"># أبقِ _MAX_REQUESTS_GENERAL/_OPS/_WINDOW_SECONDS/_EXEMPT_PREFIXES كما هي (تعتمدها test_rate_limiter.py)</span></pre>
+<div class="sim">🧠 <strong>محاكاة (وكيل F-1):</strong> 13 طلب login من IP واحد → 429 + ترويسات. لا قراءة جسم ⇒ handler سليم. عند انقطاع Redis: <code>count</code> يبقى None ⇒ يمرّ بلا ترويسة Remaining ⇒ يبقى 200 (fail-open محفوظ). تحذير CGNAT: عدّة مستخدمين خلف IP واحد يتشاركون العدّاد ⇒ الحدّ ≥12 + الحماية الأساسيّة من F-2.</div>
+</div>
+
+<!-- F-2 -->
+<h3>F-2 — login lockout <span class="badge-p0">P0</span> · <span class="v-false">NEEDS_REVISION</span></h3>
+<div class="card crit">
+<h4>الصيغة الآمنة (مع التنقيحات الخمسة)</h4>
+<pre><span class="filepath">registration_router.py</span> + <span class="filepath">error_envelope.py (ErrorCodes += ACCOUNT_LOCKED)</span>
+<span class="add">+async def _check_lockout(redis, user_id):
++    try:
++        c = await redis.get(f"login_lockout:{user_id}")
++        return c is not None and int(c) >= _LOCKOUT_THRESHOLD
++    except Exception:
++        return False        # F2-FAILOPEN
++async def _bump_lockout(redis, user_id):
++    try:
++        pipe = redis.pipeline(); pipe.incr(k); pipe.expire(k, 1800)  # F2-ATOMIC: ذرّي
++        await pipe.execute()
++    except Exception: pass</span>
+
+async def login(...):
+    user = db.find(...)
+    if not user or not user.password_hash: return _fail()
+<span class="add">+    if user.phone not in _SEED_PHONES and await _check_lockout(redis, str(user.id)):   # SEED
++        return JSONResponse(429, content=make_error(code=ErrorCodes.ACCOUNT_LOCKED, ...,
++            retryable=True, retry_after_seconds=1800).model_dump())</span>
+    if not verify_password(...):
+<span class="add">+        await _bump_lockout(redis, str(user.id))</span>
+        ... return _fail()
+<span class="add">+    await _clear_lockout(redis, str(user.id))    # ← بعد نجاح verify_password مباشرة (قبل فرع TOTP@695)
+                                                  #   لا عند 746 وإلا يبقى مستخدم TOTP مقفولاً (F2-TOTP)</span>
+    ... (فرع TOTP@695 / النجاح@746)</pre>
+<div class="sim">🧠 <strong>محاكاة (وكيل F-2):</strong> (1) <strong>TOTP:</strong> كلمة صحيحة → الفرع يعود بـpre_auth+commit@711 قبل 746؛ لو المسح عند 746 فقط ⇒ القفل لا يُمسح أبداً. الحلّ: المسح بعد 662. (2) <strong>DoS:</strong> register يكشف الهاتف (409@290) ⇒ مهاجم يقفل ضحيّة بـ5 طلبات؛ حدّ IP العام fail-open لا يحمي. (3) <strong>Redis مقطوع:</strong> بلا try/except ⇒ كل login=500.</div>
+</div>
+
+<!-- F-3 -->
+<h3>F-3 — HSTS تدريجي + S-D + S-E <span class="badge-p1">P1</span> · <span class="v-partial">GO بشروط</span></h3>
+<div class="card high">
+<ul>
+<li>المنهج التدريجي 300→يوم→أسبوع→شهر→6أشهر→سنتان سليم؛ <strong>لا preload</strong> حتى استقرار 6 أشهر + إذن مالك.</li>
+<li><span class="corrchip">حاسم</span> ضع HSTS في <strong>host vhost</strong> (<code>deploy/setup_prod_domain.sh</code> = نقطة إنهاء TLS) لا/بالإضافة إلى الحاوية؛ لأنّ <code>add_header</code> في host vhost يُلغي وراثة ترويسة الحاوية. تحقّق بـ<code>curl -I https://tawanow.com</code> بعد كل مرحلة.</li>
+<li>S-D = توثيق فقط (مطبّق). S-E = موجود (لا كود). أجّل <code>includeSubDomains</code> حتى تأكيد HTTPS صالح لكل النطاقات الفرعيّة (staging/api/dl).</li>
+<li>حدّث <code>web/src/test/nginx-security-headers.test.ts</code> لكل قيمة HSTS. النشر عبر <code>deploy_web.sh</code> (لا deploy_be) + تحقّق <code>/api/health/ready=200</code> (تفادي 502 — <code>fix_proxy.sh</code> موجود).</li>
+</ul>
+</div>
+
+<!-- F-4 -->
+<h3>F-4 — توحيد register <span class="badge-p1">P1</span> · <span class="v-partial">GO بشروط</span></h3>
+<div class="card high">
+<ul>
+<li><strong>حسم الهدف (قرار مالك):</strong> 409 موحّد = «تخفيف» (إخفاء الحقل) لا «إغلاق» — فرق 409/201 يبقى أوراكلاً (=R-062-04). الإغلاق الجذري الوحيد = <strong>200+OTP في الحالتين</strong>.</li>
+<li><span class="corrchip">حاسم</span> حدّث <code>test_registration.py:136</code> و<code>:147</code> في نفس commit (يؤكّدان <code>"phone"/"email" in message_en</code>).</li>
+<li>أي تأخير: على كل المسارات (نجاح+تعارض) أو constant-time؛ لا أحادي-المسار.</li>
+<li>لا تعديل واجهة/جوّال (تتدهور بأمان / لا تقرأ الجسم). راجِع <code>email_router.py</code> (77/145/158/237/254) للاتّساق.</li>
+</ul>
+</div>
+
+<!-- F-5 -->
+<h3>F-5 — pwd-reset + email-verify صامت <span class="badge-p1">P1</span> · <span class="v-partial">GO بشروط</span></h3>
+<div class="card high">
+<ul>
+<li>استبدل <code>raise 404</code> بـ<code>return 200</code> عامّ في ثلاثة مواضع: <code>password_reset_confirm</code>@801-802 · <code>email_verify_request</code>@842-843 · <span class="newchip">جديد</span> <strong><code>email_verify_confirm</code>@862-863</strong> (يكشف وجود البريد). وافحص <code>email_router.py:208</code>.</li>
+<li><span class="corrchip">حاسم</span> حدّث <code>test_phase146:100</code> و<code>:112</code> (404→200) في نفس commit.</li>
+<li>للمستخدم غير الموجود: نفّذ مسار dummy verify أو وحّد رسالة «بيانات/OTP غير صالحة» لإزالة أوراكل التوقيت/422 (قرار عقد). asyncio/random غير مستورَدَين ⇒ أضفهما أو استغنِ عن التأخير. لا تعديل واجهة/جوّال (يعرضان رسالة عامّة).</li>
+</ul>
+</div>
+
+<!-- F-6 -->
+<h3>F-6 — SECRET rotation <span class="badge-p2">P2</span> · <span class="v-false">إعادة كتابة</span></h3>
+<div class="card crit">
+<h4>إعادة الكتابة (خطوتان إلزاميّتان)</h4>
+<ol>
+<li><strong>توحيد decode (شرط مسبق):</strong> دالة مركزيّة <code>decode_with_rotation(token)</code> تجرّب السرّ النشط ثم <code>except JWTError</code> الـlegacy، وتوجَّه إليها <strong>المواقع العشرة</strong> (خاصّة الخمسة SSE/WS) قبل أي تدوير — وإلا تنكسر مصادقة البثّ الحيّ/الصيانة/logout/TOTP أثناء النافذة.</li>
+<li><strong>نافذة legacy ≥ عمر refresh (30 يوماً)</strong> لا 60 دقيقة (refresh موقّع بنفس السرّ) — وإلا خروج جماعي. بدائل: لا تدوّر سرّ refresh، أو وقّع access بالجديد مع إبقاء فكّ refresh داعماً للـlegacy طوال عمره.</li>
+</ol>
+<p>ابنِ فرع legacy داخل <code>verify_access_token</code> قبل فحص <code>jti</code>/idle (يبقى الإلغاء فعّالاً). راعِ <code>validate_production_settings</code> مع legacy الفارغ. <strong>ملاحظة نطاق:</strong> وكيل X-INFRA اقترح إضافة <code>aud/iss</code> — هذا <em>تشديد منفصل</em> ليس في خطة F-6 الأصليّة (التي عن تدوير السرّ)؛ يُعرَض كبند اختياريّ مستقلّ لا كجزء من F-6.</p>
+</div>
+
+<!-- F-7 -->
+<h3>F-7 — RS256 <span class="badge-p3">P3</span> · مؤجّل</h3>
+<div class="card med"><p>يمسّ 13 موقع encode/decode + تحميل زوج مفاتيح. <strong>يعتمد على إتمام توحيد decode في F-6</strong>. P3 معقول، بإذن مستقلّ.</p></div>
+
+<!-- ═══════════ 5 ═══════════ -->
+<h2>5) تفاعلات التقاطع (وكيل التقاطع)</h2>
+<table>
+<thead><tr><th>بين</th><th>المشكلة</th><th>الحلّ</th></tr></thead>
+<tbody>
+<tr><td><strong>F-1 ↔ F-4/F-5</strong></td><td>قراءة الجسم في الـmiddleware تستهلك stream كل POST auth ⇒ تكسر register/login/confirm التي تحاول F-4/F-5 إصلاحها</td><td>احذف قراءة الجسم نهائيّاً ⇒ يحلّ التعارض جذريّاً</td></tr>
+<tr><td><strong>F-1 ↔ F-2</strong></td><td>حدّ IP العام fail-open لا يضمن إيقاف 5 طلبات ⇒ لا يحمي F-2 من DoS الموجّه؛ ومجتمعَين يضاعفان حجب الخدمة على CGNAT</td><td>قفل F-2 لكل (user+ip)/backoff؛ لا تعتمد على F-1 كضمان</td></tr>
+<tr><td><strong>F-2 ↔ TOTP</strong> <span class="newchip">جديد</span></td><td>فرع TOTP يعود مبكراً@711 قبل 746 ⇒ المسح عند 746 يترك مستخدم TOTP مقفولاً</td><td>المسح بعد نجاح verify_password مباشرة (بعد 662)</td></tr>
+<tr><td><strong>F-2 ↔ F-5</strong></td><td>المسح في confirm يجب ألّا يُتاح لمهاجم بهاتف مجهول/OTP خاطئ</td><td><code>_clear_lockout</code> داخل فرع النجاح فقط (بعد 814)، لا في فرع العودة المبكرة</td></tr>
+<tr><td><strong>F-6 ↔ SSE/WS/refresh</strong></td><td>تدوير في موقع واحد يكسر 9 مواقع فكّ أخرى؛ ونافذة 60د تُبطل refresh الـ30 يوماً</td><td>توحيد decode مركزيّاً + نافذة ≥30 يوماً</td></tr>
+<tr><td><strong>F-1-HDR ↔ fail-open</strong> <span class="newchip">جديد</span></td><td>ترويسة Remaining بـcount غير معرّف وقت انقطاع Redis → NameError → 500</td><td><code>count=None</code> قبل try + حراسة <code>if count is not None</code></td></tr>
+<tr><td><strong>F-4/F-5 ↔ الاختبارات</strong></td><td>4 اختبارات قائمة تنكسر صامتةً (الخطة لم تذكرها)</td><td>حدّثها في نفس commit الإصلاح</td></tr>
+</tbody>
+</table>
+
+<!-- ═══════════ 6 ═══════════ -->
+<h2>6) الخطّة التنفيذيّة المُصحَّحة + الاختبارات</h2>
+<div class="card">
+<table>
+<thead><tr><th>#</th><th>الإصلاح (منقّح)</th><th>أولوية</th><th>الملفّات</th></tr></thead>
+<tbody>
+<tr><td>F-1′</td><td>bucket auth IP-فقط + startswith + ترويسات محروسة بـcount=None (بلا قراءة جسم، بلا otp)</td><td><span class="badge-p0">P0</span></td><td>rate_limiter.py</td></tr>
+<tr><td>F-2′</td><td>lockout (user+ip)/backoff + fail-open + ذرّيّة + مسح بعد 662 + استثناء SEED + ACCOUNT_LOCKED + معالجة 429 في الواجهة/الجوّال</td><td><span class="badge-p0">P0</span></td><td>registration_router.py · error_envelope.py · LoginPage · login_screen</td></tr>
+<tr><td>F-5′</td><td>200 عامّ في confirm@802 + email_verify_request@842 + email_verify_confirm@862 + توحيد رسالة OTP</td><td><span class="badge-p1">P1</span></td><td>registration_router.py (+ فحص email_router:208)</td></tr>
+<tr><td>F-4′</td><td>قرار المالك (200+OTP أم 409 موحّد) + تأخير مزدوج + بلا short-circuit</td><td><span class="badge-p1">P1</span></td><td>registration_router.py</td></tr>
+<tr><td>F-3′</td><td>HSTS في host vhost + تدريجي + curl تحقّق + تحديث header test</td><td><span class="badge-p1">P1</span></td><td>deploy/setup_prod_domain.sh · web/nginx.conf · nginx-security-headers.test.ts</td></tr>
+<tr><td>F-6′</td><td>توحيد 10 مواقع decode مركزيّاً ثم legacy بنافذة ≥30 يوماً</td><td><span class="badge-p2">P2</span></td><td>config.py + 10 ملفّات decode</td></tr>
+<tr><td>F-7′</td><td>RS256 مؤجّل</td><td><span class="badge-p3">P3</span></td><td>—</td></tr>
+</tbody>
+</table>
+<h4>الاختبارات الأربعة التي تنكسر صامتةً (حدّثها في نفس commit)</h4>
+<ol>
+<li><code>test_registration.py:136</code> — <code>assert "phone" in message_en.lower()</code> ← أسقِط تأكيد الحقل أو غيّره للرسالة الموحّدة (أبقِ 409).</li>
+<li><code>test_registration.py:147</code> — <code>assert "email" in message_en.lower()</code> ← مثله.</li>
+<li><code>test_phase146:100</code> — confirm unknown phone <code>assert 404</code> → 200.</li>
+<li><code>test_phase146:112</code> — verify-request unknown email <code>assert 404</code> → 200.</li>
+</ol>
+<p>+ افحص <code>ForgotPasswordPage.test.tsx</code>. + اختبارات جديدة: <code>test_auth_bucket_429</code> · <code>test_lockout_fail_open</code> · <code>test_lockout_totp_cleared</code> · <code>test_jwt_legacy_on_sse_ws</code> · autouse intra-test ليس مطلوباً (fakeredis يعزل لكل اختبار).</p>
+</div>
+
+<!-- ═══════════ 7 ═══════════ -->
+<h2>7) النشر + Rollback + بوّابات الحوكمة</h2>
+<div class="card danger">
+<h4>بوّابات إلزاميّة قبل البدء</h4>
+<ul>
+<li><strong>إذن تجاوز المناطق المحظورة</strong> (backend/app/modules + backend/tests + contracts + nginx) — كما كل المراحل الخلفيّة منذ 414.</li>
+<li><strong>قرار F-4:</strong> 200+OTP (إغلاق) أم 409 موحّد (تخفيف)؟ — حسم مالك قبل الكود.</li>
+<li><strong>FIN-COR سليم · لا migration</strong> لأيّ إصلاح. لا تلمس <code>feature_flags.yaml</code>/<code>launch_gates.yaml</code>؛ <code>rate_limits.yaml</code> آمن (غير مشمول).</li>
+<li>لا نشر على tawanow.com الحيّ قبل إصلاح كل HIGH أعلاه وتمرير حزمة BE بعد تحديث الاختبارات الأربعة.</li>
+</ul>
+</div>
+<div class="card">
+<h4>الترتيب</h4>
+<ol>
+<li>تحديث الاختبارات الأربعة + الإصلاحات F-1′+F-2′+F-5′(+F-4′) في commit BE واحد.</li>
+<li><code>pytest</code> كامل ⇒ لا regression. ثم <code>deploy_be.sh</code> (يحفظ القاعدة، لا يشغّل alembic — غير لازم).</li>
+<li>أنشئ <code>verify_security_fixes.sh</code> (register مكرّر→409، pwd-reset مجهول→200، flood→429، JWT مزيّف→401) وشغّله حيّاً.</li>
+<li>F-3′: HSTS في host vhost (Stage 300) ⇒ <code>deploy_web.sh</code> ⇒ <code>curl -I</code> ⇒ مراقبة 48س ⇒ تصعيد.</li>
+<li>F-6′ مستقلّ (توحيد decode أوّلاً). F-7′ مؤجّل بإذن مستقلّ.</li>
+</ol>
+<h4>Rollback</h4>
+<table>
+<tr><th>الإصلاح</th><th>Rollback</th></tr>
+<tr><td>F-1′</td><td>ارفع <code>_MAX_REQUESTS_AUTH</code> أو احذف فرع auth ⇒ انشر. فوريّ.</td></tr>
+<tr><td>F-2′</td><td>اضبط <code>_LOCKOUT_THRESHOLD</code> عالياً (تعطيل) — فوريّ، بلا فقدان بيانات.</td></tr>
+<tr><td>F-3′</td><td>max-age يبدأ 300ث ⇒ يُلغى بإزالة الترويسة + انتظار 5 دقائق. لا preload ⇒ قابل للتراجع.</td></tr>
+<tr><td>F-4′/F-5′</td><td>تراجع للردّ القديم — أثر فوريّ.</td></tr>
+<tr><td>F-6′</td><td>أزل <code>secret_key_legacy</code> + أعد المواقع للدالة العاديّة (احذر إبطال tokens النشطة).</td></tr>
+</table>
+</div>
+
+<div class="verdict-box gocond" style="margin-top:24px">
+الحُكم الجماعي للوكلاء الثمانية: <strong>GO بشروط</strong> — F-3/F-4/F-5 بشروط (تصحيح المراجع + تحديث الاختبارات الأربعة + HSTS في host vhost) · F-1/F-2 بعد حذف قراءة الجسم + حراسة fail-open + تنقيحات القفل الخمسة · F-6 بعد توحيد decode + نافذة 30 يوماً · F-7 مؤجّل. + إذن تجاوز المناطق المحظورة + حسم قرار F-4.
+</div>
+
+<p style="margin-top:30px;text-align:center;color:var(--muted);font-size:12.5px">
+نهاية الخطّة المنقّحة — مبنيّة على <strong>تحقّق 8 وكلاء مكتمل</strong> (run <code>wf_905dece2-86a</code>: 2.68M توكن · 604 استدعاء أداة · 32 دقيقة، كلّهم READ-ONLY) + قراءتي المباشرة للكود، مع مطابقة كل ادّعاء بسطر فعليّ ومحاكاة ذهنيّة وتحليل تقاطع. لم يُعدَّل أيّ ملفّ في المشروع. تنتظر إذنك للبدء في التنفيذ.
+</p>
+
+</div>
+</body>
+</html>

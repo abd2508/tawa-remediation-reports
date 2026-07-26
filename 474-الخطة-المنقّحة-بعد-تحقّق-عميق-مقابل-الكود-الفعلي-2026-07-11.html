@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الخطة المنقَّحة — بعد تحقّق عميق مقابل الكود الفعليّ (23 ادّعاء اختُبِر، 12 عيبًا جديدًا اكتُشِف)</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e; --purple:#b18aff; --refuted:#ff2d55; --confirmed:#37c987; --refined:#ffd23f;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.8; margin:0; font-size:16px;}
+  .wrap{max-width:1280px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:980px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--accent)}
+  .stat.confirmed .num{color:var(--confirmed)} .stat.refuted .num{color:var(--refuted)} .stat.refined .num{color:var(--refined)} .stat.purple .num{color:var(--purple)}
+  .stat .lbl{color:var(--muted); font-size:.82rem; margin-top:4px}
+  section{margin:44px 0}
+  h2.sec-title{font-size:1.5rem; border-inline-start:5px solid var(--accent); padding-inline-start:14px; margin-bottom:18px; color:#fff}
+  h2.sec-title.blocker{border-color:var(--blocker)}
+  h2.sec-title.cluster{border-color:var(--accent2); font-size:1.3rem}
+  h2.sec-title.purple{border-color:var(--purple)}
+  h3.ws-title{font-size:1.15rem; color:#fff; margin:0 0 4px}
+  p.lead{color:var(--muted); max-width:980px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 24px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card.ws{border-inline-start:5px solid var(--accent2)}
+  .card.refuted{border-inline-start:5px solid var(--refuted)}
+  .card.new-risk{border-inline-start:5px solid var(--purple)}
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+  .card-title{font-size:1.1rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.confirmed{background:rgba(55,201,135,.15); color:var(--confirmed); border:1px solid rgba(55,201,135,.4)}
+  .tag.refuted{background:rgba(255,45,85,.15); color:var(--refuted); border:1px solid rgba(255,45,85,.4)}
+  .tag.refined{background:rgba(255,210,63,.15); color:var(--refined); border:1px solid rgba(255,210,63,.4)}
+  .tag.live{background:rgba(255,45,85,.12); color:#ff6b8f; border:1px solid rgba(255,45,85,.35)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .tag.purple{background:rgba(177,138,255,.15); color:var(--purple); border:1px solid rgba(177,138,255,.4)}
+  .orig{background:var(--panel2); border-radius:10px; padding:10px 16px; margin:10px 0; font-size:.9rem; color:var(--muted)}
+  .orig b{color:var(--text)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.78rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.88rem}
+  th,td{border:1px solid var(--border); padding:9px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight.danger{background:rgba(255,45,85,.06); border-color:rgba(255,45,85,.35)}
+  .insight.purple{background:rgba(177,138,255,.07); border-color:rgba(177,138,255,.35)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .insight.danger h4{color:var(--blocker)}
+  .insight.purple h4{color:var(--purple)}
+  .fine-list{background:rgba(55,201,135,.05); border:1px dashed rgba(55,201,135,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+  .shallow-list{background:rgba(111,211,255,.05); border:1px dashed rgba(111,211,255,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+  .plan-banner{background:linear-gradient(135deg,rgba(255,45,85,.15),rgba(255,159,67,.1)); border:2px solid var(--blocker); border-radius:16px; padding:20px 26px; margin-bottom:24px; font-size:1.05rem}
+  .plan-banner b{color:#fff}
+  .simple-box{background:var(--panel2); border:1px solid var(--accent2); border-radius:12px; padding:16px 20px; margin:12px 0; font-size:.95rem}
+  .simple-box b{color:var(--accent2)}
+  .simstep{display:flex; gap:12px; margin:10px 0; align-items:flex-start}
+  .simstep .n{flex:0 0 28px; height:28px; border-radius:50%; background:var(--accent2); color:#062; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem}
+  .simstep.run .n{background:var(--purple); color:#1a0c33}
+  .simstep .t{flex:1; padding-top:2px}
+  .diagram-box{background:var(--panel2); border:1px solid var(--border); border-radius:14px; padding:18px; margin:16px 0; overflow-x:auto; text-align:center}
+  .dep-tier{display:inline-block; background:rgba(177,138,255,.15); color:var(--purple); border:1px solid rgba(177,138,255,.4); border-radius:999px; padding:3px 12px; font-size:.75rem; font-weight:700; margin-inline-end:8px}
+  .verdict-pill{display:inline-block; border-radius:999px; padding:3px 12px; font-size:.75rem; font-weight:800; margin-inline-end:8px}
+  .verdict-pill.confirmed{background:rgba(55,201,135,.18); color:var(--confirmed); border:1px solid rgba(55,201,135,.45)}
+  .verdict-pill.refuted{background:rgba(255,45,85,.18); color:var(--refuted); border:1px solid rgba(255,45,85,.45)}
+  .verdict-pill.refined{background:rgba(255,210,63,.18); color:var(--refined); border:1px solid rgba(255,210,63,.45)}
+  .sev-effort{display:flex; gap:14px; flex-wrap:wrap; margin:10px 0}
+  .sev-effort .m{background:var(--panel2); border-radius:8px; padding:6px 12px; font-size:.82rem; color:var(--muted)}
+  .sev-effort .m b{color:var(--text)}
+  .findings-mini{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0}
+  .findings-mini span{background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:.78rem; color:var(--muted); font-family:"Fira Code",monospace}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 z" fill="#37c987"/></marker>
+</defs></svg>
+<div class="wrap">
+
+<header class="top">
+  <h1>🔬 الخطة المنقَّحة — بعد تحقّق عميق مقابل الكود الفعليّ</h1>
+  <div class="sub">تنفيذًا لطلب صريح بمراجعة دقيقة جدًّا للتقرير 473: كل ادّعاء فيه وُضِع على المحكّ مقابل الكود الحقيقيّ في <code>/home/a/Desktop/APP/platform</code> عبر 6 وكلاء تدقيق قراءة-فقط متوازين، كل واحد يختبر ادّعاءات محدَّدة قابلة للدحض، يتتبّع كل نقاط الاستدعاء والتبعيّات الحقيقيّة، ويبني محاكاة ذهنيّة مبنيّة على رسم الاستدعاء الفعليّ لا على نثر عامّ. النتيجة: <b>12 من 23 ادّعاءً تأكَّد</b>، <b>7 دُحِضت</b> (الواقع مختلف جذريًّا عمّا افترضناه)، <b>4 احتاجت تنقيحًا</b> (صحيحة جزئيًّا لكن الآليّة الحقيقيّة مختلفة)، واكتُشِف <b>12 عيبًا/مخاطرة جديدة</b> أثناء التتبّع لم يذكرها التقرير الأصليّ إطلاقًا.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-11</div>
+    <div class="badge">🔎 <b>المنهج:</b> 6 وكلاء تدقيق كود قراءة-فقط متوازين، كل واحد على عنقود ملفّات مشترك (لا تضارب بين وكيلَين حول نفس الملفّ)</div>
+    <div class="badge">🛑 <b>لم يُعدَّل أيّ سطر كود</b> — تحقّق وتخطيط فقط</div>
+  </div>
+
+  <div class="plan-banner">
+    🛑 <b>هذه أيضًا وثيقة تخطيط فقط.</b> التقرير 473 لم يُحذَف — هذا تنقيح مبنيّ على تحقّق كودي فعليّ يحلّ محلّه كمرجع للتنفيذ. لا تنفيذ حتى مراجعتك والإذن الصريح.
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat"><div class="num">23</div><div class="lbl">ادّعاءً قابلًا للدحض اختُبِر مقابل الكود</div></div>
+    <div class="stat confirmed"><div class="num">12</div><div class="lbl">تأكَّد (CONFIRMED)</div></div>
+    <div class="stat refuted"><div class="num">7</div><div class="lbl">دُحِض (REFUTED)</div></div>
+    <div class="stat refined"><div class="num">4</div><div class="lbl">نُقِّح (REFINED)</div></div>
+    <div class="stat purple"><div class="num">12</div><div class="lbl">عيبًا/مخاطرة جديدة اكتُشِفت أثناء التتبّع</div></div>
+  </div>
+</header>
+
+<div class="toc">
+  <ul>
+    <li><a href="#what-changed">ماذا تغيَّر بعد المراجعة العميقة؟ (الخلاصة أوّلًا)</a></li>
+    <li><a href="#methodology">منهجيّة التحقّق: 6 عناقيد قراءة-فقط</a></li>
+    <li><a href="#coverage">مصفوفة التغطية على مستوى كل عيب (منقَّحة)</a></li>
+    <li><a href="#ws1">المسار 1 — تفويض مركزيّ (منقَّح جذريًّا)</a></li>
+    <li><a href="#ws2">المسار 2 — مصدر حقيقة للحالات (منقَّح جذريًّا)</a></li>
+    <li><a href="#ws3">المسار 3 — حارس الفعل الذرّي (منقَّح: دُحِض جزء، تأكَّد جزء)</a></li>
+    <li><a href="#ws4">المسار 4 — السبب يصل للمستخدم (منقَّح جذريًّا)</a></li>
+    <li><a href="#ws5">المسار 5 — تعليق موحّد (منقَّح جذريًّا — الآليّة موجودة أصلًا)</a></li>
+    <li><a href="#ws6">المسار 6 — تزامن الأموال (تأكَّد وتعمَّق)</a></li>
+    <li><a href="#ws7">المسار 7 — توحيد اعتماد الوكلاء (تأكَّد، مندمج مع 3)</a></li>
+    <li><a href="#ws8">المسار 8 — حذف الحساب (منقَّح جذريًّا — الادّعاء الأساسيّ خاطئ)</a></li>
+    <li><a href="#ws9">المسار 9 — القدرات اليتيمة (نطاق مُصغَّر بشدّة)</a></li>
+    <li><a href="#new-risks">عيوب جديدة اكتُشِفت أثناء المراجعة (12 عنصرًا)</a></li>
+    <li><a href="#tech">التقنيّات المضافة: أين بالضبط وماذا تؤثّر</a></li>
+    <li><a href="#invariant-appendix">ملحق — إعادة التحقّق من ثابت FIN-COR (MM3)</a></li>
+    <li><a href="#reviews">سجلّ منهجيّة التحقّق والمراجعة</a></li>
+  </ul>
+</div>
+
+<section id="what-changed">
+  <h2 class="sec-title blocker">⚡ ماذا تغيَّر بعد المراجعة العميقة؟ (اقرأ هذا أوّلًا)</h2>
+  <p class="lead">هذا هو الجزء الأهمّ في هذه الوثيقة كلّها. التقرير 473 كُتِب من الاستذكار والتلخيص، لا من قراءة كود طازجة. المراجعة هذه وضعت كل ادّعاء على المحكّ. النتيجة الصادمة: <b>أهمّ تصحيحَين يقلبان استراتيجية مسارَين كاملَين رأسًا على عقب</b> — كان يمكن أن يؤدّيا، لو نُفِّذا كما خُطِّط أصلًا، إلى إعادة بناء آليّات موجودة بالفعل من الصفر، وهو بالضبط نوع "إفساد المشروع" الذي حذّرتَ منه.</p>
+
+  <div class="card refuted">
+    <div class="card-head"><div class="card-title">🚨 الأخطر: المسار 5 (تعليق الجلسة) كان سيُعيد بناء آليّة موجودة بالفعل من الصفر</div><span class="verdict-pill refuted">REFUTED</span></div>
+    <p>473 اقترح "بناء قائمة إبطال Redis + طابع revoke-before لكل مستخدم" وكأنّها غير موجودة. <b>الواقع: هذه الآليّة بالضبط موجودة ومُستخدَمة فعليًّا</b> في 4 مواضع أخرى من الكود (<code>jwt_service.py</code>، <code>identity/dependencies.py</code>) — جلسات محظورة، إبطال jti، اكتشاف إعادة استخدام رمز التحديث. المشكلة الحقيقيّة أضيق بكثير: تعليق العميل العامّ (<code>operations_router.py:1676</code>) ببساطة <b>لا يستدعي</b> هذه الآليّة الموجودة أصلًا. <b>الإصلاح الصحيح: سطرا كود يربطان دالّة موجودة، لا بنية تحتيّة جديدة.</b></p>
+  </div>
+
+  <div class="card refuted">
+    <div class="card-head"><div class="card-title">🚨 المسار 2 (مصدر حقيقة للحالات): لا يوجد Python enum إطلاقًا لدحضه أو الاعتماد عليه، لكن أداة التوليد الآليّ موجودة بالفعل</div><span class="verdict-pill refuted">REFUTED/REFINED</span></div>
+    <p><code>order_state</code> ليس enum من الأساس — هو نصّ خام (<code>str</code>) في النموذج والمخطّط كليهما. والأهمّ: <b>خط أنابيب التوليد الآليّ (<code>openapi-typescript</code>) موجود ويعمل بالفعل</b> (<code>web/scripts/generate-api-types.mjs</code>) لكنه لا يملك شيئًا "مُعدَّدًا" ليحوّله. الإصلاح الصحيح معكوس تمامًا عمّا اقترحه 473: البدء من الخادم (تحويل الحقل إلى <code>Literal[...]</code>/<code>Enum</code>) لا من إضافة أداة توليد جديدة — الأداة جاهزة، وتحتاج فقط مُدخلًا مُعدَّدًا.</p>
+  </div>
+
+  <div class="card refuted">
+    <div class="card-head"><div class="card-title">حارس الازدواج (المسار 3، A1): المسار الرئيسيّ محميّ بالفعل بقفل صفّ + قيد فريد جزئيّ في قاعدة البيانات</div><span class="verdict-pill refuted">REFUTED</span></div>
+    <p>473 افترض غياب أيّ حماية. الواقع: <code>create_offer</code> يقفل صفّ الطلب (<code>with_for_update</code>)، <code>respond_to_offer</code> يقفل صفّ العرض، وقيد فريد جزئيّ (<code>uq_dispatch_offers_accepted_per_order</code>) موجود في قاعدة البيانات منذ هجرة <code>aa58</code>. <b>الثغرة الحقيقيّة الوحيدة أضيق بكثير</b>: نقطة نهاية واحدة فقط (<code>reassign_driver</code> اليدويّة من OPS) بلا أيّ قفل — تنجو فقط بالصدفة بفضل قيد قاعدة البيانات.</p>
+  </div>
+
+  <div class="card refuted">
+    <div class="card-head"><div class="card-title">حذف الحساب (المسار 8): الادّعاء الجوهريّ خاطئ — الهويّة مُستمَدّة من الخادم بالفعل، مُتحقَّقة مرّتين</div><span class="verdict-pill refuted">REFUTED</span></div>
+    <p>473 خشي من ثغرة أمنيّة (هويّة من بيانات العميل). <b>لا وجود لها</b> — الحذف الذاتيّ مبنيّ بإحكام: هويّة من جلسة موثّقة بالخادم، وحتى خطوة التأكيد تعيد التحقّق أنّ رمز OTP مرتبط بنفس المستخدم. المشكلة الحقيقيّة مختلفة كليًّا: <b>لا واجهة إطلاقًا</b> للسائق والمزوّد رغم أنّ الخادم يعمل تمامًا لهما، واكتشاف جانبيّ أهمّ (انظر العيوب الجديدة): دالّة "إخفاء الهويّة" الموحَّدة مُوثَّقة كمصدر وحيد لكن نقطتَين من ثلاث توثّقهما لا تستدعيانها فعليًّا.</p>
+  </div>
+
+  <div class="card refuted">
+    <div class="card-head"><div class="card-title">القدرات اليتيمة (المسار 9): الادّعاء "أكبر عائلة عبر كل الدورات" مبالَغ فيه</div><span class="verdict-pill refuted">REFUTED (نطاق)</span></div>
+    <p>عيّنة من 24 نقطة نهاية عبر 6 وحدات: 20/24 (83%) لها استدعاء واجهة حقيقيّ فعليّ. فقط 4/24 (17%) يتيمة فعلًا، <b>وكلّها في وحدة واحدة</b> (إدارة وكلاء التسوية) — الوحدة الأحدث، المدقَّقة في نفس يوم كتابة الخطة. النطاق الصحيح: قائمة مهامّ ضيّقة على صفحة واحدة، لا برنامج عريض عبر كل الوحدات.</p>
+  </div>
+
+  <div class="card ok">
+    <div class="card-head"><div class="card-title">ما تأكَّد وتعمَّق (لا تصحيح، بل تدقيق أعمق): تزامن الأموال (المسار 6)</div><span class="verdict-pill confirmed">CONFIRMED</span></div>
+    <p>MM1 ليس فقط صحيحًا — بل <b>أسوأ ممّا وُصِف</b>: عطب حتميّ بنيويّ، لا سباقًا نادرًا فقط. واكتُشِفت مخاطرة جديدة مهمّة: يوجد <b>ثلاثة</b> كاتبين غير مُقفَلين للعدّاد، لا اثنان كما افترضت الخطة الأصليّة. إستراتيجيّة القفل التشاؤميّ صحيحة أيضًا، ومدعومة الآن بدليل من نفس الكود: نمط مطابق تمامًا مُستخدَم بالفعل لعدّاد شقيق (<code>cash_outstanding_minor</code>) في نفس الملفّ.</p>
+  </div>
+</section>
+
+<section id="methodology">
+  <h2 class="sec-title cluster">🔬 منهجيّة التحقّق: 6 عناقيد قراءة-فقط</h2>
+  <p class="lead">بدل تشتيت التحقّق على 9 مسارات (يخلق تضاربًا إن اطّلع وكيلان على نفس الملفّ بفهمَين مختلفَين)، جُمِّع العمل في 6 عناقيد حسب <b>الملفّات المشتركة فعليًّا</b>، كل عنقود يمتلك "رأسه" الكامل حول ملفّاته:</p>
+  <table>
+    <tr><th>العنقود</th><th>يغطّي</th><th>الملفّات الأساسيّة</th></tr>
+    <tr><td>أ — تفويض وتعليق</td><td>المساران 1، 5</td><td><code>core/roles.py</code>، <code>identity/dependencies.py</code>، <code>identity/jwt_service.py</code></td></tr>
+    <tr><td>ب — حالات ورسائل</td><td>المساران 2، 4</td><td><code>orders/schemas.py</code>، <code>OrderStateBadge.tsx</code>، <code>LocaleSettings.tsx</code>، <code>notification_service.py</code></td></tr>
+    <tr><td>ج — حارس التوزيع</td><td>جزء من المسار 3</td><td><code>dispatch_service.py</code>، <code>operations_router.py::reassign_driver</code></td></tr>
+    <tr><td>د — وحدة التسوية (أعمق تدقيق)</td><td>المسارات 3 (جزء)، 6، 7</td><td><code>settlement/service.py</code>، <code>settlement/models.py</code>، <code>agent_admin_router.py</code>، <code>ops_router.py</code></td></tr>
+    <tr><td>هـ — حذف الحساب</td><td>المسار 8</td><td><code>account_deletion_router.py</code>، <code>anonymization.py</code>، <code>privacy_router.py</code>، <code>retention_service.py</code></td></tr>
+    <tr><td>و — القدرات اليتيمة</td><td>المسار 9</td><td>عيّنة 24 نقطة نهاية عبر 6 وحدات + <code>web/src</code></td></tr>
+  </table>
+  <p class="lead">لكل عنقود: (1) قائمة ادّعاءات دقيقة قابلة للدحض مُستخرَجة من 473 وسجلّات العيوب الأصليّة — لا "راجع المسار 1" المفتوح، بل ادّعاء محدَّد لكل نقطة، (2) حكم CONFIRMED/REFUTED/REFINED بشاهد <code>ملفّ:سطر</code> حقيقيّ، (3) تتبّع كل نقاط الاستدعاء والتبعيّات — من يستدعي هذه الدالّة، من يستوردها، ماذا تقرأ الواجهة منها، (4) محاكاة ذهنيّة مبنيّة على رسم الاستدعاء الحقيقيّ الذي تتبَّعوه لا نثرًا عامًّا، (5) أيّ مخاطرة جديدة اكتُشِفت أثناء التتبّع (محصورة بنطاق التغيير المخطَّط، لا تدقيقًا واسعًا جديدًا — 466-472 غطّت ذلك)، (6) توصية تقنيّة ثانويّة فقط إن وُجِدت أداة تندمج بلا استبدال جذريّ في نفس الحزمة (FastAPI/SQLAlchemy/PostgreSQL/React/TypeScript الحاليّة).</p>
+</section>
+
+<section id="coverage">
+  <h2 class="sec-title cluster">🗺️ مصفوفة التغطية على مستوى كل عيب (منقَّحة)</h2>
+  <p class="lead">إضافةً لتغطية العائلات (كافية في 473)، هذه مصفوفة على مستوى كل معرّف عيب مُختبَر فعليًّا — تُظهر أيّها ما زال يحتاج نفس الإصلاح المخطَّط، وأيّها يحتاج إصلاحًا مختلفًا كليًّا بعد التحقّق:</p>
+  <table>
+    <tr><th>المعرّف</th><th>التقرير</th><th>الحكم بعد التحقّق</th><th>المسار</th><th>هل تغيَّر الإصلاح المخطَّط؟</th></tr>
+    <tr><td>S1 (تقارير المبيعات)</td><td>467</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>1</td><td>لا — لكن الآليّة المستهدَفة أدقّ الآن (<code>require_provider_permission</code> لا بناء جديد)</td></tr>
+    <tr><td>Auth-F1 (ائتمان محفظة)</td><td>469</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>1</td><td>لا — نفس الإصلاح، بشاهد ملفّ:سطر دقيق الآن</td></tr>
+    <tr><td>Auth-F3 (سجلّ تدقيق COMPLIANCE)</td><td>469</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>1</td><td>نعم — إصلاح أبسط ممّا افتُرِض (سطر واحد في قائمة أدوار، لا بناء تفويض)</td></tr>
+    <tr><td>AL1/AG4 (تصادم 404)</td><td>472</td><td><span class="verdict-pill confirmed">CONFIRMED (تصميم متعمَّد)</span></td><td>1</td><td>نعم — هذا قرار تصميميّ موثَّق، لا عيب مُغفَل؛ الإصلاح اختياريّ تحسينيّ لا تصحيحيّ</td></tr>
+    <tr><td>Support-F3 (تعليق العميل)</td><td>469</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>5</td><td><b>نعم جذريًّا</b> — سطرا كود يستدعيان آليّة موجودة، لا بناء من الصفر</td></tr>
+    <tr><td>Dispatch-F4 (سائق معلَّق يظهر متاحًا)</td><td>469</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>5</td><td>نعم — إصلاح استعلام SQL محدَّد + استنساخ منطق TEMP_PENDING</td></tr>
+    <tr><td>Q6 / Dashboards-F1/F2 (انحراف enum)</td><td>467/469</td><td><span class="verdict-pill refined">REFINED</span></td><td>2</td><td><b>نعم جذريًّا</b> — البداية من الخادم (Literal/Enum) لا من "توليد جديد"</td></tr>
+    <tr><td>AG1 (قناة FULL)</td><td>472</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>2</td><td>لا — إصلاح سطرين دقيق مؤكَّد بشاهد كامل</td></tr>
+    <tr><td>A1 (ازدواج تعيين سائق)</td><td>468</td><td><span class="verdict-pill refuted">REFUTED (نطاق)</span></td><td>3</td><td><b>نعم جذريًّا</b> — الإصلاح محصور بـ<code>reassign_driver</code> فقط، لا بناء قفل جديد للمسار الرئيسيّ</td></tr>
+    <tr><td>AL5 (ازدواج منح وكيل)</td><td>472</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>3+7</td><td>لا — لكن أُدمِج مع المسار 7 (نفس الإصلاح بالضبط)</td></tr>
+    <tr><td>PT4 (استبدال سبب النزاع)</td><td>472</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>3</td><td>لا — إصلاح سطر واحد مؤكَّد بشاهد كامل</td></tr>
+    <tr><td>C (سبب لا يصل للمستخدم)</td><td>467/469</td><td><span class="verdict-pill refined">REFINED</span></td><td>4</td><td><b>نعم جذريًّا</b> — النطاق الحقيقيّ نقطة واحدة فقط (تعليق OPS)، آليّتان أخريان تعملان بالفعل</td></tr>
+    <tr><td>D (LocaleSettings no-op)</td><td>470</td><td><span class="verdict-pill confirmed">CONFIRMED</span></td><td>4</td><td>لا — لكن اكتُشِف عطب اختبار زائف يجب إصلاحه أوّلًا (انظر العيوب الجديدة)</td></tr>
+    <tr><td>MM1 (سقف الطفو)</td><td>472</td><td><span class="verdict-pill confirmed">CONFIRMED (أسوأ ممّا وُصِف)</span></td><td>6</td><td>نعم — يجب قفل نقطتَين لا واحدة (اكتُشِف كاتب ثالث)</td></tr>
+    <tr><td>MM3 (لا خرق FIN-COR)</td><td>472</td><td><span class="verdict-pill confirmed">CONFIRMED (لا يزال قائمًا)</span></td><td>ملحق</td><td>لا — أُعيد التحقّق حرفيًّا، النتيجة السلبيّة ثابتة</td></tr>
+    <tr><td>E (حذف الحساب، كل الأدوار)</td><td>466-469</td><td><span class="verdict-pill refuted">REFUTED (الادّعاء الجوهريّ)</span></td><td>8</td><td><b>نعم جذريًّا</b> — لا إصلاح أمنيّ مطلوب؛ واجهة ناقصة + دمج دالّة إخفاء هويّة مبعثرة</td></tr>
+    <tr><td>H (قدرات يتيمة)</td><td>470</td><td><span class="verdict-pill refuted">REFUTED (الحجم)</span></td><td>9</td><td><b>نعم جذريًّا</b> — 4 عناصر في صفحة واحدة، لا برنامج عريض</td></tr>
+  </table>
+</section>
+
+<section id="ws1">
+  <h2 class="sec-title purple">🔐 المسار 1 — تفويض مركزيّ (منقَّح جذريًّا)</h2>
+  <span class="verdict-pill refined">REFINED</span><span class="dep-tier">الطبقة 0 — أساس</span>
+  <div class="card ws">
+    <h3 class="ws-title">الادّعاء الأصليّ (473) مقابل الواقع المؤكَّد بالكود</h3>
+    <p><b>473 افترض:</b> فحوصات دور خام مبعثرة، تحتاج بناء طبقة تفويض واحدة من الصفر. <b>الواقع (<code>core/roles.py</code>، <code>identity/dependencies.py</code>):</b> نظام ناضج من 4 مستويات فعليًّا — <code>require_role</code> (فحص دور فقط)، <code>require_active_role</code> (+ حالة قاعدة بيانات حيّة)، <code>require_permission</code> (يستشير كتالوج المنح/السحب لكل حساب)، <code>require_provider_permission</code> (الأغنى: دور + حالة حظر + تعليق + كتالوج). المشكلة الحقيقيّة: <b>~40 نقطة نهاية فقط</b> من أصل <b>~600+</b> تستخدم المستويَين الواعيَين بالكتالوج — البقيّة تستخدم <code>require_role</code> الذي <b>لا يمكنه بنيويًّا</b> رؤية منح/سحب فرديّ لحساب، ليس لأنّ أحدًا كتب فحصًا يدويًّا خاطئًا، بل لأنّ البوّابة المستخدَمة لا تسأل الكتالوج من الأساس.</p>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">4 عيوب مؤكَّدة بشاهد <code>ملفّ:سطر</code> دقيق</h3>
+    <table>
+      <tr><th>العيب</th><th>الشاهد</th><th>الواقع</th></tr>
+      <tr><td>S1 — تقارير مبيعات</td><td><code>providers/provider_router.py:2623</code></td><td>مُقيَّد بـ<code>require_role(PROVIDER_ADMIN, PROVIDER_STAFF)</code> فقط — لا يستشير صلاحيّة <code>provider_reports:view</code> القابلة للمنح رغم وجودها في الكتالوج (<code>roles.py:55,93-113</code>). أيّ موظّف يصلها بلا منح.</td></tr>
+      <tr><td>Auth-F1 — ائتمان محفظة</td><td><code>operations/operations_router.py:2045-2100</code></td><td><b>لا <code>Depends</code> إطلاقًا</b> — فحص دور خامّ داخليّ (<code>role_satisfies</code>) بلا أيّ اعتماديّة. منح/سحب <code>wallet:manual_credit_with_reason</code> من لوحة OPS <b>بلا أثر مطلقًا</b> على هذه النقطة — وعد كاذب في واجهة الإدارة.</td></tr>
+      <tr><td>Auth-F3 — سجلّ التدقيق</td><td><code>admin/control_panel_router.py:1428-1438</code></td><td><code>COMPLIANCE_AGENT</code> يملك <code>audit_log:read_all</code> في أساسه (<code>roles.py:186</code>) لكن هذه النقطة الوحيدة مُقيَّدة <code>require_role(OPERATIONS_AGENT, SUPER_ADMIN)</code> فقط — استثناء في نقطة واحدة، لا نمط عامّ (COMPLIANCE_AGENT مُدرَج في ~20 قائمة أخرى مشابهة).</td></tr>
+      <tr><td>AL1/AG4 — تصادم 404</td><td><code>settlement/agent_router.py:29-37</code></td><td>مؤكَّد بالكود، لكن <b>تصميم متعمَّد موثَّق</b> بتعليق صريح — ليس عيبًا أُغفِل، بل تبسيط مقصود لإشارة الواجهة.</td></tr>
+    </table>
+  </div>
+
+  <div class="insight danger">
+    <h4>🚨 تحذير نطاق حاسم: لا تُحاول استبدال <code>require_role</code> بالجملة</h4>
+    <p>تحويل ~600 نقطة نهاية من "أيّ من هذه الأدوار المسمّاة" (<code>require_role</code>) إلى "يملك هذه الصلاحيّة تحديدًا" (<code>require_permission</code>) <b>ليس استبدالًا آليًّا</b> — كل تحويل يحتاج اختيار سلسلة صلاحيّة من <code>roles.py</code> والتحقّق أنّها تُطابق دلالات الهرميّة الحاليّة (<code>ADMIN</code>/<code>SUPERVISOR</code> يرثان <code>OPERATIONS_AGENT</code>). هذا <b>~600 مراجعة فرديّة حقيقيّة، لا بحث-واستبدال ميكانيكيّ</b>. النطاق المنقَّح: أصلح الأربعة المؤكَّدة أعلاه فقط الآن، واجعل القاعدة الإجرائيّة "كل نقطة نهاية جديدة حسّاسة تُبنى بـ<code>require_permission</code> منذ اليوم الأول" — لا هجرة رجعيّة شاملة.</p>
+  </div>
+
+  <div class="insight warn">
+    <h4>⚠️ عرض جانبيّ جديد اكتُشِف: إصلاح Auth-F1 يفتح مخاطرة قفل جديدة على SUPER_ADMIN</h4>
+    <p>إضافة <code>Depends(require_permission("wallet:manual_credit_with_reason"))</code> لهذه النقطة: تعمل بلا تغيير لأيّ OPS/ADMIN بلا سحب مُطبَّق (الأساس يمنحها). لكن <code>SUPER_ADMIN</code> لا يملك هذه الصلاحيّة صراحةً في قائمته — يعتمد على شارة <code>admin:all</code> العامّة. <b>هذا يفتح، لأوّل مرّة، إمكانيّة أن يسحب مشغّل OPS هذه الصلاحيّة تحديدًا عن حساب SUPER_ADMIN بالخطأ</code> وتُطبَّق فعليًّا</b> — اليوم هذا مستحيل بنيويًّا لأنّ النقطة لا تستشير الكتالوج إطلاقًا. يجب اختبار هذا صراحةً قبل النشر، وربما إضافة حارس "لا يمكن سحب صلاحيّات من آخر SUPER_ADMIN نشِط".</p>
+  </div>
+
+  <div class="card">
+    <h3 class="ws-title">محاكاة ذهنيّة مبنيّة على رسم الاستدعاء الحقيقيّ — أثناء البناء</h3>
+    <div class="simstep"><div class="n">1</div><div class="t">إصلاح S1: تغيير <code>require_role(...)</code> إلى <code>require_provider_permission("provider_reports:view")</code> في <code>provider_router.py:2623</code> — تغيير سطر واحد، محصور بهذه النقطة فقط (نمط مُستخدَم أصلًا 31 مرّة في نفس الملفّ).</div></div>
+    <div class="simstep"><div class="n">2</div><div class="t">إصلاح Auth-F1: إضافة <code>Depends(require_permission("wallet:manual_credit_with_reason"))</code> إلى توقيع <code>wallet_credit</code>، ثم اختبار صريح أنّ SUPER_ADMIN لا يزال يعمل (شارة <code>admin:all</code>) قبل الدمج.</div></div>
+    <div class="simstep"><div class="n">3</div><div class="t">إصلاح Auth-F3: سطر واحد — إضافة <code>COMPLIANCE_AGENT</code> إلى قائمة <code>require_role</code> في <code>control_panel_router.py:1428</code>، مطابقةً لبقيّة النقاط المشابهة.</div></div>
+  </div>
+
+  <div class="card">
+    <h3 class="ws-title">محاكاة ذهنيّة — أثناء التشغيل الفعليّ</h3>
+    <div class="simstep run"><div class="n">1</div><div class="t">مشغّل OPS يسحب <code>wallet:manual_credit_with_reason</code> من حساب موظّف بعد الإصلاح.</div></div>
+    <div class="simstep run"><div class="n">2</div><div class="t">الموظّف يحاول ائتمان محفظة عميل — <code>require_permission</code> يستشير الكتالوج فعليًّا الآن (بخلاف اليوم) → يرفض 403 لأوّل مرّة، مطابقًا لما كانت واجهة الإدارة "تعد" به دائمًا.</div></div>
+  </div>
+
+  <div class="sev-effort">
+    <div class="m">النطاق بعد التصحيح: <b>4 إصلاحات سطريّة دقيقة</b>، لا بناء بنية تحتيّة</div>
+    <div class="m">المخاطرة: <b>منخفضة</b> بعد تضييق النطاق (كانت ستكون عالية جدًّا لو نُفِّذ الهجرة الشاملة الأصليّة)</div>
+  </div>
+</section>
+
+<section id="ws2">
+  <h2 class="sec-title purple">🧬 المسار 2 — مصدر حقيقة للحالات (منقَّح جذريًّا)</h2>
+  <span class="verdict-pill refuted">REFUTED / REFINED</span><span class="dep-tier">الطبقة 0 — أساس</span>
+  <div class="card ws">
+    <h3 class="ws-title">الادّعاء الأصليّ مقابل الواقع</h3>
+    <p><b>473 افترض:</b> "enum" في الخادم + خريطة يدويّة مكرَّرة في الواجهة + لا أداة توليد. <b>الواقع المؤكَّد:</b> <code>order_state</code> ليس enum إطلاقًا — عمود <code>String(50)</code> خام في <code>models/order.py:36</code> وحقل <code>str</code> خام في <code>orders/schemas.py:94</code>. القيم الصالحة الوحيدة موجودة فقط كنصوص حرفيّة داخل قاموس انتقال الحالة في <code>state_transitions.py</code>. <b>والأهمّ: خط أنابيب <code>openapi-typescript</code> موجود فعليًّا ويعمل</b> (<code>web/scripts/generate-api-types.mjs</code>، <code>npm run api:codegen</code>) — لكنه ينتج <code>order_state?: string | null</code> لأنّه لا يملك شيئًا مُعدَّدًا ليحوّله، لا لأنّه معطوب.</p>
+  </div>
+
+  <div class="insight warn">
+    <h4>📐 تصحيح الشدّة: <code>OrderStateBadge.tsx</code> لا "يتكسّر" — يتدهور بأمان</h4>
+    <p>حالة غير معروفة → شارة رماديّة محايدة + النصّ الخام يظهر بلا ترجمة. ليس عطلًا، بل تدهورًا صامتًا في تجربة المستخدم (حالة جديدة تُعرَض بلا تنسيق أو ترجمة، لا شاشة بيضاء أو خطأ). اكتُشِف مكوّنان آخران بنفس النمط: <code>TopBarStatusBadge.tsx</code> له منطق تلوين منفصل خاصّ به أيضًا — النمط أوسع ممّا رصده 473 بمكوّن واحد.</p>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">الحل الجذريّ الصحيح (معكوس عن 473): ابدأ من الخادم، لا من أداة جديدة</h3>
+    <ol style="color:var(--muted)">
+      <li>تحويل <code>order_state</code> في <code>orders/schemas.py</code> إلى <code>Literal[...]</code> أو <code>class OrderStatus(str, Enum)</code> واحد يستورده <code>models/order.py</code> و<code>state_transitions.py</code> منه معًا — مصدر واحد حقيقيّ، لا ثلاثة مصادر نصّيّة متفرّقة كاليوم.</li>
+      <li>إعادة تشغيل <code>npm run api:codegen</code> الموجود فعلًا — <code>schema.d.ts</code> سيُصبح تلقائيًّا اتّحاد نصوص حرفيّة صحيح، <b>بلا أيّ أداة جديدة</b>.</li>
+      <li>في الواجهة: تعريف <code>STATE_CLASS</code> بصياغة <code>satisfies Record&lt;OrderState,string&gt;</code> (عامل <code>satisfies</code> في TypeScript، متوفّر أصلًا في نسخة هذا المشروع) — حالة جديدة في الخادم بلا خانة مقابلة في الواجهة تفشل فحص الأنواع (<code>npm run typecheck</code>، بوّابة CI موجودة أصلًا) بدل أن تصل للإنتاج بصمت.</li>
+    </ol>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">إصلاح مؤكَّد ضمن هذا المسار: قناة "FULL" في التسوية (AG1)</h3>
+    <p><code>settlement/service.py:205-209</code> يتحقّق فقط من <code>"CASH"</code> و<code>"ELECTRONIC"</code> — قيمة <code>"FULL"</code> الحقيقيّة والمُستخدَمة فعليًّا (<code>party_router.py:36</code>، بلا تحقّق/enum من جهة العميل) تتجاوز القيد كليًّا. فحص سقف الطفو بعده بسطرين (<code>service.py:230</code>) يعالج <code>FULL</code> بشكل صحيح — يثبت أنّه سهو، لا تصميمًا. <b>الإصلاح:</b> إضافة فرع <code>txn.channel == "FULL"</code> لنفس الفحص، مطابقًا لفحص السقف المجاور.</p>
+    <div class="insight warn"><h4>⚠️ عرض جانبيّ جديد: عدم تماثل في اتّجاه المنح</h4><p><code>grant.channels</code> نفسه لا يمكن أن يكون <code>"FULL"</code> إطلاقًا اليوم (فقط CASH/ELECTRONIC/BOTH، <code>agent_admin_router.py:114</code>) — إصلاح متماثل ساذج (فقط إضافة معالجة <code>FULL</code> من جهة المعاملة) يجب أن يقرّر أيضًا ماذا يعني منح وكيل صلاحيّة <code>FULL</code> مستقبلًا، لا الاكتفاء بإصلاح جهة واحدة.</p></div>
+  </div>
+
+  <div class="sev-effort">
+    <div class="m">إصلاح enum: <b>يبدأ من نوع بيانات خادم واحد</b>، لا أداة جديدة</div>
+    <div class="m">إصلاح FULL: <b>سطران</b>، مؤكَّد بشاهد كامل</div>
+  </div>
+</section>
+
+<section id="ws3">
+  <h2 class="sec-title purple">🔒 المسار 3 — حارس الفعل الذرّي (منقَّح: دُحِض جزء رئيسيّ، تأكَّد جزء)</h2>
+  <span class="verdict-pill refuted">REFUTED (الجزء الرئيسيّ)</span><span class="dep-tier">الطبقة 0 — أساس</span>
+
+  <div class="card refuted">
+    <h3 class="ws-title">A1 (ازدواج تعيين سائق) — دُحِض للمسار الرئيسيّ، تأكَّد لثغرة أضيق</h3>
+    <p><b>473 افترض:</b> لا حماية إطلاقًا. <b>الواقع:</b> <code>create_offer</code> (<code>dispatch_service.py:253</code>) يقفل صفّ الطلب <code>with_for_update()</code> <b>قبل</b> فحص وجود عرض حيّ. <code>respond_to_offer</code> (<code>:901</code>) يقفل صفّ العرض بنفس الطريقة. وقيد فريد جزئيّ حقيقيّ (<code>uq_dispatch_offers_accepted_per_order</code>) موجود في قاعدة البيانات منذ هجرة <code>aa58_dispatch_one_accepted_offer.py</code> — <b>مكتوب خصّيصًا لإغلاق هذا العيب بالضبط، وموجود بالفعل في سلسلة الهجرات</b>، وليس مجرّد مقترح. عيب توثيقيّ بسيط فقط: هذا القيد غير مُعرَّف صراحةً في نموذج SQLAlchemy (<code>models/dispatch.py:195-205</code> يسرد 5 فهارس عاديّة فقط) — انحراف نموذج/قاعدة بيانات لا عيب وظيفيّ.</p>
+    <div class="orig"><b>الثغرة الحقيقيّة الوحيدة المتبقّية:</b> <code>reassign_driver</code> (<code>operations/operations_router.py:853-1105</code>) — نقطة إعادة الإسناد اليدويّة الوحيدة من OPS — <b>بلا أيّ قفل صفّ إطلاقًا</b>. تنجو اليوم فقط بفضل قيد قاعدة البيانات (يرفض الكتابة الثانية بخطأ <code>IntegrityError</code> يحوّله المعالج العامّ في <code>main.py:1093</code> إلى 409 نظيف) — لكن بلا رسالة مخصَّصة وبلا حماية على مستوى التطبيق.</div>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">الإصلاح المنقَّح: نطاق أضيق بكثير من الأصليّ</h3>
+    <ol style="color:var(--muted)">
+      <li>إضافة <code>.with_for_update()</code> لقراءتَي الطلب والعرض القديم في <code>reassign_driver</code> (الأسطر ~898، ~989-993) — مطابقًا تمامًا لنفس الأسلوب المُستخدَم مرّتين أصلًا في <code>dispatch_service.py</code>. <b>لا هجرة قاعدة بيانات جديدة مطلوبة.</b></li>
+      <li>معالجة <code>IntegrityError</code> صراحةً في <code>reassign_driver</code> لإطلاق نفس نمط <code>DispatchError(409)</code> المُستخدَم في بقيّة الوحدة، بدل الاعتماد على المعالج العامّ الذي يعطي رسالة "تعارض بيانات" عامّة.</li>
+      <li><i>تحسين توثيقيّ منخفض الأولويّة:</i> إضافة القيد الفريد الجزئيّ صراحةً إلى <code>DispatchOffer.__table_args__</code> في النموذج (القيد موجود في قاعدة البيانات أصلًا؛ هذا توثيق فقط، لا تغيير سلوك).</li>
+    </ol>
+  </div>
+
+  <div class="card ok">
+    <h3 class="ws-title">AL5 (ازدواج منح وكيل تسوية) — تأكَّد كما وُصِف تمامًا</h3>
+    <p>لا <code>UniqueConstraint</code> على <code>settlement_agents.user_id</code> (فهرس فقط، <code>models/settlement.py:100-104</code>). مسار التوثيق (<code>agent_admin_router.py:142-150</code>) يتحقّق من الصفوف <code>PENDING</code> و<code>ACTIVE</code> معًا بشكل صحيح؛ مسار المنح المباشر (<code>ops_router.py:88-95</code>) <b>يتحقّق من ACTIVE فقط</b> — الفجوة الحقيقيّة هنا، لا في مسار التوثيق. راجع تفصيل الإصلاح الكامل في <a href="#ws7">المسار 7</a> (نفس العيب، مُدمَج هناك لتفادي الازدواج).</p>
+  </div>
+
+  <div class="card ok">
+    <h3 class="ws-title">PT4 (استبدال سبب النزاع) — تأكَّد كما وُصِف تمامًا</h3>
+    <p><code>settlement/service.py:361-373</code>: الحارس يستثني فقط <code>SETTLED</code>/<code>VOID</code> — حالة <code>DISPUTED</code> تمرّ فتُستبدَل <code>dispute_reason</code> بصمت. <b>الإصلاح:</b> إضافة <code>"DISPUTED"</code> لقائمة الاستثناء في الفحص عند السطر 368، مع رسالة <code>ALREADY_DISPUTED</code> مخصَّصة.</p>
+  </div>
+
+  <div class="sev-effort">
+    <div class="m">النطاق بعد التصحيح: <b>ثغرة واحدة ضيّقة</b> (reassign_driver) + إصلاحان مؤكَّدان صغيران (AL5 مُدمَج مع 7، PT4)</div>
+    <div class="m">المخاطرة: <b>منخفضة جدًّا</b> — لا هجرة قاعدة بيانات لـA1 إطلاقًا</div>
+  </div>
+</section>
+
+<section id="ws4">
+  <h2 class="sec-title purple">📣 المسار 4 — السبب يصل للمستخدم (منقَّح جذريًّا)</h2>
+  <span class="verdict-pill refined">REFINED</span><span class="dep-tier">الطبقة 2</span>
+
+  <div class="card ws">
+    <h3 class="ws-title">الادّعاء الأصليّ مقابل الواقع: النطاق أضيق بكثير</h3>
+    <p><b>473 افترض:</b> عطب عامّ — لا رفض/تعليق يصل سببه للمستخدم. <b>الواقع:</b> <code>NotificationService</code> (<code>notification_service.py</code>، 790 سطرًا) نظام حقيقيّ ناضج متعدّد القنوات (تطبيق+دفع+SMS) بسجلّ أحداث صريح. تتبُّع 3 تدفّقات فعليّة: رفض عنصر كتالوج (<code>catalog_moderation_router.py:197-212</code>) <b>يرسل السبب فعليًّا</b> عبر <code>NotificationService</code>؛ رفض تغيير اسم (<code>operations_router.py:7005-7027</code>) <b>يرسل رمز السبب فعليًّا</b> أيضًا. <b>الفجوة الحقيقيّة محصورة بمسار واحد فقط</b>: تعليق العميل العامّ من OPS (<code>operations_router.py:1676</code> → <code>controls_service.py:99-129</code>) لا يستدعي <code>NotificationService</code> إطلاقًا — السبب يصل فقط لسجلّ التدقيق، والمستخدم المُعلَّق يرى فقط رسالة 403 عامّة ثابتة عند طلبه التالي.</p>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">الإصلاح المنقَّح: وصل نقطة واحدة بآليّة موجودة، لا بناء أنبوب جديد</h3>
+    <p>إضافة حدث <code>user.suspended</code>/<code>user.suspension_lifted</code> لسجلّ <code>NOTIFICATION_EVENTS</code> الموجود أصلًا، واستدعاء <code>NotificationService(db).send(..., template_vars={"reason": reason})</code> داخل <code>suspend_user()</code> — بنفس النمط الحرفيّ المُستخدَم بالفعل لـ<code>catalog.item_rejected</code>. لا بنية جديدة، سطور استدعاء فقط.</p>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">LocaleSettings.tsx — تأكَّد كما وُصِف، لا يزال معطوبًا اليوم (ليس كودًا قديمًا)</h3>
+    <p>لا يستورد <code>react-i18next</code> إطلاقًا، لا يستدعي <code>i18n.changeLanguage()</code> أبدًا — فقط يحفظ تفضيلًا في الخادم لا يقرؤه أحد لاحقًا. تاريخ التعديل (2026-07-05) يطابق دفعة <code>CustomerSettings.tsx</code> نفسها التي أُصلِحت — <b>لكن هذا الملفّ تحديدًا نُسِي</b>. الآليّة الحقيقيّة العاملة موجودة مكرَّرة في مكانَين آخرَين (<code>Layout.tsx:51-56</code>، <code>CustomerSettings.tsx:156-161</code>).</p>
+    <div class="insight danger"><h4>🚨 عرض جانبيّ خطير: تعارض ترميز اللغة</h4><p>الآليّة العاملة تستخدم رموز حرفَين (<code>ar/en/fr</code>)، بينما <code>LocaleSettings.tsx</code> يعرض رموز إقليميّة (<code>ar-LY/en-US/fr-FR</code>) لا تُطابِق <code>supportedLngs</code> في i18next. <b>ربط ساذج</b> (فقط إضافة استدعاء <code>changeLanguage(locale)</code>) <b>سيفشل بصمت</b> ويسقط للغة الافتراضيّة — يجب تطبيع الرمز أوّلًا قبل الاستدعاء.</p></div>
+  </div>
+
+  <div class="sev-effort">
+    <div class="m">النطاق بعد التصحيح: <b>نقطة استدعاء واحدة</b> للسبب + إصلاح LocaleSettings (مع تطبيع رمز إلزاميّ)</div>
+  </div>
+</section>
+
+<section id="ws5">
+  <h2 class="sec-title purple">⛔ المسار 5 — تعليق موحّد (منقَّح جذريًّا — الآليّة موجودة أصلًا)</h2>
+  <span class="verdict-pill refuted">REFUTED (الادّعاء المعماريّ الرئيسيّ)</span><span class="dep-tier">الطبقة 1</span>
+
+  <div class="card refuted">
+    <h3 class="ws-title">🚨 التصحيح الأخطر في هذه الوثيقة كلّها</h3>
+    <p><b>473 اقترح:</b> بناء "طابع revoke-before لكل مستخدم + قائمة إبطال Redis" من الصفر. <b>الواقع المؤكَّد بالكود:</b> كومة إبطال حقيقيّة، ناضجة، ومُستخدَمة فعليًّا موجودة بالفعل في <code>identity/dependencies.py:36-85,154-194</code> و<code>identity/jwt_service.py:42-90,363-424</code>: (أ) قائمة حالات دور محظورة تُقرَأ من مطالبة JWT نفسها، (ب) مفتاح Redis <code>userblocked:{user_id}</code> يضعه <code>block_user_sessions()</code> ويُتحقَّق منه في <b>كل طلب</b> (يعمل خلال حياة الجلسة، لا عند تسجيل الدخول التالي فقط)، (ج) نظام إبطال jti كامل + كشف إعادة استخدام رمز تحديث. <b>هذا أكثر بكثير من "تبديل عمود قاعدة بيانات."</b> بناء هذا من جديد كان سيُنتج نظامَي إبطال متوازيَين متضاربَين — بالضبط "إفساد المشروع" الذي حذّرتَ منه.</p>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">الفجوة الحقيقيّة: أفعال تعليق محدَّدة لا تستدعي الآليّة الموجودة</h3>
+    <p><code>POST /operations/users/{user_id}/suspend</code> (العامّ، المُستخدَم ضدّ العملاء) يستدعي <code>OperationsControlsService.suspend_user</code> الذي يُغيِّر <b>فقط</b> <code>OperationalProfile.is_suspended</code> — لا يمسّ <code>users.status</code> ولا يستدعي <code>block_user_sessions()</code> إطلاقًا. وتتبُّع كل مستهلكي <code>OperationalProfile.is_suspended</code> يُظهِر أنّه <b>لا يُقرَأ إطلاقًا من أيّ بوّابة خاصّة بالعميل</b> — حتى تسجيل دخول جديد بعد "التعليق" ينجح بلا عائق.</p>
+    <div class="orig"><b>الإصلاح:</b> توجيه <code>suspend_user</code> عبر نفس الآليّة المُستخدَمة فعليًّا في 4 مواضع أخرى (الحظر الجماعيّ للاحتيال، محو GDPR، تجميد الجهاز): استدعاء <code>block_user_sessions(redis, user_id)</code> + تعيين <code>users.status="SUSPENDED"</code>. <b>مسار مُجرَّب فعليًّا</b>، مخاطرة استنساخه منخفضة.</div>
+    <div class="insight warn"><h4>⚠️ عرض جانبيّ جديد: يجب تناظر رفع التعليق أيضًا</h4><p><code>lift_suspension</code> يجب أن يستدعي <code>unblock_user_sessions()</code> المقابلة — وإلا يبقى المستخدَم محظورًا حتى انتهاء مهلة Redis (عمر رمز الوصول + 300 ثانية) رغم رفع التعليق فعليًّا في قاعدة البيانات — <b>عطب جديد سيُنشئه إصلاح ناقص</b>.</p></div>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">Dispatch-F4 (سائق معلَّق/مشغول يظهر متاحًا) — تأكَّد، إصلاح دقيق مطلوب</h3>
+    <p><code>GET /operations/dispatch/available-drivers</code> يُنفِّذ SQL خامًّا على جدول <code>drivers</code> فقط — بلا ربط مع <code>OperationalProfile.is_suspended</code> وبلا استبعاد سائق مُسنَد فعليًّا لطلب جارٍ (<code>respond_to_offer</code> لا يُغيِّر <code>driver.available</code> إطلاقًا).</p>
+    <div class="insight danger"><h4>🚨 خطر ربط جديد يجب الانتباه له</h4><p>مفتاح الربط الصحيح هو <code>d.user_id = op.user_id</code> — <b>وليس</b> <code>d.id = op.user_id</code> (مفتاحان أساسيّان مختلفان). ربط خاطئ إمّا لا يُطابِق شيئًا (يفشل بصمت، نفس العطب يستمرّ) أو يُطابِق سجلًّا خاطئًا كليًّا. كما يجب استنساخ منطق "انتهاء التعليق المؤقّت تلقائيًّا" (TEMP_PENDING) الموجود بالفعل في <code>require_provider_permission</code> — وإلا فحص <code>WHERE is_suspended</code> الساذج يُعيد عطبًا قديمًا (بقاء الحظر بعد انتهاء المؤقّت) كان قد حُلّ في مسار آخر.</p></div>
+  </div>
+
+  <div class="sev-effort">
+    <div class="m">النطاق بعد التصحيح: <b>لا بنية جديدة إطلاقًا</b> — وصل نقطتَي فعل بآليّة قائمة + إصلاح استعلام SQL واحد</div>
+    <div class="m">المخاطرة: <b>منخفضة</b> — مسار الإبطال نفسه مُجرَّب فعليًّا في 4 مواضع أخرى</div>
+  </div>
+</section>
+
+<section id="ws6">
+  <h2 class="sec-title purple">💰 المسار 6 — سلامة تزامن الأرقام الماليّة (تأكَّد وتعمَّق)</h2>
+  <span class="verdict-pill confirmed">CONFIRMED — أسوأ ممّا وُصِف</span><span class="dep-tier">الطبقة 1</span>
+
+  <div class="card ok">
+    <h3 class="ws-title">MM1 — تأكَّد حرفيًّا، وأسوأ: عطب حتميّ لا سباق نادر</h3>
+    <p>الفحص: <code>service.py:230-231</code> (داخل <code>agent_verify</code>) — لا يُغيِّر العدّاد إطلاقًا. التغيير الفعليّ: <code>service.py:312-313</code> (داخل <code>party_confirm_and_settle</code>) — طلب HTTP ومعاملة قاعدة بيانات منفصلان تمامًا، <b>بلا إعادة فحص للسقف على الإطلاق</b>. المحاكاة (سقف 10,000، سائقان): كلاهما يتحقّق (9,000 لكلّ منهما) بينما العدّاد لا يزال 0 — <b>هذا لا يحتاج تزامنًا حقيقيًّا، يمكن أن يحدث بفارق دقائق</b> — ثم كلاهما يؤكّد لاحقًا، العدّاد النهائيّ 18,000 (تجاوز 80%) بلا أيّ فحص يوقفه.</p>
+  </div>
+
+  <div class="insight purple">
+    <h4>🆕 المخاطرة الأهمّ المُكتشَفة حديثًا: ثلاثة كاتبين غير مُقفَلين، لا اثنان</h4>
+    <p>الخطة الأصليّة اعتبرت كاتبًا واحدًا فقط لـ<code>current_float_minor</code>. التتبّع الفعليّ يكشف <b>ثلاثة</b>: (1) <code>party_confirm_and_settle</code> (يزيد)، (2) <code>settle_agent_float</code> في <code>ops_router.py:183</code> (المقرّ الرئيسيّ يُنقِص نفس الحقل، أيضًا بلا قفل)، (3) توثيق الوحدة نفسها (<code>service.py:11-12</code>) يذكر أنّ الوكيل يمكن أن يُسوّي عائمه الخاصّ <b>كطرف مقابل</b> عبر استدعاء وكيل آخر لنفس <code>party_confirm_and_settle</code> — أي أنّ <b>نفس الصفّ</b> يمكن أن يكون "المنحة" التي تُزاد في تدفّق و"الحساب" الذي يُنقَص في تدفّق آخر متزامن. <b>أيّ إصلاح قائم على القفل يجب أن يشمل <code>settle_agent_float</code> أيضًا، لا <code>party_confirm_and_settle</code> فقط</b> — إغفال هذا يترك ثلث نقاط الكتابة بلا حماية.</p>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">الحل، مُعزَّز بدليل من نفس الكود لا نظريّة عامّة فقط</h3>
+    <p>القفل التشاؤميّ (<code>SELECT ... FOR UPDATE</code>) هو الاختيار الصحيح — <b>ومُثبَت الآن بنمط مطابق موجود بالفعل في نفس الملفّ</b>: عدّاد شقيق (<code>cash_outstanding_minor</code> على <code>Driver</code>) يُقفَل بالضبط بهذه الطريقة (<code>service.py:298-301</code>)، وتعليق الكود يوثّق صراحةً السبب ("حتى لا تُطرَح تسوية/تسليم متزامن مرّتين"). <b>هذا ليس اقتراحًا نظريًّا — هذا هو أسلوب الكود القائم فعلًا، يُطبَّق الآن على عدّاد شقيق نُسِي.</b></p>
+    <ol style="color:var(--muted)">
+      <li>قفل صفّ <code>SettlementAgent</code> في <b>كلٍّ من</b> <code>party_confirm_and_settle</code> و<code>settle_agent_float</code> — لا أحدهما فقط.</li>
+      <li>نقل فحص سقف الطفو إلى داخل <code>party_confirm_and_settle</code>، يُقيَّم <b>بعد</b> القفل مباشرة قبل الزيادة — يُطابِق تمامًا كيف يُستدعى <code>reconcile_driver_cash</code> فقط بعد قفل صفّ السائق.</li>
+    </ol>
+  </div>
+
+  <div class="insight danger">
+    <h4>🛡️ قيد صون ثابت (لا تغيير هنا): MM3 أُعيد التحقّق منه، لا يزال قائمًا</h4>
+    <p>بحث شامل جديد في كامل الوحدة (<code>grep -rniE "wallet"</code>) لم يُظهِر إلّا نتيجة واحدة (تعليق نصّي مُطمئِن) — لا مرجع فعليّ لأيّ <code>WalletAccount</code>. التسوية الإلكترونيّة لا تزال صفًّا <code>PENDING</code> محكومًا بعلَم <code>production_payment_enabled</code> النشِط والمُتحقَّق منه فعليًّا في وحدات التمويل. <b>هذا الثابت لم يتغيَّر، ولا يجب أن يتغيَّر أثناء إصلاح القفل أعلاه</b> — راجع <a href="#invariant-appendix">الملحق</a>.</p>
+  </div>
+
+  <div class="sev-effort">
+    <div class="m">النطاق: <b>نفس الإصلاح الأصليّ، لكن على نقطتَين لا واحدة</b></div>
+    <div class="m">المخاطرة: <b>عالية</b> (منطق ماليّ) — لكن مُدعَّمة الآن بنمط مُثبَت من نفس الكود، لا اختراعًا جديدًا</div>
+  </div>
+</section>
+
+<section id="ws7">
+  <h2 class="sec-title purple">🪪 المسار 7 — توحيد اعتماد الوكلاء (تأكَّد، مندمج مع المسار 3)</h2>
+  <span class="verdict-pill confirmed">CONFIRMED</span><span class="dep-tier">الطبقة 1</span>
+  <div class="card ok">
+    <p>تأكَّد تمامًا كما وُصِف: مسار التوثيق (<code>agent_admin_router.py:142-150</code>) يتحقّق من ACTIVE وPENDING معًا؛ مسار المنح المباشر (<code>ops_router.py:88-95</code>) يتحقّق من ACTIVE فقط، ولا يُعيِّن <code>kyc_status</code> إطلاقًا (يبقى PENDING افتراضيًّا) بينما يُفعِّل <code>is_active=True</code> فورًا — <b>هذا التصميم مقصود</b> (تجاوز KYC هو الغرض الموثَّق لهذه النقطة)، والعيب الحقيقيّ الوحيد هو غياب فحص PENDING، لا وجود المسار المختصر نفسه.</p>
+    <div class="insight warn"><h4>⚠️ عرض جانبيّ جديد: <code>get_active_grant</code> يختار صفًّا عشوائيًّا عند التطابق المزدوج</h4><p><code>service.py:56-63</code> يستخدم <code>db.scalar()</code> الذي <b>لا يرفع خطأً</b> عند وجود أكثر من نتيجة مطابقة — يُعيد الأولى بصمت. إن وُجِد صفّان نشِطان لنفس المستخدم (سيناريو ممكن فعليًّا إن اعتُمِد صفّ PENDING من مسار التوثيق لاحقًا بعد أن صار صفّ المنح المباشر نشِطًا)، الحدود/العائم/العمولة المُطبَّقة قد تكون من الصفّ الخطأ بصمت.</p></div>
+    <p><b>الإصلاح (مُدمَج مع AL5 في المسار 3):</b> إضافة <code>UniqueConstraint</code> فعليّ على <code>settlement_agents.user_id</code> (هجرة قاعدة بيانات جديدة) + تعديل فحص الازدواج في <code>ops_router.py</code> ليتحقّق من PENDING أيضًا، مطابقًا لِـ<code>agent_admin_router.py</code> تمامًا.</p>
+  </div>
+</section>
+
+<section id="ws8">
+  <h2 class="sec-title purple">🗑️ المسار 8 — حذف الحساب الذاتيّ (منقَّح جذريًّا — الادّعاء الأساسيّ خاطئ)</h2>
+  <span class="verdict-pill refuted">REFUTED (الادّعاء الأمنيّ الجوهريّ)</span><span class="dep-tier">الطبقة 2</span>
+
+  <div class="card refuted">
+    <h3 class="ws-title">التصحيح: لا ثغرة أمنيّة هنا إطلاقًا</h3>
+    <p><b>473 خشي:</b> الهويّة تُستمَدّ من بيانات يرسلها العميل (مطالبات JWT خامّة/حقل جسم الطلب). <b>الواقع المؤكَّد:</b> <code>account_deletion_router.py</code> يستمدّ الهويّة <b>حصرًا</b> من <code>UserContext.user_id</code> الآتي من <code>get_current_user</code> — رمز مُوقَّع ومُتحقَّق منه بالكامل + فحص إبطال Redis. <b>وخطوة التأكيد تذهب أبعد</b>: تُعيد التحقّق صراحةً أنّ <code>user_id</code> المرتبط برمز OTP يُطابِق جلسة المُتّصل الموثَّقة (<code>account_deletion_router.py:259-272</code>) — دفاع أعمق ممّا افترضت الخطة أنّه مفقود.</p>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">المشكلة الحقيقيّة: واجهة مفقودة، لا أمن مكسور</h3>
+    <table>
+      <tr><th>الدور</th><th>الخادم</th><th>الواجهة</th></tr>
+      <tr><td>عميل</td><td>يعمل بأمان تامّ</td><td>موجودة (<code>ProfileDeletePage.tsx</code>)</td></tr>
+      <tr><td>سائق</td><td>يعمل بأمان تامّ (نفس النقطة، <code>DRIVER</code> مُدرَج)</td><td><b>غير موجودة إطلاقًا</b> (صفر إشارة في <code>DriverSettings.tsx</code>/<code>DriverProfile.tsx</code>)</td></tr>
+      <tr><td>مزوّد (مالك)</td><td>يعمل بأمان تامّ (<code>PROVIDER_ADMIN</code> مُدرَج)</td><td><b>غير موجودة إطلاقًا</b> (صفر إشارة في <code>ProviderSettings.tsx</code>)</td></tr>
+      <tr><td>موظّفو المزوّد / OPS</td><td>لا مسار ذاتيّ إطلاقًا (على الأرجح مقصود — حسابات مُزوَّدة لا مُسجَّلة ذاتيًّا)</td><td>—</td></tr>
+    </table>
+    <p><b>الإصلاح:</b> بناء واجهة صغيرة للسائق والمزوّد تعيد استخدام نفس نمط <code>ProfileDeletePage.tsx</code> ونفس نقطة النهاية الخلفيّة العاملة أصلًا — لا تغيير خلفيّ مطلوب لهذا الجزء.</p>
+  </div>
+
+  <div class="insight purple">
+    <h4>🆕 الاكتشاف الأهمّ: دالّة "إخفاء الهويّة" الموحَّدة موجودة، لكن نقطتَين من ثلاث توثّقانها لا تستدعيانها فعليًّا</h4>
+    <p><code>anonymization.py</code> يوثّق نفسه صراحةً كـ"مصدر وحيد للحقيقة" مُستخدَم من 3 مواضع. التتبّع الفعليّ: <b>موضع واحد فقط</b> (<code>account_deletion_cron.py</code>) يستدعي <code>anonymize_user()</code> فعلًا. الموضعان الآخران (<code>privacy_router.execute_erasure</code> — محو يُشغِّله OPS، و<code>retention_service.enforce_retention</code> — وظيفة عدم النشاط لسنتين) يحملان كلّ منهما نسخة داخليّة منفصلة ومنحرفة تترك <code>username</code>/<code>password_hash</code>/<code>totp_secret</code> وكل صفوف <code>Session</code>/<code>Device</code>/<code>Role</code> بلا لمس، وتستخدم قيمة حالة ثالثة مختلفة (<code>ANONYMIZED</code> بدل <code>DELETED</code>). <b>هذه فجوة حقيقيّة في اكتمال المحو (GDPR)</b> — والإصلاح الصحيح هو <b>توصيل هاتين النقطتَين بالدالّة الحقيقيّة الموجودة أصلًا</b>، لا اختراع آليّة جديدة كما كانت الخطة الأصليّة ستقترح ضمنيًّا.</p>
+  </div>
+
+  <div class="sev-effort">
+    <div class="m">النطاق: <b>لا إصلاح أمنيّ</b> — واجهتان صغيرتان + توحيد استدعاء دالّة موجودة في نقطتَين</div>
+    <div class="m">المخاطرة: <b>منخفضة</b></div>
+  </div>
+</section>
+
+<section id="ws9">
+  <h2 class="sec-title purple">🧱 المسار 9 — القدرات اليتيمة (نطاق مُصغَّر بشدّة)</h2>
+  <span class="verdict-pill refuted">REFUTED (الحجم المزعوم)</span><span class="dep-tier">مستقلّ</span>
+
+  <div class="card refuted">
+    <h3 class="ws-title">التصحيح: ليست "أكبر عائلة عبر كل الدورات" — ظاهرة ضيّقة في وحدة واحدة حديثة</h3>
+    <p>عيّنة من 24 نقطة نهاية عبر 6 وحدات (تعمّد شمول نقاط "داخليّة المظهر" مثل طابور رسائل ميّتة مخفيّ من المخطّط وقرارات سرعة المحفظة): <b>20/24 (83%)</b> لها استدعاء واجهة حقيقيّ ونشِط فعليًّا — حتى النقاط المخفيّة من مخطّط OpenAPI (<code>include_in_schema=False</code>) لها صفحات OPS حقيقيّة. <b>فقط 4/24 (17%)</b> يتيمة فعلًا، <b>وكلّها في وحدة واحدة</b>: إدارة وكلاء التسوية (<code>settlement/ops_router.py</code> + <code>agent_admin_router.py</code>، خلف صفحة <code>OpsSettlementAgents.tsx</code>) — الوحدة الأحدث، المُدقَّقة في <b>نفس يوم</b> كتابة الخطة 473، وهو تفسير مرجَّح لانحياز الاستذكار نحو تعميم هذا النمط.</p>
+  </div>
+
+  <div class="card ws">
+    <h3 class="ws-title">قائمة مهامّ دقيقة، لا برنامج عريض</h3>
+    <table>
+      <tr><th>النقطة اليتيمة</th><th>ماذا تفعل</th><th>حجم العمل</th></tr>
+      <tr><td><code>POST .../settle-float</code></td><td>المقرّ يُسوّي عائم الوكيل النقديّ يدويًّا</td><td>صغير — زرّ + نافذة مبلغ</td></tr>
+      <tr><td><code>GET .../documents/{id}/verification</code></td><td>نتيجة تحقّق مستند KYC الاستشاريّة</td><td>تافه — جلب + شارة</td></tr>
+      <tr><td><code>POST .../{id}/revoke</code></td><td>سحب صفة الوكيل (المُغلِّف موجود بالفعل في <code>api/agentAdmin.ts</code>، غير مُستدعًى فقط)</td><td>صغير — زرّ تأكيد</td></tr>
+      <tr><td><code>PATCH .../{id}</code></td><td>محرِّر حقول عامّ للوكيل (لا مُغلِّف API حتى اليوم)</td><td>صغير-متوسّط — نموذج/نافذة</td></tr>
+    </table>
+    <p>الأربعة جميعًا امتدادات لصفحة <code>OpsSettlementAgents.tsx</code> <b>الموجودة أصلًا والمُوصَّلة جيّدًا</b> لبقيّة وظائفها — لا حاجة لصفحة/لوحة جديدة كليًّا.</p>
+  </div>
+
+  <div class="sev-effort">
+    <div class="m">النطاق بعد التصحيح: <b>4 عناصر على صفحة واحدة</b>، لا برنامج متعدّد الوحدات</div>
+  </div>
+</section>
+
+<section id="new-risks">
+  <h2 class="sec-title blocker">🆕 عيوب/مخاطر جديدة اكتُشِفت أثناء المراجعة (12 عنصرًا، بما فيها المنخفضة)</h2>
+  <p class="lead">لم يذكر التقرير 473 أيًّا من هذه — اكتُشِفت أثناء تتبّع نقاط الاستدعاء والتبعيّات الفعليّة، محصورة بنطاق التغييرات المخطَّطة (لا تدقيقًا واسعًا جديدًا). كل عنصر، مهما كانت خطورته منخفضة، مُدرَج هنا صراحةً حتى لا يُنسى.</p>
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th><th>المسار المرتبط</th></tr>
+    <tr><td>1</td><td><span class="tag high">HIGH</span></td><td>إصلاح WS1 (Auth-F1) يفتح إمكانيّة سحب صلاحيّة <code>wallet:manual_credit_with_reason</code> عن SUPER_ADMIN لأوّل مرّة (مستحيل بنيويًّا اليوم) — يحتاج اختبارًا صريحًا + حارس "لا سحب من آخر SUPER_ADMIN نشِط" قبل الدمج.</td><td>1</td></tr>
+    <tr><td>2</td><td><span class="tag high">HIGH</span></td><td><code>current_float_minor</code> له ثلاثة كاتبين غير مُقفَلين لا اثنان — <code>settle_agent_float</code> (نقصان من المقرّ) مفقود من الخطة الأصليّة تمامًا.</td><td>6</td></tr>
+    <tr><td>3</td><td><span class="tag high">HIGH</span></td><td><code>anonymize_user()</code> الموحَّدة مُوثَّقة كمصدر وحيد لكن 2 من 3 نقاط استدعاء موثَّقة (<code>privacy_router.execute_erasure</code>، <code>retention_service.enforce_retention</code>) تحملان نسخًا داخليّة منحرفة لا تمسّ <code>username</code>/<code>password_hash</code>/<code>totp_secret</code>/<code>Session</code>/<code>Device</code>/<code>Role</code> — فجوة اكتمال محو حقيقيّة.</td><td>8</td></tr>
+    <tr><td>4</td><td><span class="tag med">MED</span></td><td><code>reassign_driver</code> بلا أيّ قفل صفّ على الإطلاق — ينجو فقط بفضل قيد قاعدة البيانات، بلا حماية تطبيق أو رسالة مخصَّصة.</td><td>3</td></tr>
+    <tr><td>5</td><td><span class="tag med">MED</span></td><td>ربط جديد لإصلاح لوحة التوزيع (Dispatch-F4) يجب أن يستخدم <code>d.user_id = op.user_id</code> بدقّة — خطأ شائع محتمَل (<code>d.id</code>) يُطابِق سجلًّا خاطئًا أو لا يُطابِق شيئًا بصمت.</td><td>5</td></tr>
+    <tr><td>6</td><td><span class="tag med">MED</span></td><td>منطق "انتهاء التعليق المؤقّت تلقائيًّا" (TEMP_PENDING) الموجود في <code>require_provider_permission</code> يجب استنساخه في أيّ ربط SQL جديد يستخدم <code>OperationalProfile.is_suspended</code> — وإلا يُعاد عطب "يبقى محظورًا بعد انتهاء المؤقّت" في موضع جديد.</td><td>1، 5</td></tr>
+    <tr><td>7</td><td><span class="tag med">MED</span></td><td><code>lift_suspension</code> يجب أن يستدعي <code>unblock_user_sessions()</code> مقابلة — إغفالها يُبقي المستخدَم محظورًا حتى انتهاء مهلة Redis رغم رفع التعليق فعليًّا.</td><td>5</td></tr>
+    <tr><td>8</td><td><span class="tag med">MED</span></td><td>اختبار <code>LocaleSettings.test.tsx</code> يُقلِّد (<code>mock</code>) مكتبة <code>react-i18next</code> التي لا يستوردها المكوّن الحقيقيّ إطلاقًا، ولا يتحقّق أبدًا أنّ اللغة تغيَّرت فعليًّا — "854 اختبارًا ناجحًا" لا تغطّي هذا العطب إطلاقًا، ثقة زائفة.</td><td>4</td></tr>
+    <tr><td>9</td><td><span class="tag med">MED</span></td><td>تعارض ترميز لغة: الآليّة العاملة تستخدم <code>ar/en/fr</code>، بينما <code>LocaleSettings.tsx</code> يعرض <code>ar-LY/en-US/fr-FR</code> — ربط ساذج بلا تطبيع سيفشل بصمت.</td><td>4</td></tr>
+    <tr><td>10</td><td><span class="tag low">LOW</span></td><td><code>grant.channels</code> لا يمكن أن يكون <code>"FULL"</code> إطلاقًا اليوم (CASH/ELECTRONIC/BOTH فقط) — إصلاح متماثل لعيب AG1 يحتاج قرارًا صريحًا بشأن منح وكيل قناة <code>FULL</code> مستقبلًا، لا إصلاح جهة المعاملة فقط.</td><td>2</td></tr>
+    <tr><td>11</td><td><span class="tag low">LOW</span></td><td>القيد الفريد الجزئيّ لمنع ازدواج تعيين السائق موجود في قاعدة البيانات (هجرة <code>aa58</code>) لكن غير مُعرَّف صراحةً في <code>DispatchOffer.__table_args__</code> بنموذج SQLAlchemy — انحراف نموذج/قاعدة بيانات توثيقيّ بحت، لا عطب وظيفيّ.</td><td>3</td></tr>
+    <tr><td>12</td><td><span class="tag low">LOW</span></td><td><code>get_active_grant()</code> يستخدم <code>db.scalar()</code> الذي يختار الصفّ الأوّل بصمت عند وجود أكثر من نتيجة مطابقة لوكيل تسوية واحد — يستحقّ تحذيرًا/تنبيهًا صريحًا إن حدث، لا فقط الاعتماد على القيد الفريد الجديد لمنعه من الأساس. كذلك: فحص أمان مهمّة التنظيف الدوريّة (<code>account_deletion_cron.py</code>) أضيق من فحص الراوتر (يُغفِل التحقّق من SUPER_ADMIN والنزاع المفتوح) — مخاطرة عمليّة منخفضة لكنها تستحقّ المطابقة لتوحيد المنطق.</td><td>7، 8</td></tr>
+  </table>
+</section>
+
+<section id="tech">
+  <h2 class="sec-title cluster">⚙️ التقنيّات المضافة: أين بالضبط وماذا تؤثّر</h2>
+  <p class="lead">كل توصية هنا تندمج تدريجيًّا في الحزمة الحاليّة (FastAPI/SQLAlchemy/PostgreSQL/React/TypeScript) دون استبدال جذريّ — مُستخرَجة من فحص فعليّ لما هو موجود بالفعل في هذا الكود تحديدًا، لا من بحث عامّ في الإنترنت.</p>
+  <table>
+    <tr><th>التقنيّة/النمط</th><th>أين بالضبط</th><th>ماذا تفعل</th><th>ماذا لن تمسّ</th></tr>
+    <tr><td>عامل TypeScript <code>satisfies</code></td><td><code>web/src/components/OrderStateBadge.tsx</code> وأمثاله — تعريف <code>STATE_CLASS</code></td><td>يجعل نسيان حالة جديدة في خريطة العرض <b>عطب فحص أنواع</b> وقت البناء (بوّابة <code>npm run typecheck</code> موجودة أصلًا في CI)، لا عطبًا صامتًا وقت التشغيل.</td><td>لا يمسّ <code>docker-compose.yml</code>، لا تبعيّة جديدة (متوفّر أصلًا في نسخة TypeScript هذا المشروع)، لا يمسّ خط أنابيب <code>openapi-typescript</code> نفسه.</td></tr>
+    <tr><td><code>openapi-typescript</code> (موجود أصلًا، لا تثبيت جديد)</td><td>يبدأ العمل تلقائيًّا فور تحويل <code>order_state</code> لِـ<code>Literal[...]</code>/<code>Enum</code> في <code>backend/app/modules/orders/schemas.py</code></td><td>يُولِّد اتّحاد نصوص حرفيّة صحيحًا في <code>schema.d.ts</code> بدل <code>string \| null</code> الحاليّ — بلا أيّ تغيير على سكربت التوليد نفسه.</td><td>لا حزمة <code>package.json</code> جديدة (هو Dev-dependency موجود أصلًا)، لا تغيير على <code>web/scripts/generate-api-types.mjs</code>.</td></tr>
+    <tr><td><code>SELECT ... FOR UPDATE</code> (النمط المُثبَت أصلًا في الكود)</td><td><code>settlement/service.py::party_confirm_and_settle</code> و<code>settlement/ops_router.py::settle_agent_float</code></td><td>يقفل صفّ <code>SettlementAgent</code> بنفس الأسلوب المُستخدَم بالفعل لعدّاد <code>cash_outstanding_minor</code> الشقيق — لا نمط جديد على الفريق، استمرار لما هو قائم.</td><td>لا يمسّ منطق <code>reconcile_driver_cash</code> نفسه، لا هجرة مخطّط (القفل تطبيقيّ لا بنيويّ).</td></tr>
+    <tr><td>اختبار تأكيديّ حقيقيّ (لا مكتبة جديدة)</td><td><code>web/src/pages/account/LocaleSettings.test.tsx</code></td><td>استبدال <code>vi.mock("react-i18next", ...)</code> الوهميّ بتأكيد حقيقيّ على <code>i18n.language</code>/<code>document.documentElement.lang</code> بعد الحفظ، باستخدام كائن <code>i18n</code> الحقيقيّ من <code>web/src/i18n/config.ts</code>.</td><td>لا يمسّ بقيّة ~850 اختبار Vitest الأخرى، لا يمسّ إعداد <code>i18next.config.ts</code>/<code>i18n:lint</code>.</td></tr>
+    <tr><td>معالجة <code>IntegrityError</code> صريحة (نمط موجود أصلًا في الوحدة)</td><td><code>operations/operations_router.py::reassign_driver</code></td><td>تحويل الاعتماد على المعالج العامّ (<code>main.py:1093</code>، رسالة "تعارض بيانات" عامّة) إلى نفس نمط <code>DispatchError(409)</code> المُستخدَم في بقيّة <code>dispatch_service.py</code> — رسالة عربيّة/إنجليزيّة مخصَّصة بدل عامّة.</td><td>لا يمسّ المعالج العامّ نفسه (يبقى شبكة أمان لبقيّة النقاط)، لا هجرة جديدة.</td></tr>
+  </table>
+  <div class="insight">
+    <h4>✅ لماذا لا توصية بأدوات جذريّة جديدة (OPA، إعادة كتابة i18n، محرّك سياسات خارجيّ)؟</h4>
+    <p>كل الفجوات المؤكَّدة كانت "نقاط استدعاء مفقودة لآليّة موجودة أصلًا وتعمل جيّدًا في مواضع أخرى" — لا "بنية معماريّة وصلت طريقًا مسدودًا". استبدال معماريّ جذريّ هنا يُوسِّع نطاق التغيير ويزيد مخاطرة إفساد المشروع دون أن يحلّ مشكلة حقيقيّة أعمق ممّا وُجِد.</p>
+  </div>
+</section>
+
+<section id="invariant-appendix">
+  <h2 class="sec-title cluster">🛡️ ملحق — إعادة التحقّق من ثابت FIN-COR (MM3)</h2>
+  <div class="card ok">
+    <p>أُعيد تنفيذ نفس تتبّع تقرير 472 بالكامل مقابل الكود الحاليّ، لا استنادًا لنتيجة قديمة: بحث شامل جديد (<code>grep -rniE "wallet"</code>) عبر كامل وحدة التسوية وكل ما تستورده مباشرة (<code>cash_reconcile.py</code>، <code>driver_payout_service.py</code>) يُعيد نتيجة واحدة فقط — تعليق نصّيّ، لا مرجع فعليّ. التسوية النقديّة لا تزال حيازة فعليّة (<code>CashHandover</code>) فقط؛ الإلكترونيّة لا تزال صفًّا <code>PENDING</code> محكومًا بعلَم <code>production_payment_enabled</code> النشِط فعليًّا في وحدات التمويل المنفصلة. <b>النتيجة السلبيّة لا تزال قائمة تمامًا كما وُثِّقت في 472 — لم يتغيَّر شيء يُهدِّدها.</b> يبقى الإجراء الإلزاميّ من 473 قائمًا: أيّ تعديل على المسار 6 يجب أن يُرفَق باختبار انحداريّ صريح يتحقّق من غياب أيّ مسار <code>WalletAccount</code> في هذه الوحدة تحديدًا.</p>
+  </div>
+</section>
+
+<section id="reviews">
+  <h2 class="sec-title cluster">📋 سجلّ منهجيّة التحقّق والمراجعة</h2>
+  <div class="card">
+    <h3 class="ws-title">لماذا عناقيد حسب الملفّ المشترك لا حسب المسار</h3>
+    <p>9 مسارات كانت ستعني وكلاء متوازين يقرؤون نفس الملفّات (مثال: المساران 1 و5 كلاهما يمسّ <code>identity/dependencies.py</code>) دون علم أحدهما بالآخر — خطر تضارب استنتاجات حول نفس الكود. التجميع إلى 6 عناقيد حسب الملفّات المشتركة فعليًّا يضمن أنّ "رأسًا" واحدًا فقط يملك كل ملفّ حسّاس.</p>
+  </div>
+  <div class="card">
+    <h3 class="ws-title">لماذا ادّعاءات محدَّدة لا "راجع المسار X" مفتوحًا</h3>
+    <p>كل عنقود تلقّى قائمة ادّعاءات قابلة للدحض مُستخرَجة مسبقًا من 473 وسجلّات العيوب الأصليّة، لا توجيهًا عامًّا — هذا ما مكَّن من حكم CONFIRMED/REFUTED/REFINED دقيق بدل استكشاف تائه.</p>
+  </div>
+  <div class="card">
+    <h3 class="ws-title">حدود هذه المراجعة (بالتصميم، لا سهوًا)</h3>
+    <p>هذا تحقّق <b>محصور بنطاق التغييرات المخطَّطة في 473</b> — لم يكن تدقيقًا واسعًا جديدًا لكامل المنصّة (466-472 غطّت ذلك من قبل). "العيوب الجديدة" المذكورة أعلاه هي فقط ما ظهر أثناء تتبّع نقاط الاستدعاء لهذه المسارات التسعة تحديدًا، لا نتيجة بحث شامل جديد.</p>
+  </div>
+</section>
+
+<footer>
+  تقرير رقم 474 — منصّة تووا (Toowa) لتوصيل ليبيا — تنقيح 473 بعد تحقّق كودي فعليّ — لم يُنفَّذ أيّ جزء منها — بانتظار مراجعتك وإذنك الصريح — 2026-07-11
+</footer>
+
+<a href="#" class="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">⬆ الأعلى</a>
+
+</div>
+</body>
+</html>

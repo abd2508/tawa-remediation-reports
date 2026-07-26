@@ -1,0 +1,375 @@
+<meta charset="utf-8">
+<title>فحص عميق للمواضع الأربعة (hash-verified) — تقرير 525</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 84ch; color: var(--ink); }
+  p.lead { font-size: 1.06rem; color: var(--ink-muted); max-width: 70ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.86em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🔍"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1080px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 44ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 76ch; font-size: 1.04rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.5rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.74rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.78rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 50px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 0.98rem; color: var(--ink-muted); max-width: 82ch; margin-bottom: 20px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.94rem; max-width: 72ch; }
+  .plain b { color: var(--accent-deep); }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.94rem; max-width: 74ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.94rem; max-width: 74ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .info-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .info-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .info-box p { margin: 0; color: var(--info-ink); font-size: 0.94rem; max-width: 74ch; }
+  .info-box b { color: var(--info-ink); }
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+  ol.steps { margin: 10px 0; padding-inline-start: 22px; }
+  ol.steps li { margin-bottom: 9px; color: var(--ink); font-size: 0.92rem; }
+  ol.steps li b { color: var(--accent-deep); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  pre { background: #0d1611; color: #d7e6da; border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 0.82rem; direction: ltr; text-align: left; margin: 10px 0 16px; border: 1px solid #1d3324; }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.88rem; }
+  table th, table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; }
+  table th { background: var(--surface-2); font-weight: 700; color: var(--ink-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  table td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .table-wrap { overflow-x: auto; }
+  .scroll-table { max-height: 620px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  .scroll-table table { margin: 0; }
+  .scroll-table thead th { position: sticky; top: 0; background: var(--surface-2); z-index: 1; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 20px 0; }
+  @media (max-width: 900px) { .grid4 { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .grid4 { grid-template-columns: 1fr; } }
+  .server-card { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); text-align: center; }
+  .server-card.ok { border-color: var(--ok-border); background: var(--ok-bg); }
+  .server-card.stale { border-color: var(--crit-border); background: var(--crit-bg); }
+  .server-card .sc-ic { font-size: 2rem; margin-bottom: 6px; }
+  .server-card .sc-t { font-weight: 800; font-size: 1rem; margin-bottom: 8px; }
+  .server-card .sc-row { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 3px 0; border-top: 1px dashed var(--border); }
+  .server-card .sc-row:first-of-type { border-top: none; }
+  .server-card .sc-row b { font-family: var(--font-mono); }
+  .timeline { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 24px 0; position: relative; }
+  .tl-node { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 14px 16px; min-width: 160px; text-align: center; box-shadow: var(--shadow); flex: 1; }
+  .tl-node.now { border-color: var(--accent); background: var(--accent-tint); }
+  .tl-node .tl-t { font-weight: 800; font-size: 0.88rem; }
+  .tl-node .tl-d { font-size: 0.72rem; color: var(--ink-muted); margin-top: 4px; }
+  .tl-arrow { font-size: 1.3rem; color: var(--ink-faint); padding: 0 6px; }
+  footer { text-align: center; padding: 40px 0 10px; color: var(--ink-faint); font-size: 0.8rem; }
+  .checklist { list-style: none; margin: 10px 0; padding: 0; }
+  .checklist li { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; font-size: 0.92rem; }
+  .checklist li::before { content: "✅"; flex-shrink: 0; }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">📄 تقرير 525 · 2026-07-19</span>
+    <h1>فحص عميق ودقيق للمواضع الأربعة — مقارنة hash فعليّة، سطرًا بسطر، مع المسار المحلّي</h1>
+    <p class="lead">اتصال فعلي (SSH/docker exec) بكل خادم من الخوادم الثلاثة الحيّة، وحساب بصمة تشفيريّة (SHA-256) لكل ملفّ من الـ49 ملفًّا الخلفيّة التي تغيّرت في عمل تنفيذ خطّة 523 (تقرير 524)، ومقارنتها حرفيًّا بمحتوى نفس الملفّ في المسار المحلّي — لا افتراض، ولا اعتماد على أرقام إصدار وحدها.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">1/4</div><div class="l">مواضع مطابقة تمامًا (GitHub)</div></div>
+      <div class="s"><div class="n">49/49</div><div class="l">ملفًّا ناقصًا أو مختلفًا على كل خادم حيّ</div></div>
+      <div class="s"><div class="n">5</div><div class="l">هجرات قاعدة بيانات غائبة (ab44–ab48)</div></div>
+      <div class="s"><div class="n">0</div><div class="l">نشر جزئي أو مكسور — تأخّر موحَّد فقط</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#exec">الملخّص</a>
+  <a href="#method">المنهجيّة</a>
+  <a href="#servers">حالة المواضع الأربعة</a>
+  <a href="#alembic">فجوة قاعدة البيانات</a>
+  <a href="#files">مقارنة الملفّات (49 ملفًّا)</a>
+  <a href="#frontend">الواجهة</a>
+  <a href="#drift">انحراف مسبق غير متعلّق</a>
+  <a href="#status">الخلاصة</a>
+</nav>
+
+<section id="exec">
+  <span class="section-eyebrow">🧭 البداية</span>
+  <h2>الملخّص — بلغة بسيطة</h2>
+  <p class="intro">طلبتَ فحصًا دقيقًا جدًّا، لا سطحيًّا: هل كل ما بنيناه في تقرير 524 وصل فعليًّا للخوادم الحيّة، أم بقي في المسار المحلّي فقط؟ الجواب المختصر: <b>لم يصل شيء منه بعد لأي خادم حيّ سوى GitHub</b> — وهذا متوقَّع تمامًا لأنّك طلبتَ صراحة إيقاف النشر بعد GitHub لمراجعتك أوّلًا (تقرير 524). هذا التقرير هو تلك المراجعة: دليل فعلي، مبنيّ على بصمات تشفيريّة حقيقيّة وليس على "يُفتَرَض أنّه محدَّث"، يوثّق بدقّة بالضبط ماذا ينقص كل خادم.</p>
+  <div class="plain">
+    <div class="ic">🔬</div>
+    <p><b>لماذا بصمة SHA-256 لا مجرّد رقم إصدار؟</b> رقم الإصدار (مثل alembic <code>ab43</code>) يخبرك فقط أنّ قاعدة البيانات لم تتلقَّ هجرات جديدة — لكنه لا يثبت شيئًا عن الكود نفسه. البصمة التشفيريّة لكل ملفّ تُثبِت مباشرة: هل المحتوى الحقيقي داخل الحاوية الحيّة هو نفسه بالضبط، حرفًا بحرف، الموجود في المسار المحلّي؟ إن اختلف حرف واحد، تختلف البصمة كليًّا.</p>
+  </div>
+</section>
+
+<section id="method">
+  <span class="section-eyebrow">⚙️ الطريقة</span>
+  <h2>المنهجيّة — كيف تحقّقتُ فعليًّا (لا افتراضًا)</h2>
+  <ol class="steps">
+    <li><b>1. GitHub:</b> <code>git log origin/master</code> مقابل <code>git log HEAD</code> محليًّا — مطابقة الالتزام (commit) بالضبط.</li>
+    <li><b>2. test1 (هذا الجهاز):</b> <code>docker exec tawalocal-backend-core-1</code> مباشرة — لا حاجة SSH، نفس الجهاز.</li>
+    <li><b>3. test/.194:</b> اتصال SSH فعلي (<code>abd@192.168.178.194</code>)، ثمّ <code>docker exec</code> داخل الحاوية الحيّة هناك.</li>
+    <li><b>4. الإنتاج (tawanow.com):</b> اتصال SSH فعلي بالمفتاح الخاصّ (<code>deploy@178.105.87.192</code>)، ثمّ <code>docker exec</code> داخل الحاوية الحيّة.</li>
+    <li><b>5. لكل خادم من الثلاثة:</b> نُقِلَت قائمة الملفّات الـ49 إليه، وحُسِبَت بصمة <code>sha256sum</code> لكل ملفّ <b>داخل الحاوية الحيّة نفسها</b> (وليس افتراضًا من رقم الصورة أو تاريخ البناء وحده)، وقورِنَت مباشرة ببصمة نفس الملفّ محليًّا.</li>
+    <li><b>6. الواجهة (الملفّات المبنيّة/المُجمَّعة):</b> لأنّ ملفّات الواجهة تُبنى (bundle) ولا تبقى كملفّات مصدر مقروءة داخل حاوية النشر، بحثتُ عن نصّ مميّز جديد أضفتُه هذه الجلسة (<code>group-split-toggle</code>، خاصّ بواجهة الدفع المقسَّم للطلب الجماعي) داخل حزمة كل خادم المبنيّة فعليًّا.</li>
+  </ol>
+</section>
+
+<section id="servers">
+  <span class="section-eyebrow">🖥️ الحالة الحيّة</span>
+  <h2>المواضع الأربعة — لقطة فعليّة الآن</h2>
+  <div class="grid4">
+    <div class="server-card ok">
+      <div class="sc-ic">🐙</div>
+      <div class="sc-t">GitHub</div>
+      <div class="sc-row"><span>الحالة</span><b style="color:var(--ok-ink)">مطابق 100%</b></div>
+      <div class="sc-row"><span>الالتزام</span><b>7f0057b</b></div>
+      <div class="sc-row"><span>الفجوة</span><b>صفر</b></div>
+    </div>
+    <div class="server-card stale">
+      <div class="sc-ic">💻</div>
+      <div class="sc-t">test1 (Kali)</div>
+      <div class="sc-row"><span>alembic</span><b>ab43</b> <span class="muted">(يلزم ab48)</span></div>
+      <div class="sc-row"><span>بُنيت</span><b>18-07 18:18</b></div>
+      <div class="sc-row"><span>الملفّات المطابقة</span><b style="color:var(--crit-ink)">0 / 49</b></div>
+    </div>
+    <div class="server-card stale">
+      <div class="sc-ic">🖥️</div>
+      <div class="sc-t">test/.194</div>
+      <div class="sc-row"><span>alembic</span><b>ab43</b> <span class="muted">(يلزم ab48)</span></div>
+      <div class="sc-row"><span>بُنيت</span><b>18-07 18:26</b></div>
+      <div class="sc-row"><span>الملفّات المطابقة</span><b style="color:var(--crit-ink)">1 / 49</b> <span class="faint">(انحراف قديم غير متعلّق)</span></div>
+    </div>
+    <div class="server-card stale">
+      <div class="sc-ic">🌐</div>
+      <div class="sc-t">الإنتاج (tawanow.com)</div>
+      <div class="sc-row"><span>alembic</span><b>ab43</b> <span class="muted">(يلزم ab48)</span></div>
+      <div class="sc-row"><span>بُنيت</span><b>18-07 18:36</b></div>
+      <div class="sc-row"><span>الملفّات المطابقة</span><b style="color:var(--crit-ink)">0 / 49</b></div>
+    </div>
+  </div>
+
+  <div class="subhead">⏱️ خط زمني للبناء — الثلاثة كُتِلَة واحدة قبل بدء العمل</div>
+  <div class="timeline">
+    <div class="tl-node"><div class="tl-t">🐙 آخر التزام قبل الجلسة</div><div class="tl-d">c61592e</div></div>
+    <div class="tl-arrow">←</div>
+    <div class="tl-node"><div class="tl-t">💻 test1 بُنيت</div><div class="tl-d">2026-07-18 18:18</div></div>
+    <div class="tl-arrow">←</div>
+    <div class="tl-node"><div class="tl-t">🖥️ .194 بُنيت</div><div class="tl-d">2026-07-18 18:26</div></div>
+    <div class="tl-arrow">←</div>
+    <div class="tl-node"><div class="tl-t">🌐 الإنتاج بُنيت</div><div class="tl-d">2026-07-18 18:36</div></div>
+    <div class="tl-arrow">←</div>
+    <div class="tl-node now"><div class="tl-t">🧭 هذه الجلسة (523/524)</div><div class="tl-d">2026-07-19 — محلّي + GitHub فقط</div></div>
+  </div>
+  <p class="faint">الفارق بين بناء الخوادم الثلاثة لا يتجاوز 18 دقيقة — يتّفق تمامًا مع آليّة النشر الموثَّقة (بناء على test1 ثمّ نقل الصورة نفسها حرفيًّا لـ.194، ثمّ بناء مطابق على الإنتاج بنفس التسلسل). الثلاثة إذن ليست متفرّقة أو غير متزامنة فيما بينها — هي نسخة واحدة قديمة موحَّدة، ببساطة لم تُحدَّث بعد.</p>
+</section>
+
+<section id="alembic">
+  <span class="section-eyebrow">🗄️ قاعدة البيانات</span>
+  <h2>الفجوة في قاعدة البيانات — 5 هجرات غائبة عن الخوادم الثلاثة</h2>
+  <p class="intro">كل خادم من الثلاثة على <code>alembic ab43</code> — المسار المحلّي/GitHub وصل لـ<code>ab48</code>. الفجوة تعني جداولاً وأعمدة جديدة كاملة غير موجودة إطلاقًا في قواعد بياناتهم الحيّة.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>الهجرة</th><th>الغرض</th><th>ما تُنشئه</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">ab44</td><td>طابع زمني لمنح الصلاحيّات</td><td>عمود <code>updated_at</code> على <code>account_permission_grants</code></td></tr>
+      <tr><td class="mono">ab45</td><td>تسعير الإعلانات + حظر متجر</td><td>جدول <code>ad_pricing_config</code> كامل + 4 أعمدة حظر على <code>providers</code></td></tr>
+      <tr><td class="mono">ab46</td><td>تعبئة البلديّات الناقصة</td><td>77 صفّ بلديّة كانت غائبة كليًّا</td></tr>
+      <tr><td class="mono">ab47</td><td>سجلّ تدقيق الهويّة</td><td>جدول <code>identity_change_log</code> كامل + توسيع عمودَي القيمة القديمة/الجديدة</td></tr>
+      <tr><td class="mono">ab48</td><td>مزامنة توقيت السائق</td><td>عمود <code>pre_ready</code> على <code>dispatch_offers</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="warn-box">
+    <div class="ic">⚠️</div>
+    <p><b>مهمّ لفهم الخطر عند النشر لاحقًا:</b> بما أنّ الخوادم الثلاثة لا تملك أيًّا من هذه الجداول/الأعمدة، فإنّ نشر الكود الجديد بلا تشغيل الهجرات أوّلًا سيُفشِل الخادم فورًا (الكود يفترض وجودها). لحسن الحظّ، آليّة النشر الموثَّقة للمشروع (<code>depends_on: migrate</code>) تُشغِّل الهجرات تلقائيًّا قبل رفع الخادم — فلا حاجة لخطوة يدويّة منفصلة عند التنفيذ الفعلي.</p>
+  </div>
+</section>
+
+<section id="files">
+  <span class="section-eyebrow">📋 المقارنة التفصيليّة</span>
+  <h2>مقارنة الملفّات الـ49 — بصمة سطرًا بسطر لكل خادم</h2>
+  <p class="intro">"ملفّ جديد" = لم يكن موجودًا إطلاقًا قبل هذه الجلسة. "مُعدَّل" = ملفّ قديم مسّه تغيير. "غير موجود" = الملفّ غائب كليًّا من الحاوية الحيّة. "مختلف" = الملفّ موجود لكن محتواه يختلف حرفيًّا عن النسخة المحليّة. "مطابق" = بصمة متطابقة 100%.</p>
+  <div class="scroll-table table-wrap">
+  <table>
+    <thead><tr><th>المسار (نسبةً لـ backend/)</th><th>النوع</th><th>test1</th><th>test/.194</th><th>الإنتاج</th></tr></thead>
+    <tbody>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>alembic/versions/ab44_account_permission_grant_updated_at.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>alembic/versions/ab45_ads_pricing_and_block.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>alembic/versions/ab46_populate_unassigned_municipalities.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>alembic/versions/ab47_identity_change_log.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>alembic/versions/ab48_dispatch_offer_pre_ready.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/config.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/main.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/models/__init__.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/models/account_permission.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/models/ad_campaign.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/models/dispatch.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/models/identity_change_log.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/models/name_change_request.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/models/provider.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/ads/ads_service.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/ads/ops_ads_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/ads/provider_ads_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/dispatch/delivery_handoff_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/dispatch/dispatch_service.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/dispatch/driver_abandonment_service.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/dispatch/location_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/dispatch/pre_ready_dispatch_service.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/identity/account_permission_service.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/identity/auth_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/identity/customer_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/identity/email_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/identity/identity_change_log_service.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/operations/account_permissions_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/operations/operations_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/orders/order_service.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/providers/packaging_policy.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/providers/provider_router.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>app/modules/providers/provider_service.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_phase448_me_permissions.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_phase449_documents.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_phase4_provider.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r144_ads.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r4_auth_me.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r516_public_flags_db_layer.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill ok">مطابق</span></td><td><span class="pill ok">مطابق</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r523_dispatch_scoring.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r523_dispatch_visibility.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r523_geo_municipality_backfill.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r523_identity_change_log.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r523_packaging_policy.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r523_pre_ready_dispatch.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r523_pre_ready_sweep.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_r523_split_payment_tolerance.py</td><td><span class="pill gold">ملفّ جديد</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td><td><span class="pill crit">غير موجود</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_remediation_abandonment_fine.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+<tr><td class='mono' style='direction:ltr;text-align:left;font-size:0.78rem'>tests/test_remediation_step_b.py</td><td><span class="pill neutral">مُعدَّل</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td><td><span class="pill warn">مختلف</span></td></tr>
+
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="frontend">
+  <span class="section-eyebrow">🖼️ الواجهة</span>
+  <h2>الواجهة (Web) — نفس النتيجة، بطريقة فحص مختلفة</h2>
+  <p class="intro">ملفّات الواجهة (React/TypeScript) تُجمَّع (bundle) إلى ملفّات JavaScript مضغوطة قبل النشر — لا يمكن مقارنة الكود المصدري حرفًا بحرف داخل حاوية التشغيل. بدلًا من ذلك، بحثتُ عن مُعرِّف اختبار (<code>data-testid</code>) جديد كليًّا أضفتُه هذه الجلسة تحديدًا لواجهة الدفع المقسَّم للطلب الجماعي (نقطة 5): <code>group-split-toggle</code>.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>الخادم</th><th>نتيجة البحث داخل الحزمة الحيّة</th></tr></thead>
+    <tbody>
+      <tr><td>test1 (Kali)</td><td><span class="pill crit">0 نتيجة</span></td></tr>
+      <tr><td>test/.194</td><td><span class="pill crit">0 نتيجة</span></td></tr>
+      <tr><td>الإنتاج (tawanow.com)</td><td><span class="pill crit">0 نتيجة</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="faint">صفر تطابق في الحزم الثلاث المبنيّة يؤكّد أنّ الواجهة أيضًا لم تُبنَ/تُنشَر مجدَّدًا على أي خادم — متّسق تمامًا مع نتيجة الخلفي.</p>
+</section>
+
+<section id="drift">
+  <span class="section-eyebrow">🔎 دقّة إضافيّة</span>
+  <h2>انحراف واحد صغير — قديم، لا علاقة له بهذه الجلسة</h2>
+  <div class="info-box">
+    <div class="ic">📌</div>
+    <p>ملفّ <code>test_r516_public_flags_db_layer.py</code> يُظهِر نمطًا مختلفًا عن كل الملفّات الأخرى: <b>test1 و.194 متطابقان تمامًا مع بعضهما</b> (كما هو متوقَّع، لأنّ صورة .194 نُقِلَت حرفيًّا من test1)، لكن <b>الإنتاج يحمل نسخة أقدم مختلفة</b> عن كليهما. هذا الفارق موجود منذ ما قبل بدء هذه الجلسة بالكامل — أي أنّه لا علاقة له بأي عمل نُفِّذ هنا، واكتُشِف فقط كأثر جانبي للمقارنة الدقيقة الشاملة التي طلبتَها. لا يستدعي أي إجراء عاجل، لكن يُذكَر هنا لأجل الشفافيّة الكاملة.</p>
+  </div>
+</section>
+
+<section id="status">
+  <span class="section-eyebrow">✅ الخلاصة</span>
+  <h2>الخلاصة النهائيّة</h2>
+  <div class="plain">
+    <div class="ic">🎯</div>
+    <p><b>لا يوجد أي نشر جزئي أو مكسور أو متضارب بين الخوادم.</b> الخوادم الثلاثة (test1، test/.194، الإنتاج) متطابقة تمامًا مع بعضها البعض (نفس النسخة القديمة، بفارق دقائق في وقت البناء فقط)، وكل الفارق بينها وبين المسار المحلّي/GitHub هو بالضبط — لا أكثر ولا أقلّ — كل العمل المُنفَّذ في هذه الجلسة (النقاط الثماني من خطّة 523 + إصلاحات Codex الخمسة): 49 ملفًّا خلفيًّا (17 جديدًا كليًّا، 32 مُعدَّلًا)، 5 هجرات قاعدة بيانات، وكل تغييرات الواجهة. لا شيء منها وصل لأي خادم حيّ بعد — تمامًا كما هو متوقَّع بعد قرارك بإيقاف النشر لمراجعتك الشخصيّة أوّلًا.</p>
+  </div>
+</section>
+
+</div>
+
+<footer>تقرير 525 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-19</footer>

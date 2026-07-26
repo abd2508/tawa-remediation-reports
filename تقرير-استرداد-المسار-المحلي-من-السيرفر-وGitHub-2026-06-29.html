@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير استرداد المسار المحلي من السيرفر و GitHub — 2026-06-29</title>
+<style>
+  :root{
+    --green:#0f766e;--green-d:#115e59;--red:#dc2626;--red-bg:#fef2f2;
+    --amber:#d97706;--amber-bg:#fffbeb;--ok:#16a34a;--ok-bg:#f0fdf4;--ok-bd:#bbf7d0;
+    --ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;--card:#fff;--bg:#f8fafc;--blue:#2563eb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Noto Naskh Arabic",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:1.85;font-size:16px}
+  .wrap{max-width:1060px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#16a34a,#0f766e);color:#fff;border-radius:18px;padding:34px 30px;margin-bottom:24px;box-shadow:0 10px 30px rgba(15,118,110,.25)}
+  header.hero h1{margin:0 0 8px;font-size:26px} header.hero p{margin:4px 0;opacity:.95}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:4px 12px;border-radius:999px;font-size:13px;margin-top:10px}
+  h2{font-size:22px;border-right:6px solid var(--green);padding:6px 14px 6px 0;margin:34px 0 14px}
+  h3{font-size:18px;color:var(--green-d);margin:20px 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:14px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .grid{display:grid;gap:14px}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:780px){.g3,.g2,.g4{grid-template-columns:1fr}}
+  .stat{border-radius:14px;padding:18px;text-align:center;border:1px solid var(--line)}
+  .stat .num{font-size:32px;font-weight:800;line-height:1.1}.stat .lbl{font-size:13.5px;color:var(--muted);margin-top:6px}
+  .red{color:var(--red)}.amber{color:var(--amber)}.ok{color:var(--ok)}.gr{color:var(--green)}.blue{color:var(--blue)}
+  .box-red{background:var(--red-bg);border-color:#fecaca}.box-amber{background:var(--amber-bg);border-color:#fde68a}.box-ok{background:var(--ok-bg);border-color:var(--ok-bd)}.box-blue{background:#eff6ff;border-color:#bfdbfe}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14.5px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:right;vertical-align:top}
+  th{background:#f1f5f9;font-weight:700}tr:nth-child(even) td{background:#fafafa}
+  code{background:#f1f5f9;padding:2px 7px;border-radius:6px;font-family:Consolas,monospace;font-size:13px;direction:ltr;display:inline-block}
+  .kbd{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px 16px;direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:13px;overflow:auto;white-space:pre;line-height:1.6}
+  .tag{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;font-weight:700}
+  .tag.ok{background:#dcfce7;color:#166534}.tag.bad{background:#fee2e2;color:#991b1b}.tag.warn{background:#fef3c7;color:#92400e}
+  ul.clean{margin:8px 0;padding-right:22px}ul.clean li{margin:7px 0}
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  ol.steps>li{position:relative;padding:14px 56px 14px 16px;margin:10px 0;background:#fff;border:1px solid var(--line);border-radius:12px}
+  ol.steps>li::before{counter-increment:s;content:counter(s);position:absolute;right:14px;top:14px;width:30px;height:30px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .big{font-size:19px;font-weight:800}.note{font-size:14px;color:var(--muted)}
+  .flow{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap;justify-content:center;margin:14px 0}
+  .node{flex:1;min-width:180px;border-radius:14px;padding:16px;text-align:center;border:2px solid}
+  .node.src{background:#ecfeff;border-color:#67e8f9}.node.gh{background:#f5f3ff;border-color:#c4b5fd}.node.out{background:var(--ok-bg);border-color:var(--ok-bd)}
+  .arrow{display:flex;align-items:center;font-size:28px;color:var(--green);font-weight:800}
+  @media(max-width:780px){.arrow{transform:rotate(90deg)}}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin:30px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>✅ تقرير استرداد المسار المحلي — من السيرفر و GitHub</h1>
+  <p>منصّة تووا / Tawa — <span dir="ltr">/home/a/Desktop/APP/platform</span></p>
+  <p>التنفيذ: 2026-06-29 — كل التوقيتات بتوقيت ليبيا (<span dir="ltr">UTC+2</span>)</p>
+  <span class="pill">السيرفر لم يُمَس (قراءة فقط) ✓</span>
+  <span class="pill">GitHub: قراءة فقط (استنساخ) ✓</span>
+  <span class="pill">النواة المالية المختومة سليمة ✓</span>
+</header>
+
+<!-- ===== الخلاصة ===== -->
+<div class="card box-ok">
+  <div class="big ok">🎉 النتيجة: المسار المحلي عاد إلى حالته الأصلية بالكامل على مستوى الكود المصدري.</div>
+  <p style="margin:10px 0 0">
+    <b>100% من ملفات الكود المُدارة بـgit (4,908 ملف) صارت سليمة — صفر ملف تالف.</b>
+    استعدنا أيضاً <b>تاريخ git كاملاً (41 إصداراً)</b>، و<b>كامل مصدر تطبيق الموبايل</b>، و<b>ملفات بناء الواجهة</b> و<b>docker-compose</b>.
+    وحالة <code>git status</code> الآن تُطابق <b>تماماً</b> ما كانت عليه قبل العطب (340 ملفاً معدّلاً = عمل 25–29 يونيو المنشور وغير المُلتزَم).
+    المتبقّي تالفاً هو <b>ملفات غير مُتتبَّعة فقط</b> — غالبيتها ملفات بناء الموبايل القابلة لإعادة التوليد.
+  </p>
+</div>
+
+<!-- ===== كيف تمّ الاسترداد (المخطط) ===== -->
+<h2>🗺️ كيف استرددنا؟ (مصدران يكمّلان بعضهما)</h2>
+<div class="card">
+  <p>لا مصدرٌ واحد كان كافياً، فدمجنا اثنين:</p>
+  <div class="flow">
+    <div class="node src">
+      <div class="big blue">① السيرفر (الحاوية)</div>
+      <div class="note">2026-06-29 ظهراً</div>
+      <hr style="border:none;border-top:1px dashed #67e8f9;margin:8px 0">
+      الكود <b>الأحدث المنشور</b>:<br>backend · web/src · contracts · infra · ops · scripts<br>
+      <span class="note">(فيه عمل G4-G7-N5 غير المُلتزَم)</span>
+    </div>
+    <div class="arrow">＋</div>
+    <div class="node gh">
+      <div class="big" style="color:#7c3aed">② GitHub</div>
+      <div class="note">commit 74e9d18 — 2026-06-05</div>
+      <hr style="border:none;border-top:1px dashed #c4b5fd;margin:8px 0">
+      <b>كل ما لا يوجد في الحاوية</b>:<br>تاريخ git · الموبايل (117 ملف) · package.json / vite / tsconfig · docker-compose · الوثائق
+    </div>
+    <div class="arrow">＝</div>
+    <div class="node out">
+      <div class="big ok">المسار المحلي</div>
+      <div class="note">مُسترَدّ بالكامل</div>
+      <hr style="border:none;border-top:1px dashed var(--ok-bd);margin:8px 0">
+      أساس 5 يونيو (من git)<br>+ طبقة 29 يونيو (من السيرفر)<br>= <b>الحالة الأصلية قبل العطب</b>
+    </div>
+  </div>
+  <p class="note">لماذا مصدران؟ لأن الحاوية تحوي أحدث كود لكن بلا أدوات بناء الواجهة ولا الموبايل ولا تاريخ git؛ وGitHub يحوي كل ذلك لكنه أقدم بأيام (عمل يونيو لم يُلتزَم به). الدمج يعطي الأفضل من الاثنين.</p>
+</div>
+
+<!-- ===== ما الذي فعلته بالضبط ===== -->
+<h2>🛠️ ما الذي فعلتُه بالضبط؟ (خطوة بخطوة)</h2>
+<ol class="steps">
+  <li><b>أخذتُ نسخة حيّة من السيرفر</b> عبر <code>docker cp</code> (قراءة فقط) من الحاوية <span dir="ltr">tawalocal-backend-core-1:/app</span> → فحصتُها: <b>1,425 ملفاً، صفر تالف</b>.</li>
+  <li><b>زامنتُ السيرفر → المحلي</b> للمجلدات الستة (backend · web · contracts · infra · ops · scripts) بنسخ قسري بالمحتوى (<code>rsync --ignore-times</code>) لأن الملفات التالفة لها نفس حجم السليمة فالنسخ العادي يتخطّاها خطأً. (1,951 ملفاً).</li>
+  <li><b>اكتشفتُ أن GitHub متاح</b> ورأسه <code>74e9d18</code> = نفس آخر إصدار محلي. استنسختُه (قراءة فقط) → 41 إصداراً، يحوي كل الملفات المفقودة من السيرفر.</li>
+  <li><b>نقلتُ <code>.git</code> التالف جانباً</b> (حُفِظ احتياطياً) و<b>ركّبتُ <code>.git</code> سليماً من GitHub</b> → عادت إدارة الإصدارات والتاريخ.</li>
+  <li><b><code>git reset --hard</code></b> → أعاد كتابة كل الملفات المُتتبَّعة من التاريخ السليم (أصلح الموبايل، أدوات البناء، docker-compose، الوثائق…).</li>
+  <li><b>أعدتُ طبقة السيرفر فوقها</b> (rsync مجدداً) → أرجعتُ كود 29 يونيو الأحدث المنشور فوق أساس 5 يونيو.</li>
+  <li><b>تحقّقتُ بأدلّة قاطعة</b>: بصمات الملفات، بصمة العقود المالية، <code>git status</code>، ومسح أصفار كامل.</li>
+</ol>
+<p class="note">لم تُنفَّذ أي عملية كتابة على السيرفر أو على GitHub. كل التعديلات حصلت على المسار المحلي فقط.</p>
+
+<!-- ===== لوحة النتائج ===== -->
+<h2>📊 لوحة النتائج النهائية</h2>
+<div class="grid g4">
+  <div class="stat box-ok"><div class="num ok" dir="ltr">4908</div><div class="lbl">ملف مُتتبَّع سليم</div></div>
+  <div class="stat box-ok"><div class="num ok" dir="ltr">0</div><div class="lbl">ملف مُتتبَّع تالف</div></div>
+  <div class="stat box-ok"><div class="num ok" dir="ltr">41</div><div class="lbl">إصدار git مُسترَدّ</div></div>
+  <div class="stat box-ok"><div class="num ok" dir="ltr">340</div><div class="lbl">تعديل غير مُلتزَم<br>(= الحالة الأصلية)</div></div>
+</div>
+
+<div class="card">
+  <h3>الأدلّة (مُتحقَّق منها فعلياً)</h3>
+  <div class="kbd">✓ backend/app/main.py        : md5 محلي == md5 السيرفر  (متطابق)
+✓ الملفات المُتتبَّعة          : 4908 سليمة / 0 أصفار
+✓ مصدر الموبايل mobile_app/lib : 86 ملفاً / 0 أصفار
+✓ العقود المالية المختومة     : SHA256 مطابق 100%
+     feature_flags = 25ddf010…f1d91557   ✓
+     launch_gates  = 6c78dc89…cfcd68414   ✓
+✓ git fsck                    : سليم (تاريخ كامل: 74e9d18 ← 442ca1b ← 20d722d …)
+✓ git status                  : 340 معدّل = يطابق لقطة بداية الجلسة قبل العطب</div>
+</div>
+
+<!-- ===== ما الذي استُرِدّ ===== -->
+<h2>✅ ما الذي استُرِدّ بالكامل</h2>
+<table>
+  <tr><th>المكوّن</th><th>المصدر</th><th>الحالة</th></tr>
+  <tr><td>كود الخلفية <span dir="ltr">backend/</span> (أحدث، 29 يونيو)</td><td>السيرفر</td><td><span class="tag ok">سليم 100%</span></td></tr>
+  <tr><td>كود الواجهة <span dir="ltr">web/src/</span> (393 ملف، أحدث)</td><td>السيرفر</td><td><span class="tag ok">سليم 100%</span></td></tr>
+  <tr><td>العقود المالية المختومة <span dir="ltr">contracts/</span></td><td>السيرفر (SHA مطابق)</td><td><span class="tag ok">سليم 100%</span></td></tr>
+  <tr><td>أدوات بناء الواجهة <span dir="ltr">package.json · vite · tsconfig · eslint · nginx.conf</span></td><td>GitHub</td><td><span class="tag ok">مُسترَدّ</span></td></tr>
+  <tr><td>تطبيق الموبايل <span dir="ltr">mobile_app/</span> (117 ملف dart + pubspec)</td><td>GitHub</td><td><span class="tag ok">مُسترَدّ بالكامل</span></td></tr>
+  <tr><td>تنسيق الحاويات <span dir="ltr">docker-compose.yml · .staging.yml</span></td><td>GitHub</td><td><span class="tag ok">مُسترَدّ</span></td></tr>
+  <tr><td>تاريخ git الكامل (41 إصداراً)</td><td>GitHub</td><td><span class="tag ok">مُسترَدّ</span></td></tr>
+  <tr><td>الوثائق المُلتزَمة <span dir="ltr">CLAUDE.md · PROJECT_STATE.md · تقارير P*</span></td><td>GitHub</td><td><span class="tag ok">مُسترَدّ</span></td></tr>
+  <tr><td>ملفات البيئة <span dir="ltr">.env · backend/.env</span></td><td>نجت محلياً (سليمة)</td><td><span class="tag ok">سليمة</span></td></tr>
+</table>
+
+<!-- ===== ما الذي ينقص ===== -->
+<h2>⚠️ ما الذي ما زال ناقصاً؟ (ملفات غير مُتتبَّعة فقط)</h2>
+<div class="card box-amber">
+  <p>كل ما تبقّى تالفاً هو ملفات <b>لم تكن مُدارة بـgit ولا موجودة في الحاوية</b>. أهمّها:</p>
+  <table>
+    <tr><th>العنصر</th><th>الأهمية</th><th>الحل</th></tr>
+    <tr><td><span dir="ltr">mobile_app/build/</span> و <span dir="ltr">.dart_tool/</span> (≈6,440 ملفاً)</td><td><span class="tag ok">لا تُذكر</span></td><td>تُعاد توليدها بـ<code>flutter pub get</code> + بناء — ليست مصدراً</td></tr>
+    <tr><td><span dir="ltr">node_modules</span> للواجهة</td><td><span class="tag ok">لا تُذكر</span></td><td><code>npm install</code> (لدينا package.json + package-lock)</td></tr>
+    <tr><td><span dir="ltr">docker-compose.override.yml</span></td><td><span class="tag warn">صغيرة</span></td><td>غير مُتتبَّع وليس على GitHub؛ الحاوية العاملة تحوي إعداداتها الفعلية — يُعاد بناؤه من <code>docker inspect</code> عند الحاجة (منفذ 8090 موجود أصلاً في الحاوية حسب مذكّرة النشر)</td></tr>
+    <tr><td>مخرجات عمل غير مُلتزَمة: <span dir="ltr">_agent_testing/ · _audit/ · agentic_report/</span></td><td><span class="tag warn">صغيرة</span></td><td>ملفات نتائج/تجارب — ليست كوداً مصدرياً</td></tr>
+    <tr><td><span dir="ltr">.claude/settings.local.json</span></td><td><span class="tag ok">لا تُذكر</span></td><td>إعداد محلي — يُعاد إنشاؤه تلقائياً</td></tr>
+    <tr><td>تقارير <span dir="ltr">app_report/</span> الجديدة (بعد 5 يونيو، غير مُلتزَمة)</td><td><span class="tag warn">صغيرة</span></td><td>وثائق؛ بعضها في <span dir="ltr">New Folder 10</span> (نجا)</td></tr>
+  </table>
+  <p class="note">لا يوجد أي <b>كود مصدري</b> مفقود. النواقص كلها إمّا مُعاد توليدها آلياً، أو ملفات عمل/وثائق غير مُلتزَمة.</p>
+</div>
+
+<!-- ===== هل عاد إلى أصله؟ ===== -->
+<h2>❓ هل عاد المسار المحلي إلى أصله؟</h2>
+<div class="card box-ok">
+  <p class="big ok">نعم — على مستوى الكود المصدري: عاد بالكامل (100%).</p>
+  <p>الدليل الأقوى: حالة <code>git status</code> بعد الاسترداد تُظهر <b>340 ملفاً معدّلاً</b> هي <b>نفسها بالضبط</b> الملفات التي كانت ظاهرة كمعدّلة في لقطة بداية الجلسة (قبل اكتشاف العطب):
+  <code>backend/Dockerfile</code>، <code>backend/app/config.py</code>، <code>backend/app/core/cache.py</code> … — أي أن الشجرة عادت إلى نفس وضعها قبل العطب: كودٌ محدّث + تعديلات يونيو غير المُلتزَمة المنشورة على السيرفر.</p>
+  <p>الاستثناء الوحيد: ملفات البناء المُعاد توليدها (node_modules / mobile build) وبعض ملفات العمل غير المُلتزَمة — وهذه ليست جزءاً من "الأصل" بالمعنى المصدري.</p>
+</div>
+
+<!-- ===== توصيات ===== -->
+<h2>🧭 توصيات لتأمين ما استُرِدّ (مهمّة)</h2>
+<div class="card box-blue">
+  <ol class="clean">
+    <li><b>التزِم بالعمل المُسترَدّ فوراً (git commit) وارفعه إلى GitHub</b> — حتى لا يبقى عمل 25–29 يونيو موجوداً فقط داخل حاوية واحدة. (هذا أهم درس من الحادث: العمل كان غير مُلتزَم فكاد يُفقَد.)</li>
+    <li><b>انسخ المشروع إلى قرص خارجي</b> الآن — لا تُبقِ النسخة الوحيدة على القرص نفسه الذي تعطّب.</li>
+    <li><b>افحص صحة القرص</b>: <code>sudo smartctl -a /dev/nvme0n1</code> و <code>sudo dmesg | grep -i ext4</code> — للتأكد أن العطب كان حادثاً منفرداً (إطفاء غير نظيف) لا عطلاً متمادياً.</li>
+    <li><b>أعد توليد التبعيات</b>: <code>cd web && npm install</code> ثم <code>cd mobile_app && flutter pub get</code>.</li>
+    <li>عند الحاجة، <b>أعد بناء <span dir="ltr">docker-compose.override.yml</span></b> من <code>docker inspect</code> للحاويات العاملة (أو تجاهله ما دامت الحاوية تعمل).</li>
+    <li>النسخة الاحتياطية الكاملة محفوظة في <span dir="ltr">~/Desktop/tawa-recovery-2026-06-29/</span> (نسخة سابقة) + <code>.git</code> التالف محفوظ مؤقتاً في مجلد العمل تحسّباً.</li>
+  </ol>
+</div>
+
+<!-- ===== سبب العطب (تذكير) ===== -->
+<div class="card">
+  <h3>سبب العطب (للتذكير)</h3>
+  <p>تلف نظام ملفات <span dir="ltr">ext4</span> بعد <b>إطفاء غير نظيف/انقطاع كهرباء</b> بين 12:32 ظهراً (آخر نشر سليم) و13:16 ظهراً (إعادة الإقلاع). آلية "التخصيص المؤجَّل" في <span dir="ltr">ext4</span> سجّلت أحجام الملفات لكنها لم تكتب محتواها قبل الكراش → عادت الملفات بحجمها الصحيح لكن مملوءة أصفاراً (91.5% من الكود). الحاويات نجت لأن كودها كُتب على القرص قبل الكراش.</p>
+</div>
+
+<footer>
+  أُعِدّ بعد تنفيذ الاسترداد فعلياً — نسخ قراءة-فقط من حاوية <span dir="ltr">test.tawanow.com</span> و من GitHub، ودمجهما في المسار المحلي.
+  السيرفر و GitHub لم يُكتب عليهما إطلاقاً. 2026-06-29.
+</footer>
+
+</div>
+</body>
+</html>

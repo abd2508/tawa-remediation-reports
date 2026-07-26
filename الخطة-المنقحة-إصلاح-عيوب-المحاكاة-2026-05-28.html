@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الخطة المنقّحة لإصلاح عيوب المحاكاة — مراجعة دقيقة بالكود</title>
+<style>
+  :root{
+    --green:#0f7b53;--green-d:#0a5c3e;--green-l:#e7f4ee;
+    --ink:#16241d;--muted:#5d6b63;--line:#d9e4dd;--bg:#f6faf8;--card:#fff;
+    --red:#b3261e;--red-l:#fdecea;--amber:#9a6700;--amber-l:#fff6e0;
+    --blue:#1554b3;--blue-l:#e9f1fd;--purple:#6b3fa0;--purple-l:#f1ebfa;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.85;font-size:15.5px}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:18px;padding:32px 28px;margin-bottom:24px;box-shadow:0 8px 28px rgba(15,123,83,.22)}
+  header.top h1{margin:0 0 8px;font-size:1.7rem;line-height:1.4}
+  header.top .sub{opacity:.93}
+  .gov{background:var(--amber-l);border:2px solid var(--amber);border-radius:12px;padding:14px 18px;margin:16px 0;font-weight:600;color:#6b4a00}
+  h2{color:var(--green-d);font-size:1.32rem;margin:36px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+  h3{color:var(--green-d);font-size:1.08rem;margin:20px 0 8px}
+  h4{margin:14px 0 6px;font-size:.98rem;color:var(--ink)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0;box-shadow:0 2px 10px rgba(16,36,29,.04)}
+  .finding{border-right:6px solid var(--green)}
+  .finding.high{border-color:var(--red)} .finding.med{border-color:var(--amber)} .finding.low{border-color:var(--blue)}
+  .finding.new{border-color:var(--purple)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.9rem;background:var(--card)}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  code{background:#eef3f0;padding:1px 6px;border-radius:5px;font-size:.85em;direction:ltr;display:inline-block;line-height:1.5}
+  .tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.76rem;font-weight:700;white-space:nowrap}
+  .t-high{background:var(--red-l);color:var(--red)} .t-med{background:var(--amber-l);color:var(--amber)}
+  .t-low{background:var(--blue-l);color:var(--blue)} .t-new{background:var(--purple-l);color:var(--purple)}
+  .t-ok{background:var(--green-l);color:var(--green-d)}
+  .sim{background:var(--blue-l);border-right:4px solid var(--blue);border-radius:8px;padding:12px 16px;margin:10px 0;font-size:.92rem}
+  .sim b{color:var(--blue)}
+  .risk{background:var(--red-l);border-right:4px solid var(--red);border-radius:8px;padding:12px 16px;margin:10px 0;font-size:.92rem}
+  .ripple{background:#f3f7f5;border:1px dashed var(--line);border-radius:8px;padding:12px 16px;margin:10px 0;font-size:.9rem}
+  ul{margin:6px 0;padding-right:22px}li{margin:4px 0}
+  .lbl{font-weight:700;color:var(--green-d);margin-left:6px}
+  .footer{margin-top:46px;padding-top:18px;border-top:2px solid var(--line);color:var(--muted);font-size:.84rem;text-align:center}
+  .toc{columns:2;font-size:.92rem}.toc a{color:var(--green-d);text-decoration:none}
+  .pill{display:inline-block;background:var(--green-l);color:var(--green-d);border-radius:999px;padding:2px 10px;font-size:.78rem;font-weight:700;margin:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>الخطة المنقّحة لإصلاح عيوب المحاكاة<br>مراجعة دقيقة بالكود + محاكاة ذهنية لكل نقطة</h1>
+  <div class="sub">منصّة تووا (Toowa) · 2026-05-28 · كل نقطة قُورنت بالكود الفعلي (file:line)، حُلِّل أثرها الكامل على الملفات والدوال، ومُحِّصت ذهنيًّا أثناء البناء والإصلاح والتشغيل</div>
+</header>
+
+<div class="gov">
+  ⚖️ <b>لا تغيير كود حتى الآن.</b> هذه وثيقة تحليل وتخطيط فقط، كما طلبت — «لكي لا نخطئ ولا ندخل في عيوب
+  خطيرة». التنفيذ ينتظر إذنك الصريح، وبالترتيب المقترح. لا حاجة لأي migration جديد (جداول legal موجودة
+  أصلًا تحت <code>z1a2b3c4d5e6</code>)، وكل التغييرات لا تمسّ العقود المالية (FIN-COR يبقى سليمًا).
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">ملخّص: 6 عيوب أصلية + 6 عيوب جديدة اكتُشفت أثناء هذه المراجعة</h3>
+  <table>
+    <tr><th>#</th><th>العيب</th><th>الخطورة</th><th>migration؟</th><th>أثر الكسر إن أُصلح خطأً</th></tr>
+    <tr><td>HIGH-1</td><td>وثائق العقود لا تُزرع في الكود</td><td><span class="tag t-high">HIGH</span></td><td>لا (زرع بيانات)</td><td>لا شيء يُكسَر — إضافة بحتة</td></tr>
+    <tr><td>HIGH-2</td><td>مزوّد بلا إحداثيات → تخطٍّ صامت للتوزيع</td><td><span class="tag t-high">HIGH</span></td><td>لا</td><td>⚠️ قد يكسر تسجيل المزوّد (خاصة الجوّال) إن فُرضت الإحداثيات في المكان الخطأ</td></tr>
+    <tr><td>MED-3</td><td>عقد PROVIDER_STAFF غير قابل للتوقيع (ميّت)</td><td><span class="tag t-med">MED</span></td><td>لا</td><td>منخفض</td></tr>
+    <tr><td>MED-4</td><td>تلفيق <code>doc_version=1</code> عند غياب المستند</td><td><span class="tag t-med">MED</span></td><td>لا</td><td>منخفض — يزول بإصلاح HIGH-1</td></tr>
+    <tr><td>MED-5</td><td>ابتلاع فشل تحميل نصّ العقد في الواجهة</td><td><span class="tag t-med">MED</span></td><td>لا</td><td>منخفض (واجهة فقط)</td></tr>
+    <tr><td>LOW-6</td><td>قراءة مهلة القبول من عمود محذوف</td><td><span class="tag t-low">LOW</span></td><td>لا</td><td>منخفض</td></tr>
+    <tr style="background:var(--purple-l)"><td>ND-1</td><td><b>جديد:</b> الموظف لا يمرّ بالموافقة أصلًا (نشط فورًا) → فرع عقد الموظف ميّت</td><td><span class="tag t-new">جديد</span></td><td>لا</td><td>—</td></tr>
+    <tr style="background:var(--purple-l)"><td>ND-2</td><td><b>جديد:</b> <code>feature_toggles</code> جدول منطقي (bool) بلا عمود <code>value</code> → المهلة لا يمكن تخزينها فيه أبدًا</td><td><span class="tag t-new">جديد</span></td><td>لا</td><td>—</td></tr>
+    <tr style="background:var(--purple-l)"><td>ND-3</td><td><b>جديد:</b> تسجيل المزوّد في الجوّال لا يُرسل إحداثيات إطلاقًا</td><td><span class="tag t-new">جديد</span></td><td>لا</td><td>يقرّر مسار HIGH-2</td></tr>
+    <tr style="background:var(--purple-l)"><td>ND-4</td><td><b>جديد:</b> <code>create_onboarding_contract</code> يقرأ المستند النشط بلا تصفية lang</td><td><span class="tag t-new">جديد</span></td><td>لا</td><td>منخفض</td></tr>
+    <tr style="background:var(--purple-l)"><td>ND-5</td><td><b>جديد:</b> idempotency العقد لكل-مستخدم (لا إعادة إصدار عند ترقية نسخة المستند)</td><td><span class="tag t-new">جديد</span></td><td>لا</td><td>منخفض (مستقبلي)</td></tr>
+    <tr style="background:var(--purple-l)"><td>ND-6</td><td><b>جديد:</b> محتوى الوثائق القانونية مسودّة من المساعد، لا مُراجَعة قانونيًّا (A-R02)</td><td><span class="tag t-new">جديد</span></td><td>لا</td><td>—</td></tr>
+  </table>
+</div>
+
+<!-- ===================== HIGH-1 ===================== -->
+<h2>HIGH-1 · زرع وثائق العقود</h2>
+<div class="card finding high">
+  <h4><span class="lbl">الحالة الحالية (مُتحقَّقة بالكود):</span></h4>
+  <ul>
+    <li>migration <code>u1a2b3c4d5e6</code> ينشئ جدول <code>legal_documents</code> فقط
+        (create_table/create_index) — صفر إدخالات (سطور 21–33).</li>
+    <li>لا سكربت ولا deploy ولا startup يُدخل صفوفًا. الدالة الوحيدة <code>_seed_doc</code> في
+        <b>ملف الاختبار</b> <code>test_phase384</code>، لا في الإنتاج.</li>
+    <li><code>main.py</code> lifespan (سطر 323) لا يزرع أي شيء؛ <code>deploy/finish_deploy.sh</code>
+        يزرع حسابات تجريبية + كتالوج + أماكن، لا الوثائق القانونية.</li>
+    <li>النتيجة: <code>GET /legal/documents/{type}</code> → 404؛
+        <code>OnboardingContractSign.tsx:160</code> يعرض النصّ الاحتياطي «يرجى مراجعة شروط العقد».</li>
+  </ul>
+  <h4><span class="lbl">ماذا نغيّر ولماذا:</span></h4>
+  <p>ننشئ مصدر محتوى مُتحكَّمًا بالإصدار + دالة زرع idempotent، فيُعرض نصّ العقد الحقيقي قبل التوقيع.</p>
+  <ul>
+    <li><b>جديد</b> <code>app/modules/legal/seed_documents.py</code>: ثابت <code>DEFAULT_LEGAL_DOCS</code>
+        (6 وثائق: TOS_CUSTOMER, TOS_PROVIDER, TOS_DRIVER, PRIVACY, LIABILITY, INSURANCE — كلها
+        <code>version=1, lang="ar", is_active=True</code>) + <code>async seed_legal_documents(db)</code>
+        تتخطّى الموجود حسب القيد الفريد <code>(doc_type, version, lang)</code>.</li>
+    <li><b>جديد</b> <code>scripts/seed_legal_documents.py</code>: يستدعيها داخل الحاوية (asyncpg).</li>
+    <li><b>تعديل</b> <code>deploy/finish_deploy.sh</code>: سطر يشغّل سكربت الزرع بعد <code>alembic upgrade head</code>.</li>
+    <li><b>اختياري موصى به</b> استدعاء <code>seed_legal_documents</code> من <code>lifespan</code>
+        (خارج بيئة الاختبار) فتشفى أي بيئة ذاتيًّا عند الإقلاع.</li>
+  </ul>
+  <div class="ripple"><b>الأثر على الملفات/الدوال:</b>
+    لا تغيير على <code>legal_router.py</code> منطقيًّا (يبدأ يجد المستند فيُرجع 200 بدل 404).
+    <code>create_onboarding_contract</code> يبدأ يقرأ <code>active_doc</code> حقيقيًّا → <code>doc_version</code>
+    صحيح (يُصلح MED-4 تلقائيًّا). <code>OnboardingContractSign.tsx</code> يبدأ يعرض النصّ الحقيقي
+    (يلامس MED-5). لا migration. FIN-COR غير متأثّر.</div>
+  <div class="sim"><b>المحاكاة الذهنية:</b>
+    <b>بناء:</b> ملفّان جديدان + سطر deploy — لا تعارض. <b>إصلاح/تشغيل أول:</b> تشغيل الزرع على قاعدة
+    فيها الجدول فارغ → 6 صفوف. تشغيل ثانٍ → يتخطّى الموجود (idempotent) بلا تكرار (القيد الفريد يحمي).
+    <b>ماذا لو كان الجدول يحوي صفوفًا قديمة من العملية اليدوية السابقة؟</b> الزرع يتخطّاها (نفس
+    doc_type/version/lang) → لا ازدواج، لكن المحتوى القديم يبقى — مقبول، وإن أردنا فرض المحتوى الجديد
+    نرفع <code>version</code>. <b>خطر مكتشف (ND-4):</b> يجب أن يكون lang=ar ليطابق افتراض
+    <code>GET /legal/documents</code> (<code>lang="ar"</code> افتراضيًّا) — نزرع ar فقط أولًا.</div>
+  <div class="risk"><b>المخاطر والتراجع:</b> منخفضة جدًّا (إضافة بحتة). التراجع = تعطيل سطر الزرع +
+    حذف الصفوف. <b>قيد مهم (ND-6 / A-R02):</b> المحتوى مسودّة من المساعد بمبادئ القانون الليبي،
+    <b>يجب مراجعته قانونيًّا قبل الإطلاق الحقيقي</b> — نضعه كنسخة v1 قابلة للاستبدال.</div>
+  <h4><span class="lbl">الاختبارات:</span></h4>
+  <ul><li>BE: الزرع يُنشئ 6؛ التشغيل الثاني لا يكرّر؛ <code>GET /legal/documents/TOS_PROVIDER</code> → 200 بنصّ غير فارغ.</li></ul>
+</div>
+
+<!-- ===================== HIGH-2 ===================== -->
+<h2>HIGH-2 · مزوّد بلا إحداثيات → تخطٍّ صامت للتوزيع</h2>
+<div class="card finding high">
+  <h4><span class="lbl">الحالة الحالية (مُتحقَّقة بالكود):</span></h4>
+  <ul>
+    <li><code>provider.py</code>: <code>lat/lng</code> nullable (سطر 31–32).</li>
+    <li>تسجيل الويب يجمع الإحداثيات عبر <code>LocationPicker</code> لكن <b>اختياريًّا</b>
+        (<code>RegistrationPage.tsx:252</code> <code>if lat != null</code>؛ التحقّق يفرض الاسم+المدينة فقط).</li>
+    <li><b>(ND-3) تسجيل الجوّال لا يُرسل إحداثيات إطلاقًا</b> — <code>register_screen.dart:79–81</code>
+        يُرسل <code>business_name</code>+<code>city</code> فقط.</li>
+    <li><code>approve_onboarding</code> يتحقّق من <code>business_name</code>+<code>city</code> فقط، لا الإحداثيات
+        (operations_router.py ~1133–1165).</li>
+    <li><code>provider_router.py:246</code>: <code>if provider.lat is not None and provider.lng is not None:</code>
+        يتخطّى كتلة <code>auto_dispatch</code> بالكامل <b>دون سجلّ</b> عند غياب الإحداثيات (فرع except يسجّل،
+        أمّا التخطّي فصامت). كنس مهلة القبول يلتقط <code>AWAITING_PROVIDER_ACCEPTANCE</code> فقط فلا يُنقذه.</li>
+  </ul>
+  <div class="risk"><b>القرار المعماري الحاسم (بسبب ND-3):</b> فرض الإحداثيات في <b>الباكند عند التسجيل</b>
+    سيكسر تسجيل المزوّد في الجوّال فورًا (لا يُرسلها)، والجوّال منطقة محظورة تحتاج بناءً ونشرًا. لذلك
+    <b>لا نفرضها عند التسجيل في الباكند الآن.</b></div>
+  <h4><span class="lbl">المسار الموصى به (3 طبقات، يمنع الحالة السيّئة دون كسر):</span></h4>
+  <ol>
+    <li><b>إصلاح دفاعي فوري (إلزامي، صغير):</b> في <code>provider_router.py:246</code> فرع else →
+        <code>logging.exception/warning("order %s not dispatched: provider %s has no coordinates")</code>
+        + (موصى) إصدار <code>system_event</code> فيراه فريق العمليات. <b>لا يكسر شيئًا</b> — يحوّل الصمت إلى رؤية.</li>
+    <li><b>بوّابة عند الموافقة (موصى):</b> في <code>approve_onboarding</code> فرع PROVIDER_ADMIN بعد فحص المدينة:
+        <code>if provider.lat is None or provider.lng is None: return 422 "حدّد موقع المنشأة قبل الموافقة"</code>.
+        <b>لكن</b> يلزم تمكين الأدمن من ضبط الإحداثيات → نضيف نقطة OPS
+        <code>POST /operations/providers/{id}/location {lat,lng}</code> + حقل خريطة في صفحة الموافقة
+        <code>OpsOnboarding.tsx</code>.</li>
+    <li><b>تشديد تسجيل الويب (مكمّل، واجهة فقط آمنة):</b> جعل <code>LocationPicker</code> إلزاميًّا في نموذج
+        المزوّد (يمنع الإرسال حتى تُحدَّد الإحداثيات) — يقلّل تكرار تعثّر بوّابة الموافقة.</li>
+    <li><b>تكافؤ الجوّال (تبعية مؤجّلة، تحتاج إذنًا + بناءً):</b> إضافة الإحداثيات لتسجيل الجوّال
+        (<code>register_screen.dart</code> + <code>place_picker.dart</code>). حتى ذلك، مزوّدو الجوّال
+        يعتمدون على ضابط الإحداثيات في OPS عند الموافقة.</li>
+  </ol>
+  <div class="ripple"><b>الأثر على الملفات/الدوال:</b>
+    <code>provider_router.py</code> (سجلّ) · <code>operations_router.py</code> (بوّابة + نقطة ضبط) ·
+    <code>operations.ts</code> + <code>OpsOnboarding.tsx</code> (واجهة الضبط) · <code>RegistrationPage.tsx</code>
+    (إلزام الويب) · لاحقًا الجوّال. لا migration. الدالة <code>auto_dispatch_for_order</code> نفسها لا تتغيّر.</div>
+  <div class="sim"><b>المحاكاة الذهنية:</b>
+    <b>تشغيل بعد الإصلاح:</b> مزوّد بإحداثيات → التوزيع يعمل كما الآن (لا تغيير سلوك). مزوّد بلا إحداثيات →
+    (1) لم يعد ACTIVE أصلًا (بوّابة الموافقة 422) فلا يصل لمرحلة التوزيع. <b>ماذا عن المزوّدين النشطين حاليًّا
+    بلا إحداثيات (بيانات قديمة/جوّال)؟</b> الإصلاح الدفاعي (1) يكشفهم في السجلّ/الأحداث، وضابط OPS (2) يُصلحهم
+    — لذا لا «طلب يتيم صامت» بعد اليوم. <b>ماذا لو ضبط الأدمن إحداثيات خاطئة؟</b> تُستخدم في GEOSEARCH →
+    قد يُختار سائق بعيد؛ مخفّف بأن المزوّد نفسه يضبطها عادةً، وضابط OPS احتياطي. <b>تكرار الإصلاح الدفاعي
+    كل قبول؟</b> لا — السجلّ يُطلق مرّة لكل طلب بلا إحداثيات فقط.</div>
+  <h4><span class="lbl">الاختبارات:</span></h4>
+  <ul>
+    <li>BE: الموافقة على مزوّد بلا إحداثيات → 422؛ بعد ضبط الإحداثيات → 200.</li>
+    <li>BE: قبول طلب لمزوّد بلا إحداثيات → السجلّ يُكتب (لا توزيع صامت) — أو يُتحقَّق عبر system_event.</li>
+    <li>FE: نموذج المزوّد يمنع الإرسال بلا موقع؛ OpsOnboarding يضبط الموقع.</li>
+  </ul>
+</div>
+
+<!-- ===================== MED-3 ===================== -->
+<h2>MED-3 · عقد الموظف غير القابل للتوقيع (+ ND-1)</h2>
+<div class="card finding med">
+  <h4><span class="lbl">الحالة الحالية (مُتحقَّقة):</span></h4>
+  <ul>
+    <li><code>operations_router.py:1263</code>: ينشئ عقدًا لـ
+        <code>("PROVIDER_ADMIN","PROVIDER_STAFF","DRIVER")</code>.</li>
+    <li><code>file_router.py:73–76</code>: <code>/files/upload</code> يسمح بـ DRIVER + PROVIDER_ADMIN فقط
+        → الموظف لا يستطيع رفع صورة التوقيع الإلزامية → لا يوقّع أبدًا.</li>
+    <li><b>(ND-1) اكتشاف مهم:</b> <code>ROLE_STATUS_MAP</code> (registration_router.py:75) يجعل
+        <code>"staff": "ACTIVE"</code> — <b>الموظف نشط فورًا ولا يمرّ بـ <code>approve_onboarding</code> إطلاقًا</b>.
+        إذًا فرع PROVIDER_STAFF في إنشاء العقد <b>ميّت عمليًّا</b> للموظف المُسجَّل طبيعيًّا.</li>
+  </ul>
+  <h4><span class="lbl">ماذا نغيّر ولماذا:</span></h4>
+  <p>الجذر ليس «أضف الموظف لقائمة الرفع»، بل «الموظف لا يحتاج عقدًا أصلًا». نحذف <code>PROVIDER_STAFF</code>
+  من مجموعة إنشاء العقد في <code>operations_router.py:1263</code> فتبقى
+  <code>("PROVIDER_ADMIN","DRIVER")</code> — فلا يُنشأ عقد ميّت غير قابل للتوقيع.</p>
+  <div class="ripple"><b>الأثر:</b> سطر واحد في <code>operations_router.py</code>. <code>has_signed_contract</code>
+    للموظف ترجع True (لا عقد معلّق) → <code>ContractGate</code> لا يحجبه. لا أثر على المزوّد/السائق.</div>
+  <div class="sim"><b>المحاكاة الذهنية:</b> الموظف يسجّل بكود → ACTIVE → لا عقد → يعمل فورًا (سلوك اليوم، نظيف).
+    <b>هل يوجد مسار نادر يجعل الموظف PENDING؟</b> لم أجد واحدًا (التسجيل فقط يحدّد الحالة). إن استُحدث لاحقًا
+    مسار موافقة للموظف، نقرّر حينها (عقد + إضافته لقائمة الرفع). الآن: الحذف آمن.</div>
+  <div class="risk"><b>المخاطر:</b> منخفضة. <b>قيمة A-R01</b> تُغلَق. اختبار: موافقة وهمية على دور staff
+    لا تُنشئ عقدًا (إن بقي المسار قابلًا للاستدعاء في الاختبار).</div>
+</div>
+
+<!-- ===================== MED-4 ===================== -->
+<h2>MED-4 · تلفيق <code>doc_version=1</code></h2>
+<div class="card finding med">
+  <h4><span class="lbl">الحالة الحالية:</span></h4>
+  <p><code>legal_router.py:181</code>: <code>doc_version = active_doc.version if active_doc else 1</code>.
+  مع HIGH-1 غير مُصلَح، كل عقد يشير لنسخة 1 غير موجودة.</p>
+  <h4><span class="lbl">ماذا نغيّر ولماذا:</span></h4>
+  <p><b>يزول جذره بإصلاح HIGH-1</b> (active_doc سيوجد). دفاعيًّا نضيف: إن لم يوجد مستند نشط، نسجّل تحذيرًا
+  واضحًا (الزرع مفقود) بدل التلفيق الصامت. <b>لا نرفع استثناءً</b> هنا لئلّا نكسر الموافقة بسبب فجوة زرع.</p>
+  <div class="ripple"><b>الأثر:</b> سطر/سطران في <code>create_onboarding_contract</code>. لا أثر خارجي إن
+    وُجد المستند (الحالة المعتادة بعد HIGH-1).</div>
+  <div class="sim"><b>المحاكاة الذهنية:</b> بعد HIGH-1: active_doc موجود → version حقيقي. لو نُسي الزرع في بيئة
+    ما: تحذير في السجلّ + عقد بنسخة 1 (سلوك اليوم) — لا انهيار. <b>(ND-4)</b> القراءة بلا تصفية lang قد تختار
+    نسخة من lang آخر؛ مع زرع ar-only الآن لا مشكلة، ونضيف تصفية <code>lang=="ar"</code> احتياطًا.</div>
+</div>
+
+<!-- ===================== MED-5 ===================== -->
+<h2>MED-5 · ابتلاع فشل تحميل نصّ العقد (واجهة)</h2>
+<div class="card finding med">
+  <h4><span class="lbl">الحالة الحالية:</span></h4>
+  <p><code>OnboardingContractSign.tsx:43</code>: <code>catch { /* document optional for display */ }</code>
+  يخفي فشل تحميل النصّ، فيتابع المستخدم التوقيع بالنصّ الاحتياطي دون علمه.</p>
+  <h4><span class="lbl">ماذا نغيّر ولماذا:</span></h4>
+  <p>بدل الابتلاع: نضبط حالة تحذير «تعذّر تحميل نصّ العقد — لا توقّع قبل قراءته» ونعطّل زر التوقيع حتى يُحمَّل
+  النصّ (أو على الأقل نُظهر التحذير بوضوح). فلا يوقّع أحد عقدًا لم يُحمَّل نصّه.</p>
+  <div class="ripple"><b>الأثر:</b> <code>OnboardingContractSign.tsx</code> فقط (حالة + شرط زر). لا أثر باكند.</div>
+  <div class="sim"><b>المحاكاة الذهنية:</b> بعد HIGH-1 النصّ يُحمَّل دائمًا → التحذير لا يظهر عادةً. لو فشلت
+    الشبكة لحظيًّا → تحذير + زر معطّل + إعادة محاولة. <b>تفاعل مع HIGH-1:</b> هذا هو النصف الواجهي؛ يجب أن
+    يُنفَّذ <b>بعد</b> HIGH-1 وإلا سيُعطّل التوقيع دائمًا (لأن النصّ 404 دائمًا اليوم). الترتيب مهمّ.</div>
+  <div class="risk"><b>خطر ترتيب:</b> إن نُفِّذ MED-5 قبل HIGH-1، يُحجب التوقيع كليًّا (النصّ 404). لذا
+    <b>HIGH-1 أولًا، ثم MED-5</b>.</div>
+</div>
+
+<!-- ===================== LOW-6 ===================== -->
+<h2>LOW-6 · مهلة القبول تُقرأ من عمود محذوف (+ ND-2)</h2>
+<div class="card finding low">
+  <h4><span class="lbl">الحالة الحالية (مُتحقَّقة):</span></h4>
+  <ul>
+    <li><code>accept_timeout_service.py:55–70</code> ينفّذ
+        <code>SELECT value FROM feature_toggles WHERE flag='provider_order_accept_timeout_seconds'</code>،
+        مع except+rollback يسقط للافتراضي 300ث.</li>
+    <li><b>(ND-2) اكتشاف بنيوي:</b> جدول <code>feature_toggles</code> أعمدته
+        <code>flag</code> + <code>is_enabled</code> (Boolean) — <b>لا عمود <code>value</code></b>،
+        ولا يمكنه تخزين رقم أصلًا. أي أن «تجاوز المهلة عبر feature_toggles» <b>لم يعمل ولا يمكن أن يعمل</b>.</li>
+    <li>في <code>config.py</code>: يوجد <code>dispatch_offer_accept_window_seconds=120</code> (نافذة عرض السائق،
+        طور 444) — مختلفة عن مهلة قبول المزوّد (300ث). لا يوجد إعداد لمهلة قبول المزوّد.</li>
+  </ul>
+  <h4><span class="lbl">ماذا نغيّر ولماذا:</span></h4>
+  <p>نُسقِط استعلام <code>feature_toggles</code> المعطوب ونقرأ من إعداد جديد
+  <code>settings.provider_order_accept_timeout_seconds=300</code> (env) — مثل ما فعل 444 لنافذة العرض.
+  هكذا يصبح التجاوز فعّالًا فعلًا وبلا DB ولا migration.</p>
+  <div class="ripple"><b>الأثر:</b> <code>config.py</code> (إعداد جديد) + <code>accept_timeout_service.py</code>
+    (تبسيط الدالة لتقرأ <code>settings</code>). لا أثر على آلة الحالة ولا الكنس.</div>
+  <div class="sim"><b>المحاكاة الذهنية:</b> الافتراضي يبقى 300ث (لا تغيّر سلوك). ضبط env=180 → الكنس يرفض
+    الطلبات بعد 180ث. <b>زال خطر <code>InFailedSQLTransactionError</code></b> لأننا لم نعد نلمس عمودًا محذوفًا.
+    <b>هل يستخدم أحد آخر هذا الـflag؟</b> بحثٌ سريع يؤكّد أن المصدر الوحيد كان هذه الدالة (مكسورة) — الانتقال
+    للـconfig آمن.</div>
+</div>
+
+<!-- ===================== NEW DEFECTS ===================== -->
+<h2>العيوب الجديدة المُكتشَفة أثناء المراجعة (أُضيفت للخطة)</h2>
+<div class="card finding new">
+  <table>
+    <tr><th>#</th><th>الاكتشاف</th><th>التأثير على الخطة</th></tr>
+    <tr><td>ND-1</td><td>الموظف نشط فورًا ولا يمرّ بالموافقة → فرع عقده ميّت</td><td>يحوّل MED-3 من «أضف الموظف للرفع» إلى «احذف الموظف من إنشاء العقد» (إصلاح جذري أنظف)</td></tr>
+    <tr><td>ND-2</td><td><code>feature_toggles</code> منطقي بلا عمود <code>value</code></td><td>يحوّل LOW-6 من «أصلح قراءة العمود» إلى «انقل المصدر لإعداد config» (الإصلاح الصحيح الوحيد)</td></tr>
+    <tr><td>ND-3</td><td>تسجيل الجوّال لا يُرسل إحداثيات</td><td>يمنع فرض الإحداثيات عند التسجيل في الباكند؛ يفرض مسار «بوّابة موافقة + ضابط OPS» لـHIGH-2</td></tr>
+    <tr><td>ND-4</td><td>قراءة المستند النشط بلا تصفية lang</td><td>نزرع ar فقط أولًا + نضيف تصفية <code>lang=="ar"</code> في <code>create_onboarding_contract</code></td></tr>
+    <tr><td>ND-5</td><td>idempotency العقد لكل-مستخدم (لا إعادة إصدار عند ترقية النسخة)</td><td>مقبول الآن؛ يُوثَّق للمستقبل (A-R04) — لا يُفتح إلا عند بناء إعادة الإصدار</td></tr>
+    <tr><td>ND-6</td><td>محتوى الوثائق مسودّة غير مُراجَعة قانونيًّا</td><td>يُعلَّم محتوى HIGH-1 كـv1 قابل للاستبدال؛ مراجعة قانونية قبل الإطلاق (A-R02)</td></tr>
+  </table>
+</div>
+
+<!-- ===================== SEQUENCING ===================== -->
+<h2>الترتيب الموصى به والتبعيات</h2>
+<div class="card">
+  <ol>
+    <li><span class="pill">1</span> <b>HIGH-1</b> (زرع الوثائق) — أساس؛ يُصلح MED-4 ويفتح MED-5.</li>
+    <li><span class="pill">2</span> <b>MED-5</b> (إيقاف ابتلاع الواجهة) — <b>بعد</b> HIGH-1 حصرًا.</li>
+    <li><span class="pill">3</span> <b>MED-3+ND-1</b> (حذف الموظف من إنشاء العقد) — مستقل، صغير.</li>
+    <li><span class="pill">4</span> <b>MED-4+ND-4</b> (تحذير + تصفية lang) — مع HIGH-1.</li>
+    <li><span class="pill">5</span> <b>HIGH-2 طبقة 1</b> (سجلّ التخطّي الدفاعي) — مستقل، يحوّل الصمت لرؤية فورًا.</li>
+    <li><span class="pill">6</span> <b>HIGH-2 طبقة 2+3</b> (بوّابة الموافقة + ضابط OPS + إلزام الويب) — أكبر؛ يحتاج واجهة OPS.</li>
+    <li><span class="pill">7</span> <b>LOW-6+ND-2</b> (نقل المهلة للـconfig) — مستقل.</li>
+    <li><span class="pill">تبعية</span> <b>HIGH-2 طبقة 4</b> (إحداثيات الجوّال) — مؤجّلة لإذن + بناء جوّال.</li>
+  </ol>
+  <div class="risk"><b>تبعية حرجة واحدة:</b> الجوّال (ND-3) — لا تُفرَض الإحداثيات عند التسجيل في الباكند قبل
+    تحديث الجوّال، وإلّا ينكسر تسجيل مزوّدي الجوّال. لذا الاعتماد على بوّابة الموافقة + ضابط OPS.</div>
+</div>
+
+<!-- ===================== OUT OF SCOPE ===================== -->
+<h2>خارج النطاق (مسار منفصل)</h2>
+<div class="card">
+  <p>ملاحظات الأدوار البشرية (بطاقة سائق + وقت وصول للعميل، تنبيه صوتي/طباعة للمزوّد، ملاحة بإحداثيات للسائق،
+  تصحيح تلميح كود الدعوة للموظف) <b>تحسينات ميزات</b>، لا عيوب صحّة. تُدار كمسار منفصل بأولوية أدنى من العيوب
+  أعلاه، ولا تُخلَط بإصلاحات الصحّة لتقليل سطح التغيير.</p>
+</div>
+
+<!-- ===================== GATES ===================== -->
+<h2>بوّابات التحقّق (قبل/بعد كل تنفيذ)</h2>
+<div class="card">
+  <ul>
+    <li>قبل: <code>contract_flag_hash_check.py</code> PASS (FIN-COR سليم) + <code>forbidden_scope_guard.py</code>.</li>
+    <li>بعد كل بند: BE pytest (لا فشل جديد) + FE typecheck/vitest عند لمس الواجهة + FIN-COR PASS.</li>
+    <li>لا migration؛ رأس alembic لا يتغيّر. لا commit إلا بإذنك.</li>
+    <li>التحقّق الحيّ: زرع → <code>GET /legal/documents/TOS_PROVIDER</code> 200؛ موافقة بلا إحداثيات → 422؛ مع إحداثيات → توزيع يعمل.</li>
+  </ul>
+</div>
+
+<div class="footer">
+  الخطة المنقّحة لإصلاح عيوب المحاكاة · منصّة تووا · 2026-05-28 · 6 عيوب أصلية + 6 جديدة، كلّها مُقارَنة بالكود
+  ومُحاكاة ذهنيًّا · لا تغيير كود حتى إذنك · لا migration · FIN-COR سليم
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>دليل إنشاء مفتاح claude-master في Cloudflare — خطوة بخطوة بالصور</title>
+<style>
+  :root {
+    --bg: #0b1220; --panel: #121a2e; --panel-2: #1a2440; --txt: #eaeef7; --muted: #9aa6c2;
+    --primary: #4f8cff; --accent: #ffb84f; --ok: #6cd58d; --warn: #ffd166; --danger: #ff6b6b;
+    --code-bg: #0a1224; --border: #243056;
+    --cf-orange: #f6821f; --cf-blue: #2563eb; --cf-gray: #f8fafc; --cf-dark: #1e293b;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--txt); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif; margin: 0; padding: 0; line-height: 1.85; font-size: 16px; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  h1 { color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 0.5rem; font-size: 1.9rem; margin-top: 2.5rem; }
+  h2 { color: var(--accent); border-right: 4px solid var(--accent); padding-right: 0.75rem; margin-top: 2.5rem; font-size: 1.35rem; }
+  h3 { color: #cfd8ee; margin-top: 1.5rem; font-size: 1.1rem; }
+  p, li { color: var(--txt); }
+  ul, ol { padding-right: 1.5rem; }
+  li { margin-bottom: 0.45rem; }
+  .meta { color: var(--muted); font-size: 0.92rem; margin: 0.25rem 0; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; direction: ltr; background: var(--code-bg); padding: 0.12rem 0.42rem; border-radius: 4px; color: #ffd49a; font-size: 0.9em; unicode-bidi: embed; }
+  pre { font-family: ui-monospace, monospace; direction: ltr; text-align: left; background: var(--code-bg); padding: 1rem 1.25rem; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); font-size: 0.85rem; line-height: 1.55; }
+
+  .hero { background: linear-gradient(135deg, #0e2547 0%, #1a2440 100%); border: 2px solid var(--primary); border-radius: 14px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; }
+  .hero .label { color: var(--primary); font-weight: 700; margin-bottom: 0.4rem; }
+  .hero .text { font-size: 1.1rem; line-height: 1.85; }
+
+  .step-card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem 1.75rem; margin: 1.75rem 0; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+  .step-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border); }
+  .step-num { background: var(--primary); color: white; width: 2.4rem; height: 2.4rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.2rem; flex-shrink: 0; }
+  .step-title { color: var(--accent); font-weight: 700; font-size: 1.15rem; }
+
+  /* Cloudflare-style browser mockup */
+  .mockup { background: white; color: #1a2440; border-radius: 10px; margin: 1rem 0; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.25); }
+  .mock-browser-bar { background: #e2e8f0; padding: 0.5rem 0.9rem; font-size: 0.78rem; color: #475569; direction: ltr; text-align: left; border-bottom: 1px solid #cbd5e1; display: flex; align-items: center; gap: 0.5rem; }
+  .mock-dots { display: inline-flex; gap: 0.3rem; margin-left: 0.5rem; }
+  .mock-dots span { width: 0.7rem; height: 0.7rem; border-radius: 50%; background: #94a3b8; display: inline-block; }
+  .mock-dots span:nth-child(1) { background: #ef4444; }
+  .mock-dots span:nth-child(2) { background: #f59e0b; }
+  .mock-dots span:nth-child(3) { background: #22c55e; }
+  .mock-url { background: white; padding: 0.25rem 0.6rem; border-radius: 4px; flex: 1; color: #1e293b; font-family: ui-monospace, monospace; font-size: 0.78rem; }
+
+  .cf-page { padding: 1.25rem 1.5rem; min-height: 200px; }
+  .cf-page h4 { margin: 0 0 0.5rem; color: #0f172a; font-size: 1.1rem; font-weight: 800; }
+  .cf-page .sub { color: #64748b; font-size: 0.85rem; margin-bottom: 1rem; }
+  .cf-page .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 0.5rem; flex-wrap: wrap; }
+  .cf-btn-orange { background: var(--cf-orange); color: white; border: none; padding: 0.55rem 1.1rem; border-radius: 6px; font-weight: 700; font-size: 0.92rem; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .cf-btn-blue { background: var(--cf-blue); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+  .cf-btn-ghost { background: white; color: var(--cf-blue); border: 1px solid var(--cf-blue); padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+  .cf-card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.9rem 1.1rem; margin: 0.5rem 0; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; }
+  .cf-card .name { font-weight: 700; color: #1e293b; }
+  .cf-card .desc { color: #64748b; font-size: 0.82rem; margin-top: 0.25rem; }
+  .cf-input { width: 100%; padding: 0.55rem 0.8rem; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; font-family: ui-monospace, monospace; direction: ltr; text-align: left; }
+  .cf-select { width: 100%; padding: 0.55rem 0.8rem; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.92rem; background: white; }
+  .cf-label { display: block; font-weight: 700; color: #1e293b; font-size: 0.88rem; margin-bottom: 0.3rem; margin-top: 0.85rem; }
+  .cf-perm-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 0.5rem; align-items: center; margin: 0.4rem 0; }
+  .cf-perm-row.header { font-weight: 700; color: #475569; font-size: 0.82rem; background: #f1f5f9; padding: 0.4rem 0.5rem; border-radius: 4px; }
+  .cf-perm-row .x { color: #94a3b8; cursor: pointer; }
+  .cf-token-box { background: #fef3c7; border: 1px dashed #f59e0b; padding: 1rem 1.25rem; border-radius: 8px; margin: 1rem 0; }
+  .cf-token-box .label { color: #92400e; font-weight: 700; font-size: 0.85rem; margin-bottom: 0.4rem; }
+  .cf-token-value { background: white; border: 1px solid #d97706; padding: 0.6rem 0.85rem; border-radius: 6px; font-family: ui-monospace, monospace; font-size: 0.9rem; word-break: break-all; direction: ltr; color: #1e293b; }
+  .arrow { color: var(--accent); font-size: 1.5rem; text-align: center; padding: 0.5rem 0; font-weight: 700; }
+  .click-marker { background: var(--accent); color: #1a2440; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.78rem; font-weight: 800; display: inline-block; margin: 0 0.3rem; box-shadow: 0 0 0 3px rgba(255,184,79,0.25); }
+  .tip { background: var(--panel-2); border-right: 3px solid var(--accent); padding: 0.7rem 1rem; margin: 0.85rem 0; border-radius: 0 8px 8px 0; font-size: 0.92rem; }
+  .tip strong { color: var(--accent); }
+  .warning { background: linear-gradient(135deg, #2a2510 0%, #1a2440 100%); border: 1.5px solid var(--warn); border-radius: 10px; padding: 0.85rem 1.1rem; margin: 0.85rem 0; }
+  .warning strong { color: var(--warn); }
+  .success { background: linear-gradient(135deg, #1b4d2c 0%, #1a2440 100%); border: 1.5px solid var(--ok); border-radius: 10px; padding: 0.85rem 1.1rem; margin: 0.85rem 0; }
+  .success strong { color: var(--ok); }
+
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--panel); border-radius: 8px; overflow: hidden; }
+  th, td { padding: 0.65rem 0.85rem; text-align: right; border-bottom: 1px solid var(--border); }
+  th { background: var(--panel-2); color: var(--accent); }
+  tr:last-child td { border-bottom: none; }
+  td code { font-size: 0.85rem; }
+  @media (max-width: 720px) {
+    .cf-perm-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>دليل إنشاء مفتاح <code>claude-master</code> في Cloudflare</h1>
+<p class="meta">التاريخ: 2026-05-28 · الهدف: مفتاح API واحد يَفتح لي كل صلاحيات Cloudflare على دومين <code>tawanow.com</code> · الوقت المتوقّع: 3–5 دقائق</p>
+
+<div class="hero">
+<div class="label">الهدف بسطر واحد</div>
+<div class="text">
+في نِهاية هذا الدليل سيَكون عندك نصّ مكوَّن من ≈40 حرفاً (مثل <code>aBcD-1234567890_efgHIJKLMNopqRSTUVwxyz98</code>). تَنسخه وتُرسله لي، وأنا أَتولّى كل شيء في Cloudflare بعدها — إضافة سجلّات DNS، تَفعيل Email Routing، ربط Resend بالخادم، كل شيء.
+</div>
+</div>
+
+<hr/>
+
+<!-- ───────────────────── الخطوة 1 ───────────────────── -->
+<div class="step-card">
+<div class="step-header">
+  <div class="step-num">1</div>
+  <div class="step-title">افتح صفحة API Tokens في Cloudflare</div>
+</div>
+
+<p>افتح هذا الرابط في المتصفّح (سيَطلب منك تَسجيل الدخول إن لم تَكن داخلاً):</p>
+
+<pre style="font-size: 0.95rem;">https://dash.cloudflare.com/profile/api-tokens</pre>
+
+<h3>الذي ستَراه:</h3>
+<div class="mockup">
+  <div class="mock-browser-bar">
+    <div class="mock-dots"><span></span><span></span><span></span></div>
+    <div class="mock-url">🔒 dash.cloudflare.com/profile/api-tokens</div>
+  </div>
+  <div class="cf-page">
+    <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-bottom: 1rem; display: flex; gap: 1.5rem; font-size: 0.85rem;">
+      <span style="color: #94a3b8;">My Profile</span>
+      <span style="color: #94a3b8;">API Tokens</span>
+      <span style="color: #1e293b; font-weight: 700; border-bottom: 2px solid var(--cf-orange); padding-bottom: 0.4rem; margin-bottom: -0.5rem;">API Tokens</span>
+      <span style="color: #94a3b8;">Sessions</span>
+    </div>
+    <div class="toolbar">
+      <div>
+        <h4>API Tokens</h4>
+        <div class="sub">Tokens you have created that can be used to access the Cloudflare API.</div>
+      </div>
+      <button class="cf-btn-orange">Create Token <span class="click-marker">انقر هنا</span></button>
+    </div>
+    <div class="cf-card">
+      <div>
+        <div class="name">(لو عندك tokens سابقة ستَظهر هنا)</div>
+        <div class="desc">Active</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tip"><strong>ملاحظة:</strong> تَأكّد أنك في تَبويب <strong>«API Tokens»</strong> (الذي يَستعمل permissions حديثة)، <strong>وليس</strong> «API Keys» (Global API Key القديم).</div>
+
+</div>
+
+<!-- ───────────────────── الخطوة 2 ───────────────────── -->
+<div class="step-card">
+<div class="step-header">
+  <div class="step-num">2</div>
+  <div class="step-title">اختر «Create Custom Token»</div>
+</div>
+
+<p>بعد ضَغط Create Token تَظهر قائمة بقوالب جاهزة + خيار صَنع token مُخصَّص. <strong>نَزل لأسفل الصفحة</strong> وستَجد:</p>
+
+<div class="mockup">
+  <div class="mock-browser-bar">
+    <div class="mock-dots"><span></span><span></span><span></span></div>
+    <div class="mock-url">🔒 dash.cloudflare.com/profile/api-tokens</div>
+  </div>
+  <div class="cf-page">
+    <h4>API token templates</h4>
+    <div class="sub">Start with one of the recommended templates, or build your own.</div>
+
+    <div class="cf-card">
+      <div>
+        <div class="name">Edit zone DNS</div>
+        <div class="desc">Grants edit access to a single zone's DNS settings.</div>
+      </div>
+      <button class="cf-btn-ghost">Use template</button>
+    </div>
+
+    <div class="cf-card">
+      <div>
+        <div class="name">Read all resources</div>
+        <div class="desc">Read all resources in your account.</div>
+      </div>
+      <button class="cf-btn-ghost">Use template</button>
+    </div>
+
+    <div class="cf-card">
+      <div>
+        <div class="name">WordPress</div>
+        <div class="desc">Recommended permissions for WordPress sites.</div>
+      </div>
+      <button class="cf-btn-ghost">Use template</button>
+    </div>
+
+    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0;">
+      <h4>Create Custom Token</h4>
+      <div class="cf-card">
+        <div>
+          <div class="name">Custom Token</div>
+          <div class="desc">Create a custom token with specific permissions.</div>
+        </div>
+        <button class="cf-btn-ghost">Get started <span class="click-marker">انقر هنا</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ───────────────────── الخطوة 3 ───────────────────── -->
+<div class="step-card">
+<div class="step-header">
+  <div class="step-num">3</div>
+  <div class="step-title">املأ نموذج إنشاء التَوكن</div>
+</div>
+
+<p>هذه الصفحة الأهمّ — املأها بالضبط كما يَلي:</p>
+
+<div class="mockup">
+  <div class="mock-browser-bar">
+    <div class="mock-dots"><span></span><span></span><span></span></div>
+    <div class="mock-url">🔒 dash.cloudflare.com/profile/api-tokens/create</div>
+  </div>
+  <div class="cf-page">
+    <h4>Create Custom Token</h4>
+
+    <label class="cf-label">Token name</label>
+    <input class="cf-input" value="claude-master" />
+    <div style="color: #64748b; font-size: 0.78rem; margin-top: 0.2rem;">اسم وصفي فقط — لا تَأثير وظيفي.</div>
+
+    <label class="cf-label">Permissions</label>
+    <div class="cf-perm-row header">
+      <div>النوع</div>
+      <div>القسم</div>
+      <div>المستوى</div>
+      <div></div>
+    </div>
+    <div class="cf-perm-row">
+      <select class="cf-select"><option>Zone</option></select>
+      <select class="cf-select"><option>DNS</option></select>
+      <select class="cf-select"><option>Edit</option></select>
+      <span class="x">✕</span>
+    </div>
+    <div class="cf-perm-row">
+      <select class="cf-select"><option>Zone</option></select>
+      <select class="cf-select"><option>Zone Settings</option></select>
+      <select class="cf-select"><option>Edit</option></select>
+      <span class="x">✕</span>
+    </div>
+    <div class="cf-perm-row">
+      <select class="cf-select"><option>Zone</option></select>
+      <select class="cf-select"><option>Email Routing Addresses</option></select>
+      <select class="cf-select"><option>Edit</option></select>
+      <span class="x">✕</span>
+    </div>
+    <div class="cf-perm-row">
+      <select class="cf-select"><option>Zone</option></select>
+      <select class="cf-select"><option>Email Routing Rules</option></select>
+      <select class="cf-select"><option>Edit</option></select>
+      <span class="x">✕</span>
+    </div>
+    <button class="cf-btn-ghost" style="margin-top: 0.4rem;">+ Add more <span class="click-marker">اضغطه 3 مرّات لإضافة الصفوف</span></button>
+
+    <label class="cf-label">Zone Resources</label>
+    <div style="display: flex; gap: 0.5rem;">
+      <select class="cf-select" style="flex: 0 0 30%;"><option>Include</option></select>
+      <select class="cf-select" style="flex: 0 0 35%;"><option>Specific zone</option></select>
+      <select class="cf-select" style="flex: 1;"><option>tawanow.com</option></select>
+    </div>
+
+    <label class="cf-label">Client IP Address Filtering <span style="color:#94a3b8;font-weight:400;">(اختياري — اتركه فارغاً)</span></label>
+    <div class="cf-input" style="color: #94a3b8;">(اتركه كما هو)</div>
+
+    <label class="cf-label">TTL <span style="color:#94a3b8;font-weight:400;">(اختياري — اتركه فارغاً = لا انتهاء)</span></label>
+    <div class="cf-input" style="color: #94a3b8;">(اتركه كما هو)</div>
+
+    <div style="margin-top: 1.5rem; display: flex; gap: 0.6rem;">
+      <button class="cf-btn-blue">Continue to summary <span class="click-marker">انقر هنا</span></button>
+      <button class="cf-btn-ghost">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<h3>تَفصيل الأذونات الأربعة — انسخ هذا الجدول حرفياً:</h3>
+<table>
+<thead><tr><th>النوع</th><th>القسم</th><th>المستوى</th><th>لماذا أَحتاجه</th></tr></thead>
+<tbody>
+<tr><td><code>Zone</code></td><td><code>DNS</code></td><td><code>Edit</code></td><td>لإضافة سجلّات Resend (TXT/CNAME) في الـDNS</td></tr>
+<tr><td><code>Zone</code></td><td><code>Zone Settings</code></td><td><code>Edit</code></td><td>لقراءة + تَعديل إعدادات أساسية لو احتجنا</td></tr>
+<tr><td><code>Zone</code></td><td><code>Email Routing Addresses</code></td><td><code>Edit</code></td><td>لإضافة <code>info@tawanow.com</code> وتَحويله</td></tr>
+<tr><td><code>Zone</code></td><td><code>Email Routing Rules</code></td><td><code>Edit</code></td><td>لتَفعيل خدمة Email Routing نفسها</td></tr>
+</tbody>
+</table>
+
+<div class="warning"><strong>⚠️ مَنطقة Zone Resources مُهمّة:</strong> تَأكّد أنّ القائمة المنسدلة الأولى = <code>Include</code>، والثانية = <code>Specific zone</code>، والثالثة = <code>tawanow.com</code>. لو وَضعتَ «All zones» سيَعمل لكن أَوسع من اللازم.</div>
+
+</div>
+
+<!-- ───────────────────── الخطوة 4 ───────────────────── -->
+<div class="step-card">
+<div class="step-header">
+  <div class="step-num">4</div>
+  <div class="step-title">شاشة الملخّص → Create Token</div>
+</div>
+
+<p>Cloudflare ستُلخّص لك كل ما اخترتَه — تَأكّد من المُطابقة وانقر <strong>Create Token</strong>:</p>
+
+<div class="mockup">
+  <div class="mock-browser-bar">
+    <div class="mock-dots"><span></span><span></span><span></span></div>
+    <div class="mock-url">🔒 dash.cloudflare.com/profile/api-tokens/create/summary</div>
+  </div>
+  <div class="cf-page">
+    <h4>Token summary</h4>
+    <div class="sub">Review your token's permissions before creating it.</div>
+
+    <div class="cf-card" style="display: block;">
+      <div style="font-weight: 700; color: #1e293b; margin-bottom: 0.4rem;">claude-master</div>
+      <div style="color: #475569; font-size: 0.88rem;">
+        Permissions:<br/>
+        • All zones - Zone - DNS:Edit, Zone Settings:Edit, Email Routing Addresses:Edit, Email Routing Rules:Edit<br/>
+        Zone Resources:<br/>
+        • Include - Specific zone - tawanow.com<br/>
+        TTL: <em style="color:#94a3b8;">No TTL</em>
+      </div>
+    </div>
+
+    <div style="margin-top: 1.5rem; display: flex; gap: 0.6rem;">
+      <button class="cf-btn-blue">Create Token <span class="click-marker">انقر هنا</span></button>
+      <button class="cf-btn-ghost">Edit</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ───────────────────── الخطوة 5 ───────────────────── -->
+<div class="step-card">
+<div class="step-header">
+  <div class="step-num">5</div>
+  <div class="step-title">انسخ المفتاح فوراً — يَظهر مرّة واحدة فقط!</div>
+</div>
+
+<p>الشاشة الأخيرة تَعرض المفتاح بصيغة:</p>
+
+<div class="mockup">
+  <div class="mock-browser-bar">
+    <div class="mock-dots"><span></span><span></span><span></span></div>
+    <div class="mock-url">🔒 dash.cloudflare.com/profile/api-tokens/create</div>
+  </div>
+  <div class="cf-page">
+    <h4 style="color: #15803d;">✓ Your API token has been created!</h4>
+    <div class="sub">This is the only time this token will be displayed. Be sure to copy it now.</div>
+
+    <div class="cf-token-box">
+      <div class="label">Your API Token</div>
+      <div class="cf-token-value">aBcDeF12-GhIjKlMnOpQrStUvWxYz_3456789012345</div>
+      <div style="margin-top: 0.5rem;">
+        <button class="cf-btn-orange" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;">📋 Copy <span class="click-marker">انقر هنا أوّلاً</span></button>
+      </div>
+    </div>
+
+    <div style="margin-top: 0.85rem; padding: 0.85rem 1rem; background: #fef3c7; border-radius: 6px; color: #92400e; font-size: 0.85rem;">
+      💡 <strong>Test your token:</strong> curl -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \<br/>
+      &nbsp;&nbsp;&nbsp;-H "Authorization: Bearer aBcDeF12-…"
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+      <button class="cf-btn-blue">Continue</button>
+    </div>
+  </div>
+</div>
+
+<div class="warning"><strong>⚠️ تَحذير حَرج:</strong> هذه آخر مرّة يَظهر فيها المفتاح. لو أَغلقتَ الصفحة بدون نَسخه، لن تَستطيع رؤيته مجدّداً — ستَضطرّ لحذفه وإنشاء جديد.</div>
+
+<div class="success"><strong>✓ علامات نجاح صحيحة:</strong>
+<ul style="margin: 0.4rem 0;">
+  <li>طول المفتاح ≈ <strong>40 حرفاً</strong> (لا أَقلّ من 35، لا أَكثر من 50)</li>
+  <li><strong>بدون</strong> بادئة <code>cfk_</code></li>
+  <li>خَليط أحرف كبيرة وصغيرة وأرقام وأحياناً <code>_</code> أو <code>-</code></li>
+  <li>زرّ «Test your token» يَعمل (تَجربة اختيارية)</li>
+</ul>
+</div>
+
+</div>
+
+<!-- ───────────────────── الخطوة 6 ───────────────────── -->
+<div class="step-card">
+<div class="step-header">
+  <div class="step-num">6</div>
+  <div class="step-title">أَرسل لي المفتاح هنا</div>
+</div>
+
+<p>أَلصقه في رسالة لي. مثال:</p>
+<pre>هذا مفتاح claude-master:
+aBcDeF12-GhIjKlMnOpQrStUvWxYz_3456789012345</pre>
+
+<p>وسأَفعل فوراً:</p>
+<ol>
+  <li>أَختبره مع Cloudflare API للتَأكّد من صحّته (5 ثوانٍ)</li>
+  <li>أَستخدمه لإضافة كل سجلّات Resend في Cloudflare DNS</li>
+  <li>أُفعّل Email Routing (لو أردتَ استلام رسائل على <code>info@tawanow.com</code>)</li>
+  <li>أُحدّث ملفّ الإعدادات على خادم tawanow.com</li>
+  <li>أُعيد تَشغيل الخلفية</li>
+  <li>أُخبرك حين يَصبح إرسال OTP الحقيقي جاهزاً</li>
+</ol>
+
+</div>
+
+<hr/>
+
+<!-- ───────────────────── ملحقات ───────────────────── -->
+<h2>ملحق 1 — أخطاء شائعة وحلولها</h2>
+<table>
+<thead><tr><th>الخطأ</th><th>السبب</th><th>الحلّ</th></tr></thead>
+<tbody>
+<tr>
+  <td>المفتاح بدأ بـ <code>cfk_</code></td>
+  <td>أنشأتَ Service Token (للـZero Trust) بدل API Token عادي</td>
+  <td>ارجع للخطوة 2 وتَأكّد من ضَغط <strong>«Custom Token → Get started»</strong> في قسم API Tokens</td>
+</tr>
+<tr>
+  <td>المفتاح طوله 37 حرف hex فقط (أرقام وأحرف من a-f)</td>
+  <td>نَسختَ Global API Key القديم</td>
+  <td>هذا مُختلف ويَعمل لكن يَحتاج إيميل حسابك أيضاً. الأَفضل إنشاء API Token حديث (الخطوات 1-5 أعلاه)</td>
+</tr>
+<tr>
+  <td>الشاشة لا تَعرض زرّ «Create Custom Token»</td>
+  <td>ربما المستخدم Member وليس Owner</td>
+  <td>تَأكّد أنّك تَستخدم حساب صاحب الدومين، لا حساب فريق فرعي</td>
+</tr>
+<tr>
+  <td>لا أَرى تَبويب «API Tokens»</td>
+  <td>أنت في صفحة Account API بدل Profile API</td>
+  <td>تَأكّد أنّ الـURL بالضبط: <code>dash.cloudflare.com/profile/api-tokens</code></td>
+</tr>
+</tbody>
+</table>
+
+<h2>ملحق 2 — كيف أَستخدم المفتاح (لِعِلمك)</h2>
+<p>عندما يَصلني المفتاح، سأَستعمله بشكل آمن في Cloudflare API كهذا:</p>
+<pre>curl -H "Authorization: Bearer YOUR_TOKEN" \
+     -H "Content-Type: application/json" \
+     "https://api.cloudflare.com/client/v4/zones/1915062b57c2667ee8936fed9fff702b/dns_records" \
+     -X POST -d '{
+       "type": "TXT",
+       "name": "send.tawanow.com",
+       "content": "v=spf1 include:amazonses.com ~all",
+       "ttl": 300
+     }'</pre>
+
+<p>ثم أُضيف 2 سجلّ آخر (CNAME + TXT DMARC) بنفس الطريقة، وهكذا تَنتهي العملية.</p>
+
+<h2>ملحق 3 — أَمان المفتاح</h2>
+<ul>
+  <li>المفتاح حصريّ لدومين <code>tawanow.com</code> فقط (لو شملتَ زون واحد) — لا يُمكنه الوصول لأي حساب آخر</li>
+  <li>الصلاحيات مَحدودة بـ4 أشياء (DNS، Zone Settings، Email Routing × 2) — لا يُمكنه حذف الدومين أو الفوترة أو التَطبيقات</li>
+  <li>بعد انتهاء عملنا (تَفعيل Resend ناجح)، يُمكنك <strong>حذف</strong> المفتاح فوراً من نفس الصفحة (<code>dash.cloudflare.com/profile/api-tokens</code>)</li>
+  <li>المفتاح ليس مُخزَّناً في أي ملف داخل المشروع — يُستعمل في ذاكرة الجلسة فقط</li>
+</ul>
+
+<hr/>
+
+<div class="hero">
+<div class="label">الخلاصة</div>
+<div class="text">
+3 ضغطات زرّ في Cloudflare (Create Token → Custom Token → Get started) + إضافة 4 صفوف أذونات + اختيار <code>tawanow.com</code> = مفتاح يَفتح لي كل ما أحتاج. بعدها أنا أَتولّى Cloudflare بنفسي ولن تَلمسه مرّة أخرى.<br/><br/>
+ولا تَنسَ: <strong>Resend خدمة مُنفصلة</strong> تَتطلّب تَسجيلك ببريدك الشخصي (دقيقتان منك) ثم تُعطيني مفتاح Resend وأَفعل الباقي.
+</div>
+</div>
+
+<p class="meta" style="margin-top: 2rem; text-align: center; font-size: 0.82rem;">
+  ملفّ هذا التَقرير: <code>تقرير-دليل-claude-master-Cloudflare-2026-05-28.html</code> في مجلد <code>New Folder 10</code>
+</p>
+
+</div>
+</body>
+</html>

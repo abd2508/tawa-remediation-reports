@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير فحص الضرر ومقارنة سيرفر test.tawanow.com بالمسار المحلي — 2026-06-29</title>
+<style>
+  :root{
+    --green:#0f766e; --green-d:#115e59; --red:#dc2626; --red-bg:#fef2f2;
+    --amber:#d97706; --amber-bg:#fffbeb; --ok:#16a34a; --ok-bg:#f0fdf4;
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb; --card:#ffffff; --bg:#f8fafc;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Noto Naskh Arabic",Tahoma,sans-serif;
+       background:var(--bg);color:var(--ink);line-height:1.85;font-size:16px}
+  .wrap{max-width:1040px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f766e,#134e4a);color:#fff;
+       border-radius:18px;padding:34px 30px;margin-bottom:26px;box-shadow:0 10px 30px rgba(15,118,110,.25)}
+  header.hero h1{margin:0 0 8px;font-size:27px}
+  header.hero p{margin:4px 0;opacity:.95}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+       padding:4px 12px;border-radius:999px;font-size:13px;margin-top:10px}
+  h2{font-size:22px;border-right:6px solid var(--green);padding:6px 14px 6px 0;margin:34px 0 14px}
+  h3{font-size:18px;color:var(--green-d);margin:22px 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:14px 0;
+       box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .grid{display:grid;gap:14px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:760px){.g3,.g2{grid-template-columns:1fr}}
+  .stat{border-radius:14px;padding:18px;text-align:center;border:1px solid var(--line)}
+  .stat .num{font-size:34px;font-weight:800;line-height:1.1}
+  .stat .lbl{font-size:14px;color:var(--muted);margin-top:6px}
+  .red{color:var(--red)} .amber{color:var(--amber)} .ok{color:var(--ok)} .gr{color:var(--green)}
+  .box-red{background:var(--red-bg);border-color:#fecaca}
+  .box-amber{background:var(--amber-bg);border-color:#fde68a}
+  .box-ok{background:var(--ok-bg);border-color:#bbf7d0}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:right}
+  th{background:#f1f5f9;font-weight:700}
+  tr:nth-child(even) td{background:#fafafa}
+  code{background:#f1f5f9;padding:2px 7px;border-radius:6px;font-family:"Cascadia Code",Consolas,monospace;
+       font-size:13.5px;direction:ltr;display:inline-block}
+  .mono{direction:ltr;text-align:left;font-family:Consolas,monospace}
+  .bar{height:26px;border-radius:7px;background:#eef2f7;overflow:hidden;position:relative;margin:6px 0}
+  .bar>i{display:block;height:100%;}
+  .bar span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+       font-size:13px;font-weight:700;color:#111}
+  .legend{font-size:13px;color:var(--muted)}
+  .timeline{position:relative;padding-right:22px;margin:14px 0}
+  .timeline::before{content:"";position:absolute;right:6px;top:0;bottom:0;width:3px;background:var(--line)}
+  .ev{position:relative;margin:0 0 14px;padding-right:18px}
+  .ev::before{content:"";position:absolute;right:-1px;top:6px;width:14px;height:14px;border-radius:50%;
+       background:var(--green);border:3px solid #fff;box-shadow:0 0 0 2px var(--green)}
+  .ev.crash::before{background:var(--red);box-shadow:0 0 0 2px var(--red)}
+  .ev .t{font-weight:800;color:var(--green-d)}
+  .ev.crash .t{color:var(--red)}
+  .tag{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;font-weight:700}
+  .tag.ok{background:#dcfce7;color:#166534} .tag.bad{background:#fee2e2;color:#991b1b}
+  .tag.warn{background:#fef3c7;color:#92400e}
+  .note{font-size:14px;color:var(--muted)}
+  .big{font-size:19px;font-weight:800}
+  ul.clean{margin:8px 0;padding-right:22px} ul.clean li{margin:6px 0}
+  .kbd{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:14px 16px;direction:ltr;text-align:left;
+       font-family:Consolas,monospace;font-size:13.5px;overflow:auto;white-space:pre}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin:30px 0}
+  .why{background:#ecfeff;border:1px solid #a5f3fc;border-radius:12px;padding:16px;margin:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🛟 تقرير فحص الضرر — مقارنة سيرفر <span dir="ltr">test.tawanow.com</span> بالمسار المحلي</h1>
+  <p>المشروع: منصّة تووا / Tawa — <span dir="ltr">/home/a/Desktop/APP/platform</span></p>
+  <p>تاريخ الفحص: 2026-06-29 — كل التوقيتات بتوقيت ليبيا (طرابلس، <span dir="ltr">UTC+2</span>)</p>
+  <span class="pill">السيرفر لم يُمَس — قراءة فقط ✓</span>
+  <span class="pill">لم يُعدَّل أي ملف محلي ✓</span>
+</header>
+
+<!-- ===================== الخلاصة في سطر ===================== -->
+<div class="card box-red">
+  <div class="big red">⛔ الخلاصة بكلمة واحدة: المسار المحلي تعرّض لتلف شامل في نظام الملفات — وليس مجرد "مشكلة بسيطة".</div>
+  <p style="margin:10px 0 0">
+    <b>91.5% من ملفات الكود المحلي صارت أصفاراً فارغة</b> (الملف موجود وبنفس الحجم، لكنه فارغ من الداخل تماماً).
+    كما أن <b>قاعدة بيانات git المحلية مدمَّرة</b> (تاريخ المشروع المحلي مفقود).
+    <span class="ok"><b>الخبر الجيد:</b></span> السيرفر (الحاويات العاملة) <b>سليم بالكامل</b>،
+    ويحوي <b>كامل كود الواجهة والخلفية والعقود المالية</b>، وهناك <b>نسخة استرداد جاهزة</b> أُنشئت اليوم بالفعل.
+    <span class="amber"><b>الثغرة الوحيدة:</b></span> كود تطبيق الموبايل شبه مفقود (نجت 4 ملفات فقط).
+  </p>
+</div>
+
+<!-- ===================== السؤال المباشر: آخر تحديث للسيرفر ===================== -->
+<h2>🕒 أولاً: آخر تحديث لنسخة السيرفر (بالتاريخ والساعة والدقيقة)</h2>
+<div class="card box-ok">
+  <div class="grid g3">
+    <div class="stat box-ok">
+      <div class="num ok" dir="ltr">12:27:50</div>
+      <div class="lbl">الواجهة الأمامية (الموقع)<br>2026-06-29 ظهراً</div>
+    </div>
+    <div class="stat box-ok">
+      <div class="num ok" dir="ltr">12:32:44</div>
+      <div class="lbl">صورة الخلفية (Backend)<br>بُنيت ونُشرت 2026-06-29 ظهراً</div>
+    </div>
+    <div class="stat box-ok">
+      <div class="num ok" dir="ltr">11:55:02</div>
+      <div class="lbl">أحدث ملف كود خلفية<br>آخر تعديل قبل البناء</div>
+    </div>
+  </div>
+  <p class="big ok" style="margin:14px 0 4px;text-align:center">
+    ⬅️ آخر تحديث فعلي للسيرفر العامل = <b>الثلاثاء 2026-06-29، الساعة 12:32 ظهراً</b> (توقيت ليبيا)
+  </p>
+  <p class="note" style="text-align:center">
+    (الحاويات تُسجّل بتوقيت UTC: الواجهة <span dir="ltr">10:27:50Z</span>، الخلفية <span dir="ltr">10:32Z</span> — أضفنا ساعتين لتوقيت ليبيا.)
+  </p>
+</div>
+
+<!-- ===================== ما الذي قارنّاه وكيف ===================== -->
+<h2>🔍 ثانياً: ماذا قارنّا، وكيف؟</h2>
+<div class="card">
+  <p>"السيرفر" <span dir="ltr">test.tawanow.com</span> ليس جهازاً بعيداً — بل <b>حاويات Docker تعمل على نفس الجهاز</b>
+  خلف نفق Cloudflare (المنفذ <code>8090</code>). أخذنا منها نسخة <b>قراءة فقط</b> عبر <code>docker cp</code> وقارنّاها بالملفات المحلية،
+  بايت ببايت (<code>md5</code> و <code>cmp</code> و <code>xxd</code>).</p>
+
+  <div class="why">
+    <b>كيف عرفنا أن الملفات المحلية "تالفة" رغم أن حجمها صحيح؟</b><br>
+    أخذنا الملف الرئيسي <code>backend/app/main.py</code>: الحجم في المحلي والسيرفر <b>متطابق تماماً (63,309 بايت)</b>،
+    لكن بصمة <code>md5</code> مختلفة. عند الفحص العميق: نسخة السيرفر <b>كود سليم</b>، أما النسخة المحلية فهي
+    <b>63,309 صفراً (NUL) — فارغة بالكامل من الداخل</b>. هذه البصمة هي التوقيع الكلاسيكي لتلف نظام ملفات <span dir="ltr">ext4</span>
+    بعد إطفاء غير نظيف/انقطاع كهرباء.
+  </div>
+
+  <div class="grid g2">
+    <div class="kbd">$ wc -c main.py
+محلي : 63309   سيرفر: 63309   (نفس الحجم)
+
+$ md5sum main.py
+محلي : 83cf9ec2...   سيرفر: 93739816...  (مختلف!)
+
+$ tr -cd '\0' &lt; main.py | wc -c
+محلي : 63309  ← كله أصفار
+سيرفر: 0      ← كود سليم</div>
+    <div class="kbd"># داخل الملف المحلي (hex):
+0000ea60: 0000 0000 0000 0000  ................
+0000ea70: 0000 0000 0000 0000  ................
+
+# نفس الموضع في السيرفر:
+0000ea60: 742e 7061 7274 79  t.party_router
+0000ea70: 696d 706f 7274 20  import router…</div>
+  </div>
+</div>
+
+<!-- ===================== حجم الضرر ===================== -->
+<h2>📊 ثالثاً: حجم الضرر في المسار المحلي</h2>
+
+<div class="grid g3">
+  <div class="stat box-red"><div class="num red" dir="ltr">4948 / 5408</div><div class="lbl">ملف كود مُصفّر بالكامل<br>(91.5% من كود المصدر)</div></div>
+  <div class="stat box-red"><div class="num red" dir="ltr">3278 / 7109</div><div class="lbl">كائن git تالف<br>(46% من قاعدة git)</div></div>
+  <div class="stat box-red"><div class="num red" dir="ltr">99.99%</div><div class="lbl">من حزمة git الكبرى (131MB)<br>أصفار — التاريخ مفقود</div></div>
+</div>
+
+<div class="card">
+  <h3>نسبة الملفات المُصفّرة حسب النوع (محلي)</h3>
+  <div class="legend">🟥 مُصفّر بالكامل (مفقود) — كلما طال الشريط زاد الضرر</div>
+
+  <div><b>Python (الخلفية)</b> — 934 مفقود من 982
+    <div class="bar"><i style="width:95%;background:var(--red)"></i><span>95%</span></div></div>
+  <div><b>TypeScript/TSX (الواجهة)</b> — 526 مفقود من 550
+    <div class="bar"><i style="width:96%;background:var(--red)"></i><span>96%</span></div></div>
+  <div><b>Dart (الموبايل)</b> — 113 مفقود من 117
+    <div class="bar"><i style="width:97%;background:var(--red)"></i><span>97%</span></div></div>
+  <div><b>JSON (إعدادات)</b> — 231 مفقود من 285
+    <div class="bar"><i style="width:81%;background:var(--amber)"></i><span>81%</span></div></div>
+  <div><b>Markdown (تقارير/وثائق)</b> — 2120 مفقود من 2215
+    <div class="bar"><i style="width:96%;background:var(--red)"></i><span>96%</span></div></div>
+  <p class="note">نجا فقط <b>41 ملف مصدر</b> — معظمها ملفات صغيرة جداً أو حُرِّرت لحظة الكتابة الأخيرة فبقيت في ذاكرة النظام.
+  (نسخة الاسترداد الجاهزة قدّرت الضرر على كامل الشجرة بـ <b>79%</b> — 12,390 من 15,632 ملف؛ النسبة عندنا أعلى لأننا قِسنا ملفات الكود فقط.)</p>
+</div>
+
+<!-- ===================== جدول المقارنة ===================== -->
+<h2>⚖️ رابعاً: جدول المقارنة المباشر (السيرفر ↔ المحلي)</h2>
+<table>
+  <tr><th>المكوّن</th><th>على السيرفر (الحاوية)</th><th>في المسار المحلي</th><th>الحُكم</th></tr>
+  <tr><td>كود الخلفية <span dir="ltr">backend/</span></td><td>سليم 100% — أحدث نسخة</td><td>95% أصفار</td><td><span class="tag bad">تالف محلياً</span></td></tr>
+  <tr><td>كود الواجهة <span dir="ltr">web/src/</span></td><td>سليم 100% (المصدر كامل، 393 tsx)</td><td>96% أصفار</td><td><span class="tag bad">تالف محلياً</span></td></tr>
+  <tr><td>العقود المالية المختومة</td><td>سليمة — <b>SHA256 مطابق تماماً</b></td><td>تالفة</td><td><span class="tag ok">قابل للاسترداد</span></td></tr>
+  <tr><td>قاعدة البيانات</td><td>تعمل (PostgreSQL صحّي) + dump محفوظ</td><td>—</td><td><span class="tag ok">سليمة</span></td></tr>
+  <tr><td>تاريخ git المحلي</td><td>(GitHub قديم/stale — لم يُرفع)</td><td>مدمَّر بالكامل</td><td><span class="tag bad">مفقود</span></td></tr>
+  <tr><td>كود الموبايل <span dir="ltr">mobile_app/</span></td><td>غير موجود في الحاوية</td><td>نجت 4 ملفات فقط من ~117</td><td><span class="tag warn">شبه مفقود</span></td></tr>
+  <tr><td>تقارير <span dir="ltr">New Folder 10</span></td><td>—</td><td><b>سليمة</b> (نجت)</td><td><span class="tag ok">سليمة</span></td></tr>
+</table>
+
+<!-- ===================== لماذا حدث ===================== -->
+<h2>🧩 خامساً: ما الذي حدث بالضبط؟ (الخط الزمني)</h2>
+<div class="card">
+  <p>التوقيع التقني واضح: <b>تلف نظام ملفات <span dir="ltr">ext4</span> بعد إطفاء غير نظيف</b> (انقطاع كهرباء/تجمُّد/إطفاء قسري).
+  نظام <span dir="ltr">ext4</span> يستخدم "التخصيص المؤجَّل" — يحجز مساحة للملف ويسجّل حجمه فوراً، لكن يكتب المحتوى لاحقاً.
+  إذا انقطع الجهاز قبل الكتابة، تبقى الملفات <b>بحجمها الصحيح لكن مملوءة أصفاراً</b> — وهو بالضبط ما رأيناه.</p>
+
+  <div class="timeline">
+    <div class="ev"><div class="t">~11:55 ظهراً</div> آخر تعديل على كود الخلفية (مُجمّع داخل صورة Docker).</div>
+    <div class="ev"><div class="t">12:27:50 ظهراً</div> نشر الواجهة الأمامية إلى الحاوية (<code>docker cp</code>).</div>
+    <div class="ev"><div class="t">12:32:44 ظهراً</div> بناء ونشر صورة الخلفية. ✅ <b>هنا كانت آخر نسخة سليمة على السيرفر</b>.</div>
+    <div class="ev crash"><div class="t">بين 12:32 و 13:16</div> ⚡ إطفاء غير نظيف → نظام الملفات يُصفّر الملفات التي لم تُكتب بعد على القرص.</div>
+    <div class="ev"><div class="t">13:16:27 ظهراً</div> إعادة إقلاع النظام. الحاويات أُعيد تشغيلها تلقائياً (الكود بداخلها سليم لأنه كان مكتوباً قبل الكراش).</div>
+    <div class="ev"><div class="t">15:25 – 15:31 عصراً</div> 🛟 جلسة سابقة أنشأت <b>نسخة استرداد</b> من الحاويات: <span dir="ltr">tawa-recovery-2026-06-29/</span>.</div>
+  </div>
+  <p class="note">القرص الرئيسي <span dir="ltr">nvme0n1p2</span> مُركّب الآن بوضع <code>rw</code> ولم يُعِد التركيب للقراءة فقط — أي أن التلف <b>حدث في الماضي وانتهى</b>، وليس مستمراً الآن. (لم نتمكّن من قراءة صحة القرص <span dir="ltr">SMART</span> بدون صلاحية root — يُنصح بفحصها.)</p>
+</div>
+
+<!-- ===================== مصادر الاسترداد ===================== -->
+<h2>🟢 سادساً: مصادر الاسترداد المتاحة (ما الذي يمكن استعادته ومن أين)</h2>
+<div class="card box-ok">
+  <table>
+    <tr><th>المصدر</th><th>المحتوى</th><th>الحالة</th></tr>
+    <tr><td>الحاويات العاملة <span dir="ltr">tawalocal-*</span></td><td>كامل المصدر: backend + web + contracts + infra + ops + scripts</td><td><span class="tag ok">أحدث + سليم</span></td></tr>
+    <tr><td><span dir="ltr">tawa-recovery-2026-06-29/source/app</span></td><td>نسخة مطابقة مستخرجة من الحاوية (1429 ملف فُحِص، 0 تالف)</td><td><span class="tag ok">جاهزة</span></td></tr>
+    <tr><td><span dir="ltr">tawa-recovery-2026-06-29/db</span></td><td><code>libya_platform.dump</code> + <code>.sql.gz</code></td><td><span class="tag ok">جاهزة</span></td></tr>
+    <tr><td><span dir="ltr">tawa-recovery-2026-06-29/images</span></td><td>صور Docker المبنية (الواجهة/الخلفية) — لا تُعوَّض</td><td><span class="tag ok">جاهزة</span></td></tr>
+    <tr><td><span dir="ltr">APP/backups_offsite/</span></td><td>نسخ قاعدة بيانات يومية (حتى 2026-06-22)</td><td><span class="tag ok">احتياطي</span></td></tr>
+    <tr><td>كود الموبايل</td><td>غير موجود في أي حاوية؛ GitHub قديم (stale)</td><td><span class="tag warn">يحتاج بحثاً</span></td></tr>
+  </table>
+</div>
+
+<!-- ===================== التوصية ===================== -->
+<h2>🚑 سابعاً: التوصية والخطوات (مرتّبة حسب الأولوية)</h2>
+<div class="card box-amber">
+  <ol class="clean">
+    <li><b>انسخ مجلد الاسترداد إلى قرص خارجي فوراً</b> — لا تتركه على نفس القرص المتضرّر. (تحذير ملف الاسترداد: لا تنسخ إلى <span dir="ltr">/dev/sda</span> لأنه يُظهر أخطاء إدخال/إخراج.)</li>
+    <li><b>لا تستمر في العمل داخل المسار المتضرّر</b> <span dir="ltr">/home/a/Desktop/APP/platform</span> — معظمه أصفار، وأي بناء/اختبار سيقرأ ملفات فارغة.</li>
+    <li><b>أعِد بناء شجرة عمل نظيفة</b> من <span dir="ltr">tawa-recovery-2026-06-29/source/app</span> (الأحدث والأسلم)، ثم <code>git init</code> جديد وارفعها إلى GitHub فوراً حتى لا يبقى الكود داخل حاوية فقط.</li>
+    <li><b>استعِد قاعدة البيانات</b> من <code>libya_platform.dump</code> عند الحاجة (الحاويات تعمل الآن، فلا عجلة).</li>
+    <li><b>كود الموبايل</b>: ابحث في GitHub القديم + أي نسخة خارجية. إن لم يوجد، فالمصدر مفقود (نجت 4 ملفات فقط) — لكن ملفات <span dir="ltr">APK</span> المبنية قد تكون محفوظة في مجلد <code>/dl</code> داخل حاوية الواجهة.</li>
+    <li><b>افحص صحة القرص</b>: <code>sudo smartctl -a /dev/nvme0n1</code> و <code>sudo dmesg | grep -i ext4</code> قبل الاعتماد عليه مجدداً.</li>
+  </ol>
+</div>
+
+<!-- ===================== بخصوص G4 ===================== -->
+<h2>⏸️ ثامناً: بخصوص التحليل العميق لميزة G4 (محرّك المال)</h2>
+<div class="card">
+  <p>طلبت تحليلاً عميقاً جداً لميزة <b>G4</b> مع إطلاق وكلاء لتتبّع كل تأثير جانبي. <b>أوقفتُ إطلاق الوكلاء عمداً الآن</b>، للسبب التالي:</p>
+  <ul class="clean">
+    <li>G4 (محرّك المال) — حسب سجلّ المشروع — <b>لم يُبنَ بعد</b> (مؤجَّل بالتصميم حتى أول ميزة مالية كبرى).</li>
+    <li>الأهم: <b>91.5% من الكود المحلي أصفار</b> — لو أطلقتُ الوكلاء على المسار المحلي الآن لقرأوا ملفات فارغة وأنتجوا تحليلاً خاطئاً.</li>
+  </ul>
+  <p class="big gr">التسلسل الصحيح: نُنقذ الكود أولاً (من نسخة الاسترداد السليمة)، ثم أُجري تحليل G4 العميق + الوكلاء + بحث الإنترنت على <b>المصدر السليم</b>، وأُسلّم تقرير G4 المنفصل في <span dir="ltr">New Folder 10</span>.</p>
+  <p class="note">ملاحظة: لم أكتب فوق تقرير <code>تقرير-إكمال-الخطة-G4-G7-N5-...-2026-06-29.html</code> الموجود (سليم، 21,903 بايت، من جلسة سابقة) — أنشأتُ هذا الملف الجديد باسم منفصل حفاظاً على ما نجا.</p>
+</div>
+
+<footer>
+  أُعِدّ آلياً بعد فحص قراءة-فقط لحاويات <span dir="ltr">test.tawanow.com</span> والمسار المحلي — 2026-06-29.
+  لم يُمَس السيرفر ولم يُعدَّل أي ملف محلي.
+</footer>
+
+</div>
+</body>
+</html>

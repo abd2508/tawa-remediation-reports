@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>صقل المنصّة (دفعة 6 · 1/3) — OPS أوسع · تووا</title>
+<style>
+  :root{--g:#0a7d4d;--gd:#075c39;--gl:#e6f4ec;--goldl:#fcf3dd;--red:#b3261e;--ink:#1c2b25;--muted:#5b6b63;--line:#d9e4dd;--bg:#f4f8f5}
+  *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.85;font-size:15.5px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 18px 90px}
+  header.hero{background:linear-gradient(135deg,#7a1212,#b3261e 50%,#075c39);color:#fff;padding:46px 30px;border-radius:0 0 26px 26px}
+  header.hero h1{margin:0 0 9px;font-size:23px;font-weight:800}.badge{display:inline-block;background:rgba(255,255,255,.18);padding:7px 15px;border-radius:30px;font-size:13px;margin-top:13px}
+  .live{background:#16a34a;color:#fff;padding:3px 11px;border-radius:20px;font-size:13px;font-weight:700}
+  h2{color:var(--gd);font-size:19px;margin:32px 0 11px;padding:12px 15px;background:linear-gradient(90deg,var(--gl),transparent);border-radius:12px;display:flex;align-items:center;gap:10px;border-right:5px solid var(--g)}
+  h2 .n{background:var(--g);color:#fff;min-width:32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto}
+  .summary{background:var(--gl);border:1px solid #bfe0cd;border-radius:16px;padding:22px 26px;margin:22px 0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--g);color:#fff;font-weight:700;font-size:13px}
+  .tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:700}.ok{background:var(--gl);color:var(--gd)}
+  .simple{background:#eef6ff;border-right:5px solid #1565c0;border-radius:10px;padding:12px 16px;margin:11px 0}.simple b{color:#1565c0}
+  .danger{background:#fdecea;border-right:5px solid var(--red);border-radius:10px;padding:12px 16px;margin:11px 0}.danger b{color:var(--red)}
+  code{background:#eef3f0;padding:1px 6px;border-radius:5px;font-size:12px;direction:ltr;display:inline-block}ul{margin:6px 0;padding-right:22px}li{margin:5px 0}
+  footer{margin-top:40px;padding-top:18px;border-top:2px solid var(--line);font-size:12.5px;color:var(--muted)}.lead{font-size:16.5px}
+</style></head>
+<body>
+<header class="hero">
+  <h1>🗂️ صقل المنصّة (دفعة 6) — المنطقة 1/3: OPS أوسع</h1>
+  <p>6 تحسينات متنوّعة بدقّة أعلى — تعريب رموز خام + تأكيدات على المال/الصلاحيّات (مع فحصٍ صارم قبل الإضافة)</p>
+  <span class="badge">📅 27 يونيو 2026 · <span class="live">منشورة وحيّة</span> · واجهة فقط · عربيّة أولًا · لا commits · العقود المختومة سليمة · الدفعة 6 · المنطقة 1</span>
+</header>
+<div class="wrap">
+
+<div class="simple"><b>المنهج (دقّة أعلى):</b> فحصتُ كلّ معالِج <b>قبل الإضافة</b> فاكتشفتُ أنّ كثيرًا منها <b>مُبوَّب أصلًا</b> فلم أُكرّره — وركّزتُ على الفجوات الحقيقيّة في صفحات OPS الإداريّة/الماليّة التي لم تُمسّ في الدفعتين 4–5.</div>
+
+<h2><span class="n">①</span> تعريب نوع/حالة استثناء المطابقة</h2>
+<div class="danger"><b>الجذر:</b> <code>OpsReconciliation</code> كان يعرض النوع والحالة خامًا (<code>CASH_UNACCOUNTED / OPEN…</code>). <b>الحلّ:</b> «نقد غير محتسَب · تسوية غير مربوطة · مفتوح/محلول…».</div>
+
+<h2><span class="n">②</span> تعريب حالة الحساب</h2>
+<div class="danger"><b>الجذر:</b> <code>OpsAccountManagement</code> كان يعرض <code>role_status</code> خامًا (<code>ACTIVE/SUSPENDED…</code>). <b>الحلّ:</b> «نشط/موقوف/بانتظار التحقّق…».</div>
+
+<h2><span class="n">③</span> تأكيد تعديل نقاط الولاء (+ إصلاح NaN)</h2>
+<div class="danger"><b>الجذر + عَرَض جانبيّ:</b> التعديل يغيّر رصيد نقاط العميل بنقرة، و<code>Number("abc")</code> كان يُرسِل <b>NaN</b> للخادم. <b>الحلّ:</b> تحقّق عددٍ صحيح غير صفر + تأكيد «تطبيق تعديل ±X نقطة؟».</div>
+
+<h2><span class="n">④</span> تأكيد نشر القيد اليدويّ</h2>
+<div class="danger"><b>الجذر:</b> النشر يكتب قيدًا لا رجعة فيه في الأستاذ (رغم بوّابة التوازن DR=CR). <b>الحلّ:</b> «نشر هذا القيد إلى الأستاذ (المبلغ)؟ لا يمكن التراجع».</div>
+
+<h2><span class="n">⑤</span> تأكيد حلّ استثناء المطابقة</h2>
+<div class="simple"><b>الجذر:</b> «حلّ» يُزيل الفارق من القائمة المفتوحة بنقرة. <b>الحلّ:</b> «وضع علامة محلول؟» — كي لا يُخفي خطأٌ فارقًا حقيقيًّا.</div>
+
+<h2><span class="n">⑥</span> تأكيد منح/سحب صلاحيّة</h2>
+<div class="danger"><b>الجذر:</b> منح/سحب صلاحيّة يغيّر ما يستطيع الحساب فعله — بنقرة. <b>الحلّ:</b> «منح/سحب صلاحيّة «X»؟» (الإرجاع للافتراضيّ يمرّ دون تأكيد).</div>
+
+<h2>تتبّع الجذور + فحص قبل الإضافة + محاكاة (دقّة أعلى)</h2>
+<table>
+<tr><td>فحص قبل الإضافة (لا افتراض) — وفّر تأكيدات زائدة</td><td><b>OpsWalletCredit مُبوَّب أصلًا</b> (مراجعة → خانة confirmed) · <b>OpsFeatureToggles مُبوَّب</b> (نافذة pending + ملاحظة، والمفاتيح المختومة FIN-COR محميّة <code>if(is_sealed)return</code>) · <b>OpsManualJournal فيه بوّابة توازن</b> (أضفتُ التأكيد فوقها لأنّه نشرٌ لا رجعة فيه) ← لم أُكرّر المُبوَّب.</td></tr>
+<tr><td>أعراض جانبية مُمسَكة</td><td>إصلاح <b>NaN</b> في تعديل الولاء (كان يصل للخادم) · تعريب كسر 3 اختبارات تستعلم بالرموز الخام ← حدّثتُها للعربيّة · التأكيدات مشروطة بالإجراء الخطر فقط (منح/سحب لا الإرجاع).</td></tr>
+<tr><td>محاكاة تشغيليّة</td><td>مشغّل يقرأ استثناء/حسابًا → عربيّة مفهومة · يعدّل نقاطًا بقيمة غير رقميّة → يُرفَض · ينشر قيدًا/يحلّ فارقًا/يمنح صلاحيّةً خطأً → تأكيد.</td></tr>
+</table>
+
+<h2>الجودة والحوكمة</h2>
+<table>
+<tr><td>الستّ في الحزمة الحيّة (4 صفحات OPS)</td><td><span class="tag ok">مُثبَت ✓</span></td></tr>
+<tr><td>typecheck · OPS tests (حُدِّثت 3 اختبارات تعريب)</td><td><span class="tag ok">0 · 16 ✓</span></td></tr>
+<tr><td>الخلفية · العقود المختومة</td><td><span class="tag ok">دون تغيير · 25ddf010… · لا commits · site 200</span></td></tr>
+</table>
+
+<div class="summary">
+<h3 style="margin-top:0">خلاصة (دفعة 6 · المنطقة 1 — OPS أوسع)</h3>
+<p class="lead">صارت صفحات OPS الإداريّة/الماليّة عربيّةً ومُحكَمةً ضدّ أخطاء المال والصلاحيّات — دون إثقالٍ زائد (فحصٌ قبل الإضافة). <b>6 تحسينات متنوّعة · واجهة فقط · لا commits.</b></p>
+<p style="font-size:14px;margin-top:8px"><b>التالي مباشرةً:</b> المنطقة 2 (باقي تطبيق السائق) ثمّ المنطقة 3 (باقي بوّابة المزوّد) — 6 لكلٍّ، لإكمال 18.</p>
+</div>
+
+<footer><p><b>التحقّق:</b> 5 علامات عربيّة في الحزمة الحيّة · typecheck 0 · OPS 16/16 · الخلفية دون تغيير · <code>25ddf010…</code> دون تغيير · لا commits · https://test.tawanow.com.</p>
+<p style="margin-top:10px">📄 صقل المنصّة (دفعة 6 · 1/3) — OPS أوسع · <b>تووا</b> · 27 يونيو 2026 · New Folder 10</p></footer>
+</div></body></html>

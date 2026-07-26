@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مسار قرار متتبَّع سطرًا بسطر — من نداء المنصة حتى SystemEvent</title>
+<style>
+  :root{
+    --bg:#0e1014; --card:#161922; --card2:#1b1f2a; --ink:#e9edf4; --muted:#98a2b3;
+    --line:#272c38; --accent:#5b8cff; --accent2:#8b5bff; --green:#34c98a; --amber:#f0b429; --red:#ef5a64;
+    --green-bg:#102a20; --amber-bg:#2a2410; --red-bg:#2a1517; --blue-bg:#10203c; --trace-bg:#0a1426;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI","Tahoma","Noto Naskh Arabic",sans-serif;line-height:1.9;font-size:15.5px}
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 20px 90px}
+  header.cover{background:radial-gradient(1100px 380px at 80% -10%,#27306b 0%,transparent 60%),linear-gradient(135deg,#15193a,#1a1330);border:1px solid var(--line);border-radius:20px;padding:30px 26px;margin-bottom:20px}
+  header.cover h1{margin:0 0 6px;font-size:25px}
+  header.cover .sub{color:#c6cfe0;font-size:15px;margin:6px 0}
+  .chips{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-block;border-radius:999px;padding:4px 13px;font-weight:700;font-size:12.5px;border:1px solid}
+  .chip.b{background:#16264a;color:#9fc0ff;border-color:#2c477e}
+  .chip.g{background:#10301f;color:#74e6ab;border-color:#1d5a3b}
+  .chip.a{background:#2a2410;color:#ffd166;border-color:#5a4a17}
+  .note{border-radius:14px;padding:14px 18px;margin:16px 0;border:1px solid}
+  .note b{display:block;margin-bottom:3px}
+  .n-red{background:var(--red-bg);border-color:#5a2228}
+  .n-green{background:var(--green-bg);border-color:#1c4a38}
+  .n-amber{background:var(--amber-bg);border-color:#5a4a17}
+  .n-blue{background:var(--blue-bg);border-color:#284468}
+  h2{font-size:21px;margin:36px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line);scroll-margin-top:14px}
+  h2 .n{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;width:30px;height:30px;line-height:30px;text-align:center;border-radius:8px;font-size:14px;margin-left:8px}
+  h3{font-size:17px;margin:18px 0 8px;color:#d4dcec}
+  p{margin:9px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:13px 0}
+  code{font-family:"Cascadia Code",monospace;direction:ltr;display:inline-block;background:#0c1019;border:1px solid var(--line);border-radius:5px;padding:0 5px;color:#9fd0ff;font-size:12.5px}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px;background:var(--card);border-radius:12px;overflow:hidden}
+  th,td{padding:9px 11px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#212636;color:#cfd8e8;font-weight:700}
+  tr:last-child td{border-bottom:none}
+  .flow{background:#0c0f16;border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}
+  .fnode{background:#1a2336;border:1px solid #2c3a57;border-radius:10px;padding:9px 13px;margin:0 auto;max-width:680px;text-align:center;font-size:13.5px}
+  .fnode.dec{background:#2a2410;border-color:#5a4a17;color:#ffd166}
+  .fnode.ev{background:#10241c;border-color:#1d5a3b;color:#7fe6b3}
+  .fnode.ai{background:#211543;border-color:#3a2a66;color:#cdb6ff}
+  .farrow{text-align:center;color:var(--accent);font-size:18px;margin:5px 0;font-weight:800}
+  .stepwrap{position:relative;margin:14px 0;padding-right:46px}
+  .stepwrap .sn{position:absolute;right:0;top:2px;width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+  .stepwrap.dec .sn{background:linear-gradient(135deg,#f0b429,#e8821a)}
+  .stepwrap.ev .sn{background:linear-gradient(135deg,#34c98a,#1d8a5f)}
+  .stepwrap h4{margin:0 0 5px;font-size:16px;color:#dde5f2}
+  .trace{background:var(--trace-bg);border:1px solid #1c3358;border-right:3px solid var(--accent);border-radius:8px;padding:7px 12px;margin:7px 0;direction:ltr;text-align:left;font-family:"Cascadia Code",monospace;font-size:12.5px;color:#bcd6ff;overflow-x:auto}
+  .trace .k{color:#7fe6b3}
+  .codeblock{background:#0a0d14;border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin:9px 0;direction:ltr;text-align:left;font-family:"Cascadia Code",monospace;font-size:12px;line-height:1.65;color:#c9d6ea;overflow-x:auto;white-space:pre}
+  .cm{color:#6b7689}.kw{color:#c792ea}.st{color:#c3e88d}.fn{color:#82aaff}.nm{color:#f78c6c}.ln{color:#55617a;user-select:none}
+  .dual{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+  @media(max-width:760px){.dual{grid-template-columns:1fr}}
+  .box{border-radius:11px;padding:12px 14px;border:1px solid;font-size:13.5px}
+  .tech{background:#10141d;border-color:#26405f}.simple{background:#101e16;border-color:#1d5a3b}
+  .box .lbl{font-weight:800;font-size:13px;margin-bottom:5px}.tech .lbl{color:#86b6ff}.simple .lbl{color:#5fe0aa}
+  .foot{margin-top:40px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  a.up{color:#7f93b8;text-decoration:none;font-size:13px}
+  .tic{background:#15102a;border:1px solid #3a2a66;border-right:4px solid var(--accent2);border-radius:10px;padding:12px 15px;margin:10px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="cover">
+  <h1>🧭 مسار قرار متتبَّع سطرًا بسطر — من نداء المنصة حتى كتابة <code style="font-size:18px">SystemEvent</code></h1>
+  <div class="sub">المسار المختار: <b>كشف عدم تطابق موقع GPS عند التحقّق من إثبات التسليم</b> — مسار <b>حقيقي 100%</b> في الكود، ينتهي بكتابة <code>SystemEvent("GPS_DELIVERY_MISMATCH")</code>، ثم <b>يغذّي وكيل المخاطر</b>. كل سطر مربوط بـ <code>ملف:سطر</code> مقروء مباشرةً.</div>
+  <div class="chips">
+    <span class="chip b">Tawa / تووا</span>
+    <span class="chip g">مسار موجود فعلًا (لا مقترح)</span>
+    <span class="chip a">توثيق فقط — لا تنفيذ</span>
+  </div>
+</header>
+
+<div class="note n-red">
+  <b>⛔ لا تنفيذ.</b> هذه الوثيقة <b>تتبّع وتوثيق</b> لكود موجود + تصميم نقطة اتّصال النواة. <b>لا يُبنى ولا يُعدَّل أي شيء إلا بإذن صريح منك.</b> كل ما هو «تصميم/مقترح» مُعلَّم بوضوح ومفصول عن «الموجود فعلًا».
+</div>
+
+<!-- لماذا هذا المسار -->
+<h2 id="why"><span class="n">0</span> لماذا هذا المسار بالذات؟</h2>
+<div class="card">
+<p>اخترتُه لأنه يجمع ثلاثة شروط نادرًا ما تجتمع في مسار واحد، وكلها <b>موجودة فعلًا في الكود</b>:</p>
+<ul>
+<li><b>يبدأ بنداء من المنصة</b> (غرفة العمليات تتحقّق من إثبات تسليم) — نقطة HTTP حقيقية.</li>
+<li><b>يتّخذ قرارًا</b> (المسافة بين موقع السائق وعنوان التسليم > 500 متر).</li>
+<li><b>ينتهي بكتابة <code>SystemEvent</code></b> — ثم <b>يُقرأ هذا الحدث لاحقًا</b> كميزة في وكيل المخاطر (<code>ml_scaffold</code>) → الحلقة تُغلَق.</li>
+</ul>
+<div class="trace"><span class="k">📍 الملف الكامل:</span> backend/app/modules/delivery_proof/proof_router.py (مقروء سطرًا بسطر 1–115)</div>
+</div>
+
+<!-- نظرة عامة -->
+<h2 id="overview"><span class="n">1</span> نظرة عامة على المسار (مخطّط التسلسل)</h2>
+<div class="flow">
+  <div class="fnode">👤 غرفة العمليات (OPS) → <code>POST /delivery-proofs/{id}/validate</code></div>
+  <div class="farrow">▼</div>
+  <div class="fnode">🔐 FastAPI: <code>validate_proof()</code> + حارس الدور <code>require_role(OPS, SUPER_ADMIN)</code></div>
+  <div class="farrow">▼</div>
+  <div class="fnode">📥 تحميل الإثبات <code>_get_pending_proof()</code> (404/422 إن لزم)</div>
+  <div class="farrow">▼</div>
+  <div class="fnode">📐 حساب المسافة <code>_gps_warning()</code> → <code>haversine_meters()</code></div>
+  <div class="farrow">▼</div>
+  <div class="fnode dec">⚖️ القرار: <code>distance_m &gt; 500</code> ؟</div>
+  <div class="farrow">▼ (نعم)</div>
+  <div class="fnode ev">📝 كتابة <code>SystemEvent("GPS_DELIVERY_MISMATCH")</code> → <code>db.commit()</code></div>
+  <div class="farrow">▼ (لاحقًا، عند طلب درجة المخاطر)</div>
+  <div class="fnode ai">🧠 <code>ml_scaffold</code> يقرأ الحدث كميزة <code>gps_mismatches</code> → يخفض درجة الثقة</div>
+</div>
+
+<!-- التتبّع سطرًا بسطر -->
+<h2 id="trace"><span class="n">2</span> التتبّع سطرًا بسطر</h2>
+
+<div class="stepwrap"><div class="sn">1</div>
+  <h4>نداء المنصة + التوجيه + التحقّق من الدور</h4>
+  <div class="trace"><span class="k">📍</span> proof_router.py:22 router(prefix="/delivery-proofs") · :24 _OPS=(OPERATIONS_AGENT, SUPER_ADMIN) · :80 @router.post("/{proof_id}/validate") · :81-85 validate_proof(...)</div>
+  <div class="codeblock"><span class="ln">22 </span>router = APIRouter(prefix=<span class="st">"/delivery-proofs"</span>, …)
+<span class="ln">80 </span><span class="nm">@router.post</span>(<span class="st">"/{proof_id}/validate"</span>)
+<span class="ln">81 </span><span class="kw">async def</span> <span class="fn">validate_proof</span>(
+<span class="ln">82 </span>    proof_id: str,
+<span class="ln">83 </span>    db: AsyncSession = Depends(<span class="fn">get_db</span>),
+<span class="ln">84 </span>    _ctx: UserContext = Depends(<span class="fn">require_role</span>(*_OPS)),   <span class="cm"># OPS/SUPER فقط</span>
+<span class="ln">85 </span>):</div>
+  <div class="dual">
+    <div class="box tech"><div class="lbl">🔧 فنّيًا</div>FastAPI يحلّ التبعيات قبل جسم الدالة: <code>get_db</code> يفتح جلسة، و<code>require_role(*_OPS)</code> يرفض 403 لغير OPS/SUPER. لا منطق ذكاء بعد إلا بعد اجتياز الحارس.</div>
+    <div class="box simple"><div class="lbl">💡 ببساطة</div>المشغّل يضغط «تأكيد الإثبات». النظام أولًا يتأكّد أن له صلاحية، ثم يفتح اتصالًا بقاعدة البيانات.</div>
+  </div>
+</div>
+
+<div class="stepwrap"><div class="sn">2</div>
+  <h4>تحميل الإثبات + حُرّاس الحالة</h4>
+  <div class="trace"><span class="k">📍</span> proof_router.py:86 → _get_pending_proof (:40) · :44-45 404 إن غير موجود · :46-50 422 إن نهائي (VALID/INVALID)</div>
+  <div class="codeblock"><span class="ln">86 </span>    proof = <span class="kw">await</span> <span class="fn">_get_pending_proof</span>(proof_id, db)
+<span class="ln">42 </span>    proof = (… select(DeliveryProof).where(DeliveryProof.id == proof_id) …).first()
+<span class="ln">44 </span>    <span class="kw">if not</span> proof: <span class="kw">raise</span> HTTPException(404, …)
+<span class="ln">46 </span>    <span class="kw">if</span> proof.proof_state <span class="kw">in</span> _TERMINAL: <span class="kw">raise</span> HTTPException(422, …)</div>
+</div>
+
+<div class="stepwrap"><div class="sn">3</div>
+  <h4>جمع المدخلات لحساب القرار (موقع السائق + عنوان التسليم)</h4>
+  <div class="trace"><span class="k">📍</span> proof_router.py:87 → _gps_warning (:54) · :56-57 حارس إحداثيات السائق · :58-65 تحميل Order ثم Address · :66-67 حارس إحداثيات العنوان</div>
+  <div class="codeblock"><span class="ln">56 </span>    <span class="kw">if not</span> (proof.lat <span class="kw">and</span> proof.lng <span class="kw">and</span> proof.lat != 0 <span class="kw">and</span> proof.lng != 0): <span class="kw">return None</span>
+<span class="ln">58 </span>    order = (… Order.id == proof.order_id …).first()
+<span class="ln">61 </span>    <span class="kw">if not</span> order <span class="kw">or not</span> order.address_id: <span class="kw">return None</span>
+<span class="ln">63 </span>    address = (… Address.id == order.address_id …).first()
+<span class="ln">66 </span>    <span class="kw">if not</span> address <span class="kw">or not</span> address.lat <span class="kw">or not</span> address.lng: <span class="kw">return None</span></div>
+  <div class="dual">
+    <div class="box tech"><div class="lbl">🔧 فنّيًا</div>أربعة حُرّاس <code>return None</code> تمنع «إنذارًا كاذبًا» عند نقص الإحداثيات (مصدر بيانات نظيف للذكاء لاحقًا). الحقول: <code>DeliveryProof.lat/lng</code> (dispatch.py:258-259)، <code>Address.lat/lng</code> عبر <code>Order.address_id</code>.</div>
+    <div class="box simple"><div class="lbl">💡 ببساطة</div>قبل الحكم، النظام يتأكّد أن لديه «موقع السائق» و«عنوان الزبون» فعلًا. إن نقص أحدهما، لا يحكم إطلاقًا.</div>
+  </div>
+</div>
+
+<div class="stepwrap dec"><div class="sn">4</div>
+  <h4>⚖️ لحظة القرار — حساب المسافة ومقارنتها بالعتبة</h4>
+  <div class="trace"><span class="k">📍</span> proof_router.py:68-71 haversine_meters (core/geo_service.py:19) · :72 <b>القرار</b>: distance_m &gt; 500 · :73-76 إنذار</div>
+  <div class="codeblock"><span class="ln">68 </span>    distance_m = <span class="fn">haversine_meters</span>(
+<span class="ln">69 </span>        GeoPoint(lat=proof.lat, lng=proof.lng),       <span class="cm"># موقع السائق وقت الإثبات</span>
+<span class="ln">70 </span>        GeoPoint(lat=address.lat, lng=address.lng),   <span class="cm"># عنوان التسليم</span>
+<span class="ln">71 </span>    )
+<span class="ln">72 </span>    <span class="kw">if</span> distance_m &gt; <span class="nm">500</span>:                          <span class="cm"># ← القرار (عتبة ثابتة)</span>
+<span class="ln">73 </span>        <span class="kw">return</span> {<span class="st">"distance_m"</span>: round(distance_m), <span class="st">"message_ar"</span>: <span class="st">"تحذير…"</span>}
+<span class="ln">77 </span>    <span class="kw">return None</span></div>
+  <div class="note n-amber" style="margin:8px 0">
+    <b>هذه هي «نقطة الذكاء» الحالية</b>: قرار بقاعدة ثابتة <code>&gt; 500م</code>. وهنا بالضبط يمكن لاحقًا (تصميم، لا تنفيذ) أن يحلّ محلّها <b>نموذج شذوذ مُتعلَّم</b> من النواة (انظر القسم 5).
+  </div>
+</div>
+
+<div class="stepwrap"><div class="sn">5</div>
+  <h4>تثبيت الإثبات (القرار لا يحجب — تحذير فقط)</h4>
+  <div class="trace"><span class="k">📍</span> proof_router.py:88 proof.proof_state = "VALID" · :89 if gps_warn:</div>
+  <div class="codeblock"><span class="ln">88 </span>    proof.proof_state = <span class="st">"VALID"</span>      <span class="cm"># يُعتمد الإثبات في كل الأحوال (GPS تحذيري)</span>
+<span class="ln">89 </span>    <span class="kw">if</span> gps_warn:                    <span class="cm"># القرار كان إيجابيًا (>500م)</span></div>
+  <div class="dual">
+    <div class="box tech"><div class="lbl">🔧 فنّيًا</div>سياسة المشروع: GPS <b>لا يحجب</b> التسليم (warning-only، موثّق في proof_router.py:6) — يُسجَّل للمراجعة والتعلّم فقط، توافقًا مع «استشاري قبل إلزامي».</div>
+    <div class="box simple"><div class="lbl">💡 ببساطة</div>حتى لو كان السائق بعيدًا، التسليم يُقبل، لكن النظام «يدوّن ملاحظة» للمراجعة لاحقًا — لا يعاقب فورًا.</div>
+  </div>
+</div>
+
+<div class="stepwrap ev"><div class="sn">6</div>
+  <h4>📝 كتابة <code>SystemEvent</code> — كل حقل بالسطر</h4>
+  <div class="trace"><span class="k">📍</span> proof_router.py:92-104 db.add(SystemEvent(...))</div>
+  <div class="codeblock"><span class="ln">92 </span>    db.add(SystemEvent(
+<span class="ln">93 </span>        event_type=<span class="st">"GPS_DELIVERY_MISMATCH"</span>,                 <span class="cm"># نوع الحدث (يقرؤه الذكاء)</span>
+<span class="ln">94 </span>        severity=<span class="st">"WARNING"</span>,
+<span class="ln">95 </span>        actor_user_id=str(proof.driver_id) … ,              <span class="cm"># صاحب السلوك = السائق</span>
+<span class="ln">96 </span>        module=<span class="st">"proof_router"</span>,
+<span class="ln">97 </span>        safe_message=gps_warn[<span class="st">"message_ar"</span>],
+<span class="ln">98 </span>        metadata_json={<span class="st">"distance_m"</span>:…, <span class="st">"proof_id"</span>:…, <span class="st">"order_id"</span>:…},
+<span class="ln">103</span>        created_at=datetime.now(timezone.utc),
+<span class="ln">104</span>    ))</div>
+  <div class="trace"><span class="k">📍 المخطّط:</span> models/infra.py:62 SystemEvent — الحقول: event_type(:69) severity(:70) actor_user_id(:71) module(:75) safe_message(:77) metadata_json(:78) created_at(:79)</div>
+</div>
+
+<div class="stepwrap ev"><div class="sn">7</div>
+  <h4>التثبيت في قاعدة البيانات + الرد</h4>
+  <div class="trace"><span class="k">📍</span> proof_router.py:105 await db.commit() · :106 refresh · :107-110 يبني الرد ويُرفق gps_warning</div>
+  <div class="codeblock"><span class="ln">105</span>    <span class="kw">await</span> db.commit()              <span class="cm"># ← الحدث صار دائمًا في PostgreSQL</span>
+<span class="ln">107</span>    result = <span class="fn">_proof_dict</span>(proof)
+<span class="ln">108</span>    <span class="kw">if</span> gps_warn: result[<span class="st">"gps_warning"</span>] = gps_warn
+<span class="ln">110</span>    <span class="kw">return</span> result</div>
+  <div class="box simple" style="margin-top:6px"><div class="lbl">💡 ببساطة</div>الآن «الملاحظة» محفوظة للأبد في قاعدة البيانات، والمشغّل يرى التحذير في الرد. <b>انتهى نداء واحد كامل: من ضغطة الزر حتى كتابة الحدث.</b></div>
+</div>
+
+<!-- إغلاق الحلقة -->
+<h2 id="loop"><span class="n">3</span> إغلاق الحلقة: كيف يقرأ الذكاء هذا الحدث <a class="up" href="#why">↑</a></h2>
+<p>لاحقًا، عند طلب درجة مخاطر سائق (نقطة <code>/operations/fraud/risk-profile/{user_id}</code>)، يقرأ وكيل المخاطر نفس الحدث:</p>
+<div class="trace"><span class="k">📍</span> ml_scaffold.py:80-86 يَعُدّ أحداث GPS_DELIVERY_MISMATCH لهذا المستخدم في 30 يومًا</div>
+<div class="codeblock"><span class="ln">80 </span>gps_mismatch_count = (… count(SystemEvent)
+<span class="ln">83 </span>    .where(SystemEvent.event_type == <span class="st">"GPS_DELIVERY_MISMATCH"</span>,
+<span class="ln">84 </span>           SystemEvent.actor_user_id == user_id,
+<span class="ln">85 </span>           SystemEvent.created_at >= thirty_days_ago) …)
+<span class="ln">115</span>    gps_mismatches=int(gps_mismatch_count),     <span class="cm"># ← ميزة في متّجه المخاطر</span>
+<span class="ln">163</span>score -= min(gps_mismatches * <span class="nm">8</span>, <span class="nm">24</span>)        <span class="cm"># ← أثر على درجة الثقة</span></div>
+<div class="note n-green"><b>✔ الحلقة كاملة (كلها موجودة فعلًا):</b> نداء المنصة (الخطوة 1) → قرار (4) → كتابة <code>SystemEvent</code> (6) → <b>قراءة الذكاء لها كميزة</b> (ml_scaffold) → خفض درجة الثقة. هذا هو «الوقود» الذي ينتظره residual 322-R02 ليُدرَّب النموذج.</div>
+
+<!-- أين تتّصل النواة -->
+<h2 id="tic"><span class="n">4</span> أين تتّصل نواة الذكاء (TIC) بهذا المسار — <span style="color:#ffd166">تصميم فقط، لا تنفيذ</span> <a class="up" href="#why">↑</a></h2>
+<p>للنواة <b>نقطتا اتّصال</b> بهذا المسار. كلتاهما <b>مقترَح تصميمي</b> لا يُنفَّذ إلا بإذنك:</p>
+
+<div class="tic">
+<b>(أ) النواة كمُستهلِك (الأبسط، بلا تغيير سلوك):</b> الحدث <code>GPS_DELIVERY_MISMATCH</code> يصبح <b>ميزة وبيانات تدريب</b> لوكيل المخاطر — وهو ما يحدث أصلًا في <code>ml_scaffold</code>. النواة فقط تستبدل <code>_compute_score</code> بنموذج مُدرَّب يقرأ نفس الميزة. <b>لا لمس لـ <code>proof_router</code>.</b>
+</div>
+
+<div class="tic">
+<b>(ب) النواة كبديل للعتبة الثابتة (اختياري، أعمق):</b> عند السطر <code>proof_router.py:72</code> (<code>distance_m &gt; 500</code>)، يمكن استبدال القاعدة الثابتة بنداء:
+<div class="codeblock"><span class="cm"># تصميم مقترح فقط — غير منفّذ</span>
+res = <span class="kw">await</span> tic_client.<span class="fn">score_gps_anomaly</span>(driver_id, distance_m, context)
+<span class="kw">if</span> res.is_anomaly:   <span class="cm"># بدل العتبة الجامدة 500، نموذج يتعلّم السياق (منطقة/إشارة)</span>
+    … write SystemEvent (نفس الكتابة الحالية) + engine=res.engine + model_version</div>
+يحترم هذا قاعدة fail-open (قالب <code>sms_provider.py:30</code>): إن غابت النواة، يسقط فورًا للعتبة الثابتة <code>&gt; 500</code> → <b>لا انقطاع</b>.
+</div>
+
+<div class="note n-blue">
+<b>الوسم للتتبّع (التعايش دون تعارض):</b> كل <code>SystemEvent</code> يُكتب بالنواة يحمل في <code>metadata_json</code> الحقول <code>engine</code> + <code>model_version</code> + <code>confidence</code> → تعرف دائمًا «من قرّر» (قاعدة ثابتة أم نموذج داخلي)، والقرار الرقمي يبقى <b>داخليًا حصرًا</b> (لا خارجي في مسار GPS).
+</div>
+
+<!-- جدول التتبّع الكامل -->
+<h2 id="table"><span class="n">5</span> جدول التتبّع الكامل (مرجع سريع) <a class="up" href="#why">↑</a></h2>
+<table>
+<tr><th>#</th><th>ماذا يحدث</th><th>الملف:السطر</th><th>الحالة</th></tr>
+<tr><td>1</td><td>نداء المنصة + التحقّق من الدور</td><td><code>proof_router.py:80-85</code></td><td>موجود</td></tr>
+<tr><td>2</td><td>تحميل الإثبات + حُرّاس الحالة</td><td><code>proof_router.py:40-51, 86</code></td><td>موجود</td></tr>
+<tr><td>3</td><td>جمع الإحداثيات (سائق/عنوان)</td><td><code>proof_router.py:54-67, 87</code></td><td>موجود</td></tr>
+<tr><td>4</td><td>⚖️ القرار: المسافة &gt; 500م</td><td><code>proof_router.py:68-72</code></td><td>موجود</td></tr>
+<tr><td>5</td><td>تثبيت الإثبات (تحذير لا يحجب)</td><td><code>proof_router.py:88-89</code></td><td>موجود</td></tr>
+<tr><td>6</td><td>📝 كتابة SystemEvent</td><td><code>proof_router.py:92-104</code></td><td>موجود</td></tr>
+<tr><td>7</td><td>commit + الرد</td><td><code>proof_router.py:105-110</code></td><td>موجود</td></tr>
+<tr><td>8</td><td>🧠 الذكاء يقرأ الحدث كميزة</td><td><code>ml_scaffold.py:80-86, 115, 163</code></td><td>موجود</td></tr>
+<tr><td>أ</td><td>النواة كمستهلِك (تدريب)</td><td>عند <code>ml_scaffold._compute_score:146</code></td><td><b>تصميم</b></td></tr>
+<tr><td>ب</td><td>النواة كبديل للعتبة 500</td><td>عند <code>proof_router.py:72</code></td><td><b>تصميم</b></td></tr>
+</table>
+
+<div class="note n-red">
+<b>تذكير أخير (كما طلبت):</b> كل ما سبق <b>توثيق وتصميم فقط</b>. <b>التنفيذ: لا تنفيذ إلا بإذن صريح منك.</b> أي بناء = مرحلة مرقّمة (FIN-COR PASS · No-Commit · بدء استشاري · وسم engine/version).
+</div>
+
+<div class="foot">
+  المسار وكل الأسطر من قراءة مباشرة لـ <code>backend/app/modules/delivery_proof/proof_router.py</code> + <code>operations/ml_scaffold.py</code> + <code>models/infra.py</code>. الأسطر دقيقة وقت الكتابة؛ تتبّع بالاسم إن تغيّرت. Tawa / تووا · New Folder 10.
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقرير المفصّل — ⌘K: إكمال لوحة الأوامر ببحث الكيانات</title>
+<style>
+  :root{
+    --green:#1f7a4d; --green-d:#14532d; --amber:#b45309; --gray:#64748b;
+    --bg:#f5f8f6; --card:#fff; --border:#dbe5df; --ink:#16201c; --muted:#566860;
+    --ok:#15803d; --okbg:#e7f6ec; --warnbg:#fef4e4; --err:#b91c1c; --errbg:#fdeceb;
+    --code-bg:#0f1c17; --code-ink:#e6f3ec;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);
+       margin:0;padding:0;line-height:1.85;font-size:15px}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 80px}
+  header.hd{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:18px;
+       padding:30px 30px;box-shadow:0 10px 30px rgba(20,83,45,.20)}
+  header.hd h1{margin:0 0 8px;font-size:25px;line-height:1.45}
+  header.hd .sub{opacity:.93;font-size:15.5px}
+  .pill{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);
+       border-radius:999px;padding:4px 14px;font-size:12.5px;margin:9px 5px 0 0}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin:18px 0}
+  nav.toc strong{color:var(--green-d);display:block;margin-bottom:8px}
+  nav.toc ol{margin:0;padding-inline-start:22px;columns:2;font-size:14px}
+  nav.toc a{color:var(--green);text-decoration:none} nav.toc a:hover{text-decoration:underline}
+  section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin:18px 0;
+       box-shadow:0 2px 9px rgba(20,83,45,.05)}
+  h2{color:var(--green-d);font-size:20px;margin:2px 0 16px;padding-bottom:10px;border-bottom:2px solid #e9f2ec}
+  h3{color:var(--green);font-size:16.5px;margin:20px 0 9px}
+  p{margin:9px 0}
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13.8px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#edf5f0;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafcfb}
+  code,.mono{font-family:"SF Mono",Consolas,monospace;background:#eaf0ed;color:#0f2a1e;
+       padding:1.5px 6px;border-radius:5px;font-size:12.8px;direction:ltr;display:inline-block}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:15px 17px;overflow:auto;
+       font-family:"SF Mono",Consolas,monospace;font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;margin:11px 0}
+  pre .c{color:#7fa890} pre .k{color:#7fb0ff} pre .s{color:#9ee6a8} pre .add{color:#9ee6a8}
+  .ok{color:var(--ok);font-weight:700} .err{color:var(--err);font-weight:700}
+  .badge-ok{background:var(--okbg);color:var(--ok);border:1px solid #bfe6cb;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  .badge-pre{background:#eef2f0;color:var(--gray);border:1px solid #d6ddda;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  .figure{margin:15px 0;border:1px solid var(--border);border-radius:13px;overflow:hidden;background:#fbfdfc}
+  .figure img{display:block;width:100%}
+  .figure .cap{padding:10px 14px;font-size:13px;color:var(--muted);background:#f2f7f4;border-top:1px solid var(--border)}
+  ul.clean{margin:8px 0;padding-inline-start:22px} ul.clean li{margin:6px 0}
+  .kv{display:grid;grid-template-columns:230px 1fr;gap:7px 16px;font-size:14px;margin:9px 0}
+  .kv .k{color:var(--muted)}
+  .note{background:var(--warnbg);border:1px solid #f4d9a8;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .seal{background:var(--okbg);border:1px solid #bfe6cb;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin:10px 0}
+  .flow span{background:#edf5f0;border:1px solid var(--border);border-radius:8px;padding:6px 11px}
+  .flow .arr{background:none;border:none;color:var(--green);font-weight:800}
+  .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:28px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <h1>التقرير المفصّل — ⌘K لوحة أوامر OPS<br>إكمال الجزء الناقص: بحث الكيانات + تعميق الرابط</h1>
+  <div class="sub">الملاحة كانت مبنيّة؛ أُضيف بحث الأشخاص والانتقال المُعمَّق إلى كونسول الكيان</div>
+  <div>
+    <span class="pill">النطاق: tawanow.com</span>
+    <span class="pill">واجهة فقط · بلا تبعيّة</span>
+    <span class="pill">بلا باكند / migration</span>
+    <span class="pill">FIN-COR PASS</span>
+    <span class="pill">9 اختبار لوحة · 36 إجمالي</span>
+    <span class="pill">2026-06-12</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>محتويات التقرير</strong>
+  <ol>
+    <li><a href="#s1">الخلاصة والاكتشاف</a></li>
+    <li><a href="#s2">الفحص المسبق (نقاط الوصل)</a></li>
+    <li><a href="#s3">بحث الأشخاص بالكود</a></li>
+    <li><a href="#s4">تعميق الرابط + قراءة ?q</a></li>
+    <li><a href="#s5">عيب التبويب الذي التقطه التحقّق الحيّ</a></li>
+    <li><a href="#s6">الاختبارات والبوّابة</a></li>
+    <li><a href="#s7">النشر والتحقّق الحيّ بالصور</a></li>
+    <li><a href="#s8">الحالة النهائيّة</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2>① الخلاصة والاكتشاف</h2>
+  <p>
+    اخترتَ «⌘K لوحة أوامر OPS» (تنقّل سريع + بحث كيانات). عند التتبّع تبيّن أنّ
+    <strong>الجزء الملاحيّ مبنيّ مسبقًا</strong> (<code>OpsCommandPalette.tsx</code> لوحة خفيفة <strong>بلا تبعيّة cmdk</strong>،
+    مثبَّتة في <code>Layout.tsx</code>، اختصار ⌘/Ctrl+K، 8 اختبارات، منشورة). الناقص الفعليّ كان
+    <strong>بحث الكيانات</strong>. فأكملته بإضافته لا بإعادة بناء اللوحة (للحفاظ على سلوكها واختباراتها).
+  </p>
+  <div class="kv">
+    <div class="k">قبل</div><div>لوحة ⌘K ملاحيّة فقط (66 صفحة، مفلترة بالدور، تنقّل لوحة المفاتيح)</div>
+    <div class="k">بعد</div><div>+ قسم «أشخاص» (بحث مؤجَّل) + اختيار شخص يعمّق-الرابط لكونسول الكيان مع بحث مسبق</div>
+    <div class="k">النطاق</div><div>واجهة فقط — اللوحة + 3 كونسولات (قراءة <code>?q</code>) · بلا تبعيّة جديدة</div>
+    <div class="k">القلب الماليّ / الترحيل</div><div>لا مساس — <span class="ok">FIN-COR PASS</span> · بلا migration</div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2>② الفحص المسبق — نقاط الوصل</h2>
+  <table>
+    <tr><th>البند</th><th>الحالة المؤكَّدة بالكود</th></tr>
+    <tr><td>اللوحة + الاختصار</td><td><span class="ok">موجودة</span> — <code>OpsCommandPalette.tsx</code> (مثبّتة بـ<code>Layout.tsx</code>، ⌘/Ctrl+K، 8 اختبار)</td></tr>
+    <tr><td>مصدر الملاحة المشترك</td><td><code>OPS_NAV_SECTIONS</code> + <code>canAccessOpsPath</code> (نفس مصدر الشريط الجانبيّ — لا انحراف)</td></tr>
+    <tr><td>واجهة بحث الأشخاص</td><td><code>operationsApi.searchUsers(q, role?)</code> — نفس باكند بحث الكونسولات</td></tr>
+    <tr><td>كونسولات الكيانات</td><td>Customers (بحث ظاهر دائمًا) · Providers/Drivers (تبويبان: معلّقون/بحث) — كلّها <code>handleSearch</code> + <code>searchUsers</code></td></tr>
+    <tr><td>تعميق الرابط</td><td>الكونسولات لم تكن تقرأ <code>?q</code> ⇒ أُضيف</td></tr>
+  </table>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2>③ بحث الأشخاص بالكود (في اللوحة)</h2>
+  <pre><span class="c">// بحث مؤجَّل (300ms، ≥3 أحرف) + حارس ignore يمنع تحديث الحالة بعد الإغلاق/التفكيك</span>
+useEffect(() => {
+  <span class="k">const</span> q = query.trim();
+  <span class="k">if</span> (q.length &lt; 3) { setPeople([]); setSearching(false); <span class="k">return</span>; }
+  <span class="k">let</span> ignore = false; setSearching(true);
+  <span class="k">const</span> timer = setTimeout(<span class="k">async</span> () => {
+    <span class="k">try</span> { <span class="k">const</span> res = <span class="k">await</span> operationsApi.searchUsers(q);
+           <span class="k">if</span> (!ignore) setPeople((res.data <span class="k">as</span> PersonResult[]).slice(0, 6)); }
+    <span class="k">catch</span> { <span class="k">if</span> (!ignore) setPeople([]); }
+    <span class="k">finally</span> { <span class="k">if</span> (!ignore) setSearching(false); }
+  }, 300);
+  <span class="k">return</span> () => { ignore = true; clearTimeout(timer); };
+}, [query]);
+
+<span class="c">// القائمة القابلة للاختيار: الملاحة أوّلًا ثمّ الأشخاص — تنقّل لوحة المفاتيح يشمل الاثنين</span>
+<span class="k">const</span> items = [...navResults, ...people.map(p => ({ kind: <span class="s">"person"</span>, ...p }))];</pre>
+  <p>الـplaceholder صار «ابحث عن صفحة أو شخص… (⌘K)». تظهر الملاحة المفلترة بالدور أوّلًا، ثمّ ترويسة «أشخاص» + صفوف المستخدمين (👤 الاسم · الهاتف · الدور).</p>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2>④ تعميق الرابط + قراءة <code>?q</code></h2>
+  <pre><span class="c">// اختيار شخص → كونسول الدور مع ?q=&lt;phone&gt; (مطابقة دقيقة بالهاتف)</span>
+<span class="k">if</span> (c.kind === <span class="s">"person"</span>)
+  navigate(`/ops/cp/${consoleForRole(c.role)}?q=${encodeURIComponent(c.phone)}`);
+<span class="c">// provider→providers · driver→drivers · else→customers</span></pre>
+  <pre><span class="c">// في كلّ كونسول: قراءة ?q عند التركيب فتُشغّل البحث القائم</span>
+useEffect(() => {
+  <span class="k">const</span> dq = <span class="k">new</span> URLSearchParams(window.location.search).get(<span class="s">"q"</span>);
+  <span class="k">if</span> (dq &amp;&amp; dq.trim().length &gt;= 3) { <span class="add">setPageTab("search");</span> handleSearch(dq.trim()); }
+}, []);</pre>
+  <div class="flow">
+    <span>⌘K</span><span class="arr">←</span>
+    <span>اكتب اسم/هاتف</span><span class="arr">←</span>
+    <span>searchUsers (debounced)</span><span class="arr">←</span>
+    <span>قسم «أشخاص»</span><span class="arr">←</span>
+    <span>اختيار</span><span class="arr">←</span>
+    <span>/ops/cp/{role}?q=phone</span><span class="arr">←</span>
+    <span>الكونسول يبدّل لتبويب البحث + بحث مسبق</span>
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2>⑤ عيب التبويب الذي التقطه التحقّق الحيّ</h2>
+  <div class="note">
+    <strong>التحقّق الحيّ التقط عيبًا لم تلتقطه الاختبارات:</strong> عند تعميق الرابط لـProviders/Drivers، كان الكونسول
+    يبقى على تبويب «⏳ بانتظار الموافقة» الافتراضيّ، فلا يُرى البحث المسبق (الإدخال والنتائج في تبويب «🔍 البحث»).
+    الإصلاح: إضافة <code>setPageTab("search")</code> إلى تأثير قراءة <code>?q</code> في الكونسولين (Customers بحثها ظاهر دائمًا فلا يلزمها). أُعيد البناء والنشر والتحقّق.
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2>⑥ الاختبارات والبوّابة</h2>
+  <table>
+    <tr><th>الفحص</th><th>النتيجة</th></tr>
+    <tr><td>اختبارات اللوحة</td><td><span class="badge-ok">9</span> (8 سابقة + 1 جديد: بحث-أشخاص ⇒ تعميق <code>?q=%2B…</code>)</td></tr>
+    <tr><td>اللوحة + الكونسولات الثلاثة</td><td><span class="badge-ok">36 ناجح</span> (لا تراجع)</td></tr>
+    <tr><td>typecheck (tsc)</td><td><span class="badge-ok">0</span></td></tr>
+    <tr><td>eslint</td><td><span class="badge-ok">0 خطأ · 0 تحذير</span> (أُزيلت <code>eslint-disable</code> غير اللازمة)</td></tr>
+    <tr><td>build</td><td><span class="badge-ok">PASS</span></td></tr>
+    <tr><td>FIN-COR (العقود)</td><td><span class="badge-ok">PASS</span> — واجهة فقط</td></tr>
+  </table>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2>⑦ النشر والتحقّق الحيّ بالصور على tawanow.com</h2>
+  <p>النشر عبر <code>deploy_web.sh</code> (صحّي؛ بلا باكند/migration). ثمّ تحقّق حيّ بحساب OPS:</p>
+  <table>
+    <tr><th>الخطوة</th><th>النتيجة الحيّة</th></tr>
+    <tr><td>⌘/Ctrl+K</td><td>تفتح اللوحة — placeholder «ابحث عن صفحة أو شخص… (⌘K)»</td></tr>
+    <tr><td>الملاحة</td><td>مفلترة بالدور (SUPER يرى كل الأقسام)</td></tr>
+    <tr><td>بحث «21891000»</td><td>قسم <strong>«أشخاص» + 6 مستخدمين حقيقيّين</strong> (عملاء/مزوّدون/مدير النظام)</td></tr>
+    <tr><td>اختيار مزوّد «خالد كازا»</td><td>→ <code>/ops/cp/providers?q=%2B218910000020</code></td></tr>
+    <tr><td>الكونسول بعد التعميق</td><td><strong>تبويب البحث فعّال · الإدخال معبّأ <code>+218910000020</code> · «خالد كازا» في النتائج</strong></td></tr>
+  </table>
+  <div class="figure">
+    <img src="shots_cmdk/palette_people_search.png" alt="لوحة ⌘K مع بحث الأشخاص">
+    <div class="cap">حيّ: لوحة ⌘K — بحث «21891000» يُظهر قسم «أشخاص» بـ 6 مستخدمين حقيقيّين مع أدوارهم.</div>
+  </div>
+  <div class="figure">
+    <img src="shots_cmdk/deeplink_provider_presearched.png" alt="كونسول المزودين بعد التعميق">
+    <div class="cap">حيّ: بعد اختيار المزوّد — <code>/ops/cp/providers?q=…</code> تبويب البحث فعّال والإدخال معبّأ والنتيجة ظاهرة.</div>
+  </div>
+  <div class="seal">
+    ✅ التدفّق كامل حيًّا: ⌘K ← بحث شخص ← اختيار ← تعميق رابط ← كونسول الكيان مبدَّل لتبويب البحث ومُعبّأ مسبقًا بالنتيجة.
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2>⑧ الحالة النهائيّة</h2>
+  <ul class="clean">
+    <li>⌘K مكتملة الآن: <strong>ملاحة (66 صفحة، مفلترة بالدور) + بحث كيانات عميق</strong> — لوحة خفيفة بلا تبعيّة.</li>
+    <li>واجهة فقط · بلا باكند/FIN-COR/migration · بلا commit · رأس المستودع <code>aa29</code>.</li>
+    <li>بهذا تكتمل سلسلة E-series كلّها (E1 جيوفنس · E2 تسوية ثلاثية · E3 مندوب رئيس · E4 طابور KYC بالمخاطر · E5 تحقّق الوثائق · E6 ⌘K).</li>
+  </ul>
+</section>
+
+<div class="foot">
+  تووا — منصّة التوصيل الليبيّة · تقرير ⌘K (إكمال ببحث الكيانات + تعميق الرابط) · 2026-06-12<br>
+  النطاق الحيّ tawanow.com · واجهة فقط · بلا تبعيّة · FIN-COR PASS · بلا migration · بلا commit · رأس المستودع aa29
+</div>
+
+</div>
+</body>
+</html>

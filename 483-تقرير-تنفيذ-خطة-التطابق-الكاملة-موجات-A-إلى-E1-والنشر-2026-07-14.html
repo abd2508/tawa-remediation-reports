@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير 483 — تنفيذ خطة التطابق الكاملة (الموجات A–E1) والمراجعة والنشر</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e; --waveA:#ff2d55; --waveB:#ff9f43; --waveC:#2aa5d8; --waveD:#9b7bd8; --waveE:#e879f9;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.85; margin:0; font-size:16px;}
+  .wrap{max-width:1280px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:1000px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.med .num{color:var(--med)} .stat.ok .num{color:var(--ok)}
+  .stat .lbl{color:var(--muted); font-size:.82rem; margin-top:4px}
+  section{margin:50px 0}
+  h2.sec-title{font-size:1.55rem; border-inline-start:6px solid var(--accent); padding-inline-start:16px; margin-bottom:10px; color:#fff}
+  h2.sec-title.waveA{border-color:var(--waveA)} h2.sec-title.waveB{border-color:var(--waveB)}
+  h2.sec-title.waveC{border-color:var(--waveC)} h2.sec-title.waveD{border-color:var(--waveD)} h2.sec-title.waveE{border-color:var(--waveE)}
+  h3.item-title{font-size:1.25rem; color:#fff; margin:36px 0 6px; padding-inline-start:12px; border-inline-start:3px solid var(--border)}
+  h4.sub-title{font-size:1.02rem; color:var(--accent2); margin:20px 0 8px}
+  p.lead{color:var(--muted); max-width:1000px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card.warn{border-inline-start:5px solid var(--high)}
+  .card.new{border:1.5px solid var(--accent2)}
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+  .card-title{font-size:1.1rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700; white-space:nowrap}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .tag.new{background:rgba(42,165,216,.18); color:var(--accent2); border:1px solid rgba(42,165,216,.5)}
+  .tag.waveA{background:rgba(255,45,85,.15); color:var(--waveA); border:1px solid rgba(255,45,85,.4)}
+  .tag.waveB{background:rgba(255,159,67,.15); color:var(--waveB); border:1px solid rgba(255,159,67,.4)}
+  .tag.waveC{background:rgba(42,165,216,.15); color:var(--waveC); border:1px solid rgba(42,165,216,.4)}
+  .tag.waveD{background:rgba(155,123,216,.15); color:var(--waveD); border:1px solid rgba(155,123,216,.4)}
+  .tag.waveE{background:rgba(232,121,249,.15); color:var(--waveE); border:1px solid rgba(232,121,249,.4)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.78rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.87rem}
+  th,td{border:1px solid var(--border); padding:8px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight.blocker{background:rgba(255,45,85,.07); border-color:rgba(255,45,85,.4)}
+  .insight.new{background:rgba(42,165,216,.07); border-color:rgba(42,165,216,.4)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .insight.blocker h4{color:var(--blocker)}
+  .insight.new h4{color:var(--accent2)}
+  .verdict{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid rgba(55,201,135,.4); border-radius:16px; padding:24px 28px; margin:20px 0}
+  .verdict h3{margin:0 0 10px; color:var(--accent); font-size:1.2rem}
+  .verdict.correction{background:linear-gradient(135deg,#0c1a2a,#1a0c2a); border-color:rgba(42,165,216,.4)}
+  .verdict.correction h3{color:var(--accent2)}
+  .scenario-table td:first-child{white-space:nowrap; font-weight:700; color:var(--accent2)}
+  .scenario-table .sev-crit{color:var(--blocker); font-weight:700}
+  .scenario-table .sev-high{color:var(--high); font-weight:700}
+  .scenario-table .sev-med{color:var(--med)}
+  .scenario-table .sev-low{color:var(--low)}
+  .diagram{background:var(--code-bg); border:1px solid var(--border); border-radius:14px; padding:26px; margin:18px 0; overflow-x:auto}
+  .flow-row{display:flex; align-items:center; gap:0; flex-wrap:nowrap; min-width:max-content}
+  .flow-box{background:var(--panel); border:1.5px solid var(--accent2); border-radius:10px; padding:12px 16px; font-size:.82rem; text-align:center; min-width:130px; color:var(--text)}
+  .flow-box.start{border-color:var(--accent)} .flow-box.end{border-color:var(--ok); background:rgba(55,201,135,.08)}
+  .flow-box.danger{border-color:var(--blocker); background:rgba(255,45,85,.08)}
+  .flow-box.warn{border-color:var(--high); background:rgba(255,159,67,.08)}
+  .flow-arrow{color:var(--muted); font-size:1.3rem; padding:0 10px; flex-shrink:0}
+  .branch-wrap{display:flex; flex-direction:column; gap:14px; margin:14px 0}
+  .branch{display:flex; align-items:center; gap:10px}
+  .branch .cond{font-size:.75rem; color:var(--muted); min-width:200px; text-align:left; direction:ltr}
+  .checklist{list-style:none; padding:0; margin:10px 0}
+  .checklist li{padding:6px 0 6px 0; border-bottom:1px dashed var(--border); display:flex; gap:10px; align-items:flex-start}
+  .checklist li:last-child{border-bottom:none}
+  .check-ok{color:var(--ok); font-weight:900}
+  .check-new{color:var(--accent2); font-weight:900}
+  .check-x{color:var(--muted); font-weight:900}
+  .pipe{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:14px 0}
+  .pipe .step{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px 16px; font-size:.85rem}
+  .pipe .step.ok{border-color:var(--ok); background:rgba(55,201,135,.08)}
+  .pipe .arrow{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>✅ تقرير تنفيذ خطة التطابق الكاملة — من الموجة A حتى E1، ثم المراجعة والنشر</h1>
+  <div class="sub">تنفيذ فعلي كامل للخطة المُوسَّعة (تقريرا 481 و482): كل الموجات (A، B، C، D جزئيًا بقرار موثَّق، E1)، مراجعة دقيقة شاملة قبل النشر كشفت عن عيبين حقيقيين خطيرين لم يظهرا في أي مراجعة سابقة، ثم نشر فعلي على المنصات الأربع (باستثناء بناء تطبيق جوّال جديد — قرار المشغّل الصريح).</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-14</div>
+    <div class="badge">🔁 <b>يُنفِّذ:</b> تقارير 480–482 (التدقيق والخطط)</div>
+    <div class="badge">🚀 <b>الحالة:</b> منشور على GitHub + test1 + test2 + Production (باك-إند)</div>
+  </div>
+</header>
+
+<div class="stats-grid">
+  <div class="stat"><div class="num">11</div><div class="lbl">التزامات (commits) خلال الجلسة</div></div>
+  <div class="stat ok"><div class="num">9</div><div class="lbl">موجات مُنفَّذة كاملة أو جزئيًا بقرار موثَّق</div></div>
+  <div class="stat blocker"><div class="num">4</div><div class="lbl">عيوب حقيقية مكتشَفة أثناء البناء والمراجعة</div></div>
+  <div class="stat ok"><div class="num">4/4</div><div class="lbl">منصّات النشر (GitHub+test1+test2+Production)</div></div>
+  <div class="stat"><div class="num">2083</div><div class="lbl">وحدة (module) بُنيت بنجاح في اختبار التجميع النهائي</div></div>
+</div>
+
+<nav class="toc">
+  <b>فهرس التقرير</b>
+  <ul>
+    <li><a href="#simple">ملخّص بلغة بسيطة — ماذا تغيّر فعليًّا؟</a></li>
+    <li><a href="#waveA">الموجة A — الامتثال وتحكّم الوصول</a></li>
+    <li><a href="#waveB">الموجة B — تجارة العميل الأساسية</a></li>
+    <li><a href="#waveC">الموجة C — سلامة وتشغيل السائق</a></li>
+    <li><a href="#waveD">الموجة D — إثراءات ثانوية (تنفيذ جزئي مقصود)</a></li>
+    <li><a href="#waveE">الموجة E — البنية التحتية الداعمة</a></li>
+    <li><a href="#bugs">🐞 العيوب الحقيقية المكتشَفة أثناء البناء والمراجعة</a></li>
+    <li><a href="#deploy">🚀 النشر على المنصّات الأربع</a></li>
+    <li><a href="#deferred">📌 ما تم تأجيله عمدًا ولماذا</a></li>
+    <li><a href="#verify">🧪 التحقّق والاختبار</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================ -->
+<section id="simple">
+  <h2 class="sec-title" style="border-color:var(--accent2)">📖 ملخّص بلغة بسيطة — ماذا تغيّر فعليًّا؟</h2>
+  <div class="card">
+    <p>تطبيق الجوّال (React Native) كان به فجوات حقيقية مقارنة بموقع الويب — بعضها يمنع العميل من طلب صنف بحجم معيّن، وبعضها يترك السائق عالقًا بلا حلّ في موقف حقيقي، وبعضها أمني/امتثالي (من يرى ماذا). خلال هذه الجلسة:</p>
+    <ul class="checklist">
+      <li><span class="check-ok">✔</span> <b>السلّة أصبحت "ذكية":</b> يمكن للعميل الآن اختيار حجم الصنف وإضافاته (مثل "برغر كبير بدون جبنة")، بدل صنف واحد بسعر ثابت فقط.</li>
+      <li><span class="check-ok">✔</span> <b>الدفع أصبح أغنى:</b> دفع مُجزَّأ (جزء نقدًا وجزء من المحفظة)، إكراميّة اختيارية للسائق، جدولة الطلب لوقت لاحق، واستلام ذاتي من المتجر بدل التوصيل.</li>
+      <li><span class="check-ok">✔</span> <b>تتبّع الطلب أصبح تفاعليًّا:</b> زر إلغاء (عندما يكون مسموحًا فقط)، تقييم المتجر والسائق بعد التسليم، ومحادثة مباشرة بين العميل والسائق أثناء التوصيل.</li>
+      <li><span class="check-ok">✔</span> <b>سلامة السائق:</b> زر استغاثة (SOS)، مشاركة موقع الرحلة مع أحد الأقارب برابط، الإبلاغ عن تأخير، التحقّق من رمز التسليم، وحلّ حقيقي لموقف "العميل لا يملك كامل المبلغ نقدًا" — كان هذا الموقف يُوقِف السائق تمامًا بلا أي طريقة للمتابعة.</li>
+      <li><span class="check-ok">✔</span> <b>صلاحيات الموظّفين:</b> موظّف المتجر يرى فقط الأزرار المسموح له بها فعليًّا (لا كل الأزرار كما كان)، ويملك شاشة "صلاحياتي" ليعرف ماذا يملك تحديدًا.</li>
+      <li><span class="check-ok">✔</span> <b>مزوّد الاستلام الذاتي/التوصيل الذاتي:</b> كان بلا أي طريقة لإغلاق الطلب من التطبيق إطلاقًا — أُصلح بالكامل.</li>
+    </ul>
+    <p style="margin-top:16px">وفي أثناء البناء نفسه، ظهرت <b>4 أعطال حقيقية كانت ستمنع الطلب الحقيقي من إتمام رحلته</b> (تفصيلها في القسم المخصّص أدناه) — لم تكن معروفة من قبل، واكتُشفت فقط لأن الكود الفعلي أُعيد كتابته وقُورِن سطرًا بسطر مع الباك-إند الحقيقي، لا افتراضًا نظريًّا.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="waveA">
+  <h2 class="sec-title waveA">🔴 الموجة A — الامتثال وتحكّم الوصول</h2>
+  <div class="tag-row"><span class="tag ok">مُنفَّذة بالكامل</span><span class="tag audit">2 التزام</span></div>
+  <table>
+    <tr><th>البند</th><th>ماذا يعني عمليًّا</th><th>الحالة</th></tr>
+    <tr><td>A1 — بوّابة حالة الحساب</td><td>سائق/مزوّد "قيد المراجعة" أو "مرفوض" يرى شاشة توضيحية بدل تطبيق عادي مضلِّل</td><td><span class="tag ok">✔</span></td></tr>
+    <tr><td>A2 — سبب الرفض</td><td>الحساب المرفوض يرى <i>لماذا</i> رُفض، لا مجرد "مرفوض" بلا تفسير — احتاج endpoint باك-إند جديد</td><td><span class="tag ok">✔</span></td></tr>
+    <tr><td>A3 — بوّابة الصلاحيات</td><td>موظّف المتجر يرى فقط أزرار القبول/الرفض/التحضير التي يملك صلاحيتها فعليًّا</td><td><span class="tag ok">✔</span></td></tr>
+    <tr><td>A4 — إغلاق الاستلام/التوصيل الذاتي</td><td>مزوّد بنمط استلام ذاتي أو توصيل ذاتي يمكنه الآن إغلاق الطلب من التطبيق</td><td><span class="tag ok">✔</span></td></tr>
+  </table>
+  <div class="insight blocker">
+    <h4>عطل حقيقي مُكتشَف أثناء A2</h4>
+    اختبارات الميزة الجديدة كشفت أن <b>تسجيل الدخول بكلمة المرور</b> (لا برمز OTP) كان يفقد حالة "مرفوض" تمامًا ويُعيد الحساب كأنه نشط عادي — عطل أمني/امتثالي حقيقي كان موجودًا من قبل، لم تكشفه أي مراجعة سابقة. أُصلح في <code>registration_router.py</code> وأُضيفت اختبارات خاصة تمنع تكراره.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="waveB">
+  <h2 class="sec-title waveB">🟠 الموجة B — تجارة العميل الأساسية</h2>
+  <div class="tag-row"><span class="tag ok">مُنفَّذة بالكامل</span><span class="tag audit">4 التزامات</span></div>
+
+  <h3 class="item-title">B1 — تخصيص الأصناف (Variants/Modifiers)</h3>
+  <p>أُعيد بناء مفتاح سطر السلّة بالكامل من <code>itemId</code> وحده إلى مفتاح مركّب (صنف + حجم + إضافات + سعر) — الآن "برغر كبير بدون جبنة" و"برغر عادي بصلصة حارة" سطران منفصلان في نفس السلّة، لا يتصادمان. تمّت هجرة بيانات السلّة القديمة المحفوظة على الجهاز بلا فقدان أي بيانات (اختبار وحدة مخصَّص يحاكي بيانات حقيقية قديمة).</p>
+
+  <h3 class="item-title">B2 — إثراء الدفع</h3>
+  <p>دفع مُجزَّأ (نقد+محفظة)، إكراميّة، جدولة لوقت لاحق (عبر أزرار جاهزة بدل منتقي تاريخ/وقت — قرار مقصود لتفادي مكتبة جديدة عالية الخطورة)، بوّابة تحقّق OTP للطلبات النقدية عالية القيمة.</p>
+
+  <h3 class="item-title">B3 — إثراء تتبّع الطلب</h3>
+  <p>زر إلغاء (فقط عندما يسمح الخادم فعليًّا)، تقييم المتجر والسائق بعد التسليم. <b>ملاحظة:</b> التتبّع الحيّ نفسه (SSE + استقصاء احتياطي) تبيّن أنه <u>مبني بالفعل ويعمل بشكل صحيح</u> من عمل سابق — الفرضية الأولية بغيابه كانت غير دقيقة.</p>
+
+  <h3 class="item-title">B4 — محادثة داخل الطلب</h3>
+  <p>محادثة مباشرة بين العميل والسائق أثناء التوصيل فقط (تختفي بعد التسليم تلقائيًّا)، بمكوّن مشترك يُعاد استخدامه في تطبيق السائق أيضًا.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="waveC">
+  <h2 class="sec-title waveC">🔵 الموجة C — سلامة وتشغيل السائق</h2>
+  <div class="tag-row"><span class="tag ok">مُنفَّذة بالكامل (C1–C5)</span><span class="tag audit">1 التزام</span></div>
+  <table>
+    <tr><th>البند</th><th>ماذا يعني عمليًّا</th></tr>
+    <tr><td>C1 — SOS/استغاثة</td><td>زر أحمر واحد، للعميل والسائق كليهما، يصل فورًا لفريق العمليات — لا يتوقّف حتى لو فشل تحديد الموقع</td></tr>
+    <tr><td>C2 — مشاركة الرحلة</td><td>رابط عام (بلا تسجيل دخول) يمكن مشاركته مع قريب ليتابع موقع السائق مباشرة، صالح لمدة محدودة</td></tr>
+    <tr><td>C3 — إشعار تأخير</td><td>السائق يُبلغ العميل بسبب التأخير ومدّته التقريبية</td></tr>
+    <tr><td>C4 — التحقّق من رمز التسليم</td><td>العميل يرى رمزًا من 4 أرقام، يعطيه للسائق عند التسليم — طبقة أمان إضافية اختيارية</td></tr>
+    <tr><td>C5 — استثناء نقدي</td><td><b>الأهم عمليًّا:</b> عندما لا يستطيع العميل الدفع كامل المبلغ نقدًا (لا يملك المبلغ / دفع جزئيًّا / لا توجد فكّة)، يستطيع السائق الآن تسجيل ذلك والمتابعة بدل التوقّف الكامل بلا حلّ</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="waveD">
+  <h2 class="sec-title waveD">🟣 الموجة D — إثراءات ثانوية (تنفيذ جزئي مقصود)</h2>
+  <div class="tag-row"><span class="tag new">3 من ~14 بندًا</span><span class="tag audit">1 التزام</span></div>
+  <p class="lead">هذه الموجة كانت مُصنَّفة أصلًا بأدنى أولوية في الخطة ("🟡 لاحقًا"، بعد كل الموجات الحرجة والعالية). نُفِّذت 3 مكاسب حقيقية منخفضة المخاطر وعالية القيمة، وتُرِك الباقي موثَّقًا بوضوح (انظر قسم "ما تم تأجيله").</p>
+  <ul class="checklist">
+    <li><span class="check-ok">✔</span> <b>زر رفض العرض للسائق:</b> كانت الواجهة الخلفية تدعمه بالكامل، فقط الزر كان غائبًا — إصلاح سريع منخفض المخاطر</li>
+    <li><span class="check-ok">✔</span> <b>شاشة "صلاحياتي":</b> موظّف المتجر يرى الآن قائمة صلاحياته الممنوحة فعليًّا، ومن منحها ومتى — كانت غائبة تمامًا (مُصنَّفة 🔴 في التدقيق الأصلي، لا مجرد تجميلية)</li>
+    <li><span class="check-ok">✔</span> <b>إخفاء زر تحويل المحفظة عند إيقافه:</b> الميزة موقوفة حاليًا على مستوى المنصّة (راية أمان)، وكان الزر يظهر رغم ذلك</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="waveE">
+  <h2 class="sec-title waveE">🩷 الموجة E — البنية التحتية الداعمة</h2>
+  <div class="tag-row"><span class="tag ok">مُنفَّذة بالكامل</span><span class="tag audit">1 التزام</span></div>
+  <div class="diagram">
+    <div class="flow-row">
+      <div class="flow-box start">إقلاع التطبيق</div><div class="flow-arrow">←</div>
+      <div class="flow-box">فحص الإصدار من الخادم</div>
+    </div>
+    <div class="branch-wrap" style="margin-top:14px">
+      <div class="branch"><div class="cond">إصدار قديم جدًا (force_update)</div><div class="flow-arrow">→</div><div class="flow-box danger">شاشة "يلزم التحديث" — رابط المتجر، بلا تجاوز</div></div>
+      <div class="branch"><div class="cond">أي خطأ شبكة/خادم</div><div class="flow-arrow">→</div><div class="flow-box end">التطبيق الطبيعي (فشل-آمن، لا حجب أبدًا)</div></div>
+    </div>
+  </div>
+  <p>الباك-إند كان يملك هذه الآلية جاهزة تمامًا منذ فترة طويلة، لكن لا تطبيق جوّال كان يستهلكها إطلاقًا. الآن مبنية وموصولة، بتصميم "فشل-آمن" صريح — أي عطل في الفحص نفسه لا يحجب التطبيق عن مستخدم شرعي.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="bugs">
+  <h2 class="sec-title" style="border-color:var(--blocker)">🐞 العيوب الحقيقية المكتشَفة أثناء البناء والمراجعة</h2>
+  <p class="lead">أربعة أعطال حقيقية — لم تكن معروفة قبل هذه الجلسة، ولم تظهر في أي من تقارير التدقيق أو الخطط السابقة (480–482) — اكتُشفت فقط عبر إعادة كتابة الكود الفعلي ومقارنته سطرًا بسطر مع الباك-إند الحقيقي، ومراجعة إضافية بعد اكتمال كل الموجات تتبّعت التفاعل <i>بين</i> الموجات لا كل موجة بمعزل عن الأخرى.</p>
+
+  <h3 class="item-title">1 — كل طلب حقيقي (غير تجريبي) كان يفشل فورًا</h3>
+  <div class="tag-row"><span class="tag blocker">حرج جدًا</span><span class="tag waveB">اكتُشف أثناء B1</span></div>
+  <div class="insight blocker">
+    <h4>ماذا حدث</h4>
+    عند إرسال الطلب للخادم الحقيقي، كان التطبيق يرسل اسم حقل خاطئ (<code>item_id</code> بدل <code>catalog_item_id</code>) — الخادم يرفض الحقل الناقص فورًا. <b>هذا يعني أن الدفع الحقيقي (غير وضع العرض التجريبي) لم يكن يعمل إطلاقًا لأي عميل</b>، ولم يظهر من قبل لأن التطبيق يُختبَر عادة في وضع العرض التجريبي فقط.
+  </div>
+  <p><b>الإصلاح:</b> تصحيح اسم الحقل + إضافة الحقول الجديدة (الحجم، الإضافات) بالصيغة الصحيحة تمامًا.</p>
+
+  <h3 class="item-title">2 — ملاحظات التوصيل المكتوبة كانت تُفشِل الطلب أيضًا</h3>
+  <div class="tag-row"><span class="tag blocker">حرج</span><span class="tag waveB">اكتُشف أثناء B2</span></div>
+  <p>حقل الملاحظات كان يُرسَل كنصّ حرّ، لكن الخادم يتوقّع بنية مختلفة تمامًا لهذا الحقل تحديدًا — أي عميل يكتب أي ملاحظة توصيل كان طلبه سيُرفَض. الحقل الصحيح للنصّ الحرّ اسمه مختلف تمامًا، واستُخدِم بدلًا منه.</p>
+
+  <h3 class="item-title">3 — طلبات الدفع المُجزَّأ كانت ستُترَك عالقة للأبد بلا حلّ للسائق</h3>
+  <div class="tag-row"><span class="tag blocker">حرج جدًا</span><span class="tag audit">اكتُشف في المراجعة النهائية، بعد ربط موجتين مختلفتين</span></div>
+  <div class="insight blocker">
+    <h4>ماذا حدث</h4>
+    ميزة الدفع المُجزَّأ (نقد+محفظة) الجديدة تجعل الخادم يُسجّل نوع دفع جديد اسمه "مُجزَّأ" — لكن شاشة السائق كانت تتحقّق فقط من "نقدًا بالكامل" لتقرير هل يحتاج تحصيل نقد أم لا. <b>أي طلب دفع مُجزَّأ حقيقي كان سيصل للسائق بلا أي خطوة تحصيل نقد ظاهرة على الإطلاق، ثم يفشل الإغلاق النهائي للطلب للأبد بلا أي طريقة مرئية للسائق لحلّ المشكلة</b> — كانت ميزة الدفع المُجزَّأ الجديدة نفسها ستجعل كل طلب يستخدمها غير قابل للتسليم عمليًّا.
+  </div>
+  <p><b>الإصلاح:</b> شاشة السائق أصبحت تتعرّف على طريقة الدفع "مُجزَّأ" أيضًا، فتظهر خطوة تحصيل النقد (وخيار الاستثناء النقدي من الموجة C إن لزم) بشكل طبيعي تمامًا.</p>
+
+  <h3 class="item-title">4 — سيناريو نادر لكنه حقيقي: انقطاع الشبكة بعد تأكيد OTP مباشرة</h3>
+  <div class="tag-row"><span class="tag med">متوسط، نادر</span><span class="tag audit">اكتُشف في المراجعة النهائية</span></div>
+  <p>إن انقطعت شبكة الإنترنت في اللحظة الدقيقة بين نجاح تأكيد رمز التحقّق وإرسال الطلب فعليًّا، كان التطبيق سيحفظ الطلب لإعادة الإرسال التلقائي لاحقًا — لكن رمز التأكيد نفسه ينتهي خلال دقائق، فيفشل الطلب للأبد بصمت عند إعادة الإرسال. الآن يظهر للعميل رسالة صريحة تطلب إعادة المحاولة يدويًّا في هذه الحالة تحديدًا، بدل وعد كاذب بالإرسال التلقائي.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="deploy">
+  <h2 class="sec-title" style="border-color:var(--accent2)">🚀 النشر على المنصّات الأربع</h2>
+  <p class="lead">بقرار صريح من المشغّل: النشر شمل الباك-إند (كود بايثون) + الكود المصدري لتطبيق الجوّال (بلا بناء ملف APK جديد الآن). التتابع: GitHub أولًا (الأقل خطورة)، ثم test1، ثم test2، ثم Production أخيرًا.</p>
+
+  <div class="pipe">
+    <div class="step ok">1. GitHub — دفع الفرع</div><div class="arrow">←</div>
+    <div class="step ok">2. test1 (محلي)</div><div class="arrow">←</div>
+    <div class="step ok">3. test2 (شبكة محلية)</div><div class="arrow">←</div>
+    <div class="step ok">4. Production (الخادم الحيّ)</div>
+  </div>
+
+  <h3 class="item-title">عطل بنية تحتية اكتُشف أثناء النشر على Production</h3>
+  <div class="tag-row"><span class="tag blocker">حرج، مُصلَح فورًا</span></div>
+  <div class="insight blocker">
+    <h4>ماذا حدث</h4>
+    خطوة ترحيل قاعدة البيانات (migrate) على الخادم الحيّ فشلت في البداية — كانت تبحث عن ملفات في مسار خاطئ بسبب إعداد قديم في ملف تشغيل الحاويات لم يُنقَل مع بقية الكود (لأنه يعيش خارج مجلد الباك-إند مباشرة). أُصلح فورًا بمزامنة الملف الصحيح، وأُعيدت المحاولة بنجاح تام.
+  </div>
+
+  <h3 class="item-title">هجرات قاعدة البيانات المُطبَّقة على Production</h3>
+  <p>4 هجرات إضافية بالكامل (جداول جديدة + قيود تحقّق + فهارس بحث) — لا حذف ولا تعديل هدّام على أي بيانات موجودة. طُبِّقت فقط بعد تفويض صريح إضافي من المشغّل خصّيصًا لهذه الخطوة (تُعامَل هجرات قاعدة بيانات الإنتاج دائمًا كخطوة منفصلة تحتاج إذنًا صريحًا، بصرف النظر عن مدى أمان الهجرة نفسها).</p>
+
+  <h3 class="item-title">التحقّق بعد النشر</h3>
+  <ul class="checklist">
+    <li><span class="check-ok">✔</span> كل الحاويات الأربع (test1، test2، Production، وحاويات قاعدة البيانات المصاحبة) سليمة وتعمل (healthy)</li>
+    <li><span class="check-ok">✔</span> فحص مباشر لنقطة النهاية الجديدة (فحص الإصدار) على Production — استجابة صحيحة تمامًا</li>
+    <li><span class="check-ok">✔</span> لم يُلمَس تطبيق الويب (واجهة العملاء والمزوّدين على الموقع) إطلاقًا — النشر كان محصورًا في الباك-إند فقط كما طُلب</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="deferred">
+  <h2 class="sec-title" style="border-color:var(--muted)">📌 ما تم تأجيله عمدًا ولماذا</h2>
+  <p class="lead">قرارات نطاق واعية، لا نسيان — كل بند هنا كان اختيارًا مدروسًا بين قيمة الميزة ومخاطر بنائها الآن.</p>
+  <table>
+    <tr><th>البند</th><th>السبب</th></tr>
+    <tr><td>مسح رمز QR (تحويل المحفظة، إثبات تسليم بديل)</td><td>يحتاج مكتبة كاميرا جديدة كليًّا — مخاطرة بناء غير مبرَّرة في هذه الجولة</td></tr>
+    <tr><td>إثبات تسليم بالتوقيع اليدوي</td><td>يحتاج مكتبة رسم/توقيع جديدة — نفس المنطق</td></tr>
+    <tr><td>منتقي تاريخ/وقت حقيقي للجدولة (بدل الأزرار الجاهزة)</td><td>React Native لا يملك منتقيًا مدمجًا؛ الحل البديل (أزرار جاهزة) يحقّق نفس الهدف الوظيفي بمخاطرة أقل بكثير</td></tr>
+    <tr><td>خريطة حيّة لموقع السائق داخل شاشة التتبّع</td><td>ميزة كبيرة قائمة بذاتها تحتاج مكتبة خرائط جديدة</td></tr>
+    <tr><td>~11 بندًا متبقيًا من الموجة D (تصدير CSV، لوحة تشغيل موحّدة للمزوّد، إحصائيات ملخّصة، إلخ)</td><td>كانت مُصنَّفة أصلًا كأدنى أولوية في الخطة ("لاحقًا")؛ 3 بنود عالية القيمة ومنخفضة المخاطر منها نُفِّذت بالفعل</td></tr>
+    <tr><td>زر نزاع (dispute) من شاشة التتبّع</td><td>لم يكن ضمن النطاق التقني الصريح المحدَّد في الخطة المُعتمَدة</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="verify">
+  <h2 class="sec-title" style="border-color:var(--ok)">🧪 التحقّق والاختبار</h2>
+  <ul class="checklist">
+    <li><span class="check-ok">✔</span> فحص الأنواع (TypeScript) نظيف تمامًا بعد كل التزام</li>
+    <li><span class="check-ok">✔</span> فحص جودة الكود (lint) نظيف تمامًا</li>
+    <li><span class="check-ok">✔</span> 41 اختبارًا آليًّا لتطبيق الجوّال، كلها ناجحة (كانت 32 قبل هذه الجلسة — أُضيفت اختبارات جديدة للميزات الحسّاسة كمفتاح سطر السلّة)</li>
+    <li><span class="check-ok">✔</span> بناء تجميعي فعلي كامل للتطبيق (2083 وحدة) نجح بلا أي خطأ — تأكيد أن التطبيق يعمل فعليًّا لا فقط أن الكود "يُقرَأ" بشكل صحيح</li>
+    <li><span class="check-ok">✔</span> إعادة تشغيل اختبارات الباك-إند المرتبطة مباشرة بالتغييرات (88 اختبارًا) بعد دمج عمل جلسة موازية على نفس الفرع — كلها ناجحة</li>
+    <li><span class="check-ok">✔</span> التحقّق من عدم تغيّر بصمات ملفات الأمان المالي الحسّاسة (رايات الميزات وبوّابات الإطلاق) طوال الجلسة</li>
+  </ul>
+</section>
+
+<footer>
+  تقرير 483 — تنفيذ خطة التطابق الكاملة والمراجعة والنشر · تووا (Tawa) Libya Delivery Platform · 2026-07-14
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>

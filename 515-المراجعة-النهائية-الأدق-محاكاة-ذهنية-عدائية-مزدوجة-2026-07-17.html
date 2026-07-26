@@ -1,0 +1,634 @@
+<meta charset="utf-8">
+<title>المراجعة النهائية الأدق — محاكاة عدائية مزدوجة (Codex + وكلاء فحص) — تقرير 515</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 78ch; color: var(--ink); }
+  p.lead { font-size: 1.06rem; color: var(--ink-muted); max-width: 68ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.86em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "⚔️"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1040px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.95rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 30ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 70ch; font-size: 1.04rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.65rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.76rem; color: rgba(255,255,255,0.78); }
+
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.78rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+
+  section { margin: 54px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 1rem; color: var(--ink-muted); max-width: 76ch; margin-bottom: 24px; }
+
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.95rem; max-width: 66ch; }
+  .plain b { color: var(--accent-deep); }
+
+  .analogy { background: var(--accent-2-tint); border: 1px dashed var(--accent-2); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; }
+  .analogy .k { font-size: 0.76rem; font-weight: 800; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .analogy p { margin: 0; font-size: 0.92rem; color: var(--ink); max-width: 66ch; }
+
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.95rem; max-width: 68ch; }
+  .warn-box b { color: var(--warn-ink); }
+
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.95rem; max-width: 68ch; }
+  .crit-box b { color: var(--crit-ink); }
+
+  .pipeline { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 8px 4px 16px; }
+  .pl-stage { flex: 0 0 auto; min-width: 118px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px; }
+  .pl-node { width: 52px; height: 52px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; background: var(--surface); border: 2px solid var(--ok-border); box-shadow: var(--shadow); color: var(--ok-ink); margin-bottom: 8px; }
+  .pl-node.stop { border-color: var(--crit-border); color: var(--crit-ink); background: var(--crit-bg); }
+  .pl-node.pending { border-color: var(--warn-border); color: var(--warn-ink); background: var(--warn-bg); }
+  .pl-stage .t { font-size: 0.8rem; font-weight: 700; color: var(--ink); }
+  .pl-stage .d { font-size: 0.7rem; color: var(--ink-faint); margin-top: 2px; max-width: 130px; }
+  .pl-arrow { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 26px; margin-top: -26px; }
+  .pl-arrow svg { width: 22px; height: 12px; }
+  .pl-arrow path { stroke: var(--ok-border); stroke-width: 2.5; fill: none; }
+
+  .vflow { display: flex; flex-direction: column; gap: 0; margin: 18px 0; padding: 20px; background: var(--surface-2); border: 1px dashed var(--border); border-radius: var(--radius); }
+  .vf-step { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 18px; box-shadow: var(--shadow); }
+  .vf-step b { display: block; font-size: 0.95rem; margin-bottom: 2px; }
+  .vf-step span.d { color: var(--ink-faint); font-size: 0.82rem; }
+  .vf-step.ok { border-color: var(--ok-border); }
+  .vf-step.stop { border-color: var(--crit-border); background: var(--crit-bg); }
+  .vf-step.stop b { color: var(--crit-ink); }
+  .vf-step.pending { border-style: dashed; background: transparent; color: var(--ink-faint); box-shadow: none; }
+  .vf-arrow { align-self: center; color: var(--ink-faint); font-size: 1.1rem; padding: 4px 0; }
+
+  .feature { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 22px 24px; margin-bottom: 26px; }
+  .feature .fhead { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+  .feature .fnum { font-family: var(--font-display); font-weight: 800; font-size: 0.76rem; background: var(--accent-tint); color: var(--accent-deep); border-radius: 999px; padding: 3px 12px; }
+  .feature h3 { font-size: 1.08rem; margin: 0; }
+  .feature .simple-answer { color: var(--ink-muted); font-size: 0.92rem; margin: 10px 0 4px; }
+
+  .phase-head { display: flex; align-items: center; gap: 10px; margin: 40px 0 16px; }
+  .phase-head .pnum { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex: 0 0 auto; }
+  .phase-head h3 { margin: 0; font-size: 1.15rem; }
+  .phase-head .pdesc { color: var(--ink-faint); font-size: 0.82rem; }
+
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 8px; display: flex; align-items: center; gap: 6px; }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+
+  ol.steps { margin: 10px 0; padding-inline-start: 22px; }
+  ol.steps li { margin-bottom: 9px; color: var(--ink); font-size: 0.92rem; }
+  ol.steps li b { color: var(--accent-deep); }
+  ul.simple-list { margin: 10px 0; padding-inline-start: 22px; }
+  ul.simple-list li { margin-bottom: 8px; color: var(--ink-muted); font-size: 0.92rem; }
+  ul.simple-list li b { color: var(--ink); }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; min-width: 560px; }
+  thead th { text-align: right; font-family: var(--font-display); font-weight: 700; background: var(--surface-2); color: var(--ink-muted); font-size: 0.71rem; letter-spacing: 0.03em; padding: 10px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.mono { font-family: var(--font-mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; }
+  td.center { text-align: center; }
+  td.scenario { font-weight: 600; }
+  td.mitigation { color: var(--ink-muted); }
+
+  .evidence-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin: 14px 0; font-size: 0.85rem; }
+  .evidence-box .k { font-weight: 800; color: var(--accent-deep); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+  .evidence-box .row { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+  .evidence-box .row:last-child { border-bottom: none; }
+  .evidence-box .row .l { color: var(--ink-faint); min-width: 220px; flex: 0 0 auto; }
+  .evidence-box .row .v { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink); direction: ltr; unicode-bidi: isolate; }
+
+  .verdict-card { border-radius: 18px; padding: 26px 26px; margin: 20px 0; border: 2px solid; }
+  .verdict-card.reversed { background: linear-gradient(135deg, var(--crit-bg), var(--surface)); border-color: var(--crit-border); }
+  .verdict-card.ready { background: linear-gradient(135deg, var(--ok-bg), var(--surface)); border-color: var(--ok-border); }
+  .verdict-card .vtitle { font-size: 1.1rem; font-weight: 800; color: var(--crit-ink); margin-bottom: 6px; }
+  .verdict-card.ready .vtitle { color: var(--accent-deep); }
+
+  .reviewer-split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
+  @media (max-width: 700px) { .reviewer-split { grid-template-columns: 1fr; } }
+  .reviewer-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+  .reviewer-card .rk { font-size: 0.72rem; font-weight: 800; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .reviewer-card p { font-size: 0.88rem; margin: 0; color: var(--ink-muted); }
+
+  .final-verdict { background: linear-gradient(135deg, var(--accent-tint), var(--surface)); border: 2px solid var(--accent); border-radius: 20px; padding: 32px 30px; text-align: center; margin: 24px 0; }
+  .final-verdict .big { font-size: 3rem; margin-bottom: 10px; }
+  .final-verdict h3 { font-size: 1.25rem; color: var(--accent-deep); margin: 0 0 8px; }
+  .final-verdict p { margin: 0 auto; color: var(--ink-muted); font-size: 0.95rem; max-width: 62ch; }
+
+  hr.div { border: none; border-top: 1px dashed var(--border); margin: 46px 0; }
+  footer { margin-top: 72px; padding: 24px 0; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--ink-faint); text-align: center; }
+  a { color: var(--accent-deep); }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="inner">
+      <span class="kicker">⚔️ المراجعة النهائية الأدق — تقرير 515 — محاكاة عدائية مزدوجة ومستقلة</span>
+      <h1>الخطّة بعد أن حاول "خصمان" منفصلان كسرها — Codex + ثلاثة وكلاء فحص جنائيّ</h1>
+      <p class="lead">
+        هذه ليست إضافة على الخطّة السابقة (514) — بل مراجعة عدائية حقيقية لها: تشغيل أداة Codex بشكل مستقلّ
+        عبر الطرفية لمهاجمة أخطر أربعة قرارات بالخطّة، بالتوازي مع ثلاثة وكلاء فحص جنائيّ يتتبّعون كل زرّ وكل
+        شاشة وكل تفاعل ممكن بين الميزات مجتمعة. النتيجة غيّرت حكمًا جوهريًّا واحدًا بشكل كامل (الطلب المجمّع)،
+        وكشفت عن ثغرات حقيقية بمستوى قاعدة البيانات لم تظهر بالجولة الأولى، وأكّدت بشكل مستقلّ (من مراجعَين
+        مختلفَين تمامًا) نفس العيب الجوهريّ بخلل التزامن.
+      </p>
+      <div class="hero-stats">
+        <div class="s"><div class="n">2</div><div class="l">مراجعتان عدائيتان مستقلّتان</div></div>
+        <div class="s"><div class="n">1</div><div class="l">حكم كامل انعكس — الطلب المجمّع</div></div>
+        <div class="s"><div class="n">2</div><div class="l">اكتشاف تقارب مستقلّ على نفس العيب</div></div>
+        <div class="s"><div class="n">50+</div><div class="l">سيناريو واقعيّ موثَّق بدليل من الكود</div></div>
+        <div class="s"><div class="n">0</div><div class="l">تعديل فعليّ نُفِّذ — فحص فقط</div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#method">المنهجية</a>
+    <a href="#reversal">التصحيح الأهمّ — الطلب المجمّع</a>
+    <a href="#bugfix">إصلاح خلل التزامن — نسخة مصحَّحة</a>
+    <a href="#cart">مهلة السلّة — أساس ناقص مكتشَف</a>
+    <a href="#identity">تعديل هاتف/بريد المزوّد — تصميم بيانات أوضح</a>
+    <a href="#customer-ui">فحص شاشات العميل زرًّا بزرّ</a>
+    <a href="#ops-ui">فحص شاشات العمليّات والمزوّد والسائق</a>
+    <a href="#combo">اكتشافات التفاعل بين الميزات معًا</a>
+    <a href="#residuals">ملاحظات إضافية غير مخطَّط لها</a>
+    <a href="#roadmap">الخطّة النهائية المُعاد ترتيبها</a>
+    <a href="#final">الخلاصة</a>
+  </nav>
+
+  <section id="method">
+    <div class="section-eyebrow">🔬 المنهجية</div>
+    <h2>كيف تمّت هذه المراجعة تحديدًا</h2>
+    <p class="intro">بدل الاكتفاء بمراجعة واحدة، استُخدِمت أداتان مختلفتان تمامًا بشكل مستقلّ عن بعضهما، لكلّ منهما
+    "عقل" مختلف، على نفس الأسئلة الأخطر بالخطّة — إن اتّفقتا على شيء فهذا دليل قويّ، وإن اختلفتا فالاختلاف نفسه إشارة تستحقّ الانتباه.</p>
+
+    <div class="reviewer-split">
+      <div class="reviewer-card">
+        <div class="rk">🤖 المراجع الأوّل — Codex عبر الطرفية</div>
+        <p>أداة مراجعة كود مستقلّة، شُغِّلت بصلاحية قراءة فقط، بتوجيه واحد: "افترض أن هذه الخطّة خاطئة، وأثبت ذلك
+        بدليل من الكود الفعليّ إن استطعت." قرأت الكود المصدريّ للتغييرات الأربعة الأخطر بالخطّة من الصفر، دون
+        أن ترى تقييمات الجولة السابقة، فجاءت أحكامها مستقلّة تمامًا.</p>
+      </div>
+      <div class="reviewer-card">
+        <div class="rk">🕵️ المراجع الثاني — ثلاثة وكلاء فحص جنائيّ</div>
+        <p>كل وكيل تتبّع زاوية مختلفة: الأوّل كل شاشة يراها العميل زرًّا بزرّ، الثاني كل شاشة يراها فريق العمليّات
+        والمزوّد والسائق، والثالث تحديدًا يبحث عمّا يحدث حين تجتمع كل الميزات الأربعة الجديدة معًا بنفس النظام
+        الحيّ بنفس الوقت — وهو النوع من الأخطاء الذي تفوته أيّ مراجعة تنظر لكلّ ميزة بمعزل عن الأخرى.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="reversal">
+    <div class="section-eyebrow">🔄 أهمّ تصحيح بهذه الجولة</div>
+    <h2>الطلب المجمّع — الحكم السابق "جاهز بشروط" كان غير دقيق</h2>
+    <p class="intro">الجولة الأولى من الفحص خلصت إلى أن الطلب المجمّع "جاهز لفكّ الختم بشروط تشغيليّة بسيطة".
+    المراجعة العدائية بهذه الجولة قرأت نفس الكود بعين أكثر عدائيّة، ووجدت أربع ثغرات حقيقية بمستوى قاعدة البيانات
+    والمعاملات الماليّة لم تظهر بالفحص الأوّل. هذا تصحيح صريح، لا إضافة — الحكم الجديد يُلغي الحكم القديم.</p>
+
+    <div class="verdict-card reversed">
+      <div class="vtitle">✗ الحكم المُصحَّح: غير جاهز — يحتاج أربعة إصلاحات جوهريّة قبل أيّ تفعيل، ولو تجريبيّ</div>
+      <p style="max-width:76ch; color:var(--ink); margin:0;">البنية العامّة (طلب أصل + طلبات فرعيّة) لا تزال سليمة
+      كفكرة معماريّة. لكن أربعة تفاصيل تنفيذيّة دقيقة — وليست تفاصيل ثانوية — تجعل تفعيلها اليوم خطرًا حقيقيًّا
+      ماليًّا وتشغيليًّا، لا مجرّد نقص بالواجهة كما بدا بالفحص الأوّل.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الثغرة المكتشَفة حديثًا</th><th>لماذا هي خطيرة تحديدًا</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">حساب حالة المجموعة لا يتعامل بشكل صحيح مع "رفض المزوّد" أو "انتهاء المهلة"</td><td class="mitigation">الكود الحاليّ يتعرّف فقط على الحالات التي تحوي كلمة "ملغيّ" كطلبات خارجة من الحساب — لكن "رفضه المزوّد" و"انتهت مهلته" حالتان نهائيّتان مختلفتان تمامًا، ولا يتعرّف عليهما — فتبقى المجموعة تظهر "قيد التنفيذ" رغم أن أحد أطرافها انتهى فعليًّا، والمبلغ الإجماليّ المعروض يبقى خاطئًا</td></tr>
+          <tr><td class="scenario">لا يوجد ضمان حقيقيّ "طلب فرعيّ واحد لكلّ مزوّد" بمستوى الخدمة نفسها</td><td class="mitigation">الفحص عند نقطة الدخول يتحقّق فقط من عدد المزوّدين المختلفين، لكن الخدمة الداخليّة تُنشئ كل ما يُرسَل إليها دون فحص إضافيّ — ما يعني إمكانية إنشاء أكثر من طلب فرعيّ لنفس المزوّد داخل نفس المجموعة، وهو ما يخالف التصميم المُعلَن للميزة</td></tr>
+          <tr><td class="scenario">الطلبات المجدولة (لوقت لاحق) تفقد جدولتها عند المرور بالسلّة المجمّعة</td><td class="mitigation">حقل "موعد التسليم المجدوَل" موجود بطلب الشراء لكن لا يُمرَّر من خطوة السلّة المجمّعة لخطوة إنشاء الطلب الفعليّة — فيتحوّل الطلب المجدوَل بصمت لطلب فوريّ، وهو خلل يمسّ توقّعات العميل مباشرة</td></tr>
+          <tr><td class="scenario">مفتاح الإيقاف الطارئ لا يعمل فعليًّا بعد التفعيل</td><td class="mitigation">النظام مصمَّم أصلًا بطبقتَي حماية: إعداد ثابت بملفّ الإعدادات + مفتاح إيقاف طارئ فوريّ بقاعدة البيانات يمكن لفريق العمليّات ضغطه لحظيًّا دون إعادة نشر. لكن كود الدفع الفعليّ يقرأ فقط الإعداد الثابت المخزَّن مؤقّتًا بالذاكرة — أي أن مفتاح الإيقاف الطارئ <b>لا يوقف شيئًا فعليًّا</b> إن حدثت مشكلة بعد التفعيل، حتى لو ضغطه فريق العمليّات فورًا</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="crit-box">
+      <div class="ic">🛑</div>
+      <p><b>الثغرة الأخطر بينها تحديدًا:</b> غياب مفتاح إيقاف طارئ فعّال. تخيّل أن الميزة فُعِّلت، وظهرت مشكلة
+      حقيقية (مثلًا بند حساب الحالة أعلاه يسبّب عرض مبالغ خاطئة لعشرات العملاء) — الخطوة الطبيعيّة لفريق العمليّات
+      هي الضغط على "إيقاف فوريّ" من لوحة التحكّم. لكن هذا الزرّ حاليًّا <b>لن يوقف شيئًا</b> حتى تُعاد كتابة الكود
+      نفسه ويُعاد نشره من جديد — أي أن "الإيقاف الطارئ" ليس طارئًا فعليًّا. هذا وحده كافٍ لتأجيل أيّ تفعيل، ولو تجريبيّ محدود.</p>
+    </div>
+
+    <div class="analogy">
+      <div class="k">لماذا لم يظهر هذا بالفحص الأوّل؟ — درس مفيد</div>
+      <p>الفحص الأوّل تتبّع "هل يعمل المسار السعيد بشكل صحيح؟" (عميل يطلب من مزوّدَين، يدفع، يُسلَّم) ووجد أنه يعمل
+      فعلًا بشكل سليم ماليًّا. المراجعة العدائية هنا سألت سؤالًا مختلفًا: "ماذا لو حدث خطأ — رفض، انتهاء مهلة، حاجة
+      لإيقاف الميزة فورًا؟" ووجدت أن هذه المسارات الأقلّ شيوعًا (لكن الحتميّة الحدوث على المدى الطويل) لم تُبنَ
+      بنفس الصلابة. هذا بالضبط سبب طلب مراجعة ثانية عدائية منفصلة — الفحص الأوّل ليس خاطئًا بما وجده، لكنه لم يسأل الأسئلة الصعبة الكافية.</p>
+    </div>
+
+    <div class="evidence-box">
+      <div class="k">أدلّة (من مراجعة Codex المستقلّة)</div>
+      <div class="row"><span class="l">حساب حالة المجموعة</span><span class="v">backend/app/modules/carts/service.py:102</span></div>
+      <div class="row"><span class="l">إنشاء الطلبات الفرعيّة دون تحقّق تكرار المزوّد</span><span class="v">backend/app/modules/carts/service.py:182 + router.py:123</span></div>
+      <div class="row"><span class="l">فقدان حقل الجدولة</span><span class="v">carts/service.py:186 (لا يُمرَّر إلى order_service)</span></div>
+      <div class="row"><span class="l">تجاوز طبقة الإيقاف الطارئ بقاعدة البيانات</span><span class="v">carts/router.py:125 + core/feature_flags.py:62 (يقرأ YAML المخزَّن مؤقّتًا فقط)</span></div>
+    </div>
+    <div class="tag-row"><span class="pill crit">✗ غير جاهز — يُلغي حكم التقرير 514</span><span class="pill warn">⚠ أخطر بند: الإيقاف الطارئ معطَّل فعليًّا</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="bugfix">
+    <div class="section-eyebrow">🐞 تأكيد مستقلّ مزدوج</div>
+    <h2>إصلاح خلل التزامن — نسخة مصحَّحة وأعمق ممّا كان مخطَّطًا</h2>
+    <p class="intro">هذا الخلل (خدمتان قد تعدِّلان نفس الطلب دون حماية كافية) اكتشفه الفحص الأوّل. المهمّ هنا: <b>كلا
+    المراجعَين المستقلَّين بهذه الجولة — Codex ووكيل الفحص التركيبيّ — وصلا لنفس النتيجة الجوهريّة بشكل منفصل تمامًا</b>،
+    وهذا تأكيد قويّ. لكن كليهما وجد أيضًا أن الإصلاح المخطَّط أصلًا (تحديث مشروط بسيط) غير كافٍ وحده.</p>
+
+    <div class="plain">
+      <div class="ic">✅</div>
+      <p><b>ما تأكَّد أنه صحيح:</b> السباق المباشر بين الخدمتَين أضيق ممّا افترضناه أوّلًا — الحالة الوسيطة التي
+      تُنشئها إحدى الخدمتَين غير مرئيّة للخدمة الأخرى قبل تأكيد الحفظ. لكن هذا لا يُلغي المشكلة، بل يُحدِّد شكلها الحقيقيّ.</p>
+    </div>
+
+    <div class="subhead">ثلاث فجوات إضافيّة اكتشفها كلا المراجعَين، لم تكن بالخطّة الأصليّة</div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الفجوة</th><th>الشرح المبسَّط</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">التحديث المشروط البسيط (بحسب الحالة فقط) له "ثغرة عودة" نظريّة</td><td class="mitigation">تخيّل طلبًا انتقل من حالة "لا يوجد سائق" إلى حالة أخرى ثم عاد لنفس حالة "لا يوجد سائق" مرّة أخرى — تحديث مشروط يعتمد على "الحالة" فقط قد يظنّ خطأً أن هذا هو نفس الموقف القديم ويلغيه بقرار قديم غير صالح. الحلّ: استخدام "رقم إصدار" موجود أصلًا بجدول الطلبات (لم يكن يُستخدَم لهذا الغرض)، إضافة لفحص الحالة — كل تعديل حقيقيّ يزيد الرقم، فيستحيل الخلط بين موقفَين متشابهَين بالحالة لكن مختلفَين بالزمن</td></tr>
+          <tr><td class="scenario">التنبيهات وتحرير الأموال تحدث قبل تأكيد الحفظ النهائيّ، لا بعده</td><td class="mitigation">هذا هو الاكتشاف الأهمّ المشترَك بين المراجعَين: الكود الحاليّ يُرسِل الإشعار للعميل ويُحرِّر المبلغ المحجوز <b>أثناء</b> المعالجة، قبل أن يتأكّد أن الحفظ بقاعدة البيانات نجح فعلًا. فإن فشل الحفظ لاحقًا (بسبب نفس نوع السباق المذكور)، يكون العميل قد استلم إشعارًا بإلغاء طلب لم يُلغَ فعليًّا بقاعدة البيانات — تناقض مباشر بين ما يراه العميل وما هو مسجَّل فعليًّا</td></tr>
+          <tr><td class="scenario">كل الطلبات المفحوصة بدورة واحدة تشترك بنفس "المعاملة" الماليّة الواحدة</td><td class="mitigation">إن فشلت معالجة طلب واحد بمنتصف الدورة (بسبب نفس السباق)، قد يتسبّب ذلك بفشل حفظ كل الطلبات الأخرى التي عولجت بنجاح بنفس الدورة قبله — رغم أن إشعاراتها ورسائلها الخارجيّة قد أُرسِلت بالفعل. الحلّ: معالجة كل طلب بمعاملة مستقلّة عن البقية، لا معاملة واحدة مشتركة للدورة كلّها</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="vflow">
+      <div class="vf-step"><b>النسخة المصحَّحة من الإصلاح — بالترتيب الصحيح</b><span class="d">بدل: افحص الحالة → عدِّل → أرسل إشعارًا</span></div>
+      <div class="vf-arrow">↓</div>
+      <div class="vf-step ok"><b>1. تحديث مشروط على الحالة + رقم الإصدار معًا</b><span class="d">يمنع كلًّا من التعارض المباشر و"ثغرة العودة"</span></div>
+      <div class="vf-arrow">↓</div>
+      <div class="vf-step ok"><b>2. كل طلب بمعاملة مستقلّة، لا معاملة دورة مشتركة</b><span class="d">فشل طلب واحد لا يُسقِط ما نجح قبله</span></div>
+      <div class="vf-arrow">↓</div>
+      <div class="vf-step ok"><b>3. الإشعار وتحرير المبلغ فقط بعد تأكيد نجاح الحفظ</b><span class="d">لا مجال لتناقض بين ما يراه العميل وما هو مسجَّل فعليًّا</span></div>
+    </div>
+
+    <div class="evidence-box">
+      <div class="k">أدلّة (تقاربت عليها المراجعتان المستقلّتان)</div>
+      <div class="row"><span class="l">"رقم الإصدار" الموجود أصلًا وغير المُستخدَم لهذا الغرض</span><span class="v">backend/app/models/order.py:59</span></div>
+      <div class="row"><span class="l">الإشعار وتحرير المبلغ قبل الحفظ النهائيّ</span><span class="v">stale_no_driver_service.py:83, 90, 104</span></div>
+      <div class="row"><span class="l">معاملة واحدة مشتركة لكل الدورة</span><span class="v">stale_no_driver_service.py:64, 128, 131</span></div>
+    </div>
+    <div class="tag-row"><span class="pill ok">✓ تأكيد مستقلّ مزدوج على المشكلة الجوهريّة</span><span class="pill warn">⚠ الإصلاح المطلوب أعمق ممّا خُطِّط له أوّلًا</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="cart">
+    <div class="section-eyebrow">🧾 اكتشاف أساسيّ</div>
+    <h2>مهلة السلّة والتحقّق قبل الدفع — أساس تقنيّ ناقص بالكامل</h2>
+    <p class="intro">المراجعة العدائية وجدت شيئًا أساسيًّا فاتَ الفحص الأوّل تمامًا: البنية التي يُفترَض أن تُقارَن
+    بها الأسعار غير موجودة أصلًا بالكود اليوم.</p>
+
+    <div class="crit-box">
+      <div class="ic">🕳️</div>
+      <p><b>الفجوة الجذريّة:</b> طلب الشراء المُرسَل من العميل يحتوي على "أيّ صنف، أيّ كميّة، أيّ إضافات" — لكنه
+      <b>لا يحتوي على السعر الذي رآه العميل بالسلّة أصلًا</b>. بمعنى آخر: لا يمكن تقنيًّا اليوم مقارنة "السعر اللي
+      شافه العميل" بـ"السعر الحاليّ بالكتالوج"، لأن الأوّل غير مُخزَّن بالطلب الوارد من الأساس. هذا ليس نقصًا
+      بمنطق التحقّق، بل نقص ببنية البيانات نفسها التي يُفترَض أن يُبنى عليها التحقّق — يجب إصلاحه أوّلًا، قبل أيّ سطر تحقّق.</p>
+    </div>
+
+    <div class="subhead">الفجوات الإضافيّة المكتشَفة</div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الفجوة</th><th>التوضيح</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">السلّة المجمَّعة تُنشئ طلباتها الفرعيّة بالتتابع، لا دفعة واحدة</td><td class="mitigation">فحص السعر "قبل الدفع" لكل طلب فرعيّ على حدة لا يفي بالغرض — الطلب الفرعيّ الأوّل قد يحجز مبلغًا فعليًّا أو يستهلك رمز تحقّق قبل أن يكتشف النظام أن الطلب الفرعيّ الثاني سعره تغيَّر. الحلّ الصحيح: فحص واحد شامل لكل عناصر السلّة المجمَّعة معًا، قبل البدء بمعالجة أيّ طلب فرعيّ منها</td></tr>
+          <tr><td class="scenario">مفتاح منع التكرار (Idempotency) للسلّة المجمَّعة لا يقارن محتوى السلّة الفعليّ</td><td class="mitigation">إعادة استخدام نفس المفتاح مع محتوى سلّة مختلف تمامًا (مزوّدون/أصناف مختلفة) قد يُعيد نفس النتيجة القديمة بصمت دون خطأ — وهذا أخطر من مجرّد رفض الطلب، لأنه قد يُظهِر للعميل تأكيدًا لطلب لم يطلبه فعليًّا بمحتواه الجديد</td></tr>
+          <tr><td class="scenario">مفتاح منع التكرار نفسه فريد على مستوى المنصّة كلّها، لا على مستوى كل عميل على حدة</td><td class="mitigation">من الناحية النظريّة، يمكن لعميلَين مختلفَين استخدام نفس قيمة المفتاح والتصادم — يجب أن يكون التفرّد مربوطًا بهويّة العميل + المفتاح معًا، لا المفتاح وحده</td></tr>
+          <tr><td class="scenario">الطلبات المجدولة (لوقت لاحق) يجب أن تُستثنى من فحص "هل المزوّد مفتوح الآن"</td><td class="mitigation">النظام الحاليّ يتعمَّد تجاوز فحص ساعات العمل للطلبات المجدولة (لأنها تُسلَّم لاحقًا، لا فورًا) — فحص عامّ جديد "هل المزوّد مفتوح؟" دون استثناء الطلبات المجدولة سيكسر هذه الميزة الموجودة أصلًا ويرفض حجوزات مستقبليّة صحيحة تمامًا</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="analogy">
+      <div class="k">تصحيح مفيد على نطاق الميزة</div>
+      <p>الفحص الأوّل افترض أن "هل المزوّد مفتوح؟" جزء أساسيّ من الفحص الجديد المطلوب. لكن تبيَّن أن هذا الفحص
+      <b>موجود أصلًا</b> بخطوة إنشاء الطلب الحاليّة (يتحقّق من قبول الطلبات وساعات العمل تلقائيًّا). القيمة
+      الحقيقيّة المضافة من هذه الميزة تحديدًا هي فحص <b>السعر والمخزون فقط</b> — وهذا يُبسِّط الميزة فعليًّا، لكنه
+      يعني أيضًا أن بناء حقل "السعر المُتوقَّع" بطلب الشراء هو الخطوة الأولى الحقيقية، لا خطوة ثانوية.</p>
+    </div>
+
+    <div class="tag-row"><span class="pill crit">✗ يحتاج تعديل بنية بيانات أوّلًا (حقل سعر جديد)</span><span class="pill ok">✓ نطاق الفحص الفعليّ أضيق وأبسط ممّا اعتُقِد (سعر/مخزون فقط)</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="identity">
+    <div class="section-eyebrow">🪪 اكتشاف بنيويّ</div>
+    <h2>تعديل هاتف/بريد المزوّد — يحتاج قرار تصميم بيانات واضح قبل أيّ برمجة</h2>
+    <p class="intro">هذا البند تحوَّل من "توسيع بسيط لنظام موجود" إلى "قرار تصميم بيانات حقيقيّ يحتاج توقيعك" — بسبب
+    اكتشاف دقيق بشكل النموذج الحاليّ لبيانات المزوّد.</p>
+
+    <div class="warn-box">
+      <div class="ic">🧩</div>
+      <p><b>الاكتشاف الجوهريّ:</b> جدول بيانات "المزوّد" بالنظام يحتوي حقل "هاتف تواصل عامّ" (يظهر للعملاء)، لكنه
+      <b>لا يحتوي حقل بريد إلكترونيّ إطلاقًا</b>. أمّا "هاتف/بريد تسجيل الدخول والهويّة" فيعيشان بجدول منفصل تمامًا
+      يخصّ صاحب الحساب (المالك)، وقد يملك هذا المالك عدّة متاجر بنفس الوقت. إذن سؤال "تعديل هاتف المزوّد" ليس سؤالًا
+      تقنيًّا واحدًا، بل سؤالان مختلفان تمامًا يحتاجان إجابتَين منفصلتَين:</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>السؤال</th><th>لماذا يحتاج قرارك أنت تحديدًا</th></tr></thead>
+        <tbody>
+          <tr><td>هل "تعديل هاتف المزوّد" يعني رقم التواصل العامّ الذي يراه العملاء بصفحة المتجر؟</td><td>هذا حقل تسويقيّ/تشغيليّ بسيط — تعديله لا يمسّ هويّة الحساب أو الأمان، ويمكن أن يكون بلا موافقة صارمة</td></tr>
+          <tr><td>أم يعني رقم/بريد صاحب الحساب المُستخدَم لتسجيل الدخول والتحقّق؟</td><td>هذا حقل أمنيّ حسّاس، وتعديله عبر متجر واحد سيغيّره لكل متاجر نفس المالك دفعة واحدة — قرار له أثر أوسع بكثير ممّا يبدو من داخل شاشة إعدادات متجر واحد</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subhead">فجوات تصميم إضافيّة يجب سدّها بغضّ النظر عن الإجابة أعلاه</div>
+    <ul class="simple-list">
+      <li><b>منطق التطبيق حاليًّا "مكتوب يدويًّا" لكل حقل على حدة</b> — الكود الحاليّ يعرف فقط كيف يُطبِّق تغيير "الاسم" تحديدًا على العمود الصحيح. توسيعه لحقول أخرى يحتاج "سجلًّا" واضحًا يربط بدقّة: أيّ دور + أيّ نوع حقل → أيّ جدول + أيّ عمود + أيّ نوع تحقّق يلزمه — وليس مجرّد تمرير اسم الحقل كنصّ حرّ للنظام ليقرّر بنفسه.</li>
+      <li><b>لا يوجد فحص لصحّة "نوع الحقل" المُرسَل اليوم</b> — والكود الحاليّ عند مواجهة "دور غير معروف" لا يرفض الطلب بوضوح، بل يعتمده بصمت كأنه نجح دون تطبيق أيّ تغيير فعليّ. هذا سلوك خفيّ موجود بالفعل بالكود، يستحقّ إصلاحًا منفصلًا بغضّ النظر عن هذا المشروع.</li>
+      <li><b>الموافقة على تعديل حقل، إن وافق عليها ضابط عمليّات، يجب أن تُعيد أيضًا حالة "تحقّق الرقم/البريد" لغير مُتحقَّق منها</b> — تمامًا كما يحدث اليوم عند التعديل اليدويّ المباشر من لوحة التحكّم لحالات استثنائية — وإلا سيظهر رقم أو بريد جديد "موثَّق" رغم أن أحدًا لم يتحقّق فعليًّا أن صاحبه يملكه.</li>
+      <li><b>يجب إعادة فحص "هل هذا الرقم/البريد مُستخدَم من قِبل حساب آخر؟" لحظة الموافقة النهائيّة، لا لحظة تقديم الطلب فقط</b> — لأن الوقت الفاصل بين تقديم الطلب وموافقة فريق العمليّات عليه قد يكون ساعات، وخلالها قد يسجّل شخص آخر بنفس الرقم.</li>
+      <li><b>تصحيح فنّيّ دقيق بخطوة الترحيل المخطَّطة لقاعدة البيانات:</b> يجب تعبئة الصفوف القديمة بقيمة افتراضيّة صريحة (وليس تركها فارغة) قبل تفعيل القيد الجديد — لأن قاعدة البيانات نفسها تسمح تقنيًّا بوجود عدّة صفوف "فارغة" رغم وجود قيد تفرّد، ما يُبطِل الحماية المقصودة تمامًا إن تُرِك الحقل فارغًا بالصفوف القديمة.</li>
+    </ul>
+
+    <div class="evidence-box">
+      <div class="k">أدلّة</div>
+      <div class="row"><span class="l">حقل الهاتف العامّ بجدول المزوّد (لا بريد إطلاقًا)</span><span class="v">backend/app/models/provider.py:29</span></div>
+      <div class="row"><span class="l">التطبيق مكتوب يدويًّا لحقل الاسم فقط حاليًّا</span><span class="v">operations_router.py:7612, 7629</span></div>
+      <div class="row"><span class="l">"دور غير معروف" يُعتمَد بصمت دون تطبيق فعليّ</span><span class="v">operations_router.py:7642</span></div>
+      <div class="row"><span class="l">نمط إعادة التحقّق عند التأكيد النهائيّ (موجود بمسار السائق، يجب تكراره هنا)</span><span class="v">driver_phone_change_router.py:62, 81</span></div>
+    </div>
+    <div class="tag-row"><span class="pill warn">⚠ يحتاج قرارك الصريح: هاتف عامّ أم هويّة حساب؟</span><span class="pill crit">✗ "سجلّ ربط" صريح مطلوب، لا نصّ حرّ</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="customer-ui">
+    <div class="section-eyebrow">👆 فحص زرّ بزرّ</div>
+    <h2>شاشات العميل — كل تفاعل مُتصوَّر بدقّة</h2>
+    <p class="intro">وكيل الفحص الجنائيّ الأوّل تتبّع كل شاشة سيراها العميل بعد التغييرات المخطَّطة (السلّة، شاشة الدفع
+    المجمَّع، الصفحة الرئيسيّة)، ومحاكى عشرات تسلسلات التفاعل الواقعيّة. أهمّ الاكتشافات:</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>السيناريو</th><th>ماذا سيرى العميل فعليًّا</th><th>الحلّ</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">تصفّح الهاتف بالخلفية والعودة لاحقًا أثناء عدّ السلّة التنازليّ</td><td class="mitigation">المتصفّحات تُبطئ المؤقّتات بالخلفية — عند العودة، الرقم المعروض يكون أعلى من الوقت الفعليّ المتبقّي فعليًّا</td><td class="mitigation">حساب الوقت المتبقّي دائمًا من "وقت انتهاء" ثابت من الخادم، لا من عدّاد يتناقص محليًّا</td></tr>
+          <tr><td class="scenario">فتح السلّة على جهازَين/تبويبَين بنفس الحساب بنفس الوقت</td><td class="mitigation">لا تزامن إطلاقًا بينهما اليوم — كل تبويب يرى نسخته الخاصّة فقط، فقد يظهر عدّاد مختلف تمامًا بكل تبويب</td><td class="mitigation">جعل الخادم هو "الحكم الوحيد" وقت الدفع الفعليّ، بغضّ النظر عمّا يعرضه أيّ تبويب محليًّا</td></tr>
+          <tr><td class="scenario">فشل تحميل بيانات مزوّد واحد فقط بسلّة تحوي عدّة مزوّدين</td><td class="mitigation">زرّ الدفع يبقى معطَّلًا للأبد بصمت، دون رسالة خطأ ودون خيار إعادة محاولة — خلل موجود بالكود اليوم، يصبح أكثر احتمالًا مع تفعيل السلّة المجمَّعة (مزوّدون أكثر = احتمال فشل أعلى)</td><td class="mitigation">تمييز المزوّد الذي فشل تحميله + زرّ "إعادة محاولة" واضح بدل تعطيل صامت</td></tr>
+          <tr><td class="scenario">الضغط على زرّ الدفع مرّتين بسرعة</td><td class="mitigation">لا يوجد حاليًّا أيّ قفل يمنع إرسال الطلب مرّتين بشاشة السلّة تحديدًا (موجود بشاشة الدفع العاديّة لكن ليس هنا) — خطر طلب مكرَّر فعليّ</td><td class="mitigation">تعطيل الزرّ فور أوّل ضغطة حتى يعود الردّ، بنفس النمط المستخدَم أصلًا بشاشة أخرى بالتطبيق</td></tr>
+          <tr><td class="scenario">تحديث الصفحة أثناء شاشة الدفع المجمَّع تحديدًا</td><td class="mitigation">اكتُشِف عطل حقيقيّ موجود بالكود اليوم (غير ظاهر فقط لأن الميزة مُغلَقة): تحديث الصفحة قد "يطرد" العميل مباشرة خارج شاشة الدفع المجمَّع ويُفقِد محتوى السلّة، بسبب تحميل بيانات المصادقة والإعدادات بترتيب غير متزامن بشكل صحيح</td><td class="mitigation">انتظار اكتمال تحميل بيانات المصادقة والإعدادات قبل اتّخاذ أيّ قرار بإخراج العميل من الشاشة</td></tr>
+          <tr><td class="scenario">العودة للسلّة وحذف مزوّد كامل، ثم المتابعة للدفع بمفتاح الطلب القديم نفسه</td><td class="mitigation">مفتاح منع التكرار المحفوظ محليًّا لا يتجدَّد إلا عند خطأ فعليّ — قد يُرسَل نفس المفتاح القديم مع محتوى سلّة جديد تمامًا، بنتيجة غير متوقَّعة</td><td class="mitigation">تجديد المفتاح تلقائيًّا كلّما تغيَّر محتوى السلّة فعليًّا، لا فقط عند حدوث خطأ</td></tr>
+          <tr><td class="scenario">رسائل الخطأ الجديدة (السعر تغيَّر، الصنف غير متوفّر، السلّة انتهت) بلغة العميل غير العربيّة</td><td class="mitigation">لا توجد اليوم أيّ ترجمة جاهزة لهذه الرسائل بأيّ من اللغات الثلاث — نمط الكود الحاليّ يعرض النصّ العربيّ الافتراضيّ تلقائيًّا حتى لمستخدم اختار الإنجليزيّة أو الفرنسيّة</td><td class="mitigation">إضافة كل رسائل الأخطاء الجديدة للغات الثلاث قبل الإطلاق، لا الاكتفاء بنصّ افتراضيّ عربيّ واحد</td></tr>
+          <tr><td class="scenario">عدّاد تنازليّ رقميّ داخل تخطيط عربيّ (من اليمين لليسار)</td><td class="mitigation">دون معالجة خاصّة، قد تُعرَض الأرقام بترتيب معكوس (مثلًا "59:4" بدل "4:59") — الكود يعالج هذه المشكلة تحديدًا بمكان واحد آخر مشابه بالتطبيق، لكن ليس تلقائيًّا بكلّ مكوّن جديد</td><td class="mitigation">فرض اتّجاه "من اليسار لليمين" صراحة لعرض الأرقام فقط، بنفس الطريقة المُستخدَمة بالمكان المشابه أصلًا</td></tr>
+          <tr><td class="scenario">مستخدم قارئ شاشة (لذوي الإعاقة البصريّة) والعدّاد التنازليّ</td><td class="mitigation">دون إعداد خاصّ، إمّا أن يتجاهل قارئ الشاشة العدّاد كليًّا (لا يعرف المستخدم أن سلّته توشك على الانتهاء)، أو يُعلن كل ثانية بصوت مزعج ومربك</td><td class="mitigation">إعلان صامت للتغييرات كل ثانية، مع إعلان صوتيّ واضح فقط عند نقاط مهمّة محدَّدة (دقيقة متبقّية، 10 ثوانٍ متبقّية، الانتهاء الفعليّ)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="analogy">
+      <div class="k">ما تأكَّد أنه آمن تمامًا — بلا حاجة لأيّ تعديل</div>
+      <p>زرّ "اتصل بنا" الجديد المقترَح بالصفحة الرئيسيّة آمن تمامًا تقنيًّا — المسار الذي يُحيل إليه مفتوح حتى
+      لغير المسجَّلين دخولًا، والضغط عليه مرارًا لا يسبّب أيّ مشكلة. لا حاجة لأيّ حذر إضافيّ بهذا البند تحديدًا.</p>
+    </div>
+    <div class="tag-row"><span class="pill crit">✗ الدفع المجمَّع اليوم به عطل تحديث صفحة حقيقيّ (مخفيّ فقط لأن الميزة مُغلَقة)</span><span class="pill warn">⚠ لا ترجمة جاهزة للرسائل الجديدة بثلاث لغات</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="ops-ui">
+    <div class="section-eyebrow">🖥️ فحص زرّ بزرّ</div>
+    <h2>شاشات العمليّات والمزوّد والسائق — كل تفاعل مُتصوَّر بدقّة</h2>
+    <p class="intro">وكيل الفحص الجنائيّ الثاني تتبّع شاشات فريق العمليّات (طابور الموافقات، قائمة الطلبات)، وشاشات
+    إعدادات المزوّد والسائق. أهمّ الاكتشافات:</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>السيناريو</th><th>ماذا يحدث فعليًّا</th><th>الحلّ</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">موافقة موظّفَي عمليّات على نفس الطلب بنفس اللحظة تقريبًا</td><td class="mitigation">محميّة فعليًّا اليوم بآليّة "تحديث مشروط" سليمة — الموظّف الثاني يحصل على رسالة خطأ واضحة "تمّت المعالجة بالفعل" بدل تكرار الإجراء</td><td class="mitigation">لا حاجة لأيّ إصلاح — هذا الجزء آمن ويبقى آمنًا حتى بعد توسيعه ليشمل الهاتف والبريد</td></tr>
+          <tr><td class="scenario">إضافة نوع الحقل (اسم/هاتف/بريد) لنفس طابور الموافقات القديم</td><td class="mitigation">دون تحديث خطوة تحقّق التفرّد بقاعدة البيانات معًا، سيحصل مزوّد يطلب تعديل بريده أثناء وجود طلب تعديل اسم معلَّق على رسالة خطأ مضلِّلة تمامًا: "يوجد طلب تغيير اسم معلَّق بالفعل" رغم أنه لا يطلب تغيير اسم إطلاقًا</td><td class="mitigation">تحديث قيد التفرّد بقاعدة البيانات ليكون لكل نوع حقل على حدة، لا لكل مزوّد فقط، مع رسالة خطأ عامّة تذكر نوع الحقل الصحيح</td></tr>
+          <tr><td class="scenario">شاشة طابور الموافقات تعرض العناوين والتسميات الحاليّة</td><td class="mitigation">التسميات مكتوبة يدويًّا اليوم لتقول "الاسم الحاليّ" و"الاسم المطلوب" في كل مكان — لو ظهر طلب تعديل هاتف بنفس الشاشة دون تعديل التسميات، سيرى الموظّف حرفيًّا "الاسم المطلوب: 218912345+" وهو مربك وغير احترافيّ</td><td class="mitigation">تسميات تتغيَّر تلقائيًّا حسب نوع الحقل المطلوب تعديله، مترجمة بثلاث لغات</td></tr>
+          <tr><td class="scenario">شارة "جزء من مجموعة" المقترَحة بشاشة طلبات العمليّات</td><td class="mitigation">البيانات اللازمة لعرض هذه الشارة (رقم المجموعة) غير موجودة أصلًا بالبيانات التي تصل للواجهة اليوم — إضافة الشارة بالواجهة وحدها لن تعرض شيئًا فعليًّا دون تعديل خلفيّ أوّلًا لإرسال هذه المعلومة</td><td class="mitigation">إرسال رقم المجموعة من الخادم كخطوة أولى، قبل أيّ عمل بالواجهة</td></tr>
+          <tr><td class="scenario">موظّف عمليّات يُصفّي الطلبات حسب مزوّد معيَّن، ويرى طرفًا واحدًا فقط من طلب مجمَّع</td><td class="mitigation">لا يوجد رابط أو زرّ ينقله لبقيّة أطراف نفس المجموعة — الشارة وحدها بلا رابط فعليّ "تُنبِّه لمشكلة دون أن تحلّها"، وقد تكون أسوأ من عدم وجودها إن أوهمت الموظّف أنه يملك أداة للتعامل معها</td><td class="mitigation">جعل الشارة نفسها رابطًا فعليًّا يعرض بقيّة أطراف المجموعة عند الضغط عليها، لا نصًّا زخرفيًّا فقط</td></tr>
+          <tr><td class="scenario">صفحة تقييم الأداء الجديدة المقترَحة — من يستطيع رؤيتها؟</td><td class="mitigation">النمط الحاليّ بالمشروع: أيّ صفحة جديدة يُنسى تسجيلها بقائمة الصلاحيّات المسموحة "تظهر تلقائيًّا للجميع" بدل أن تُخفى — عكس ما قد يُفترَض بديهيًّا. لو نُسِي تسجيلها بشكل صحيح، سيراها موظّفون بصلاحيّات منخفضة (رقابة القراءة فقط مثلًا) رغم أنها تعرض أرقامًا ماليّة حسّاسة، ثم يُفاجَؤون برفض الدخول الفعليّ</td><td class="mitigation">تسجيل الصفحة الجديدة بقائمة الصلاحيّات المسموحة (دور ماليّ/إداريّ فقط) بنفس اللحظة بالضبط التي تُضاف فيها للمسارات، لا كخطوة لاحقة منفصلة يسهل نسيانها</td></tr>
+          <tr><td class="scenario">مزوّد يترك قسم "تعديل الهاتف" مفتوحًا (بعد طلب رمز التحقّق) وتنتهي صلاحيّة جلسته</td><td class="mitigation">النمط الحاليّ المشابه (قسم تغيير الاسم) لا يعيد توجيه المستخدم لتسجيل الدخول تلقائيًّا عند انتهاء الجلسة أثناء هذه العمليّة تحديدًا — يظهر خطأ عامّ مبهم فقط، والقسم يبقى مفتوحًا بحالة عالقة</td><td class="mitigation">توجيه أخطاء انتهاء الجلسة بهذا القسم تحديدًا لنفس آليّة "إعادة تسجيل الدخول" المستخدَمة بأماكن أخرى بالتطبيق</td></tr>
+          <tr><td class="scenario">مكوّن "تفضيلات الإشعارات" المشترَك بين العميل والسائق</td><td class="mitigation">مشاركة الشكل المرئيّ فقط آمنة تمامًا. لكن لو شاركا أيضًا نفس منطق "جلب الحفظ من الخادم" (لا الشكل فقط)، فأيّ عطل مستقبليّ بخادم أحد الدورَين (مثلًا السائق) سينعكس تلقائيًّا على الدور الآخر (العميل) أيضًا رغم أنهما نظامان مختلفان تمامًا خلف الكواليس</td><td class="mitigation">مشاركة الشكل المرئيّ (الأزرار والتبديلات) فقط، مع إبقاء "من أين تُجلَب البيانات وأين تُحفَظ" منفصلًا تمامًا لكلّ دور كما هو اليوم</td></tr>
+          <tr><td class="scenario">أوّل ظهور فعليّ لشارة "طلب مجمَّع" أمام موظّف عمليّات لم يرها من قبل</td><td class="mitigation">لا يوجد أيّ تلميح داخل الشاشة نفسها يشرح معناها — الاعتماد الكامل على دليل تشغيليّ خارجيّ قد لا يقرأه الموظّف بالوقت الفعليّ</td><td class="mitigation">تلميح نصّيّ قصير يظهر عند تمرير الفأرة فوق الشارة نفسها يشرح المعنى مباشرة، دون الاعتماد فقط على دليل خارجيّ</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tag-row"><span class="pill ok">✓ آليّة الموافقة الأساسيّة آمنة ولا تحتاج تعديلًا</span><span class="pill crit">✗ شارة المجموعة تحتاج بيانات خلفيّة أوّلًا لتعمل إطلاقًا</span><span class="pill warn">⚠ صلاحيّات الصفحة الجديدة يجب تسجيلها بنفس لحظة إنشائها لا بعدها</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="combo">
+    <div class="section-eyebrow">🧬 الأهمّ من حيث القيمة</div>
+    <h2>ماذا يحدث حين تجتمع كل الميزات الجديدة معًا بنفس النظام الحيّ؟</h2>
+    <p class="intro">هذا القسم يبحث تحديدًا عمّا لا تكتشفه أيّ مراجعة تنظر لكلّ ميزة بمفردها — التفاعلات الناشئة فقط
+    حين تعمل عدّة ميزات جديدة معًا بنفس اللحظة على نفس الطلب.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>التفاعل المفحوص</th><th>الحكم</th><th>التفصيل</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">فحص السعر الجديد يرفض جزءًا من طلب مجمَّع بينما باقي أجزائه سليمة</td><td class="mitigation"><span class="pill ok">آمن بشرط</span></td><td class="mitigation">طالما فحص السعر الجديد يُبنى بنفس نوع الأخطاء المُستخدَم أصلًا بالنظام، فإن آليّة "الكلّ أو لا شيء" الموجودة أصلًا بالسلّة المجمَّعة ستُلغي الطلب كاملًا تلقائيًّا، لا جزءًا منه فقط — لكن هذا يعتمد بدقّة على استخدام نفس فئة الأخطاء الصحيحة عند البرمجة</td></tr>
+          <tr><td class="scenario">هل إصلاح خلل التزامن (النقطة أعلاه) يحتاج أن يكون "واعيًا" بوجود طلبات مجمَّعة؟</td><td class="mitigation"><span class="pill ok">لا حاجة</span></td><td class="mitigation">حالة المجموعة تُحسَب دائمًا "حيّة" من حالات الطلبات الفرعيّة الفعليّة، لا تُخزَّن بشكل منفصل قد يصبح قديمًا — لذا القفل على مستوى كل طلب فرعيّ على حدة يكفي تمامًا، ولا حاجة لتعقيد إضافيّ خاصّ بالمجموعات</td></tr>
+          <tr><td class="scenario">مزوّد لديه طلب تعديل هاتف معلَّق، وبنفس الوقت لديه طلب جديد بانتظار قبوله</td><td class="mitigation"><span class="pill warn">يحتاج انتباهًا</span></td><td class="mitigation">إن كان رقم الهاتف يُستخدَم بأيّ مكان لإرسال إشعار "طلب جديد بانتظارك" للمزوّد، يجب التأكّد أن الإشعار يُرسَل دائمًا للرقم الفعليّ المسجَّل لحظة الإرسال (لا رقم قديم مخزَّن بذاكرة مؤقّتة)، حتى لا يفوت المزوّد إشعارًا مهمًّا بسبب تزامن التوقيت مع طلب تعديل هاتفه</td></tr>
+          <tr><td class="scenario">فحص السعر الجديد (نقطة السلّة) يرفض الدفع لأن المزوّد "مغلق" — بينما توجد أصلًا آليّة قديمة منفصلة تراقب نفس الشيء</td><td class="mitigation"><span class="pill warn">تكرار غير منسَّق</span></td><td class="mitigation">يوجد بالفعل نظام قديم يراقب "هل قَبِل المزوّد الطلب بالوقت المحدَّد؟" بشكل منفصل تمامًا. إضافة فحص جديد "هل المزوّد مفتوح؟" دون تنسيق مع النظام القديم قد يُنتج تجربة مربكة: العميل يرى "تمّ التحقّق، كل شيء سليم" ثم يُفاجَأ بعدها مباشرة برفض من النظام القديم لنفس السبب تقريبًا</td></tr>
+          <tr><td class="scenario">ضغط مرتفع لحظيّ (حملة تسويقيّة تدفع كثيرين للدفع بنفس اللحظة تقريبًا) على السلّة المجمَّعة تحديدًا</td><td class="mitigation"><span class="pill crit">مصدر قلق حقيقيّ سعويّ</span></td><td class="mitigation">السلّة المجمَّعة تُبقي اتّصالًا واحدًا بقاعدة البيانات مفتوحًا طوال معالجة كل أطرافها بالتتابع (قد تصل لعشرة أطراف بمعاملة واحدة). عدد الاتّصالات المتاحة بقاعدة البيانات محدود بشكل معروف بإعدادات النظام. إضافة خطوة تحقّق سعر جديدة تُطيل مدّة إشغال هذا الاتّصال أكثر. حملة تسويقيّة ناجحة قد تستنزف كل الاتّصالات المتاحة دفعة واحدة وتُبطئ المنصّة كلّها لكل المستخدمين، لا فقط لمن يستخدم السلّة المجمَّعة</td></tr>
+          <tr><td class="scenario">عرض "بديل" لصنف غير متوفّر من مزوّدَين مختلفَين بنفس الطلب المجمَّع بنفس الوقت</td><td class="mitigation"><span class="pill ok">آمن بالخلفيّة</span></td><td class="mitigation">هذا المسار مبنيّ أصلًا بشكل مستقلّ لكل طلب فرعيّ على حدة، فلا تعارض تقنيّ بين عرضَين متزامنَين. الملاحظة الوحيدة تصميميّة: يجب أن تعرض الواجهة للعميل كلا العرضَين معًا بوضوح، لا عرضًا واحدًا يخفي الآخر</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tag-row"><span class="pill crit">⚠ أهمّ تفاعل مكتشَف: خطر استنزاف اتّصالات قاعدة البيانات عند حملة تسويقيّة + سلّة مجمَّعة معًا</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="residuals">
+    <div class="section-eyebrow">🔎 اكتشافات جانبيّة</div>
+    <h2>ملاحظات لم تكن مطلوبة، ظهرت أثناء القراءة العميقة للكود</h2>
+    <p class="intro">أثناء القراءة الدقيقة للملفّات المذكورة أعلاه، ظهرت ثلاث ملاحظات غير مرتبطة مباشرة بالخطّة، لكنها
+    تستحقّ التوثيق لأنها اكتشافات حقيقية بالكود القائم فعليًّا اليوم.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الملاحظة</th><th>التفصيل</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">تناقض بين وصف الكود وسلوكه الفعليّ بشأن غرامات السائق</td><td class="mitigation">التعليق التوضيحيّ أعلى ملفّ رصد تخلّي السائق يذكر صراحة "لا خصم ماليّ"، بينما الكود الفعليّ بنفس الملفّ يطبِّق غرامات ماليّة فعليّة (بحسب عدد المرّات). تناقض توثيقيّ يستحقّ تصحيحًا بسيطًا حتى لا يُضلِّل من يقرأ الكود مستقبلًا</td></tr>
+          <tr><td class="scenario">تنبيهات "لا يوجد سائق" قد تُدمَج بالخطأ لعدّة طلبات مختلفة كتنبيه واحد فقط</td><td class="mitigation">آليّة منع التكرار بالتنبيهات الخارجيّة تعتمد على "نوع الحدث" فقط، لا على رقم الطلب المحدَّد — ما يعني أن عدّة طلبات مختلفة أُلغيت خلال نفس النافذة الزمنيّة القصيرة قد تُنتج تنبيهًا واحدًا فقط لفريق العمليّات، رغم أن كل طلب يستحقّ مراجعة تعويض منفصلة</td></tr>
+          <tr><td class="scenario">احتمال احتساب ضريبة أقلّ من المفترَض على جزء من الطلبات</td><td class="mitigation">ملاحظة تحتاج تحقّقًا إضافيًّا (لم تُؤكَّد بشكل قاطع): طريقة حساب الوعاء الضريبيّ بخطوة التسوية قد تطرح رسوم التوصيل من الإجماليّ بطريقة قد لا تُطابق كيف يُخزَّن الإجماليّ فعليًّا وقت إنشاء الطلب — يستحقّ هذا مراجعة منفصلة مع فريق المحاسبة للتأكّد، وليس تغييرًا مباشرًا دون تأكيد أوّلًا</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="roadmap">
+    <div class="section-eyebrow">🗺️ إعادة الترتيب</div>
+    <h2>الخطّة النهائية — بعد كل التصحيحات</h2>
+    <p class="intro">هذا هو الترتيب النهائيّ الصحيح لكل شيء، بعد دمج كل ما اكتشفته المراجعتان العدائيتان فوق الخطّة
+    السابقة (514). الفروق الجوهريّة عن الخطّة السابقة موضَّحة بوضوح.</p>
+
+    <div class="pipeline">
+      <div class="pl-stage"><div class="pl-node pending">0️⃣</div><div class="t">بوّابة الدخول</div><div class="d">كما بالتقرير 514 — دون تغيير</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🎨</div><div class="t">المرحلة 1</div><div class="d">واجهة فقط — دون تغيير</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node pending">🏗️</div><div class="t">المرحلة 2أ — جديدة</div><div class="d">إصلاحات أساس قبل أيّ ميزة جديدة</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🔐</div><div class="t">المرحلة 2ب</div><div class="d">الميزات نفسها — بعد الإصلاحات</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node" style="background:var(--accent);border-color:var(--accent-deep);color:#fff;">📊</div><div class="t">المرحلة 3</div><div class="d">تقييم الأداء — دون تغيير</div></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">2أ</div><div><h3>مرحلة جديدة — إصلاحات أساسيّة يجب أن تسبق أيّ ميزة جديدة تلمس الطلبات</h3><div class="pdesc">لم تكن موجودة بالتقرير 514 — اكتشاف هذه الجولة</div></div></div>
+    <ol class="steps">
+      <li>إضافة حقل "السعر المُتوقَّع لحظة الإضافة للسلّة" لبنية طلب الشراء نفسها — أساس لا غنى عنه لأيّ فحص سعر لاحق.</li>
+      <li>ربط طبقة الإيقاف الطارئ بقاعدة البيانات فعليًّا بمسار الدفع، بدل الاكتفاء بقراءة الإعداد الثابت المخزَّن مؤقّتًا فقط — بند أمان أساسيّ يجب أن يسبق أيّ تفعيل لاحق للسلّة المجمَّعة.</li>
+      <li>إصلاح حساب حالة/إجماليّ المجموعة ليتعرَّف بشكل صحيح على "رفض المزوّد" و"انتهاء المهلة" كحالات نهائيّة، لا فقط "الإلغاء".</li>
+      <li>فرض "طلب فرعيّ واحد لكل مزوّد" فعليًّا بمستوى الخدمة نفسها، لا بفحص سطحيّ عند نقطة الدخول فقط.</li>
+      <li>تمرير حقل الجدولة (للطلبات المستقبليّة) عبر مسار السلّة المجمَّعة كاملًا، بدل فقدانه بمنتصف الطريق.</li>
+      <li>تجديد مفتاح منع التكرار بالسلّة المجمَّعة تلقائيًّا كلّما تغيَّر محتوى السلّة، لا فقط عند الخطأ، وربط تفرّده بهويّة العميل معًا لا بقيمته وحدها.</li>
+      <li>إصلاح عطل تحديث الصفحة الموجود فعليًّا اليوم بشاشة الدفع المجمَّع (مخفيّ حاليًّا فقط لأن الميزة مُغلَقة).</li>
+      <li>تصحيح الإصلاح المخطَّط لخلل التزامن ليشمل: رقم إصدار الطلب (لا الحالة فقط)، معاملة مستقلّة لكل طلب لا معاملة دورة مشتركة، وتأجيل الإشعارات وتحرير الأموال حتى بعد تأكيد الحفظ الفعليّ.</li>
+    </ol>
+
+    <div class="crit-box">
+      <div class="ic">🛑</div>
+      <p>حتى إتمام هذه المرحلة، يبقى الحكم الرسميّ: <b>الطلب المجمّع غير جاهز للتفعيل ولو تجريبيًّا محدودًا</b> —
+      هذا يُلغي توصية التقرير 514 بتجربة محدودة قبل الإطلاق الكامل، ويستبدلها بهذه المرحلة الإصلاحيّة كشرط مسبق إلزاميّ.</p>
+    </div>
+
+    <div class="phase-head"><div class="pnum">2ب</div><div><h3>الميزات كما كانت مخطَّطة — بعد المرحلة 2أ فقط</h3><div class="pdesc">نفس بنود التقرير 514، بشروط إضافيّة موضَّحة</div></div></div>
+    <ul class="simple-list">
+      <li><b>مهلة السلّة + التحقّق قبل الدفع:</b> نطاقها الحقيقيّ سعر ومخزون فقط (لا حالة فتح/إغلاق المزوّد — موجودة أصلًا)، وتحتاج فحصًا واحدًا شاملًا لكامل السلّة المجمَّعة معًا، لا فحصًا منفصلًا لكل طرف على حدة.</li>
+      <li><b>تعديل هاتف/بريد المزوّد:</b> يحتاج <b>قرارك الصريح أوّلًا</b> — هل المقصود الهاتف العامّ الظاهر للعملاء، أم هاتف/بريد هويّة الحساب المُستخدَم لتسجيل الدخول (والذي قد يمسّ عدّة متاجر لنفس المالك معًا)؟ لا يبدأ أيّ عمل برمجيّ قبل هذا القرار.</li>
+      <li><b>فكّ ختم الطلب المجمّع:</b> يُنتظَر حتى اكتمال كامل المرحلة 2أ أعلاه، ثم إعادة فحص قصير للتأكّد أن الإصلاحات الأربعة طُبِّقت فعليًّا، قبل أيّ تفعيل ولو تجريبيّ.</li>
+      <li><b>شارة "جزء من مجموعة" بلوحة العمليّات:</b> تحتاج أوّلًا إرسال رقم المجموعة من الخادم للواجهة (خطوة خلفيّة قبل أيّ عمل واجهة)، ويجب أن تكون رابطًا فعليًّا لبقيّة الأطراف، لا نصًّا زخرفيًّا فقط.</li>
+      <li><b>صفحة تقييم الأداء الجديدة:</b> تسجيل الصلاحيّات المسموحة بنفس لحظة إضافة الصفحة للمسارات، لا كخطوة تالية منفصلة يسهل نسيانها (النمط الحاليّ بالمشروع يجعل النسيان يُظهِر الصفحة للجميع، لا يُخفيها).</li>
+    </ul>
+  </section>
+
+  <hr class="div">
+
+  <section id="final">
+    <div class="section-eyebrow">🏁 الخلاصة</div>
+    <h2>الخلاصة النهائيّة</h2>
+
+    <div class="final-verdict">
+      <div class="big">⚔️</div>
+      <h3>مراجعة عدائية مزدومة غيّرت حكمًا كاملًا، وعمّقت كل بند آخر بأدلّة من الكود</h3>
+      <p>لم تكن هذه جولة "تجميل" للخطّة السابقة، بل محاولة جادّة لكسرها من زاويتَين مختلفتَين تمامًا. النتيجة:
+      حكم كامل انعكس (الطلب المجمّع)، وثغرة أساسيّة بالبيانات اكتُشِفت (مهلة السلّة تحتاج حقل سعر غير موجود أصلًا)،
+      وقرار تصميم حقيقيّ ظهر يحتاج توقيعك (هويّة هاتف/بريد المزوّد)، وتأكيد مستقلّ مزدوج على عمق إصلاح خلل التزامن.</p>
+    </div>
+
+    <ul class="simple-list">
+      <li><b>الانعكاس الأهمّ:</b> الطلب المجمّع لم يعد "جاهزًا بشروط بسيطة" — أصبح "يحتاج أربعة إصلاحات جوهريّة أوّلًا"، أخطرها أن مفتاح الإيقاف الطارئ المُفترَض لا يعمل فعليًّا اليوم.</li>
+      <li><b>التأكيد الأقوى:</b> خلل تزامن إلغاء الطلبات مشكلة حقيقيّة أكّدها مراجعان مستقلّان تمامًا، والإصلاح الصحيح أعمق من مجرّد تحديث مشروط بسيط — يحتاج رقم إصدار + معاملات مستقلّة + تأجيل الإشعارات لما بعد الحفظ.</li>
+      <li><b>الاكتشاف الأكثر جذريّة:</b> ميزة "مهلة السلّة والتحقّق قبل الدفع" لا يمكن بناؤها كما خُطِّط لها أصلًا لأن البنية الأساسيّة لمقارنة الأسعار غير موجودة بالكود اليوم — يجب إضافة حقل جديد أوّلًا.</li>
+      <li><b>القرار الذي ينتظر توقيعك:</b> هل "هاتف/بريد المزوّد" يعني الرقم العامّ الظاهر للعملاء أم هويّة صاحب الحساب؟ الإجابتان تقودان لتصميمَين مختلفَين تمامًا.</li>
+      <li><b>فحص كل زرّ وشاشة:</b> أكثر من 25 سيناريو واقعيّ موثَّق (تبديل تبويبات، فقدان الاتّصال، الرجوع للخلف، قارئ الشاشة، تبديل اللغة، التطبيق القديم المخزَّن) — كل واحد بدليل من الكود وحلّ واضح.</li>
+      <li><b>لا شيء نُفِّذ أو نُشِر فعليًّا</b> — هذه أدقّ نسخة من الخطّة حتى الآن، وتنتظر توجيهك للبدء بأيّ مرحلة، بدءًا بالمرحلة صفر والمرحلة الأولى (الأقلّ مخاطرة) إن رغبتَ بالبدء فورًا.</li>
+    </ul>
+  </section>
+
+  <footer>
+    تووا (Tawa) — تقرير رقم 515 · 2026-07-17 · مراجعة عدائية مزدوجة (Codex عبر الطرفية + ثلاثة وكلاء فحص جنائيّ) — بلا تنفيذ فعليّ بعد
+  </footer>
+
+</div>

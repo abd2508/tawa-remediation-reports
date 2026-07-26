@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تووا — خطة تنفيذية + مكتبة سيناريوهات (٢٠٠+)</title>
+<style>
+  :root{
+    --green:#1b7f4b;--green-d:#0f5c34;--green-l:#e7f5ee;--amber:#b97400;--amber-l:#fff4e0;
+    --red:#b4232a;--red-l:#fde7e8;--blue:#1f5fa8;--blue-l:#e8f1fb;--purple:#6b3fa0;--purple-l:#f0e9fa;
+    --ink:#1f2430;--muted:#5d6677;--line:#e2e6ec;--bg:#f6f8fa;--card:#fff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Tahoma","Noto Sans Arabic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.8;font-size:15.5px}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 18px 90px}
+  header.hero{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:18px;padding:34px 30px;box-shadow:0 10px 30px rgba(15,92,52,.25)}
+  header.hero h1{margin:0 0 6px;font-size:29px}header.hero p{margin:4px 0;opacity:.96}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:3px 12px;border-radius:999px;font-size:13px;margin-top:8px;margin-left:6px}
+  h2.section{font-size:24px;margin:48px 0 6px;padding-bottom:8px;border-bottom:3px solid var(--green);display:flex;align-items:center;gap:10px}
+  h3{font-size:19px;margin:28px 0 8px;color:var(--green-d)}
+  h4{font-size:16px;margin:18px 0 6px;background:var(--green-l);display:inline-block;padding:3px 12px;border-radius:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+  .num{background:#fff;color:var(--green-d);width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--green)}
+  .badge{display:inline-block;padding:2px 9px;border-radius:8px;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .b-ok{background:var(--green-l);color:var(--green-d)}.b-part{background:var(--amber-l);color:var(--amber)}
+  .b-miss{background:var(--red-l);color:var(--red)}.b-tip{background:var(--blue-l);color:var(--blue)}
+  .b-new{background:var(--purple-l);color:var(--purple)}.b-mod{background:var(--amber-l);color:var(--amber)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafbfc}
+  td.id{font-weight:800;color:var(--purple);white-space:nowrap;direction:ltr;text-align:center}
+  code{background:#eef1f4;border:1px solid #e0e4e9;border-radius:5px;padding:0 5px;font-family:"Consolas",monospace;font-size:12.5px;direction:ltr;display:inline-block}
+  .note{border-right:5px solid var(--green);background:var(--green-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .warn{border-right:5px solid var(--amber);background:var(--amber-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .danger{border-right:5px solid var(--red);background:var(--red-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .tip{border-right:5px solid var(--blue);background:var(--blue-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  ul.clean{padding-right:22px;margin:8px 0}ul.clean li{margin:4px 0}
+  .fileref{font-size:12px;color:var(--muted);direction:ltr;display:inline-block;text-align:left}
+  .toc{columns:3;column-gap:26px;font-size:14px}.toc a{color:var(--green-d);text-decoration:none}.toc a:hover{text-decoration:underline}
+  .diagram{background:#fff;border:1px dashed var(--green);border-radius:14px;padding:14px;margin:18px 0;text-align:center}
+  .diagram svg{max-width:100%;height:auto}.cap{font-size:13px;color:var(--muted);margin-top:6px}
+  .legend span{margin-left:12px}.foot{margin-top:50px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:14px}
+  a.src{color:var(--blue);font-size:13px}
+  .grp{background:var(--purple);color:#fff;padding:6px 14px;border-radius:9px;font-weight:800;margin:26px 0 4px;font-size:15.5px}
+  .cnt{background:#fff;color:var(--purple);border-radius:6px;padding:0 8px;font-size:13px;margin-right:8px}
+  @media(max-width:900px){.toc{columns:2}}@media(max-width:600px){.toc{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>الخطة التنفيذية الدقيقة + مكتبة السيناريوهات</h1>
+  <p>تحويل وثيقة التصميم إلى خطة قابلة للبناء — للنقاط: <b>١) البحث حسب النوع · ٢) صلاحيات الموظفين (المحور) · ٤) رمز الإحالة</b>.</p>
+  <p>مع <b>أكثر من ٢٢٠ سيناريو محاكاة</b> للعمل الحقيقي، ومبدأ حاكم: <b>المالك (موقّع العقد) سيّد الصلاحيات</b> — يمنح أيّ صلاحية لأي موظف (مؤقتة بمؤقّت أو دائمة) عدا الصلاحيات التدميرية المحفوظة له وحده.</p>
+  <p class="pill">التاريخ: 2026-06-30</p>
+  <p class="pill">المرحلة: خطة تنفيذية — لم يُكتب كود بعد</p>
+  <p class="pill">النقطة ٣ (السلة): مؤجَّلة لعمل منفصل</p>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:6px">المبادئ الحاكمة (اقرأها أولاً)</h3>
+  <ol class="clean">
+    <li><b>المالك سيّد الصلاحيات:</b> يتحكّم تحكّماً تامّاً في كل شيء داخل متجره، ويمنح أيّ صلاحية لأي موظف (حتى الصغير) — <b>مؤقتة بمؤقّت</b> أو <b>دائمة</b>.</li>
+    <li><b>استثناء التدمير:</b> هناك «صلاحيات تدميرية / عُليا جداً» (حذف/إيقاف حساب، الحساب البنكي، البيانات القانونية، إغلاق المتجر، إدارة الصلاحيات نفسها…) <b>لا تُمنح أبداً</b> لأي موظف وتبقى للمالك وحده.</li>
+    <li><b>المسميات عامّة لا تخصّ مزوّداً:</b> قائمة منسدلة بمسمّيات عامّة (مشرف، كاشير، موظف، موظف مالية، موظف خارجي، موظف مؤقت…) + <b>«أخرى»</b> ليكتب المالك مسمّى مخصّصاً. المسمّى <b>مجرّد عنوان للعرض</b>، والصلاحيات تُمنح بحرّية ومستقلّة عنه (لأن صيدليّة لا «موظف تحضير» فيها — فلا نربط المسمّى بنوع المتجر).</li>
+    <li><b>إعادة استخدام البنية المُثبتة:</b> نبني فوق محرّك الصلاحيات B-4 الموجود (كتالوج + منح/سحب + حارس + كاش)، وعلم <code>is_grantable</code> الموجود <b>والمُطبَّق فعلاً</b> هو ما يصنع طبقة «التدميرية».</li>
+  </ol>
+  <p class="legend">
+    <span class="badge b-new">🟣 جديد</span><span class="badge b-mod">🟠 تعديل</span>
+    <span class="badge b-ok">✅ موجود نعيد استخدامه</span><span class="badge b-miss">🔴 فجوة نُغلقها</span>
+  </p>
+  <h4>الفهرس</h4>
+  <div class="toc">
+    <a href="#principle">• مبدأ التحكّم التام (طبقتان)</a><br>
+    <a href="#cat">• كتالوج الصلاحيات الكامل</a><br>
+    <a href="#labels">• المسميات العامّة + «أخرى»</a><br>
+    <a href="#temp">• المؤقّت مقابل الدائم</a><br>
+    <a href="#ideas">• أفكار وتوسّعات إضافية</a><br>
+    <a href="#model">• تغييرات نموذج البيانات</a><br>
+    <a href="#api">• نقاط الـAPI</a><br>
+    <a href="#panel">• لوحة الموظفين</a><br>
+    <a href="#jobs">• المهام الخلفية</a><br>
+    <a href="#phasing">• خطة التنفيذ بالدفعات</a><br>
+    <a href="#p1plan">• النقطة ١ — خطة</a><br>
+    <a href="#p4plan">• النقطة ٤ — خطة</a><br>
+    <a href="#lib">• مكتبة السيناريوهات (٢٢٠+)</a><br>
+    <a href="#nottouch">• ما لن نلمسه</a><br>
+    <a href="#sources">• المصادر</a>
+  </div>
+</div>
+
+<!-- ===== PRINCIPLE: TWO TIERS ===== -->
+<h2 class="section" id="principle"><span class="num">أ</span> مبدأ التحكّم التام — طبقتان للصلاحيات</h2>
+<p>كل صلاحية في المنصّة تُصنَّف إلى واحدة من طبقتين. الآلية جاهزة: علم <code>is_grantable</code> على كتالوج الصلاحيات، <b>والـAPI يرفض فعلاً منح أي صلاحية <code>is_grantable=false</code></b> <span class="fileref">(account_permissions_router.py:151)</span>.</p>
+<div class="diagram">
+<svg viewBox="0 0 900 280" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="13">
+  <rect x="40" y="40" width="380" height="210" rx="12" fill="#fde7e8" stroke="#b4232a"/>
+  <text x="230" y="66" text-anchor="middle" font-weight="800" fill="#b4232a">طبقة S — للمالك وحده (تدميرية)</text>
+  <text x="230" y="88" text-anchor="middle" font-size="12" fill="#7a1b20">is_grantable = false — لا تُمنح لأي موظف أبداً</text>
+  <g font-size="12.5" fill="#7a1b20">
+    <text x="60" y="116">• حذف موظف / فصله</text>
+    <text x="60" y="140">• إيقاف حساب موظف (دائم)</text>
+    <text x="60" y="164">• إدارة صلاحيات الموظفين (منح/سحب)</text>
+    <text x="60" y="188">• الحساب البنكي / بيانات العقد القانونية</text>
+    <text x="60" y="212">• إغلاق المتجر / تغيير العمولة</text>
+    <text x="60" y="234">• حذف الكتالوج جملةً / نقل الملكية</text>
+  </g>
+  <rect x="480" y="40" width="380" height="210" rx="12" fill="#e7f5ee" stroke="#1b7f4b"/>
+  <text x="670" y="66" text-anchor="middle" font-weight="800" fill="#0f5c34">طبقة A — يمنحها المالك لأي موظف</text>
+  <text x="670" y="88" text-anchor="middle" font-size="12" fill="#0f5c34">is_grantable = true — مؤقتة بمؤقّت أو دائمة</text>
+  <g font-size="12.5" fill="#0f5c34">
+    <text x="500" y="116">• قبول/رفض الطلبات</text>
+    <text x="500" y="140">• التحضير / الجاهزية / تسليم للسائق</text>
+    <text x="500" y="164">• إبلاغ نفاد صنف / تقديم بديل</text>
+    <text x="500" y="188">• إسناد الطلبات / إيقاف التحضير المؤقّت</text>
+    <text x="500" y="212">• إدارة الكتالوج / تعديل الأسعار</text>
+    <text x="500" y="236">• عرض التقارير / التسويات (قراءة) · إيقاف مؤقّت لموظف</text>
+  </g>
+</svg>
+<div class="cap">شكل ١: الطبقتان. اليمين (S) محفوظة للمالك ولا تُمنح. اليسار (A) يوزّعها المالك كما يشاء، مؤقتة أو دائمة.</div>
+</div>
+<div class="note"><b>ملاحظة دقيقة:</b> «الإيقاف المؤقّت لموظف» في طبقة A (يستطيع المالك منحه لمشرف). أمّا «الإيقاف الدائم» و«الحذف» و«إدارة الصلاحيات» ففي طبقة S (المالك وحده). هكذا يبقى المشرف مساعِداً قويّاً دون أن يملك أدوات تدمير.</div>
+
+<!-- ===== CATALOG ===== -->
+<h2 class="section" id="cat"><span class="num">ب</span> كتالوج صلاحيات المزوّد الكامل</h2>
+<p>نضيف هذه الرموز إلى <code>permissions_catalog</code> (فئة <code>provider</code>). كلّ رمز له وصف عربي/إنجليزي وعلم منح.</p>
+<h4>طبقة A — قابلة للمنح (is_grantable = true)</h4>
+<table>
+  <thead><tr><th>الرمز</th><th>المعنى البسيط</th><th>ملاحظات</th></tr></thead>
+  <tbody>
+    <tr><td><code>provider_order:view</code></td><td>رؤية طابور الطلبات</td><td>أساسية لأي موظف عامل</td></tr>
+    <tr><td><code>provider_order:accept</code></td><td>قبول الطلبات</td><td>🔴 اليوم للمالك فقط — نُحرّرها كصلاحية</td></tr>
+    <tr><td><code>provider_order:reject</code></td><td>رفض الطلب (بسبب)</td><td>قد يقصرها المالك على المشرف</td></tr>
+    <tr><td><code>order:update_preparation_state</code></td><td>بدء التحضير / جاهز</td><td>✅ موجودة (دور الموظف)</td></tr>
+    <tr><td><code>provider_order:handoff</code></td><td>تأكيد تسليم الطلب للسائق</td><td>—</td></tr>
+    <tr><td><code>provider_order:assign</code></td><td>إسناد الطلبات لموظف آخر</td><td>للمشرف/المالك عادةً</td></tr>
+    <tr><td><code>provider_item:report_unavailable</code></td><td>إبلاغ نفاد صنف</td><td>✅ موجودة سلوكاً</td></tr>
+    <tr><td><code>provider_item:substitute</code></td><td>تقديم بديل لصنف</td><td>✅ موجودة سلوكاً</td></tr>
+    <tr><td><code>provider_intake:toggle</code></td><td>إيقاف/استئناف استقبال الطلبات مؤقتاً</td><td>✅ موجودة سلوكاً</td></tr>
+    <tr><td><code>provider_catalog:manage</code></td><td>إضافة/تعديل أصناف</td><td>—</td></tr>
+    <tr><td><code>provider_catalog:price</code></td><td>تعديل الأسعار</td><td>حسّاسة تجارياً — قابلة للمنح بحذر</td></tr>
+    <tr><td><code>provider_reports:view</code></td><td>عرض التقارير والمبيعات (قراءة)</td><td>للكاشير/المالية</td></tr>
+    <tr><td><code>provider_settlement:view</code></td><td>عرض التسويات (قراءة فقط)</td><td>عرض لا صرف</td></tr>
+    <tr><td><code>provider_staff:view</code></td><td>رؤية قائمة الموظفين وأدائهم</td><td>للمشرف</td></tr>
+    <tr><td><code>provider_staff:suspend_temp</code></td><td>إيقاف موظف <b>مؤقتاً</b> (≤ أسبوع)</td><td>للمشرف — بإشعار وموافقة المالك للتحويل لدائم</td></tr>
+    <tr><td><code>provider_complaint:respond</code></td><td>الردّ على شكاوى الطلبات</td><td>—</td></tr>
+    <tr><td><code>provider_hours:manage</code></td><td>تعديل أوقات العمل</td><td>—</td></tr>
+  </tbody>
+</table>
+<h4>طبقة S — للمالك وحده (is_grantable = false)</h4>
+<table>
+  <thead><tr><th>الرمز</th><th>لماذا محفوظة للمالك</th></tr></thead>
+  <tbody>
+    <tr><td><code>provider_staff:manage_permissions</code></td><td>من يدير الصلاحيات يملك كل شيء — قلب التحكّم.</td></tr>
+    <tr><td><code>provider_staff:suspend_permanent</code></td><td>إيقاف دائم = قطع رزق موظف؛ قرار مالك.</td></tr>
+    <tr><td><code>provider_staff:delete</code></td><td>حذف/فصل موظف نهائياً.</td></tr>
+    <tr><td><code>provider:bank_account</code></td><td>تغيير وجهة الأموال = أخطر إجراء مالي.</td></tr>
+    <tr><td><code>provider:legal_identity</code></td><td>بيانات العقد/الهوية القانونية للمنشأة.</td></tr>
+    <tr><td><code>provider:close</code></td><td>إغلاق المتجر يوقف العمل كلّه.</td></tr>
+    <tr><td><code>provider:commission</code></td><td>تغيير نموذج العمولة (تفاوض مع المنصّة).</td></tr>
+    <tr><td><code>provider_catalog:bulk_delete</code></td><td>حذف الكتالوج جملةً — تدمير بيانات.</td></tr>
+    <tr><td><code>provider:transfer_ownership</code></td><td>نقل ملكية الحساب.</td></tr>
+    <tr><td><code>provider_invite:manage</code></td><td>توليد/تدوير رمز دعوة الموظفين.</td></tr>
+  </tbody>
+</table>
+<div class="tip"><b>توسعة:</b> نضيف زرّاً للمالك «🧊 تجميد كل الموظفين فوراً» (طوارئ) — يوقف كل الإجراءات مؤقتاً بنقرة (مثلاً عند اشتباه أمني)، ويُلغى بنقرة. هذه صلاحية طبقة S.</div>
+
+<!-- ===== LABELS ===== -->
+<h2 class="section" id="labels"><span class="num">ج</span> المسميات العامّة + «أخرى» (منفصلة عن الصلاحيات)</h2>
+<p>عند دعوة/تعديل موظف، يختار المالك <b>مسمّى عرضٍ</b> من قائمة منسدلة عامّة لا تخصّ نوع مزوّد، أو يكتب مسمّاه:</p>
+<div class="diagram">
+<svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="13">
+  <rect x="280" y="20" width="340" height="40" rx="8" fill="#fff" stroke="#1b7f4b"/>
+  <text x="450" y="45" text-anchor="middle">المسمّى الوظيفي (للعرض): ▾</text>
+  <g font-size="12.5">
+    <rect x="300" y="70" width="300" height="26" fill="#f6f8fa" stroke="#eee"/><text x="315" y="88">🛡️ مشرف</text>
+    <rect x="300" y="96" width="300" height="26" fill="#fff" stroke="#eee"/><text x="315" y="114">💵 كاشير</text>
+    <rect x="300" y="122" width="300" height="26" fill="#f6f8fa" stroke="#eee"/><text x="315" y="140">🧑 موظف</text>
+    <rect x="300" y="148" width="300" height="26" fill="#fff" stroke="#eee"/><text x="315" y="166">📊 موظف مالية</text>
+    <rect x="300" y="174" width="300" height="26" fill="#f6f8fa" stroke="#eee"/><text x="315" y="192">🌐 موظف خارجي · ⏳ موظف مؤقت · 🔁 مناوب</text>
+    <rect x="300" y="200" width="300" height="30" fill="#f0e9fa" stroke="#6b3fa0"/><text x="315" y="220" fill="#6b3fa0" font-weight="700">✏️ أخرى… (اكتب مسمّى مخصّصاً)</text>
+  </g>
+</svg>
+<div class="cap">شكل ٢: قائمة المسميات العامّة + خيار «أخرى» لكتابة مسمّى حرّ. المسمّى عنوانٌ فقط.</div>
+</div>
+<ul class="clean">
+  <li><b>المسمّى = حقل عرض فقط</b> (<code>staff_title</code>)، عامّ عبر كل المزوّدين، غير مرتبط بنوع المتجر، ولا يمنح صلاحية بذاته.</li>
+  <li><b>الصلاحيات مستقلّة تماماً:</b> يمنحها المالك واحدةً واحدةً (طبقة A) كما يشاء، بغضّ النظر عن المسمّى.</li>
+  <li><b>إعداد مبدئي اختياري (Preset):</b> اختيار مسمّى مثل «مشرف» قد <b>يقترح</b> تفعيل حزمة صلاحيات شائعة — لكن المالك يعدّلها بحرّية (المسمّى لا يفرض شيئاً).</li>
+  <li><b>«أخرى»:</b> يكتب المالك أي اسم (مثلاً «منسّق فرع»، «أمين مخزن») ويبني صلاحياته يدوياً.</li>
+  <li><b>قوالب محفوظة (توسعة):</b> يمكن للمالك حفظ مجموعة صلاحيات باسمٍ لإعادة استخدامها على موظفين جدد بنقرة.</li>
+</ul>
+
+<!-- ===== TEMP vs PERM ===== -->
+<h2 class="section" id="temp"><span class="num">د</span> صلاحية مؤقّتة (بمؤقّت) مقابل دائمة</h2>
+<p>المالك يمنح كل صلاحية إمّا <b>دائمة</b> أو <b>مؤقّتة بتاريخ/مدة انتهاء</b>. هذا يطابق أفضل ممارسات RBAC ٢٠٢٥ (استثناءات موثّقة بانتهاء صلاحية).</p>
+<div class="warn"><b>فجوة تقنية نُغلقها:</b> سجلّ المنح <code>account_permission_grants</code> اليوم بلا حقل انتهاء. <b>سنضيف</b> عموداً <code>expires_at</code> (اختياري). يطبَّق بطريقتين معاً: (١) <b>كسول</b> — محرّك الصلاحية الفعّالة يتجاهل أي GRANT منتهٍ فوراً، (٢) <b>كنس دوري</b> — مهمّة خلفية تُنظّف المنتهية وتُشعِر، على نمط الحلقات الموجودة في <code>main.py</code>.</div>
+<div class="diagram">
+<svg viewBox="0 0 900 150" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="12.5">
+  <rect x="30" y="50" width="170" height="46" rx="8" fill="#f0e9fa" stroke="#6b3fa0"/><text x="115" y="70" text-anchor="middle">المالك يمنح «قبول»</text><text x="115" y="87" text-anchor="middle" font-size="11">مؤقّتة: تنتهي بعد ٣ أيام</text>
+  <line x1="200" y1="73" x2="250" y2="73" stroke="#6b3fa0" marker-end="url(#p)"/>
+  <rect x="250" y="50" width="180" height="46" rx="8" fill="#e7f5ee" stroke="#1b7f4b"/><text x="340" y="70" text-anchor="middle">الموظف يقبل الطلبات</text><text x="340" y="87" text-anchor="middle" font-size="11">طوال المدّة</text>
+  <line x1="430" y1="73" x2="480" y2="73" stroke="#b97400" marker-end="url(#a)"/>
+  <rect x="480" y="50" width="180" height="46" rx="8" fill="#fff4e0" stroke="#b97400"/><text x="570" y="70" text-anchor="middle">انتهت المدّة</text><text x="570" y="87" text-anchor="middle" font-size="11">expires_at مرّ</text>
+  <line x1="660" y1="73" x2="710" y2="73" stroke="#b4232a" marker-end="url(#r)"/>
+  <rect x="710" y="50" width="160" height="46" rx="8" fill="#fde7e8" stroke="#b4232a"/><text x="790" y="70" text-anchor="middle">تُسحب تلقائياً</text><text x="790" y="87" text-anchor="middle" font-size="11">+ إشعار المالك</text>
+  <text x="450" y="128" text-anchor="middle" fill="#5d6677">الصلاحية الدائمة = بلا expires_at؛ تبقى حتى يسحبها المالك يدوياً</text>
+  <defs>
+    <marker id="p" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#6b3fa0"/></marker>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#b97400"/></marker>
+    <marker id="r" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#b4232a"/></marker>
+  </defs>
+</svg>
+<div class="cap">شكل ٣: دورة حياة صلاحية مؤقّتة — تنتهي تلقائياً وتُشعَر، دون تدخّل.</div>
+</div>
+
+<!-- ===== IDEAS ===== -->
+<h2 class="section" id="ideas"><span class="num">هـ</span> أفكار وتوسّعات إضافية (قيمة مضافة)</h2>
+<ul class="clean">
+  <li><b>موظف مؤقّت / مناوب بانتهاء كامل:</b> حساب يعمل حتى تاريخ/ساعة محدّدة ثم يُجمَّد آلياً (مفيد للمواسم ورمضان).</li>
+  <li><b>موظف خارجي مقيّد:</b> وصول مقيّد زمنياً وبصلاحيات قراءة افتراضياً (محاسب خارجي مثلاً).</li>
+  <li><b>سجلّ تغييرات الصلاحيات:</b> من منح/سحب ماذا ولِمن ومتى ولماذا — موجود أصلاً (<code>granted_by · reason · created_at</code> + التدقيق) ونعرضه كـ«سجلّ».</li>
+  <li><b>إشعارات المالك:</b> عند كل فعل مشرف حسّاس (إيقاف مؤقت، تعديل سعر…) يصل إشعار للمالك.</li>
+  <li><b>قوالب صلاحيات محفوظة:</b> «احفظ هذه المجموعة باسم» لإعادة استخدامها.</li>
+  <li><b>تجميد طوارئ شامل:</b> زرّ يوقف كل الموظفين بنقرة (مالك).</li>
+  <li><b>وضع القراءة فقط:</b> أي مسمّى يمكن جعله «عرض فقط» (كل صلاحياته view).</li>
+  <li><b>لوحة أداء مباشرة:</b> من يعمل الآن، آخر نشاط، الطلبات الجارية لكل موظف.</li>
+  <li><b>تنبيه التحضير المتأخّر:</b> إن تجاوز طلبٌ زمناً معيّناً لدى موظف، يُنبَّه المشرف/المالك.</li>
+</ul>
+
+<!-- ===== MODEL ===== -->
+<h2 class="section" id="model"><span class="num">و</span> تغييرات نموذج البيانات (مجمّعة)</h2>
+<table>
+  <thead><tr><th>العنصر</th><th>النوع</th><th>التفصيل الدقيق</th></tr></thead>
+  <tbody>
+    <tr><td>رموز صلاحيات المزوّد</td><td><span class="badge b-mod">🟠</span></td><td>إضافة رموز <code>provider_*</code> إلى <code>DEFAULT_PERMISSION_CATALOG</code> مع <code>is_grantable</code> الصحيح لكلّ منها (طبقة A=true، طبقة S=false).</td></tr>
+    <tr><td>انتهاء المنح</td><td><span class="badge b-new">🟣</span></td><td>عمود <code>expires_at</code> (اختياري) على <code>account_permission_grants</code> + احترامه في <code>has_effective_permission</code>.</td></tr>
+    <tr><td>مسمّى الموظف</td><td><span class="badge b-new">🟣</span></td><td>عمود <code>staff_title</code> (نصّ) على <code>OperationalProfile</code> — عرض فقط، عامّ.</td></tr>
+    <tr><td>حالة الإيقاف</td><td><span class="badge b-new">🟣</span></td><td>أعمدة <code>suspension_until · suspension_state(NONE/TEMP_PENDING/PERMANENT) · suspended_by_role</code> (الحقول الأساسية موجودة).</td></tr>
+    <tr><td>إسناد الطلب</td><td><span class="badge b-new">🟣</span></td><td>عمودا <code>assigned_staff_id · assigned_at</code> على الطلب (نطاق المزوّد، لا يمسّ المالية).</td></tr>
+    <tr><td>وضع التوزيع</td><td><span class="badge b-new">🟣</span></td><td><code>order_distribution_mode(AUTO/MANUAL) · auto_cascade_seconds</code> على <code>Provider</code> (بجانب <code>auto_accept_orders</code> الموجود).</td></tr>
+    <tr><td>تقييم أسبوعي</td><td><span class="badge b-new">🟣</span></td><td>جدول <code>provider_staff_review</code> (اختياري؛ الأرقام تُحسب من <code>audit_log</code>).</td></tr>
+  </tbody>
+</table>
+<div class="danger"><b>تنبيه المنطقة المحظورة:</b> أعمدة <code>Order</code> و<code>Provider</code> و<code>OperationalProfile</code> تقع في مجلدات backend المحظورة (models/migrations). تنفيذها يتطلّب <b>إذنك الصريح</b> — وهو ما اعتدنا أخذه في المراحل السابقة.</div>
+
+<!-- ===== API ===== -->
+<h2 class="section" id="api"><span class="num">ز</span> نقاط الـAPI (إضافة/تعديل)</h2>
+<table>
+  <thead><tr><th>النقطة</th><th>النوع</th><th>الحارس / الملاحظة</th></tr></thead>
+  <tbody>
+    <tr><td><code>GET /providers/me/staff</code></td><td><span class="badge b-new">🟣</span></td><td><code>provider_staff:view</code> (مالك/مشرف) — قائمة + حالة + إحصاء اليوم.</td></tr>
+    <tr><td><code>GET /providers/me/staff/{id}</code></td><td><span class="badge b-new">🟣</span></td><td>بطاقة موظف كاملة.</td></tr>
+    <tr><td><code>GET /providers/me/permissions/catalog</code></td><td><span class="badge b-new">🟣</span></td><td>صلاحيات فئة <code>provider</code> فقط — والقابلة للمنح منها فقط للعرض في شاشة المنح.</td></tr>
+    <tr><td><code>POST /providers/me/staff/{id}/permissions</code></td><td><span class="badge b-new">🟣</span></td><td><b>مالك فقط</b> (<code>provider_staff:manage_permissions</code>, طبقة S). يقبل <code>permission, effect, expires_at?, reason</code>. ABAC: الموظف من متجري + الصلاحية قابلة للمنح.</td></tr>
+    <tr><td><code>DELETE /providers/me/staff/{id}/permissions/{perm}</code></td><td><span class="badge b-new">🟣</span></td><td>مسح منح/سحب (مالك).</td></tr>
+    <tr><td><code>PATCH /providers/me/staff/{id}/title</code></td><td><span class="badge b-new">🟣</span></td><td>ضبط المسمّى العرضي (قائمة عامّة أو «أخرى»).</td></tr>
+    <tr><td><code>POST /providers/me/staff/{id}/suspend</code></td><td><span class="badge b-new">🟣</span></td><td>مؤقّت: <code>provider_staff:suspend_temp</code> (مشرف، ≤أسبوع). دائم: مالك فقط.</td></tr>
+    <tr><td><code>POST /providers/me/staff/{id}/suspension/approve</code></td><td><span class="badge b-new">🟣</span></td><td>مالك يحوّل المؤقّت لدائم أو يرفض.</td></tr>
+    <tr><td><code>POST /providers/me/staff/{id}/reinstate</code></td><td><span class="badge b-new">🟣</span></td><td>مالك يُعيد التفعيل.</td></tr>
+    <tr><td><code>DELETE /providers/me/staff/{id}</code></td><td><span class="badge b-new">🟣</span></td><td><b>مالك فقط</b>. يُعيد إسناد طلباته الجارية ثم يفصل.</td></tr>
+    <tr><td><code>POST /providers/me/orders/{id}/assign</code></td><td><span class="badge b-new">🟣</span></td><td><code>provider_order:assign</code>.</td></tr>
+    <tr><td><code>PATCH /providers/me/distribution-mode</code></td><td><span class="badge b-new">🟣</span></td><td>مالك (أو مشرف بإذن) — AUTO/MANUAL + مهلة.</td></tr>
+    <tr><td><code>POST /providers/me/staff/freeze-all</code></td><td><span class="badge b-new">🟣</span></td><td>تجميد طوارئ (مالك، طبقة S).</td></tr>
+    <tr><td><code>POST /providers/orders/{id}/accept</code></td><td><span class="badge b-mod">🟠</span></td><td>الحارس: <code>require_permission("provider_order:accept")</code> بدل دور ثابت.</td></tr>
+    <tr><td>حارس إجراءات المزوّد</td><td><span class="badge b-mod">🟠</span></td><td>إضافة فحص <code>is_suspended</code> + <code>suspension_until</code> ليسري الإيقاف فوراً.</td></tr>
+  </tbody>
+</table>
+
+<!-- ===== PANEL ===== -->
+<h2 class="section" id="panel"><span class="num">ح</span> لوحة الموظفين (داخل قسم المزوّد)</h2>
+<ul class="clean">
+  <li><b>القائمة:</b> بحث/تصفية (نشط/موقوف/مؤقّت)، ترتيب (الأعلى أداءً)، شارة حالة لكل موظف.</li>
+  <li><b>بطاقة الموظف:</b> المسمّى + بيانات شخصية + بيانات عمل (بدأ متى، أول طلب اليوم، قبِل/جهّز، قيد العمل وتفاصيلها، متوسط التحضير) + التقييم.</li>
+  <li><b>مصفوفة الصلاحيات:</b> مربّع لكل صلاحية طبقة A، مع مفتاح «دائم / مؤقّت (اختر تاريخاً)». صلاحيات طبقة S تظهر <b>رمادية مقفلة</b> «للمالك فقط». (يراها المالك فقط.)</li>
+  <li><b>أزرار:</b> [دعوة موظف]، [تعديل المسمّى]، [تعديل الصلاحيات]، [إيقاف مؤقّت/دائم]، [حذف]، [إعادة تفعيل]، وأعلى اللوحة [وضع التوزيع] و[🧊 تجميد الكل].</li>
+  <li><b>إشعار المالك:</b> شريط أعلى يعرض ما فعله المشرف (إيقاف مؤقّت بانتظار موافقة…).</li>
+</ul>
+<div class="tip">نُحاكي كونسول OPS الجاهز (<code>OpsAccountManagement.tsx</code> + <code>api/accountPermissions.ts</code>) لتسريع البناء وتوحيد التجربة.</div>
+
+<!-- ===== JOBS ===== -->
+<h2 class="section" id="jobs"><span class="num">ط</span> المهام الخلفية (على النمط الموجود)</h2>
+<ul class="clean">
+  <li><b>كنس انتهاء المنح المؤقّتة:</b> حلقة دقيقية تُلغي GRANT المنتهية وتُشعِر — على نمط <code>_scheduled_order_release_loop</code> (قفل Redis، مُعطَّلة في الاختبارات).</li>
+  <li><b>كنس انتهاء الإيقاف المؤقّت:</b> إعادة الموظف نشطاً تلقائياً عند مرور <code>suspension_until</code> دون موافقة دائمة.</li>
+  <li><b>تصعيد التوزيع الآلي:</b> إسناد للموظف التالي عند عدم الاستجابة خلال <code>auto_cascade_seconds</code> (يلتقي مع منطق مهلة القبول الموجود).</li>
+</ul>
+
+<!-- ===== PHASING ===== -->
+<h2 class="section" id="phasing"><span class="num">ي</span> خطة التنفيذ بالدفعات (قابلة للاختبار كلٌّ على حدة)</h2>
+<table>
+  <thead><tr><th>الدفعة</th><th>المحتوى</th><th>اعتماد</th></tr></thead>
+  <tbody>
+    <tr><td><b>ج-1</b></td><td>رموز صلاحيات المزوّد في الكتالوج + تحويل حارس القبول إلى صلاحية + فحص <code>is_suspended</code>.</td><td>لا واجهة جديدة — أساس آمن.</td></tr>
+    <tr><td><b>ج-2</b></td><td><code>expires_at</code> على المنح + احترامه + كنس الانتهاء.</td><td>يفعّل المؤقّت.</td></tr>
+    <tr><td><b>ج-3</b></td><td>endpoints الموظفين + لوحة الموظفين + مصفوفة الصلاحيات + المسمّيات.</td><td>الواجهة الرئيسية.</td></tr>
+    <tr><td><b>ج-4</b></td><td>الإيقاف (مؤقّت/موافقة/دائم) + إعادة الإسناد + تجميد الطوارئ.</td><td>—</td></tr>
+    <tr><td><b>ج-5</b></td><td>وضع التوزيع AUTO/MANUAL + الإسناد + التصعيد + التقييم.</td><td>—</td></tr>
+    <tr><td><b>أ</b></td><td>النقطة ٤ (الإحالة): ضبط + التقاط الرمز + شرح المستخدم.</td><td>سريعة — يُنصح بها أولاً.</td></tr>
+    <tr><td><b>ب</b></td><td>النقطة ١ (البحث): وسيط النوع + القائمة المنسدلة + التمرير.</td><td>منخفضة المخاطر.</td></tr>
+  </tbody>
+</table>
+
+<!-- ===== P1 ===== -->
+<h2 class="section" id="p1plan"><span class="num">١</span> النقطة ١ — البحث حسب النوع (خطة موجزة كاملة)</h2>
+<ul class="clean">
+  <li><span class="badge b-mod">🟠</span> إضافة <code>provider_type</code> (اختياري) إلى <code>GET /catalog/search</code> و<code>fuzzy_search_catalog_items</code> عبر JOIN على <code>Provider.provider_type</code> — يُطبَّق في مساري PostgreSQL وSQLite معاً.</li>
+  <li><span class="badge b-new">🟣</span> قائمة منسدلة بجانب صندوق البحث في <code>SearchResultsPage</code> (تقرأ <code>/providers/types?active_only=true</code>؛ أوّلها «الكل»).</li>
+  <li><span class="badge b-mod">🟠</span> تمرير النوع المختار من <code>HomePage</code> إلى <code>/search?q=…&amp;type=…</code> + تمريره لتبويب «مطاعم».</li>
+  <li><span class="badge b-new">🟣</span> عدّاد نتائج لكل نوع + رسالة فراغ ودودة.</li>
+  <li><b>عدم كسر:</b> الوسيط اختياري ⇒ غيابه = البحث العام الحالي حرفياً.</li>
+</ul>
+
+<!-- ===== P4 ===== -->
+<h2 class="section" id="p4plan"><span class="num">٤</span> النقطة ٤ — رمز الإحالة (خطة موجزة كاملة)</h2>
+<ul class="clean">
+  <li><span class="badge b-mod">🟠</span> ضبط: <code>referral_max_per_window=3–5</code> · <code>referral_reward_on_conversion=true</code> · <code>referral_referee_reward_minor&gt;0</code> (قابلة للضبط لحظياً عبر <code>LoyaltyConfig</code>).</li>
+  <li><span class="badge b-new">🟣</span> التقاط رمز إحالة (اختياري) عند تسجيل العميل → يستدعي <code>redeem</code> بعد الإنشاء (مع device_id).</li>
+  <li><span class="badge b-new">🟣</span> إظهار «أنت وصديقك تربحان» في صفحة الإحالة وعند التسجيل.</li>
+  <li><span class="badge b-tip">💡</span> تقوية بصمة الجهاز لكشف تعدّد الحسابات.</li>
+  <li><b>الختم:</b> كل المكافآت تراكمية حتى يُفتح <code>production_payment_enabled</code>.</li>
+</ul>
+
+<!-- ===================== SCENARIO LIBRARY ===================== -->
+<h2 class="section" id="lib"><span class="num">ك</span> مكتبة السيناريوهات (٢٢٠+ محاكاة للعمل الحقيقي)</h2>
+<p>كل سطر: <b>الموقف → السلوك المتوقّع/القاعدة التي تضمنه</b>. مرتّبة بمجموعات. الرمز يبدأ بحرف المجموعة.</p>
+
+<div class="grp">المجموعة A — منح الصلاحيات (المالك سيّد التحكّم) <span class="cnt">A1–A22</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">A1</td><td>المالك يمنح موظفاً صغيراً «قبول الطلبات» دائماً.</td><td>يُكتب GRANT بلا expires_at؛ خلال ≤60ث يقبل الموظف الطلبات.</td></tr>
+<tr><td class="id">A2</td><td>المالك يمنح «قبول» مؤقّتاً ٣ أيام.</td><td>GRANT بـ expires_at=+3d؛ يُسحب تلقائياً بعدها مع إشعار.</td></tr>
+<tr><td class="id">A3</td><td>المالك يمنح «تعديل الأسعار» لكاشير.</td><td>يُسمح (طبقة A)؛ يظهر في سجلّ المنح باسم المالك.</td></tr>
+<tr><td class="id">A4</td><td>المالك يسحب صلاحية ممنوحة.</td><td>REVOKE يلغيها؛ تسري خلال انتهاء الكاش (60ث).</td></tr>
+<tr><td class="id">A5</td><td>المالك يمنح ثم يمدّد المدّة المؤقّتة.</td><td>تحديث expires_at لقيمة أبعد؛ يُحترم فوراً.</td></tr>
+<tr><td class="id">A6</td><td>المالك يحوّل صلاحية مؤقّتة إلى دائمة.</td><td>إزالة expires_at؛ تبقى حتى السحب اليدوي.</td></tr>
+<tr><td class="id">A7</td><td>المالك يمنح حزمة صلاحيات دفعةً واحدة (Preset).</td><td>عدة GRANT في عملية واحدة؛ كلّها تظهر في البطاقة.</td></tr>
+<tr><td class="id">A8</td><td>المالك يحاول منح صلاحية طبقة S (مثلاً حذف موظف).</td><td>تُرفض (is_grantable=false) برسالة «صلاحية للمالك فقط».</td></tr>
+<tr><td class="id">A9</td><td>المالك يمنح «إيقاف مؤقّت» لمشرف.</td><td>يُسمح (طبقة A)؛ يصبح المشرف قادراً على إيقاف مؤقّت.</td></tr>
+<tr><td class="id">A10</td><td>المالك يمنح صلاحية لموظف من متجر آخر.</td><td>تُرفض (ABAC: الموظف ليس ضمن متجر المالك).</td></tr>
+<tr><td class="id">A11</td><td>المالك يمنح «عرض التقارير» فقط (قراءة).</td><td>الموظف يرى الأرقام، ولا يصرف ولا يعدّل.</td></tr>
+<tr><td class="id">A12</td><td>منح بلا سبب مكتوب.</td><td>السبب اختياري؛ يُقبل، ويُسجَّل الفاعل والوقت تلقائياً.</td></tr>
+<tr><td class="id">A13</td><td>المالك يمنح صلاحيتين متعارضتين منطقياً (قبول + عرض فقط).</td><td>لا تعارض تقني؛ الأوسع يفوز (يقبل).</td></tr>
+<tr><td class="id">A14</td><td>منح مؤقّت بتاريخ ماضٍ بالخطأ.</td><td>تحقّق: expires_at يجب أن يكون مستقبلاً، وإلا 422.</td></tr>
+<tr><td class="id">A15</td><td>المالك يمنح كل صلاحيات طبقة A لموظف («شبه مالك»).</td><td>يُسمح — لكنه لا يطال طبقة S (لا يحذف/يدير صلاحيات).</td></tr>
+<tr><td class="id">A16</td><td>سحب صلاحية أساسية (عرض الطابور) عن عامل.</td><td>يُسمح؛ الموظف لم يعد يرى الطلبات (المالك مسؤول عن القرار).</td></tr>
+<tr><td class="id">A17</td><td>منح «قبول» لموظف موقوف حالياً.</td><td>يُقبل المنح لكن لا يسري حتى يُعاد تفعيله (الإيقاف يعلو).</td></tr>
+<tr><td class="id">A18</td><td>المالك يستعرض سجلّ تغييرات الصلاحيات.</td><td>يرى من/ماذا/متى/لماذا (granted_by+reason+الوقت).</td></tr>
+<tr><td class="id">A19</td><td>محاولة منح من حساب ليس مالكاً (مشرف).</td><td>تُرفض — إدارة الصلاحيات طبقة S للمالك وحده.</td></tr>
+<tr><td class="id">A20</td><td>منح صلاحية لموظف ثم حذف الموظف.</td><td>الحذف يُزيل الموظف ومنحه؛ لا منح يتيم.</td></tr>
+<tr><td class="id">A21</td><td>المالك يحفظ مجموعة صلاحيات كقالب «منسّق».</td><td>يُحفظ القالب لإعادة استخدامه على آخرين.</td></tr>
+<tr><td class="id">A22</td><td>منح صلاحية ثم انتهاء المدّة أثناء عمل الموظف عليها.</td><td>الإجراء الجاري يكتمل؛ الإجراء التالي يُرفض بعد الانتهاء.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة B — الصلاحيات التدميرية المحظورة (طبقة S) <span class="cnt">B1–B12</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">B1</td><td>محاولة منح «حذف موظف» لأي أحد.</td><td>مرفوض دائماً (is_grantable=false).</td></tr>
+<tr><td class="id">B2</td><td>محاولة منح «تغيير الحساب البنكي».</td><td>مرفوض — للمالك وحده.</td></tr>
+<tr><td class="id">B3</td><td>محاولة منح «إدارة الصلاحيات».</td><td>مرفوض — قلب التحكّم محفوظ للمالك.</td></tr>
+<tr><td class="id">B4</td><td>محاولة منح «إغلاق المتجر».</td><td>مرفوض.</td></tr>
+<tr><td class="id">B5</td><td>محاولة منح «تغيير العمولة».</td><td>مرفوض.</td></tr>
+<tr><td class="id">B6</td><td>محاولة منح «الإيقاف الدائم».</td><td>مرفوض — المشرف يملك «المؤقّت» فقط.</td></tr>
+<tr><td class="id">B7</td><td>محاولة منح «حذف الكتالوج جملةً».</td><td>مرفوض.</td></tr>
+<tr><td class="id">B8</td><td>محاولة منح «نقل الملكية».</td><td>مرفوض.</td></tr>
+<tr><td class="id">B9</td><td>المالك نفسه يستخدم صلاحية طبقة S.</td><td>يُسمح — المالك يملكها بحكم الدور.</td></tr>
+<tr><td class="id">B10</td><td>تعديل قاعدة البيانات يدوياً لجعل صلاحية S قابلة للمنح.</td><td>سياسة: رموز S تُبذَر is_grantable=false ويُمنع تعديلها من واجهة المزوّد.</td></tr>
+<tr><td class="id">B11</td><td>موظف يحمل «شبه كل شيء» يحاول حذف زميل.</td><td>مرفوض — لا يملك طبقة S مهما مُنح.</td></tr>
+<tr><td class="id">B12</td><td>المالك يستخدم «تجميد الكل» الطارئ.</td><td>يُسمح (S)؛ يوقف كل الموظفين فوراً حتى الإلغاء.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة C — المسميات العامّة و«أخرى» <span class="cnt">C1–C12</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">C1</td><td>المالك يختار مسمّى «مشرف» من القائمة.</td><td>يُحفظ كعنوان عرض؛ قد يقترح حزمة صلاحيات قابلة للتعديل.</td></tr>
+<tr><td class="id">C2</td><td>صيدليّة تختار مسمّى لموظفها (لا «تحضير»).</td><td>القائمة عامّة؛ لا مسمّى مرتبط بنوع المتجر.</td></tr>
+<tr><td class="id">C3</td><td>المالك يختار «أخرى» ويكتب «أمين مخزن».</td><td>يُحفظ المسمّى الحرّ؛ يبني صلاحياته يدوياً.</td></tr>
+<tr><td class="id">C4</td><td>مسمّى «كاشير» بصلاحيات قبول (غير معتاد).</td><td>يُسمح — المسمّى لا يقيّد الصلاحيات إطلاقاً.</td></tr>
+<tr><td class="id">C5</td><td>تغيير مسمّى موظف لاحقاً.</td><td>يتغيّر العنوان فقط؛ الصلاحيات تبقى كما هي.</td></tr>
+<tr><td class="id">C6</td><td>مسمّى فارغ.</td><td>يُسمح بعنوان افتراضي «موظف» للعرض.</td></tr>
+<tr><td class="id">C7</td><td>مسمّى طويل جداً.</td><td>يُقصّ بحدّ أقصى معقول (مثلاً ٤٠ حرفاً).</td></tr>
+<tr><td class="id">C8</td><td>المالك يختار «موظف مؤقّت».</td><td>عنوان عرض؛ يُقترن اختيارياً بانتهاء وصول كامل (مجموعة L).</td></tr>
+<tr><td class="id">C9</td><td>مسمّى «موظف خارجي».</td><td>عنوان عرض؛ افتراضياً صلاحيات قراءة مقترحة (قابلة للتعديل).</td></tr>
+<tr><td class="id">C10</td><td>مسمّيان متطابقان لموظفين.</td><td>مسموح — العنوان ليس مُعرِّفاً فريداً.</td></tr>
+<tr><td class="id">C11</td><td>القائمة تُعمّم على كل المزوّدين.</td><td>مصدر واحد للمسميات العامّة (لا فرع لكل نوع متجر).</td></tr>
+<tr><td class="id">C12</td><td>المالك يريد مسمّى بإيموجي.</td><td>يُقبل النصّ كما هو؛ عرض فقط.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة D — المشرف وحدوده <span class="cnt">D1–D14</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">D1</td><td>المشرف يرى كل الموظفين وأداءهم.</td><td>يُسمح (provider_staff:view).</td></tr>
+<tr><td class="id">D2</td><td>المشرف يوزّع الطلبات.</td><td>يُسمح (provider_order:assign) إن مُنح.</td></tr>
+<tr><td class="id">D3</td><td>المشرف يوقف موظفاً مؤقتاً يوماً.</td><td>يُسمح؛ إشعار فوري للمالك.</td></tr>
+<tr><td class="id">D4</td><td>المشرف يحاول إيقاف موظف ٣ أسابيع.</td><td>مرفوض — السقف أسبوع.</td></tr>
+<tr><td class="id">D5</td><td>المشرف يحاول الإيقاف الدائم.</td><td>مرفوض — طبقة S للمالك.</td></tr>
+<tr><td class="id">D6</td><td>المشرف يحاول حذف موظف.</td><td>مرفوض.</td></tr>
+<tr><td class="id">D7</td><td>المشرف يحاول إيقاف المالك.</td><td>مرفوض — لا يطال من هو أعلى رتبة.</td></tr>
+<tr><td class="id">D8</td><td>المشرف يحاول إيقاف مشرف آخر مساوٍ.</td><td>مرفوض (لا يطال مساوياً/أعلى).</td></tr>
+<tr><td class="id">D9</td><td>المشرف يحاول منح صلاحيات.</td><td>مرفوض — إدارة الصلاحيات للمالك.</td></tr>
+<tr><td class="id">D10</td><td>المشرف يحاول تغيير الحساب البنكي.</td><td>مرفوض (طبقة S).</td></tr>
+<tr><td class="id">D11</td><td>المشرف يقبل/يرفض الطلبات.</td><td>يُسمح إن مُنح القبول/الرفض.</td></tr>
+<tr><td class="id">D12</td><td>المشرف يبدّل وضع التوزيع.</td><td>يُسمح فقط إن منحه المالك ذلك.</td></tr>
+<tr><td class="id">D13</td><td>سُحبت صلاحيات المشرف فجأة.</td><td>يعود موظفاً عادياً خلال الكاش.</td></tr>
+<tr><td class="id">D14</td><td>المشرف يطّلع على سجلّ منح المالك.</td><td>قراءة فقط إن مُنح؛ لا يعدّل.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة E — الإيقاف (مؤقّت/موافقة/دائم) <span class="cnt">E1–E18</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">E1</td><td>إيقاف مؤقّت يوماً.</td><td>الموظف TEMP_PENDING؛ يُرفض أي إجراء منه فوراً.</td></tr>
+<tr><td class="id">E2</td><td>موظف موقوف يحاول قبول طلب.</td><td>مرفوض «حسابك موقوف مؤقتاً».</td></tr>
+<tr><td class="id">E3</td><td>موقوف وله طلبات جارية.</td><td>تُعاد للطابور/تُسنَد لغيره فوراً.</td></tr>
+<tr><td class="id">E4</td><td>المالك يفتح اللوحة بعد إيقاف المشرف.</td><td>شريط: «أوقف المشرفُ X الموظفَ Y حتى الغد — السبب…» [موافقة][رفض].</td></tr>
+<tr><td class="id">E5</td><td>المالك يوافق على الإيقاف.</td><td>يتحوّل PERMANENT.</td></tr>
+<tr><td class="id">E6</td><td>المالك يرفض الإيقاف.</td><td>يعود الموظف نشطاً فوراً.</td></tr>
+<tr><td class="id">E7</td><td>المالك لا يتدخّل حتى انتهاء المدّة.</td><td>كنس دوري يعيده نشطاً تلقائياً.</td></tr>
+<tr><td class="id">E8</td><td>المالك يوقف موظفاً دائماً مباشرة.</td><td>يُسمح بلا حاجة لموافقة (هو صاحب الصلاحية).</td></tr>
+<tr><td class="id">E9</td><td>إيقاف موظف موقوف أصلاً.</td><td>عملية عديمة الأثر/تحديث مدّة؛ لا ازدواج.</td></tr>
+<tr><td class="id">E10</td><td>إعادة تفعيل موظف.</td><td>يعود نشطاً؛ صلاحياته السابقة كما كانت.</td></tr>
+<tr><td class="id">E11</td><td>إيقاف بمدّة = أسبوع تماماً.</td><td>يُقبل (الحدّ الأقصى المسموح).</td></tr>
+<tr><td class="id">E12</td><td>إيقاف بلا سبب.</td><td>السبب مطلوب للإيقاف (للشفافية)؛ وإلا 422.</td></tr>
+<tr><td class="id">E13</td><td>موقوف يحاول تسجيل الدخول.</td><td>يدخل لكن كل الإجراءات مرفوضة + لافتة الحالة.</td></tr>
+<tr><td class="id">E14</td><td>إيقاف ثم منح صلاحية أثناء الإيقاف.</td><td>المنح يُسجَّل لكن لا يسري حتى التفعيل.</td></tr>
+<tr><td class="id">E15</td><td>موافقة المالك على إيقاف منتهٍ مسبقاً.</td><td>إن عاد نشطاً تلقائياً، الموافقة لاغية (رسالة توضيح).</td></tr>
+<tr><td class="id">E16</td><td>إيقاف يطال طلباً قيد التسليم للسائق.</td><td>الإجراء الحرج يُكمَل/يُسنَد لزميل؛ لا عطل للعميل.</td></tr>
+<tr><td class="id">E17</td><td>سجلّ من أوقف ومتى.</td><td>محفوظ (suspended_by, by_role, at, until, reason).</td></tr>
+<tr><td class="id">E18</td><td>إيقاف كل الموظفين دفعة (طوارئ).</td><td>«تجميد الكل» — لا أحد يتصرّف حتى الإلغاء.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة F — الحذف والفصل <span class="cnt">F1–F10</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">F1</td><td>المالك يحذف موظفاً.</td><td>يُعاد إسناد طلباته أولاً ثم يُفصل ربطه + تُلغى صلاحياته.</td></tr>
+<tr><td class="id">F2</td><td>مشرف يحاول الحذف.</td><td>مرفوض (طبقة S).</td></tr>
+<tr><td class="id">F3</td><td>حذف موظف له طلبات جارية.</td><td>لا طلب يتيم — يُعاد توزيعه قبل الفصل.</td></tr>
+<tr><td class="id">F4</td><td>حذف ثم محاولة الموظف الدخول.</td><td>لم يعد مرتبطاً بالمتجر؛ لا وصول لإجراءاته.</td></tr>
+<tr><td class="id">F5</td><td>سجلّ عمله السابق بعد الحذف.</td><td>يبقى في التدقيق (لا يُمحى التاريخ التشغيلي).</td></tr>
+<tr><td class="id">F6</td><td>حذف موظف موقوف.</td><td>يُسمح؛ ينطبق نفس تنظيف الإسناد.</td></tr>
+<tr><td class="id">F7</td><td>إعادة دعوة من حُذف.</td><td>ينضمّ كموظف جديد برمز دعوة جديد.</td></tr>
+<tr><td class="id">F8</td><td>حذف آخر موظف قبول والمتجر مزدحم.</td><td>يُسمح؛ المالك مسؤول؛ التوزيع يصعّد إليه.</td></tr>
+<tr><td class="id">F9</td><td>محاولة حذف المالك نفسه عبر اللوحة.</td><td>غير متاح — المالك ليس عنصراً في قائمة الموظفين القابلة للحذف.</td></tr>
+<tr><td class="id">F10</td><td>حذف بالخطأ.</td><td>لا تراجع تلقائي؛ يُعاد الدعوة — (توسعة: تأكيد مزدوج قبل الحذف).</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة G — التوزيع الآلي (AUTO) <span class="cnt">G1–G18</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">G1</td><td>طلب جديد في الوضع الآلي.</td><td>يظهر لكل من يملك «عرض الطابور» + المشرف + المالك.</td></tr>
+<tr><td class="id">G2</td><td>موظف يقبل أولاً.</td><td>يُسنَد له ويختفي من البقية.</td></tr>
+<tr><td class="id">G3</td><td>لا أحد يقبل خلال المهلة.</td><td>إسناد تلقائي للموظف التالي (round-robin) + تنبيهه.</td></tr>
+<tr><td class="id">G4</td><td>التالي أيضاً لا يستجيب.</td><td>تصعيد للمالك/المشرف بتنبيه بارز.</td></tr>
+<tr><td class="id">G5</td><td>كل الموظفين موقوفون.</td><td>تصعيد مباشر للمالك؛ لا يضيع الطلب.</td></tr>
+<tr><td class="id">G6</td><td>الطلب لمتجر يقبل تلقائياً (auto_accept).</td><td>يُقبل تلقائياً ثم يُوزَّع للتحضير.</td></tr>
+<tr><td class="id">G7</td><td>موظف بلا «قبول» يحاول القبول.</td><td>مرفوض — يحتاج الصلاحية.</td></tr>
+<tr><td class="id">G8</td><td>تغيير المهلة لحظياً.</td><td>يُطبَّق على الطلبات الجديدة.</td></tr>
+<tr><td class="id">G9</td><td>طلب مجدول (scheduled).</td><td>يدخل التوزيع عند موعد الإطلاق لا قبله (يلتقي مع منطق الجدولة الموجود).</td></tr>
+<tr><td class="id">G10</td><td>تعدّد الفروع/الأجهزة لنفس الموظف.</td><td>الإسناد بالموظف لا بالجهاز؛ يظهر على كل أجهزته.</td></tr>
+<tr><td class="id">G11</td><td>انقطاع الإنترنت لحظة الإسناد.</td><td>إعادة المحاولة؛ التصعيد يحمي من الضياع.</td></tr>
+<tr><td class="id">G12</td><td>موظف يقبل ثم لا يبدأ التحضير.</td><td>تنبيه تأخّر للمشرف + خيار إعادة الإسناد.</td></tr>
+<tr><td class="id">G13</td><td>ذروة طلبات متزامنة.</td><td>كلٌّ يظهر للجميع؛ القفل الذرّي يمنع الازدواج.</td></tr>
+<tr><td class="id">G14</td><td>التحويل من آلي ليدوي أثناء وجود طلبات معلّقة.</td><td>المعلّقة تنتظر التوجيه؛ الجديدة تتبع اليدوي.</td></tr>
+<tr><td class="id">G15</td><td>موظف وحيد متاح.</td><td>round-robin يدور عليه وحده؛ يعمل طبيعياً.</td></tr>
+<tr><td class="id">G16</td><td>تصعيد متكرّر بلا استجابة طويلة.</td><td>تنبيه متصاعد + (توسعة) تنبيه غرفة عمليات المنصّة اختيارياً.</td></tr>
+<tr><td class="id">G17</td><td>قبول من موظف ثم سحب صلاحيته بعد القبول.</td><td>يكمل الطلب الجاري؛ لا يقبل جديداً.</td></tr>
+<tr><td class="id">G18</td><td>المالك يفضّل ألا تظهر الطلبات للمالية.</td><td>المالية بلا «عرض الطابور» → لا ترى الطلبات.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة H — التوزيع اليدوي (MANUAL) <span class="cnt">H1–H14</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">H1</td><td>طلب جديد في الوضع اليدوي.</td><td>لا يذهب لأحد؛ ينتظر توجيه المالك/المشرف.</td></tr>
+<tr><td class="id">H2</td><td>المشرف يُسند لخالد.</td><td>يظهر لخالد فقط؛ يقبله ويبدأ.</td></tr>
+<tr><td class="id">H3</td><td>تأخّر التوجيه عن مهلة.</td><td>تنبيه أحمر للمالك/المشرف (صمّام أمان).</td></tr>
+<tr><td class="id">H4</td><td>إسناد لموظف موقوف.</td><td>مرفوض؛ اختر موظفاً نشطاً.</td></tr>
+<tr><td class="id">H5</td><td>إسناد لموظف بلا «قبول».</td><td>تحذير؛ إمّا يُمنح أو يُختار غيره.</td></tr>
+<tr><td class="id">H6</td><td>إعادة إسناد طلب من موظف لآخر.</td><td>يُسمح للمالك/المشرف؛ يُسجَّل التغيير.</td></tr>
+<tr><td class="id">H7</td><td>إسناد طلب لنفسه (المشرف يعمل أيضاً).</td><td>يُسمح إن ملك القبول/التحضير.</td></tr>
+<tr><td class="id">H8</td><td>الموظف المُسنَد يرفض/لا يقبل.</td><td>يعود للمالك/المشرف لإعادة الإسناد.</td></tr>
+<tr><td class="id">H9</td><td>تحويل ليدوي بلا من يوجّه (غياب الكل).</td><td>تنبيه + خيار العودة للآلي؛ العميل لا يُترَك.</td></tr>
+<tr><td class="id">H10</td><td>إسناد جماعي لعدة طلبات لموظف.</td><td>يُسمح؛ تظهر كلها في طابوره.</td></tr>
+<tr><td class="id">H11</td><td>إسناد ثم حذف الموظف.</td><td>يُعاد الإسناد قبل الحذف (F1).</td></tr>
+<tr><td class="id">H12</td><td>طلب مجدول في اليدوي.</td><td>ينتظر التوجيه عند موعد الإطلاق.</td></tr>
+<tr><td class="id">H13</td><td>من يملك «الإسناد» فقط دون «القبول».</td><td>يوزّع لكن لا يقبل بنفسه — أدوار منفصلة.</td></tr>
+<tr><td class="id">H14</td><td>تغيير الوضع آلي↔يدوي مراراً.</td><td>يُطبَّق على الجديد؛ لا يربك الجاري.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة I — القبول والتزامن والقفل <span class="cnt">I1–I12</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">I1</td><td>موظفان يقبلان الطلب نفسه لحظياً.</td><td>قفل ذرّي: الأول يفوز؛ الثاني «قبله زميلك».</td></tr>
+<tr><td class="id">I2</td><td>قبول طلب قُبل أصلاً.</td><td>رسالة واضحة لا خطأ نظام.</td></tr>
+<tr><td class="id">I3</td><td>قبول ثم رفض سريع.</td><td>يتبع آلة حالات الطلب؛ يُسجَّل السبب.</td></tr>
+<tr><td class="id">I4</td><td>قبول طلب أُلغي من العميل قبل لحظة.</td><td>يُرفض القبول؛ يختفي من الطابور.</td></tr>
+<tr><td class="id">I5</td><td>قبول مزدوج عبر جهازين لنفس الموظف.</td><td>القفل يمنع الازدواج؛ قبول واحد.</td></tr>
+<tr><td class="id">I6</td><td>قبول بعد انتهاء مهلة قبول المتجر.</td><td>يُرفض؛ الطلب أُعيد توزيعه/تصعيده.</td></tr>
+<tr><td class="id">I7</td><td>رفض بلا سبب.</td><td>السبب مطلوب (موجود فعلاً) — يُسجَّل.</td></tr>
+<tr><td class="id">I8</td><td>قبول من موظف ملك صلاحية مؤقّتة منتهية للتو.</td><td>يُرفض بعد الانتهاء.</td></tr>
+<tr><td class="id">I9</td><td>قبول لطلب متجر آخر (خطأ توجيه).</td><td>ABAC يمنع — ليس ضمن متجره.</td></tr>
+<tr><td class="id">I10</td><td>قبول أثناء «تجميد الكل».</td><td>مرفوض حتى يُلغى التجميد.</td></tr>
+<tr><td class="id">I11</td><td>قبول والمالك يراقب مباشرة.</td><td>يظهر في لوحة المالك لحظياً (من قبِل).</td></tr>
+<tr><td class="id">I12</td><td>قبول طلب ثم انقطاع الموظف.</td><td>المالك/المشرف يعيد إسناده (J).</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة J — الانقطاع وإعادة الإسناد <span class="cnt">J1–J10</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">J1</td><td>موظف قبِل ثم خرج/انقطع.</td><td>الطلب «قيد عمل X منذ كذا»؛ زرّ إعادة إسناد.</td></tr>
+<tr><td class="id">J2</td><td>تجاوز التحضير حدّاً زمنياً.</td><td>تنبيه تلقائي للمشرف/المالك.</td></tr>
+<tr><td class="id">J3</td><td>إعادة إسناد لموظف نشط.</td><td>ينتقل الطلب فوراً؛ يُسجَّل.</td></tr>
+<tr><td class="id">J4</td><td>الموظف الأصلي عاد بعد إعادة الإسناد.</td><td>الطلب لم يعد له؛ رسالة توضيح.</td></tr>
+<tr><td class="id">J5</td><td>انقطاع جماعي (عطل شبكة المتجر).</td><td>الطلبات تبقى محفوظة؛ تُستأنف عند العودة؛ تصعيد عند التأخّر.</td></tr>
+<tr><td class="id">J6</td><td>إعادة إسناد طلب شبه جاهز.</td><td>يحافظ على حالته (جاهز/قيد تحضير) عند الانتقال.</td></tr>
+<tr><td class="id">J7</td><td>المالك يعيد كل طلبات موظف موقوف دفعةً.</td><td>إعادة توزيع جماعية بنقرة.</td></tr>
+<tr><td class="id">J8</td><td>إعادة إسناد متكرّر لنفس الطلب.</td><td>مسموح؛ يُسجَّل كل تغيير في التاريخ.</td></tr>
+<tr><td class="id">J9</td><td>لا موظف نشط لإعادة الإسناد.</td><td>يُصعَّد للمالك؛ أو يبقى لديه.</td></tr>
+<tr><td class="id">J10</td><td>إعادة إسناد طلب أوشك على التسليم للسائق.</td><td>يُكمَل بأمان؛ لا إرباك للسائق/العميل.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة K — الأمان وحدود النطاق (ABAC) <span class="cnt">K1–K14</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">K1</td><td>موظف متجر A يطلب طلبات متجر B.</td><td>مرفوض — provider_id لا يطابق.</td></tr>
+<tr><td class="id">K2</td><td>موظف يتلاعب بمعرّف الطلب في الطلب الشبكي.</td><td>التحقق الخادمي يرفض ما ليس لمتجره.</td></tr>
+<tr><td class="id">K3</td><td>موظف يحاول endpoints المالك.</td><td>مرفوض (طبقة S/الصلاحية غائبة).</td></tr>
+<tr><td class="id">K4</td><td>موظف منصّة (OPS) لا علاقة له بالمتجر.</td><td>صلاحيات المزوّد فئة منفصلة؛ لا تتداخل.</td></tr>
+<tr><td class="id">K5</td><td>محاولة منح صلاحية OPS لموظف متجر.</td><td>كتالوج المزوّد يعرض فئة provider فقط.</td></tr>
+<tr><td class="id">K6</td><td>توكن منتهٍ/ملغى لموظف.</td><td>يُرفض (آلية الجلسات الموجودة).</td></tr>
+<tr><td class="id">K7</td><td>موظف موقوف بتوكن صالح.</td><td>الحارس يفحص is_suspended ويرفض.</td></tr>
+<tr><td class="id">K8</td><td>تغيير صلاحية لا ينعكس فوراً.</td><td>كاش 60ث ثم يسري؛ الحسّاس يُعاد فحصه عند التنفيذ.</td></tr>
+<tr><td class="id">K9</td><td>محاولة رفع الامتياز عبر تعديل المسمّى.</td><td>المسمّى لا يمنح صلاحية إطلاقاً.</td></tr>
+<tr><td class="id">K10</td><td>خلل في محرّك الصلاحيات (Redis).</td><td>فشل-آمن لصلاحيات الدور الأساسية (لا انقطاع).</td></tr>
+<tr><td class="id">K11</td><td>متجر موقوف ومحاولة موظفه العمل.</td><td>مرفوض — إيقاف المتجر يُجمّد موظفيه.</td></tr>
+<tr><td class="id">K12</td><td>سجلّ كل محاولة مرفوضة.</td><td>تُدوَّن في التدقيق للمراجعة.</td></tr>
+<tr><td class="id">K13</td><td>موظفان بنفس الهاتف (مشاركة).</td><td>كل حساب مستقلّ بصلاحياته؛ التدقيق يميّز الفاعل.</td></tr>
+<tr><td class="id">K14</td><td>محاولة منح صلاحية غير موجودة بالكتالوج.</td><td>مرفوضة — لا منح لصلاحية مجهولة.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة L — موظف مؤقّت/خارجي/مناوب <span class="cnt">L1–L12</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">L1</td><td>دعوة موظف مؤقّت لرمضان.</td><td>وصول كامل ينتهي بتاريخ محدّد ثم يُجمَّد آلياً.</td></tr>
+<tr><td class="id">L2</td><td>انتهاء مدّة الموظف المؤقّت.</td><td>يُجمَّد؛ إشعار المالك؛ يمكن التمديد.</td></tr>
+<tr><td class="id">L3</td><td>محاسب خارجي بصلاحيات قراءة.</td><td>يرى التقارير فقط، مؤقّتاً.</td></tr>
+<tr><td class="id">L4</td><td>موظف خارجي يحاول إجراءً تشغيلياً.</td><td>مرفوض — صلاحياته قراءة.</td></tr>
+<tr><td class="id">L5</td><td>مناوب يعمل ساعات محدّدة.</td><td>(توسعة) صلاحيات تعمل ضمن نافذة زمنية.</td></tr>
+<tr><td class="id">L6</td><td>تمديد موظف مؤقّت قبل الانتهاء.</td><td>تحديث تاريخ الانتهاء؛ يستمرّ.</td></tr>
+<tr><td class="id">L7</td><td>تحويل مؤقّت إلى دائم.</td><td>إزالة تاريخ الانتهاء؛ يصبح عادياً.</td></tr>
+<tr><td class="id">L8</td><td>موظف مؤقّت له طلبات عند الانتهاء.</td><td>تُعاد قبل التجميد.</td></tr>
+<tr><td class="id">L9</td><td>موظف خارجي ينتهي وصوله.</td><td>يُجمَّد؛ سجلّه يبقى.</td></tr>
+<tr><td class="id">L10</td><td>عدة موظفين مؤقّتين بمواعيد مختلفة.</td><td>كلٌّ بمؤقّته المستقلّ.</td></tr>
+<tr><td class="id">L11</td><td>المسمّى «مؤقّت» دون ضبط مؤقّت.</td><td>عنوان فقط؛ لا انتهاء ما لم يُضبط.</td></tr>
+<tr><td class="id">L12</td><td>موظف مؤقّت يُمنح صلاحية دائمة.</td><td>الصلاحية دائمة لكن الحساب قد يُجمَّد بانتهاء المدّة (الحساب يعلو).</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة M — الأداء والتقييم والبطاقة <span class="cnt">M1–M12</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">M1</td><td>عرض «أول طلب اليوم» لموظف.</td><td>يُحسب من أول إجراء قبول/تحضير له اليوم (audit_log).</td></tr>
+<tr><td class="id">M2</td><td>عدد ما قبِل/جهّز اليوم.</td><td>عدّاد مباشر من سجلّ التدقيق.</td></tr>
+<tr><td class="id">M3</td><td>متوسط زمن التحضير.</td><td>من فارق بدء→جاهز عبر طلباته.</td></tr>
+<tr><td class="id">M4</td><td>الطلبات قيد العمل وتفاصيلها.</td><td>قائمة حيّة في البطاقة.</td></tr>
+<tr><td class="id">M5</td><td>ترتيب الموظفين أسبوعياً.</td><td>قائمة «الأعلى أداءً» يراها المالك/المشرف.</td></tr>
+<tr><td class="id">M6</td><td>تقييم يدوي من المالك.</td><td>درجة + ملاحظة تُحفظ (provider_staff_review).</td></tr>
+<tr><td class="id">M7</td><td>تقييم شهري.</td><td>تجميع للفترة المختارة.</td></tr>
+<tr><td class="id">M8</td><td>نسبة الرفض/التأخير لموظف.</td><td>مؤشّر ضمن البطاقة.</td></tr>
+<tr><td class="id">M9</td><td>أداء بعد حذف الموظف.</td><td>تاريخه يبقى في التدقيق للمراجعة.</td></tr>
+<tr><td class="id">M10</td><td>موظف بلا نشاط اليوم.</td><td>تظهر أصفار بوضوح (لا خطأ).</td></tr>
+<tr><td class="id">M11</td><td>مقارنة موظفين.</td><td>(توسعة) عرض جنباً إلى جنب.</td></tr>
+<tr><td class="id">M12</td><td>تصدير تقرير الأداء.</td><td>(توسعة) CSV للمالك.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة N — تعارضات وحالات حرجة عامّة <span class="cnt">N1–N16</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">N1</td><td>المالك يفقد هاتفه/جلسته.</td><td>آليات الجلسة/الاسترجاع الموجودة؛ لا أحد يرث صلاحياته.</td></tr>
+<tr><td class="id">N2</td><td>عقد المالك ينتهي/المتجر يُغلق.</td><td>تجميد كل الموظفين تبعاً.</td></tr>
+<tr><td class="id">N3</td><td>موظف واحد فقط (المالك يعمل بنفسه).</td><td>كل شيء يعمل؛ لا حاجة لموظفين.</td></tr>
+<tr><td class="id">N4</td><td>منح وسحب متسارع لنفس الصلاحية.</td><td>آخر كتابة تفوز؛ متّسق عبر القيد الفريد (user, permission).</td></tr>
+<tr><td class="id">N5</td><td>المالك يمنح ثم يُجمّد الكل طارئاً.</td><td>التجميد يعلو كل الصلاحيات مؤقتاً.</td></tr>
+<tr><td class="id">N6</td><td>تعارض إيقاف مؤقّت مع منح دائم.</td><td>الإيقاف يعلو (لا تصرّف وهو موقوف).</td></tr>
+<tr><td class="id">N7</td><td>سحب «عرض الطابور» أثناء عمل الموظف.</td><td>يكمل الجاري؛ لا يرى جديداً.</td></tr>
+<tr><td class="id">N8</td><td>قيمة مهلة تصعيد = 0.</td><td>تحقّق: حدّ أدنى منطقي يُفرض.</td></tr>
+<tr><td class="id">N9</td><td>وقت الخادم/المنطقة الزمنية للانتهاءات.</td><td>UTC داخلياً؛ عرض بتوقيت ليبيا.</td></tr>
+<tr><td class="id">N10</td><td>تكرار نفس المنح.</td><td>القيد الفريد يجعلها تحديثاً لا ازدواجاً.</td></tr>
+<tr><td class="id">N11</td><td>محرّك الكاش يعيد قيمة قديمة لحظياً.</td><td>≤60ث؛ الحسّاس يُعاد فحصه عند التنفيذ.</td></tr>
+<tr><td class="id">N12</td><td>المالك يمنح صلاحية ثم يحذف رمزها من الكتالوج (نظرياً).</td><td>سياسة: رموز المزوّد مُبذورة وثابتة؛ لا حذف من واجهة المزوّد.</td></tr>
+<tr><td class="id">N13</td><td>طلب يصل لحظة تحويل الوضع.</td><td>يتبع الوضع وقت وصوله؛ لا ازدواج معالجة.</td></tr>
+<tr><td class="id">N14</td><td>موظف يعمل لمتجرين (نظرياً).</td><td>الربط واحد (provider_id)؛ نموذج V1 = متجر واحد للموظف.</td></tr>
+<tr><td class="id">N15</td><td>عطل قاعدة بيانات أثناء منح.</td><td>المعاملة ذرّية؛ إمّا تُكتب كاملة أو لا.</td></tr>
+<tr><td class="id">N16</td><td>تعارض موافقة إيقاف مع إعادة تفعيل متزامنة.</td><td>قفل/ترتيب؛ النتيجة الأخيرة متّسقة + سجلّ.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة O — النقطة ١: البحث حسب النوع <span class="cnt">O1–O14</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">O1</td><td>«معكرونة» + نوع «مطعم».</td><td>أصناف المطاعم فقط.</td></tr>
+<tr><td class="id">O2</td><td>«معكرونة» + «الكل».</td><td>كل النتائج (سلوك اليوم).</td></tr>
+<tr><td class="id">O3</td><td>«معكرونة» + «سوق».</td><td>أصناف الأسواق فقط.</td></tr>
+<tr><td class="id">O4</td><td>اختيار «مقهى» بالرئيسية ثم بحث «قهوة».</td><td>يبقى النوع «مقهى».</td></tr>
+<tr><td class="id">O5</td><td>«دواء» + «مطعم».</td><td>«لا نتائج لهذا النوع» (لا خطأ) + اقتراح «الكل».</td></tr>
+<tr><td class="id">O6</td><td>نوع بلا مزوّدين نشطين.</td><td>لا يظهر أصلاً (active_only).</td></tr>
+<tr><td class="id">O7</td><td>تبويب «مطاعم» مع نوع مختار.</td><td>يحترم النوع أيضاً (اتساق).</td></tr>
+<tr><td class="id">O8</td><td>عدّاد لكل نوع.</td><td>يظهر عدد النتائج.</td></tr>
+<tr><td class="id">O9</td><td>بحث على PostgreSQL.</td><td>الفلتر مُطبَّق في مسار similarity.</td></tr>
+<tr><td class="id">O10</td><td>بحث على SQLite (اختبارات).</td><td>الفلتر مُطبَّق أيضاً (إغلاق فجوة المحرّكين).</td></tr>
+<tr><td class="id">O11</td><td>بحث بلا اختيار نوع.</td><td>عام تماماً (لا كسر للسلوك القديم).</td></tr>
+<tr><td class="id">O12</td><td>متجر مؤقّت الإغلاق ضمن النوع.</td><td>يظهر صنفه رماديّاً «مغلق الآن» لا يُحجب.</td></tr>
+<tr><td class="id">O13</td><td>تغيير النوع أثناء كتابة الاستعلام.</td><td>إعادة استعلام حيّة بالنوع الجديد.</td></tr>
+<tr><td class="id">O14</td><td>مشاركة رابط بحث بنوع.</td><td>الرابط يحمل <code>type</code> فيُعاد إنتاج نفس النتيجة.</td></tr>
+</tbody></table>
+
+<div class="grp">المجموعة P — النقطة ٤: رمز الإحالة <span class="cnt">P1–P16</span></div>
+<table>
+<thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">P1</td><td>صديق يدخل رمزك عند التسجيل.</td><td>يُلتقَط؛ يُستدعى redeem بعد الإنشاء.</td></tr>
+<tr><td class="id">P2</td><td>صديق يكمل أول طلب.</td><td>تُمنح المكافأة عند التحويل (on_conversion).</td></tr>
+<tr><td class="id">P3</td><td>صديق سجّل ولم يطلب.</td><td>لا مكافأة (يقتل حسابات وهمية).</td></tr>
+<tr><td class="id">P4</td><td>الطرفان يربحان.</td><td>المُحيل + المُحال كلاهما (referee_reward&gt;0).</td></tr>
+<tr><td class="id">P5</td><td>محاولة إحالة النفس (نفس الهاتف).</td><td>مرفوض (SELF_REFERRAL).</td></tr>
+<tr><td class="id">P6</td><td>محاولة إحالة النفس (نفس الجهاز).</td><td>مرفوض (إشارة device).</td></tr>
+<tr><td class="id">P7</td><td>مُحال يحاول استخدام رمزين.</td><td>مرّة واحدة فقط (قيد فريد).</td></tr>
+<tr><td class="id">P8</td><td>مُحيل يتجاوز السقف اليومي.</td><td>تُحجب الزائدة (max_per_window).</td></tr>
+<tr><td class="id">P9</td><td>١٠ حسابات وهمية بلا طلبات.</td><td>لا ربح + كشف بالهاتف/الجهاز + السقف.</td></tr>
+<tr><td class="id">P10</td><td>رمز غير صالح.</td><td>رسالة «رمز غير صالح».</td></tr>
+<tr><td class="id">P11</td><td>إدخال الرمز بعد التسجيل (الصفحة).</td><td>مدعوم أيضاً (المسار الحالي).</td></tr>
+<tr><td class="id">P12</td><td>مشاركة عبر واتساب.</td><td>رابط wa.me مع الرمز (موجود).</td></tr>
+<tr><td class="id">P13</td><td>OPS يغيّر قيم الإحالة لحظياً.</td><td>عبر LoyaltyConfig بلا إعادة نشر.</td></tr>
+<tr><td class="id">P14</td><td>المكافأة قبل فتح ختم الدفع.</td><td>تراكمية فقط (لا صرف نقدي).</td></tr>
+<tr><td class="id">P15</td><td>إلغاء أول طلب بعد منح التحويل.</td><td>(توسعة) فترة تجميد ٧–١٤ يوماً قبل الإيداع.</td></tr>
+<tr><td class="id">P16</td><td>«ما فائدتي؟» يسأل المستخدم.</td><td>الواجهة توضّح «أنت وصديقك تربحان».</td></tr>
+</tbody></table>
+
+<div class="note"><b>الإجمالي:</b> A22 + B12 + C12 + D14 + E18 + F10 + G18 + H14 + I12 + J10 + K14 + L12 + M12 + N16 + O14 + P16 = <b>٢٢٦ سيناريو</b>. وكلّها قابلة للتحويل إلى اختبارات آلية عند البناء.</div>
+
+<!-- ===== NOT TOUCH ===== -->
+<h2 class="section" id="nottouch">ما لن نلمسه</h2>
+<ul class="clean">
+  <li><b>النقطة ٣ (السلة):</b> مؤجَّلة لعمل منفصل.</li>
+  <li><b>النواة المالية + الأعلام المختومة:</b> لا تُمسّ؛ مكافآت الإحالة تراكمية خلف الختم.</li>
+  <li><b>المناطق المحظورة في backend:</b> أي تعديل (أعمدة Order/Provider/الهجرات) بإذنك الصريح فقط.</li>
+  <li><b>تعداد أدوار المنصّة العام:</b> لا نضيف دوراً جديداً — نعبّر بالصلاحيات.</li>
+</ul>
+
+<!-- ===== SOURCES ===== -->
+<h2 class="section" id="sources">المصادر</h2>
+<div class="card">
+  <a class="src" href="https://www.osohq.com/learn/rbac-best-practices">Oso — RBAC Best Practices 2025</a><br>
+  <a class="src" href="https://workos.com/blog/role-based-access-control-example">WorkOS — RBAC Examples</a><br>
+  <a class="src" href="https://www.techryde.com/blog/dispatch-delivery-for-restaurants-what-it-means-and-why-it-matters-now/">Techryde — Dispatch (auto/manual) 2025</a><br>
+  <a class="src" href="https://www.fact-finder.com/blog/faceted-search/">Fact-Finder — Faceted Search</a><br>
+  <a class="src" href="https://www.rivo.io/blog/fraud-prevention-referrals-statistics">Rivo — Referral Fraud Prevention 2026</a><br>
+  <a class="src" href="https://viral-loops.com/blog/fraud-in-referral-programs/">Viral Loops — Referral fraud</a>
+</div>
+
+<div class="foot">
+  <p><b>منهجية:</b> مبنيّ على قراءة الكود الفعلي بتاريخ ٢٠٢٦-٠٦-٣٠. الأساس المُكتشَف: محرّك صلاحيات B-4 (كتالوج + منح/سحب + حارس + كاش) وعلم <code>is_grantable</code> المُطبَّق فعلاً — فالنقطة ٢ توسعةٌ لا بناءٌ من الصفر. الإضافات الدقيقة: <code>expires_at</code> للمنح المؤقّت، <code>staff_title</code> للمسمّى العامّ، وحقول الإيقاف/الإسناد/التوزيع.</p>
+  <p><b>لم يُكتب أي كود.</b> هذه خطة تنفيذية وسيناريوهات — بانتظار إذنك بالبدء ومن أي دفعة.</p>
+  <p style="text-align:center;margin-top:18px;color:#1b7f4b;font-weight:700">— نهاية الخطة · منصّة تووا —</p>
+</div>
+
+</div>
+</body>
+</html>

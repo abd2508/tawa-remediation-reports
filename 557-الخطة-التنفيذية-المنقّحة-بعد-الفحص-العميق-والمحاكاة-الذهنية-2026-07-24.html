@@ -1,0 +1,547 @@
+<title>557 — الخطة التنفيذية المنقّحة بعد الفحص العميق</title>
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74;
+  --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  direction:rtl;line-height:1.7;max-width:980px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:70ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.88em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.84em}
+a{color:var(--accent2)}
+
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.9em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:130px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.7em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.82em}
+
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+
+section{margin:44px 0}
+section > h2{font-size:1.4em;padding-bottom:10px;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:10px}
+section > h2 .n{font-family:var(--mono);color:var(--sub);font-size:.7em}
+
+.chip{display:inline-block;font-size:.72em;font-weight:700;padding:2px 9px;border-radius:999px;margin-inline-end:5px;white-space:nowrap}
+.chip.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.good{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.chip.info{background:color-mix(in srgb,var(--info) 16%,transparent);color:var(--info)}
+.chip.build{background:color-mix(in srgb,var(--build) 16%,transparent);color:var(--build)}
+.chip.corr{background:color-mix(in srgb,var(--corr) 16%,transparent);color:var(--corr)}
+
+.finding{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:16px 0}
+.finding h3{margin:0 0 6px;font-size:1.08em;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.finding h3 .id{font-family:var(--mono);color:var(--sub);font-size:.75em;font-weight:600}
+.finding .meta-row{color:var(--sub);font-size:.85em;margin-bottom:10px}
+.finding .files{font-family:var(--mono);font-size:.82em;color:var(--sub);direction:ltr;text-align:left}
+
+.correction-box{background:color-mix(in srgb,var(--corr) 7%,var(--panel));border:1px dashed var(--corr);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.correction-box b{color:var(--corr)}
+
+.decision-box{background:color-mix(in srgb,var(--warn) 8%,var(--panel));border:1px solid var(--warn);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.decision-box b{color:var(--warn)}
+
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.9em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--line);font-weight:700}
+tr:nth-child(even) td{background:color-mix(in srgb,var(--line) 35%,transparent)}
+
+.phase{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:18px 0;
+  border-inline-start:6px solid var(--accent)}
+.phase.gated{border-inline-start-color:var(--warn)}
+.phase.danger{border-inline-start-color:var(--bad)}
+.phase h3{margin-top:0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:baseline}
+.phase .eff{font-family:var(--mono);color:var(--sub);font-size:.8em;font-weight:600}
+.phase ul{margin:8px 0;padding-inline-start:22px}
+.phase li{margin-bottom:6px}
+
+.tech-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin:14px 0}
+.tech-card h4{margin:0 0 6px}
+
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+</style>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 557 · مراجعة عدائيّة-الجودة + محاكاة ذهنية + خطّة منقّحة</div>
+  <h1>الخطّة التنفيذية المنقّحة — بعد الفحص العميق ومحاكاة الأثر الكامل</h1>
+  <div class="meta">
+    يبني على التقرير 556 (الخريطة الأصليّة) ويصحّحه بندًا بندًا · 5 وكلاء فحص مستقلّين، تتبّع مباشر بالكود (grep شامل + قراءة كل موقع استدعاء) · 2026-07-24
+  </div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>26</b><span>نتيجة أصليّة من 555 تمّت مراجعتها</span></div>
+  <div class="stat"><b>9</b><span>تصحيحات جوهريّة قلبت الحلّ المقترح في 556</span></div>
+  <div class="stat"><b>6</b><span>نتائج جديدة لم تكن في 555 ولا 556</span></div>
+  <div class="stat"><b>1</b><span>خطر بمستوى توقّف إنتاج لو نُفِّذ كما كُتب أصلًا (F-24)</span></div>
+  <div class="stat"><b>10</b><span>قرارات صريحة تنتظر المالك قبل أي كود</span></div>
+</div>
+
+<div class="callout method">
+  <b>منهجيّة هذه الجولة:</b> بدل تكرار فحص 556 بنفس الطريقة، طُلِب من كل وكيل تتبّع كامل لنصف قطر الأثر (كل ملف/كل موقع استدعاء عبر grep شامل، لا عيّنة) + محاكاة ذهنية صريحة لكل نقطة («ماذا يحدث عند أوّل طلب بعد النشر؟ ماذا يحدث لبيانات موجودة مسبقًا؟ ماذا يحدث في سباق/تزامن؟ هل النشر آمن على التدرّج؟»). النتيجة: 5 تقارير غنيّة جدًّا لم تكتفِ بتأكيد خطّة 556 بل <b>قلبت استنتاجاتها</b> في تسع نقاط على الأقلّ — وهذا بالضبط ما يجعل جولة تحقّق عدائي ثانية غير ضروريّة الآن (استُشير مستشار تقني أعلى بهذا القرار صراحةً): الجولة الأولى نفسها كانت بجودة عدائيّة، والمستخدم نفسه هو الفحص الأخير قبل تنفيذ أي كود فعليّ من هذه الخطّة.
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li>القرارات التي تنتظرك (اقرأها أوّلًا)</li>
+    <li>نتائج جديدة لم تكن معروفة قبل هذه الجولة</li>
+    <li>الهويّة — تصحيحات وتوسعة نطاق</li>
+    <li>الاكتشاف والطلب — تصحيحات وتوسعة نطاق</li>
+    <li>دورة حياة الطلب — تصحيحات وتوسعة نطاق</li>
+    <li>المحفظة والولاء — تصحيحات وتوسعة نطاق</li>
+    <li>الأعمال الكبيرة والتقنيات الحديثة — الحكم النهائي</li>
+    <li>الخطّة المرحليّة المنقّحة الكاملة</li>
+    <li>جدول التتبّع الكامل (كل بند 555 ← حالته الآن)</li>
+  </ol>
+</div>
+
+<section id="decisions">
+  <h2><span class="n">§1</span> القرارات التي تنتظرك</h2>
+  <p>هذه ليست تفاصيل تقنيّة — هي اختيارات منتج/سياسة لا يمكن لأي فحص كود أن يحسمها. رُتِّبت من الأكثر إلحاحًا.</p>
+
+  <table>
+    <tr><th>#</th><th>القرار</th><th>لماذا لا يمكن حسمه هندسيًّا</th><th>الأثر إن تأخّر</th></tr>
+    <tr><td>1</td><td><b>F-24</b>: هل نُشغّل نشرًا على مرحلتين (كود ثم هجرة لاحقًا) أم نقبل نافذة خطر توقّف؟</td><td>منطقة محظورة (migrations) — يحتاج إذنًا صريحًا بالتحديد، ونشر بمرحلتين يحتاج تنسيقًا تشغيليًّا حقيقيًّا عبر 3 بيئات</td><td>لو نُفِّذ بمرحلة واحدة كما اقترحت 556 أصلًا: <span class="chip bad">خطر توقّف إنتاج حقيقيّ</span></td></tr>
+    <tr><td>2</td><td><b>F-05 بند 4</b>: إعادة تعيين نفس السائق أم تحويل لسائق آخر أم إرجاع للمزوّد؟</td><td>قرار تجربة مستخدم/عمليّات، ليس خطأ كود — 3 مسارات ممكنة بتبعات مختلفة كليًّا للسائق النازح</td><td>بدونه، حالة RESCHEDULED تبقى بلا مخرج تلقائي (تدخّل يدويّ فقط، كما اليوم)</td></tr>
+    <tr><td>3</td><td><b>F-09</b>: توسيع تحقّق الهاتف لـ5-6 مواقع أخرى أم الاكتفاء بالتسجيل فقط؟</td><td>نطاق العمل يتضاعف إن اتّسع (كل موقع يحتاج اختبارات خاصّة به)</td><td>ثغرات تنسيق هاتف مماثلة تبقى في التحويل/العنوان/تغيير هاتف السائق</td></tr>
+    <tr><td>4</td><td><b>F-06 / F-25</b>: هل نوسّع الإصلاح ليشمل كل الحالات الشقيقة المكتشَفة حديثًا (SCHEDULED، OFFER_EXPIRED_REASSIGN، SUBSTITUTION_REJECTED_CANCELLED، EXPIRED) أم نبقيه ضيّقًا كما في 556؟</td><td>يقارب مضاعفة حجم كلا البندين، وبعضها (SCHEDULED) يحتاج زرًّا جديدًا بالكامل لا مجرّد شرط</td><td>حالات شقيقة تبقى بنفس العيب الأصلي</td></tr>
+    <tr><td>5</td><td><b>F-14</b>: توحيد دلاليّة السعر (أوّل نشِط مقابل الأرخص النشِط) — أيّهما الصحيح؟</td><td>هذا فرق مقصود موجود في الكود اليوم في مكانين مختلفين، ليس خطأً بالضرورة — قرار عمل لا إصلاح</td><td>البناء المعماري (المسند المشترك) يبقى غير مكتمل حتى يُحسم</td></tr>
+    <tr><td>6</td><td><b>F-23</b>: تغيير نصّ ظاهر للمستخدم (aria-pressed مكرّرة)</td><td>محظور تعديل نصوص واجهة بلا إذن صريح (قاعدة عامّة في الحوكمة)</td><td>يبقى معلَّقًا كما في 556، بلا تغيير</td></tr>
+    <tr><td>7</td><td><b>F-10</b>: إصلاح سطر واحد (account_deletion فقط) أم توحيد حقيقي لـ4 تطبيقات إخفاء رقم مختلفة؟</td><td>التوحيد يعني لمس 4 ملفّات بدل ملف واحد — قرار حجم عمل لا صوابيّة</td><td>3 تطبيقات مكرَّرة تبقى، بعضها غير آمن فعلًا (account_deletion)</td></tr>
+    <tr><td>8</td><td><b>F-21</b>: هل PENDING_CONVERSION يستحقّ لونًا غير أخضر أيضًا؟</td><td>قرار تصميم/وضوح رسالة، ليس صوابيّة كود</td><td>رصيد "معلَّق فعليًّا" قد يبدو مؤكَّدًا بصريًّا</td></tr>
+    <tr><td>9</td><td><b>البناء رقم 2</b> (طابور استثناءات عامّ): جدول جديد أم عرض قراءة محسوب فوق الجداول الحاليّة؟</td><td>قرار معماري كبير — التوصية انقلبت هذه الجولة نحو "عرض محسوب + اختبار تغطية" بدل جدول كتابة جديد، لكنّه قرار يستحقّ تأكيدًا صريحًا قبل البناء</td><td>يحدّد حجم العمل (3-3.5 يوم) وموضع اللمس (5+ مواقع كتابة إن اختير الجدول)</td></tr>
+    <tr><td>10</td><td><b>الإصلاح الحيّ الجديد</b> (رفض جماعي بلا أثر تدقيق) — هل يُصلَح فورًا بمعزل عن هذه الخطّة؟</td><td>عيب حيّ مستقلّ اكتُشِف بالصدفة أثناء الفحص، لا علاقة له مباشرة بأيّ من الـ26 نتيجة الأصليّة</td><td>موافقات/رفض جماعي للسائقين والمزوّدين تستمرّ بلا أثر تدقيق — فجوة امتثال حقيقيّة اليوم</td></tr>
+  </table>
+</section>
+
+<section id="new-findings">
+  <h2><span class="n">§2</span> نتائج جديدة — لم تكن معروفة قبل هذه الجولة</h2>
+
+  <div class="finding">
+    <h3><span class="id">NEW-1</span> الرفض الجماعي لطلبات الانضمام لا يترك أثر تدقيق إطلاقًا <span class="chip bad">عيب حيّ</span></h3>
+    <div class="meta-row">اكتُشِف أثناء فحص وكيل «الأعمال الكبيرة» عند تتبّع سابقة إصلاح مشابهة سابقة (C-05 في تقرير 534)</div>
+    <p><code>bulk_router.py:354</code> يضبط حالة الدور إلى <code>REJECTED</code> مباشرة، بدون إنشاء صفّ <code>OnboardingDecision</code> وبدون استدعاء <code>audit_logger.log</code> — بينما مسار الرفض الفردي (<code>operations_router.py:3227</code>) يفعل الاثنين معًا. هذا نظير حرفيّ لعيب سابق تمّ إصلاحه بالفعل في مسار <b>الموافقة</b> الجماعية (كانت تتجاوز فحوص KYC كليًّا) لكنّ مسار <b>الرفض</b> الجماعي لم يتلقَّ نفس المعالجة قط.</p>
+    <div class="correction-box"><b>التوصية:</b> استخراج دالة <code>reject_role()</code> مشتركة يستدعيها كلا المسارين (فرديّ وجماعيّ)، على غرار النمط الموجود فعلًا في <code>state_transitions.py</code> لحالات الطلب/الشكوى. جهد تقديريّ: 0.75–1 يوم.</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">NEW-2</span> الحجم الحقيقي لتراكم مفاتيح i18n — 1,034 مفتاحًا لا ~28 <span class="chip warn">تصحيح حجم</span></h3>
+    <div class="meta-row">قياس تجريبيّ مباشر، وليس تقديرًا — تمّ التحقّق من المنهجيّة أوّلًا بمقارنة 5 مفاتيح معروفة الحالة</div>
+    <p>من أصل 3,596 استدعاء <code>t()</code> إجماليّ في الشيفرة، <b>1,034 مفتاحًا (~29%)</b> غائب عن الملفّات اللغويّة الثلاثة معًا (ليس فقط عن واحد أو اثنين). هذا أكبر بكثير من تقدير 556 الأصليّ (~28 مفتاحًا كان يخصّ فقط أمثلة F-13 اليدويّة المكتشَفة، لا الحجم الكلّي الفعلي عبر كامل الشيفرة).</p>
+    <div class="decision-box"><b>قرار منهجيّ حاسم:</b> الاختبار الخامس (الـratchet) <b>يجب</b> أن يُبنى كـ«تجنيد تاريخي بحت» (snapshot = الحالة الحاليّة كما هي بكل عيوبها)، تمامًا مثل الاختبارين الحاليَّين لسلاسل JSX الخام. أي محاولة لجعله يفشل على الفجوة الحاليّة الضخمة ستمنع أي دمج مستقبليّ فورًا. علاج الـ1,034 مفتاحًا نفسها عمل مستقبليّ منفصل تمامًا، غير مضمَّن في هذه الخطّة.</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">NEW-3</span> فخّ تصادم اسم مكوّن — 4 نُسخ StatusBadge غير مرتبطة <span class="chip info">تحذير منهجيّ</span></h3>
+    <p>4 ملفّات (<code>ControlPanelUsers/Customers/Drivers/Providers</code>) تُعرِّف كلٌّ منها مكوّن <code>StatusBadge</code> محليًّا خاصًّا بها، بخصائص (props) مختلفة تمامًا عن مكوّن <code>StatusBadge</code> الذي يخصّ F-21 فعليًّا. أيّ بحث نصف قطر أثر بـ<code>grep -r StatusBadge</code> بلا تحقّق يدويّ من كلّ نتيجة كان سيُدرج هذه الأربعة خطأً ضمن نطاق إصلاح F-21.</p>
+    <div class="correction-box"><b>الدرس المنهجي:</b> أي بند مستقبليّ يعتمد grep لاسم مكوّن مشترك يحتاج تحقّقًا يدويًّا من توقيع كلّ نتيجة (الخصائص/الاستيراد)، لا الاكتفاء بتطابق الاسم.</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">NEW-4</span> غياب مصدر ملزم لتاريخ رأس alembic — الملف الحاكم كان قديمًا مرّتين متتاليتين</h3>
+    <p><code>CLAUDE.md</code> يذكر رأس Alembic كـ<code>ab60</code> (مُصحَّح 2026-07-22) — لكنّ عمل Tawa Trade اللاحق (تقارير 551-554) أضاف هجرات جديدة على الأرجح تجاوزت هذا الرأس أيضًا. <b>لا تثق بهذا الرقم في CLAUDE.md دون إعادة تحقّق مباشرة</b> (<code>alembic heads</code>) قبل كتابة أي <code>down_revision</code> جديد — هذا حدث بالفعل مرّتين في هذه السلسلة من التقارير.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">NEW-5</span> حارس ثبات دفتر الأستاذ الآن له إصلاح مقترح ملموس — لكنّه ليس كافيًا وحده</h3>
+    <p>الإصلاح المقترح: إضافة <code>.where(LedgerEntry.reference_type.notin_(("referral_reward","referral_referee_reward")))</code> لاستعلام <code>check_wallet_ledger_invariant()</code>. يُصلِح هذا مصدر الانحراف الإيجابي الكاذب المعروف — لكن تمّ اكتشاف <b>مصدر انحراف ثانٍ معاكس الاتّجاه</b> (أرصدة أوّليّة/تاريخيّة زُرِعت مباشرة بلا قيد تمويل مرافق) يبقى دون علاج. لا يجوز الترويج لهذا الإصلاح كـ«الحارس أصبح آمنًا للتنبيه الآن» — يحتاج خطوة تحقّق بيانات فعليّة (زرع حجم إحالات معروف، تأكيد أنّ الانحراف يعود لخط الأساس المتوقَّع) قبل وصل أيّ تنبيه حيّ به.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">NEW-6</span> اختبار F-03 قائم اليوم يعتمد على وجود العيب — سينكسر عند الإصلاح</h3>
+    <p><code>LoginPage.test.tsx:88</code> يفترض حاليًّا سلوك الخطأ الخام العربيّ الثابت (وهو العيب نفسه). إصلاح F-03 <b>سيُفشِل</b> هذا الاختبار ما لم يُحدَّث ضمن نفس دفعة العمل — ميزانيّة هذا التحديث يجب أن تُدرَج صراحة في تقدير الجهد، لا أن تُفاجئنا بعد التنفيذ.</p>
+  </div>
+</section>
+
+<section id="identity">
+  <h2><span class="n">§3</span> الهويّة — تصحيحات وتوسعة نطاق</h2>
+
+  <div class="finding">
+    <h3><span class="id">F-03</span> رسائل الخطأ العربيّة الثابتة <span class="chip corr">تصحيح جوهريّ</span></h3>
+    <div class="meta-row">556 قالت: 65 موقعًا / 29 ملفًّا — الفحص الدقيق هذه المرّة: <b>68 موقعًا عبر 34 ملفًّا</b></div>
+    <p>عند التتبّع الشامل (لا عيّنة) وُجِد 3 مواقع إضافيّة، بالإضافة إلى تصحيحين: (أ) 4 ملفّات من نوع <code>SSEAlert</code> تقنيًّا خارج نطاق هذا الإصلاح (تعتمد على نص خطأ يأتي من الخادم نفسه لا من الواجهة) وتحتاج تذكرة عمل خلفيّة منفصلة، (ب) ملفّ واحد (<code>MaintenanceBanner</code>) كان إيجابيّة كاذبة — النصّ فيه صحيح فعلًا وليس عيبًا.</p>
+    <div class="correction-box"><b>ماذا سيتغيّر فعليًّا:</b> بناء <code>resolveApiErrorMessage()</code> (أو تعميم الدالّة الموجودة في <code>useFieldErrors.ts</code>) + هجرة 68 موقعًا عبر 34 ملفًّا + تحديث <code>ar/en/fr.json</code> لكلّ نصّ احتياطيّ خام مكتشَف + <b>تحديث <code>LoginPage.test.tsx:88</code> إلزاميًّا في نفس الدفعة</b> (انظر NEW-6) + مراجعة كلّ اختبار من الـ34 ملفًّا يُحاكي استجابة إنجليزيّة/فرنسيّة للتأكّد من عدم كسره.</div>
+    <div class="decision-box">قرار: هل نُدرج 4 ملفّات SSEAlert بفتح تذكرة خلفيّة موازية الآن، أم نُبقيها خارج النطاق تمامًا هذه المرّة؟</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-03b</span> <code>useFieldErrors</code> — مترجم أخطاء Pydantic ثابت العربيّة</h3>
+    <p>يمكن للـhook استدعاء <code>useTranslation()</code> ذاتيًّا بدل تمرير نصّ ثابت. 5 مستهلِكين فقط. لا خطر كسر اختبار (لا تغطية اختبار حاليّة للمسار الإنجليزيّ أصلًا) — لكن هذا يعني اختبارًا جديدًا يجب كتابته من الصفر لإثبات السلوك الصحيح، لا الاكتفاء بعدم الكسر.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-07</span> مفاتيح i18n مفقودة في LocationPicker <span class="chip corr">تصحيح جوهريّ</span></h3>
+    <p>العدد الفعليّ 20 مفتاحًا (لا ~15). <b>اكتشاف جديد حاسم:</b> <code>t("location.outside_libya")</code> يُستدعى مرّتين بنصَّين احتياطيَّين مختلفين (أحدهما لمسار GPS والآخر لمسار البحث على الخريطة) — تصادم مفتاح واحد لسيناريوهين مختلفين.</p>
+    <div class="decision-box">قرار: هل ندمج الصياغة في نصّ واحد يغطّي الحالتين، أم نُقسّم المفتاح إلى اثنين (<code>outside_libya_gps</code> / <code>outside_libya_search</code>)؟ يجب حسمه <b>قبل</b> كتابة الـ20 مفتاحًا لا بعده.</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-08</span> معالجة خطأ <code>applyReverse</code> <span class="chip corr">تصحيح جوهريّ</span></h3>
+    <p>الاقتراح الأصليّ في 556 (إعادة استخدام حالتَي <code>gpsError</code>/<code>searchError</code> الموجودتين) <b>لا يعمل فعليًّا</b> — التحقّق المباشر بالكود أثبت أنّهما ضمن نطاق عرض تبويب مختلف تمامًا عن التبويب الذي يستدعي <code>applyReverse</code>. الإصلاح الصحيح يحتاج حالة جديدة مخصَّصة + كتلة عرض جديدة تحت تبويب الخريطة تحديدًا، لا إعادة استخدام أيّ حالة قائمة.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-09</span> تحقّق الهاتف — التصميم آمن، لكن النطاق أضيق ممّا يجب</h3>
+    <p>تصميم «تمرير السلسلة الفارغة» مؤكَّد آمنًا لسنتينل <code>+000</code> <b>بشرط</b> كتابته بحارس عودة مبكّرة صريح (تمّ رسم مخطّطه في تقرير الوكيل). <b>5-6 مواقع أخرى</b> غير محقَّقة للهاتف اكتُشِفت: <code>driver_phone_change_router</code>، <code>address_router</code>، <code>transfer_router</code>، هاتف الموظّف في <code>provider_router</code>، <code>agent_admin_router</code>، <code>contact_settings_router</code>.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-10</span> إخفاء رقم الهاتف — 4-5 تطبيقات مستقلّة لا 2 <span class="chip corr">تصحيح جوهريّ</span></h3>
+    <p>وُجِدت: <code>pii_masking.mask_phone</code> (الصحيح)، تطبيق <code>account_deletion</code> غير الآمن، تطبيق <code>auth_router</code> الآمن بلاحقة، تطبيق <code>purchase_for_another.py</code> الخاصّ به، ونسخة مكرَّرة من التطبيق الآمن في <code>loyalty/service.py</code>. الإصلاح الأدنى (سطر واحد في <code>account_deletion</code> فقط) يُصلِح الخطر الفعليّ؛ التوحيد الحقيقي (4 ملفّات) أكبر بأربعة أضعاف.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-11</span> شارة الجرس — تحديث بسيط لكن يحتاج mock جديدًا</h3>
+    <p>لا يوجد mock لـMSW لهذا المسار اليوم — بدونه سيفشل <code>Layout.test.tsx</code> بخطأ «طلب غير معالَج». يجب إضافة الـmock ضمن نفس التغيير، وليس بعده.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-12</span> عدم بقاء اللغة عند التبديل <span class="chip bad">إصلاح ساذج كان سيُنتج عيبًا جديدًا</span></h3>
+    <p>الإصلاح الحرفيّ (<code>localeApi.set(next)</code> مباشرة) <b>يخزّن رمزًا مجرَّدًا (bare code)</b> بينما صفحة <code>LocaleSettings.tsx</code> تتوقّع رمزًا مقترنًا بالمنطقة (<code>en-US</code> لا <code>en</code>) — هذا سيكسر قائمة الإعدادات المنسدلة بدل إصلاح شيء. لا يوجد أي تغطية اختبار اليوم لـ<code>switchLang</code> التفاعليّ.</p>
+    <div class="correction-box"><b>الإصلاح الصحيح:</b> بناء دالّة تحويل مشترَكة (bare ↔ مقترن بالمنطقة) — نمط <code>toI18nextCode</code> الموجود فعلًا في <code>LocaleSettings.tsx</code> صالح كأساس مباشر لها.</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-13</span> كتل غير مترجمة — العدد الفعليّ ~48 مفتاحًا لا ~28 <span class="chip corr">تصحيح حجم</span></h3>
+    <p>التوزيع الفعلي: PasswordInput (6) · CustomerSettings (18) · AddressBook (8) · LegalCenter (13) · LocaleSettings (3، يُعاد استخدام <code>common.save</code> الموجود بدل مفتاح جديد). <b>اكتشاف مجاور إضافي:</b> مفاتيح <code>driver.theme_light/dark</code> و<code>provider.theme_light/dark</code> (4 مفاتيح) مفقودة أيضًا بنفس النمط — تُطوى ضمن نفس دفعة العمل لأنّها نفس السبب الجذريّ حرفيًّا.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-19</span> الخطّ العربيّ <span class="chip good">مؤكَّد نظيف — تحذير بناء واحد</span></h3>
+    <p>الإصلاح يخصّ <code>web/public/fonts</code> فقط — <b>وليس</b> <code>web/dist</code> (نتاج بناء يُستبدَل تلقائيًّا، لمسه بلا معنى). لا خطر اختبار. بصمة الـPWA precache ستتغيّر (متوقَّع وليس عيبًا).</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-22</span> ترجمة مقصوصة (truncated) <span class="chip corr">تصحيح جوهريّ</span></h3>
+    <p>القصّ موجود في <b>مكانين معًا</b>: ملف <code>ar.json</code> نفسه <b>و</b> قيمة <code>defaultValue</code> المكتوبة مباشرة داخل JSX — التذكرة الأصليّة ذكرت JSON فقط. يجب إصلاح الاثنين معًا وإلا يبقى النصّ الافتراضيّ مقصوصًا حتى بعد تصحيح JSON.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-23</span> aria-pressed مكرَّرة <span class="chip warn">بانتظار إذن</span></h3>
+    <p>مؤكَّد كما في 556 (3 ملفّات)، بلا تغيير — يبقى معلَّقًا لأنّه تغيير نصّ ظاهر يحتاج إذنًا صريحًا وفق قاعدة الحوكمة العامّة.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-24</span> إزالة عمود ميّت <span class="chip bad">أخطر بند في هذه الخطّة كلّها</span></h3>
+    <p>التصحيح الحاسم: العمود <b>ليس ميّتًا فعليًّا</b> على مستوى ORM. تمّ تتبّع 3 مواقع حرجة تعتمد على تحميل النموذج الكامل عبر <code>.get()</code>: <code>customer_router.py:68</code> (جلب الملف الشخصي)، <code>notification_service.py:503</code> (كل إرسال إشعار)، <code>order_service.py:2452</code> (كل إنشاء طلب) — اثنان من الثلاثة كان بحث grep عن اسم الحقل وحده سيُفوّتهما كليًّا.</p>
+    <div class="decision-box"><b>هذا يغيّر خطّة النشر جذريًّا:</b> نشر واحد يجمع (تعديل النموذج + الهجرة) معًا <b>غير آمن للتدرّج (rolling deploy)</b> — سينتج <code>UndefinedColumnError</code> إنتاجيًّا أثناء نافذة النشر إن حاولت نسخة قديمة من التطبيق قراءة عمود حُذِف بالفعل من قاعدة البيانات. الإصلاح الإلزاميّ: <b>نشر بمرحلتين منفصلتين زمنيًّا</b> — (1) إزالة الحقل من النموذج/الشيفرة فقط، انتظار اكتمال التدرّج الكامل عبر كل نسخة تشغيل، ثم (2) تشغيل هجرة حذف العمود لاحقًا. كذلك: <b>يجب إعادة التحقّق المباشر من رأس alembic الحقيقي</b> قبل كتابة <code>down_revision</code> (انظر NEW-4) — لا الاعتماد على الرقم المكتوب في CLAUDE.md.</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">RATCHET-5</span> اختبار i18n الخامس <span class="chip build">بناء صغير</span></h3>
+    <p>الفجوة حقيقيّة ومؤكَّدة، والقالب يُطابق حرفيًّا <code>nav-keys-present.test.ts</code> الموجود. لا حاجة لتعديل YAML الخاص بـCI (vitest يكتشف الملفّ تلقائيًّا). <b>الحجم الحقيقي والقاعدة الإلزاميّة موضّحان في NEW-2 أعلاه.</b></p>
+  </div>
+</section>
+
+<section id="discovery">
+  <h2><span class="n">§4</span> الاكتشاف والطلب — تصحيحات وتوسعة نطاق</h2>
+
+  <div class="finding">
+    <h3><span class="id">F-01b</span> الخصم غير ظاهر بعد إتمام الطلب <span class="chip corr">تصحيح جوهريّ</span></h3>
+    <p>الإصلاح الأدنى الآمن: إضافة <code>discount_minor</code> و<code>promotion_id</code> فقط (وليس <code>name</code> — يحتاج نمط تحميل دفعي إضافيّ، جهد زائد غير ضروريّ للنطاق الأدنى). <b>اكتشاف حاسم:</b> يوجد مُسلسِل ثانٍ مستقلّ — <code>carts/router.py::_serialize_group</code> — الطلبات الجماعيّة/المقسَّمة ستبقى بلا خصم ظاهر ما لم يُصلَح هذا المسار الثاني أيضًا في نفس الدفعة. شاشة النجاح الفوريّة في <code>CheckoutPage</code> نفسها تعمل بالفعل من حالة محليّة ولا تحتاج هذا الإصلاح — الحاجة فقط لـ<code>OrderTrackingPage</code> والعروض اللاحقة.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-02</span> زرّ سلّة فارغة <span class="chip good">لم يُعثَر على عيب كود — يحتاج إعادة اختبار حيّ</span></h3>
+    <p>مرشّحان جديدان محدَّدان لإعادة اختبار حيّ مركَّز (لا مزيد من قراءة الكود): (1) بقاء حالة عبر تبويبات متعدّدة — لا يوجد مستمع لحدث <code>storage</code>، يمكن أن يُعيد إحياء سلّة أُفرِغت من تبويب آخر قديم؛ (2) سباق بين مؤقّت الإخفاء التلقائيّ (3 ثوانٍ) ونقرة المستخدم عند حدود الوقت بالضبط. لا يوجد إصلاح كود مطروح بعد.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-14</span> إتاحة الصنف/الخيار <span class="chip corr">الفرضيّة الأصليّة كانت خاطئة</span></h3>
+    <p>556 افترضت أنّ <code>get_item_with_availability</code> يشمل فحص الخيار (variant) — <b>غير صحيح</b>، الدالّة لا تشير إلى <code>item.variants</code> إطلاقًا. هذا يفسّر وجود كتلتين مكرَّرتين إضافيّتين لم تُحتسَبا في 556 (فحص ما قبل الدفع ~484-527 وإنشاء الطلب ~794-838 في <code>order_service.py</code>) — العدد الحقيقيّ للمواقع <b>6 لا 4</b>. <b>اكتشاف آليّة العيب:</b> الصنف يُضاف للسلّة فعليًّا بسعر <b>صفر</b> (لا مجرّد «سعر فارغ معروض») بسبب احتياطي <code>?? 0</code> في <code>CartContext</code> — فحص ما قبل الدفع يرفضه بشكل صحيح، لكن العميل يعيش تجربة «صنف مجّانيّ في السلّة» حتى تلك اللحظة.</p>
+    <div class="correction-box"><b>البناء الموصى به:</b> <code>backend/app/core/item_access.py</code> على نمط <code>provider_access.py</code> الموجود فعلًا (سابقة حقيقيّة: واجهة مزدوجة — بانٍ لشرط SQL + محمول Python). ترتيب البناء الإلزاميّ: المسند الأساسيّ ← مسار الطلب ← العرض المرئيّ للعميل (ولا يُعكَس الترتيب، وإلا قد ينحرف السعر/التوفّر بصمت).</div>
+    <div class="decision-box">قرار: <code>_price()</code> (أوّل نشِط) مقابل <code>_representative_price_minor()</code> (الأرخص النشِط) — فرق حقيقيّ موجود في الكود اليوم، ليس عرضيًّا. أيّهما الدلالة الصحيحة؟</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-15</span> البحث الشامل من الرئيسيّة <span class="chip corr">تصحيح جوهريّ</span></h3>
+    <p>عدم تناظر اكتُشِف: <code>HomePage</code> اليوم <b>بلا أيّ تأخير (debounce)</b> — يُطلق طلبًا مع كلّ ضغطة مفتاح بالفعل حاليًّا، بينما <code>SearchResultsPage</code> يُطبِّق تأخيرًا 300ms. النسخ الحرفيّ لنمط الأخيرة سيحتاج أوّلًا <b>إضافة</b> تأخير لصفحة الرئيسيّة قبل إضافة الاستعلام الثاني، وإلا تضاعف عدد الطلبات لكلّ ضغطة مفتاح. <code>catalog_search_router</code> ليس رخيصًا (3 رحلات ذهاب-إياب + حلقة Python لكلّ صفّ لحساب رسوم التوصيل) — استدعاؤه بلا تأخير مكلف فعليًّا.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-16</span> تبديل اللغة يتخطّى الفرنسيّة <span class="chip bad">إصلاح 556 المقترح لا يعمل إطلاقًا</span></h3>
+    <p>مؤكَّد بتتبّع مصدر i18next مباشرة: تعديل إعداد الكاشف (<code>load: "languageOnly"</code>) الذي اقترحته 556 <b>لا أثر له إطلاقًا</b> على هذا العيب المحدَّد — سلسلة الشروط الثلاثيّة المعطوبة نفسها موجودة حرفيًّا في ملفّ ثانٍ أيضًا (<code>CustomerSettings.tsx:158</code>) وملفّ ثالث مكتشَف حديثًا (<code>OpsWalletVelocity.tsx</code>) — <b>10 ملفّات إجمالًا لا 2</b>.</p>
+    <div class="correction-box"><b>الإصلاح الصحيح المؤكَّد:</b> استبدال سلسلة الشرط الثلاثيّة في كلّ الملفّات العشرة بدالّة تحويل واحدة على نمط <code>toI18nextCode</code> الموجود فعلًا في <code>LocaleSettings.tsx</code> — مثبَت آمنًا لأنّه مستخدَم بالفعل في مسار حيّ آخر.</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-17</span> نصّ السائق الخاطئ ما قبل الاستلام <span class="chip corr">فجوة إضافيّة مكتشَفة</span></h3>
+    <p>الإصلاح المقترح (فحص <code>fulfillmentType</code>) مؤكَّد وبسيط، لكن <b>لا يغطّي حالة الجدولة (SCHEDULED)</b> — طلب COD+توصيل مجدوَل سيُظهر نفس رسالة «جهّز النقد» المبكِّرة فور الحجز، قبل أن يقترب الوقت الفعليّ بساعات. مفتاح i18n الجديد يستدعي إعادة توليد بصمة snapshot الخاصّة بـ<code>i18n-value-drift</code>.</p>
+    <div class="decision-box">قرار: هل نُدرِج فحص SCHEDULED ضمن نفس الإصلاح أم نُبقيه ضيّقًا كما اقتُرح أصلًا؟</div>
+  </div>
+</section>
+
+<section id="lifecycle">
+  <h2><span class="n">§5</span> دورة حياة الطلب — تصحيحات وتوسعة نطاق</h2>
+
+  <div class="finding">
+    <h3><span class="id">F-04</span> لوحة السائق العالقة (رقم اللوحة) <span class="chip corr">يحتاج ترحيل بيانات لا كود فقط</span></h3>
+    <p>الإصلاح مؤكَّد صحيحًا (كتابة <code>DriverVehicleProfile.plate_number</code> بدل <code>Driver.vehicle_plate</code>)، لكن <b>لا توجد أي هجرة أو كود سابق نقل البيانات التاريخيّة</b> بين الحقلين — يلزم ترحيل SQL لمرّة واحدة عبر البيئات الثلاث (test1 / .194 / الإنتاج) كخطوة تشغيليّة منفصلة عن نشر الكود. لا يوجد أي اختبار حاليّ يُمرِّر هذا الحقل عبر نقطة النهاية إطلاقًا — اختبارات جديدة من الصفر مطلوبة. <b>ملاحظة تشغيليّة:</b> أيّ سائق عالق اليوم بسبب هذا العيب تحديدًا سيُحرَّر تلقائيًّا بمجرّد الترحيل الرجعيّ.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-05</span> استثناءات النقد — 4 بنود، كلّ منها له تصحيح مستقلّ</h3>
+    <p><b>بند 1</b> (دمج استثناءات النقد في استعلام الطلبات العالقة): <span class="chip corr">تصحيح إطار</span> — العمليّات <b>ليست عمياء فعليًّا اليوم</b>، صفحة <code>OpsCashExceptions.tsx</code> كاملة موجودة بالفعل وتُدرِج كلّ الاستثناءات بمعزل عن حالة الطلب. هذا الإصلاح تحسين ثانويّ (يظهر أيضًا ضمن شاشة تصنيف العالقين) لا إغلاق فجوة حقيقيّة. <b>تحذير إضافيّ:</b> زرّ الإجراء في <code>OpsStuckOrders.tsx</code> مبنيّ على <code>if/elif</code> صريح لأربع حالات قديمة فقط — أي صفّ جديد مصدره استثناء نقد فقط سيسقط في فرع <code>else</code> ويعرض زرّ إجراء معطوبًا ما لم يُضَف فرع جديد صراحة.</p>
+    <p><b>بند 2</b> (حدث SSE عند فتح الاستثناء): موضع الإنشاء الصحيح هو <code>open_cash_exception</code> لا <code>resolve_cash_exception</code>. <b>يجب شحنه سويًّا مع البند 3</b> — بلا الأخير يبقى عديم الأثر لأنّ التدفّق يكون مغلقًا بالفعل عند تلك اللحظة.</p>
+    <p><b>بند 3</b> (فصل تفعيل التدفّق عن عرض الخريطة): <span class="chip bad">إصلاح ساذج كان سيُعيد نسخة من العيب نفسه</span> — يجب أيضًا إضافة حارس <code>showMap &&</code> صريح على شرط عرض الخريطة نفسه (السطر ~1001)، الذي لا يملك حارسًا خاصًّا به اليوم ونجح فقط لأنّ إغلاق التدفّق كان يوقف تحديثات الموقع ضمنيًّا. بدون هذا الحارس المرافق، الفصل المقترح يُعيد إنتاج نسخة من نفس عيب «الخريطة تُعرَض في حالات خاطئة».</p>
+    <p><b>بند 4</b> (إعادة تعيين سائق لحالة RESCHEDULED): <span class="chip bad">غير آمن للبناء كما وُصِف</span> — <code>create_offer</code>/<code>auto_dispatch</code> ترفض هذه الحالة صراحة. السابقة الآمنة الوحيدة الموجودة هي <code>reassign_driver</code> (~200 سطر، يتجاوز عمدًا تسلسل الحالة أحاديّ الاتّجاه، يتطلّب اختيار سائق مختلف، بلا إشعار للسائق المُبعَد). يحتاج قرار منتج صريح أوّلًا (انظر القرار #2 في §1).</p>
+    <p><b>اكتشاف بنية تحتيّة منفصل:</b> قالب nginx المُنهي لـTLS في المستودع <b>لا يملك كتلة location مخصَّصة لـSSE</b> (تخزين مؤقّت عام مفعَّل، مهلة 60 ثانية) — قد يفسّر السؤال المفتوح منذ تقرير 519 حول ما إذا كان SSE ميّتًا فعليًّا في الإنتاج. مهمّة تحقّق بنية تحتيّة منفصلة، تحتاج وصولًا للخادم (<code>nginx -T</code>).</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-06</span> حالات شقيقة إضافيّة مكتشَفة</h3>
+    <p>الإصلاح المقترح سطر واحد ومؤكَّد. حالتان شقيقتان جديدتان بنفس النمط: <code>SCHEDULED</code> (لا زرّ إلغاء إطلاقًا رغم سماح الخلفيّة به) و<code>OFFER_EXPIRED_REASSIGN</code> (لا بطاقة/شرح مخصَّص). قرار توسعة النطاق مطلوب (§1، القرار #4).</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-18</span> تقييم ثلاثيّ الطبقات — الإصلاح يحتاج دقّة إضافيّة <span class="chip corr">تصحيح جوهريّ</span></h3>
+    <p>«الطبقات الثلاث» = مزوّد + سائق + منصّة (حتى 3 نداءات POST متوازية). قيد 409 مُحدَّد <b>لكلّ target_type على حدة</b> عبر قيد فريد. الإصلاح الصحيح يجب أن يفحص كلّ نتيجة من النتائج الثلاث المستقرّة <b>بشكل مستقلّ</b>، لا «أيّ 409 يعني نجاحًا» على مستوى الدفعة — وإلا عميل قيّم المزوّد لكن لم يقيّم السائق/المنصّة قد يتلقّى خطأً كاذبًا. <b>خطر N+1</b> في البند 2 (جلب تقييمات لكلّ طلب ظاهر بشغف) — يُوصى بجلب كسول عند النقر بدلًا من ذلك.</p>
+    <div class="decision-box">قرار: هل «إخفاء الزرّ قبل النقر» متطلّب تجربة مستخدم صارم (تغيير خلفيّ أكبر) أم يكفي الجلب الكسول عند النقر؟</div>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-20</span> حقل المبلغ الخاطئ في الفرز <span class="chip good">مؤكَّد نظيف</span></h3>
+    <p>إصلاح سطر واحد + استيراد. تحقّق شامل من 32 موقعًا آخر لـ<code>total_minor</code> — لا وجود لنسخة أخرى من نفس العيب. نقطتان ثانويّتان جديدتان (الفرز يستخدم نفس الحقل الخاطئ، وعدم اتّساق في <code>OpsSplitPayments</code>) — أولويّة منخفضة، غير مطلوبتين لإغلاق هذا البند.</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-25</span> حالات شقيقة أسوأ من الحالة المُبلَّغ عنها أصلًا</h3>
+    <p>مؤكَّد كما وُصِف. <code>SUBSTITUTION_REJECTED_CANCELLED</code> و<code>EXPIRED</code> تشتركان في نفس الثغرة الثلاثيّة (غائبة عن <code>STATE_ORDER</code>، غائبة عن اختبار بادئة <code>isFailedTerminal</code>، وغير مستثناة من شارة F-06 أيضًا) — <b>أسوأ فعليًّا</b> من البند الأصليّ المُبلَّغ عنه. <code>RETURNED</code>/<code>DISPUTE_RESOLVED</code> تشتركان بنسخة أقلّ حدّة. قرار توسعة النطاق مطلوب (§1، القرار #4).</p>
+  </div>
+
+  <div class="finding">
+    <h3><span class="id">F-26</span> منطقة زمنيّة الجدولة <span class="chip good">حكم نهائيّ: إغلاق</span></h3>
+    <p>تتبّع شامل، لا عيب كود — ليبيا لا تُطبِّق توقيتًا صيفيًّا (UTC+2 ثابت)، ولا يوجد مسار إعادة طلب يلمس <code>scheduledFor</code>. عيب تجربة مستخدم بسيط غير مرتبط اكتُشِف (زحف القيمة الدنيا عند إعادة العرض) — تحسين تجميليّ فقط، لا يطابق العرَض الأصليّ المُبلَّغ عنه.</p>
+  </div>
+
+  <div class="finding">
+    <h3>توسعة نطاق SSE (F-05 بند 3 نفسه) <span class="chip info">مؤكَّد محدود ومضبوط</span></h3>
+    <p>تضمين <code>AWAITING_PROVIDER_ACCEPTANCE</code> محدود بمهلة انتهاء تلقائيّ موجودة (~300 ثانية) — زيادة عدد الاتّصالات حقيقيّة لكنّها صغيرة ومحدودة. الخلفيّة تتعامل بالفعل مع الحالات غير النهائيّة بشكل صحيح — الواجهة الأماميّة كانت المصدر الوحيد لتضييق النطاق.</p>
+  </div>
+</section>
+
+<section id="wallet">
+  <h2><span class="n">§6</span> المحفظة والولاء — تصحيحات وتوسعة نطاق</h2>
+
+  <div class="finding">
+    <h3><span class="id">F-21</span> عدم الإفصاح عن مكافأة الإحالة <span class="chip bad">الإصلاح المقترح حرفيًّا كان سيكون عديم الأثر في الإنتاج</span></h3>
+    <p>الاقتراح الحرفيّ (إعادة استخدام حارس <code>!me.redeemable</code> + نصّ <code>accrual_note</code> الموجود) <b>سيكون عديم الأثر فعليًّا في الإنتاج</b>، لأنّ <code>redeemable</code> يعكس علمًا مختلفًا تمامًا مفعَّلًا بالفعل (<code>loyalty_redemption_enabled</code>، افتراضيًّا true) لا <code>production_payment_enabled</code>. كما أنّه سيكسر اختبارًا قائمًا (<code>LoyaltyPage.test.tsx:37</code> يستخدم <code>getByText</code> المفرد الذي سيرمي خطأً عند وجود تطابقين إن أُعيد استخدام نفس النصّ مع قائمة إحالات غير محجوبة).</p>
+    <div class="correction-box"><b>الإصلاح الصحيح:</b> ملاحظة جديدة غير مشروطة، بمفتاح/نصّ مستقلّ تمامًا، مع فرع لونيّ ثلاثيّ حقيقيّ للحالة (توسعة النوع فقط بلا فرع فعليّ = عديم الأثر بصمت).</div>
+    <div class="decision-box">قرار: هل تستحقّ حالة <code>PENDING_CONVERSION</code> أيضًا لونًا غير أخضر مميّزًا؟</div>
+  </div>
+
+  <div class="finding">
+    <h3>حارس ثبات دفتر المحفظة — إصلاح ملموس الآن، بتحفّظ</h3>
+    <p>انظر <b>NEW-5</b> أعلاه للتفاصيل الكاملة — الإصلاح المقترح يُصلِح مصدرًا واحدًا للانحراف الكاذب، لكن مصدرًا ثانيًا معاكس الاتّجاه يبقى، ويحتاج خطوة تحقّق بيانات قبل الوثوق بأي تنبيه مبنيّ على هذا الحارس.</p>
+  </div>
+</section>
+
+<section id="bigtech">
+  <h2><span class="n">§7</span> الأعمال الكبيرة والتقنيات الحديثة — الحكم النهائي</h2>
+
+  <div class="tech-card">
+    <h4>1. مسند «هل الصنف قابل للشراء» المشترك <span class="chip build">بناء، 4-5 أيام</span></h4>
+    <p>الفرضيّة صُحِّحت (انظر F-14 أعلاه) — النطاق الحقيقيّ 6 مواقع خلفيّة لا 4، بالإضافة إلى تكرار أماميّ ثانٍ (<code>CustomizationModal.tsx</code> يكرّر أيضًا <code>hasCustomization</code>). السابقة المعماريّة الصحيحة: <code>provider_access.py</code> (واجهة مزدوجة بانٍ SQL + محمول Python). ترتيب البناء إلزاميّ: المسند الأساسيّ ← مسار الطلب ← العرض المرئيّ.</p>
+  </div>
+
+  <div class="tech-card">
+    <h4>2. طابور استثناءات عامّ <span class="chip corr">التوصية انقلبت من «جدول جديد» إلى «عرض محسوب + اختبار تغطية»</span></h4>
+    <p>جدول كتابة جديد يتطلّب إضافة INSERT في 5+ مواقع إنشاء قائمة — وهذا الكود له سابقة حيّة مؤكَّدة لضبط دقيق من هذا النوع بالضبط يفوّت (إجراءات Tawa Trade لا تُسجَّل في AuditLog إطلاقًا، اكتُشِف 2026-07-23، لا يزال غير مُصلَح). سابقة معماريّة أفضل: جدول <code>work_items</code> موجود بالفعل (بُني لمرحلة Trade 6-8) مع تعليق صريح في التوثيق يقول إنّ ضمّ أنواع استثناءات أخرى فيه «قرار منفصل أعلى تأثيرًا يحتاج إذنه الخاصّ» — هذا البند فعليًّا إعادة نظر في ذاك القرار. <b>الإصلاح الحقيقيّ هو اختبار يفرض التغطية</b> (اختبار يمرّ على كلّ النماذج بحثًا عن أعمدة حالة شبيهة بـOPEN ويتأكّد من تسجيلها أو استثنائها صراحةً) — لا اختيار جدول-مقابل-عرض بحدّ ذاته؛ بدون هذا الاختبار، أيّ قائمة تسجيل ستكون قابلة للنسيان تمامًا مثل شرط WHERE IN المُكوَّد يدويًّا اليوم. آليّات استثناء مؤكَّدة اليوم: <code>order_state</code>، <code>cash_exceptions</code>، <code>chargeback_cases</code>، <code>financial_disputes</code>، <code>incident_records</code> (بلا <code>order_id</code> موثوق)، <code>work_items</code>. جهد: 3-3.5 أيام.</p>
+  </div>
+
+  <div class="tech-card">
+    <h4>3. أدوات i18n الحديثة <span class="chip warn">أولويّة منخفضة — النطاق أضيق ممّا اقترحته 556</span></h4>
+    <p>الفرضيّة الأصليّة خاطئة جزئيًّا: <code>i18next-cli</code> <b>معتمَد جزئيًّا بالفعل</b> (موجود في <code>package.json</code>، ملفّ إعداد <code>i18next.config.ts</code>، مهمّة CI موصولة بالفعل كاستشاريّة/<code>continue-on-error</code>). الإضافة الجديدة الوحيدة فعليًّا: <code>eslint-plugin-i18next</code>. <b>حاسم:</b> <code>i18next-cli</code> لا يملك آليّة تجنيد تاريخيّ (grandfathering) مكافئة — هذا بالضبط سبب كونه استشاريًّا فقط اليوم، والفريق توصّل لهذا الحلّ بنفسه بالفعل بشكل صحيح. التوصية: <b>لا تُنفَّذ هجرة كبيرة</b> — أضِف eslint-plugin فقط (جهد تطوير، خطر منخفض)، اترك الاختبارات الخمسة المخصَّصة كالبوّابة الحاجبة الفعليّة لأنّها تحلّ المشكلة الصعبة بشكل صحيح بالفعل. جهد: 0.5-1 يوم (نطاق أصغر من قبل، لا أكبر).</p>
+  </div>
+
+  <div class="tech-card">
+    <h4>4. أمان تذكرة SSE عبر fetch-event-source <span class="chip warn">تأجيل / لا تُنفَّذ الهجرة الكاملة</span></h4>
+    <p>مدّة صلاحيّة التذكرة مضبوطة بالفعل (120 ثانية، مُخفَّضة من 300)، مدعومة بـRedis، يوجد احتياطي JWT، وعدم كونها للاستخدام الواحد قرار مقصود (3 خطّافات تعتمد على إعادة اتّصال <code>EventSource</code> الأصليّة التلقائيّة بإعادة استخدام رابط التذكرة نفسه). نصف القطر الحقيقيّ: 8 ملفّات تُنشئ <code>EventSource</code> مباشرة + 13 ملفًّا متأثّرًا عبر مستهلِكين لاحقين — لا يوجد تجريد اتّصال مشترك، فهذه 8 عمليّات إعادة كتابة مستقلّة لا واحدة. <b>خطر جديد:</b> <code>fetchEventSource</code> يوقف الاتّصال افتراضيًّا عند تصغير التبويب (<code>openWhenHidden</code> افتراضيّها false) خلافًا لـ<code>EventSource</code> الأصليّة — خطر انحدار حقيقيّ لتطبيق السائق تحديدًا في نافذة قبول العرض (~20 ثانية).</p>
+    <div class="correction-box"><b>البديل الأرخص الموصى به بدلًا:</b> نسخ نمط إعادة الاتّصال اليدويّ مع إعادة سكّ التذكرة الموجود بالفعل في <code>useSSE.ts</code> إلى الخطّافين الوحيدين اللذين لديهما فعليًّا فجوة إعادة استخدام تذكرة قديمة (<code>OpsFleetMap</code>، <code>ProviderOrderQueue</code>) — ~0.5 يوم، بلا أي تبعيّة جديدة.</div>
+  </div>
+
+  <div class="tech-card">
+    <h4>5. توسعة تصنيف أسباب رفض الكوبون <span class="chip corr">النطاق أضيق ممّا افترضته 556</span></h4>
+    <p>الفرضيّة جزئيًّا خاطئة — <code>customer_id</code> موصول بالفعل حتى <code>quote_promotion</code> ونداء الراوتر له؛ الفجوة الحقيقيّة تمرير مفقود واحد في موقع نداء داخليّ واحد، لا سلك توقيع جديد بالكامل. <b>عدم تطابق نطاق (SCOPE_MISMATCH)</b> يُوصى بإسقاطه (خطر شيفرة ميّتة/غير قابلة للوصول — السلال ذات مزوّد واحد فقط). النمط الصحيح لتحويل السبب لنصّ موجود بالفعل: قاموس <code>PROMO_REASON_AR_DEFAULT</code> في <code>CheckoutPage.tsx</code> + مفاتيح i18n (أماميّ)، لا جدول بحث خلفيّ جديد. <b>حاسم:</b> فحص الحدّ الأقصى لكلّ عميل يجب وصله في <code>create_order</code> و<code>quote_promotion</code> معًا <b>في نفس الدفعة/المرحلة</b> — لا مُنفصلَين — لأنّ الفصل يُعيد إنتاج عيب انحراف المعاينة/الإرسال الذي أُصلِح للتوّ كـF-01 (توثيق الوحدة نفسها يذكر هذا صراحة). ملاحظة سباق TOCTOU: العدّ لكلّ عميل بلا حارس تزامن خلافًا لحارس <code>usage_limit</code> العامّ (تحديث شرطيّ) — فجوة موجودة مسبقًا لا مُستحدَثة، لكن لا يجب تقديمها كـ«آمنة الآن حديثًا». جهد: 1-1.5 يوم.</p>
+  </div>
+
+  <div class="tech-card">
+    <h4>6. انضباط XState لتأهيل السائقين <span class="chip corr">مرحلتان — الأولى عاجلة، عيب حيّ مستقلّ مكتشَف</span></h4>
+    <p>الهدف مؤكَّد صحيحًا، لكن اكتُشِف <b>عيب حيّ ملموس منفصل تمامًا عن F-04</b>: مسار الرفض الجماعي لا يترك أثر تدقيق إطلاقًا (تفاصيل كاملة في NEW-1 أعلاه) — نظير مباشر لعيب سابق تمّ إصلاحه في مسار الموافقة الجماعية (C-05، تقرير 534) لكن لم يُطبَّق على الرفض قط.</p>
+    <p><b>المرحلة أ (عاجلة، 0.75-1 يوم):</b> إصلاح عيب أثر التدقيق + استخراج <code>reject_role()</code> مشتركة على نمط <code>state_transitions.py</code>.<br><b>المرحلة ب (مستقبليّة، غير عاجلة، 2-3 أيام):</b> انضباط حالة تأهيل محسوبة صريحة كاملة — بند كبير منفصل، ليس عاجلًا.</p>
+  </div>
+
+  <div class="callout warn">
+    <b>ترتيب الأولويّة الموصى به عبر البنود الستّة:</b> البند 6 (المرحلة أ) والبند 2 أقوى دليلًا (عيب حيّ مؤكَّد + فجوة بنيويّة مؤكَّدة بسابقة واضحة). البند 1 والبند 5 رخيصان ومحدودان جيّدًا. البند 6 (المرحلة ب) والبند 3 مشروعان لكن أقلّ إلحاحًا. البند 4 أضعف عائد/تكلفة — يُؤجَّل.
+  </div>
+</section>
+
+<section id="phases">
+  <h2><span class="n">§8</span> الخطّة المرحليّة المنقّحة الكاملة</h2>
+
+  <div class="phase">
+    <h3>المرحلة 0 — إصلاحات فوريّة بلا إذن <span class="eff">~6-7 ساعات</span></h3>
+    <ul>
+      <li>F-19 (خطّ عربيّ، <code>public/fonts</code> فقط)</li>
+      <li>F-20 (حقل الفرز)</li>
+      <li>F-22 (قصّ الترجمة — JSON + JSX معًا)</li>
+      <li>F-08 (حالة خطأ <code>applyReverse</code> مخصَّصة جديدة)</li>
+      <li><b>NEW-1 المرحلة أ</b>: إصلاح عيب أثر تدقيق الرفض الجماعي (عاجل، عيب حيّ)</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <h3>المرحلة 1 — إصلاحات سطحيّة عالية الأولويّة <span class="eff">~20-26 ساعة</span></h3>
+    <ul>
+      <li>F-01b (خصم بعد الطلب — المسارَين: <code>orders</code> و<code>carts/_serialize_group</code> معًا)</li>
+      <li>F-04 (لوحة السائق) <b>+ ترحيل بيانات SQL عبر 3 بيئات</b> كخطوة تشغيليّة مرافقة</li>
+      <li>F-06 (زرّ إلغاء NO_DRIVER_ESCALATION — النطاق الضيّق أوّلًا، بانتظار قرار التوسعة)</li>
+      <li>F-07 (مفاتيح LocationPicker — بعد حسم قرار تصادم المفتاح)</li>
+      <li>F-11 (شارة الجرس + mock جديد)</li>
+      <li>F-12 (بقاء اللغة — عبر دالّة التحويل bare↔region)</li>
+      <li>F-16 (تبديل اللغة — 10 ملفّات عبر دالّة <code>toI18nextCode</code> موحَّدة)</li>
+      <li>F-17 (نصّ السائق قبل الاستلام — بعد حسم قرار SCHEDULED)</li>
+      <li>F-18 (تقييم ثلاثيّ الطبقات — فحص مستقلّ لكلّ target_type)</li>
+      <li>F-25 (حالات شقيقة — النطاق الضيّق أوّلًا)</li>
+      <li>F-05 بنود 2+3 (<b>يجب شحنهما معًا في نفس الـPR</b> + حارس <code>showMap</code> المرافق)</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <h3>المرحلة 2 — دفعة i18n <span class="eff">~18-24 ساعة</span></h3>
+    <ul>
+      <li>F-13 (~48 مفتاحًا + 4 مفاتيح theme مجاورة)</li>
+      <li>F-09 (تحقّق الهاتف — نطاق التسجيل أوّلًا، بانتظار قرار التوسعة)</li>
+      <li>F-03 + F-03b (68 موقعًا/34 ملفًّا + <code>useFieldErrors</code>) <b>+ تحديث إلزاميّ لـ<code>LoginPage.test.tsx:88</code></b></li>
+      <li>F-10 (إصلاح أدنى: <code>account_deletion</code> فقط، بانتظار قرار التوحيد الكامل)</li>
+      <li>RATCHET-5 (اختبار i18n الخامس — <b>تجنيد تاريخيّ بحت</b> لـ1,034 مفتاحًا، بلا محاولة علاج الفجوة في نفس البند)</li>
+    </ul>
+  </div>
+
+  <div class="phase danger">
+    <h3>المرحلة 3 — الخطر الأعلى: F-24 (نشر بمرحلتين إلزاميّتين) <span class="eff">مرحلة منفصلة زمنيًّا، ~4-6 ساعات كود + نافذة انتظار تدرّج</span></h3>
+    <ul>
+      <li>خطوة 3أ: إزالة الحقل من النموذج/الشيفرة فقط (بلا هجرة)، نشر، انتظار اكتمال التدرّج الكامل عبر كل نسخة تشغيل في كل بيئة</li>
+      <li>خطوة 3ب (لاحقًا، بعد تأكيد الاكتمال): تشغيل هجرة حذف العمود — <b>بعد إعادة تحقّق رأس alembic الحقيقيّ مباشرة</b>، لا الاعتماد على CLAUDE.md</li>
+      <li>يتطلّب إذن مالك صريح لكلّ خطوة على حدة (منطقة محظورة)</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <h3>المرحلة 4 — بناء المسند المشترك للإتاحة (F-14) <span class="eff">~4-5 أيام</span></h3>
+    <ul>
+      <li>بعد حسم قرار دلاليّة السعر (§1 القرار #5)</li>
+      <li><code>item_access.py</code> على نمط <code>provider_access.py</code> — المسند ← مسار الطلب ← العرض المرئيّ (هذا الترتيب إلزاميّ)</li>
+      <li>هجرة 6 مواقع خلفيّة + <code>CustomizationModal.tsx</code> الأماميّ</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <h3>المرحلة 5 — بناء طابور الاستثناءات + F-05 بند 1 <span class="eff">~3.5-4.5 أيام</span></h3>
+    <ul>
+      <li>بعد تأكيد قرار عرض-محسوب-مقابل-جدول (§1 القرار #9)</li>
+      <li>الإصلاح الجوهريّ: اختبار يفرض تسجيل كل عمود حالة شبيه بـOPEN عبر كل النماذج</li>
+      <li>F-05 بند 1 (دمج استثناءات النقد في استعلام الطلبات العالقة) + إصلاح فرع <code>else</code> في زرّ الإجراء</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <h3>المرحلة 6 — بنود تقنيّة صغيرة مضبوطة النطاق <span class="eff">~2-2.5 يوم مجتمعة</span></h3>
+    <ul>
+      <li>NEW-1 المرحلة ب (انضباط تأهيل XState الكامل) — 2-3 أيام، غير عاجل</li>
+      <li>eslint-plugin-i18next فقط (بند 3 التقنيّ) — 0.5-1 يوم</li>
+      <li>إعادة اتّصال SSE اليدويّة في OpsFleetMap/ProviderOrderQueue (بديل بند 4 التقنيّ) — 0.5 يوم</li>
+      <li>توسعة تصنيف سبب الكوبون (بند 5 التقنيّ) — 1-1.5 يوم، يشحن مع F-01/quote_promotion معًا</li>
+      <li>حارس ثبات دفتر المحفظة (استبعاد أنواع الإحالة) + خطوة تحقّق بيانات — قبل وصل أيّ تنبيه</li>
+    </ul>
+  </div>
+
+  <div class="phase gated">
+    <h3>المرحلة 7 — بانتظار إذن/قرار صريح فقط <span class="eff">بلا جدول زمنيّ حتى الحسم</span></h3>
+    <ul>
+      <li>F-23 (تغيير نصّ ظاهر — يحتاج إذنًا)</li>
+      <li>F-05 بند 4 (إعادة تعيين/تحويل سائق — يحتاج قرار منتج)</li>
+      <li>توسعة نطاق F-06/F-25/F-09/F-10 (إن اختير التوسيع الكامل بدل الضيّق)</li>
+      <li>F-02 و F-26 — إعادة اختبار حيّ مركَّز فقط، لا كود بعد</li>
+      <li>تحقّق بنية تحتيّة لـSSE على مستوى nginx (يحتاج وصول خادم)</li>
+    </ul>
+  </div>
+</section>
+
+<section id="tracking">
+  <h2><span class="n">§9</span> جدول التتبّع الكامل — كل بند 555 ← حالته الآن</h2>
+  <table>
+    <tr><th>البند</th><th>حالة 556</th><th>حالة بعد هذه الجولة</th><th>تغيّر؟</th></tr>
+    <tr><td>F-01</td><td>مُصلَح ومدموج</td><td>مؤكَّد — لكن F-01b (خصم غير ظاهر) يبقى مفتوحًا بمسارَين لا واحد</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-02</td><td>لا يُستنسَخ في الكود الساكن</td><td>مرشّحان جديدان محدَّدان لإعادة اختبار حيّ (تعدّد تبويبات / سباق مؤقّت)</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-03</td><td>65 موقعًا/29 ملفًّا</td><td>68 موقعًا/34 ملفًّا + يكسر اختبارًا قائمًا يجب تحديثه</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-04</td><td>إصلاح كود</td><td>+ ترحيل بيانات إلزاميّ عبر 3 بيئات + سائقون عالقون اليوم فعلًا</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-05</td><td>4 بنود منفصلة</td><td>بند1 إعادة تأطير (ليس فجوة حقيقيّة) · بند2+3 يجب شحنهما معًا + حارس إضافيّ · بند4 غير آمن كما وُصِف</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-06</td><td>إصلاح سطر واحد</td><td>+ حالتان شقيقتان جديدتان (SCHEDULED، OFFER_EXPIRED_REASSIGN)</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-07</td><td>~15 مفتاحًا</td><td>20 مفتاحًا + تصادم مفتاح واحد لسيناريوهين</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-08</td><td>إعادة استخدام حالة موجودة</td><td>لا يعمل — حالة جديدة مطلوبة</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>F-09</td><td>تصميم آمن</td><td>مؤكَّد + 5-6 مواقع إضافيّة غير محقَّقة</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-10</td><td>2 تطبيق</td><td>4-5 تطبيقات مستقلّة</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-11</td><td>تحديث بسيط</td><td>+ mock جديد إلزاميّ</td><td class="chip corr">طفيف</td></tr>
+    <tr><td>F-12</td><td>إصلاح مباشر</td><td>الإصلاح الحرفيّ يكسر LocaleSettings — يحتاج دالّة تحويل</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>F-13</td><td>~28 مفتاحًا</td><td>~48 مفتاحًا + 4 مفاتيح theme مجاورة</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-14</td><td>مسند موجود يشمل variant</td><td>لا يشملها — 6 مواقع لا 4 + آليّة سعر صفر مكتشَفة</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>F-15</td><td>انسخ نمط SearchResultsPage</td><td>HomePage بلا تأخير أصلًا — يحتاج إضافته أوّلًا</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-16</td><td>إصلاح إعداد الكاشف</td><td>عديم الأثر كليًّا — الإصلاح الفعليّ توحيد دالّة عبر 10 ملفّات</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>F-17</td><td>فحص fulfillmentType</td><td>+ فجوة SCHEDULED مكتشَفة</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-18</td><td>إصلاح تقييم مبسَّط</td><td>يحتاج فحص كل target_type مستقلًّا + خطر N+1</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-19</td><td>إصلاح خطّ</td><td>مؤكَّد — تحذير public/fonts لا dist</td><td class="chip good">مؤكَّد</td></tr>
+    <tr><td>F-20</td><td>إصلاح حقل الفرز</td><td>مؤكَّد نظيف تمامًا</td><td class="chip good">مؤكَّد</td></tr>
+    <tr><td>F-21</td><td>إعادة استخدام حارس/نصّ موجود</td><td>عديم الأثر في الإنتاج + يكسر اختبارًا — يحتاج نصّ/فرع جديدَين</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>F-22</td><td>إصلاح JSON فقط</td><td>+ JSX defaultValue مقصوص أيضًا</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-23</td><td>بانتظار إذن</td><td>بلا تغيير</td><td>لا</td></tr>
+    <tr><td>F-24</td><td>إزالة عمود ميّت، خطوة واحدة</td><td>ليس ميّتًا — خطر توقّف إنتاج، يلزم نشر بمرحلتين</td><td class="chip bad">قُلِب — الأخطر في الخطّة</td></tr>
+    <tr><td>F-25</td><td>حالة شقيقة واحدة</td><td>+ حالتان أخريان أسوأ حدّة</td><td class="chip corr">نعم</td></tr>
+    <tr><td>F-26</td><td>لا عيب</td><td>مؤكَّد إغلاق نهائيّ + نتف تجميليّة غير مرتبطة</td><td class="chip good">مؤكَّد</td></tr>
+    <tr><td>SSE توسعة</td><td>فصل التفعيل عن الخريطة</td><td>+ حارس showMap مرافق إلزاميّ</td><td class="chip corr">نعم</td></tr>
+    <tr><td>i18n-ratchet-5</td><td>~28 مفتاحًا مفقودًا</td><td>1,034 مفتاحًا (~29%) — يجب أن يكون تجنيدًا تاريخيًّا بحتًا</td><td class="chip corr">نعم</td></tr>
+    <tr><td>ledger-guard</td><td>مشكلة مكتشَفة، بلا إصلاح</td><td>إصلاح ملموس مقترَح + مصدر انحراف ثانٍ متبقٍّ</td><td class="chip corr">نعم</td></tr>
+    <tr><td>بناء 1 (مسند إتاحة)</td><td>4 مواقع</td><td>6 مواقع خلفيّة + موقع أماميّ</td><td class="chip corr">نعم</td></tr>
+    <tr><td>بناء 2 (طابور استثناءات)</td><td>جدول جديد</td><td>عرض محسوب + اختبار تغطية (انقلاب توصية)</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>بناء 3 (i18n tooling)</td><td>اعتماد i18next-cli</td><td>معتمَد جزئيًّا بالفعل — نطاق أضيق (eslint-plugin فقط)</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>بناء 4 (fetch-event-source)</td><td>ترقية مقترَحة</td><td>تأجيل — بديل مستهدَف أرخص بلا تبعيّة جديدة</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>بناء 5 (تصنيف سبب الكوبون)</td><td>سلك توقيع جديد</td><td>نطاق أضيق (تمرير مفقود واحد) + يجب شحنه مع quote_promotion معًا</td><td class="chip corr">نعم</td></tr>
+    <tr><td>بناء 6 (XState تأهيل)</td><td>بناء واحد كبير</td><td>مرحلتان — أ عاجلة (عيب حيّ جديد)، ب مؤجَّلة</td><td class="chip bad">قُلِب</td></tr>
+    <tr><td>NEW-1..6</td><td>—</td><td>نتائج جديدة كليًّا، غير موجودة في 555 أو 556</td><td class="chip bad">جديد</td></tr>
+  </table>
+</section>
+
+<footer>
+  تقرير 557 · يبني على 556 ويصحّحه · 5 وكلاء فحص مستقلّين (general-purpose)، تتبّع مباشر بالكود عبر grep شامل وقراءة كل موقع استدعاء + محاكاة ذهنية صريحة لكل بند · جولة تحقّق عدائي ثانية استُبعِدت عمدًا (استشارة مباشرة أكّدت أنّ الجولة الأولى نفسها كانت بجودة عدائيّة، والمستخدم هو الفحص الأخير قبل أي تنفيذ) · لا تعديل كود في هذه الجلسة — فحص وتخطيط فقط · 2026-07-24
+</footer>

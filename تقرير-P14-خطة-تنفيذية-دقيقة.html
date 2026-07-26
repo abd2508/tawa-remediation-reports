@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خطة تنفيذية دقيقة — Stage-2 + مؤشر متعدد الأجهزة</title>
+<style>
+:root {
+  --bg: #080C14; --surface: #0f1826; --surface2: #141f30; --surface3: #1a2840;
+  --border: #1c2e47; --text: #C8D4E8; --text-dim: #6A7D96;
+  --accent: #3D8EF0; --accent2: #5BA8FF; --good: #2EBD71; --good2: #3DD680;
+  --warn: #D9972A; --warn2: #EDAB3A; --crit: #E84040; --info: #7C6FE8; --purple: #A855F7;
+  --teal: #14B8A6; --orange: #F97316;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Segoe UI',system-ui,-apple-system,sans-serif; background: var(--bg);
+  color: var(--text); font-size: 14.5px; line-height: 1.75; display: flex; min-height: 100vh; }
+
+/* ── NAV ── */
+nav { width: 260px; min-width: 260px; background: var(--surface); border-left: 1px solid var(--border);
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; padding: 20px 0; order: 2; }
+nav .logo { padding: 0 18px 18px; border-bottom: 1px solid var(--border); margin-bottom: 6px; }
+nav .logo-title { font-size: 14px; font-weight: 800; color: var(--accent); }
+nav .logo-sub { font-size: 10.5px; color: var(--text-dim); margin-top: 2px; }
+nav h3 { font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-dim); padding: 14px 18px 6px; }
+nav a { display: block; padding: 6px 18px; color: var(--text-dim); text-decoration: none;
+  font-size: 12.5px; border-right: 3px solid transparent; transition: all .12s; }
+nav a:hover, nav a.active { color: var(--accent); border-right-color: var(--accent);
+  background: rgba(61,142,240,.05); }
+nav .sep { height: 1px; background: var(--border); margin: 8px 0; }
+
+/* ── MAIN ── */
+main { flex: 1; padding: 44px 60px; max-width: 980px; order: 1; }
+h1 { font-size: 27px; font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 6px; }
+h2 { font-size: 20px; font-weight: 700; color: #fff; margin-top: 56px; margin-bottom: 14px;
+     padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+h3 { font-size: 15.5px; font-weight: 600; color: var(--accent2); margin-top: 28px; margin-bottom: 8px; }
+h4 { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 14px; margin-bottom: 4px; }
+p { margin-bottom: 10px; color: var(--text-dim); }
+p strong { color: var(--text); }
+
+/* chips */
+.chip { display: inline-flex; align-items: center; border-radius: 4px; padding: 2px 8px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .05em; white-space: nowrap; }
+.ok  { background: rgba(46,189,113,.14); color: var(--good2); border: 1px solid rgba(46,189,113,.28); }
+.wn  { background: rgba(217,151,42,.14); color: var(--warn2); border: 1px solid rgba(217,151,42,.28); }
+.cr  { background: rgba(232,64,64,.14);  color: #F87171;      border: 1px solid rgba(232,64,64,.28);  }
+.in  { background: rgba(124,111,232,.14);color: #A78BFA;      border: 1px solid rgba(124,111,232,.28);}
+.dim { background: rgba(106,125,150,.1); color: var(--text-dim);border:1px solid var(--border); }
+.teal{ background: rgba(20,184,166,.14); color: #2DD4BF;      border: 1px solid rgba(20,184,166,.28);}
+
+/* cards */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
+  padding: 18px 22px; margin-bottom: 14px; }
+.card.ok  { border-right: 4px solid var(--good);  }
+.card.wn  { border-right: 4px solid var(--warn);  }
+.card.cr  { border-right: 4px solid var(--crit);  }
+.card.in  { border-right: 4px solid var(--info);  }
+
+/* tables */
+.tw { overflow-x: auto; margin: 14px 0; border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+th { background: var(--surface2); color: var(--text-dim); text-transform: uppercase;
+  letter-spacing: .08em; font-size: 9.5px; padding: 9px 13px; text-align: right; }
+td { padding: 9px 13px; border-top: 1px solid var(--border); vertical-align: top; }
+tr:hover td { background: rgba(61,142,240,.025); }
+.row-ok td { background: rgba(46,189,113,.025); }
+.row-wn td { background: rgba(217,151,42,.025); }
+.row-cr td { background: rgba(232,64,64,.025);  }
+
+/* code */
+pre { background: #060a10; border: 1px solid var(--border); border-radius: 6px;
+  padding: 14px 16px; overflow-x: auto; font-size: 11.5px; line-height: 1.6;
+  font-family: 'Cascadia Code','Fira Code',Consolas,monospace; margin: 8px 0; }
+pre .add { color: var(--good2); }
+pre .del { color: #F87171; }
+pre .com { color: var(--text-dim); }
+pre .hi  { color: var(--warn2); }
+code { font-family: 'Cascadia Code','Fira Code',Consolas,monospace;
+  background: rgba(61,142,240,.1); color: var(--accent2);
+  padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+code.ok { background: rgba(46,189,113,.1); color: var(--good2); }
+code.cr { background: rgba(232,64,64,.1);  color: #F87171; }
+
+/* alerts */
+.al { border-radius: 7px; padding: 11px 15px; margin: 12px 0; font-size: 13px; }
+.al-ok { background: rgba(46,189,113,.09); border: 1px solid rgba(46,189,113,.28); }
+.al-wn { background: rgba(217,151,42,.09); border: 1px solid rgba(217,151,42,.28); }
+.al-in { background: rgba(124,111,232,.09);border: 1px solid rgba(124,111,232,.28); }
+.al-cr { background: rgba(232,64,64,.09);  border: 1px solid rgba(232,64,64,.28);  }
+
+/* diagram */
+.dw { background: var(--surface2); border: 1px solid var(--border); border-radius: 9px;
+  padding: 20px; margin: 14px 0; overflow-x: auto; }
+.dw svg { max-width: 100%; display: block; margin: 0 auto; }
+
+/* hero meta */
+.hm { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0 36px; }
+.hc { background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 18px; padding: 4px 12px; font-size: 12px; }
+.hc span { color: var(--accent); font-weight: 600; }
+
+/* scenario table */
+.sc-pass td:last-child { color: var(--good2); }
+.sc-warn td:last-child { color: var(--warn2); }
+.sc-fail td:last-child { color: #F87171; }
+.sc-num { font-family: monospace; font-size: 11px; color: var(--text-dim); font-weight: 700; }
+
+/* steps */
+.step { display: flex; gap: 14px; align-items: flex-start; padding: 12px 0;
+  border-bottom: 1px solid var(--border); }
+.step:last-child { border-bottom: none; }
+.step-n { width: 26px; height: 26px; min-width: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; flex-shrink: 0; }
+.step-n.ok   { background: var(--good); color: #fff; }
+.step-n.wn   { background: var(--warn); color: #000; }
+.step-n.in   { background: var(--info); color: #fff; }
+.step-n.cr   { background: var(--crit); color: #fff; }
+.step-body strong { color: var(--text); font-size: 13px; }
+.step-body p { margin-bottom: 0; font-size: 12.5px; }
+
+/* grids */
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 12px 0; }
+.sc { background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 16px; }
+.sc.ok  { border-color: rgba(46,189,113,.35); }
+.sc.wn  { border-color: rgba(217,151,42,.35); }
+.sc.cr  { border-color: rgba(232,64,64,.35);  }
+.sc .sct { font-weight: 700; font-size: 13px; margin-bottom: 5px; }
+
+/* big stat */
+.stats4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin: 14px 0; }
+.stat { background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px; text-align: center; }
+.stat .sn { font-size: 30px; font-weight: 800; line-height: 1; }
+.stat .sl { font-size: 10.5px; color: var(--text-dim); margin-top: 4px; letter-spacing: .05em; }
+.sn.ok { color: var(--good2); } .sn.wn { color: var(--warn2); }
+.sn.ac { color: var(--accent2); } .sn.in { color: #A78BFA; }
+
+hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+@media(max-width:860px){ body{flex-direction:column} nav{width:100%;height:auto;position:static;order:1}
+  main{padding:20px 16px;order:2} .g2,.g3,.stats4{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">
+    <div class="logo-title">توا — خطة تنفيذية دقيقة</div>
+    <div class="logo-sub">Stage-2 DB + مؤشر متعدد الأجهزة</div>
+  </div>
+  <h3>السياق</h3>
+  <a href="#baseline">خريطة الواقع الحالي</a>
+  <a href="#chain">سلسلة الترحيل الكاملة</a>
+  <div class="sep"></div>
+  <h3>البند الأول — Stage-2</h3>
+  <a href="#s2-reality">الحقيقة الكاملة</a>
+  <a href="#s2-scenarios">سيناريوهات Stage-2</a>
+  <a href="#s2-plan">الخطة التنفيذية</a>
+  <a href="#s2-side">الأعراض الجانبية</a>
+  <div class="sep"></div>
+  <h3>البند الثاني — Multi-Device</h3>
+  <a href="#md-gap">تشريح الفجوة</a>
+  <a href="#md-scenarios">سيناريوهات متعددة</a>
+  <a href="#md-plan">الخطة التنفيذية</a>
+  <a href="#md-code">الكود الكامل</a>
+  <a href="#md-side">الأعراض الجانبية</a>
+  <div class="sep"></div>
+  <h3>النهاية</h3>
+  <a href="#combined">الخطة المدمجة</a>
+  <a href="#risks">جدول المخاطر</a>
+  <a href="#decision">قرار المشغّل</a>
+</nav>
+
+<main>
+<h1>خطة تنفيذية دقيقة<br>Stage-2 DB + مؤشر متعدد الأجهزة</h1>
+<div class="hm">
+  <div class="hc">التاريخ: <span>6 يوليو 2026</span></div>
+  <div class="hc">DB Head: <span>ab20 (180 migration)</span></div>
+  <div class="hc">Postgres Image: <span>16-alpine (vanilla)</span></div>
+  <div class="hc">orders.group_id: <span>موجود في DB ✓</span></div>
+  <div class="hc">API group_id: <span>غائب ✗</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2 id="baseline">خريطة الواقع الحالي — الأرض الصلبة</h2>
+
+<p>قبل أي خطة، قرأنا كل ملف مؤثر. هذه هي الوقائع الدقيقة لا الافتراضات.</p>
+
+<div class="g2">
+<div class="card ok">
+  <h4 style="color:var(--good2);margin-top:0">ما هو موجود ✅</h4>
+  <ul style="padding-right:16px;font-size:12.5px;line-height:2;color:var(--text-dim)">
+    <li>Root migration: <code>c648957b778e</code> ← يبني كل شيء من صفر</li>
+    <li>سلسلة كاملة: 180 ترحيل حتى <code>ab20</code></li>
+    <li><code>orders.group_id VARCHAR(36)</code> ← موجود منذ ab03</li>
+    <li><code>Order.group_id: Mapped[Optional[str]]</code> ← نموذج SQLAlchemy</li>
+    <li><code>order.group_id = group.id</code> ← يُعيَّن في carts/service.py:217</li>
+    <li>Kali DB: <code>ab20</code> (مؤكد من docker exec)</li>
+    <li>entrypoint.sh: <code>alembic upgrade head</code> دائماً</li>
+  </ul>
+</div>
+<div class="card cr">
+  <h4 style="color:#F87171;margin-top:0">ما هو غائب ✗</h4>
+  <ul style="padding-right:16px;font-size:12.5px;line-height:2;color:var(--text-dim)">
+    <li><code>group_id</code> غائب من <code>OrderSummary</code> schema</li>
+    <li><code>group_id</code> غائب من <code>_serialize_order()</code></li>
+    <li><code>group_id</code> غائب من <code>OrderSummary</code> TypeScript interface</li>
+    <li>MSW handler لـ GET /api/orders لا يُعيد <code>group_id</code></li>
+    <li>لا custom postgres image (vanilla postgres:16-alpine)</li>
+    <li>لا init.sql مدمج في صورة postgres</li>
+  </ul>
+</div>
+</div>
+
+<div class="al al-in">
+  💡 <strong>اكتشاف مهم:</strong> <code>z1a2b3c4d5e6</code> ليس هو قاعدة المخطط — هو مجرد ترحيل إصلاح timestamps. القاعدة الحقيقية هي <code>c648957b778e</code> (baseline_full_schema_v1_0). عند إنشاء container جديد، alembic يُشغّل 180 ترحيلاً من الصفر — لا توجد قاعدة مدمجة في الصورة الحالية.
+</div>
+
+<h2 id="chain">سلسلة الترحيل الكاملة — 180 خطوة</h2>
+
+<div class="dw">
+<svg viewBox="0 0 860 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L6,3z" fill="#3D8EF0"/></marker>
+  </defs>
+  <!-- Base -->
+  <rect x="10" y="35" width="90" height="34" rx="5" fill="#0f1826" stroke="#2EBD71"/>
+  <text x="55" y="50" fill="#2EBD71" font-size="9" text-anchor="middle" font-weight="700">c648957b</text>
+  <text x="55" y="62" fill="#6A7D96" font-size="8" text-anchor="middle">baseline</text>
+  <!-- arrow -->
+  <path d="M100 52 L115 52" stroke="#3D8EF0" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- old chain -->
+  <rect x="115" y="35" width="145" height="34" rx="5" fill="#0f1826" stroke="#1c2e47"/>
+  <text x="187" y="50" fill="#C8D4E8" font-size="9" text-anchor="middle" font-weight="700">~64 ترحيلاً قديماً</text>
+  <text x="187" y="62" fill="#6A7D96" font-size="8" text-anchor="middle">(أسماء مجزّأة)</text>
+  <!-- arrow -->
+  <path d="M260 52 L275 52" stroke="#3D8EF0" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- z1a2b3c4d5e6 -->
+  <rect x="275" y="35" width="80" height="34" rx="5" fill="#0f1826" stroke="#1c2e47"/>
+  <text x="315" y="50" fill="#C8D4E8" font-size="8.5" text-anchor="middle">z1a2b3c4d5e6</text>
+  <text x="315" y="62" fill="#6A7D96" font-size="7.5" text-anchor="middle">tz-fix</text>
+  <!-- arrow -->
+  <path d="M355 52 L370 52" stroke="#3D8EF0" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- aa01–aa15 -->
+  <rect x="370" y="35" width="105" height="34" rx="5" fill="#1a1529" stroke="#7C6FE8"/>
+  <text x="422" y="50" fill="#A78BFA" font-size="9" text-anchor="middle" font-weight="700">aa01 → aa15</text>
+  <text x="422" y="62" fill="#6A7D96" font-size="7.5" text-anchor="middle">15 features</text>
+  <!-- arrow -->
+  <path d="M475 52 L490 52" stroke="#3D8EF0" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- aa16–aa73 -->
+  <rect x="490" y="35" width="105" height="34" rx="5" fill="#1a1529" stroke="#7C6FE8"/>
+  <text x="542" y="50" fill="#A78BFA" font-size="9" text-anchor="middle" font-weight="700">aa16 → aa73</text>
+  <text x="542" y="62" fill="#6A7D96" font-size="7.5" text-anchor="middle">58 features</text>
+  <!-- arrow -->
+  <path d="M595 52 L610 52" stroke="#3D8EF0" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- ab01–ab03 -->
+  <rect x="610" y="35" width="80" height="34" rx="5" fill="#1a1529" stroke="#D9972A"/>
+  <text x="650" y="50" fill="#EDAB3A" font-size="9" text-anchor="middle" font-weight="700">ab03</text>
+  <text x="650" y="62" fill="#6A7D96" font-size="7.5" text-anchor="middle">order_groups +</text>
+  <!-- note for group_id -->
+  <path d="M650 69 L650 85" stroke="#D9972A" stroke-width="1" stroke-dasharray="3,2"/>
+  <rect x="610" y="85" width="80" height="18" rx="3" fill="rgba(217,151,42,.1)" stroke="rgba(217,151,42,.3)"/>
+  <text x="650" y="97" fill="#EDAB3A" font-size="7.5" text-anchor="middle">orders.group_id ✓</text>
+  <!-- arrow -->
+  <path d="M690 52 L705 52" stroke="#3D8EF0" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- ab04–ab20 -->
+  <rect x="705" y="35" width="110" height="34" rx="5" fill="#0f2018" stroke="#2EBD71"/>
+  <text x="760" y="50" fill="#2EBD71" font-size="9" text-anchor="middle" font-weight="700">ab04 → ab20 (HEAD)</text>
+  <text x="760" y="62" fill="#6A7D96" font-size="7.5" text-anchor="middle">17 features</text>
+  <!-- bottom labels -->
+  <text x="55" y="92" fill="#6A7D96" font-size="7" text-anchor="middle">Root</text>
+  <text x="422" y="92" fill="#6A7D96" font-size="7" text-anchor="middle">سلسلة aa</text>
+  <text x="760" y="92" fill="#2EBD71" font-size="7" text-anchor="middle">HEAD الحالي</text>
+</svg>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2 id="s2-reality">البند الأول — Stage-2: الحقيقة الكاملة من الكود</h2>
+
+<h3>كيف يعمل النظام الآن بالضبط</h3>
+
+<div class="card">
+<h4 style="margin-top:0">السلوك الحالي عند docker compose up</h4>
+<pre><span class="com"># docker-compose.yml (مقتطف مُبسَّط)</span>
+postgres:
+  image: postgres:16-alpine@sha256:4e6e670b...  <span class="com"># vanilla — لا init SQL</span>
+  volumes: [pg_data:/var/lib/postgresql/data]    <span class="com"># يحفظ البيانات بين الإعادات</span>
+
+<span class="com"># backend entrypoint.sh</span>
+alembic upgrade head   <span class="com"># يُشغَّل في كل بدء تشغيل — آمن (idempotent)</span>
+uvicorn app.main:app ...</pre>
+<div class="al al-ok" style="margin-top:8px">
+  ✅ <strong>الوضع الطبيعي الآن:</strong> Volume موجودة → postgres تحمّل بياناتها → alembic يرى <code>ab20</code> already → لا يفعل شيئاً → يبدأ uvicorn.
+</div>
+<div class="al al-wn" style="margin-top:4px">
+  ⚠ <strong>الخطر:</strong> Volume <code>pg_data</code> تُحذف (down -v، تلف، هجرة خادم) → postgres تبدأ من صفر → alembic يُشغّل 180 ترحيلاً (~40-90 ثانية) → ثم يبدأ الخادم. لا انكسار، لكن تأخير وخطر أثناء النشر الأول.
+</div>
+</div>
+
+<h3>لماذا السيناريو المؤلم أخطر مما يبدو</h3>
+<div class="card wn">
+<pre><span class="com"># سيناريو: خادم Hetzner يُعاد بناؤه بعد فشل</span>
+docker compose down -v   <span class="hi"># البيانات تُحذف</span>
+docker compose up        <span class="com"># postgres تبدأ من صفر (vanilla image)</span>
+<span class="com"># backend يبدأ — entrypoint يُشغّل alembic upgrade head</span>
+<span class="com"># 180 ترحيل × 0.5 ثانية = ~90 ثانية فشل في healthcheck</span>
+<span class="hi"># إذا healthcheck retries = 5 × 5s = 25s → يفشل قبل انتهاء migrations!</span>
+<span class="com"># الحل الحالي: backend يُعيد المحاولة تلقائياً بعد restart</span></pre>
+<p>المشكلة الحقيقية: start_period=20s في healthcheck backend. إذا 180 ترحيلاً أخذت > 20s، قد يبدأ health-check قبل جاهزية الخادم. هذا مشكلة في الإنتاج خاصة.</p>
+</div>
+
+<h2 id="s2-scenarios">سيناريوهات Stage-2 — تحليل شامل</h2>
+
+<div class="tw">
+<table>
+<tr><th>#</th><th>السيناريو</th><th>مع Volume موجودة</th><th>بدون Volume (بدون Stage-2)</th><th>بدون Volume (مع Stage-2)</th></tr>
+
+<tr class="row-ok"><td class="sc-num">S2-01</td><td>docker compose up عادي</td><td>✅ آمن — لا ترحيل</td><td>✅ آمن — لا ترحيل</td><td>✅ آمن</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-02</td><td>docker compose restart</td><td>✅ آمن</td><td>لا ينطبق</td><td>✅ آمن</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-03</td><td>docker compose down ثم up (volume محفوظة)</td><td>✅ آمن</td><td>لا ينطبق</td><td>✅ آمن</td></tr>
+<tr class="row-cr"><td class="sc-num">S2-04</td><td>docker compose down <strong>-v</strong> ثم up</td><td>🚫 غير ممكن</td><td>⚠ 180 ترحيل (~90s) — ثم يعمل</td><td>✅ من init.sql مباشرة (~5s)</td></tr>
+<tr class="row-cr"><td class="sc-num">S2-05</td><td>Disk تلف أو استعادة من صفر</td><td>🚫 غير ممكن</td><td>⚠ 180 ترحيل + خطر healthcheck</td><td>✅ أسرع بكثير</td></tr>
+<tr class="row-cr"><td class="sc-num">S2-06</td><td>نقل الخادم / VPS جديد</td><td>يحتاج migrate volume</td><td>⚠ pg_dump restore + 0 ترحيل</td><td>✅ pg_dump restore + 0 ترحيل</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-07</td><td>CI/CD pipeline نظيف</td><td>لا volume في CI</td><td>⚠ 180 ترحيل في كل run</td><td>✅ init.sql مباشرة</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-08</td><td>إضافة ترحيل جديد (ab21+)</td><td>✅ entrypoint يُطبّقه</td><td>✅ لا فرق</td><td>⚠ يحتاج تحديث Stage-3</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-09</td><td>rollback ترحيل (alembic downgrade)</td><td>يعمل يدوياً</td><td>يعمل يدوياً</td><td>يعمل يدوياً</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-10</td><td>healthcheck backend يفشل في 180 ترحيل</td><td>لا ينطبق</td><td>⚠ خطر حقيقي — start_period=20s</td><td>✅ init.sql أسرع بكثير</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-11</td><td>بيئة تطوير محلية جديدة</td><td>لا volume</td><td>⚠ 90s في كل إعداد جديد</td><td>✅ ~5s</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-12</td><td>اختبار ab_migration صحيح بعد Stage-2</td><td>لا ينطبق</td><td>يعمل عبر alembic</td><td>⚠ يجب اختبار أن init.sql + alembic لا تتعارضان</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-13</td><td>postgres extensions (uuid-ossp, pgcrypto)</td><td>موجودة في volume</td><td>⚠ c648957b يُنشئها عبر alembic</td><td>يجب تضمينها في init.sql</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-14</td><td>البيانات الحالية (Production)</td><td>✅ في volume آمنة</td><td>🚫 تُحذف مع -v</td><td>🚫 init.sql لا يحتوي بيانات</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-15</td><td>تغيير POSTGRES_USER/PASSWORD في env</td><td>يحتاج تعديل URL</td><td>يعمل عادي</td><td>يعمل عادي</td></tr>
+<tr class="row-cr"><td class="sc-num">S2-16</td><td>initdb.d/ — postgres يُشغّل init.sql مرة واحدة فقط</td><td>لا ينطبق</td><td>لا ينطبق</td><td>⚠ init.sql يُشغَّل فقط عند إنشاء DB فارغة جديدة — لا تعارض مع alembic إن كان init.sql هو snapshot الـ alembic</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-17</td><td>check constraint وظيفي بعد Stage-2</td><td>✅ موجود في alembic</td><td>✅ موجود في alembic</td><td>⚠ يجب أن يكون في init.sql أيضاً</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-18</td><td>GIS extension (postgis) — ضروري</td><td>✅ موجود</td><td>✅ c648957b يُنشئها</td><td>⚠ init.sql يجب أن يتضمن CREATE EXTENSION IF NOT EXISTS postgis</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-19</td><td>alembic_version جدول بعد Stage-2</td><td>موجود في volume</td><td>alembic يُنشئه</td><td>⚠ يجب أن يكون في init.sql مع stamp ab20 حتى لا يُعيد alembic تطبيق الترحيلات</td></tr>
+<tr class="row-cr"><td class="sc-num">S2-20</td><td>نسيان إضافة alembic_version في init.sql</td><td>لا ينطبق</td><td>لا ينطبق</td><td>💥 <strong>كارثي</strong>: alembic يعتقد DB فارغة ويُطبّق 180 ترحيلاً على schema موجودة → errors مزدوجة (CREATE TABLE table already exists)</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-21</td><td>فرق version بين init.sql وآخر ترحيل مُطبَّق</td><td>لا ينطبق</td><td>لا ينطبق</td><td>⚠ يحتاج اختبار: init.sql يُنشئ schema + alembic_version=ab20، ثم أي ترحيل جديد يُطبَّق بشكل طبيعي</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-22</td><td>init.sql ينتهي بـ \encoding أو \set</td><td>لا ينطبق</td><td>لا ينطبق</td><td>قد يسبب خطأ عند تنفيذ pg_dump بشكل غير صحيح — اجرأ التنظيف</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-23</td><td>الـ Database name مختلف</td><td>libya_platform</td><td>✅ يُنشأ تلقائياً</td><td>⚠ init.sql يجب أن يكون مرن أو يستخدم \c</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-24</td><td>Collation وترتيب النص العربي</td><td>في volume</td><td>PostgreSQL default</td><td>⚠ pg_dump --schema-only يحفظ الـ collation — لا تغيير</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-25</td><td>staging vs local — نفس الصورة؟</td><td>لا ينطبق</td><td>نعم — نفس الـ image</td><td>نعم — نفس init.sql</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-26</td><td>حجم init.sql</td><td>لا ينطبق</td><td>لا ينطبق</td><td>متوقع ~50-100KB — صغير جداً</td></tr>
+<tr class="row-wn"><td class="sc-num">S2-27</td><td>تطور المشروع — ترحيل ab21 يأتي لاحقاً</td><td>يُطبَّق عبر alembic</td><td>يُطبَّق عبر alembic</td><td>✅ يُطبَّق عبر alembic (init.sql + alembic_version يُعرّف نقطة البداية)</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-28</td><td>اختبار pytest — يستخدم DB مؤقت</td><td>ليس volume</td><td>✅ alembic في fixture</td><td>✅ لا تغيير — pytest لا يستخدم الصورة المخصصة</td></tr>
+<tr class="row-ok"><td class="sc-num">S2-29</td><td>perf: alembic يُطبَّق على db جاهزة (ab20→ab20)</td><td>~10ms (no-op)</td><td>~10ms (no-op)</td><td>~10ms (no-op)</td></tr>
+<tr class="row-cr"><td class="sc-num">S2-30</td><td>init.sql يحتوي بيانات seed خاطئة</td><td>لا ينطبق</td><td>لا ينطبق</td><td>⚠ لا تضع DATA في init.sql — schema فقط + alembic_version فقط</td></tr>
+
+</table>
+</div>
+
+<h2 id="s2-plan">الخطة التنفيذية الدقيقة — Stage-2</h2>
+
+<div class="al al-in">
+💡 <strong>الاستراتيجية الأكثر أماناً:</strong> استخدام <code>pg_dump --schema-only</code> من DB حية + إضافة <code>INSERT INTO alembic_version</code> — هذا يُنشئ init.sql دقيقاً بالكامل.
+</div>
+
+<div class="card">
+<div class="step"><div class="step-n ok">1</div><div class="step-body">
+  <strong>توليد init.sql من DB الحية</strong>
+  <p>من داخل container postgres الحالي:</p>
+  <pre>docker exec tawalocal-postgres-1 pg_dump \
+  --schema-only \
+  --no-owner \
+  --no-acl \
+  -U postgres \
+  libya_platform > /tmp/schema_ab20.sql
+
+<span class="com"># إضافة alembic_version لمنع إعادة تطبيق الترحيلات</span>
+echo "INSERT INTO alembic_version (version_num) VALUES ('ab20_staff_evaluation');" >> /tmp/schema_ab20.sql</pre>
+</div></div>
+
+<div class="step"><div class="step-n ok">2</div><div class="step-body">
+  <strong>تنظيف init.sql</strong>
+  <p>إزالة أي سطور قد تسبب تعارضاً:</p>
+  <pre><span class="com"># أزل أسطار SET و SELECT المرجعية إن وُجدت</span>
+grep -v "^SET \|^SELECT " /tmp/schema_ab20.sql > /tmp/init_clean.sql
+<span class="com"># تحقق أن CREATE EXTENSION IF NOT EXISTS موجودة (uuid-ossp, pgcrypto, postgis)</span>
+grep "CREATE EXTENSION" /tmp/init_clean.sql</pre>
+</div></div>
+
+<div class="step"><div class="step-n ok">3</div><div class="step-body">
+  <strong>بناء Dockerfile.postgres-v2</strong>
+  <p>لا نعدّل docker-compose.yml الآن — ننشئ ملف بناء منفصل:</p>
+  <pre><span class="com"># docker/postgres-v2/Dockerfile</span>
+FROM postgres:16-alpine@sha256:4e6e670bb069...  <span class="com"># نفس hash الأصل</span>
+COPY init_clean.sql /docker-entrypoint-initdb.d/01_schema.sql
+<span class="com"># postgres تُشغّل /docker-entrypoint-initdb.d/*.sql فقط عند DB فارغة جديدة</span></pre>
+</div></div>
+
+<div class="step"><div class="step-n ok">4</div><div class="step-body">
+  <strong>بناء الصورة واختبارها</strong>
+  <pre>docker buildx build -t tawalocal-postgres-v2:latest ./docker/postgres-v2/
+
+<span class="com"># اختبار: container جديد من صفر + تحقق من alembic</span>
+docker run -d --name pg-test-v2 \
+  -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=libya_platform \
+  tawalocal-postgres-v2:latest
+
+docker exec pg-test-v2 psql -U postgres -d libya_platform \
+  -c "SELECT version_num FROM alembic_version;"
+<span class="com"># المتوقع: ab20_staff_evaluation</span>
+
+<span class="com"># تحقق من backend يعمل بدون ترحيلات</span>
+<span class="com"># entrypoint سيرى ab20 ولن يُطبّق شيئاً</span></pre>
+</div></div>
+
+<div class="step"><div class="step-n wn">5</div><div class="step-body">
+  <strong>تحديث docker-compose.yml (يحتاج إذن مشغّل)</strong>
+  <p>السطر الوحيد الذي يتغير:</p>
+  <pre><span class="del">    image: postgres:16-alpine@sha256:4e6e670b...</span>
+<span class="add">    image: tawalocal-postgres-v2:latest   # ← الصورة الجديدة</span></pre>
+  <div class="al al-wn" style="margin-top:8px">⚠ هذا الملف محظور — يحتاج موافقة مشغّل صريحة</div>
+</div></div>
+
+<div class="step"><div class="step-n ok">6</div><div class="step-body">
+  <strong>نافذة صيانة + نشر على staging</strong>
+  <pre><span class="com"># 1. توقف الخدمة</span>
+docker compose -p tawalocal down
+
+<span class="com"># 2. حذف volume القديمة (بعد نسخ احتياطي منها)</span>
+docker volume rm tawalocal_pg_data
+
+<span class="com"># 3. تشغيل مع الصورة الجديدة</span>
+docker compose -p tawalocal up -d
+
+<span class="com"># 4. تحقق: يجب أن يبدأ في ثوانٍ لا دقائق</span>
+docker logs tawalocal-backend-core-1 | grep "alembic\|Migrations"</pre>
+</div></div>
+
+<div class="step"><div class="step-n in">7</div><div class="step-body">
+  <strong>التحقق النهائي</strong>
+  <pre>docker exec tawalocal-backend-core-1 alembic current
+<span class="com"># يجب: ab20_staff_evaluation (head)</span>
+
+curl -s http://127.0.0.1:8080/health/live
+<span class="com"># يجب: {"status":"ok"}</span></pre>
+</div></div>
+</div>
+
+<h2 id="s2-side">الأعراض الجانبية لـ Stage-2</h2>
+
+<div class="tw">
+<table>
+<tr><th>العرض الجانبي</th><th>هل يحدث؟</th><th>الحل</th></tr>
+<tr class="row-ok"><td>alembic يُعيد تطبيق الترحيلات</td><td><span class="chip ok">✅ لا يحدث</span> — init.sql يُضع alembic_version=ab20</td><td>لا شيء</td></tr>
+<tr class="row-ok"><td>بيانات الإنتاج تُحذف</td><td><span class="chip ok">✅ لا</span> — init.sql لا يُشغَّل إلا على DB فارغة</td><td>لا شيء</td></tr>
+<tr class="row-wn"><td>ترحيل جديد بعد Stage-2</td><td><span class="chip wn">تحذير</span> — init.sql يصبح قديماً</td><td>تحديث init.sql مع كل Stage deploy مستقبلي</td></tr>
+<tr class="row-ok"><td>pytest تنكسر</td><td><span class="chip ok">✅ لا</span> — pytest لا يستخدم هذه الصورة</td><td>لا شيء</td></tr>
+<tr class="row-ok"><td>backend يرفض الاتصال</td><td><span class="chip ok">✅ لا</span> — init.sql يُنشئ نفس المخطط</td><td>لا شيء</td></tr>
+<tr class="row-wn"><td>SHA الصورة يتغير</td><td><span class="chip wn">نعم</span> — من postgres:16-alpine@sha256:4e6... إلى الجديدة</td><td>تحديث SHA في docker-compose.yml</td></tr>
+<tr class="row-ok"><td>healthcheck أبطأ</td><td><span class="chip ok">✅ لا</span> — أسرع بكثير من 180 ترحيل</td><td>لا شيء</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2 id="md-gap">البند الثاني — تشريح الفجوة طبقة بطبقة</h2>
+
+<p>البيانات موجودة في DB — لكنها محاصرة في 3 طبقات وسطى مغلقة. هذا هو المسار الكامل من القرص إلى الشاشة.</p>
+
+<div class="dw">
+<svg viewBox="0 0 840 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="b" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3z" fill="#2EBD71"/></marker>
+    <marker id="c" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3z" fill="#E84040"/></marker>
+    <marker id="d" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3z" fill="#D9972A"/></marker>
+  </defs>
+  <!-- Layer labels -->
+  <text x="20" y="14" fill="#6A7D96" font-size="9" font-weight="700" letter-spacing=".1em">L1 — DATABASE</text>
+  <text x="20" y="84" fill="#6A7D96" font-size="9" font-weight="700" letter-spacing=".1em">L2 — SQLAlchemy ORM</text>
+  <text x="20" y="154" fill="#6A7D96" font-size="9" font-weight="700" letter-spacing=".1em">L3 — OrderSummary Schema</text>
+  <text x="20" y="224" fill="#6A7D96" font-size="9" font-weight="700" letter-spacing=".1em">L4 — API Response → Frontend</text>
+
+  <!-- L1: DB column — EXISTS -->
+  <rect x="20" y="20" width="380" height="52" rx="7" fill="#0f2018" stroke="#2EBD71"/>
+  <text x="30" y="38" fill="#2EBD71" font-size="10" font-weight="700">orders table</text>
+  <text x="30" y="54" fill="#C8D4E8" font-size="9">group_id VARCHAR(36) NULL</text>
+  <text x="30" y="66" fill="#6A7D96" font-size="8">Migration ab03 • Index: idx_orders_group_id</text>
+  <text x="410" y="46" fill="#2EBD71" font-size="10" font-weight="700">✅ EXISTS</text>
+
+  <!-- L2: ORM model — EXISTS -->
+  <rect x="20" y="90" width="380" height="52" rx="7" fill="#0f2018" stroke="#2EBD71"/>
+  <text x="30" y="108" fill="#2EBD71" font-size="10" font-weight="700">Order model (order.py:116)</text>
+  <text x="30" y="124" fill="#C8D4E8" font-size="9">group_id: Mapped[Optional[str]] = mapped_column(String(36))</text>
+  <text x="30" y="136" fill="#6A7D96" font-size="8">carts/service.py:217 → order.group_id = group.id ← يُعيَّن عند الدفع</text>
+  <text x="410" y="116" fill="#2EBD71" font-size="10" font-weight="700">✅ EXISTS</text>
+
+  <!-- L3: Schema — MISSING -->
+  <rect x="20" y="160" width="380" height="52" rx="7" fill="rgba(232,64,64,.06)" stroke="#E84040"/>
+  <text x="30" y="178" fill="#E84040" font-size="10" font-weight="700">OrderSummary (schemas.py)</text>
+  <text x="30" y="194" fill="#C8D4E8" font-size="9">group_id: <span style="fill:#E84040">لا يوجد ✗</span></text>
+  <text x="30" y="206" fill="#6A7D96" font-size="8">_serialize_order() → لا يُمرِّر group_id ← يُحتسب من order.group_id</text>
+  <text x="410" y="186" fill="#E84040" font-size="10" font-weight="700">✗ MISSING</text>
+
+  <!-- L4: Frontend — MISSING -->
+  <rect x="20" y="230" width="380" height="44" rx="7" fill="rgba(232,64,64,.06)" stroke="#E84040"/>
+  <text x="30" y="248" fill="#E84040" font-size="10" font-weight="700">OrderSummary TypeScript (types.ts)</text>
+  <text x="30" y="264" fill="#C8D4E8" font-size="9">group_id?: لا يوجد ✗ → localStorage workaround</text>
+  <text x="410" y="252" fill="#E84040" font-size="10" font-weight="700">✗ MISSING</text>
+
+  <!-- Arrows L1→L2 -->
+  <path d="M210 72 L210 90" stroke="#2EBD71" stroke-width="1.5" marker-end="url(#b)"/>
+  <!-- L2→L3 -->
+  <path d="M210 142 L210 160" stroke="#E84040" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#c)"/>
+  <text x="215" y="155" fill="#E84040" font-size="8">getattr(order,'group_id') ← يوجد لكن لا يُمرَّر</text>
+  <!-- L3→L4 -->
+  <path d="M210 212 L210 230" stroke="#E84040" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#c)"/>
+
+  <!-- Right side: current workaround -->
+  <rect x="480" y="20" width="330" height="252" rx="7" fill="#0f1826" stroke="#D9972A" stroke-dasharray="5,3"/>
+  <text x="645" y="40" fill="#EDAB3A" font-size="10" text-anchor="middle" font-weight="700">الحل الحالي (localStorage)</text>
+  <text x="645" y="60" fill="#6A7D96" font-size="9" text-anchor="middle">CartGroupCheckoutPage → tawa_group_map</text>
+  <text x="645" y="76" fill="#6A7D96" font-size="9" text-anchor="middle">LRU 20 entries في localStorage</text>
+  <text x="645" y="116" fill="#6A7D96" font-size="9" text-anchor="middle">OrderHistoryPage → useMemo يقرأ</text>
+  <text x="645" y="132" fill="#6A7D96" font-size="9" text-anchor="middle">خريطة عكسية {orderId→groupId}</text>
+  <text x="645" y="168" fill="#E84040" font-size="9" text-anchor="middle">⚠ جهاز واحد فقط</text>
+  <text x="645" y="184" fill="#E84040" font-size="9" text-anchor="middle">⚠ يُفقد عند مسح المتصفح</text>
+  <text x="645" y="200" fill="#E84040" font-size="9" text-anchor="middle">⚠ لا يعمل في التصفح الخاص</text>
+  <text x="645" y="216" fill="#E84040" font-size="9" text-anchor="middle">⚠ أقدم من 20 مجموعة يُزال</text>
+  <text x="645" y="260" fill="#EDAB3A" font-size="9" text-anchor="middle">يتم استبداله بـ API عند الإذن</text>
+</svg>
+</div>
+
+<h2 id="md-scenarios">سيناريوهات مؤشر المجموعة — تحليل شامل</h2>
+
+<div class="tw">
+<table>
+<tr><th>#</th><th>السيناريو</th><th>الوضع الحالي (localStorage)</th><th>بعد API fix</th></tr>
+
+<tr class="row-cr"><td class="sc-num">MD-01</td><td>مستخدم يُسجّل الدخول من جهاز جديد</td><td class="sc-fail">✗ لا يرى المؤشر</td><td class="sc-pass">✅ يراه</td></tr>
+<tr class="row-cr"><td class="sc-num">MD-02</td><td>مستخدم يُصفّي بيانات المتصفح</td><td class="sc-fail">✗ يختفي المؤشر</td><td class="sc-pass">✅ دائم</td></tr>
+<tr class="row-cr"><td class="sc-num">MD-03</td><td>تصفح خاص / incognito</td><td class="sc-warn">⚠ try/catch → لا مؤشر</td><td class="sc-pass">✅ يراه</td></tr>
+<tr class="row-wn"><td class="sc-num">MD-04</td><td>أكثر من 20 مجموعة (LRU limit)</td><td class="sc-warn">⚠ أقدم 20 تُزال من localStorage</td><td class="sc-pass">✅ كل المجموعات من DB</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-05</td><td>طلب عادي (group_id = NULL)</td><td class="sc-pass">✅ لا مؤشر</td><td class="sc-pass">✅ لا مؤشر (group_id: null)</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-06</td><td>طلب مجموعة (group_id مُعيَّن)</td><td class="sc-pass">✅ مؤشر موجود (نفس الجهاز)</td><td class="sc-pass">✅ مؤشر موجود</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-07</td><td>مستخدم يرى قائمة الطلبات</td><td>localStorage reverse-map</td><td>order.group_id مباشرة</td></tr>
+<tr class="row-cr"><td class="sc-num">MD-08</td><td>مشاركة رابط قائمة الطلبات مع شخص آخر</td><td class="sc-fail">✗ localStorage شخصي</td><td class="sc-pass">✅ من API</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-09</td><td>JavaScript error في localStorage parsing</td><td><span class="chip wn">catch → {}</span></td><td class="sc-pass">✅ لا localStorage</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-10</td><td>مستخدم يضغط على زر المجموعة</td><td>navigate(/order-group/:id)</td><td>navigate(/order-group/:id)</td></tr>
+<tr class="row-wn"><td class="sc-num">MD-11</td><td>طلب قديم (قبل ab03) — group_id = NULL</td><td class="sc-pass">✅ لا مؤشر</td><td class="sc-pass">✅ group_id: null → لا مؤشر</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-12</td><td>صفحة جيدة الاستجابة (TS type safety)</td><td>order.group_id لا يوجد في type</td><td>✅ بعد تحديث types.ts</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-13</td><td>الـ API يُعيد group_id: null للطلبات العادية</td><td>لا ينطبق</td><td>✅ Optional field — موجود لكن null</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-14</td><td>الـ API يُعيد group_id: "grp-abc" للمجموعات</td><td>لا ينطبق</td><td>✅ ظهور المؤشر</td></tr>
+<tr class="row-wn"><td class="sc-num">MD-15</td><td>الـ MSW handler لا يُعيد group_id</td><td>tests تعمل بـ localStorage</td><td>⚠ handler يحتاج تحديث للاختبار الجديد</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-16</td><td>Pydantic model_dump() يُخرج group_id=None</td><td>لا ينطبق</td><td>✅ {…, "group_id": null} — متوافق للخلف</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-17</td><td>GET /orders/:id — هل يُعيد group_id أيضاً؟</td><td>لا</td><td>✅ نفس _serialize_order يُعيده</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-18</td><td>Provider يرى طلبات — هل يرى group_id؟</td><td>لا</td><td>⚠ provider uses different serializer (order_service.py) — لا يتأثر</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-19</td><td>OPS يرى الطلبات</td><td>لا</td><td>OPS له serializer خاص — لا يتأثر</td></tr>
+<tr class="row-wn"><td class="sc-num">MD-20</td><td>عميل يستخدم group_id لشيء آخر في المستقبل</td><td>لا ينطبق</td><td>✅ موجود في API — يمكن استخدامه</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-21</td><td>group_id يُرجع من GET /orders list pagination</td><td>لا</td><td>✅ كل صفحة تحمله</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-22</td><td>group_id في GET /orders/:id (detail)</td><td>لا</td><td>✅ نفس serializer</td></tr>
+<tr class="row-cr"><td class="sc-num">MD-23</td><td>لو نسينا الـ backend ونحدّثنا frontend فقط</td><td class="sc-fail">✗ group_id يظل null في API</td><td>يجب تحديث الاثنين معاً</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-24</td><td>backward compatibility — عميل قديم لا يفهم group_id</td><td>لا ينطبق</td><td>✅ field جديد optional — لا يكسر العملاء القدامى</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-25</td><td>تحميل قائمة 50 طلب — N+1 query؟</td><td>localStorage — لا query</td><td>✅ لا — group_id مُحمَّل مع Order row نفسه</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-26</td><td>تحميل قائمة طويلة جداً (1000 طلب)</td><td>localStorage parsing</td><td>✅ أسرع — بدون parsing</td></tr>
+<tr class="row-wn"><td class="sc-num">MD-27</td><td>اختبارات Vitest الحالية للـ OrderHistoryPage</td><td>تعمل (localStorage)</td><td>⚠ يجب تحديث MSW handler + الاختبار</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-28</td><td>SSR أو pre-rendering (لو أُضيف لاحقاً)</td><td>localStorage fails في SSR</td><td>✅ API — يعمل في SSR</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-29</td><td>تسريب group_id لمستخدم آخر؟</td><td>لا ينطبق</td><td>✅ GET /orders مؤمّن بـ require_role(CUSTOMER) + WHERE customer_id = user.user_id</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-30</td><td>group_id أطول من 36 حرف (UUID)</td><td>لا ينطبق</td><td>✅ VARCHAR(36) — محمي على مستوى DB</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-31</td><td>طلب ألغي قبل الدفع (لا group_id)</td><td>لا مؤشر</td><td>✅ group_id: null → لا مؤشر</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-32</td><td>طلب ERRAND — هل له group_id؟</td><td>لا</td><td>✅ ERRAND لا يمر عبر cart checkout-group — group_id: null دائماً</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-33</td><td>تعطّل carts/service وعدم تعيين group_id</td><td>لا مؤشر</td><td>✅ group_id: null → لا مؤشر (graceful)</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-34</td><td>migration downgrade ab03 (إزالة group_id)</td><td>لا ينطبق</td><td>✅ downgrade يُزيل العمود + يجب عكس schema change</td></tr>
+<tr class="row-ok"><td class="sc-num">MD-35</td><td>أداء JSON serialization مع حقل جديد</td><td>localStorage JSON.parse</td><td>✅ FieldValue=None → minimal overhead</td></tr>
+
+</table>
+</div>
+
+<h2 id="md-plan">الخطة التنفيذية الدقيقة — مؤشر متعدد الأجهزة</h2>
+
+<div class="stats4">
+  <div class="stat"><div class="sn ok">4</div><div class="sl">ملفات تُعدَّل</div></div>
+  <div class="stat"><div class="sn wn">2</div><div class="sl">في منطقة محظورة</div></div>
+  <div class="stat"><div class="sn ac">2</div><div class="sl">في frontend (مسموح)</div></div>
+  <div class="stat"><div class="sn in">~6</div><div class="sl">أسطر مُضافة إجمالاً</div></div>
+</div>
+
+<div class="al al-wn">
+⚠ <strong>شرط مسبق:</strong> الخطوات 1 و 2 في المنطقة المحظورة <code>backend/app/modules/</code> — تحتاج إذن مشغّل صريح قبل التنفيذ.
+</div>
+
+<div class="card">
+<div class="step"><div class="step-n cr">1</div><div class="step-body">
+  <strong>backend/app/modules/orders/schemas.py — محظور</strong>
+  <p>إضافة <code>group_id</code> لـ <code>OrderSummary</code> بعد <code>cancel_reason</code>:</p>
+  <pre><span class="com">    # H5: the rejection/cancellation reason</span>
+    cancel_reason: Optional[str] = None
+<span class="add">    # P14 multi-device: back-link to the cart group this order belongs to (NULL for</span>
+<span class="add">    # single-provider orders). Surfaces the 🛒 group badge on any device without</span>
+<span class="add">    # relying on localStorage (which is single-device only).</span>
+<span class="add">    group_id: Optional[str] = None</span></pre>
+</div></div>
+
+<div class="step"><div class="step-n cr">2</div><div class="step-body">
+  <strong>backend/app/modules/orders/order_router.py — محظور</strong>
+  <p>في دالة <code>_serialize_order</code> بعد <code>cancel_reason=...</code>:</p>
+  <pre><span class="com">        # H5: the rejection/cancellation reason</span>
+        cancel_reason=getattr(order, "cancel_reason", None),
+<span class="add">        # P14 multi-device: pass the group_id from the order row (no extra query;
+        # already loaded). None for regular single-provider orders.</span>
+<span class="add">        group_id=getattr(order, "group_id", None),</span>
+    ).model_dump()</pre>
+</div></div>
+
+<div class="step"><div class="step-n ok">3</div><div class="step-body">
+  <strong>web/src/api/types.ts — مسموح</strong>
+  <p>إضافة <code>group_id</code> في نهاية interface <code>OrderSummary</code>:</p>
+  <pre><span class="com">  // H5: the rejection / cancellation reason</span>
+  cancel_reason?: string | null;
+<span class="add">  // P14 multi-device: back-link to the cart group (null for single-provider orders).</span>
+<span class="add">  group_id?: string | null;</span>
+  // D1: line items
+  items?: OrderSummaryItem[];</pre>
+</div></div>
+
+<div class="step"><div class="step-n ok">4</div><div class="step-body">
+  <strong>web/src/pages/customer/OrderHistoryPage.tsx — مسموح</strong>
+  <p>استبدال منطق localStorage بـ <code>order.group_id</code> المباشر:</p>
+  <pre><span class="com">// ── حذف هذه الكتلة كاملاً (لم تعد ضرورية) ──</span>
+<span class="del">  const groupByOrderId = useMemo&lt;Record&lt;string, string&gt;&gt;(() => {</span>
+<span class="del">    try {</span>
+<span class="del">      const raw = localStorage.getItem("tawa_group_map");</span>
+<span class="del">      ...</span>
+<span class="del">    } catch { return {}; }</span>
+<span class="del">  }, []);</span>
+<span class="del">  const navigateToGroup = useCallback(</span>
+<span class="del">    (groupId: string) => navigate(`/order-group/${groupId}`),</span>
+<span class="del">    [navigate]</span>
+<span class="del">  );</span>
+
+<span class="com">// ── في render — استبدال ──</span>
+<span class="del">  {groupByOrderId[order.id] && (</span>
+<span class="del">    &lt;button onClick={(e) => { e.stopPropagation(); navigateToGroup(groupByOrderId[order.id]); }}&gt;</span>
+
+<span class="add">  {order.group_id && (</span>
+<span class="add">    &lt;button</span>
+<span class="add">      onClick={(e) => { e.stopPropagation(); navigate(`/order-group/${order.group_id}`); }}&gt;</span></pre>
+</div></div>
+
+<div class="step"><div class="step-n in">5</div><div class="step-body">
+  <strong>web/src/test/handlers/customer.ts — مسموح (اختياري لكن موصى به)</strong>
+  <p>تحديث MSW handler لإضافة group_id في مثال مع مجموعة:</p>
+  <pre><span class="com">  // GET /api/orders — إضافة طلب بـ group_id للاختبار</span>
+  http.get("/api/orders", () => {
+    return HttpResponse.json({
+      items: [
+        {
+          id: "ord-00000001",
+          order_state: "DELIVERED",
+          ...existing fields...
+<span class="add">          group_id: null,  // طلب عادي</span>
+        },
+<span class="add">        {</span>
+<span class="add">          id: "ord-00000002",</span>
+<span class="add">          order_state: "AWAITING_PROVIDER_ACCEPTANCE",</span>
+<span class="add">          ...fields...,</span>
+<span class="add">          group_id: "grp-test-0011223344",  // طلب مع مجموعة</span>
+<span class="add">        },</span>
+      ],
+    });
+  })</pre>
+</div></div>
+
+<div class="step"><div class="step-n in">6</div><div class="step-body">
+  <strong>إزالة imports غير الضرورية من OrderHistoryPage.tsx</strong>
+  <p>بعد حذف useMemo و useCallback للـ group logic، إزالتهما من imports إن لم يُستخدما في مكان آخر:</p>
+  <pre><span class="com">// تحقق قبل الحذف: هل useCallback/useMemo مستخدمان في مكان آخر في الملف؟</span>
+grep "useCallback\|useMemo" OrderHistoryPage.tsx
+<span class="com"># إن لم يوجد استخدام آخر → احذفهما من imports</span></pre>
+</div></div>
+</div>
+
+<h2 id="md-code">الكود الكامل — كل تغيير بالتفصيل</h2>
+
+<h3>الملف 1: schemas.py (backend)</h3>
+<div class="card cr" style="font-size:13px">
+<strong style="color:#F87171">📁 backend/app/modules/orders/schemas.py</strong> — يحتاج إذن مشغّل
+<pre><span class="com">    # H5: surface WHY the order was rejected/cancelled so the customer is not left
+    # guessing at a bare REJECTED_BY_PROVIDER / DELIVERY_FAILED / CANCELLED state.
+    # The provider rejection reason (phase 372) and the customer/OPS cancel reason
+    # both land here; the FE shows it on the tracking screen for terminal states.
+    cancel_reason: Optional[str] = None</span>
+<span class="add">    # P14 multi-device: back-link to the cart group this sub-order belongs to.
+    # NULL for regular single-provider orders. Populated by carts/service.py:217
+    # (order.group_id = group.id) at checkout-group creation time.
+    # Returned here so the customer order-history on ANY device can show the 🛒
+    # group badge — without relying on localStorage (which is single-device-only).
+    group_id: Optional[str] = None</span>
+    # D1: line items as returned by GET /providers/orders
+    items?: OrderSummaryItem[];</pre>
+</div>
+
+<h3>الملف 2: order_router.py (backend)</h3>
+<div class="card cr" style="font-size:13px">
+<strong style="color:#F87171">📁 backend/app/modules/orders/order_router.py</strong> — يحتاج إذن مشغّل
+<pre><span class="com">        # H5: the rejection/cancellation reason (None until set).
+        cancel_reason=getattr(order, "cancel_reason", None),</span>
+<span class="add">        # P14 multi-device: group_id straight off the order row — already loaded by
+        # the list/get queries (no extra join). None for single-provider orders.
+        group_id=getattr(order, "group_id", None),</span>
+    ).model_dump()</pre>
+<div class="al al-in" style="margin-top:8px">
+  💡 هذا السطر الواحد يُؤثّر على <strong>4 endpoints</strong> كلها تستخدم <code>_serialize_order</code>:
+  <br>• GET /orders (list) — line 477
+  <br>• POST /orders (create) — line 588
+  <br>• GET /orders/:id (detail) — line 838
+  <br>• GET /orders/:id للـ PROVIDER — line 935
+</div>
+</div>
+
+<h3>الملف 3: types.ts (frontend)</h3>
+<div class="card ok" style="font-size:13px">
+<strong style="color:var(--good2)">📁 web/src/api/types.ts</strong> — مسموح
+<pre><span class="com">  // H5: the rejection / cancellation reason, shown to the customer on a terminal
+  // failure state so they aren't left with a bare REJECTED/FAILED status.
+  cancel_reason?: string | null;</span>
+<span class="add">  // P14 multi-device: back-link to the cart group (null for single-provider orders).
+  // Returned by GET /orders and GET /orders/:id when backend fix is applied.
+  group_id?: string | null;</span>
+  // D1: line items
+  items?: OrderSummaryItem[];</pre>
+</div>
+
+<h3>الملف 4: OrderHistoryPage.tsx (frontend)</h3>
+<div class="card ok" style="font-size:13px">
+<strong style="color:var(--good2)">📁 web/src/pages/customer/OrderHistoryPage.tsx</strong> — مسموح
+<pre><span class="com">// 1. تعديل imports — أزل useCallback وuseMemo إن لم يُستخدما:</span>
+<span class="del">import { useState, useMemo, useCallback } from "react";</span>
+<span class="add">import { useState } from "react";  // ← أو أبقِ useMemo إن كان يُستخدم لشيء آخر</span>
+
+<span class="com">// 2. احذف هذه الكتلة كاملاً:</span>
+<span class="del">  const groupByOrderId = useMemo&lt;Record&lt;string, string&gt;&gt;(() => {</span>
+<span class="del">    try {</span>
+<span class="del">      const raw = localStorage.getItem("tawa_group_map");</span>
+<span class="del">      if (!raw) return {};</span>
+<span class="del">      const map: Record&lt;string, string[]&gt; = JSON.parse(raw);</span>
+<span class="del">      const reverse: Record&lt;string, string&gt; = {};</span>
+<span class="del">      for (const [gid, oids] of Object.entries(map)) {</span>
+<span class="del">        for (const oid of oids) reverse[oid] = gid;</span>
+<span class="del">      }</span>
+<span class="del">      return reverse;</span>
+<span class="del">    } catch { return {}; }</span>
+<span class="del">  }, []);</span>
+<span class="del">  const navigateToGroup = useCallback(</span>
+<span class="del">    (groupId: string) =&gt; navigate(`/order-group/${groupId}`),</span>
+<span class="del">    [navigate]</span>
+<span class="del">  );</span>
+
+<span class="com">// 3. في render — استبدال الـ chip:</span>
+<span class="del">  {groupByOrderId[order.id] && (</span>
+<span class="del">    &lt;button</span>
+<span class="del">      onClick={(e) => { e.stopPropagation(); navigateToGroup(groupByOrderId[order.id]); }}</span>
+<span class="del">      aria-label={`...${groupByOrderId[order.id].slice(-8).toUpperCase()}`}</span>
+<span class="del">    &gt;</span>
+
+<span class="add">  {order.group_id && (</span>
+<span class="add">    &lt;button</span>
+<span class="add">      onClick={(e) => { e.stopPropagation(); navigate(`/order-group/${order.group_id}`); }}</span>
+<span class="add">      aria-label={`${t("order.group_badge_label", { defaultValue: "مجموعة" })} #${order.group_id.slice(-8).toUpperCase()}`}</span>
+<span class="add">    &gt;</span></pre>
+</div>
+
+<h2 id="md-side">الأعراض الجانبية لمؤشر متعدد الأجهزة</h2>
+
+<div class="tw">
+<table>
+<tr><th>العرض الجانبي</th><th>هل يحدث؟</th><th>التأثير</th><th>الحل</th></tr>
+<tr class="row-ok"><td>API response يكبر بـ field جديد</td><td><span class="chip ok">نعم — ضئيل</span></td><td>~20 bytes/طلب</td><td>مقبول تماماً</td></tr>
+<tr class="row-ok"><td>عميل قديم (iOS/Android قبل التحديث) يُرسَل group_id</td><td><span class="chip ok">لا مشكلة</span></td><td>يتجاهل الـ field غير المعروف</td><td>backward compatible</td></tr>
+<tr class="row-wn"><td>اختبارات Vitest الحالية تفشل</td><td><span class="chip wn">محتمل</span></td><td>اختبارات تعتمد على localStorage للـ group badge</td><td>تحديث MSW handler + اختبار جديد</td></tr>
+<tr class="row-ok"><td>Pydantic validation error</td><td><span class="chip ok">لا</span></td><td>group_id Optional — لا يكسر أي validation</td><td>لا شيء</td></tr>
+<tr class="row-ok"><td>N+1 queries في list_orders</td><td><span class="chip ok">لا</span></td><td>group_id مُحمَّل مع Order row نفسه — لا join إضافي</td><td>لا شيء</td></tr>
+<tr class="row-wn"><td>useMemo و useCallback تُزالان</td><td><span class="chip wn">نعم</span></td><td>تُبسّط الكود — إيجابي</td><td>تأكد أن useCallback لا يُستخدم في مكان آخر</td></tr>
+<tr class="row-ok"><td>OrderHistoryPage.test.tsx تنكسر</td><td><span class="chip ok">لا (حالياً)</span></td><td>اختبارات حالية لا تختبر group badge</td><td>لا شيء</td></tr>
+<tr class="row-ok"><td>TypeScript compile error</td><td><span class="chip ok">لا</span></td><td>بعد تحديث types.ts — 0 errors</td><td>تحديث types.ts أولاً</td></tr>
+<tr class="row-wn"><td>تسريب group_id لـ Provider/OPS endpoints</td><td><span class="chip ok">لا</span></td><td>Provider وOPS يستخدمان serializers مختلفة</td><td>تحقق بعد التطبيق</td></tr>
+<tr class="row-ok"><td>تسريب group_id لعميل آخر</td><td><span class="chip ok">لا</span></td><td>list_orders مؤمّن WHERE customer_id = user.user_id</td><td>لا شيء</td></tr>
+</table>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<h2 id="combined">الخطة المدمجة — الترتيب الصحيح</h2>
+
+<div class="card">
+<div class="step"><div class="step-n ok">A</div><div class="step-body">
+  <strong>قبل كل شيء: تحقق من FIN-COR</strong>
+  <pre>python3 platform/_ai_tools/bin/contract_flag_hash_check.py  <span class="com"># PASS مطلوب</span></pre>
+</div></div>
+<div class="step"><div class="step-n ok">B</div><div class="step-body">
+  <strong>Multi-Device (الأسهل — يبدأ بـ frontend فقط)</strong>
+  <p>ينفَّذ frontend أولاً لا يتطلب إذناً خاصاً:</p>
+  <p>• تحديث <code>types.ts</code> ← ينتهي في دقيقة واحدة</p>
+  <p>• تحديث <code>OrderHistoryPage.tsx</code> ← ينتهي في 5 دقائق</p>
+  <p><strong>الانتظار:</strong> للـ backend (محظور) حتى تُعطى الإذن</p>
+</div></div>
+<div class="step"><div class="step-n wn">C</div><div class="step-body">
+  <strong>عند إذن backend: تحديث schemas.py + order_router.py</strong>
+  <p>سطر واحد في كل ملف — 10 دقائق — اختبار:</p>
+  <pre>python -m pytest backend/tests/test_phase3_orders.py -q  <span class="com"># يجب PASS</span>
+python -m pytest backend/tests/ -q --tb=no               <span class="com"># يجب ≥ baseline</span></pre>
+</div></div>
+<div class="step"><div class="step-n wn">D</div><div class="step-body">
+  <strong>عند إذن Stage-2: بناء init.sql + صورة postgres جديدة</strong>
+  <p>20-30 دقيقة في staging، نافذة صيانة مخططة.</p>
+</div></div>
+<div class="step"><div class="step-n in">E</div><div class="step-body">
+  <strong>بناء frontend وإعادة النشر على الأربعة</strong>
+  <pre>cd web && npm run build && npm test  <span class="com"># 1371+ pass</span>
+docker buildx build -t tawalocal-web-frontend:latest ./web
+docker compose -p tawalocal up -d --no-deps web-frontend</pre>
+</div></div>
+</div>
+
+<h2 id="risks">جدول المخاطر الكامل</h2>
+<div class="tw">
+<table>
+<tr><th>المخاطرة</th><th>احتمال</th><th>الأثر</th><th>التدابير</th></tr>
+<tr class="row-ok"><td>alembic يُعيد تطبيق الترحيلات بعد Stage-2 (نسيان alembic_version)</td><td><span class="chip cr">عالٍ إن نُسي</span></td><td>💥 CREATE TABLE already exists</td><td>اختبار على بيئة نظيفة أولاً</td></tr>
+<tr class="row-ok"><td>init.sql يفتقد extension (postgis)</td><td><span class="chip wn">متوسط</span></td><td>فشل queries الجغرافية</td><td>grep "CREATE EXTENSION" في init.sql</td></tr>
+<tr class="row-ok"><td>backend يُصدر group_id لـ Provider endpoints</td><td><span class="chip ok">منخفض</span></td><td>معلومة extra — لا ضرر</td><td>فحص بعد التطبيق</td></tr>
+<tr class="row-ok"><td>Vitest تفشل بعد تحديث handler</td><td><span class="chip wn">متوسط</span></td><td>CI يفشل</td><td>تحديث handler + اختبار قبل push</td></tr>
+<tr class="row-ok"><td>useCallback لا يزال مستخدماً في مكان آخر</td><td><span class="chip ok">منخفض</span></td><td>TS error بسيط</td><td>grep قبل الحذف</td></tr>
+<tr class="row-ok"><td>Docker image postgres-v2 لا تعمل مع staging</td><td><span class="chip wn">متوسط</span></td><td>وقت توقف staging</td><td>اختبار container منفصل أولاً</td></tr>
+</table>
+</div>
+
+<h2 id="decision">قرار المشغّل — ملخص ما تحتاجه</h2>
+
+<div class="g2">
+<div class="sc wn">
+  <div class="sct" style="color:var(--warn2)">Stage-2 DB — ما تحتاجه</div>
+  <ul style="font-size:12.5px;padding-right:14px;line-height:2;color:var(--text-dim)">
+    <li>إذن تعديل <code>docker-compose.yml</code></li>
+    <li>تحديد نافذة صيانة staging (15-30 دقيقة)</li>
+    <li>إذن إنشاء <code>docker/postgres-v2/</code></li>
+    <li>إذن النشر على الأربعة مواقع بعد الاختبار</li>
+  </ul>
+</div>
+<div class="sc wn">
+  <div class="sct" style="color:var(--warn2)">Multi-Device — ما تحتاجه</div>
+  <ul style="font-size:12.5px;padding-right:14px;line-height:2;color:var(--text-dim)">
+    <li>إذن تعديل <code>backend/app/modules/orders/schemas.py</code></li>
+    <li>إذن تعديل <code>backend/app/modules/orders/order_router.py</code></li>
+    <li>Frontend جاهز للتطبيق الفوري (ملفان، سطران)</li>
+  </ul>
+</div>
+</div>
+
+<div class="al al-wn">
+  ⚠ هذه خطة مراجعة فقط. لا يُنفَّذ أي بند قبل الحصول على إذن مشغّل صريح في هذه المحادثة.
+</div>
+
+<hr>
+<p style="text-align:center;font-size:12.5px;color:var(--text-dim);padding-bottom:32px">
+  خطة تنفيذية دقيقة — منصة توا · 6 يوليو 2026<br>
+  بناءً على قراءة مباشرة لـ: entrypoint.sh · docker-compose.yml · order_router.py · schemas.py · carts/service.py · order.py · types.ts · OrderHistoryPage.tsx
+</p>
+</main>
+
+<script>
+const secs = document.querySelectorAll('h2[id]');
+const links = document.querySelectorAll('nav a');
+const obs = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting) links.forEach(l =>
+      l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+  });
+}, { threshold: 0.2 });
+secs.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

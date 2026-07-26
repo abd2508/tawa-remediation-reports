@@ -1,0 +1,80 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تقرير معماريّ عميق — قاعدة بيانات تووا — 2026-06-19</title>
+<style>
+ *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;background:#eef2f6;color:#1e293b;line-height:1.85}
+ .wrap{max-width:1140px;margin:0 auto;padding:0 18px 90px}
+ header{background:linear-gradient(135deg,#020617,#1e3a8a 50%,#0f172a);color:#fff;padding:46px 28px;border-radius:0 0 26px 26px;box-shadow:0 12px 34px rgba(2,6,23,.34)}
+ header h1{margin:0 0 8px;font-size:1.8rem} header p{margin:4px 0;color:#cbd5e1}
+ .pill{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);padding:3px 11px;border-radius:999px;font-size:.82rem;margin:3px 4px}
+ h2{font-size:1.42rem;margin:38px 0 12px;padding:8px 16px 8px 0;background:#fff;border-radius:10px;border-right:6px solid #1e3a8a}
+ h2.good{border-right-color:#047857} h2.bad{border-right-color:#b45309} h2.tech{border-right-color:#7c3aed}
+ .lead{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px 22px;margin:14px 0}
+ .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:14px 0}
+ .kpi{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;text-align:center} .kpi b{display:block;font-size:1.25rem;color:#1e3a8a} .kpi span{font-size:.74rem;color:#64748b}
+ table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem;background:#fff;border-radius:10px;overflow:hidden}
+ th,td{border:1px solid #e2e8f0;padding:9px 12px;text-align:right;vertical-align:top} th{background:#1e3a8a;color:#fff}
+ h2.good~table th{background:#047857} h2.bad~table th{background:#b45309} h2.tech~table th{background:#7c3aed}
+ code{font-family:"Cascadia Code",Consolas,monospace;font-size:.78rem;color:#0f172a;direction:ltr;display:inline-block;unicode-bidi:embed;background:#f1f5f9;padding:0 5px;border-radius:5px}
+ .verdict{background:#eff6ff;border:2px solid #93c5fd;border-radius:14px;padding:14px 20px;color:#1e3a8a;margin:14px 0}
+ .foot{margin-top:40px;padding-top:18px;border-top:1px solid #e2e8f0;font-size:.83rem;color:#64748b}
+ .dim{display:inline-block;background:#ede9fe;color:#6d28d9;border-radius:6px;padding:1px 7px;font-size:.78rem;font-weight:600}
+</style></head><body>
+<header>
+ <h1>🗄️ تقرير معماريّ عميق — قاعدة بيانات تووا</h1>
+ <p>دراسة مبنيّة على القاعدة والكود الحيّ (PostgreSQL 16.13، رأس aa41) — المميزات · العيوب · الاحتياجات · التقنيات الأحدث</p>
+ <div style="margin-top:12px"><span class="pill">📅 2026-06-19</span><span class="pill">145 جدول</span><span class="pill">~99.5% ORM</span><span class="pill">صفر triggers</span><span class="pill">117 هجرة</span></div>
+</header>
+<div class="wrap">
+
+<div class="lead">
+ <b>الحكم المختصر:</b> قاعدتك <b>قويّة ومنظَّمة ومفصولة فصلًا نظيفًا عن الكود</b> — قيود غنيّة تحمي نفسها، دفتر مزدوج نظيف، هجرات منضبطة، حدّ ORM موحّد، وصفر منطق أعمال داخل القاعدة. <b>عيوبها ليست أخطاءً بل فرص تحسين</b>: JSON قديم بدل JSONB، فهارس FK ناقصة، لا تقسيم، وبعض الثوابت الماليّة العميقة تُحرَسها الأكواد لا القاعدة. ونعم — <b>توجد تقنيات أحدث</b> تجعلها أقوى وأدقّ وأمرن وأذكى وأأمن، مرتّبة أدناه بخريطة طريق.
+ <div class="grid"><div class="kpi"><b>PostgreSQL 16.13</b><span>الإصدار (حديث)</span></div><div class="kpi"><b>145</b><span>جدول</span></div><div class="kpi"><b>151</b><span>مفتاح أجنبي FK</span></div><div class="kpi"><b>69</b><span>قيد CHECK حقيقي</span></div><div class="kpi"><b>52</b><span>قيد UNIQUE</span></div><div class="kpi"><b>434</b><span>فهرس</span></div><div class="kpi"><b>117</b><span>هجرة (رأس مفرد)</span></div><div class="kpi"><b>~99.5%</b><span>وصول عبر ORM</span></div><div class="kpi"><b>0</b><span>triggers (لا منطق في القاعدة)</span></div></div>
+</div>
+
+<h2>① خريطة المعمار</h2>
+<div class="lead"><svg viewBox="0 0 760 300" width="100%" style="max-width:760px;background:#0f172a;border-radius:12px">
+<style>.b{rx:8}.t{fill:#e2e8f0;font:13px sans-serif;text-anchor:middle}.s{fill:#94a3b8;font:10px sans-serif;text-anchor:middle}.e{stroke:#475569;fill:none;marker-end:url(#a)}</style>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<rect class="b" x="40" y="20" width="680" height="46" rx="8" fill="#1e293b" stroke="#334155"/><text class="t" x="380" y="40">التطبيق (FastAPI + خدمات) — كلّ منطق الأعمال هنا</text><text class="s" x="380" y="57">post_journal (توازن الدفتر) · with_for_update (تزامن) · RBAC/ABAC</text>
+<rect class="b" x="40" y="92" width="680" height="40" rx="8" fill="#14532d" stroke="#16a34a"/><text class="t" x="380" y="116">حدّ ORM موحّد (SQLAlchemy) — ~99.5% · 7 SQL خام فقط</text>
+<rect class="b" x="40" y="158" width="430" height="120" rx="8" fill="#1e3a8a" stroke="#3b82f6"/><text class="t" x="255" y="180">PostgreSQL 16.13 — مخزن علائقيّ نظيف</text>
+<text class="s" x="255" y="202">145 جدول · 151 FK · 69 CHECK · 52 UNIQUE · 434 فهرس</text>
+<text class="s" x="255" y="220">دفتر مزدوج (أرصدة مشتقّة، مليم صحيح) · timestamptz</text>
+<text class="s" x="255" y="238">صفر triggers · لا منطق أعمال · 117 هجرة رأس مفرد</text>
+<text class="s" x="255" y="262" style="fill:#fca5a5">⚠ json لا jsonb · ~43 FK بلا فهرس · لا تقسيم · لا RLS</text>
+<rect class="b" x="495" y="158" width="225" height="120" rx="8" fill="#3f2d0a" stroke="#b45309"/><text class="t" x="607" y="180">Redis</text>
+<text class="s" x="607" y="202">كاش (KPI/أسطول)</text><text class="s" x="607" y="220">GEOSEARCH (أقرب سائق)</text><text class="s" x="607" y="238">Pub/Sub (SSE) · أقفال</text><text class="s" x="607" y="262">idempotency/توكِن</text>
+<path class="e" d="M380,66 L380,92"/><path class="e" d="M380,132 L255,158"/><path class="e" d="M460,132 L560,158"/>
+</svg><br><span style="font-size:.84rem;color:#64748b">المنطق كلّه في طبقة التطبيق؛ القاعدة مخزن علائقيّ نظيف خلف حدّ ORM موحّد؛ Redis للكاش والمكان والبثّ. النقاط الحمراء = فرص التحسين.</span></div>
+<div class="lead"><b>المجالات السبعة (145 جدولًا):</b> الهوية والأمان (15) · الكتالوج والمزوّدون (20) · الطلبات (12) · التوزيع والسائقون (16) · <b>المال والدفتر (26 — الأكبر)</b> · العمليات والحوكمة (21) · أخرى (35).</div>
+
+<h2 class="good">② المميزات (نقاط القوّة)</h2>
+<table><tr><th>الميزة</th><th>التفصيل (بالدليل)</th></tr><tr><td style="width:28%"><b>سلامة قويّة تحمي نفسها</b></td><td>151 FK + 69 CHECK + 52 UNIQUE. قيود ماليّة في القاعدة نفسها: <code>ck_wallet_balance_nonneg</code> (الرصيد≥0) · المبالغ&gt;0 · القيد الفريد الجزئي للنزاعات. ⇒ حتى لو أخطأ الكود، القاعدة تصدّ كثيرًا من الفساد.</td></tr><tr><td style="width:28%"><b>فصل نظيف عن الكود</b></td><td><b>صفر triggers</b> ولا إجراءات أعمال مخزّنة (الدوال كلّها امتداد بحث <code>pg_trgm</code>+<code>arabic_normalize</code>). المنطق في الكود، القاعدة <b>مخزن علائقيّ نظيف</b> — قابلة للاستعلام/النسخ/الاستعادة باستقلال.</td></tr><tr><td style="width:28%"><b>حدّ وصول موحّد</b></td><td>~99.5% عبر ORM (1554 موضع SQLAlchemy مقابل 7 SQL خام فقط) — لا SQL متناثر يصعب تتبّعه.</td></tr><tr><td style="width:28%"><b>هجرات منضبطة</b></td><td>117 هجرة Alembic، <b>رأس مفرد</b> (aa41)، كلّها مُتحقَّقة على PostgreSQL صعودًا وهبوطًا قبل النشر. تطوّر مخطّط منسوخ وقابل للتكرار.</td></tr><tr><td style="width:28%"><b>دفتر مزدوج نظيف</b></td><td><code>ledger_entries</code> (debit/credit_minor، journal_id، account_id، reference) — الأرصدة <b>مشتقّة</b> لا مخزّنة (لا تعارض). المال <b>عدد صحيح بالمليم</b> لا كسور عائمة (لا أخطاء تقريب).</td></tr><tr><td style="width:28%"><b>وقت آمن</b></td><td>278 عمود وقت <b>كلّها timestamptz</b> (واعية بالمنطقة) — لا توقيتات ساذجة (أُصلِحت بهجرة tz_fix).</td></tr><tr><td style="width:28%"><b>نظافة أمنيّة جيّدة</b></td><td>تجزئة الحسّاس بدل تخزينه الخام: <code>refresh_token_hash</code> (لا توكِن خام) · <code>before/after_hash</code> (تدقيق مقاوم للعبث) · <code>description_hash</code> (نصّ الشكوى لا يُخزَّن) · <code>request/response_hash</code> (idempotency) · بصمة الجهاز مجزّأة.</td></tr><tr><td style="width:28%"><b>أختام FIN-COR</b></td><td>أعلام ماليّة محكومة (cash_out/peer_transfer/production_payment=false) ببصمة SHA256 مُتحقَّقة — صدّ صلب لتفعيل خطر بالخطأ.</td></tr></table>
+
+<h2 class="bad">③ العيوب والثغرات (فرص التحسين)</h2>
+<table><tr><th>الخطورة</th><th>العيب</th><th>الأثر والحلّ</th></tr><tr><td style="white-space:nowrap">🟠 متوسّط</td><td><b>JSON لا JSONB (49 عمودًا)</b></td><td>كلّ أعمدة الـJSON من نوع <code>json</code> القديم (نصّي): <b>لا يُفهرَس، أبطأ، لا استعلام داخل البنية</b>. <code>jsonb</code> ثنائيّ قابل للفهرسة (GIN) وأسرع. (مُسجَّل: JSON-R01).</td></tr><tr><td style="white-space:nowrap">🟠 متوسّط</td><td><b>~43 FK بلا فهرس داعم</b></td><td>من 151 FK، ~43 بلا فهرس على عمود الربط ⇒ <b>JOIN/حذف أبطأ + تنازع أقفال</b> عند الكِبَر. حلّ: فهرسة أعمدة FK الساخنة.</td></tr><tr><td style="white-space:nowrap">🟠 متوسّط</td><td><b>لا تقسيم (partitioning)</b></td><td>الجداول المتنامية بلا حدّ (<code>audit_log</code> 12.9k، <code>ledger_entries</code>، <code>login_attempts</code>، <code>notifications</code>) <b>غير مُقسَّمة ولا مؤرشَفة</b> ⇒ تتضخّم وتبطئ مع الزمن. حلّ: تقسيم زمنيّ + أرشفة.</td></tr><tr><td style="white-space:nowrap">🔴 مهمّ مفاهيميًّا</td><td><b>ثوابت ماليّة عميقة في الكود لا القاعدة</b></td><td>توازن الدفتر (Σمدين=Σدائن) في <code>post_journal</code> (بايثون) لا trigger · تطابق المحفظة↔الدفتر <b>بلا حارس قاعدة</b> (الحارس استشاريّ). ⇒ السلامة الماليّة العميقة تعتمد على صحّة الكود + تطبيق الهجرات.</td></tr><tr><td style="white-space:nowrap">🟡 منخفض</td><td><b>لا تشفير على مستوى العمود</b></td><td>لا <code>pgcrypto</code>. الحسّاس مُجزَّأ (جيّد) لكن لا تشفير حقول في الراحة — يعتمد على تشفير القرص/المجلّد فقط.</td></tr><tr><td style="white-space:nowrap">🟡 منخفض</td><td><b>لا PostGIS للمكان</b></td><td>الجغرافيا = haversine في بايثون + Redis GEO. يعمل، لكن لا فهرسة مكانيّة حقيقيّة ولا استعلامات مضلّعات/مسافات دقيقة في القاعدة.</td></tr><tr><td style="white-space:nowrap">🟡 منخفض</td><td><b>لا RLS (أمان على مستوى الصفّ)</b></td><td>التحكّم بالوصول كلّه في الكود (RBAC/ABAC). لا طبقة دفاع ثانية في القاعدة (سياسات RLS = 0).</td></tr><tr><td style="white-space:nowrap">🟡 منخفض</td><td><b>أعمدة ميّتة (تراكم)</b></td><td><code>wallet_accounts.status</code>+<code>version</code> موجودان لكن ميّتان (يُكتبان/لا يُقرآن) — فخّ سبق أن أربك التدقيق. تنظيف مخطّط مطلوب.</td></tr><tr><td style="white-space:nowrap">🟡 منخفض</td><td><b>قابليّة التوسّع الأفقيّ</b></td><td>نسخة واحدة (pool 10+20). لا نُسَخ قراءة (replicas) ولا مجمّع اتّصالات (PgBouncer) — كافٍ الآن، يحتاج توسعة عند النموّ.</td></tr></table>
+
+<h2 class="bad">④ ماذا تحتاج (مرتّبة بالأولويّة)</h2>
+<table><tr><th>الأفق</th><th>الإجراءات</th></tr><tr><td style="width:28%"><b>سريع وعالي القيمة (أيّام)</b></td><td>ترقية JSON→JSONB (مع GIN على المسارات الساخنة) · فهرسة الـ43 FK · حذف الأعمدة الميّتة · تفعيل النسخ الاحتياطيّ WAL/PITR (الإعداد جاهز).</td></tr><tr><td style="width:28%"><b>متوسّط (أسابيع)</b></td><td>تقسيم زمنيّ + أرشفة للجداول المتنامية (audit/ledger/login/notifications) · حارس قاعدة لتوازن الدفتر (trigger/constraint مؤجَّل) · ربط حارس Σ المحفظة بعد تدقيق البيانات · <code>pg_stat_statements</code> للمراقبة.</td></tr><tr><td style="width:28%"><b>استراتيجيّ (عند النموّ)</b></td><td>PgBouncer + نسخة قراءة · RLS كطبقة دفاع ثانية · PostGIS للمكان · pgvector للذكاء (احتيال/توصيات) · Materialized Views + pg_cron للتقارير.</td></tr></table>
+
+<h2 class="tech">⑤ هل توجد تقنيات أحدث لجعلها أقوى/أحسن/أدقّ/أمرن/أذكى/أأمن؟ — نعم</h2>
+<table><tr><th>التقنية</th><th>تُحسّن</th><th>ماذا تضيف</th></tr>
+<tr><td><b>JSONB + فهارس GIN</b></td><td><span class="dim">أحسن · أدقّ · أمرن</span></td><td>استبدال <code>json</code> النصّيّ بـ<code>jsonb</code> الثنائيّ القابل للفهرسة ⇒ استعلام داخل بنية البيانات (price_snapshot/service_area) أسرع وأدقّ. <b>موصى به أولًا</b> (منخفض المخاطرة).</td></tr><tr><td><b>التقسيم الزمنيّ + pg_partman</b></td><td><span class="dim">أقوى</span></td><td>تقسيم <code>ledger_entries</code>/<code>audit_log</code>/<code>login_attempts</code> شهريًّا ⇒ استعلامات وصيانة أسرع آلاف المرّات عند ملايين الصفوف + أرشفة سهلة. <b>موصى به للتوسّع</b>.</td></tr><tr><td><b>trigger/constraint مؤجَّل للدفتر</b></td><td><span class="dim">أأمن · أدقّ</span></td><td>نقل توازن الدفتر (Σمدين=Σدائن) إلى القاعدة كقيد مؤجَّل ⇒ يستحيل قيد غير متوازن <b>حتى لو أخطأ الكود</b>. يرفع متانة القلب المالي.</td></tr><tr><td><b>Row-Level Security (RLS)</b></td><td><span class="dim">أأمن</span></td><td>سياسات وصول على مستوى الصفّ في القاعدة ⇒ طبقة دفاع ثانية تحت RBAC الكود (عميل يرى صفوفه فقط حتى لو أخطأ الكود). قويّة للمال والخصوصيّة.</td></tr><tr><td><b>PostGIS</b></td><td><span class="dim">أدقّ · أذكى</span></td><td>فهرسة مكانيّة حقيقيّة (GiST) + استعلامات مسافة/مضلّعات/أقرب-سائق دقيقة في القاعدة بدل haversine في الكود ⇒ توزيع أدقّ ومناطق خدمة أذكى.</td></tr><tr><td><b>pgvector (تضمينات AI)</b></td><td><span class="dim">أذكى</span></td><td>تخزين تضمينات (embeddings) للكشف عن الاحتيال، التوصيات، البحث الدلاليّ ⇒ ذكاء داخل القاعدة. يربط الـAI بالبيانات مباشرة.</td></tr><tr><td><b>Materialized Views + pg_cron</b></td><td><span class="dim">أحسن · أذكى</span></td><td>لوحات KPI/تقارير محسوبة مسبقًا ومحدَّثة بجدول ⇒ تقارير فوريّة بدل إعادة حساب ثقيل كلّ مرّة.</td></tr><tr><td><b>pgcrypto / تشفير الراحة</b></td><td><span class="dim">أأمن</span></td><td>تشفير حقول حسّاسة مختارة على مستوى العمود ⇒ حماية أعمق للـPII حتى لو تسرّب القرص.</td></tr><tr><td><b>PgBouncer + نسخ قراءة</b></td><td><span class="dim">أقوى · أمرن</span></td><td>مجمّع اتّصالات + توزيع القراءة على نسخ ⇒ تحمّل أحمال أعلى بكثير دون لمس الكود. أساس التوسّع.</td></tr><tr><td><b>Logical replication / CDC (outbox)</b></td><td><span class="dim">أمرن · أذكى</span></td><td>بثّ التغييرات بموثوقيّة (نمط outbox) لأنظمة لاحقة/تحليلات لحظيّة دون إثقال القاعدة الأساس.</td></tr><tr><td><b>Generated columns</b></td><td><span class="dim">أحسن · أمرن</span></td><td>قيم مشتقّة محسوبة في القاعدة (بدل تكرارها في الكود) ⇒ اتّساق مضمون وأقلّ تداخل.</td></tr></table>
+
+<h2 class="tech">⑥ خريطة طريق مقترحة (3 مراحل)</h2>
+<table><tr><th>المرحلة</th><th>الإجراءات</th><th>القيمة</th></tr><tr><td style='white-space:nowrap'><b>المرحلة 1 — مكاسب سريعة</b></td><td>JSON→JSONB · فهرسة الـ43 FK · حذف الأعمدة الميّتة · تفعيل WAL/PITR · pg_stat_statements</td><td>رفع الأداء والدقّة والمراقبة بمخاطرة منخفضة جدًّا.</td></tr><tr><td style='white-space:nowrap'><b>المرحلة 2 — تحصين القلب المالي</b></td><td>قيد قاعدة لتوازن الدفتر · حارس Σ المحفظة الحيّ (بعد تدقيق) · أرشفة/تقسيم زمنيّ</td><td>نقل السلامة الماليّة العميقة من «اعتماد على الكود» إلى «تضمن القاعدة».</td></tr><tr><td style='white-space:nowrap'><b>المرحلة 3 — التوسّع والذكاء</b></td><td>PgBouncer + نسخة قراءة · RLS · PostGIS · pgvector · Materialized Views</td><td>جاهزيّة للنموّ الكبير + ذكاء + أمان أعمق.</td></tr></table>
+
+<h2>⑦ الخلاصة</h2>
+<div class="verdict">
+ <b>متينة؟ نعم.</b> قيود تحمي نفسها (151 FK · 69 CHECK · 52 UNIQUE · 434 فهرس).<br>
+ <b>واضحة؟ نعم.</b> تسمية متّسقة، علاقات صريحة، مجالات مرتّبة.<br>
+ <b>قويّة؟ نعم.</b> أقفال تزامن، دفتر مزدوج، هجرات مُتحقَّقة، مليم صحيح، وقت آمن.<br>
+ <b>مستقلّة عن الكود؟ نعم في الجوهر.</b> صفر منطق في القاعدة، حدّ ORM موحّد، قاعدة قابلة للاستعلام/النسخ باستقلال. <b>التحفّظ الوحيد:</b> الثوابت الماليّة العميقة تُحرَسها الأكواد — بقرارك الموثَّق.<br>
+ <b>أحدث وأقوى ممكن؟ نعم.</b> JSONB · تقسيم · قيود دفتر في القاعدة · RLS · PostGIS · pgvector — كلّها ترفعها دون كسر ما هو قائم. القرار قرارك، والأولويّة للمكاسب السريعة منخفضة المخاطرة.
+</div>
+
+<div class="foot">
+ <p>🗄️ تقرير معماريّ عميق لقاعدة بيانات تووا · 2026-06-19 · مبنيّ على فحص حيّ (PostgreSQL 16.13، libya_platform، رأس aa41) والكود (SQLAlchemy/Alembic). أرقام مستخرجة من information_schema/pg_catalog والكود مباشرة.</p>
+ <p>ملاحظة: القاعدة الحاليّة قبل الإطلاق (بيانات قليلة) ⇒ الأداء ليس مشكلة الآن؛ التوصيات للتصميم عند النموّ. القلب المالي مختوم (FIN-COR PASS).</p>
+</div>
+</div></body></html>

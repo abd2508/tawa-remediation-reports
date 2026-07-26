@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير: تسجيل TOTP والفرض الصارم لـMFA على الإنتاج — tawanow 2026-06-23</title>
+<style>
+  :root{
+    --green:#1b7f4f;--green-d:#0f5c38;--amber:#9a6b00;--red:#b3261e;--blue:#1558b0;
+    --bg:#f5f7f6;--card:#fff;--ink:#17241e;--muted:#5b6b63;--line:#dde6e1;
+    --ok:#e8f5ee;--okl:#9fd6b7;--warn:#fdf4e3;--warnl:#e9cd8f;--bad:#fdecea;--badl:#f0b3ad;--blbg:#e7eefb;--bll:#b9cdf0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;line-height:1.78}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f5c38,#1b7f4f);color:#fff;border-radius:18px;padding:34px;box-shadow:0 10px 30px rgba(15,92,56,.25)}
+  header.hero h1{margin:0 0 8px;font-size:22px;line-height:1.5}
+  header.hero p{margin:4px 0;opacity:.95;font-size:13px}
+  .meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+  .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:12px}
+  h2{margin:32px 0 13px;font-size:20px;color:var(--green-d);border-right:6px solid var(--green);padding:8px 14px 8px 0;background:linear-gradient(90deg,#eef6f1,transparent)}
+  h3{margin:17px 0 8px;font-size:15px;color:var(--green-d)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:19px;margin:13px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:9px 0;font-size:12.4px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;vertical-align:top}
+  th{background:#eef6f1;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fbfdfc}
+  .ok{background:var(--ok)!important}.warn{background:var(--warn)!important}.bad{background:var(--bad)!important}.bl{background:var(--blbg)!important}
+  .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:700;white-space:nowrap}
+  .pill.g{background:var(--ok);color:var(--green-d);border:1px solid var(--okl)}
+  .pill.r{background:var(--bad);color:var(--red);border:1px solid var(--badl)}
+  code{background:#eef2ef;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-family:"Cascadia Code",Consolas,monospace;font-size:11.2px;direction:ltr;display:inline-block}
+  .diag{background:#0e1f18;border-radius:12px;padding:15px;color:#d7ffe9;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.2px;line-height:1.6;overflow:auto;white-space:pre}
+  .diag .y{color:#ffd479}.diag .r{color:#ff9a8c}.diag .g{color:#7fffb0}.diag .b{color:#8cc6ff}.diag .m{color:#d9a8ff}.diag .c{color:#7fb89a}
+  .simple{background:#eef6ff;border:1px solid var(--bll);border-radius:10px;padding:10px 13px;margin:9px 0;font-size:12.7px}
+  .simple b{color:var(--blue)}
+  .danger{background:var(--bad);border:1px solid var(--badl);border-radius:10px;padding:11px 13px;margin:10px 0;font-size:12.7px}
+  .danger b{color:var(--red)}
+  .secret{background:#10241b;border:2px solid var(--green);border-radius:12px;padding:14px;margin:11px 0;color:#d7ffe9;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;word-break:break-all}
+  .secret b{color:#ffd479}
+  .note{font-size:11.8px;color:var(--muted)}
+  .dash{display:flex;flex-wrap:wrap;gap:9px;margin:8px 0}
+  .kpi{flex:1 1 150px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .kpi.g{background:var(--ok);border-color:var(--okl)}.kpi.r{background:var(--bad);border-color:var(--badl)}
+  .kpi .n{font-size:15px;font-weight:800;color:var(--green-d)}.kpi.r .n{color:var(--red)}
+  .kpi .l{font-size:10.5px;color:var(--muted)}
+  .footer{margin:30px 0 8px;text-align:center;color:var(--muted);font-size:11.8px}
+  ul{margin:5px 0;padding-right:20px}li{margin:3px 0;font-size:12.6px}
+  ol{margin:5px 0;padding-right:22px}ol li{margin:5px 0;font-size:12.6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير: تسجيل TOTP والفرض الصارم لـMFA على الإنتاج</h1>
+  <p>منظومة تووا / Tawa · <b>https://tawanow.com</b> · حساب السوبر أدمين <code>admin</code> · 2026-06-23</p>
+  <p>من «المراقبة (report-only)» إلى «الفرض الصارم»: كلمة المرور وحدها لم تعد تكفي — يلزم كود TOTP</p>
+  <div class="meta">
+    <span>🔴 MFA مفروض بصرامة (admin)</span>
+    <span>✅ دورة الدخول الكاملة مُتحقَّقة قبل الفرض</span>
+    <span>🔑 السرّ سُلِّم للمشغّل</span>
+    <span>🆘 break-glass موثَّق</span>
+    <span>🔒 FIN-COR/nginx لم تُمَسّ · 6/6 صحّيّة</span>
+  </div>
+</header>
+
+<!-- 0 -->
+<h2>٠) لوحة النتائج</h2>
+<div class="dash">
+  <div class="kpi g"><div class="n">✅ مُسجَّل</div><div class="l">TOTP لـadmin (totp_enabled=true)</div></div>
+  <div class="kpi g"><div class="n">✅ مُتحقَّق</div><div class="l">دورة الدخول الكاملة قبل الفرض</div></div>
+  <div class="kpi r"><div class="n">🔴 صارم</div><div class="l">MFA_REPORT_ONLY=false</div></div>
+  <div class="kpi g"><div class="n">0</div><div class="l">tracebacks · مساس FIN-COR</div></div>
+  <div class="kpi g"><div class="n">6/6</div><div class="l">حاويات صحّيّة · الموقع 200</div></div>
+</div>
+
+<div class="simple">🟦 <b>بلغة بسيطة:</b> قبل اليوم، كان يكفي <code>admin</code> + <code>admin</code> للدخول إلى لوحة التحكّم. الآن أضفنا <b>عاملاً ثانياً</b>: رمز مؤقّت (6 أرقام يتغيّر كل 30 ثانية) من تطبيق مُصادقة على هاتفك. فحتى لو سُرِقت كلمة المرور، لا أحد يدخل بلا هاتفك. وقبل تشغيل هذا الإلزام، <b>جرّبنا دورة الدخول كاملةً</b> للتأكّد أنّك لن تُقفَل خارج حسابك.</div>
+
+<!-- 1 -->
+<h2>١) المنهج — لماذا على مرحلتين</h2>
+<div class="card">
+  <div class="diag"><span class="b">التسلسل الآمن المُطبَّق:</span>
+  <span class="g">المرحلة (أ)</span> تسجيل TOTP + التحقّق من دورة الدخول الكاملة   ← <span class="y">إثبات أنّك لن تُقفَل</span>
+        │  (report-only ما زال فعّالاً هنا → admin/admin غير محجوب فيُمكِن التسجيل)
+        ▼
+  <span class="r">المرحلة (ب)</span> قلب MFA_REPORT_ONLY=false → الفرض الصارم          ← <span class="y">كلمة المرور وحدها لا تكفي</span>
+        │
+        ▼  تحقّق نهائيّ: admin/admin → requires_totp → كود → توكن كامل ✓</div>
+  <p class="note"><b>القاعدة:</b> لا نُفعّل الفرض إلّا بعد إثبات أنّ صاحب الحساب يستطيع إكمال الدخول بالعامل الثاني — وإلّا فخطر قفل أوّل-تشغيل (دجاجة-وبيضة).</p>
+</div>
+
+<!-- 2 -->
+<h2>٢) المرحلة (أ): تسجيل TOTP — خطوة بخطوة (مُتحقَّقة حيّاً)</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>الإجراء</th><th>النقطة</th><th>النتيجة الحيّة</th></tr>
+    <tr class="ok"><td>1</td><td>دخول admin/admin</td><td><code>POST /auth/login</code></td><td>توكن كامل ✓ (report-only فعّال → غير محجوب)</td></tr>
+    <tr class="ok"><td>2</td><td>توليد سرّ TOTP + URI</td><td><code>POST /auth/totp/setup</code></td><td>سرّ 32 حرفاً + <code>otpauth://…</code> ✓</td></tr>
+    <tr class="ok"><td>3</td><td>حساب كود من السرّ</td><td><code>pyotp</code> داخل الحاوية</td><td>كود <code>825613</code></td></tr>
+    <tr class="ok"><td>4</td><td>تفعيل العامل الثاني</td><td><code>POST /auth/totp/enable</code></td><td><code>totp_enabled: true</code> ✓</td></tr>
+    <tr class="ok"><td>5</td><td>إعادة الدخول (تأكيد البوّابة)</td><td><code>POST /auth/login</code></td><td><code>requires_totp:true</code> + <code>pre_auth_token</code> ✓</td></tr>
+    <tr class="ok"><td>6</td><td>تبادل الكود بتوكن كامل</td><td><code>POST /auth/totp/verify-pre-auth</code></td><td>توكن كامل ✓ · <code>/control-panel=200</code> ✓</td></tr>
+  </table>
+  <div class="danger"><b>🔑 السرّ سُلِّم للمشغّل (ضروريّ للدخول — احفظه في تطبيق المُصادقة):</b></div>
+  <div class="secret">TOTP SECRET: <b>V4Y2XEOPWNBBOZEPKW7FLH2YCBVOLFUD</b>
+otpauth URI: otpauth://totp/Tawa:%2B218000000099?secret=V4Y2XEOPWNBBOZEPKW7FLH2YCBVOLFUD&issuer=Tawa</div>
+  <p class="note">أضِف السرّ إلى <b>Google Authenticator / Authy</b> (الصق السرّ أو امسح الـURI). من الآن: الدخول = <code>admin</code> + <code>admin</code> + <b>الكود من تطبيقك</b>.</p>
+</div>
+
+<!-- 3 -->
+<h2>٣) المرحلة (ب): الفرض الصارم (مُتحقَّق حيّاً)</h2>
+<div class="card">
+  <table>
+    <tr><th>الإجراء</th><th>أين</th><th>النتيجة</th></tr>
+    <tr class="ok"><td>قلب العلَم → صارم</td><td><code>docker-compose.staging.yml</code> <code>MFA_REPORT_ONLY: "false"</code></td><td>أُعيد إنشاء backend · صحّيّ · 0 tracebacks</td></tr>
+    <tr class="ok"><td>تأكيد القيمة في الحاوية</td><td><code>printenv MFA_REPORT_ONLY</code></td><td><code>false</code> (= صارم) ✓</td></tr>
+    <tr class="bad"><td><b>دخول admin/admin بعد الفرض</b></td><td><code>POST /auth/login</code></td><td><b><code>requires_totp:true</code></b> — <b>كلمة المرور وحدها لا تكفي</b> ✓</td></tr>
+    <tr class="ok"><td>إكمال الدخول بالكود</td><td><code>verify-pre-auth</code> (كود <code>466833</code>)</td><td>توكن كامل ✓ · <code>/control-panel=200</code> ✓</td></tr>
+  </table>
+  <div class="diag"><span class="b">سلوك الدخول الآن (admin):</span>
+  admin + admin            →  <span class="r">requires_totp</span> (لا جلسة بعد)
+       + كود TOTP (هاتفك)  →  <span class="g">توكن كامل → لوحة التحكّم</span>
+
+<span class="b">سلوك أيّ حساب مُمتاز آخر بلا TOTP (تحت الصرامة):</span>
+  دخول  →  <span class="y">توكن تسجيل مُقيَّد فقط</span> (مرفوض كتوكن وصول؛ مقبول فقط في /totp/setup+/enable)
+        →  يُجبَر على تسجيل TOTP قبل أيّ إجراء</div>
+</div>
+
+<!-- 4 -->
+<h2>٤) أثر الفرض على الحسابات المُمتازة الأخرى</h2>
+<div class="card warn" style="border-color:var(--warnl)">
+  <p>الأدوار المُلزَمة الآن: <code>SUPER_ADMIN · OPERATIONS_AGENT · FINANCE_AGENT · COMPLIANCE_AGENT</code>.</p>
+  <ul>
+    <li>أيّ حساب بأحد هذه الأدوار و<b>بلا TOTP مُسجَّل</b> سيحصل عند الدخول على <b>توكن تسجيل مُقيَّد فقط</b> ولن يستطيع تنفيذ أيّ إجراء حتى يُسجِّل TOTP (عبر <code>/auth/totp/setup</code> ثم <code>/enable</code> — التوكن المُقيَّد يسمح بهاتين فقط).</li>
+    <li>هذا هو <b>الفرض المقصود</b>؛ إن وُجد موظّفو OPS فعليّون، أبلغهم بتسجيل TOTP عند أول دخول.</li>
+    <li>العملاء والسائقون والمزوّدون <b>غير متأثّرين</b> (ليسوا أدواراً مُمتازة).</li>
+  </ul>
+</div>
+
+<!-- 5 -->
+<h2>٥) 🆘 break-glass — إن فقدتَ السرّ أو قُفِلت</h2>
+<div class="card">
+  <p class="note">على الخادم في <code>/home/deploy/platform</code> (نسخة احتياطيّة من الإعداد موجودة: <code>/tmp/staging.yml.bak.*</code>):</p>
+  <ol>
+    <li><b>تعطيل الصرامة فوراً (يعود admin/admin للعمل):</b>
+      <div class="diag">sed -i 's/MFA_REPORT_ONLY: "false"/MFA_REPORT_ONLY: "true"/' docker-compose.staging.yml
+docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d backend-core</div>
+    </li>
+    <li><b>أو إلغاء TOTP لـadmin عبر قاعدة البيانات:</b>
+      <div class="diag">docker exec -it tawa-postgres-1 psql -U &lt;user&gt; -d &lt;db&gt; \
+  -c "UPDATE users SET totp_enabled=false WHERE username='admin';"</div>
+    </li>
+    <li><b>إعادة تسجيل سرّ جديد:</b> كرّر المرحلة (أ) (login → setup → enable).</li>
+  </ol>
+</div>
+
+<!-- 6 -->
+<h2>٦) السلامة + الحالة النهائيّة</h2>
+<table>
+  <tr><th>العنصر</th><th>الحالة</th></tr>
+  <tr class="ok"><td>الحاويات</td><td>✅ 6/6 صحّيّة · backend 0 tracebacks/ERROR (5 دقائق)</td></tr>
+  <tr class="ok"><td>الموقع العامّ</td><td>✅ <code>/</code>=200 · <code>/api/health/ready</code>=200</td></tr>
+  <tr class="ok"><td>FIN-COR</td><td>✅ <code>feature_flags 25ddf010…</code> · <code>launch_gates 6c78dc89…</code> (ثابت)</td></tr>
+  <tr class="ok"><td>nginx · batching/Wave-C</td><td>✅ لم تُمَسّ (لا migration · لا مساس بالعقود)</td></tr>
+  <tr class="bad"><td><b>H-1 MFA</b></td><td>🔴 <b>مفروض بصرامة</b> (admin مُسجَّل + الصرامة فعّالة)</td></tr>
+  <tr class="warn"><td>H-2 IP allowlist · H-4 · H-5 · H-6</td><td>منشورة، <b>مُطفأة</b> (قفل IP <b>لم يُفعَّل</b> عمداً لئلّا يُقفَل وصولك)</td></tr>
+  <tr class="ok"><td>PWA (تحديث موثوق)</td><td>✅ منشورة (تحلّ «عدم ظهور التعديلات»)</td></tr>
+</table>
+
+<div class="footer">
+  تسجيل TOTP لـ<code>admin</code> + الفرض الصارم لـMFA على الإنتاج (tawanow.com) · دورة الدخول الكاملة مُتحقَّقة قبل الفرض · السرّ سُلِّم للمشغّل · break-glass موثَّق · 6/6 حاويات صحّيّة · 0 tracebacks · FIN-COR/nginx لم تُمَسّ · 2026-06-23
+</div>
+
+</div>
+</body>
+</html>

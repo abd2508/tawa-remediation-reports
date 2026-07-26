@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فحص لوحة التحكم (OPS) الشامل — تووا — 2026-06-01</title>
+<style>
+  :root{
+    --bg:#0f1419; --card:#1a212b; --card2:#222b38; --line:#2e3a4a;
+    --txt:#e7eef6; --mut:#9fb0c3; --pri:#2ec28a; --pri2:#1f9e6e;
+    --red:#ff5d5d; --amber:#ffba49; --blue:#5ab0ff; --green:#37d399;
+    --redbg:#3a1c1f; --amberbg:#3a2f1a; --greenbg:#16302a; --bluebg:#16283a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.85;font-size:15px}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+  header.head{background:linear-gradient(135deg,#16302a,#16283a);border:1px solid var(--line);border-radius:18px;padding:30px 28px;margin-bottom:26px}
+  header.head h1{margin:0 0 6px;font-size:27px}
+  header.head .sub{color:var(--mut);font-size:14px}
+  .pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:3px 12px;margin:4px 4px 0 0;font-size:12.5px;color:var(--mut)}
+  h2{margin:34px 0 14px;font-size:21px;border-right:4px solid var(--pri);padding-right:12px}
+  h3{margin:22px 0 10px;font-size:17px;color:var(--blue)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+  .stat{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .stat .n{font-size:26px;font-weight:800}
+  .stat .l{font-size:12.5px;color:var(--mut);margin-top:3px}
+  .ok{color:var(--green)} .bad{color:var(--red)} .warn{color:var(--amber)} .info{color:var(--blue)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.6px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:var(--card2);color:var(--mut);font-weight:700}
+  td code,code{background:#0b0f14;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12.5px;color:#cfe9ff;font-family:ui-monospace,Consolas,monospace;direction:ltr;display:inline-block}
+  .tag{display:inline-block;border-radius:6px;padding:1px 9px;font-size:12px;font-weight:700}
+  .t-clean{background:var(--greenbg);color:var(--green)} .t-dup{background:var(--redbg);color:var(--red)}
+  .t-conf{background:var(--amberbg);color:var(--amber)} .t-part{background:var(--bluebg);color:var(--blue)}
+  .finding{border-radius:12px;padding:16px 18px;margin:14px 0;border:1px solid}
+  .f-red{background:var(--redbg);border-color:#5a2b2e} .f-amber{background:var(--amberbg);border-color:#5a4a24}
+  .f-green{background:var(--greenbg);border-color:#225244} .f-blue{background:var(--bluebg);border-color:#244a6a}
+  .finding h3{margin:0 0 8px;color:inherit}
+  .lead{font-size:18px;font-weight:700;margin:6px 0}
+  ul{margin:8px 0;padding-right:22px} li{margin:5px 0}
+  .muted{color:var(--mut);font-size:13px}
+  .sev{font-weight:800;border-radius:6px;padding:2px 10px;font-size:12.5px}
+  .sev-p1{background:var(--redbg);color:var(--red)} .sev-p2{background:var(--amberbg);color:var(--amber)} .sev-p3{background:var(--bluebg);color:var(--blue)}
+  .foot{margin-top:40px;border-top:1px solid var(--line);padding-top:16px;color:var(--mut);font-size:12.5px;text-align:center}
+  .verify{font-size:12px;color:var(--mut);border-right:2px solid var(--pri2);padding-right:8px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="head">
+  <h1>🛡️ فحص لوحة التحكم (OPS) الشامل</h1>
+  <div class="sub">منصّة تووا / Toowa — تقرير فحص بنيويّ + وظيفيّ + برمجيّ + صلاحيّات + ربط API · 2026-06-01</div>
+  <div style="margin-top:12px">
+    <span class="pill">📂 web/src — opsRouter · Layout · opsAccess · 81 صفحة</span>
+    <span class="pill">🔬 فحص قراءة-فقط · بلا أي تعديل كود</span>
+    <span class="pill">✅ كل ادّعاء مُتحقَّق منه مباشرةً بالكود</span>
+  </div>
+</header>
+
+<div class="card">
+  <div class="lead">الخلاصة التنفيذيّة</div>
+  <p>لوحة التحكم <b class="ok">سليمة بنيويّاً وأمنيّاً بدرجة عالية</b>: لا روابط ميتة، لا صفحات مكسورة، لا استدعاءات API معطّلة، لا انجراف صلاحيّات، ولا لوحات «مخفيّة» حقيقيّة — كلّ الصفحات الفرعيّة مربوطة من حاضناتها. وُجدت <b class="bad">مشكلة تكرار/تعارض حقيقيّة واحدة (P1)</b> ومشكلة <b class="warn">ترجمة واسعة (P2)</b> + لمسات تحسين. لا شيء حاجب للتشغيل، لكن إصلاح P1/P2 يرفع اللوحة إلى مستوى احترافيّ متماسك.</p>
+  <div class="grid">
+    <div class="stat"><div class="n">81</div><div class="l">صفحة OPS (62+3+16)</div></div>
+    <div class="stat"><div class="n">83</div><div class="l">مسار في الراوتر</div></div>
+    <div class="stat"><div class="n ok">0</div><div class="l">استيراد مكسور</div></div>
+    <div class="stat"><div class="n ok">0</div><div class="l">رابط شريط ميّت</div></div>
+    <div class="stat"><div class="n ok">0</div><div class="l">انجراف صلاحيّات</div></div>
+    <div class="stat"><div class="n ok">0</div><div class="l">API معطّل</div></div>
+    <div class="stat"><div class="n bad">2</div><div class="l">صفحتا تكرار كتابة</div></div>
+    <div class="stat"><div class="n warn">45</div><div class="l">مفتاح ترجمة ناقص</div></div>
+  </div>
+</div>
+
+<!-- ============ منهجيّة ============ -->
+<h2>منهجيّة الفحص</h2>
+<div class="card">
+  <ul>
+    <li><b>طبقة البنية:</b> استخراج كلّ مسار من <code>opsRouter.tsx</code>، والتحقّق آليّاً من وجود ملفّ كلّ صفحة مستوردة (lazy)، ورصد اليتيمات والمسارات المكرّرة والـcatch-all.</li>
+    <li><b>طبقة التنقّل:</b> مطابقة روابط الشريط الجانبيّ (<code>Layout.tsx · navSections</code>) بالمسارات، ورصد الروابط الميتة والصفحات المخفيّة (المربوطة من بطاقات الحاضنات).</li>
+    <li><b>طبقة الصلاحيّات:</b> مقارنة حتميّة (Python) بين مجموعة الدور في حارس كلّ مسار وخريطة <code>opsAccess.OPS_NAV_ACCESS</code>.</li>
+    <li><b>طبقة الربط بالـAPI:</b> 3 وكلاء استكشاف متوازية (قراءة فقط) جرَدت كلّ استدعاء <code>apiClient.*</code> في وحدات الـAPI وطابقته بمسارات الراوترات الخلفيّة (مع بادئات <code>main.py</code>).</li>
+    <li><b>التحقّق المباشر:</b> كلّ نتيجة حرجة من الوكلاء أُعيد التحقّق منها بقراءة الكود/grep مباشرةً قبل إثباتها هنا (قاعدة منع الهلوسة) — صُحِّح تحليلان للوكلاء (انظر الحواشي).</li>
+  </ul>
+</div>
+
+<!-- ============ ما هو سليم ============ -->
+<h2>أولاً: ما هو سليم ومُتحقَّق منه ✅</h2>
+
+<div class="finding f-green">
+  <h3>1) سلامة البنية والاستيرادات</h3>
+  <ul>
+    <li><b>83 مساراً</b> (80 محروساً + 3 إعادات توجيه) — <b>كلّ</b> صفحة مستوردة بـ<code>lazy()</code> موجودة على القرص (صفر استيراد مكسور → صفر انهيار بناء).</li>
+    <li><b>صفر مسار مكرّر</b>، و<code>{ path:"*" } → /ops</code> (catch-all موجود).</li>
+    <li>«اليتيمتان» الظاهرتان (<code>ControlPanelAuditLog</code>, <code>ControlPanelSystemEvents</code>) ليستا ميتتين — تُستخدمان كتبويبين داخل <code>ControlPanelAuditCenter</code>.</li>
+  </ul>
+</div>
+
+<div class="finding f-green">
+  <h3>2) لا لوحات «مخفيّة» — كلّ الصفحات الفرعيّة مربوطة من حاضناتها</h3>
+  <p>الشريط الجانبيّ يعرض 59 رابطاً. الـ21 صفحة غير الموجودة في الشريط ليست مخفيّة، بل تُفتح من لوحتين حاضنتين عبر بطاقات (تصميم hub-and-spoke):</p>
+  <ul>
+    <li><b>لوحة المالية</b> <code>/ops/finance</code> تربط <b>12/12</b> صفحة ماليّة (ledger · refunds · settlements · chargebacks · tax · payroll · COA · reports · recon · commission · cash-risk · manual-journal).</li>
+    <li><b>لوحة CP</b> <code>/ops/cp</code> تربط <b>15/15</b> صفحة عبر مصفوفة <code>DOMAINS</code> (users · customers · providers · drivers · orders · complaints · wallets · errors · backups · ledger · cash-collections · dispatch-offers · audit-log · system-events · restore-drills).</li>
+  </ul>
+  <div class="verify">تحقّق: <code>grep to={d.path}</code> في ControlPanelLanding + روابط OpsFinanceDashboard طابقت 100% أبناء كلّ حاضنة.</div>
+</div>
+
+<div class="finding f-green">
+  <h3>3) الصلاحيّات (RBAC) — صفر انجراف 🔒</h3>
+  <p>المقارنة الحتميّة بين حُرّاس المسارات (<code>opsRouter</code>) وخريطة <code>opsAccess</code>: <b>صفر تعارض</b> في الـ59 مساراً المُعيّنة (الادّعاء «verified 1:1» صحيح). المجموعات الخمس متّسقة: <code>ALL_OPS · OPS_FIN · OPS_ADMIN · OPS_ADMIN_FIN · SUPER</code>.</p>
+  <ul>
+    <li>الـ21 صفحة المفتوحة-من-بطاقة محروسة بمساراتها (<code>OPS_ADMIN</code>/<code>OPS_FIN</code>)، وحاضنتاها بنفس الدور → لا تسرّب.</li>
+    <li><code>canAccessOpsPath</code> fail-open للمفاتيح المجهولة (للتنقّل فقط) — وحارس المسار يبقى خطّ الدفاع الأمنيّ.</li>
+  </ul>
+</div>
+
+<div class="finding f-green">
+  <h3>4) ربط الواجهة بالـAPI — صفر زرّ معطّل</h3>
+  <ul>
+    <li>~42 نقطة في <code>operations.ts</code> + 18 في <code>controlPanel.ts</code> (كلّها GET) + عيّنة من المالية — <b>كلّها لها مسار خلفيّ مطابق</b> (طريقة HTTP مطابقة).</li>
+    <li>العيب التاريخيّ (<code>OpsDriverCashLimit</code> PUT مقابل POST خلفيّ) <b>مُصلَح</b>: الآن <code>setCashLimit</code> = <code>POST /operations/drivers/{id}/cash-limit</code> على الطرفين.</li>
+    <li>تحقّق ماليّ مباشر: trial-balance · chart-of-accounts · tax/rates · journals/manual · reconciliation/run · settlements/generate-batch — كلّها موجودة في راوترات <code>backend/app/modules/finance/</code>.</li>
+  </ul>
+</div>
+
+<div class="finding f-green">
+  <h3>5) جودة الصفحات — لا صفحات وهميّة</h3>
+  <p>لا صفحات stub/«قريباً»/TODO فارغة؛ لا أزرار صمّاء؛ نمط متّسق <code>loading → error → empty</code> في كلّ الصفحات الجالبة للبيانات؛ لا مكوّنات مستوردة غير موجودة.</p>
+</div>
+
+<!-- ============ المشاكل ============ -->
+<h2>ثانياً: المشاكل المُثبَتة 🔴🟡</h2>
+
+<div class="finding f-red">
+  <h3><span class="sev sev-p1">P1 — حرج وظيفيّاً</span> &nbsp; تكرار/تعارض: صفحتا كتابة مُقنَّعتان بعائلة «العرض فقط»</h3>
+  <p>اتّفاقيّة المرحلة 397: صفحات <code>ControlPanel*</code> = <b>مرايا قراءة فقط</b> موسومة «(عرض)»، وصفحات <code>Ops*</code> = سطح الفعل. لكنّ صفحتين تكسران الاتّفاقيّة: عنوانهما «لوحة …» <b>بلا وسم «عرض»</b>، وتستدعيان <code>operationsApi</code> للكتابة مباشرةً (لا <code>controlPanelApi</code> الذي كلّه GET):</p>
+  <table>
+    <tr><th>الصفحة</th><th>العنوان</th><th>أفعال الكتابة الفعليّة (مُتحقَّقة)</th><th>تتعارض مع</th></tr>
+    <tr>
+      <td><code>admin/ControlPanelDrivers.tsx</code></td>
+      <td>«لوحة السائقين»<br><span class="bad">بلا «عرض»</span></td>
+      <td>approveOnboarding · rejectOnboarding · suspendUser · reinstateDriver · <b>setCashLimit</b> · approve/rejectDocument</td>
+      <td><code>OpsDriverControls</code> · <code>OpsDriverCashLimit</code> · <code>OpsOnboarding</code></td>
+    </tr>
+    <tr>
+      <td><code>admin/ControlPanelProviders.tsx</code></td>
+      <td>«لوحة المزودين»<br><span class="bad">بلا «عرض»</span></td>
+      <td>approveOnboarding · rejectOnboarding · suspendUser · approve/rejectDocument</td>
+      <td><code>OpsOnboarding</code></td>
+    </tr>
+  </table>
+  <p class="lead" style="font-size:15px">لماذا هو تعارض حقيقيّ؟</p>
+  <ul>
+    <li><b>اعتماد/رفض الانضمام</b> (سائق ومزوّد) متاح من <b>سطحين</b> (CP + OpsOnboarding) → نفس الفعل، واجهتان يجب أن تبقيا متطابقتين سلوكيّاً.</li>
+    <li><b>تعديل حدّ النقد</b> متاح من <b>ثلاثة</b> أسطح: <code>ControlPanelDrivers</code> + <code>OpsDriverControls</code> + <code>OpsDriverCashLimit</code> (كلّها نقطة API واحدة سليمة، لكن 3 مداخل UI متكرّرة → ارتباك «أين أفعلها؟» + خطر تباين تحقّق المدخلات).</li>
+    <li>كسر الاتّفاقيّة يضلّل المُشغّل: اسم «ControlPanel» يوحي بالقراءة، والصفحة تكتب فعلاً.</li>
+  </ul>
+  <div class="verify">تحقّق مباشر: <code>controlPanelApi</code> كلّه <code>apiClient.get</code>؛ بينما ControlPanelDrivers:284/288/358/367/381 وControlPanelProviders:219/222/284 تستدعي <code>operationsApi</code> المُحوِّر. حاشية: عدّ الوكيل «17/13 فعلاً» مبالَغ (عَدَّ تعريفات وحدة API)؛ الجوهر — تكرار كتابة حقيقيّ — مؤكَّد.</div>
+  <p class="lead" style="font-size:15px">التوصية</p>
+  <ul>
+    <li><b>الخيار أ (الأنظف):</b> اجعل <code>ControlPanelDrivers/Providers</code> قراءة-فقط فعليّاً (أزل أزرار الكتابة، أبقِ القائمة + وسم «(عرض)») وادفع كلّ الأفعال إلى <code>OpsOnboarding</code> + <code>OpsDriverControls</code> كمصدر وحيد.</li>
+    <li><b>الخيار ب:</b> إن أُريد إبقاء الأفعال في CP، أزِل التكرار من الأسطح الأخرى ووحّد نقطة الدخول، مع توحيد تسمية الصفحة بوضوح.</li>
+  </ul>
+</div>
+
+<div class="finding f-amber">
+  <h3><span class="sev sev-p2">P2 — متوسّط (احترافيّة/تدويل)</span> &nbsp; 45 من 67 مفتاح تنقّل ناقص من <u>الثلاث</u> لغات</h3>
+  <p>الشريط الجانبيّ يستخدم 67 مفتاح ترجمة؛ <b>22 موجود فقط</b> و<b>45 مفقود من ar.json وen.json وfr.json معاً</b> → يعتمد على القيمة الافتراضيّة الـinline.</p>
+  <div class="finding f-blue" style="margin:10px 0">
+    <b>تصحيح مهمّ لتحليل الوكيل:</b> القيم الافتراضيّة (<code>def:</code>) <b>عربيّة</b> (مثل «سجلّ الأماكن»، «استثناءات النقد»). لذلك:
+    <ul>
+      <li>المستخدم <b class="ok">العربيّ يرى عربيّاً سليماً</b> (لا مشكلة فعليّة له).</li>
+      <li>المتضرّر فعلاً مستخدمو <b class="warn">الإنجليزيّة/الفرنسيّة</b>: يرون 9 عناوين أقسام + ~36 تسمية عنصر <b>بالعربيّة</b> رغم اختيارهم لغةً أخرى → شريط جانبيّ مختلط غير احترافيّ.</li>
+    </ul>
+  </div>
+  <p class="muted">أمثلة من الـ45 المفقودة: <code>ops.section.*</code> (9 أقسام) · ops.places · ops.cash_exceptions · ops.conversations · ops.master_catalog · ops.driver_settlements · ops.fraud_review · ops.cp_drivers · ops.feature_toggles · ops.geographic_regions … </p>
+  <p><b>التوصية:</b> إضافة الـ45 مفتاحاً إلى ar/en/fr (الترجمة العربيّة جاهزة من <code>def:</code>؛ يلزم فقط نقلها للملفّ + ترجمة en/fr). مجهود محدود، أثر احترافيّ مباشر.</p>
+</div>
+
+<!-- ============ تحسينات ============ -->
+<h2>ثالثاً: لمسات احترافيّة (P3) 🟦</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>الملاحظة</th><th>التوصية</th></tr>
+    <tr><td>1</td><td>وسم «العرض فقط» غير موحّد: Complaints/DispatchOffers/CashCollections موسومة «(عرض)»؛ Wallets بشارة inline؛ Drivers/Providers بلا وسم.</td><td>نمط وسم واحد في العنوان لكلّ صفحة قراءة-فقط.</td></tr>
+    <tr><td>2</td><td>صفحات ماليّة قراءة-فقط (<code>OpsChartOfAccounts</code>, <code>OpsLedgerExplorer</code>) غير موسومة → المُشغّل قد يبحث عن زرّ تعديل غير موجود.</td><td>أضف وسم «(عرض)» لها.</td></tr>
+    <tr><td>3</td><td>عمق التنقّل: 27 صفحة (12 مالية + 15 CP) لا تظهر في الشريط — تُكتشف فقط بدخول الحاضنة.</td><td>قائمة فرعيّة قابلة للطيّ تحت «المالية» و«CP» لإبراز refunds/settlements/tax… مباشرةً.</td></tr>
+    <tr><td>4</td><td>صفحات نقد/تسوية السائق مبعثرة على <code>/ops/driver-*</code> بدل تجميعها.</td><td>(تجميليّ) توحيد تحت <code>/ops/drivers/*</code> + قسم تنقّل واحد.</td></tr>
+    <tr><td>5</td><td>بطاقات الحاضنات (ControlPanelLanding/OpsFinanceDashboard) غير مُرشَّحة بـ<code>canAccessOpsPath</code> (حارس المسار هو الضامن).</td><td>منخفض: ترشيح البطاقات بالدور لاتّساق التجربة.</td></tr>
+    <tr><td>6</td><td><code>OpsMaintenanceMode</code> رسالة افتراضيّة عربيّة مُضمَّنة بدل i18n.</td><td>منخفض جدّاً: نقلها لمفتاح ترجمة.</td></tr>
+  </table>
+</div>
+
+<!-- ============ خريطة التكرار ============ -->
+<h2>رابعاً: خريطة أزواج التكرار (مرجع)</h2>
+<div class="card">
+  <table>
+    <tr><th>المجال</th><th>صفحة CP (قراءة)</th><th>صفحة Ops (فعل)</th><th>الحكم</th></tr>
+    <tr><td>الشكاوى</td><td>ControlPanelComplaints «(عرض)»</td><td>OpsComplaints</td><td><span class="tag t-clean">فصل نظيف</span></td></tr>
+    <tr><td>عروض التوزيع</td><td>ControlPanelDispatchOffers «(عرض)»</td><td>OpsDispatchOffer</td><td><span class="tag t-clean">فصل نظيف</span></td></tr>
+    <tr><td>النقد</td><td>ControlPanelCashCollections «(عرض)»</td><td>OpsCashExceptions</td><td><span class="tag t-clean">كيانان مختلفان</span></td></tr>
+    <tr><td>المحافظ</td><td>ControlPanelWallets (بشارة inline)</td><td>OpsWalletCredit</td><td><span class="tag t-part">نظيف جزئيّاً</span></td></tr>
+    <tr><td>السائقون</td><td>ControlPanelDrivers <b>(يكتب!)</b></td><td>OpsDriverControls + OpsDriverCashLimit</td><td><span class="tag t-conf">تعارض</span></td></tr>
+    <tr><td>المزوّدون</td><td>ControlPanelProviders <b>(يكتب!)</b></td><td>OpsOnboarding</td><td><span class="tag t-dup">تكرار كتابة</span></td></tr>
+    <tr><td>سجلّ الأستاذ</td><td>— (حُذف 397)</td><td>OpsLedgerExplorer (<code>/cp/ledger</code>→redirect)</td><td><span class="tag t-clean">مُحلّ</span></td></tr>
+  </table>
+  <p class="muted">صفحات المالية الستّ (Dashboard/Reports/Ledger/COA/Reconciliation/…) لكلٍّ غرض متمايز — <b>لا تكرار</b>. صفحات السائق التشغيليّة (Controls/Emergencies/Settlements/Payout/CashLimit/Fleet) متمايزة الأغراض — التكرار الوحيد هو زوج CP أعلاه.</p>
+</div>
+
+<!-- ============ الأولويّات ============ -->
+<h2>خامساً: خطّة العمل المقترحة (تنتظر إذنك)</h2>
+<div class="card">
+  <ol>
+    <li><span class="sev sev-p1">P1</span> حسم تكرار <code>ControlPanelDrivers/Providers</code> (قراءة-فقط + وسم، أو توحيد نقطة الكتابة). <span class="muted">— يزيل التعارض الوحيد الحقيقيّ.</span></li>
+    <li><span class="sev sev-p2">P2</span> إضافة 45 مفتاح ترجمة لـ ar/en/fr. <span class="muted">— أثر احترافيّ مباشر لمستخدمي en/fr.</span></li>
+    <li><span class="sev sev-p3">P3</span> توحيد وسم «العرض فقط» + قائمة فرعيّة للمالية/CP + تجميع صفحات السائق. <span class="muted">— تلميع.</span></li>
+  </ol>
+  <p class="muted">كلّ ما سبق <b>واجهة فقط</b> (لا خلفيّة، لا migration، لا مساس بـFIN-COR). أستطيع التنفيذ بالتسلسل فور إذنك.</p>
+</div>
+
+<div class="foot">
+  فحص قراءة-فقط · بلا أي تعديل على الكود · كلّ نتيجة مُتحقَّق منها مباشرةً من المصدر.<br>
+  تووا / Toowa — لوحة التحكم والعمليات (OPS) · 2026-06-01
+</div>
+
+</div>
+</body>
+</html>

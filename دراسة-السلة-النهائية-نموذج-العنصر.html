@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تووا — دراسة السلة النهائية (نموذج العنصر)</title>
+<style>
+  :root{--green:#1b7f4b;--green-d:#0f5c34;--green-l:#e7f5ee;--amber:#b97400;--amber-l:#fff4e0;
+    --red:#b4232a;--red-l:#fde7e8;--blue:#1f5fa8;--blue-l:#e8f1fb;--purple:#6b3fa0;--purple-l:#f0e9fa;
+    --teal:#0e7490;--teal-l:#e0f2fe;--ink:#1f2430;--muted:#5d6677;--line:#e2e6ec;--bg:#f6f8fa;--card:#fff;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Tahoma","Noto Sans Arabic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.8;font-size:15.5px}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 18px 90px}
+  header.hero{background:linear-gradient(135deg,#08401f,#0e7490);color:#fff;border-radius:18px;padding:34px 30px;box-shadow:0 10px 30px rgba(14,116,144,.25)}
+  header.hero h1{margin:0 0 6px;font-size:28px}header.hero p{margin:4px 0;opacity:.96}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:3px 12px;border-radius:999px;font-size:13px;margin-top:8px;margin-left:6px}
+  h2.section{font-size:24px;margin:48px 0 6px;padding-bottom:8px;border-bottom:3px solid var(--teal);display:flex;align-items:center;gap:10px}
+  h3{font-size:19px;margin:28px 0 8px;color:var(--green-d)}
+  h4{font-size:16px;margin:18px 0 6px;background:var(--green-l);display:inline-block;padding:3px 12px;border-radius:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+  .num{background:#fff;color:var(--teal);width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--teal)}
+  .badge{display:inline-block;padding:2px 9px;border-radius:8px;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .b-ok{background:var(--green-l);color:var(--green-d)}.b-part{background:var(--amber-l);color:var(--amber)}
+  .b-miss{background:var(--red-l);color:var(--red)}.b-new{background:var(--purple-l);color:var(--purple)}.b-mod{background:var(--amber-l);color:var(--amber)}.b-tech{background:var(--teal-l);color:var(--teal)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafbfc}
+  td.id{font-weight:800;color:var(--purple);white-space:nowrap;direction:ltr;text-align:center}
+  code{background:#eef1f4;border:1px solid #e0e4e9;border-radius:5px;padding:0 5px;font-family:"Consolas",monospace;font-size:12.5px;direction:ltr;display:inline-block}
+  .codeblock{background:#1f2430;color:#e6e9ef;border-radius:10px;padding:12px 14px;overflow-x:auto;direction:ltr;text-align:left;font-family:"Consolas",monospace;font-size:12px;line-height:1.55;margin:10px 0}
+  .codeblock .c{color:#7f8aa3}.codeblock .g{color:#7fd1b9}.codeblock .r{color:#ff9a9a}.codeblock .y{color:#f0c674}
+  .note{border-right:5px solid var(--green);background:var(--green-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .warn{border-right:5px solid var(--amber);background:var(--amber-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .danger{border-right:5px solid var(--red);background:var(--red-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .tip{border-right:5px solid var(--blue);background:var(--blue-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .tech{border-right:5px solid var(--teal);background:var(--teal-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .sim{border:1px solid var(--line);border-right:5px solid var(--teal);border-radius:10px;padding:14px 16px;margin:14px 0;background:#fff}
+  .sim .ttl{font-weight:800;color:var(--teal);margin-bottom:6px;font-size:16px}
+  ul.clean{padding-right:22px;margin:8px 0}ul.clean li{margin:5px 0}
+  ol.steps{padding-right:22px}ol.steps li{margin:6px 0}
+  .fileref{font-size:12px;color:var(--muted);direction:ltr;display:inline-block;text-align:left}
+  .toc{columns:3;column-gap:26px;font-size:14px}.toc a{color:var(--green-d);text-decoration:none}
+  .diagram{background:#fff;border:1px dashed var(--teal);border-radius:14px;padding:14px;margin:18px 0;text-align:center}
+  .diagram svg{max-width:100%;height:auto}.cap{font-size:13px;color:var(--muted);margin-top:6px}
+  .legend span{margin-left:12px}.foot{margin-top:50px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:14px}
+  a.src{color:var(--blue);font-size:13px}
+  .grp{background:var(--teal);color:#fff;padding:6px 14px;border-radius:9px;font-weight:800;margin:26px 0 4px;font-size:15.5px}
+  .cnt{background:#fff;color:var(--teal);border-radius:6px;padding:0 8px;font-size:13px;margin-right:8px}
+  @media(max-width:900px){.toc{columns:2}}@media(max-width:600px){.toc{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>دراسة السلة النهائية — «نموذج العنصر»</h1>
+  <p>الخطة معتمدة، مع التعديل الجوهري الذي طلبته: <b>داخلياً نتعامل مع كل عنصر (item) كوحدة مستقلّة</b> — بسعره وحالته واسترجاعه — بغضّ النظر عن المزوّد. هذا يبسّط الاسترجاع وكل شيء.</p>
+  <p>تتضمّن: التصميم ثلاثي الطبقات · محاكاة ذهنية دقيقة · مكتبة سيناريوهات موسّعة على مستوى العنصر · أحدث التقنيات العالمية.</p>
+  <p class="pill">التاريخ: 2026-06-30</p>
+  <p class="pill">دراسة وتصميم — لم يُكتب كود</p>
+  <p class="pill">مبنيّ على واقع الكود</p>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:6px">ما الذي تغيّر عن الخطة السابقة؟ (التعديل الجوهري)</h3>
+  <p>في الخطة السابقة كانت <b>وحدة المعالجة الداخلية = المتجر (طلب-ابن)</b>. الآن — بناءً على توجيهك — تصبح <b>وحدة المعالجة الداخلية = العنصر (line item)</b>. المتجر يبقى موجوداً، لكن فقط كـ<b>تجميع للتحضير والتسوية والتوصيل</b>، أمّا <b>مصدر الحقيقة للسعر والحالة والاسترجاع فهو العنصر</b>. هذا تماماً نموذج Shopify/Amazon الحديث (سطر الطلب هو الذرّة).</p>
+  <div class="note"><b>المفاجأة السارّة من الكود:</b> العنصر <code>OrderItem</code> <b>أصلاً</b> يحمل سعره (<code>unit_price_minor</code> + <code>line_total_minor</code>) ولقطة الإضافات (<code>selected_modifiers</code>) و<b>حقل حالة <code>status</code></b> (افتراضي CONFIRMED). فالأساس موجود — والناقص هو: (١) دورة حياة فعّالة للعنصر، (٢) استرجاع على مستوى العنصر (جدول <code>refunds</code> اليوم بلا <code>order_item_id</code>). <span class="fileref">models/order.py · OrderItem</span></div>
+  <p class="legend">
+    <span class="badge b-ok">✅ موجود</span><span class="badge b-part">🟡 جزئي</span>
+    <span class="badge b-miss">🔴 فجوة</span><span class="badge b-new">🟣 سنضيفه</span><span class="badge b-tech">🌐 تقنية حديثة</span>
+  </p>
+  <h4>الفهرس</h4>
+  <div class="toc">
+    <a href="#simple">• اشرحها لي ببساطة (لأي شخص)</a><br>
+    <a href="#layers">• النموذج ثلاثي الطبقات</a><br>
+    <a href="#why">• لماذا «العنصر»؟ (الفوائد)</a><br>
+    <a href="#item">• العنصر: سعر · حالة · استرجاع</a><br>
+    <a href="#lifecycle">• دورة حياة العنصر</a><br>
+    <a href="#group">• تجميع المتجر (مشتقّ)</a><br>
+    <a href="#pay">• الدفعة الواحدة → العناصر</a><br>
+    <a href="#refund">• الاسترجاع على مستوى العنصر</a><br>
+    <a href="#saga">• الفشل الجزئي (تعويض)</a><br>
+    <a href="#model">• نموذج البيانات + الـAPI</a><br>
+    <a href="#sim">• محاكاة ذهنية دقيقة</a><br>
+    <a href="#lib">• مكتبة السيناريوهات الموسّعة</a><br>
+    <a href="#tech">• أحدث التقنيات والأفكار</a><br>
+    <a href="#decisions">• قرارات تحتاج حسماً</a><br>
+    <a href="#qa">• أسئلة وأجوبة</a><br>
+    <a href="#phases">• الخطة المرحلية المنقّحة</a><br>
+    <a href="#nottouch">• ما لن نلمسه</a><br>
+    <a href="#sources">• المنهجية والمصادر</a>
+  </div>
+</div>
+
+<!-- ============ SIMPLE EXPLAIN ============ -->
+<h2 class="section" id="simple"><span class="num">٠</span> اشرحها لي ببساطة (لأي شخص)</h2>
+<div class="card">
+  <p><b>تخيّل «كيس تسوّق» واحداً</b> تضع فيه ما تريد من عدّة محلّات (مطعم، سوق، صيدلية). على كل غرض داخل الكيس <b>بطاقة سعر</b> خاصّة به و<b>قسيمة إرجاع</b> خاصّة به. أنت <b>تدفع مرّة واحدة</b> عند الباب ثمن الكيس كلّه. وخلف الكواليس، المنصّة تُرتّب الأغراض حسب محلّها (لتُخبر كل محلّ بتجهيز أغراضه ولتدفع لكل محلّ نصيبه)، وترسل مندوب توصيل (واحداً إن كانت المحلّات قريبة، أو أكثر إن كانت بعيدة). وإذا أردتَ <b>إرجاع غرضٍ واحد</b>، تنزع <b>قسيمته وحده</b> — وبقيّة الكيس لا تتأثّر.</p>
+  <p>هذا هو «نموذج العنصر»: <b>الغرض (العنصر) هو الوحدة</b> التي نتعامل معها داخلياً — له سعره وحالته وإرجاعه — بغضّ النظر عن المحلّ. هذا يجعل الإرجاع والمحاسبة وكل شيء أبسط وأدقّ.</p>
+</div>
+<div class="diagram">
+<svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="13">
+  <!-- bag -->
+  <path d="M170 70 h220 l20 150 h-260 z" fill="#e0f2fe" stroke="#0e7490" stroke-width="2"/>
+  <rect x="225" y="50" width="110" height="26" rx="13" fill="none" stroke="#0e7490" stroke-width="2"/>
+  <text x="280" y="44" text-anchor="middle" font-weight="700" fill="#0e7490">🛍️ كيس واحد (سلّة)</text>
+  <!-- item tags inside -->
+  <rect x="195" y="95" width="80" height="30" rx="6" fill="#fff" stroke="#1b7f4b"/><text x="235" y="115" text-anchor="middle" font-size="11">🍔 سعره</text>
+  <rect x="285" y="95" width="80" height="30" rx="6" fill="#fff" stroke="#1b7f4b"/><text x="325" y="115" text-anchor="middle" font-size="11">🥤 سعره</text>
+  <rect x="195" y="135" width="80" height="30" rx="6" fill="#fff" stroke="#1f5fa8"/><text x="235" y="155" text-anchor="middle" font-size="11">🍚 سعره</text>
+  <rect x="285" y="135" width="80" height="30" rx="6" fill="#fff" stroke="#6b3fa0"/><text x="325" y="155" text-anchor="middle" font-size="11">💊 سعره</text>
+  <text x="280" y="200" text-anchor="middle" font-size="11" fill="#0e7490">كل غرض ببطاقته الخاصّة</text>
+  <!-- one payment -->
+  <line x1="410" y1="140" x2="470" y2="140" stroke="#0e7490" stroke-width="2" marker-end="url(#s1)"/>
+  <rect x="470" y="118" width="170" height="44" rx="9" fill="#0e7490"/><text x="555" y="145" text-anchor="middle" fill="#fff" font-weight="700">💳 تدفع مرّة واحدة</text>
+  <!-- return one -->
+  <line x1="555" y1="162" x2="555" y2="186" stroke="#b4232a" stroke-width="2" marker-end="url(#s2)"/>
+  <rect x="455" y="188" width="200" height="40" rx="9" fill="#fde7e8" stroke="#b4232a"/><text x="555" y="207" text-anchor="middle" font-size="12">↩️ ترجِع غرضاً واحداً فقط</text><text x="555" y="223" text-anchor="middle" font-size="11">والباقي كما هو</text>
+  <!-- delivery -->
+  <rect x="690" y="70" width="190" height="120" rx="10" fill="#f0e9fa" stroke="#6b3fa0"/>
+  <text x="785" y="95" text-anchor="middle" font-weight="700" fill="#6b3fa0">🛵 التوصيل</text>
+  <text x="785" y="122" text-anchor="middle" font-size="12">محلّات قريبة → مندوب واحد</text>
+  <text x="785" y="148" text-anchor="middle" font-size="12">محلّات بعيدة → عدّة مناديب</text>
+  <text x="785" y="174" text-anchor="middle" font-size="11" fill="#5d6677">المنصّة تقرّر تلقائياً</text>
+  <defs>
+    <marker id="s1" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#0e7490"/></marker>
+    <marker id="s2" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#b4232a"/></marker>
+  </defs>
+</svg>
+<div class="cap">شكل توضيحي مبسّط: كيس واحد فيه أغراض من عدّة محلّات · بطاقة سعر لكل غرض · دفعة واحدة · إرجاع غرض واحد دون الباقي · توصيل بمندوب واحد أو أكثر.</div>
+</div>
+
+<!-- ============ LAYERS ============ -->
+<h2 class="section" id="layers"><span class="num">١</span> النموذج ثلاثي الطبقات (قلب التصميم)</h2>
+<div class="tip"><b>ببساطة:</b> ثلاث طبقات = (١) <b>الكيس</b> الذي تدفع له مرّة واحدة، (٢) <b>فرز الأغراض حسب المحلّ</b> ليُحضّر كلٌّ أغراضه ويُدفَع له، (٣) <b>كل غرض</b> هو الأساس الذي نحفظ عنده السعر والحالة والإرجاع.</div>
+<div class="diagram">
+<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="12.5">
+  <!-- layer 1 group -->
+  <rect x="250" y="16" width="400" height="44" rx="10" fill="#0e7490"/><text x="450" y="38" text-anchor="middle" fill="#fff" font-weight="700">الطبقة ١ — السلة / الدفعة الواحدة (Order Group)</text><text x="450" y="54" text-anchor="middle" fill="#cdeffb" font-size="11">دفعة واحدة + idempotency + حالة مجمّعة</text>
+  <line x1="450" y1="60" x2="450" y2="80" stroke="#0e7490" marker-end="url(#t)"/>
+  <!-- layer 3 items (source of truth) drawn as the core -->
+  <rect x="60" y="86" width="780" height="120" rx="12" fill="#e0f2fe" stroke="#0e7490" stroke-width="2"/>
+  <text x="450" y="106" text-anchor="middle" font-weight="800" fill="#0e7490">الطبقة ٣ (الأساس) — العناصر: مصدر الحقيقة للسعر/الحالة/الاسترجاع</text>
+  <g font-size="11.5">
+    <rect x="80" y="118" width="150" height="76" rx="8" fill="#fff" stroke="#0e7490"/><text x="155" y="138" text-anchor="middle">🍔 عنصر #1</text><text x="155" y="156" text-anchor="middle">سعر · حالة · استرجاع</text><text x="155" y="174" text-anchor="middle" fill="#5d6677">(مطعم)</text>
+    <rect x="250" y="118" width="150" height="76" rx="8" fill="#fff" stroke="#0e7490"/><text x="325" y="138" text-anchor="middle">🥤 عنصر #2</text><text x="325" y="156" text-anchor="middle">سعر · حالة · استرجاع</text><text x="325" y="174" text-anchor="middle" fill="#5d6677">(مطعم)</text>
+    <rect x="420" y="118" width="150" height="76" rx="8" fill="#fff" stroke="#0e7490"/><text x="495" y="138" text-anchor="middle">🍚 عنصر #3</text><text x="495" y="156" text-anchor="middle">سعر · حالة · استرجاع</text><text x="495" y="174" text-anchor="middle" fill="#5d6677">(سوق)</text>
+    <rect x="590" y="118" width="150" height="76" rx="8" fill="#fff" stroke="#0e7490"/><text x="665" y="138" text-anchor="middle">💊 عنصر #4</text><text x="665" y="156" text-anchor="middle">سعر · حالة · استرجاع</text><text x="665" y="174" text-anchor="middle" fill="#5d6677">(صيدلية)</text>
+  </g>
+  <!-- layer 2 fulfillment groups -->
+  <text x="450" y="226" text-anchor="middle" font-weight="700" fill="#6b3fa0">الطبقة ٢ — تجميع التحضير/التسوية/التوصيل لكل مزوّد (مشتقّ من العناصر)</text>
+  <rect x="120" y="238" width="230" height="56" rx="9" fill="#f0e9fa" stroke="#6b3fa0"/><text x="235" y="260" text-anchor="middle">🍽️ مجموعة المطعم = [#1,#2]</text><text x="235" y="280" text-anchor="middle" font-size="11">تحضير · عمولة · سائق</text>
+  <rect x="370" y="238" width="160" height="56" rx="9" fill="#f0e9fa" stroke="#6b3fa0"/><text x="450" y="260" text-anchor="middle">🛒 السوق = [#3]</text>
+  <rect x="550" y="238" width="180" height="56" rx="9" fill="#f0e9fa" stroke="#6b3fa0"/><text x="640" y="260" text-anchor="middle">💊 الصيدلية = [#4]</text>
+  <text x="450" y="320" text-anchor="middle" fill="#5d6677" font-size="12">المزوّد يرى عناصره فقط · التسوية بعناصره · السائق يلتقط عناصره — لكن الذرّة تبقى العنصر</text>
+  <defs><marker id="t" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#0e7490"/></marker></defs>
+</svg>
+<div class="cap">شكل ١: ثلاث طبقات — السلة (دفعة واحدة) فوق، العناصر (الذرّة: سعر/حالة/استرجاع) أساساً، وتجميع المزوّد طبقةً وسطى مشتقّة للتحضير والتسوية والتوصيل.</div>
+</div>
+<table>
+  <thead><tr><th>الطبقة</th><th>الوحدة</th><th>المسؤولية</th><th>المصدر في الكود</th></tr></thead>
+  <tbody>
+    <tr><td><b>١ — السلة (Group)</b></td><td>الدفعة</td><td>دفعة واحدة · idempotency · حالة مجمّعة للعرض</td><td><span class="badge b-new">🟣 جديد</span> <code>order_groups</code></td></tr>
+    <tr><td><b>٢ — تجميع المزوّد</b></td><td>المتجر</td><td>تحضير · عمولة/تسوية · التقاط السائق</td><td><span class="badge b-mod">🟠</span> مشتقّ بـ<code>group_id</code> + <code>provider_id</code></td></tr>
+    <tr><td><b>٣ — العنصر (الأساس)</b></td><td>العنصر</td><td><b>السعر · الحالة · الاسترجاع · العمولة المنسوبة</b></td><td><span class="badge b-ok">✅ موجود</span> <code>OrderItem</code> (سعر+حالة)</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ WHY ============ -->
+<h2 class="section" id="why"><span class="num">٢</span> لماذا «العنصر» وحدةً داخلية؟</h2>
+<ul class="clean">
+  <li><b>استرجاع دقيق:</b> أرجِع صنفاً واحداً (نفد/تالف/مرفوض) دون المساس بالباقي — والعمولة تُعاد حسابها لذلك العنصر فقط.</li>
+  <li><b>حالات مختلطة طبيعية:</b> عنصر سُلِّم · عنصر استُبدِل · عنصر نفد · عنصر أُلغي — كلّها داخل سلة واحدة بلا تعقيد.</li>
+  <li><b>تسوية عادلة:</b> المزوّد يُحاسَب على عناصره المُسلَّمة فعلاً، لا على ما نفد أو أُرجِع.</li>
+  <li><b>محاسبة قابلة للتدقيق:</b> كل حركة مالية (حجز/التزام/استرجاع/عمولة) منسوبة لعنصر → دفتر أستاذ نظيف على مستوى السطر (item ledger).</li>
+  <li><b>يطابق المعيار العالمي:</b> Shopify/Amazon: الطلب = سطور؛ الاسترجاع لكل سطر؛ عمولة البائع تُعاد حسابها على المُرجَع فقط بينما يبقى الآخرون كما هم.</li>
+</ul>
+
+<!-- ============ ITEM ============ -->
+<h2 class="section" id="item"><span class="num">٣</span> العنصر: سعر · حالة · استرجاع (ما هو موجود وما نضيفه)</h2>
+<div class="tip"><b>ببساطة:</b> كل غرض في الكيس يحمل ٣ أشياء: <b>كم ثمنه</b>، و<b>أين وصل</b> (قيد التحضير/سُلّم/أُلغي…)، و<b>هل يمكن إرجاعه</b>. الكود يحفظ الثمن والحالة أصلاً؛ ننقصنا «الإرجاع لكل غرض» فنضيفه.</div>
+<table>
+  <thead><tr><th>الخاصّية</th><th>الحالة</th><th>التفصيل</th></tr></thead>
+  <tbody>
+    <tr><td>سعر العنصر</td><td><span class="badge b-ok">✅</span></td><td><code>unit_price_minor</code> × <code>qty</code> + الإضافات (<code>selected_modifiers</code>) = <code>line_total_minor</code> — محسوب أصلاً لكل سطر.</td></tr>
+    <tr><td>حالة العنصر</td><td><span class="badge b-part">🟡</span></td><td><code>OrderItem.status</code> موجود (CONFIRMED) لكنه غير مُفعَّل كآلة حالات — <b>نُفعّله</b>.</td></tr>
+    <tr><td>إضافات/تخصيص</td><td><span class="badge b-ok">✅</span></td><td><code>selected_modifiers</code> + <code>customizations_snapshot</code> مُجمّدة وقت الطلب.</td></tr>
+    <tr><td>نفاد/بديل العنصر</td><td><span class="badge b-part">🟡</span></td><td>إبلاغ النفاد + عرض بديل موجودان (من جهة المزوّد) — نربطهما بحالة العنصر.</td></tr>
+    <tr><td>استرجاع العنصر</td><td><span class="badge b-miss">🔴</span></td><td>الاسترجاع اليوم على مستوى الطلب (<code>refunds.order_id</code> بلا <code>order_item_id</code>) — <b>نضيف الحبيبية على مستوى العنصر</b>.</td></tr>
+    <tr><td>العمولة المنسوبة للعنصر</td><td><span class="badge b-new">🟣</span></td><td>حساب حصّة العنصر من العمولة لإعادة حسابها عند استرجاعه (إعادة استخدام منطق العمولة الحالي على أساس العنصر).</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ LIFECYCLE ============ -->
+<h2 class="section" id="lifecycle"><span class="num">٤</span> دورة حياة العنصر (آلة حالات)</h2>
+<div class="tip"><b>ببساطة:</b> رحلة الغرض من «مؤكَّد» إلى «سُلّم»، وقد يتفرّع إلى «نفد» أو «بديل» أو «أُلغي» أو «استُرجِع». كل خطوة تحرّك <b>مال هذا الغرض وحده</b> (تُحجَز/تُلتزَم/تُحرَّر/تُسترجَع قيمته).</div>
+<div class="diagram">
+<svg viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="12">
+  <rect x="30" y="100" width="110" height="44" rx="9" fill="#e0f2fe" stroke="#0e7490"/><text x="85" y="120" text-anchor="middle">مؤكَّد</text><text x="85" y="136" text-anchor="middle" font-size="10">CONFIRMED</text>
+  <line x1="140" y1="122" x2="190" y2="122" stroke="#1b7f4b" marker-end="url(#g)"/>
+  <rect x="190" y="100" width="110" height="44" rx="9" fill="#e7f5ee" stroke="#1b7f4b"/><text x="245" y="120" text-anchor="middle">قيد التحضير</text><text x="245" y="136" text-anchor="middle" font-size="10">PREPARING</text>
+  <line x1="300" y1="122" x2="350" y2="122" stroke="#1b7f4b" marker-end="url(#g)"/>
+  <rect x="350" y="100" width="110" height="44" rx="9" fill="#e7f5ee" stroke="#1b7f4b"/><text x="405" y="120" text-anchor="middle">جاهز/التُقِط</text><text x="405" y="136" text-anchor="middle" font-size="10">READY/PICKED</text>
+  <line x1="460" y1="122" x2="510" y2="122" stroke="#1b7f4b" marker-end="url(#g)"/>
+  <rect x="510" y="100" width="110" height="44" rx="9" fill="#1b7f4b"/><text x="565" y="120" text-anchor="middle" fill="#fff">سُلِّم</text><text x="565" y="136" text-anchor="middle" fill="#d6f0e2" font-size="10">DELIVERED</text>
+  <line x1="620" y1="122" x2="670" y2="122" stroke="#1f5fa8" marker-end="url(#b)"/>
+  <rect x="670" y="100" width="120" height="44" rx="9" fill="#e8f1fb" stroke="#1f5fa8"/><text x="730" y="120" text-anchor="middle">استُرجِع (لاحقاً)</text><text x="730" y="136" text-anchor="middle" font-size="10">REFUNDED</text>
+  <!-- branches -->
+  <line x1="245" y1="100" x2="245" y2="60" stroke="#b97400" marker-end="url(#a)"/><rect x="180" y="26" width="130" height="34" rx="8" fill="#fff4e0" stroke="#b97400"/><text x="245" y="48" text-anchor="middle" font-size="11">نفد → UNAVAILABLE</text>
+  <line x1="310" y1="43" x2="360" y2="43" stroke="#6b3fa0" marker-end="url(#p)"/><rect x="360" y="26" width="140" height="34" rx="8" fill="#f0e9fa" stroke="#6b3fa0"/><text x="430" y="48" text-anchor="middle" font-size="11">بديل → SUBSTITUTED</text>
+  <line x1="245" y1="144" x2="245" y2="188" stroke="#b4232a" marker-end="url(#r)"/><rect x="150" y="190" width="190" height="34" rx="8" fill="#fde7e8" stroke="#b4232a"/><text x="245" y="212" text-anchor="middle" font-size="11">أُلغي قبل التحضير → CANCELLED</text>
+  <text x="565" y="180" text-anchor="middle" font-size="11" fill="#5d6677">كل انتقال يحرّك المال المنسوب لهذا العنصر فقط (حجز/التزام/تحرير/استرجاع)</text>
+  <defs>
+    <marker id="g" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#1b7f4b"/></marker>
+    <marker id="b" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#1f5fa8"/></marker>
+    <marker id="a" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b97400"/></marker>
+    <marker id="p" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6b3fa0"/></marker>
+    <marker id="r" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b4232a"/></marker>
+  </defs>
+</svg>
+<div class="cap">شكل ٢: آلة حالات العنصر — كل انتقال يحرّك فقط المال المنسوب لذلك العنصر. الحالات المختلطة (سُلِّم/نفد/استُبدِل/استُرجِع) تتعايش في سلة واحدة.</div>
+</div>
+
+<!-- ============ GROUP ============ -->
+<h2 class="section" id="group"><span class="num">٥</span> تجميع المزوّد = مشتقّ من العناصر (لا يكسر شيئاً)</h2>
+<p>المزوّد لا يزال يرى «طلبه» ويحضّره ويُسوَّى عليه ويلتقطه السائق — لكن «طلب المزوّد» الآن = <b>مجموعة عناصر هذا المزوّد داخل السلة</b>. هذا يحافظ على كل منطق المزوّد الحالي (الطابور/التحضير/الجاهزية/الالتقاط/التسوية/العمولة) بينما الذرّة المالية تبقى العنصر.</p>
+<div class="tech"><b>🌐 Order Orchestration / Split Routing (المعيار الحديث):</b> الطلب متعدّد البائعين يُقسَّم إلى مجموعات لكل بائع، كلٌّ يُوجَّه ويُتتبَّع مستقلاً، مع <b>توحيد تواصل العميل</b> (متابعة واحدة). هذا بالضبط ما تفعله الطبقتان ١ (عرض موحّد) و٢ (تجميع المزوّد).</div>
+
+<!-- ============ PAY ============ -->
+<h2 class="section" id="pay"><span class="num">٦</span> الدفعة الواحدة → تُنسَب للعناصر</h2>
+<div class="tip"><b>ببساطة:</b> تدفع ثمن الكيس مرّة واحدة، ثم النظام «يوزّع» المبلغ على الأغراض بحسب أسعارها — فما دُفع من المحفظة يُحجَز لكل غرض، وما هو نقد يُحصَّل عند بابه. هكذا يصبح إرجاع غرضٍ = إرجاع <b>حصّته</b> بدقّة.</div>
+<div class="diagram">
+<svg viewBox="0 0 900 180" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="12">
+  <rect x="350" y="20" width="200" height="40" rx="9" fill="#0e7490"/><text x="450" y="44" text-anchor="middle" fill="#fff" font-weight="700">💳 دفعة واحدة (إجمالي السلة)</text>
+  <line x1="450" y1="60" x2="450" y2="80" stroke="#0e7490" marker-end="url(#t2)"/>
+  <text x="450" y="96" text-anchor="middle" font-size="11.5" fill="#0e7490">تُنسَب حصّة كل عنصر (سعره) — محفظة تُحجَز / نقد يُحصَّل عند الوقفة</text>
+  <g font-size="11">
+    <rect x="90" y="108" width="150" height="50" rx="8" fill="#e7f5ee" stroke="#1b7f4b"/><text x="165" y="128" text-anchor="middle">#1 محفظة (محجوز)</text><text x="165" y="146" text-anchor="middle" fill="#5d6677">حصّته من الحجز</text>
+    <rect x="260" y="108" width="150" height="50" rx="8" fill="#e7f5ee" stroke="#1b7f4b"/><text x="335" y="128" text-anchor="middle">#2 محفظة (محجوز)</text>
+    <rect x="430" y="108" width="150" height="50" rx="8" fill="#fff4e0" stroke="#b97400"/><text x="505" y="128" text-anchor="middle">#3 نقد عند الوقفة</text>
+    <rect x="600" y="108" width="170" height="50" rx="8" fill="#fff4e0" stroke="#b97400"/><text x="685" y="128" text-anchor="middle">#4 نقد عند الوقفة</text>
+  </g>
+  <defs><marker id="t2" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#0e7490"/></marker></defs>
+</svg>
+<div class="cap">شكل ٣: الدفعة الواحدة تُنسَب لكل عنصر بسعره — فيصبح الاسترجاع/التحرير لكل عنصر دقيقاً ومباشراً.</div>
+</div>
+<div class="tech"><b>🌐 Idempotent Ledger + Idempotency Key:</b> مفتاح idempotency على مستوى السلة (الأب) يضمن عدم ازدواج الدفعة؛ وكل قيد دفتر منسوب لعنصر يحمل مرجعاً فريداً (<code>order_item_id</code>) فلا يتكرّر الاسترجاع. (نُعيد استخدام idempotency + الدفتر الموجودَين.)</div>
+
+<!-- ============ REFUND ============ -->
+<h2 class="section" id="refund"><span class="num">٧</span> الاسترجاع على مستوى العنصر (+ إعادة حساب العمولة)</h2>
+<div class="tip"><b>ببساطة:</b> تريد إرجاع غرض واحد؟ النظام يأخذ <b>ثمن ذلك الغرض فقط</b>، يعيده لمحفظتك، ويصحّح حساب عمولة محلّه لذلك الغرض — بقيّة الأغراض والمحلّات لا تتأثّر إطلاقاً.</div>
+<div class="diagram">
+<svg viewBox="0 0 900 160" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="12">
+  <rect x="30" y="55" width="150" height="50" rx="9" fill="#fde7e8" stroke="#b4232a"/><text x="105" y="75" text-anchor="middle">طلب استرجاع عنصر</text><text x="105" y="93" text-anchor="middle" font-size="11">#3 فقط</text>
+  <line x1="180" y1="80" x2="225" y2="80" stroke="#b4232a" marker-end="url(#r2)"/>
+  <rect x="225" y="55" width="170" height="50" rx="9" fill="#fff" stroke="#b4232a"/><text x="310" y="75" text-anchor="middle" font-size="12">مبلغ = حصّة العنصر</text><text x="310" y="93" text-anchor="middle" font-size="11">line_total (+ نصيبه من الرسم)</text>
+  <line x1="395" y1="80" x2="440" y2="80" stroke="#b4232a" marker-end="url(#r2)"/>
+  <rect x="440" y="55" width="180" height="50" rx="9" fill="#e8f1fb" stroke="#1f5fa8"/><text x="530" y="75" text-anchor="middle" font-size="12">موافقة (مزدوجة فوق حدّ)</text><text x="530" y="93" text-anchor="middle" font-size="11">refund.order_item_id</text>
+  <line x1="620" y1="80" x2="665" y2="80" stroke="#1b7f4b" marker-end="url(#g3)"/>
+  <rect x="665" y="40" width="210" height="34" rx="8" fill="#e7f5ee" stroke="#1b7f4b"/><text x="770" y="62" text-anchor="middle" font-size="11.5">إيداع محفظة العميل</text>
+  <rect x="665" y="86" width="210" height="34" rx="8" fill="#f0e9fa" stroke="#6b3fa0"/><text x="770" y="108" text-anchor="middle" font-size="11.5">عمولة المزوّد تُعاد للعنصر فقط</text>
+  <defs>
+    <marker id="r2" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b4232a"/></marker>
+    <marker id="g3" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#1b7f4b"/></marker>
+  </defs>
+</svg>
+<div class="cap">شكل ٤: استرجاع عنصر واحد — المبلغ = حصّته، إيداع المحفظة، وإعادة حساب عمولة المزوّد لذلك العنصر فقط (الباقي كما هو).</div>
+</div>
+<div class="tech"><b>🌐 Per-Vendor Commission Recalculation (المعيار الحديث للأسواق):</b> عند استرجاع جزئي، تُعدَّل أرباح <b>البائع المعنيّ فقط</b>، وتُعاد حساب عمولة المنصّة على المبلغ المُرجَع، بينما تبقى أرباح بقيّة البائعين كما هي. نموذج العنصر يجعل هذا تلقائياً.</div>
+
+<!-- ============ SAGA ============ -->
+<h2 class="section" id="saga"><span class="num">٨</span> الفشل الجزئي والتعويض (Saga)</h2>
+<div class="tip"><b>ببساطة:</b> لو تعثّر محلٌّ واحد بعد الدفع (أغلق أو نفد غرضه)، لا نلغي الكيس كلّه — بل «نصلح» الغرض المتعثّر وحده (نعيد ثمنه)، والباقي يكمل طريقه. والإصلاح آمن حتى لو تكرّر (لا يُرجِع المبلغ مرّتين).</div>
+<div class="tech"><b>🌐 Saga + تعويضات idempotent:</b> الإنشاء يتمّ في <b>معاملة قاعدة بيانات ذرّية واحدة</b> (إمّا كل العناصر+الدفعة أو لا شيء). أمّا ما يحدث <b>بعد</b> الدفع (مزوّد يرفض، عنصر ينفد) فيُعالَج بـ<b>تعويض على مستوى العنصر</b>: تحرير حجز ذلك العنصر / استرجاعه — والتعويض <b>idempotent</b> (تكراره لا يُرجِع مرّتين، يفحص أولاً). </div>
+<div class="diagram">
+<svg viewBox="0 0 900 150" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="12">
+  <rect x="30" y="55" width="150" height="44" rx="9" fill="#e0f2fe" stroke="#0e7490"/><text x="105" y="80" text-anchor="middle">دُفع · ٤ عناصر</text>
+  <line x1="180" y1="77" x2="225" y2="77" stroke="#0e7490" marker-end="url(#t3)"/>
+  <rect x="225" y="40" width="190" height="34" rx="8" fill="#e7f5ee" stroke="#1b7f4b"/><text x="320" y="62" text-anchor="middle" font-size="11.5">#1,#2,#4 مقبولة → تستمر</text>
+  <rect x="225" y="86" width="190" height="34" rx="8" fill="#fde7e8" stroke="#b4232a"/><text x="320" y="108" text-anchor="middle" font-size="11.5">#3 المزوّد رفض/نفد</text>
+  <line x1="415" y1="103" x2="460" y2="103" stroke="#b4232a" marker-end="url(#r3)"/>
+  <rect x="460" y="86" width="210" height="34" rx="8" fill="#fff4e0" stroke="#b97400"/><text x="565" y="108" text-anchor="middle" font-size="11.5">تعويض #3 فقط (تحرير/استرجاع)</text>
+  <line x1="670" y1="103" x2="715" y2="103" stroke="#1b7f4b" marker-end="url(#g4)"/>
+  <rect x="715" y="86" width="160" height="34" rx="8" fill="#e7f5ee" stroke="#1b7f4b"/><text x="795" y="108" text-anchor="middle" font-size="11.5">السلة تكتمل بالباقي</text>
+  <defs>
+    <marker id="t3" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#0e7490"/></marker>
+    <marker id="r3" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#b4232a"/></marker>
+    <marker id="g4" markerWidth="8" markerHeight="8" refX="4.5" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#1b7f4b"/></marker>
+  </defs>
+</svg>
+<div class="cap">شكل ٥: فشل جزئي — تعويض العنصر المتعثّر وحده، والسلة تكتمل بالباقي (لا «الكل أو لا شيء» بعد الدفع).</div>
+</div>
+
+<!-- ============ MODEL ============ -->
+<h2 class="section" id="model"><span class="num">٩</span> نموذج البيانات + الـAPI (منقّح لنموذج العنصر)</h2>
+<table>
+  <thead><tr><th>العنصر</th><th>النوع</th><th>التفصيل</th></tr></thead>
+  <tbody>
+    <tr><td><code>order_groups</code></td><td><span class="badge b-new">🟣</span></td><td>الطبقة ١: الدفعة الواحدة + idempotency + حالة مجمّعة.</td></tr>
+    <tr><td><code>orders.group_id</code></td><td><span class="badge b-mod">🟠</span></td><td>ربط تجميع المزوّد بالأب (null = طلب مفرد كاليوم).</td></tr>
+    <tr><td><code>OrderItem.status</code> (آلة حالات)</td><td><span class="badge b-mod">🟠</span></td><td>تفعيل: CONFIRMED→PREPARING→READY→DELIVERED · UNAVAILABLE · SUBSTITUTED · CANCELLED · REFUNDED.</td></tr>
+    <tr><td><code>refunds.order_item_id</code> أو <code>refund_lines</code></td><td><span class="badge b-new">🟣</span></td><td><b>القلب:</b> استرجاع على مستوى العنصر (مبلغ لكل عنصر). جدول <code>refund_lines</code> أنظف لاسترجاع عدة عناصر دفعة.</td></tr>
+    <tr><td>حصّة العنصر من الحجز/الالتزام</td><td><span class="badge b-new">🟣</span></td><td>نسب قيمة الحجز/الالتزام لكل عنصر (allocation) لتمكين التحرير/الاسترجاع الجزئي.</td></tr>
+    <tr><td>عمولة منسوبة للعنصر</td><td><span class="badge b-new">🟣</span></td><td>حساب حصّة العنصر من العمولة (إعادة استخدام منطق العمولة على أساس <code>line_total</code>).</td></tr>
+    <tr><td>التسوية/العمولة لكل مزوّد</td><td><span class="badge b-ok">✅ بلا تغيير جوهري</span></td><td>تُجمَّع من عناصر المزوّد المُسلَّمة فعلاً.</td></tr>
+    <tr><td><code>POST /carts/checkout-group</code></td><td><span class="badge b-new">🟣</span></td><td>ينشئ الأب + العناصر + تجميع المزوّد + الدفعة في معاملة ذرّية.</td></tr>
+    <tr><td><code>POST /orders/items/{id}/refund</code></td><td><span class="badge b-new">🟣</span></td><td>استرجاع عنصر واحد (مبلغ حصّته + موافقة + إعادة عمولة).</td></tr>
+    <tr><td><code>POST /orders/items/{id}/cancel</code></td><td><span class="badge b-new">🟣</span></td><td>إلغاء عنصر قبل التحضير (تحرير حصّته).</td></tr>
+    <tr><td><code>GET /orders/groups/{id}</code></td><td><span class="badge b-new">🟣</span></td><td>متابعة موحّدة (عناصر + تجميع المزوّد + حالات).</td></tr>
+  </tbody>
+</table>
+<div class="note"><b>مبدأ السلامة:</b> لا نغيّر منطق الطلب/التسوية/العمولة جوهرياً؛ نضيف <b>الغلاف (الأب)</b> + <b>الحبيبية على مستوى العنصر</b> للحالة والاسترجاع + <b>نسب القيمة للعنصر</b>. النواة المالية (الدفتر المتوازن) تبقى، لكن مراجعها تصبح أدقّ (لكل عنصر).</div>
+
+<!-- ============ SIM ============ -->
+<h2 class="section" id="sim"><span class="num">١٠</span> محاكاة ذهنية دقيقة (خطوة بخطوة)</h2>
+
+<div class="sim"><div class="ttl">محاكاة ١ — سلة من ٣ متاجر، محفظة، استرجاع عنصر واحد بعد التسليم</div>
+<ol class="steps">
+  <li>العميل يضيف: برجر+مشروب (مطعم) · أرز (سوق) · دواء (صيدلية). الإجمالي = مجموع أسعار العناصر + رسوم.</li>
+  <li>«ادفع» (محفظة) → دفعة واحدة → الأب يُنشأ + ٤ عناصر + ٣ تجميعات مزوّد، وتُحجَز <b>حصّة كل عنصر</b> من المحفظة (معاملة ذرّية).</li>
+  <li>المطاعم/السوق/الصيدلية يحضّرون عناصرهم (كل عنصر CONFIRMED→PREPARING→READY).</li>
+  <li>التوصيل: المتاجر متقاربة → <code>compute_batch</code> يجمعها لسائق واحد (٣ وقفات + تسليم).</li>
+  <li>كل عنصر يصبح DELIVERED → يُلتزَم حجزه → يُحوَّل لمزوّده في التسوية (عمولة على عناصره).</li>
+  <li>بعد ساعة: الدواء (#4) خاطئ → العميل يطلب استرجاعه. النظام: <code>refund.order_item_id=#4</code> بمبلغ حصّته → موافقة → إيداع محفظة العميل + إعادة عمولة الصيدلية لهذا العنصر فقط. باقي العناصر لا تتأثّر.</li>
+</ol></div>
+
+<div class="sim"><div class="ttl">محاكاة ٢ — فشل جزئي: متجر يرفض بعد الدفع</div>
+<ol class="steps">
+  <li>سلة محفظة من متجرين. دفعة واحدة → حجز حصّتَي العنصرين.</li>
+  <li>المطعم يقبل ويحضّر؛ السوق <b>يرفض</b> (مغلق فجأة).</li>
+  <li>تعويض idempotent: تحرير حجز عنصر السوق فقط → يعود جزؤه للرصيد + إشعار «تعذّر متجر — اقتراح بدائل».</li>
+  <li>عنصر المطعم يكمل ويُسلَّم ويُسوَّى. السلة «مكتملة جزئياً» (عرض موحّد يبيّن حالة كل عنصر).</li>
+</ol></div>
+
+<div class="sim"><div class="ttl">محاكاة ٣ — نفاد صنف + بديل، ودفع مختلط</div>
+<ol class="steps">
+  <li>سلة: مطعم (نقد) + صيدلية (محفظة). الابن-المحفظة يُحجَز؛ الابن-النقد يُحصَّل عند الوقفة.</li>
+  <li>المطعم: أحد الصنفين نفد → العنصر UNAVAILABLE → عرض بديل → العميل يقبل → SUBSTITUTED (يُعاد حساب سعر العنصر + فرق نقدي عند الوقفة).</li>
+  <li>التسليم: السائق يحصّل نقد المطعم (بعد الفكّة لتلك الوقفة)؛ الصيدلية كانت محفظة → التزام حجزها.</li>
+  <li>كل عنصر يحمل سعره النهائي وحالته — التدقيق المالي نظيف على مستوى السطر.</li>
+</ol></div>
+
+<div class="sim"><div class="ttl">محاكاة ٤ — إلغاء عنصر واحد قبل التحضير</div>
+<ol class="steps">
+  <li>سلة محفظة من ٣ عناصر، حُجزت حصصها.</li>
+  <li>العميل يلغي عنصراً واحداً قبل أن يبدأ المتجر تحضيره → العنصر CANCELLED → تحرير حصّته فقط → يعود جزؤه للرصيد فوراً (لا حاجة لطلب استرجاع).</li>
+  <li>العنصران الباقيان يستمرّان بلا أي أثر.</li>
+</ol></div>
+
+<!-- ============ SCENARIO LIBRARY ============ -->
+<h2 class="section" id="lib"><span class="num">١١</span> مكتبة السيناريوهات الموسّعة (على مستوى العنصر)</h2>
+<p>أُبقِيت سيناريوهات الخطة السابقة وأُعيدت صياغتها على مستوى العنصر، مع إضافة مجموعات جديدة.</p>
+
+<div class="grp">I — حالات العنصر <span class="cnt">I1–I16</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">I1</td><td>عنصر يُسلَّم بنجاح.</td><td>DELIVERED → التزام حصّته → تسوية لمزوّده.</td></tr>
+<tr><td class="id">I2</td><td>عنصر نفد قبل التحضير.</td><td>UNAVAILABLE → تحرير/استرجاع حصّته + إشعار.</td></tr>
+<tr><td class="id">I3</td><td>عنصر يُستبدَل ببديل أرخص.</td><td>SUBSTITUTED → فرق يُعاد (محفظة) أو يقلّ النقد عند الوقفة.</td></tr>
+<tr><td class="id">I4</td><td>عنصر يُستبدَل ببديل أغلى.</td><td>قرار: يُطلب فرق إضافي (موافقة العميل) أم يُرفض البديل.</td></tr>
+<tr><td class="id">I5</td><td>إلغاء عنصر قبل التحضير.</td><td>CANCELLED → تحرير حصّته فوراً.</td></tr>
+<tr><td class="id">I6</td><td>إلغاء عنصر بعد بدء تحضيره.</td><td>حسب سياسة المتجر (قد يُمنع/يُغرَّم) — لهذا العنصر فقط.</td></tr>
+<tr><td class="id">I7</td><td>عنصر تالف عند التسليم.</td><td>استرجاع العنصر (REFUNDED) + إعادة عمولته.</td></tr>
+<tr><td class="id">I8</td><td>عنصران من نفس المتجر، أحدهما نفد.</td><td>المتاح يُسلَّم؛ النافد يُحرَّر — كلٌّ بحالته.</td></tr>
+<tr><td class="id">I9</td><td>عنصر بكمية 3، نفد منها 1.</td><td>قرار: استرجاع جزئي بالكمية (line مع qty مُرجَع) — يدعمه نموذج العنصر.</td></tr>
+<tr><td class="id">I10</td><td>عنصر بإضافات (modifiers).</td><td>السعر واللقطة مُجمّدان؛ الاسترجاع بالسعر النهائي.</td></tr>
+<tr><td class="id">I11</td><td>عنصر مجدول ضمن سلة فورية.</td><td>عنصره/تجميعه ينتظر موعده؛ الباقي ينطلق.</td></tr>
+<tr><td class="id">I12</td><td>عنصر استلام-ذاتي + عنصر توصيل.</td><td>الاستلام الذاتي بلا سائق؛ التوصيل يُرسَل.</td></tr>
+<tr><td class="id">I13</td><td>عنصر يتأخّر تحضيره كثيراً.</td><td>تنبيه + خيار إلغاء العنصر واسترجاعه.</td></tr>
+<tr><td class="id">I14</td><td>كل عناصر متجر نفدت.</td><td>تجميعه يُلغى كاملاً (= إلغاء كل عناصره) + استرجاع حصصها.</td></tr>
+<tr><td class="id">I15</td><td>عنصر بسعر تغيّر بعد العرض.</td><td>لقطة سعر العنصر تحمي العميل (السعر وقت الطلب).</td></tr>
+<tr><td class="id">I16</td><td>عنصر مرفوض من العميل عند الباب.</td><td>عدم حضور/رفض على مستوى العنصر (نموذج عدم الحضور لذلك العنصر).</td></tr>
+</tbody></table>
+
+<div class="grp">P — الدفع (الدفعة الواحدة) <span class="cnt">P1–P14</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">P1</td><td>سلة محفظة، رصيد كافٍ.</td><td>دفعة واحدة → حجز حصّة كل عنصر (معاملة ذرّية).</td></tr>
+<tr><td class="id">P2</td><td>الرصيد لا يكفي الإجمالي.</td><td>رفض قبل أي حجز (لا حجز جزئي).</td></tr>
+<tr><td class="id">P3</td><td>دفع مختلط: عناصر محفظة + عناصر نقد.</td><td>المحفظة تُحجَز؛ النقد يُحصَّل عند الوقفات (إن سُمح بالخلط).</td></tr>
+<tr><td class="id">P4</td><td>مجزّأ داخل عنصر/متجر (نقد+محفظة).</td><td>إعادة استخدام <code>tenders</code> الموجود لذلك المتجر.</td></tr>
+<tr><td class="id">P5</td><td>عميل عالي المخاطر + نقد على توصيل.</td><td>حظر (بوّابة المخاطر الحالية) على مستوى السلة.</td></tr>
+<tr><td class="id">P6</td><td>إجمالي نقدي عالٍ.</td><td>بوّابة OTP على مستوى السلة.</td></tr>
+<tr><td class="id">P7</td><td>دَين مفتوح على العميل.</td><td>حظر السلة قبل الإنشاء.</td></tr>
+<tr><td class="id">P8</td><td>الفكّة على عدة وقفات نقدية.</td><td>تقريب لكل وقفة (يطابق ما يُسلَّم) — موثّق ومعروض.</td></tr>
+<tr><td class="id">P9</td><td>كوبون على السلة.</td><td>يُوزَّع على العناصر بالتناسب (يحفظ صحّة التسوية).</td></tr>
+<tr><td class="id">P10</td><td>إكرامية.</td><td>تُسنَد لمتجر/سائق محدّد (قرار عرض).</td></tr>
+<tr><td class="id">P11</td><td>تكرار الإرسال.</td><td>idempotency الأب → لا ازدواج دفعة.</td></tr>
+<tr><td class="id">P12</td><td>التحقّق الإضافي للمحفظة فوق حدّ.</td><td>على إجمالي السلة (step-up الحالي).</td></tr>
+<tr><td class="id">P13</td><td>فشل حجز عنصر أثناء المعاملة.</td><td>تراجع ذرّي كامل (لا نصف سلة) قبل الدفع.</td></tr>
+<tr><td class="id">P14</td><td>سقف عدد العناصر/المتاجر.</td><td>سقف معقول لضبط التوصيل والاحتيال.</td></tr>
+</tbody></table>
+
+<div class="grp">R — الاسترجاع/الإلغاء على مستوى العنصر <span class="cnt">R1–R14</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">R1</td><td>استرجاع عنصر واحد بعد التسليم.</td><td><code>refund.order_item_id</code> بمبلغ حصّته + موافقة + إيداع محفظة + إعادة عمولته.</td></tr>
+<tr><td class="id">R2</td><td>استرجاع عدة عناصر دفعة.</td><td><code>refund_lines</code> (سطر لكل عنصر) — مجموع الحصص.</td></tr>
+<tr><td class="id">R3</td><td>إلغاء عنصر قبل القبول (محفظة).</td><td>تحرير حصّته فقط → رصيد فوري.</td></tr>
+<tr><td class="id">R4</td><td>إلغاء عنصر نقدي قبل التحصيل.</td><td>إلغاء نظيف بلا استرجاع (لا مال تحرّك).</td></tr>
+<tr><td class="id">R5</td><td>استرجاع جزء من كمية عنصر.</td><td>استرجاع بالكمية المُرجَعة (qty × unit_price).</td></tr>
+<tr><td class="id">R6</td><td>استرجاع كبير فوق الحدّ.</td><td>موافقة مزدوجة (نفس آلية الحدّ الحالية).</td></tr>
+<tr><td class="id">R7</td><td>استرجاع عنصر + بقاء آخر مُسلَّماً.</td><td>مستقلّان تماماً (الذرّة = العنصر).</td></tr>
+<tr><td class="id">R8</td><td>استرجاع نقدي (بعد فتح البوّابة).</td><td>مؤجَّل خلف <code>GATE_PAYMENT_SANDBOX</code>.</td></tr>
+<tr><td class="id">R9</td><td>تكرار طلب استرجاع نفس العنصر.</td><td>تعويض idempotent: يفحص أولاً، لا يُرجِع مرّتين.</td></tr>
+<tr><td class="id">R10</td><td>استرجاع عنصر استُبدِل.</td><td>بالسعر النهائي بعد الاستبدال.</td></tr>
+<tr><td class="id">R11</td><td>عدم حضور لعنصر/متجر.</td><td>نموذج عدم الحضور لذلك العنصر (رسم + تعويض المزوّد).</td></tr>
+<tr><td class="id">R12</td><td>إلغاء السلة كلّها قبل القبول.</td><td>تحرير كل حصص العناصر.</td></tr>
+<tr><td class="id">R13</td><td>استرجاع عنصر يخفّض إجمالي التسوية للمزوّد.</td><td>تُعاد عمولة العنصر فقط؛ بقية عناصر المزوّد دون مساس.</td></tr>
+<tr><td class="id">R14</td><td>استرجاع بعد التزام الحجز (تسليم).</td><td>مسار <code>refund</code> (إيداع) لا التحرير.</td></tr>
+</tbody></table>
+
+<div class="grp">D — التوصيل متعدّد العناصر/الوقفات <span class="cnt">D1–D10</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">D1</td><td>متاجر متقاربة.</td><td>سائق واحد (compute_batch) يلتقط عناصر كل متجر.</td></tr>
+<tr><td class="id">D2</td><td>متاجر متباعدة.</td><td>عدة سائقين (إرسال مستقل لكل تجميع).</td></tr>
+<tr><td class="id">D3</td><td>تجاوز سقف نقد السائق.</td><td>الخوارزمية تستبعد وقفة → سائق آخر.</td></tr>
+<tr><td class="id">D4</td><td>تجميع جاهزية مختلفة.</td><td>قرار: ينطلق عند جاهزية الكل (تجميع) أم لكلٍّ.</td></tr>
+<tr><td class="id">D5</td><td>فشل تسليم وقفة.</td><td>عناصر تلك الوقفة فاشلة؛ الباقي يكتمل.</td></tr>
+<tr><td class="id">D6</td><td>رسم التوصيل عند سائق واحد.</td><td>رسم محفّز أقلّ (Uber-style) — قرار.</td></tr>
+<tr><td class="id">D7</td><td>لا سائق لمتجر.</td><td>تصعيد «لا سائق» + إشعار + خيار إلغاء عناصره.</td></tr>
+<tr><td class="id">D8</td><td>تحصيل نقد متعدّد الوقفات.</td><td>كل وقفة تُحصَّل على حدة (بعد فكّتها).</td></tr>
+<tr><td class="id">D9</td><td>عنصر استلام ذاتي ضمن سلة توصيل.</td><td>بلا سائق لذلك العنصر؛ يؤكّده المزوّد.</td></tr>
+<tr><td class="id">D10</td><td>إعادة إسناد وقفة لسائق آخر.</td><td>على مستوى التجميع (لا يمسّ العناصر مالياً).</td></tr>
+</tbody></table>
+
+<div class="grp">X — تعارضات وتزامن <span class="cnt">X1–X12</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">X1</td><td>متجر مغلق لحظة الدفع.</td><td>يُعرَض الخيار: أكمل الباقي أم أوقف.</td></tr>
+<tr><td class="id">X2</td><td>صنف نفد لحظة الدفع.</td><td>معالجة النفاد على العنصر قبل الإنشاء.</td></tr>
+<tr><td class="id">X3</td><td>انقطاع أثناء الدفع.</td><td>idempotency الأب يمنع الازدواج.</td></tr>
+<tr><td class="id">X4</td><td>تغيّر السعر بين العرض والدفع.</td><td>لقطة سعر كل عنصر تحمي العميل.</td></tr>
+<tr><td class="id">X5</td><td>الرصيد نقص وقت الحجز.</td><td>فحص ذرّي → رفض نظيف.</td></tr>
+<tr><td class="id">X6</td><td>نجاح حجز عنصرين وفشل ثالث.</td><td>تراجع ذرّي كامل قبل الدفع.</td></tr>
+<tr><td class="id">X7</td><td>استرجاع + إلغاء متزامنان لنفس العنصر.</td><td>قفل/ترتيب + تعويض idempotent → نتيجة واحدة متّسقة.</td></tr>
+<tr><td class="id">X8</td><td>توقيت الجدولة المختلطة.</td><td>UTC داخلياً؛ عرض بتوقيت ليبيا.</td></tr>
+<tr><td class="id">X9</td><td>الفكّة تجعل مجموع الوقفات ≠ الإجمالي.</td><td>قاعدة الفكّة لكل وقفة موثّقة ومعروضة.</td></tr>
+<tr><td class="id">X10</td><td>استرجاع عنصر بعد التزام حجزه.</td><td>مسار refund لا تحرير (حسب حالة العنصر).</td></tr>
+<tr><td class="id">X11</td><td>مجموع استرجاعات العناصر = الإجمالي.</td><td>السلة تصبح «مُسترجَعة بالكامل» (مشتقّ من حالات العناصر).</td></tr>
+<tr><td class="id">X12</td><td>تكرار تعويض (شبكة).</td><td>idempotent: يفحص الحالة، لا يكرّر الحركة المالية.</td></tr>
+</tbody></table>
+
+<div class="note"><b>الإجمالي:</b> I16 + P14 + R14 + D10 + X12 = <b>٦٦ سيناريو أساسياً</b>، كلٌّ يتفرّع (طريقة دفع × حالة عنصر × توصيل) إلى مئات الفروع عند البناء — وكلّها قابلة للتحويل إلى اختبارات.</div>
+
+<!-- ============ TECH ============ -->
+<h2 class="section" id="tech"><span class="num">١٢</span> أحدث التقنيات والأفكار (٢٠٢٥/٢٠٢٦) المتوافقة معنا</h2>
+<table>
+  <thead><tr><th>التقنية/الفكرة</th><th>كيف نطبّقها</th></tr></thead>
+  <tbody>
+    <tr><td><b>🌐 Line-Item Order Model</b> (Shopify/Amazon)</td><td>العنصر هو الذرّة للسعر/الحالة/الاسترجاع — قلب هذا التعديل.</td></tr>
+    <tr><td><b>🌐 Order Orchestration / Split Routing</b></td><td>تقسيم لكل مزوّد + تتبّع مستقل + متابعة موحّدة (الطبقتان ١/٢).</td></tr>
+    <tr><td><b>🌐 Per-Item Partial Refund + Commission Recalc</b></td><td>استرجاع عنصر وإعادة عمولته فقط؛ بقية البائعين كما هم.</td></tr>
+    <tr><td><b>🌐 Saga + Idempotent Compensation</b></td><td>إنشاء ذرّي؛ تعويض ما بعد الدفع على مستوى العنصر، idempotent.</td></tr>
+    <tr><td><b>🌐 Idempotent Ledger + Idempotency Key</b></td><td>مفتاح على الأب + مرجع فريد لكل قيد منسوب لعنصر → لا ازدواج.</td></tr>
+    <tr><td><b>🌐 Multi-Store Single-Cart</b> (Uber Eats/DoubleDash)</td><td>سلة واحدة لعدة متاجر برسم توصيل محفّز عند التجميع.</td></tr>
+    <tr><td><b>🌐 Automated RMA / Returns 2025</b></td><td>سير استرجاع آلي لكل عنصر (سبب + موافقة + إيداع) قابل للتوسعة لسياسات لكل مزوّد/فئة.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ DECISIONS ============ -->
+<h2 class="section" id="decisions"><span class="num">١٣</span> قرارات تحتاج حسماً (مع توصية)</h2>
+<table>
+  <thead><tr><th>القرار</th><th>التوصية</th></tr></thead>
+  <tbody>
+    <tr><td>خلط طرق الدفع بين العناصر/المتاجر</td><td>ابدأ موحّداً، ثم افتح الخلط.</td></tr>
+    <tr><td>الفكّة في النقد متعدّد الوقفات</td><td>لكل وقفة.</td></tr>
+    <tr><td>رسوم التوصيل عند التجميع</td><td>رسم محفّز أقلّ لسائق واحد.</td></tr>
+    <tr><td>بديل أغلى من الأصل</td><td>يتطلّب موافقة العميل على الفرق.</td></tr>
+    <tr><td>توزيع الكوبون</td><td>بالتناسب على العناصر.</td></tr>
+    <tr><td>سقف عدد العناصر/المتاجر للسلة</td><td>سقف معقول (مثلاً ٤ متاجر).</td></tr>
+    <tr><td>تخزين refund لكل عنصر</td><td><code>refund_lines</code> (أنظف من عمود مفرد لعدة عناصر).</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ QA ============ -->
+<h2 class="section" id="qa"><span class="num">١٤</span> أسئلة وأجوبة</h2>
+<div class="sim"><div class="ttl">هل يلغي «نموذج العنصر» فكرة المزوّد؟</div>لا. المزوّد يبقى للتحضير/التسوية/التوصيل، لكنه «تجميع لعناصره». الذرّة المالية والحالة هي العنصر.</div>
+<div class="sim"><div class="ttl">هل نكسر الطلبات المفردة الحالية؟</div>لا. <code>group_id=null</code> = السلوك الحالي حرفياً. والعنصر أصلاً يحمل سعره وحالته.</div>
+<div class="sim"><div class="ttl">كيف يبقى الدفتر متوازناً مع استرجاع عنصر؟</div>كل استرجاع عنصر = قيد متوازن منسوب لـ<code>order_item_id</code> (idempotent)؛ النواة المالية كما هي، فقط المرجع أدقّ.</div>
+<div class="sim"><div class="ttl">ماذا لو استُرجِعت كل العناصر؟</div>حالة السلة «مُسترجَعة بالكامل» مشتقّة من حالات العناصر — لا حاجة لحالة سلة منفصلة تتعارض.</div>
+
+<!-- ============ PHASES ============ -->
+<h2 class="section" id="phases"><span class="num">١٥</span> الخطة المرحلية المنقّحة (للتنفيذ لاحقاً بإذنك)</h2>
+<table>
+  <thead><tr><th>المرحلة</th><th>المحتوى</th><th>المخاطرة</th></tr></thead>
+  <tbody>
+    <tr><td><b>س1 — الأساس</b></td><td><code>order_groups</code> + <code>orders.group_id</code> + تفعيل آلة حالات <code>OrderItem.status</code> + هجرة.</td><td>منخفضة (إضافي).</td></tr>
+    <tr><td><b>س2 — نسب القيمة للعنصر</b></td><td>حساب حصّة كل عنصر من الحجز/الالتزام/العمولة (allocation) — أساس الاسترجاع الجزئي.</td><td>متوسطة (محاسبي — اختبار دقيق).</td></tr>
+    <tr><td><b>س3 — الدفعة الموحّدة</b></td><td><code>checkout-group</code> ذرّي (محفظة/نقد موحّد أولاً).</td><td>متوسطة.</td></tr>
+    <tr><td><b>س4 — استرجاع/إلغاء العنصر</b></td><td><code>refund_lines</code> + endpoints العنصر + إعادة العمولة + تعويض idempotent.</td><td>متوسطة–مرتفعة (مالي).</td></tr>
+    <tr><td><b>س5 — الواجهة</b></td><td>سلة موحّدة + متابعة على مستوى العنصر + استرجاع عنصر بنقرة.</td><td>متوسطة.</td></tr>
+    <tr><td><b>س6 — التوصيل الذكي</b></td><td>تفعيل التجميع + رسم محفّز + متعدّد الوقفات.</td><td>مرتفعة (اختبار حِمل).</td></tr>
+    <tr><td><b>س7 — الخلط والكوبونات والبدائل</b></td><td>خلط الدفع + توزيع الكوبون + بديل أغلى بموافقة.</td><td>متوسطة.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ NOT TOUCH ============ -->
+<h2 class="section" id="nottouch">ما لن نلمسه</h2>
+<ul class="clean">
+  <li><b>النواة المالية (FIN-COR):</b> الدفتر المتوازن + قواعد العمولة/التسوية تبقى؛ نضيف نسبة القيمة للعنصر فقط.</li>
+  <li><b>الأعلام المختومة:</b> <code>production_payment_enabled</code> وأخواتها — استرجاع النقد/PSP مؤجَّل خلفها.</li>
+  <li><b>الطلب المفرد:</b> <code>group_id=null</code> = السلوك الحالي حرفياً.</li>
+</ul>
+
+<!-- ============ SOURCES ============ -->
+<h2 class="section" id="sources">المنهجية والمصادر</h2>
+<div class="card">
+  <p><b>قراءة الكود (٢٠٢٦-٠٦-٣٠):</b> <code>models/order.py · OrderItem</code> (سعر+حالة+إضافات) · <code>order_service.create_order</code> (بناء العناصر + line_total + tenders + البوّابات) · <code>models/payment.py</code> (wallet_reservations · refunds بلا order_item_id) · <code>finance/settlement_service.py</code> (العمولة) · <code>dispatch/batching_service.compute_batch</code> · <code>config.py</code> (<code>split_payment_enabled=True</code>).</p>
+  <p><b>أحدث التقنيات:</b>
+    <a class="src" href="https://www.cs-cart.com/blog/marketplace-order-management/">Marketplace Order Management 2026</a> ·
+    <a class="src" href="https://bagisto.com/en/how-refunds-work-multi-vendor-marketplace/amp/">Multi-Vendor Partial Refunds</a> ·
+    <a class="src" href="https://spreecommerce.org/the-ultimate-guide-to-multi-vendor-marketplace-ecommerce/">Order Orchestration / Split Routing</a> ·
+    <a class="src" href="https://www.uber.com/us/en/newsroom/multi-store-ordering/">Uber Multi-Store</a> ·
+    <a class="src" href="https://www.geeksforgeeks.org/system-design/saga-design-pattern/">Saga Pattern</a> ·
+    <a class="src" href="https://dev.to/woovi/what-is-ledger-and-why-does-it-need-idempotence-18n9">Idempotent Ledger</a>
+  </p>
+</div>
+
+<div class="foot">
+  <p><b>لم يُكتب أي كود.</b> هذه الخطة المنقّحة النهائية بعد التعديل الجوهري (نموذج العنصر) + محاكاة ذهنية + ٦٦ سيناريو أساسياً + أحدث التقنيات — بانتظار حسمك للقرارات السبعة، ثم التنفيذ المرحلي (س1…س7).</p>
+  <p style="text-align:center;margin-top:18px;color:#0e7490;font-weight:700">— دراسة السلة النهائية · نموذج العنصر · منصّة تووا —</p>
+</div>
+
+</div>
+</body>
+</html>

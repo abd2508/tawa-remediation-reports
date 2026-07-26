@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تووا — شرح المشروع والشاشات (مبسّط)</title>
+<style>
+  :root{ --g:#0e7a4f; --g2:#5fd0a0; --ink:#16242f; --muted:#6b7c8c; --line:#e3e9ee; --bg:#f5f7f9;
+         --dark:#15202b; --dark2:#0f1720; --dline:#243240; --dink:#e8eef5; --dmuted:#9fb2c4; }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,Arial,sans-serif; margin:0; background:var(--bg); color:var(--ink); line-height:1.9}
+  .wrap{max-width:1000px; margin:0 auto; padding:24px 18px 80px}
+  header.hero{background:linear-gradient(135deg,var(--g),#0a5c3b); color:#fff; border-radius:20px; padding:34px 26px; text-align:center; box-shadow:0 10px 30px rgba(14,122,79,.25)}
+  header.hero h1{margin:0 0 6px; font-size:2rem}
+  header.hero p{margin:0; opacity:.92}
+  h2{color:var(--g); border-bottom:3px solid var(--g2); padding-bottom:8px; margin-top:46px; font-size:1.45rem}
+  h3{color:var(--ink); margin-top:28px; font-size:1.15rem}
+  p,li{font-size:1.02rem}
+  .lead{font-size:1.12rem; background:#fff; border-right:5px solid var(--g); border-radius:10px; padding:14px 18px; box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  .step{display:flex; gap:14px; align-items:flex-start; background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:12px 0; box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  .step .num{flex:0 0 40px; height:40px; border-radius:50%; background:var(--g); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:1.1rem}
+  .step .t b{color:var(--g)}
+  .note{background:#fff7e6; border:1px solid #ffe2a8; border-radius:10px; padding:12px 16px; color:#7a5b13}
+  .ok{background:#e9f8f0; border:1px solid #b6e6cf; border-radius:10px; padding:12px 16px; color:#0a5c3b}
+
+  /* phone mockup */
+  .screens{display:flex; flex-wrap:wrap; gap:22px; justify-content:center; margin:18px 0}
+  .phone{width:330px; background:#fff; border:10px solid #1c2530; border-radius:34px; overflow:hidden; box-shadow:0 16px 40px rgba(0,0,0,.18)}
+  .phone .bar{background:#1c2530; height:22px}
+  .phone .scr{padding:14px}
+  .cap{max-width:330px; text-align:center; color:var(--muted); font-size:.92rem; margin:8px auto 0}
+  .shot{margin:6px 0 26px}
+
+  .field{display:block; width:100%; border:1.5px solid var(--line); border-radius:9px; padding:9px 11px; margin:5px 0 2px; font-size:.92rem; background:#fff; color:var(--ink)}
+  .flabel{font-size:.82rem; font-weight:700; color:#33414d; margin-top:8px; display:block}
+  .btn{display:block; width:100%; text-align:center; border-radius:10px; padding:11px; font-weight:800; border:none; cursor:default; font-size:.95rem}
+  .btn-g{background:var(--g); color:#fff}
+  .btn-o{background:#eef6f2; color:var(--g); border:1.5px solid var(--g)}
+  .divider{font-size:.72rem; font-weight:800; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:4px; margin:14px 0 6px; letter-spacing:.04em}
+  .sel{background:#eef6f2; border-color:var(--g)!important}
+
+  /* modal */
+  .modal{background:#fff; border-radius:14px; padding:12px; box-shadow:0 8px 30px rgba(0,0,0,.12)}
+  .mtitle{font-weight:800; margin:2px 4px 10px}
+  .tabs{display:flex; gap:6px; margin-bottom:8px}
+  .tab{flex:1; text-align:center; padding:8px; border-radius:8px; font-weight:800; font-size:.85rem; border:1.5px solid var(--line); background:#fff; color:var(--ink)}
+  .tab.on{background:var(--g); color:#fff; border-color:var(--g)}
+  .prow{display:flex; align-items:center; gap:8px; padding:9px 4px; border-bottom:1px solid var(--line)}
+  .prow .nm{font-weight:700}
+  .prow .sub{font-size:.78rem; color:var(--muted)}
+  .prow .pick{color:var(--g); font-weight:800; font-size:.85rem; white-space:nowrap}
+
+  /* OPS dark panel */
+  .panel{background:var(--dark); border:1px solid var(--dline); border-radius:16px; padding:18px; color:var(--dink); box-shadow:0 10px 30px rgba(0,0,0,.2)}
+  .panel h4{color:var(--g2); margin:0 0 4px}
+  .panel .psub{color:var(--dmuted); font-size:.86rem; margin:0 0 12px}
+  .ptools{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px}
+  .pin{background:var(--dark2); border:1px solid var(--dline); border-radius:9px; padding:8px 11px; color:var(--dink); font-size:.86rem}
+  .pbtn{background:var(--g); color:#fff; border:none; border-radius:9px; padding:8px 12px; font-weight:800; font-size:.86rem}
+  .pcity{color:var(--g2); border-bottom:1px solid var(--dline); padding-bottom:5px; margin:14px 0 6px; font-weight:800}
+  .pplace{display:flex; align-items:center; gap:8px; padding:7px 4px; border-bottom:1px solid var(--dline); font-size:.9rem}
+  .pplace .tiny{background:#1c2a38; border:1px solid #3a5168; color:#cfe0ef; border-radius:8px; padding:2px 8px; font-size:.74rem}
+
+  /* chips */
+  .chips{display:flex; flex-wrap:wrap; gap:6px; margin:6px 0}
+  .chip{border-radius:14px; padding:3px 11px; font-size:.85rem; border:1px solid}
+  .chip.core{background:#eef2f6; color:#33414d; border-color:#c9d4de}
+  .chip.rem{background:#e9f8f0; color:#0a5c3b; border-color:#b6e6cf}
+  .catbox{background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin:8px 0}
+  .catbox h4{margin:0 0 6px; color:var(--g)}
+  footer{margin-top:50px; text-align:center; color:var(--muted); font-size:.85rem}
+  .legend{font-size:.85rem; color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🚚 تووا — شرح المشروع والشاشات</h1>
+  <p>بكلمات بسيطة — كيف يعمل، وكيف يبدو على الشاشة فعلاً · 2026-05-25</p>
+</header>
+
+<!-- ════════════ القسم الأول: الفكرة من البداية ════════════ -->
+<h2>الجزء الأول — فكرة المشروع كاملة، من البداية وببساطة</h2>
+
+<p class="lead"><b>تووا</b> تطبيق توصيل ليبي يربط ثلاثة أطراف: <b>العميل</b> الذي يطلب، و<b>المزوّد</b> (مطعم/مقهى) الذي يجهّز، و<b>السائق</b> الذي يوصّل — وخلفهم <b>غرفة العمليات (لوحة التحكم)</b> التي تدير كل شيء.</p>
+
+<h3>المشكلة التي نحلّها هنا</h3>
+<p>عندما يسجّل صاحب مطعم أو مقهى جديد، كان عليه أن <b>يكتب كل شيء بيده</b>: اسم المطعم، أصنافه، صوره… وهذا متعب ويملأ التطبيق ببيانات غير موحّدة. أردنا أن نجعل الأمر <b>سهلاً وجاهزاً</b>.</p>
+
+<h3>الحلّ: «مخازن جاهزة» نبنيها مرّة، فيستفيد منها الجميع</h3>
+
+<div class="step"><div class="num">1</div><div class="t"><b>مخزن الأصناف والصور والمكوّنات</b><br>
+جمعنا <b>أصنافاً حقيقية</b> (شاورما، بازين، بيتزا، عصائر…) مع <b>صور جاهزة</b> و<b>مكوّنات</b>. فحين يضيف المزوّد صنفاً، يختاره جاهزاً بدل كتابته. والمكوّنات <b>غير جامدة</b>: المزوّد يضيف/يحذف، و<b>العميل يزيل ما لا يريد</b> (مثلاً «بدون مخلل»).</div></div>
+
+<div class="step"><div class="num">2</div><div class="t"><b>مخزن المطاعم والمقاهي لكل مدينة</b> (الجديد)<br>
+جمعنا <b>مطاعم ومقاهي ليبيا الحقيقية</b> ورتّبناها <b>حسب المدينة</b>، وميّزنا: هذا <b>مطعم</b> 🍽️ وهذا <b>مقهى</b> ☕. فحين يسجّل مزوّد، يختار مدينته → تظهر له قائمة الأماكن في مدينته → يضغط على مكانه → <b>تُكتب بياناته وحدها</b>.</div></div>
+
+<div class="step"><div class="num">3</div><div class="t"><b>قائمة خاصة للمقاهي</b><br>
+المقاهي تختلف عن المطاعم: تقدّم <b>القهوة بأنواعها</b>، و<b>الباريوش</b> (الكروة)، و<b>الفروبيه</b>، وأكلاً خفيفاً. أضفنا هذه الأصناف خصيصاً للمقاهي.</div></div>
+
+<div class="ok"><b>المبدأ الثابت:</b> كل هذه المخازن <b>بلا أسعار</b> (المزوّد يحدّد سعره)، و<b>بلا بيانات مُختلقة</b> (كل اسم حقيقي من مصدر موثوق؛ ما لا نجده يبقى فارغاً).</div>
+
+<h3>ماذا يعني هذا عملياً؟</h3>
+<ul>
+  <li><b>للمزوّد:</b> تسجيل أسرع وأسهل — يختار مكانه وأصنافه جاهزة.</li>
+  <li><b>للعميل:</b> أسماء وصور موحّدة وجميلة، ويقدر يزيل أي مكوّن لا يريده.</li>
+  <li><b>لك (لوحة التحكم):</b> تتحكّم بكل المخازن من مكان واحد — تضيف، تخفي، تعدّل.</li>
+</ul>
+
+<!-- ════════════ القسم الثاني: الشاشات ════════════ -->
+<h2>الجزء الثاني — كيف تبدو الشاشات فعلاً</h2>
+<p class="note">📌 الشاشات التالية مرسومة <b>بنفس تصميم التطبيق ونصوصه وبياناته الحقيقية</b> (أسماء مطاعم ومقاهي طرابلس الفعلية من مخزننا). هكذا ستبدو تماماً عند التشغيل.</p>
+
+<!-- شاشة 1: تسجيل المزوّد -->
+<div class="shot">
+<div class="screens">
+  <div>
+    <div class="phone"><div class="bar"></div><div class="scr">
+      <div style="font-weight:800;color:var(--g);font-size:1.05rem;margin-bottom:6px">مزوّد — إنشاء حساب</div>
+      <span class="flabel">اسم مدير المنشأة *</span>
+      <div class="field">أحمد المبروك</div>
+      <span class="flabel">رقم الهاتف *</span>
+      <div class="field" dir="ltr">+218910000000</div>
+      <div class="divider">بيانات المنشأة التجارية</div>
+      <span class="flabel">نوع النشاط *</span>
+      <div class="field sel">☕ مقهى</div>
+      <span class="flabel">المدينة / البلدية *</span>
+      <div class="field">طرابلس المركز</div>
+      <button class="btn btn-o">📍 اختر مطعمك / مقهاك من القائمة</button>
+    </div></div>
+    <div class="cap"><b>① شاشة التسجيل:</b> المزوّد يختار النوع (مقهى) ومدينته، ثم يضغط الزر الأخضر «اختر مكانك».</div>
+  </div>
+
+  <!-- شاشة 2: نافذة اختيار المكان -->
+  <div>
+    <div class="phone"><div class="bar"></div><div class="scr">
+      <div class="modal">
+        <div class="mtitle">📍 اختر مكانك في طرابلس المركز</div>
+        <div class="tabs"><div class="tab">🍽️ مطاعم (120)</div><div class="tab on">☕ مقاهٍ (17)</div></div>
+        <div class="field">🔎 ابحث باسم المكان أو المنطقة…</div>
+        <div class="prow"><div style="flex:1"><div class="nm">مقهى الساعة</div><div class="sub">المدينة القديمة (ميدان الساعة) · مقهى تقليدي</div></div><span class="pick">اختيار ›</span></div>
+        <div class="prow"><div style="flex:1"><div class="nm">كافيه كازا</div><div class="sub">ميدان الساعة، خلف متحف السرايا · مقهى</div></div><span class="pick">اختيار ›</span></div>
+        <div class="prow"><div style="flex:1"><div class="nm">السرايا الحمراء</div><div class="sub">ساحة الشهداء · ليبي تقليدي + مقهى</div></div><span class="pick">اختيار ›</span></div>
+        <div class="prow"><div style="flex:1"><div class="nm">كوستا كوفي</div><div class="sub">طرابلس · مقهى</div></div><span class="pick">اختيار ›</span></div>
+        <div class="prow"><div style="flex:1"><div class="nm">نسبريسو</div><div class="sub">طرابلس · مقهى</div></div><span class="pick">اختيار ›</span></div>
+      </div>
+    </div></div>
+    <div class="cap"><b>② نافذة الأماكن:</b> تبويبان (مطاعم/مقاهٍ) + بحث + قائمة <b>مقاهي طرابلس الحقيقية</b>. يضغط على مقهاه.</div>
+  </div>
+
+  <!-- شاشة 3: بعد الاختيار -->
+  <div>
+    <div class="phone"><div class="bar"></div><div class="scr">
+      <div style="font-weight:800;color:var(--g);font-size:1.05rem;margin-bottom:6px">مزوّد — إنشاء حساب</div>
+      <div class="ok" style="padding:8px 12px;font-size:.85rem">✓ تم ملء بياناتك من «كافيه كازا»</div>
+      <span class="flabel">الاسم الكامل للمنشأة *</span>
+      <div class="field sel">كافيه كازا</div>
+      <span class="flabel">نوع النشاط *</span>
+      <div class="field sel">☕ مقهى</div>
+      <span class="flabel">المدينة / البلدية *</span>
+      <div class="field">طرابلس المركز</div>
+      <span class="flabel">العنوان</span>
+      <div class="field sel">ميدان الساعة، خلف متحف السرايا</div>
+      <button class="btn btn-g">إنشاء الحساب</button>
+    </div></div>
+    <div class="cap"><b>③ بعد الضغط:</b> الاسم والنوع والعنوان <b>تُكتب وحدها</b> فوراً. يكمل ويرسل. (وإن لم يجد مكانه، يكتبه بيده.)</div>
+  </div>
+</div>
+</div>
+
+<!-- شاشة 4: لوحة التحكم — سجلّ الأماكن -->
+<div class="shot">
+<h3>④ لوحة التحكم — صفحة «سجلّ الأماكن»</h3>
+<div class="panel">
+  <h4>🏪 سجلّ الأماكن</h4>
+  <p class="psub">454 مكاناً · 389 مطعم · 51 مقهى · 14 مطعم ومقهى — يختار منها المزوّد مكانه عند التسجيل (بلا أسعار)</p>
+  <div class="ptools">
+    <span class="pin" style="flex:1">🔎 ابحث باسم / مدينة / منطقة…</span>
+    <span class="pin">الكل ▾</span>
+    <button class="pbtn">➕ مكان جديد</button>
+  </div>
+  <div class="pcity">طرابلس المركز <span style="color:var(--dmuted);font-weight:400">· 120</span></div>
+  <div class="pplace"><div style="flex:1"><b>مطعم البلدية / القمبري</b> <span style="color:var(--dmuted)">الباب البحري · مأكولات بحرية</span> <span class="tiny">🍽️ مطعم</span></div><span class="tiny">🙈 إخفاء</span><span class="tiny">🗑️</span></div>
+  <div class="pplace"><div style="flex:1"><b>كافيه كازا</b> <span style="color:var(--dmuted)">ميدان الساعة · مقهى</span> <span class="tiny">☕ مقهى</span></div><span class="tiny">🙈 إخفاء</span><span class="tiny">🗑️</span></div>
+  <div class="pplace"><div style="flex:1"><b>السرايا الحمراء</b> <span style="color:var(--dmuted)">ساحة الشهداء · ليبي + مقهى</span> <span class="tiny">🍽️☕ مطعم ومقهى</span></div><span class="tiny">🙈 إخفاء</span><span class="tiny">🗑️</span></div>
+  <div class="pcity">بنغازي <span style="color:var(--dmuted);font-weight:400">· 97</span></div>
+  <div class="pplace"><div style="flex:1"><b>بانينو</b> <span style="color:var(--dmuted)">ليبي / عالمي</span> <span class="tiny">🍽️ مطعم</span></div><span class="tiny">🙈 إخفاء</span><span class="tiny">🗑️</span></div>
+</div>
+<div class="cap" style="max-width:100%"><b>أنت في لوحة التحكم</b> ترى كل الأماكن مجمّعة حسب المدينة، وتبحث/تفلتر، وتضيف مكاناً جديداً، وتخفي أو تحذف أيّ مكان.</div>
+</div>
+
+<!-- شاشة 5: قائمة المقاهي + المكوّنات -->
+<div class="shot">
+<h3>⑤ قائمة أصناف المقاهي (الجديدة)</h3>
+<div class="catbox"><h4>☕ قهوة</h4><div class="chips">
+  <span class="chip core">إسبريسو</span><span class="chip core">أمريكانو</span><span class="chip core">لاتيه</span>
+  <span class="chip core">مكياتو</span><span class="chip core">موكا</span><span class="chip core">فلات وايت</span>
+  <span class="chip core">قهوة تركية</span><span class="chip core">قهوة فرنسية</span><span class="chip core">باريوش</span></div></div>
+<div class="catbox"><h4>🥤 مشروبات باردة</h4><div class="chips">
+  <span class="chip core">فروبيه كراميل</span><span class="chip core">فروبيه شوكولاتة</span><span class="chip core">فروبيه قهوة</span>
+  <span class="chip core">فروبيه فانيلا</span><span class="chip core">آيس لاتيه</span><span class="chip core">آيس أمريكانو</span></div></div>
+<div class="catbox"><h4>🥪 أكل خفيف</h4><div class="chips">
+  <span class="chip core">توست بالجبن</span><span class="chip core">ساندويتش حلوم</span><span class="chip core">ميني بيتزا</span></div></div>
+
+<h3>مثال على «المكوّنات غير الجامدة»</h3>
+<div class="catbox">
+  <b>لاتيه</b> — مكوّناته:
+  <div class="chips">
+    <span class="chip core">قهوة (أساسي)</span>
+    <span class="chip core">حليب (أساسي)</span>
+    <span class="chip rem">سكر (يستطيع العميل إزالته)</span>
+  </div>
+  <div class="legend">الأخضر = مكوّن يستطيع العميل إزالته عند الطلب · الرمادي = أساسي. (لا يتغيّر السعر عند الإزالة.)</div>
+</div>
+</div>
+
+<!-- ════════════ ماذا أنجزنا / المتبقّي ════════════ -->
+<h2>الجزء الثالث — ماذا أنجزنا، وما المتبقّي</h2>
+
+<div class="ok">
+<b>أنجزنا (جاهز ويعمل):</b>
+<ul style="margin:8px 0 0">
+  <li>مخزن الأصناف والصور والمكوّنات + قائمة المقاهي (قهوة/باريوش/فروبيه).</li>
+  <li>مخزن 454 مطعماً ومقهى حقيقياً، مرتّب حسب المدينة ومُصنّف (مطعم/مقهى).</li>
+  <li>قائمة المدن مُحدّثة لأحدث تقسيم رسمي لليبيا (141 بلدية).</li>
+  <li>شاشة «اختر مكانك» في التسجيل + صفحة «سجلّ الأماكن» في لوحة التحكم.</li>
+</ul>
+</div>
+
+<div class="note" style="margin-top:14px">
+<b>المتبقّي الوحيد = «التشغيل المباشر» (النشر):</b> تفعيل كل ما سبق على الموقع الحقيقي ليراه المستخدمون. <b>تركتُه بانتظار إذنك أنت</b> كما طلبت — كل شيء جاهز، ينتظر كلمة «انشر».
+</div>
+
+<footer>تووا — وثيقة شرح مبسّطة · بلا مصطلحات تقنية · 2026-05-25</footer>
+</div>
+</body>
+</html>

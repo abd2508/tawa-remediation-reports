@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دراسة لوحة تحكّم تووا الشاملة — تتبّع كل زرّ من الكود — 2026-06-04</title>
+<style>
+  :root{
+    --bg:#0f1115;--card:#171a21;--card2:#1d212b;--txt:#e7ecf3;--muted:#9aa6b6;
+    --line:#2a2f3a;--accent:#5b9dff;--ok:#36d399;--warn:#fbbd23;--bad:#f87272;--purple:#b18bff;
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:'Segoe UI','Noto Sans Arabic',Tahoma,sans-serif;line-height:1.75;font-size:15px}
+  .wrap{max-width:1180px;margin:0 auto;padding:30px 22px 90px}
+  header.top{border-bottom:2px solid var(--line);padding-bottom:18px;margin-bottom:24px}
+  h1{font-size:25px;margin:0 0 8px}
+  h2{font-size:21px;margin:36px 0 12px;padding-right:11px;border-right:4px solid var(--accent)}
+  h3{font-size:17px;margin:22px 0 9px;color:#cdd7e4}
+  .sub{color:var(--muted);font-size:13.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin:14px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin:16px 0}
+  .stat{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:14px}
+  .stat .n{font-size:25px;font-weight:800}
+  .stat .l{color:var(--muted);font-size:12px;margin-top:3px}
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:12.5px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;vertical-align:top}
+  th{background:#10131a;color:#bcc7d6;font-weight:700}
+  code,.mono{font-family:var(--mono);font-size:11.5px;background:#0b0d12;border:1px solid var(--line);border-radius:5px;padding:1px 6px;direction:ltr;unicode-bidi:plaintext;display:inline-block}
+  .b{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .b-ok{background:rgba(54,211,153,.15);color:var(--ok)}
+  .b-warn{background:rgba(251,189,35,.14);color:var(--warn)}
+  .b-bad{background:rgba(248,114,114,.15);color:var(--bad)}
+  .b-sup{background:rgba(177,139,255,.14);color:var(--purple)}
+  .b-ro{background:rgba(91,157,255,.13);color:var(--accent)}
+  .legend{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)} .muted{color:var(--muted)} .purple{color:var(--purple)} .acc{color:var(--accent)}
+  ul{margin:7px 0;padding-right:20px} li{margin:5px 0}
+  .crit{background:rgba(248,114,114,.07);border:1px solid rgba(248,114,114,.3);border-radius:10px;padding:13px 16px;margin:12px 0}
+  .crit .h{color:var(--bad);font-weight:800;margin-bottom:5px}
+  .note{background:rgba(251,189,35,.07);border:1px solid rgba(251,189,35,.28);border-radius:10px;padding:12px 15px;margin:13px 0;color:#f2dca0;font-size:13.5px}
+  .good{background:rgba(54,211,153,.06);border:1px solid rgba(54,211,153,.28);border-radius:10px;padding:12px 15px;margin:13px 0;font-size:13.5px}
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:12.5px}
+  .tocgrid{columns:2;gap:18px} @media(max-width:700px){.tocgrid{columns:1}}
+  .tocgrid a{color:var(--acc);text-decoration:none;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>دراسة لوحة تحكّم تووا الشاملة — تتبّع كل زرّ وحوار وأكشن من الكود</h1>
+  <div class="sub">المشروع: تووا (Toowa) · لوحة التحكّم: بناء OPS منفصل يُخدَم على <code>/ops</code> · المصدر المُدقَّق: <code>/home/a/Desktop/APP/platform</code> (الكود الحيّ + الباكند) · التاريخ: 2026-06-04</div>
+  <div class="sub" style="margin-top:6px"><b>المنهجيّة:</b> 7 وكلاء متخصّصين بالتوازي قرؤوا كلّ صفحة <code>.tsx</code> كاملةً، وتتبّعوا كلّ عنصر تفاعليّ: التسمية → المعالِج → استدعاء API → المسار الخلفيّ الفعليّ (تُحقّق وجوده بالـgrep في <code>backend/app/modules</code> بـ<code>file:line</code>) → الحكم. لا أخذ عيّنات — كلّ زرّ.</div>
+</header>
+
+<h2>1 · الخلاصة التنفيذيّة</h2>
+<div class="card">
+  <p>لوحة التحكّم تضمّ <b>~75 لوحة عبر 80+ مسارًا</b>، تتبّعنا فيها <b>~270 عنصرًا تفاعليًّا</b>. النتيجة الأهمّ مطمئنة بنيويًّا:</p>
+  <div class="good"><b class="ok">عقد الواجهة↔الباكند سليم بالكامل:</b> <b>صفر زرّ يستدعي مسارًا خلفيًّا غير موجود</b> · صفر توجيه خاطئ في روابط القوائم · كلّ استدعاء API يُطابق مسارًا حقيقيًّا مُتحقَّقًا. أزرار تحريك المال (ترحيل قيد · إضافة رصيد · دفع رواتب) مُحكَمة بالأدوار وغالبًا بتأكيد، والدفع الفعليّ مقفل بـ<code>production_payment_enabled</code>.</p>
+  <p>لكنّ الدراسة كشفت <b>5 عيوب حقيقيّة</b> (بينها عيب اتّجاه مال + إدخال ميّت + جمود صلاحيّة)، و<b>كودين خلفيّين بلا واجهة</b>، ومشاكل تنظيم/تنقّل (21 صفحة بلا رابط قائمة دائم)، وأنماطًا متكرّرة (ابتلاع الأخطاء · شارات «للقراءة فقط» كاذبة · i18n غير متّسق).</p>
+  <div class="grid">
+    <div class="stat"><div class="n acc">~75</div><div class="l">لوحة مدقَّقة</div></div>
+    <div class="stat"><div class="n ok">~245</div><div class="l">عنصر ✅ يعمل</div></div>
+    <div class="stat"><div class="n bad">5</div><div class="l">عيوب حقيقيّة (🔴/⚠️)</div></div>
+    <div class="stat"><div class="n bad">2</div><div class="l">كود خلفيّ بلا واجهة (يتيم)</div></div>
+    <div class="stat"><div class="n warn">21</div><div class="l">صفحة مخفيّة (بلا رابط قائمة)</div></div>
+    <div class="stat"><div class="n warn">~30</div><div class="l">ملاحظة UX/i18n/ابتلاع أخطاء</div></div>
+  </div>
+  <div class="legend">
+    <span class="b b-ok">✅ يعمل</span><span class="b b-warn">🟡 غامض/ضعيف</span><span class="b b-bad">🔴 عيب/مكسور</span><span class="b b-sup">⚠️ يعمل بقيود</span><span class="b b-ro">👁️ قراءة فقط</span>
+  </div>
+</div>
+
+<!-- ========= CRITICAL ========= -->
+<h2>2 · العيوب الحرجة (مرتّبة بالأولويّة)</h2>
+
+<div class="crit"><div class="h">🔴 #1 — تسوية النزاع تُحابي العميل دائمًا (عيب اتّجاه مال)</div>
+  <b>OpsChargebackCenter.tsx:143</b> — زرّ «حل» يُرسل القرار مُثبَّتًا على <code>FAVOR_CUSTOMER</code> دائمًا. الباكند يدعم <code>FAVOR_PROVIDER/SPLIT</code> (<code>chargeback_router.py:139</code>) لكنّ الواجهة لا تتيح الاختيار → كلّ نزاع داخليّ يُحسَم ضدّ المنصّة/المزوّد بغضّ النظر عن وجاهته. <b>الإصلاح:</b> إضافة منتقي قرار (محاباة عميل/مزوّد/تقسيم) قبل الإرسال.
+</div>
+
+<div class="crit"><div class="h">🔴 #2 — حقل «وقت الوصول المقدّر» ميّت في إنشاء العروض</div>
+  <b>OpsDispatchOffer.tsx</b> — الواجهة ترسل <code>eta_minutes</code> لكنّ <code>CreateOfferRequest</code> (<code>dispatch_router.py:70-72</code>) لا يحوي هذا الحقل ولا <code>extra="forbid"</code> → Pydantic <b>يتجاهله بصمت</b>. المشغّل يظنّ أنّه ضبط وقت وصول وهو لا يُرسَل إطلاقًا. <b>الإصلاح:</b> إمّا حذف الحقل أو إضافته للـschema الخلفيّ.
+</div>
+
+<div class="crit"><div class="h">🔴 #3 — استرداد كبير = طريق مسدود في الواجهة</div>
+  <b>OpsRefundCenter</b> — الباكند يفرض موافقة ثانية (maker-checker) للاسترداد ≥ العتبة (<code>refund_router.py:206</code>)، لكن <b>لا زرّ في أيّ لوحة</b> يستدعي <code>POST /finance/refunds/{id}/second-approve</code> (<code>:315</code>) → الاسترداد الكبير يرجع 422 بلا طريقة لإتمامه من اللوحة. <b>الإصلاح:</b> إضافة زرّ «موافقة ثانية» (وكيل مختلف).
+</div>
+
+<div class="crit"><div class="h">🔴 #4 — OpsZonePolygon: أزرار ميّتة لغير SUPER (بلا حارس دور في الواجهة)</div>
+  <b>OpsZonePolygon.tsx</b> — يعرض نموذج الإنشاء وأزرار الإنهاء <b>لكلّ أدوار OPS</b>، بينما <code>zone_suspension_router</code> محصور بـSUPER_ADMIN → غير-SUPER يضغط فيبتلع 403 («تعذّر إنشاء المنطقة»). شقيقته <b>OpsZoneSuspensions</b> تحرسه بـ<code>canManage = role === "SUPER_ADMIN"</code> وتُظهر إشعارًا للقراءة. <b>الإصلاح:</b> محاكاة نمط الشقيقة.
+</div>
+
+<div class="crit"><div class="h">🔴 #5 — OpsDriverPayoutTiers: إدخالات «minor» خام + قيم افتراضيّة أصغر ×10</div>
+  <b>OpsDriverPayoutTiers.tsx</b> — حقول الإنشاء تأخذ قيمًا خامًا بالمليم (<code>perKm=150</code>, <code>minFee=200</code> افتراضيًّا) بينما المنصّة بالمليم والقيمة القانونيّة لكلّ كم = 1500 → استخدام الافتراضيّات يُنشئ شريحة أجور شبه-صفريّة (خطر تسعير أجور خاطئ). <b>الإصلاح:</b> إدخال بالدينار عبر <code>parseToMinor</code> كبقيّة المنصّة + تصحيح الافتراضيّات.
+</div>
+
+<h3>كودان خلفيّان بلا أيّ واجهة (يتيمان)</h3>
+<div class="card">
+<table>
+  <tr><th>المسار الخلفيّ</th><th>الوصف</th><th>الأثر</th></tr>
+  <tr><td><code>POST /operations/users/{id}/identity-escalation</code> (operations_router.py:1069)</td><td>تصعيد احتيال/هويّة</td><td><span class="bad">لا API ولا واجهة — قدرة موجودة لا يصلها مشغّل</span></td></tr>
+  <tr><td><code>POST /operations/system/compute-trust-scores</code> (operations_router.py:3912)</td><td>إعادة حساب درجات الثقة يدويًّا</td><td><span class="bad">لا زرّ — لا يمكن فرض إعادة حساب المخاطر</span> (المجدول الخلفيّ فقط)</td></tr>
+</table>
+<p class="muted">مسارات أخرى بلا واجهة لكن بقصد (مدفوعة بمجدول خلفيّ): <code>scheduled-orders/release-due</code> — ليست يتيمة.</p>
+</div>
+
+<!-- ========= NAVIGATION ========= -->
+<h2>3 · التنظيم والتنقّل (قلب الطلب)</h2>
+
+<h3>أ) لوحات مخفيّة — 21 مسارًا بلا رابط قائمة دائم</h3>
+<div class="card">
+  <p>كلّها تُفتح فقط عبر «مركز» (hub) موجود في القائمة، لا برابط مباشر — أي تبعد <b>نقرتين</b> ولا تنقّل دائم لها:</p>
+  <ul>
+    <li><b>11 صفحة ControlPanel</b> (عبر <code>/ops/cp</code>): users · orders · complaints · wallets · errors · backups · dispatch-offers · cash-collections · restore-drills · system-events(تحويل) · ledger(تحويل).</li>
+    <li><b>10 صفحة مالية</b> (عبر لوحة <code>/ops/finance</code>): ledger · chart-of-accounts · tax · reports · manual-journal · payroll · chargebacks · commission · cash-risk · reconciliation.</li>
+  </ul>
+  <p class="muted">لا توجد صفحة «مجهولة كليًّا» (URL فقط) — كلّها يصلها مركزها. لكنّ فقدان سياق المركز (deep-link أو زرّ رجوع) يترك المشغّل بلا طريق عودة، والصفحات الماليّة العميقة مدفونة خلف <code>/ops/finance</code>.</p>
+</div>
+
+<h3>ب) توجيه مكسور · انحراف أدوار</h3>
+<div class="card">
+  <ul>
+    <li><b class="ok">توجيه مكسور: 0</b> — لا رابط قائمة يشير لمسار غير موجود. تحويلان صحيحان (<code>/ops/cp/ledger→/ops/finance/ledger</code>, <code>/ops/cp/system-events→…/audit-log?tab=events</code>).</li>
+    <li><b>انحراف أدوار نشط: 0</b> — حُرّاس <code>opsRouter</code> و<code>opsAccess.ts</code> متطابقان 1:1 (تحقّق نقطيّ: emergency-stop/maintenance/bulk/feature-toggles/admin/accounts = SUPER في الاثنين؛ document-policies/geographic-regions = SUPER؛ wallet-velocity = OPS_FIN).</li>
+    <li><b class="warn">ثغرة كامنة:</b> <code>canAccessOpsPath</code> <b>تفشل-مفتوحةً</b> للمسارات المجهولة (<code>opsAccess.ts:97 → return true</code>). 9 مسارات ماليّة (payroll/tax/chart-of-accounts/manual-journal/chargebacks/commission/reports/cash-risk/reconciliation) ليست مفاتيح في <code>OPS_NAV_ACCESS</code> → فلترة الدور على مستوى الرابط تعتمد على fail-open. آمنة اليوم لأنّ حُرّاس المسار تفرض OPS_FIN، لكنّ ادّعاء «1:1» غير دقيق لها — وأيّ ترقية مستقبليّة لأحدها للقائمة تتجاوز فلترة الدور بصمت.</li>
+  </ul>
+</div>
+
+<h3>ج) الترتيب والتجميع — ملاحظات</h3>
+<div class="card">
+  <ul>
+    <li>🟡 <b>تشتّت كونسولات الكيانات:</b> «المزوّدون» و«العملاء» (<code>/ops/cp/providers</code>, <code>/ops/cp/customers</code>) تحت قسم «الرئيسية»، بينما «السائقون» تحت قسم «إدارة السائقين» — الثلاثة المتماثلة موزّعة على قسمين.</li>
+    <li>🟡 <b>مفاهيم مكرّرة:</b> الشكاوى (<code>/ops/complaints</code> قابلة للكتابة + <code>/ops/cp/complaints</code> للعرض)؛ التوزيع (<code>/ops/dispatch</code> + <code>/ops/cp/dispatch-offers</code>) — سطحان لنفس المفهوم.</li>
+    <li>🟡 <b>تصادم أيقونات:</b> <code>🗺️</code> لـfleet/gate-board/zone-polygon/geographic-regions؛ <code>🚫</code> لـproviders-inactive/document-reject-reasons/customer-debts/zone-suspensions؛ <code>🧾</code> لـsettlement-agents/driver-settlements — يُضعف القابليّة للمسح البصريّ.</li>
+    <li>🟡 ازدواج صيانة/طوارئ: <b>OpsMaintenanceMode</b> و<b>OpsEmergencyStop</b> يستدعيان <b>نفس</b> مفتاح الباكند (<code>/operations/maintenance/enable</code>) → تبديل أحدهما يغيّر حالة الآخر بصمت (كلاهما محميّ بـSUPER+تأكيد، لكنّه ازدواج مربك).</li>
+  </ul>
+</div>
+
+<!-- ========= CROSS-CUTTING ========= -->
+<h2>4 · أنماط متكرّرة عبر اللوحات</h2>
+<div class="card">
+  <ul>
+    <li>🟡 <b>شارات «READ-ONLY» كاذبة:</b> <code>ControlPanelUsers/Customers/Providers/Drivers</code> تُظهر ترويسة «READ-ONLY · PII REDACTED» فوق كونسولات <b>تُجري</b> تعليقًا/رفعًا/إضافة رصيد/حدّ نقد/إعادة كلمة مرور/تعطيل TOTP — تناقض يُضعف الثقة (صفحة الهبوط صُحِّحت لكنّ ترويسات الصفحات لا).</li>
+    <li>🟡 <b>ابتلاع الأخطاء واسع الانتشار:</b> <code>OpsSupportCenter</code> (الأخطر — يبتلع كلّ المعالِجات الأربعة، والإرسال يمسح النصّ قبل الفشل) · لوحات <code>pages/ops/</code> الثلاث (Settlements/PayoutTiers/CashLimit) · تصدير CSV في Incidents/Complaints · أخطاء المالية (ManualJournal/Tax/Payroll تُجمّع كلّ الأسباب في «تعذّر» واحدة) · AIControls (reinstate/profile).</li>
+    <li>🟡 <b>تأكيدات ناقصة على إجراءات خطِرة:</b> <code>OpsAIControls</code> تعليق جماعيّ بلا حوار تأكيد · <code>OpsAccountManagement</code> إنشاء حساب صلاحيّات بلا تأكيد · <code>OpsPosIntegrations</code> تدوير المفتاح (مدمّر) بلا تأكيد (الإلغاء فقط محميّ).</li>
+    <li>🟡 <b>i18n غير متّسق:</b> الأغلب نصوص عربيّة خام لا مفاتيح <code>t()</code>؛ ومزيج إنجليزيّ غير مترجَم (OpsAppVersions «Shorebird patch ID» · OpsFraudRules «New Rule/Name/Severity» · رموز enum خام BALANCED/ASSET/doc_type · aria-labels إنجليزيّة مقابل تسميات عربيّة).</li>
+    <li>🟡 <b>أخطاء وحدة/تسمية:</b> <code>OpsWalletCredit</code> بانر السقف يقول «10 د.ل (1000 درهم)» — و10 د.ل = 10000 درهم لا 1000 (السقف المنفَّذ صحيح، النصّ مضلِّل) · <code>OpsCommissionConfig</code> «LYD» في بعض الـplaceholders مقابل معيار «د.ل».</li>
+    <li>🟡 <b>فخّ UX:</b> <code>OpsCashExceptions</code> يعرض <code>SETTLE_PARTIAL</code> لكلّ بلاغ رغم أنّ الباكند يقبله فقط لـ<code>PARTIAL_PAYMENT</code> → 422 مضمون عند الاختيار الخاطئ · <code>OpsDriverEmergencies</code> إعادة التعيين تتطلّب لصق UUID سائق يدويًّا (بلا منتقي).</li>
+    <li>🟡 <b>قدرات خلفيّة غير موصولة جزئيًّا:</b> <code>commissionApi.patchConfig</code> موجود (<code>commission_config_router.py:194</code>) بلا واجهة (لا تعديل/تعطيل تكوين) · <code>OpsSettlementAgents</code> رفع وثيقة بـ<code>object_key</code> خام بلا واجهة رفع ملفّ · <code>OpsFinanceReports</code> الباكند يدعم فلتر تاريخ + تصدير CSV بلا أزرار في الواجهة.</li>
+    <li>⚠️ <b>ازدواج مسار خلفيّ:</b> مساران بنفس المسار <code>/operations/drivers/{id}/cash-limit</code>: <code>POST {new_limit_minor,reason}</code> (operations_router.py:891) و<code>PUT {cash_limit_minor,cash_allowed}</code> (driver_cash_limit_router.py:42). الواجهة تستخدم POST الصحيح (العيب القديم أُصلح)، لكنّ الـPUT الميّت فخّ كامن — يُنصَح بإزالته.</li>
+  </ul>
+</div>
+
+<!-- ========= PER PANEL ========= -->
+<h2>5 · شرح كل لوحة (سطر واحد) + حالتها — مجمَّعة بالعنقود</h2>
+
+<h3>أ) العمليّات الأساسيّة (Main)</h3>
+<table>
+<tr><th>اللوحة</th><th>ماذا تفعل (سطر)</th><th>الحالة</th></tr>
+<tr><td>OpsDashboard</td><td>لوحة رؤية تشغيليّة مباشرة: لقطات + بطاقات حالة + روابط تنقّل سريع لكلّ العمليّات</td><td><span class="b b-ok">✅</span> <span class="muted">بعض «الحالات» ثوابت ساكنة تبدو حيّة</span></td></tr>
+<tr><td>OpsAuditExplorer</td><td>ملخّص أدلّة صحّة النظام (عدّادات/أخطاء/نسخ) — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>OpsIncidentCenter</td><td>رصد إشارات الحوادث وإدارة دورة حياتها (إنشاء/انتقال/post-mortem) + تصدير CSV</td><td><span class="b b-ok">✅</span> <span class="muted">تصدير يبتلع الفشل</span></td></tr>
+<tr><td>OpsComplaints</td><td>فرز الشكاوى ومتابعة SLA (تعيين/حل/تصعيد) + تصدير</td><td><span class="b b-ok">✅</span> <span class="muted">تصدير بلا معالجة خطأ</span></td></tr>
+<tr><td>OpsDriverEmergencies</td><td>استقبال بلاغات طوارئ السائقين ومعالجتها/إعادة تعيين سائق بديل</td><td><span class="b b-warn">🟡 UUID يدويّ</span></td></tr>
+<tr><td>OpsDriverAbandonment</td><td>سجلّ تخلّي السائقين (حظر+غرامة) مع رفع الحظر</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsCashExceptions</td><td>بلاغات تعذّر تحصيل النقد ومعالجتها + تسوية عدم حضور</td><td><span class="b b-warn">🟡 SETTLE_PARTIAL لكل الصفوف</span></td></tr>
+<tr><td>OpsConversations</td><td>عرض محادثات العميل↔السائق لكل طلب — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>OpsStuckOrders</td><td>طلبات عالقة (مرتجع/نزاع/إثبات/بلا سائق) بإجراء مخصّص لكل حالة</td><td><span class="b b-ok">✅ موصول جيّدًا</span></td></tr>
+<tr><td>OpsActionItems</td><td>متابعة مهام الإجراءات التشغيليّة وإغلاقها</td><td><span class="b b-warn">🟡 بلا PageHeader · enum خام</span></td></tr>
+<tr><td>OpsSupportCenter</td><td>إدارة جلسات الدعم: قائمة + محادثة ثنائيّة + إغلاق</td><td><span class="b b-bad">🟡 يبتلع كل الأخطاء (الأخطر)</span></td></tr>
+</table>
+
+<h3>ب) المالية — تقارير ودفتر (OPS_FIN)</h3>
+<table>
+<tr><th>اللوحة</th><th>ماذا تفعل</th><th>الحالة</th></tr>
+<tr><td>OpsFinanceDashboard</td><td>مؤشرات ماليّة فوريّة + 12 رابط تنقّل لكل المراكز الماليّة</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsLedgerExplorer</td><td>عرض قيود الدفتر المزدوج + بحث بالمعرّف + درج تتبّع — قراءة فقط</td><td><span class="b b-ro">👁️</span> <span class="muted">فلتر نصّ خام</span></td></tr>
+<tr><td>OpsChartOfAccounts</td><td>شجرة دليل الحسابات الرسميّ — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>OpsTaxConfig</td><td>إدارة نِسب الضريبة (إضافة/تفعيل) + إجمالي محصَّل</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsFinanceReports</td><td>قائمة الدخل + ميزان المراجعة + تجميع COA — قراءة فقط</td><td><span class="b b-warn">🟡 بلا فلتر تاريخ/تصدير رغم دعم الباكند</span></td></tr>
+<tr><td>OpsManualJournal</td><td>ترحيل قيد محاسبيّ يدويّ متوازن للدفتر</td><td><span class="b b-ok">✅ محميّ (دور+توازن+قفل فترة)</span></td></tr>
+<tr><td>OpsPayroll</td><td>موظفون + دورة رواتب + اعتماد (قيد استحقاق) + دفع (مقفل)</td><td><span class="b b-ok">✅ الدفع مقفل بالعلَم</span></td></tr>
+<tr><td>OpsWalletVelocity</td><td>مراقبة قرارات Velocity لشحن المحافظ — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>OpsWalletCredit</td><td>إضافة رصيد يدويّ لمحفظة بخطوتين+تأكيد+سقف حسب الدور</td><td><span class="b b-ok">✅ الأقوى حراسةً</span> <span class="muted">بانر وحدة مضلِّل</span></td></tr>
+</table>
+
+<h3>ج) المالية — تحريك المال (OPS_FIN)</h3>
+<table>
+<tr><th>اللوحة</th><th>ماذا تفعل</th><th>الحالة</th></tr>
+<tr><td>OpsRefundCenter</td><td>مراجعة الاستردادات واعتمادها/رفضها</td><td><span class="b b-bad">🔴 لا مسار موافقة ثانية للكبير</span></td></tr>
+<tr><td>OpsChargebackCenter</td><td>حلّ النزاعات + تجميد/رفع تجميد محفظة</td><td><span class="b b-bad">🔴 القرار مثبَّت FAVOR_CUSTOMER</span></td></tr>
+<tr><td>OpsSettlementCenter</td><td>تسويات المزوّدين (توليد دفعة+اعتماد+دفع)</td><td><span class="b b-ok">✅ الدفع mock مقفل</span></td></tr>
+<tr><td>OpsCommissionConfig</td><td>ضبط عمولة المنصّة (عام+override) + معاينة + عكس</td><td><span class="b b-warn">🟡 patchConfig بلا واجهة</span></td></tr>
+<tr><td>OpsCashRiskCenter</td><td>النقد المعلّق لدى السائقين: تأكيد/تعليم فرق/حل</td><td><span class="b b-ok">✅</span> <span class="muted">بلا حارس دور أماميّ</span></td></tr>
+<tr><td>OpsReconciliation</td><td>تشغيل المطابقة ورصد الاستثناءات وتسويتها</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsCustomerDebts</td><td>ديون عدم الحضور (تمنع الطلب) + إعفاء يفكّ الحظر</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsSettlementAgents</td><td>إنشاء مندوبي التسوية + وثائق + اعتماد KYC</td><td><span class="b b-warn">🟡 رفع وثيقة بـobject_key خام</span></td></tr>
+<tr><td>OpsBonusEngine</td><td>حملات مكافآت (إنشاء/فتح/معاينة/صرف بسقف ميزانية)</td><td><span class="b b-ok">✅ السقف ضابط الأمان</span></td></tr>
+</table>
+
+<h3>د) التوزيع/الأسطول/السائقون</h3>
+<table>
+<tr><th>اللوحة</th><th>ماذا تفعل</th><th>الحالة</th></tr>
+<tr><td>OpsDriverControls</td><td>بحث سائق + إجراءات (حدّ نقد/تعليق/رفع) + تبويبات GPS/مخاطر</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsDispatchOffer</td><td>إنشاء عروض توزيع يدويّة (طلب جاهز↔سائق) + سجلّ</td><td><span class="b b-bad">🔴 حقل ETA ميّت</span></td></tr>
+<tr><td>OpsFleetMap</td><td>خريطة أسطول حيّة (poll+SSE) + تصفية</td><td><span class="b b-ok">✅</span> <span class="muted">صفوف SSE بلا اسم/حالة مؤقّتًا</span></td></tr>
+<tr><td>OpsOnboarding</td><td>مراجعة تسجيل السائقين/المزوّدين (قبول/رفض/وثائق/موقع/جماعيّ)</td><td><span class="b b-warn">🟡 رفض وثيقة بلا سبب</span></td></tr>
+<tr><td>OpsInactiveProviders</td><td>مزوّدون معتمدون لا يظهرون في البحث + السبب — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>OpsDriverSettlements</td><td>تسويات السائقين اليوميّة (توليد+تسجيل استلام نقد)</td><td><span class="b b-ok">✅</span> <span class="muted">يبتلع الأخطاء</span></td></tr>
+<tr><td>OpsDriverPayoutTiers</td><td>شرائح أجور السائقين + override لكل سائق</td><td><span class="b b-bad">🔴 إدخال minor خام + افتراضي ×10 خطأ</span></td></tr>
+<tr><td>OpsDriverCashLimit</td><td>عرض/تعديل حدّ النقد لكل سائق</td><td><span class="b b-ok">✅ عيب PUT القديم أُصلح</span></td></tr>
+</table>
+
+<h3>هـ) الكتالوج/الجغرافيا/الوثائق/العروض</h3>
+<table>
+<tr><th>اللوحة</th><th>ماذا تفعل</th><th>الحالة</th></tr>
+<tr><td>OpsCatalogModeration</td><td>مراجعة أصناف المزوّدين قبل النشر (موافقة/إعادة بسبب)</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsMasterCatalog</td><td>إدارة الكتالوج المرجعيّ (أصناف/صور/مكوّنات+استيراد)</td><td><span class="b b-ok">✅ نظيف</span></td></tr>
+<tr><td>OpsFoodCategories</td><td>إدارة تصنيفات الطعام التسعة (CRUD)</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsPlaces</td><td>إدارة سجلّ الأماكن (مطاعم/مقاهٍ لكل مدينة)</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsPromotions</td><td>إدارة حملات العروض على مستوى المنصّة</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsDocumentInbox</td><td>صندوق وارد موحّد لوثائق المزوّدين (معاينة/قبول/رفض بأسباب)</td><td><span class="b b-warn">🟡 رابط المعاينة الكاملة يتجاوز المصادقة</span></td></tr>
+<tr><td>OpsDocumentPolicies</td><td>تعديل سياسات أنواع الوثائق (SUPER فقط)</td><td><span class="b b-warn">⚠️ onBlur قد يفقد آخر تعديل · بلا إنشاء</span></td></tr>
+<tr><td>OpsDocumentRejectReasons</td><td>إدارة أسباب رفض الوثائق المُعدّة سلفًا (SUPER)</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsGeographicRegions</td><td>إدارة المناطق والبلديات (SUPER)</td><td><span class="b b-warn">🟡 لا إعادة تسمية منطقة · نقل بلا تأكيد</span></td></tr>
+</table>
+
+<h3>و) الحوكمة/النظام/الإدارة</h3>
+<table>
+<tr><th>اللوحة</th><th>ماذا تفعل</th><th>الحالة</th></tr>
+<tr><td>OpsLaunchGates</td><td>متابعة وإغلاق/تجاوز/إعادة فتح بوابات الإطلاق</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsGateBoard</td><td>لوحة قراءة لإشارات جاهزيّة الإطلاق</td><td><span class="b b-warn">🟡 بطاقات إشارة ثوابت تبدو حيّة</span></td></tr>
+<tr><td>OpsFlowTraceExplorer</td><td>تتبّع دورة حياة طلب بإدخال معرّفه — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>OpsPilot</td><td>إدارة مرحلة التجربة (تفعيل/إيقاف/إتمام/دعوة)</td><td><span class="b b-ok">✅ إتمام بتأكيد</span></td></tr>
+<tr><td>OpsSoftLaunch</td><td>الإطلاق التدريجيّ (تفعيل/تراجع طارئ) + تسجيل حادثة</td><td><span class="b b-ok">✅ تراجع بتأكيد</span></td></tr>
+<tr><td>OpsKpiDashboard</td><td>مؤشرات أداء حيّة (طلبات/سائقون/مالية) كل 30ث — قراءة</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>OpsAppVersions</td><td>نشر نسخ التطبيق + تحديث إلزاميّ (SUPER)</td><td><span class="b b-ok">✅ SUPER+تأكيد</span></td></tr>
+<tr><td>OpsArchivePage</td><td>أرشيف التنبيهات والعلاقات (>24س) — قراءة محليّة</td><td><span class="b b-ro">👁️ بلا backend بقصد</span></td></tr>
+<tr><td>OpsHandoff</td><td>توثيق تسليم الورديات + ملخّص + تصدير CSV</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>OpsAccountManagement</td><td>إنشاء وإدارة حسابات فريق العمليّات (SUPER)</td><td><span class="b b-warn">🟡 بلا تأكيد · يبتلع الأخطاء</span></td></tr>
+<tr><td>OpsMaintenanceMode</td><td>تفعيل/إيقاف وضع الصيانة (503 لغير المشغّلين) (SUPER)</td><td><span class="b b-ok">✅ محميّ جيّدًا</span></td></tr>
+<tr><td>OpsEmergencyStop</td><td>إيقاف طوارئ فوريّ (نفس آلية الصيانة) (SUPER)</td><td><span class="b b-warn">🟡 يزدوج مع الصيانة</span></td></tr>
+<tr><td>OpsFeatureToggles</td><td>تبديل مفاتيح الميزات بطبقاتها (SEALED/ADMIN/GATED) (SUPER)</td><td><span class="b b-ok">✅ الأفضل حمايةً</span></td></tr>
+<tr><td>OpsAIControls</td><td>التحكم بالإجراءات الذكيّة + إدارة الحسابات عالية الخطورة</td><td><span class="b b-warn">🟡 تعليق جماعيّ بلا تأكيد · يبتلع</span></td></tr>
+<tr><td>OpsFraudRules</td><td>إدارة قواعد كشف الاحتيال + مسح يدويّ (إنشاء SUPER)</td><td><span class="b b-warn">🟡 نصوص إنجليزيّة مختلطة</span></td></tr>
+<tr><td>OpsFraudReview</td><td>تشغيل مسح الاحتيال وعرض العلامات — قراءة + إعادة فحص</td><td><span class="b b-warn">🟡 يزدوج مع FraudRules</span></td></tr>
+<tr><td>OpsPosIntegrations</td><td>تكامل أنظمة POS (أحداث/تدوير/إلغاء مفتاح) (SUPER)</td><td><span class="b b-warn">🟡 التدوير بلا تأكيد</span></td></tr>
+<tr><td>OpsZonePolygon</td><td>مناطق توصيل متعدّدة الأضلاع (إنشاء/إنهاء)</td><td><span class="b b-bad">🔴 بلا حارس دور أماميّ</span></td></tr>
+<tr><td>OpsZoneSuspensions</td><td>إيقاف/استئناف الخدمة في منطقة (مستطيل/دائرة) (SUPER)</td><td><span class="b b-ok">✅ محروسة بشكل صحيح</span></td></tr>
+<tr><td>OpsBulkActions</td><td>تنفيذ إجراء واحد على عدّة عناصر (حتى 100) (SUPER)</td><td><span class="b b-ok">✅ تأكيد+سقف</span></td></tr>
+<tr><td>TotpSetupPage</td><td>إعداد المصادقة الثنائيّة TOTP (QR+تفعيل)</td><td><span class="b b-ok">✅</span></td></tr>
+</table>
+
+<h3>ز) ControlPanel (إدارة/مراقبة)</h3>
+<table>
+<tr><th>اللوحة</th><th>ماذا تفعل</th><th>الحالة</th></tr>
+<tr><td>ControlPanelLanding</td><td>صفحة هبوط: بطاقات عدّادات تقود لوحدات الإدارة/المراقبة</td><td><span class="b b-ok">✅</span></td></tr>
+<tr><td>ControlPanelUsers</td><td>إدارة المستخدمين: بحث+قائمة+إجراءات (تعليق/رصيد/كلمة مرور/TOTP)</td><td><span class="b b-warn">🟡 شارة READ-ONLY كاذبة</span></td></tr>
+<tr><td>ControlPanelCustomers</td><td>إدارة العملاء: درج معلومات/إجراءات/طلبات</td><td><span class="b b-warn">🟡 شارة READ-ONLY كاذبة</span></td></tr>
+<tr><td>ControlPanelProviders</td><td>إدارة المزوّدين: تفاصيل/إجراءات</td><td><span class="b b-warn">🟡 شارة READ-ONLY كاذبة</span></td></tr>
+<tr><td>ControlPanelDrivers</td><td>إدارة السائقين: قائمة+إجراءات (حدّ نقد)</td><td><span class="b b-warn">🟡 شارة READ-ONLY كاذبة</span></td></tr>
+<tr><td>ControlPanelOrders</td><td>عرض الطلبات + درج تتبّع التدفّق — قراءة فقط</td><td><span class="b b-ro">👁️ شارة دقيقة</span></td></tr>
+<tr><td>ControlPanelComplaints</td><td>عرض الشكاوى + مسار الطلب — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>ControlPanelWallets</td><td>عرض المحافظ (رقم/رصيد) — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>ControlPanelErrors</td><td>عرض أخطاء النظام بفلترة — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>ControlPanelBackups</td><td>عرض سجلّ النسخ الاحتياطيّ — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>ControlPanelAuditCenter</td><td>تبويبان: سجلّ التدقيق + أحداث النظام — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>ControlPanelDispatchOffers</td><td>عرض عروض التوزيع — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>ControlPanelCashCollections</td><td>عرض تحصيلات النقد — قراءة فقط</td><td><span class="b b-ro">👁️</span></td></tr>
+<tr><td>ControlPanelRestoreDrills</td><td>عرض تمارين الاستعادة (DR) — قراءة فقط</td><td><span class="b b-ro">👁️ تضارب تسمية تمارين/تجارب</span></td></tr>
+</table>
+
+<!-- ========= RECOMMENDATIONS ========= -->
+<h2>6 · توصيات التنظيم والإصلاح (مرتّبة)</h2>
+<div class="card">
+  <h3>إصلاحات سلوكيّة (عيوب)</h3>
+  <ol>
+    <li><b>Chargeback:</b> منتقي قرار (عميل/مزوّد/تقسيم) بدل التثبيت على FAVOR_CUSTOMER.</li>
+    <li><b>DispatchOffer:</b> حذف حقل ETA الميّت أو ربطه بـschema خلفيّ.</li>
+    <li><b>RefundCenter:</b> زرّ «موافقة ثانية» لإكمال الاسترداد الكبير.</li>
+    <li><b>ZonePolygon:</b> حارس دور أماميّ (نمط ZoneSuspensions) لإخفاء أزرار غير-SUPER.</li>
+    <li><b>DriverPayoutTiers:</b> إدخال بالدينار (<code>parseToMinor</code>) + تصحيح الافتراضيّات ×10.</li>
+    <li><b>كودان يتيمان:</b> إمّا واجهة لـidentity-escalation وcompute-trust-scores أو توثيق إزالتهما.</li>
+  </ol>
+  <h3>تنظيم وتنقّل</h3>
+  <ol>
+    <li>توحيد كونسولات الكيانات الثلاثة (عملاء/مزوّدون/سائقون) في قسم واحد «إدارة الكيانات».</li>
+    <li>رفع الصفحات الماليّة العميقة كقائمة فرعيّة قابلة للطيّ تحت «المالية» بدل الاعتماد على المركز فقط (تخفيف الـ21 صفحة المخفيّة).</li>
+    <li>إضافة المسارات الماليّة التسعة المفقودة إلى <code>OPS_NAV_ACCESS</code> (سدّ fail-open).</li>
+    <li>تمييز الأيقونات المتصادمة (🗺️/🚫/🧾) برموز مميّزة.</li>
+    <li>دمج/تمييز ازدواج الصيانة/الطوارئ والشكاوى والتوزيع.</li>
+  </ol>
+  <h3>اتّساق وثقة</h3>
+  <ol>
+    <li>إزالة شارات «READ-ONLY» من كونسولات ControlPanel القابلة للكتابة الأربعة.</li>
+    <li>استبدال ابتلاع الأخطاء برسائل خادم حقيقيّة (أولًا SupportCenter ثمّ المالية ثمّ pages/ops).</li>
+    <li>تأكيدات على الإجراءات المدمّرة بلا تأكيد (تعليق جماعيّ AIControls · إنشاء حساب · تدوير مفتاح POS).</li>
+    <li>تصحيح بانر وحدة WalletCredit وتوحيد «د.ل»؛ ترجمة النصوص الإنجليزيّة الخام ورموز enum.</li>
+    <li>منتقي سائق (بدل UUID) في DriverEmergencies؛ تقييد SETTLE_PARTIAL لـPARTIAL_PAYMENT.</li>
+  </ol>
+</div>
+
+<div class="good"><b class="ok">إيجابيّات مؤكَّدة بالكود:</b> لا زرّ يستدعي مسارًا مفقودًا · لا توجيه مكسور في القوائم · أزرار تحريك المال (قيد يدويّ · إضافة رصيد) محميّة بالدور + التوازن/الفترة + تأكيد؛ والدفع الفعليّ مقفل بـ<code>production_payment_enabled</code> · OpsFeatureToggles وOpsWalletCredit نموذجان للحماية الجيّدة.</div>
+
+<footer>
+  أُنشئ هذا التقرير من قراءة الكود الحيّ مباشرةً بـ7 وكلاء متخصّصين بالتوازي (~75 لوحة، ~270 عنصرًا، أدلّة <code>file:line</code>) — لا من ملفّات md ولا ذاكرة. 2026-06-04. لا تعديل كود — دراسة وتتبّع فقط.
+</footer>
+
+</div>
+</body>
+</html>

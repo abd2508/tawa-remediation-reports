@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تووا — خطة ربط المخزن المرجعي بلوحة التحكم</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;margin:0;background:#0f1720;color:#e8eef5;direction:rtl;line-height:1.85}
+header{background:linear-gradient(135deg,#0e7a4f,#0b5c3c);padding:30px 22px}
+header h1{margin:0;font-size:26px}
+header p{margin:8px 0 0;opacity:.93;font-size:14px}
+.wrap{max-width:1080px;margin:0 auto;padding:20px}
+h2{color:#5fd0a0;border-bottom:2px solid #243240;padding-bottom:8px;margin:34px 0 14px;font-size:22px}
+h3{color:#8be0b0;margin:22px 0 8px;font-size:18px}
+p,li{font-size:15px}
+.box{background:#15202b;border:1px solid #243240;border-radius:12px;padding:16px 20px;margin:14px 0}
+.warn{background:#3a2a13;border:1px solid #7a5a1f;border-radius:12px;padding:14px 20px;margin:14px 0;color:#ffd591}
+.ok{background:#13402c;border:1px solid #1f6b46;border-radius:12px;padding:14px 20px;margin:14px 0;color:#9be8be}
+.flow{background:#13283a;border:1px solid #1f4f6b;border-radius:12px;padding:14px 20px;margin:14px 0;color:#a9d8f5}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;background:#15202b;border-radius:10px;overflow:hidden}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid #243240;vertical-align:top}
+th{background:#1c2a38;color:#9fb2c4}
+code{background:#0c141d;color:#7fd6a8;padding:2px 7px;border-radius:6px;font-size:13px;direction:ltr;display:inline-block}
+.tag{display:inline-block;border-radius:14px;padding:2px 10px;font-size:12px;margin:2px}
+.tag.safe{background:#13402c;color:#8be0b0;border:1px solid #1f6b46}
+.tag.mid{background:#3a2a13;color:#ffd591;border:1px solid #7a5a1f}
+.tag.new{background:#13283a;color:#a9d8f5;border:1px solid #1f4f6b}
+.step{display:flex;gap:14px;align-items:flex-start;margin:12px 0}
+.num{flex:0 0 38px;height:38px;border-radius:50%;background:#0e7a4f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px}
+.muted{color:#9fb2c4;font-size:13px}
+ul{margin:8px 0}
+.before-after{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.before-after>div{padding:12px;border-radius:10px}
+.before{background:#2a1717;border:1px solid #5a2a2a}
+.after{background:#13402c;border:1px solid #1f6b46}
+hr{border:none;border-top:1px solid #243240;margin:26px 0}
+.legend span{margin-left:14px}
+.mock{background:#0c141d;border:1px solid #243240;border-radius:10px;padding:14px;font-family:monospace;direction:ltr;text-align:left;white-space:pre;overflow-x:auto;color:#cfe0ef;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<header>
+  <h1>🔗 تووا — خطة ربط المخزن المرجعي بلوحة التحكم</h1>
+  <p>ماذا سأفعل بالضبط · مبنيّة على الكود الفعلي للمنصّة · 2026-05-25</p>
+  <p>القرار المعتمد: <b>كتالوج مرجعي كامل</b> + <b>استضافة الصور ثابتة عبر nginx</b> · المرجعي <b>بلا أسعار</b> (المزوّد يسعّر)</p>
+</header>
+<div class="wrap">
+
+<h2>1) الفكرة في جملة واحدة</h2>
+<div class="box">
+نبني <b>«كتالوج مرجعي» واحداً مشتركاً على مستوى المنصّة</b> (الأسماء + الصور المتعددة + المكوّنات)، يُدار من <b>لوحة التحكم</b>.
+المزوّد لا يكتب الصنف من الصفر، بل <b>يختار</b> من هذا الكتالوج → يختار صورة تعجبه → تظهر له المكوّنات الجاهزة (يعدّلها) → <b>يضع سعره فقط</b>.
+والعميل عند الطلب يفتح الصنف و<b>يزيل أي مكوّن لا يريده</b>.
+</div>
+
+<h2>2) لماذا هذا ممكن الآن؟ (ما اكتشفتُه في كود المنصّة)</h2>
+<p>فحصتُ الكود الحقيقي، وهذه الحقائق التي تبني عليها الخطة:</p>
+<table>
+<tr><th>المكوّن في المنصّة</th><th>الحالة</th><th>المعنى للخطة</th></tr>
+<tr><td><code>CatalogItem</code> (صنف لكل مزوّد): اسم {ar,en} + فئة + <code>image_url</code> + الحالة</td><td>موجود</td><td>سنربط كل صنف مزوّد باختيار من المرجعي</td></tr>
+<tr><td><code>ItemVariant</code>: السعر <b>بالمليم</b></td><td>موجود</td><td>هنا يضع المزوّد سعره (المرجعي بلا سعر)</td></tr>
+<tr><td><code>ItemComponent.is_removable</code> + <code>ModifierGroup/Option</code></td><td class="tag safe">✅ موجود</td><td><b>نموذج المكوّنات القابلة للإزالة جاهز</b> — يطابق مخزننا تماماً</td></tr>
+<tr><td>الطلب يقبل <code>removed_component_ids</code> + معاينة سعر</td><td class="tag safe">✅ موجود</td><td><b>إزالة العميل للمكوّن مدعومة أصلاً في الطلب</b></td></tr>
+<tr><td><code>food_categories</code> (فئات هرمية)</td><td>موجود — بلا إدارة/seed</td><td>سنستورد الفئات التسع ونضيف إدارتها</td></tr>
+<tr><td>صور الأصناف: <code>image_url</code> نص حر — <b>حقل واحد فقط</b></td><td>محدود</td><td>سنضيف دعم <b>صور متعددة</b> عبر جدول مرجعي</td></tr>
+<tr><td>«كتالوج مرجعي مشترك»</td><td class="tag mid">✗ غير موجود</td><td><b>هذا ما سنبنيه</b></td></tr>
+</table>
+<div class="ok"><b>الخلاصة السارّة:</b> منطق «المكوّنات القابلة للإزالة» الذي صمّمناه في المخزن <b>موجود فعلاً في المنصّة</b> — لسنا نخترع شيئاً غريباً، بل نُغذّي بنيةً جاهزة.</div>
+
+<h2>3) ما الذي سأبنيه بالضبط؟</h2>
+
+<h3>أ. ثلاثة جداول مرجعية جديدة (قاعدة البيانات) <span class="tag new">جديد</span></h3>
+<div class="mock">MasterCatalogItem        ← الصنف المرجعي المشترك
+  ├─ external_id          ← يطابق "it025" في store_items.json
+  ├─ names_json {ar,en}   ← الاسم العربي/الإنجليزي
+  ├─ category_id          ← يربط بالفئة
+  └─ status               ← مُفعّل / مخفي
+
+MasterCatalogImage       ← صور متعددة لكل صنف (المزوّد يختار منها)
+  ├─ master_item_id
+  ├─ url                  ← رابط الصورة المستضافة
+  ├─ is_primary           ← الصورة الأساسية
+  └─ sort_order
+
+MasterCatalogIngredient  ← المكوّنات الافتراضية لكل صنف
+  ├─ master_item_id
+  ├─ name_json {ar,en}
+  └─ is_removable         ← هل يقدر العميل يزيله؟</div>
+<p class="muted">تُضاف عبر <b>migration واحدة</b> بعد آخر نسخة (aa04). <b>بلا أثر مالي إطلاقاً</b> (المكوّنات بلا سعر) → فحص السلامة المالية FIN-COR يبقى سليماً.</p>
+
+<h3>ب. استضافة الصور الـ292 (ثابتة عبر nginx) <span class="tag new">جديد</span></h3>
+<ul>
+<li>نسخ مجلّد <code>items/*.jpg</code> (292 صورة) إلى مجلّد ثابت يخدمه الخادم.</li>
+<li>تصبح كل صورة متاحة على رابط مثل: <code>https://staging.tawanow.com/static/catalog/img025.jpg</code></li>
+<li>نخزّن هذه الروابط في <code>MasterCatalogImage.url</code> — فتظهر للمزوّد والعميل مباشرةً، <b>بلا اعتماد على إنترنت خارجي</b>.</li>
+</ul>
+
+<h3>ج. سكربت الاستيراد (مرّة واحدة، قابل للإعادة) <span class="tag new">جديد</span></h3>
+<p>سكربت <code>import_master_catalog.py</code> يقرأ ملفات المخزن ويملأ القاعدة:</p>
+<ul>
+<li>9 فئات → <code>food_categories</code></li>
+<li>134 صنفاً → <code>MasterCatalogItem</code></li>
+<li>292 صورة → <code>MasterCatalogImage</code> (الأولى = أساسية)</li>
+<li>كل المكوّنات → <code>MasterCatalogIngredient</code></li>
+</ul>
+<p class="muted">آمن وقابل للإعادة (idempotent) عبر <code>external_id</code> — لا يكرّر شيئاً لو شُغّل مرّتين.</p>
+
+<h3>د. نقاط نهاية (API) <span class="tag new">جديد/توسعة</span></h3>
+<ul>
+<li><code>GET /catalog/master/items</code> — قائمة الأصناف المرجعية بصورها ومكوّناتها (للمزوّد ولوحة التحكم).</li>
+<li>توسعة إنشاء صنف المزوّد ليقبل «اخترتُ الصنف المرجعي رقم كذا + الصورة كذا» → فينسخ المكوّنات تلقائياً.</li>
+<li>إضافة تحكّم بالمكوّنات للمزوّد (إضافة/حذف مكوّن — ناقص حالياً).</li>
+<li>نقاط لوحة التحكم: تفعيل/إخفاء/تعديل المرجعي + إدارة الفئات + زر الاستيراد.</li>
+</ul>
+
+<h3>هـ. الواجهات <span class="tag new">جديد</span></h3>
+<ul>
+<li><b>بوابة المزوّد:</b> زر «اختر من الكتالوج» يفتح نافذة: فئة ← صنف ← اختيار صورة ← قائمة مكوّنات (شطب/إضافة) ← إدخال السعر.</li>
+<li><b>لوحة التحكم (OPS):</b> صفحة جديدة «الكتالوج المرجعي» لإدارة كل شيء + الاستيراد.</li>
+<li><b>تطبيق العميل (Flutter):</b> ورقة تخصيص الصنف تُظهر المكوّنات وتسمح بإزالة غير المرغوب.</li>
+</ul>
+
+<h2>4) كيف سيظهر؟ (رحلة كل طرف)</h2>
+
+<h3>👨‍🍳 المزوّد — إضافة صنف</h3>
+<div class="flow">
+<b>قبل:</b> يكتب اسم الصنف يدوياً + يلصق رابط صورة من الإنترنت + يكتب السعر.
+<br><b>بعد:</b>
+<div class="step"><div class="num">1</div><div>يضغط «اختر من الكتالوج» → يختار الفئة (مثلاً «مشاوي»)</div></div>
+<div class="step"><div class="num">2</div><div>يرى الأصناف المرجعية بصورها → يختار «شاورما دجاج»</div></div>
+<div class="step"><div class="num">3</div><div>تظهر له <b>صور الصنف المتعددة</b> → يختار التي تناسب مطعمه</div></div>
+<div class="step"><div class="num">4</div><div>تظهر المكوّنات الجاهزة (خبز صاج، دجاج، ثومية، مخلل، بطاطس…) → <b>يحذف/يضيف</b> ما يناسبه</div></div>
+<div class="step"><div class="num">5</div><div>يدخل <b>سعره فقط</b> (بالمليم) → يحفظ → الصنف يذهب للموافقة ثم النشر</div></div>
+</div>
+
+<h3>🛒 العميل — الطلب</h3>
+<div class="flow">
+<div class="step"><div class="num">1</div><div>يرى الصنف بالصورة التي اختارها المزوّد</div></div>
+<div class="step"><div class="num">2</div><div>يفتح الصنف → يرى قائمة المكوّنات</div></div>
+<div class="step"><div class="num">3</div><div><b>يزيل أي مكوّن لا يريده</b> (مثلاً «بدون مخلل») → يضيف للسلة</div></div>
+<div class="step"><div class="num">4</div><div>يُرسَل مع الطلب <code>removed_component_ids</code> (مدعوم أصلاً ✅) → يصل للمطبخ</div></div>
+</div>
+
+<h3>🛠️ لوحة التحكم (OPS) — التحكم</h3>
+<div class="flow">
+صفحة «الكتالوج المرجعي» الجديدة تتيح:
+<ul style="margin-top:6px">
+<li>تصفّح كل الأصناف المرجعية بفئاتها وصورها ومكوّناتها</li>
+<li>تفعيل/إخفاء صنف · تعديل اسمه · إضافة/إزالة صورة · تعديل المكوّنات الافتراضية</li>
+<li>إدارة الفئات التسع</li>
+<li>زر «استيراد/تحديث من المخزن»</li>
+<li>(تبقى صفحة الموافقة على أصناف المزوّدين كما هي)</li>
+</ul>
+</div>
+
+<h2>5) خطوات التنفيذ — 3 مراحل (بإذن منفصل لكلٍّ)</h2>
+<table>
+<tr><th>المرحلة</th><th>ماذا أفعل</th><th>المخاطرة</th></tr>
+<tr>
+<td><b>أ — البيانات والاستضافة</b></td>
+<td>الجداول الثلاثة + migration + استضافة الـ292 صورة + سكربت الاستيراد + الفئات التسع + صفحة OPS للعرض فقط</td>
+<td><span class="tag safe">آمنة</span><br><span class="muted">لا تمسّ تدفّق المزوّد/العميل الحالي إطلاقاً</span></td>
+</tr>
+<tr>
+<td><b>ب — المزوّد</b></td>
+<td>نافذة «اختر من المرجعي» + قبول الخادم للاختيار + نسخ المكوّنات + تحكّم المزوّد بها</td>
+<td><span class="tag mid">متوسطة</span></td>
+</tr>
+<tr>
+<td><b>ج — العميل</b></td>
+<td>ربط تخصيص المكوّنات في الويب + شاشة التخصيص في تطبيق Flutter</td>
+<td><span class="tag mid">متوسطة</span></td>
+</tr>
+</table>
+<p class="muted">نبدأ بالمرحلة (أ) لأنها آمنة بالكامل وتُظهر النتيجة في لوحة التحكم بسرعة، ثم ننتقل تدريجياً.</p>
+
+<h2>6) ضمانات الجودة (لكل مرحلة قبل اعتبارها منتهية)</h2>
+<div class="ok">
+✓ اختبارات الخلفية (pytest) تنجح &nbsp; · &nbsp; ✓ اختبارات الواجهة (vitest) تنجح<br>
+✓ فحص الأنواع والبناء &nbsp; · &nbsp; ✓ <b>فحص السلامة المالية FIN-COR = PASS</b><br>
+✓ الـ migration مُتحقَّقة على PostgreSQL حقيقي (تركيب + تراجع نظيف)<br>
+✓ تجربة محلية أولاً ثم staging &nbsp; · &nbsp; ✓ <b>بلا أي commit أو نشر بلا إذنك</b>
+</div>
+
+<h2>7) بوابة الحوكمة (مهم)</h2>
+<div class="warn">
+⚠️ هذا العمل يمسّ <b>مناطق محظورة</b> في المشروع: <code>backend/app/</code> و<code>mobile_app/</code> والبنية التحتية (nginx).
+<br>القاعدة: <b>لا أعدّل أي كود في هذه المناطق إلا بإذنك الصريح</b>، مرحلةً مرحلة. هذا المستند خطة للمراجعة فقط — لم يُكتب أي كود بعد.
+</div>
+
+<h2>8) ما لن يتغيّر / ما هو آمن</h2>
+<ul>
+<li><b>لا أسعار في المرجعي</b> — السعر يبقى مسؤولية المزوّد عبر <code>ItemVariant</code> بالمليم.</li>
+<li><b>لا أثر مالي</b> — المكوّنات بلا سعر (price_delta=0)، فالنظام المحاسبي لا يتأثّر.</li>
+<li>المزوّدون الحاليون وأصنافهم لا تتأثّر — الميزة <b>إضافية</b> (يمكن الاستمرار بالكتابة اليدوية أيضاً).</li>
+<li>المخزن المرجعي يبقى مصدر الحقيقة في <code>/home/a/Desktop/تووا-مخزون-الصور/</code>؛ الاستيراد يُحدِّث القاعدة منه.</li>
+</ul>
+
+<hr>
+<p class="muted">المخزن جاهز: 134 صنفاً فريداً · 292 صورة (106 صنف بصورتين+) · مكوّنات غير جامدة · 95 بلدية · 454 مطعماً · بلا أسعار · مُدقَّق بصرياً.
+الخطوة التالية بانتظار قرارك: البدء بالمرحلة (أ).</p>
+
+</div>
+</body>
+</html>

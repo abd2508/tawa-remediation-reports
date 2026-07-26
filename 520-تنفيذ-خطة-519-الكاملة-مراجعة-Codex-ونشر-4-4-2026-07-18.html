@@ -1,0 +1,508 @@
+<meta charset="utf-8">
+<title>تنفيذ خطّة 519 كاملة + مراجعة Codex + نشر 4/4 — تقرير 520</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 84ch; color: var(--ink); }
+  p.lead { font-size: 1.06rem; color: var(--ink-muted); max-width: 70ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.86em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🚀"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1080px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 40ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 76ch; font-size: 1.04rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.5rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.74rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.78rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 50px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 0.98rem; color: var(--ink-muted); max-width: 82ch; margin-bottom: 20px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.94rem; max-width: 72ch; }
+  .plain b { color: var(--accent-deep); }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.94rem; max-width: 74ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.94rem; max-width: 74ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .info-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .info-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .info-box p { margin: 0; color: var(--info-ink); font-size: 0.94rem; max-width: 74ch; }
+  .info-box b { color: var(--info-ink); }
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+  ol.steps { margin: 10px 0; padding-inline-start: 22px; }
+  ol.steps li { margin-bottom: 9px; color: var(--ink); font-size: 0.92rem; }
+  ol.steps li b { color: var(--accent-deep); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 26px; box-shadow: var(--shadow); margin-bottom: 22px; }
+  .item-card .item-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .item-card .item-num { font-family: var(--font-display); font-weight: 800; font-size: 0.82rem; color: #fff; background: var(--accent); border-radius: 8px; padding: 3px 10px; }
+  .item-card h3 { font-size: 1.12rem; margin: 0; }
+  .item-card .files { font-size: 0.78rem; color: var(--ink-faint); margin: 4px 0 14px; }
+  pre { background: #0d1611; color: #d7e6da; border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 0.82rem; direction: ltr; text-align: left; margin: 10px 0 16px; border: 1px solid #1d3324; }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.88rem; }
+  table th, table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; }
+  table th { background: var(--surface-2); font-weight: 700; color: var(--ink-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  table td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .table-wrap { overflow-x: auto; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+  .deploy-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 20px 0; }
+  .deploy-node { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 16px 18px; min-width: 150px; text-align: center; box-shadow: var(--shadow); }
+  .deploy-node.done { border-color: var(--ok-border); background: var(--ok-bg); }
+  .deploy-node .dn-ic { font-size: 1.6rem; }
+  .deploy-node .dn-t { font-weight: 800; font-size: 0.92rem; margin: 6px 0 2px; }
+  .deploy-node .dn-s { font-size: 0.74rem; color: var(--ink-muted); }
+  .deploy-arrow { font-size: 1.4rem; color: var(--ink-faint); padding: 0 10px; }
+  .codex-card { border-inline-start: 4px solid var(--crit-ink); }
+  .codex-card.p2 { border-inline-start-color: var(--warn-ink); }
+  .codex-card.p3 { border-inline-start-color: var(--info-ink); }
+  footer { text-align: center; padding: 40px 0 10px; color: var(--ink-faint); font-size: 0.8rem; }
+  .checklist { list-style: none; margin: 10px 0; padding: 0; }
+  .checklist li { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; font-size: 0.92rem; }
+  .checklist li::before { content: "✅"; flex-shrink: 0; }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">📄 تقرير 520 · 2026-07-18</span>
+    <h1>تنفيذ خطّة 519 الكاملة (12 بندًا) + مراجعة Codex (8 إصلاحات) + نشر على المواضع الأربعة</h1>
+    <p class="lead">تنفيذ متسلسل دقيق لكل بند في خطّة التدقيق العميق (تقرير 519)، تلاه اختبار شامل، مراجعة كود مستقلّة عبر Codex CLI، إصلاح كل ما وجدته، مراجعة شخصية نهائية، ثم النشر الكامل على المواضع الأربعة الإلزاميّة: GitHub · test1 · test/.194 · الإنتاج (tawanow.com).</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">12/12</div><div class="l">بندًا من الخطة منفَّذ</div></div>
+      <div class="s"><div class="n">8/8</div><div class="l">ملاحظة Codex مُصلَحة</div></div>
+      <div class="s"><div class="n">4/4</div><div class="l">مواضع نشر مكتملة</div></div>
+      <div class="s"><div class="n">3759+1702+64</div><div class="l">اختبارًا ناجحًا (خلفي+واجهة+جوّال)</div></div>
+      <div class="s"><div class="n">0</div><div class="l">انحدار</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#exec">الملخّص التنفيذي</a>
+  <a href="#method">منهجيّة العمل</a>
+  <a href="#items">البنود الاثنا عشر</a>
+  <a href="#codex">مراجعة Codex</a>
+  <a href="#tests">الاختبارات</a>
+  <a href="#git">Git</a>
+  <a href="#deploy">النشر</a>
+  <a href="#tech">التقنيات الحديثة</a>
+  <a href="#status">الحالة النهائية</a>
+</nav>
+
+<section id="exec">
+  <span class="section-eyebrow">🧭 البداية</span>
+  <h2>الملخّص التنفيذي</h2>
+  <p class="intro">بلغة بسيطة: أخذنا قائمة من 12 مشكلة حقيقية اكتُشِفت في تدقيق سابق (تقرير 519) — بعضها أخطاء صامتة كانت تُفشِل ميزات حيّة دون أن يشعر أحد، وبعضها تحسينات تقنية — وأصلحناها واحدة تلو الأخرى بدقة، دون تجاوز أي منها. ثم اختبرنا كل شيء، طلبنا من أداة مراجعة مستقلّة (Codex) أن تدقّق العمل بعين ثانية، أصلحنا كل ما وجدته (8 مشاكل حقيقية إضافية)، راجعنا كل شيء بأنفسنا مرّة أخيرة، ثم رفعنا ونشرنا التحديث على جميع خوادم المشروع الأربعة.</p>
+  <div class="plain">
+    <div class="ic">💡</div>
+    <p><b>لماذا هذا مهم:</b> أخطر بندين في القائمة (عدّاد الإشعارات المُصمَّم على شكل بيانات خاطئ، وموقع السائق الحيّ الذي لم يكن يصل للعميل فعليًّا) كانا يعملان بصمت منذ فترة طويلة دون أن يُظهرا أي خطأ واضح للمستخدم — المستخدم كان يرى فقط نتيجة أسوأ (إشعارات لا تُقرأ بشكل صحيح، خريطة تتحدّث كل 10 ثوانٍ بدل أن تكون حيّة فعليًّا).</p>
+  </div>
+</section>
+
+<section id="method">
+  <span class="section-eyebrow">⚙️ الطريقة</span>
+  <h2>منهجيّة العمل — بالتسلسل، دون توقّف</h2>
+  <p class="intro">التزام صارم بالترتيب الذي طُلِب: تنفيذ → اختبار → مراجعة Codex → إصلاح → مراجعة شخصية → رفع (push) → نشر (deploy) → تقرير.</p>
+  <ol class="steps">
+    <li><b>1. التنفيذ:</b> كل بند من الـ12 نُفِّذ بالكود الفعلي (لا خطط نظرية) — تعديل خلفي (Python/FastAPI) وواجهة (React/TypeScript) وتطبيق جوّال (React Native) حسب الحاجة.</li>
+    <li><b>2. الاختبار الأوّل:</b> تشغيل كامل حزم الاختبار الثلاث (خلفي pytest، واجهة vitest، جوّال jest) — صفر انحدار.</li>
+    <li><b>3. مراجعة Codex:</b> <code>codex review --uncommitted</code> عبر الطرفية — عمل بنجاح (لم يكن معطَّلًا)، فلم تكن هناك حاجة للبديل (المراجعة الشخصية المباشرة).</li>
+    <li><b>4. الإصلاح:</b> 8 ملاحظات حقيقية من Codex — تحقّق شخصي من كل واحدة بقراءة الكود الفعلي (وليس تصديق ادّعاء Codex أعمى)، ثم إصلاحها واختبارها.</li>
+    <li><b>5. مراجعة شخصية مباشرة:</b> فحص <code>git status</code>/<code>git diff</code> بالكامل، عزل أي ملفات من جلسات أخرى متوازية (غير مرتبطة بهذا العمل) عبر <code>git stash</code> جزئي، دون لمسها أو حذفها.</li>
+    <li><b>6. الاختبار الثاني:</b> إعادة تشغيل كامل الحزم بعد كل إصلاحات Codex — صفر انحدار مرّة أخرى.</li>
+    <li><b>7. الرفع (Push):</b> فرع جديد <code>feat/r519-execution</code> (وليس دفعًا مباشرًا على master، احتياطًا)، التزامان (commits)، رفع إلى GitHub، ثمّ دمج نظيف (fast-forward) إلى <code>master</code> ورفعه.</li>
+    <li><b>8. النشر:</b> على المواضع الأربعة الإلزاميّة بالترتيب الموصى به: GitHub → test1 → test/.194 → الإنتاج (بعد إذن تشغيلي صريح لكل مرّة، كما تقتضي قواعد المشروع).</li>
+  </ol>
+</section>
+
+<section id="items">
+  <span class="section-eyebrow">🛠️ التنفيذ</span>
+  <h2>البنود الاثنا عشر — تفصيل تقني وبلغة بسيطة</h2>
+  <p class="intro">أرقام البنود أدناه هي نفس أرقامها الأصليّة من خطّة تقرير 519 (وليست مُعادة الترقيم) — لهذا التسلسل ليس متتاليًا 1-12.</p>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 1</span><h3>صندوق الإشعارات — إعادة كتابة كاملة لتطابق شكل بيانات الخادم الحقيقي</h3></div>
+    <div class="files">web/src/api/notifications.ts · web/src/pages/account/NotificationInbox.tsx</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> واجهة الإشعارات كانت مبنيّة على افتراض خاطئ تمامًا لشكل البيانات القادمة من الخادم — كأنها تنتظر رسالة بصيغة معيّنة بينما الخادم يرسل صيغة مختلفة كليًّا. النتيجة: عرض غير صحيح للإشعارات كان حيًّا على الموقع (اكتُشِف سابقًا في تقرير 517 كعيب حرج).</p></div>
+    <p><b>تفصيل تقني:</b> الواجهة كانت تفترض مغلّفًا (envelope) بالشكل <code>{items, unread_count, total}</code> مع حقول <code>title_ar</code>/<code>body_ar</code> لكل عنصر. الخادم الحقيقي (<code>notification_router.py</code>) يُعيد <code>{notifications, count}</code> بحقول <code>{event_type, title_key, body_key, template_vars}</code>. بما أنّ المسار لا يعلن <code>response_model=</code>، فإنّ OpenAPI المولَّد يُصنِّف هذا المسار <code>unknown</code> — فلم يكتشف أي أداة فحص أنواع هذا الانحراف تلقائيًّا. أُعيدت كتابة الواجهة (<code>NotificationRecord</code>) لتطابق الشكل الحقيقي تمامًا، وأُضيفت دالّتا <code>markRead()</code> و<code>unreadCount()</code> المفقودتين.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 2</span><h3>حارس نوع (Type Guard) لحالة الطلب في شارة الحالة</h3></div>
+    <div class="files">web/src/components/OrderStateBadge.tsx</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> لون شارة حالة الطلب (مثل "تم التسليم" باللون الأخضر) كان يُختار من قائمة غير كاملة — أي حالة جديدة تُضاف للنظام دون تحديث هذه القائمة تظهر بلون رمادي عام دون أن يلاحظ أحد النقص وقت البرمجة.</p></div>
+    <p><b>تفصيل تقني:</b> أُضيف نوع <code>OrderState</code> اتحاديّ (union) يعكس بدقّة الـ28 حالة الموجودة فعليًّا في <code>state_transitions.py</code> الخلفي، مع <code>STATE_CLASS satisfies Record&lt;OrderState, string&gt;</code> — أي أنّ فحص الأنواع (TypeScript) سيفشل تلقائيًّا في وقت البناء إن نُسِيت حالة عند إضافة سطر جديد لهذا النوع. <b>تنويه أمانة تقنية:</b> هذا لا يحمي من إضافة حالة جديدة من الخادم فقط (بلا لمس هذا الملف) — إذ <code>order_state</code> يبقى عمود <code>str</code> عاديًّا بلا تحقّق نوع فعلي عبر OpenAPI؛ حماية كاملة من ذلك الاتجاه تتطلّب عملًا أكبر منفصلًا.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 3</span><h3>إصلاح سباق إنشاء المحفظة (Race Condition) عند أوّل استخدام</h3></div>
+    <div class="files">backend/app/modules/payments/wallet_service.py · backend/app/modules/ads/provider_ads_router.py</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> إذا ضغط مستخدم جديد على زرّ يحتاج محفظة مرّتين بسرعة (أو فتح تبويبين)، كلا الطلبين قد يحاولان إنشاء نفس المحفظة في نفس اللحظة — أحدهما ينجح والآخر يتحطّم بخطأ خادم 500 بدل أن يتعامل مع الموقف بهدوء.</p></div>
+    <p><b>تفصيل تقني:</b> الخطّة الأصليّة (تقرير 518) اقترحت وضع الإصلاح داخل <code>payment_router.py</code> حول <code>db.commit()</code> — لكن التحقّق المباشر من الكود (بند من تقرير 519) أثبت أنّ هذا موضع خاطئ: خطأ <code>IntegrityError</code> يُطلَق فعليًّا عند <code>flush()</code> داخل <code>get_or_create_wallet()</code>، أي طبقات أسفل الراوتر، فلن يصل أبدًا لأي <code>try/except</code> عند نقطة الـcommit. الإصلاح الصحيح استخدم <code>async with self._session.begin_nested()</code> (نقطة حفظ SAVEPOINT) بدل تراجع كامل (rollback) للجلسة — لأنّ هذه الدالّة تُستدعى أحيانًا في منتصف معاملة تحتوي كتابات أخرى شقيقة (مثل صفّ سجلّ تدقيق سابق)، وتراجع كامل كان سيُلغي تلك الكتابة الشقيقة أيضًا بصمت.</p>
+    <pre><code>async with self._session.begin_nested():
+    wallet = WalletAccount(user_id=user_id, ...)
+    self._session.add(wallet)
+    await self._session.flush()
+except IntegrityError:
+    # خسرنا السباق — عميل آخر أنشأها بالفعل، نُعيد قراءتها فقط
+    result = await self._session.execute(select(WalletAccount)...)
+    wallet = result.scalars().one()</code></pre>
+    <p><b>اكتشاف إضافي أثناء الإصلاح:</b> مسار <code>provider_ads_router.py</code>'s <code>quote_campaign</code> كان يستدعي <code>get_balance()</code> (التي تُنشئ المحفظة ضمنيًّا) دون أي <code>db.commit()</code> بعدها — بما أنّ <code>get_db()</code> لا يعمل commit تلقائيًّا، كانت المحفظة الجديدة لأوّل عرض إعلانيّ لمالك متجر تُفقَد بصمت عند إغلاق الجلسة. أُضيف <code>await db.commit()</code> صريح.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 4</span><h3>ربط أداتَي فحص العقد (verify-api-contract) وكشف الكود الميت (Knip) بخطّ CI كـ"مصعد" (Ratchet)</h3></div>
+    <div class="files">.github/workflows/ci.yml · web/knip.json · web/package.json</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> كانت هناك أداتان جاهزتان تكتشفان مشاكل حقيقية (طلبات واجهة تشير لمسارات خادم غير موجودة، وملفّات/دوال كود ميّتة لا يستخدمها أحد) — لكن لم يكن أحد يشغّلهما تلقائيًّا. المشكلة: كلتاهما تكتشف عشرات المشاكل القديمة الموجودة أصلًا في المشروع، فتفعيلهما بشكل صارم كان سيرفض كل طلب دمج (PR) مستقبلي بسبب ديون قديمة لا ذنب لصاحب الطلب فيها.</p></div>
+    <p><b>تفصيل تقني — نمط "المِصعد" (Ratchet):</b> بدل بوّابة صارمة على كامل الشجرة، تُقارَن نتائج الأداة بين فرع <code>HEAD</code> (طلب الدمج الحالي) وفرع <code>BASE</code> (master) — ويفشل البناء فقط إن أضاف هذا الطلب مخالفات <b>جديدة</b>؛ الديون القديمة "مُتوارَثة" (grandfathered) ولا تُحظَر، لكنّها لا تستطيع أن تكبر أكثر. نفس النمط المستخدم مسبقًا لبوّابتَي OpenAPI وRuff. <code>web/knip.json</code> ضروري لأنّ الإعدادات الافتراضية لـKnip تفوّت نقطة الدخول الثانية للمشروع (<code>ops.html → ops-main.tsx</code>) فتُصنِّف كامل واجهة العمليّات (~50 ملفًّا) خطأً كـ"ميّتة".</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 5</span><h3>حركة سلسة لموقع السائق على خريطة تتبّع العميل (RAF Interpolation)</h3></div>
+    <div class="files">web/src/components/TripRouteMap.tsx</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> عند تتبّع سائق حيًّا على الخريطة، كانت أيقونة السائق "تقفز" فجأة من نقطة لأخرى كل 10-15 ثانية بدل أن تنزلق بسلاسة بينهما — وهو ما يبدو أقلّ احترافيّة ويصعب متابعته بصريًّا.</p></div>
+    <p><b>تفصيل تقني (اكتشاف ذاتيّ أثناء التنفيذ، وليس من الخطّة الأصليّة):</b> عند كتابة منطق التحريك بـ<code>requestAnimationFrame</code>، اكتُشِفت علّة حقيقيّة: <code>currentRef.current</code> لم تكن تُهيَّأ أبدًا عند التركيب الأوّل (mount) — فقط تُكتَب داخل دالّة <code>tick()</code> نفسها. النتيجة: عند أوّل تحديث موقع، كان <code>from = currentRef.current ?? [lat, lng]</code> يُساوي دائمًا نفس قيمة <code>to</code> (كلاهما يقرآن نفس الإحداثيّات الحاليّة)، فيتوقّف الكود مبكرًا ولا تبدأ الحركة إطلاقًا — أي أنّ ميزة التحريك بأكملها كانت معطَّلة تمامًا رغم كتابتها! أُصلِح بإضافة فرع صريح "أوّل موقع نراه":</p>
+    <pre><code>if (currentRef.current === null) {
+  currentRef.current = to;
+  marker.setLatLng(to);
+  return;
+}
+const from = currentRef.current;
+if (from[0] === to[0] && from[1] === to[1]) return;</code></pre>
+    <p>مُفعَّلة فقط في خريطة تتبّع العميل (<code>OrderTrackingPage.tsx</code>) عبر خاصيّة <code>smoothDriverMarker</code> — وليست في خريطة السائق نفسه أو معاينة العروض الساكنة، لأنّهما لا يحتاجانها.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 6</span><h3>سجلّ تدقيق (Audit Log) لإجراءات تعليق وصلاحيّات موظّفي المزوّد</h3></div>
+    <div class="files">backend/app/modules/providers/provider_router.py</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> عندما يُعلِّق صاحب متجر موظّفًا، أو يمنحه/يسحب منه صلاحيّة معيّنة، لم يكن هناك أي سجلّ يوثّق "من فعل ماذا ولماذا ومتى" — بخلاف إجراءات مشابهة أخرى في النظام موثَّقة بالكامل. لو حدث نزاع لاحقًا، لا وجود لأثر تاريخي لمراجعته.</p></div>
+    <p><b>تفصيل تقني:</b> 6 مسارات عولجت بنمطين مختلفين حسب شكل الكود القائم:</p>
+    <ul>
+      <li><b>التعليق/الموافقة/الإعادة (3 مسارات):</b> كانت تحتوي أصلًا <code>db.commit()</code> واحد في النهاية — كتابة سجلّ التدقيق تنضمّ لنفس المعاملة (<code>session=db</code>) قبل ذلك الـcommit مباشرة.</li>
+      <li><b>منح/سحب الصلاحيّات (3 مسارات):</b> الخدمة المستدعاة (<code>account_permission_service</code>) تعمل commit داخليًّا بنفسها — فكتابة سجلّ التدقيق commit ثانٍ منفصل ومتساهل (best-effort) على نفس الجلسة، محاط بـ<code>try/except</code> حتى لا يتحوّل فشل كتابة السجلّ (وحده) أبدًا إلى فشل 500 لعمليّة صلاحيّات ناجحة أصلًا.</li>
+    </ul>
+    <div class="warn-box"><div class="ic">⚠️</div><p><b>قرار تصميمي مهمّ اتُّخِذ أثناء العمل:</b> المحاولة الأولى استخدمت <code>audit_logger.log()</code> بلا تمرير <code>session=db</code>، معتمدة على آليّة جلسة احتياطيّة داخليّة في المُسجِّل. تحقّق (بحث AST عبر كامل شجرة <code>app/</code>) أثبت أنّ هذا النمط <b>لا مثيل له إطلاقًا</b> في بقيّة المشروع، وغير قابل للاختبار عبر بنية الاختبارات القائمة (التي تشير لمحرّك قاعدة بيانات مختلف تمامًا عن الإنتاج). صُحِّح لإعادة استخدام نفس الجلسة <code>db</code> بدل ابتكار نمط جديد غير مسبوق.</p></div>
+    <p>8 اختبارات جديدة (<code>test_r519_item6_staff_audit_log.py</code>) تغطّي الحالات الست، متضمّنة حالة "لا تدقيق لعمليّة عبثيّة" (idempotent no-op) — إزالة صلاحيّة لم تُمنَح أصلًا لا تُنتِج سجلّ تدقيق كاذبًا يدّعي حدوث تغيير فعليّ.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 11</span><h3>دالّة مشتركة موحَّدة لحساب فترة التهدئة (Cooldown) لتغيير الاسم</h3></div>
+    <div class="files">backend/app/modules/identity/customer_router.py</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> يمكن للعميل تغيير اسمه مرّة كلّ 30 يومًا فقط. حساب "متى يمكنه التغيير مجدّدًا" كان مكتوبًا مرّتين بشكل منفصل في مكانين — مسار للعرض فقط ومسار للتنفيذ الفعلي — بصيغتين مختلفتين رياضيًّا لكن يُفترَض أن تُعطيا نفس النتيجة. أيّ تعديل مستقبلي في أحدهما دون الآخر كان سيُنتِج تناقضًا صامتًا.</p></div>
+    <p><b>تفصيل تقني:</b> أُنشِئت دالّة <code>_cooldown_state(last_name_change_at, now=None)</code> ووحدة بيانات <code>@dataclass CooldownState</code>، على نمط <code>_now()</code> المُتَّبَع مسبقًا في <code>pause_service.py</code> — الوقت الحالي مُعامَل صريح اختياري (لا يُقرَأ من الساعة داخليًّا بشكل ثابت)، بحيث تمرّر الاستدعاءات الحقيقيّة الوقت الفعلي، بينما تمرّر الاختبارات وقتًا ثابتًا للتكرار المضبوط. استُبدِل الحسابان المكرّران في كلا المسارين باستدعاء واحد لهذه الدالّة. 4 اختبارات وحدة جديدة (لا سابق تغيير، حظر ضمن 30 يومًا، فتح عند اليوم الـ30 تمامًا، تحويل توقيت ساذج/بلا منطقة زمنيّة إلى UTC).</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 13</span><h3>مكوّن مشترك <code>EmptyState</code> لحالة "لا توجد بيانات"</h3></div>
+    <div class="files">web/src/components/EmptyState.tsx</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> رسالة "لا توجد نتائج" أو ما شابهها كانت مكتوبة ومنسَّقة يدويًّا في كل صفحة تحتاجها على حدة، بنفس الشكل تقريبًا — تكرار بلا داعٍ.</p></div>
+    <p><b>تفصيل تقني:</b> مكوّن بسيط بخصائص <code>{message, testId?, as?, style?}</code>، بنمط افتراضي مطابق تمامًا للنمط السابق المتكرّر يدويًّا (<code>textAlign: center</code>، لون نص ثانوي، حشو 2rem/0)، مع دمج أي <code>style</code> يمرّره المستدعي فوق الافتراضي. اعتُمِد في 3 مواضع حقيقيّة مطابقة تمامًا: <code>OpsCustomerDebts.tsx</code>، <code>SearchResultsPage.tsx</code>، <code>OpsComplaints.tsx</code>. 4 اختبارات جديدة.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 14</span><h3>نبضة موقع السائق المرتبطة بالطلب (Order-Scoped SSE Heartbeat) — ويب + جوّال</h3></div>
+    <div class="files">web/src/api/dispatch.ts · web/src/pages/driver/DriverDelivery.tsx · apps/mobile/src/lib/location.ts · apps/mobile/src/app/(driver)/trip/[id].tsx</div>
+    <div class="crit-box"><div class="ic">🚨</div><p><b>بلغة بسيطة — هذا هو الاكتشاف الأخطر في القائمة:</b> خريطة تتبّع الطلب الحيّة التي يراها العميل مصمَّمة أصلًا لتتحدّث فوريًّا عبر بثّ حيّ (SSE) كلّما تحرّك السائق. لكن التحقّق المباشر من الكود أثبت أنّ <b>لا أحد على الإطلاق</b> — لا تطبيق الويب ولا تطبيق الجوّال — كان يرسل قط تحديث موقع مع رقم الطلب (<code>order_id</code>). أي أنّ البثّ الحيّ الفوري لم يكن يعمل إطلاقًا لأي سائق، منذ إضافته؛ خريطة العميل كانت تعمل طوال الوقت فقط على نظام الاحتياط (استعلام كل 10 ثوانٍ)، دون أن يظهر أي خطأ — الميزة كانت "معطَّلة بصمت" لا "معطَّلة بخطأ".</p></div>
+    <p><b>تفصيل تقني:</b> الخادم (<code>publish_driver_location</code>) يبثّ عبر SSE فقط <code>if body.order_id</code>. أُضيفت نبضة جديدة مستقلّة عن نبضة الحضور العامّة الموجودة أصلًا (<code>useDriverPresenceHeartbeat</code>، بلا سياق طلب نشط، بقيت كما هي) — نبضة جديدة تعمل فقط أثناء وجود شاشة التوصيل مفتوحة ولطلب غير منتهٍ (<code>TERMINAL_ORDER_STATES</code> في الويب، <code>isTerminal()</code> في الجوّال)، كل 15 ثانية، تمرّر <code>order_id</code> + <code>heading</code> + <code>speed</code>.</p>
+    <pre><code>useEffect(() => {
+  if (!orderId || !orderState || TERMINAL_ORDER_STATES.has(orderState)) return;
+  const tick = () => navigator.geolocation.getCurrentPosition((pos) => {
+    dispatchApi.postLocation(pos.coords.latitude, pos.coords.longitude,
+      pos.coords.accuracy, orderId, pos.coords.heading, pos.coords.speed).catch(() => {});
+  }, () => {}, { timeout: 5000 });
+  tick();
+  const h = setInterval(tick, 15000);
+  return () => clearInterval(h);
+}, [orderId, orderState]);</code></pre>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 15</span><h3>إصلاح الاسم المتاح لقارئات الشاشة في نافذة المساعدة المنبثقة (HelpPopover)</h3></div>
+    <div class="files">OpsIncidentCenter · OpsCatalogModeration · ProviderCatalog · ProviderPauseControl · WalletPage <span class="faint">(5 مواضع)</span></div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> زرّ "؟" الصغير الذي يفتح شرحًا إضافيًّا لم يكن له اسم واضح لمستخدمي قارئات الشاشة (ذوي الإعاقة البصريّة) — كان يُقرَأ فقط كـ"زرّ" بلا وصف لما يفعله.</p></div>
+    <p><b>تفصيل تقني:</b> أُضيفت خاصيّة <code>triggerLabel</code> (بنفس نصّ محتوى النافذة المنبثقة) في 5 مواضع مطابقة — أكثر من الرقم الأصليّ في الخطّة (4) لأنّ كل موضع مطابق فعليًّا في الكود صُحِّح، لا الحدّ الأدنى المذكور فقط.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 16</span><h3>ترجمة شروحات الصلاحيّات (PERMISSION_HELP) للإنجليزيّة والفرنسيّة</h3></div>
+    <div class="files">web/src/i18n/ar.json · en.json · fr.json · web/src/api/providerStaff.ts</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> شرح كل صلاحيّة (مثل "قبول طلب") كان مكتوبًا بالعربية فقط داخل الكود مباشرة — أي مستخدم يستخدم الواجهة بالإنجليزية أو الفرنسية كان يرى الشرح العربي دائمًا مهما غيّر اللغة.</p></div>
+    <div class="warn-box"><div class="ic">⚠️</div><p><b>تحدٍّ تقني حقيقي عولج بعناية:</b> مفاتيح i18next الافتراضيّة تفصل بالنقطتين (<code>:</code>) — ورموز الصلاحيّات نفسها تحتوي نقطتين (مثل <code>provider_order:accept</code>)، ما يُسبِّب تصادمًا في تحليل المسار. حُلَّ بدالّة تعقيم <code>permissionHelpI18nKey(code)</code> تستبدل <code>:</code> بـ<code>__</code> قبل بناء مسار المفتاح.</p></div>
+    <p>أُضيف كائن <code>permissions</code> جديد بـ21 مفتاح شرح مُعقَّم في الملفّات الثلاثة، مع 3 اختبارات تتحقّق من الحلّ الحقيقي متعدّد اللغات (وليس <code>t()</code> وهميّة) — لأنّ اختبارًا وهميًّا كان سيُخفي عيب "العربية تفوز دائمًا".</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">البند 18</span><h3>إصلاح قاعدة احتيال "إلغاء الطلبات" الميّتة + قاعدة جديدة "نمط إثباتات ضعيفة الثقة"</h3></div>
+    <div class="files">backend/app/modules/fraud/strategies/order_cancellation.py · low_confidence_proof_pattern.py (جديد)</div>
+    <div class="crit-box"><div class="ic">🚨</div><p><b>بلغة بسيطة:</b> قاعدة كانت مُفترَضًا أن ترصد عميلًا يُلغي طلبات كثيرة في فترة قصيرة (سلوك احتيال محتمل) — لكنّها لم تعمل قطّ منذ إضافتها، لأنّها كانت تبحث عن قيمة نصّيّة ("CANCELLED") لم توجد أبدًا في قاعدة البيانات؛ القيمة الحقيقيّة هي "CANCELLED_BY_CUSTOMER".</p></div>
+    <p><b>تفصيل تقني — لماذا لم يكن الإصلاح البسيط كافيًا:</b> استبدال النصّ مباشرة كان سيكون خطيرًا: نفس القيمة <code>CANCELLED_BY_CUSTOMER</code> تُكتَب أيضًا من خدمة إلغاء منفصلة عند فشل النظام في إيجاد سائق (<code>cancel_reason='no_driver'</code>) — وهذا لا ذنب للعميل فيه إطلاقًا. استُبعِدَت هذه الحالة أوّلًا (<code>cancel_reason != 'no_driver'</code>).</p>
+    <div class="warn-box"><div class="ic">⚠️</div><p><b>إصلاح إضافي من مراجعة Codex (مذكور أدناه):</b> نفس اسم الحالة <code>CANCELLED_BY_CUSTOMER</code> يُكتَب أيضًا حين يُلغي موظّف عمليّات (OPS) أو مدير الطلب — الاسم مُضلِّل (ليس بالضرورة "من العميل"). أُضيف شرط <code>EXISTS</code> على جدول <code>audit_log</code> يتحقّق أنّ الفاعل الحقيقي المسجَّل هو <code>CUSTOMER</code> فعلًا، وليس مجرّد اسم الحالة.</p></div>
+    <p><b>القاعدة الجديدة:</b> <code>low_confidence_proof_pattern</code> — تجمّع سائقًا يُقدِّم عدّة إثباتات تسليم بثقة منخفضة (أقلّ من 40) خلال فترة قصيرة كإشارة احتيال. تعمّدت عدم توسيع النطاق أكثر (لم تُبنَ نسخة جديدة من تسجيل سلوك الدفع النقدي أو تحليلات التخلّي عن الطلبات، لأنّ كلتيهما موجودتان فعلًا كنظامين منفصلين، وبناء نسخة ثالثة كان سيُعاقِب نفس السلوك مرّتين).</p>
+  </div>
+</section>
+
+<section id="codex">
+  <span class="section-eyebrow">🔍 المراجعة المستقلّة</span>
+  <h2>مراجعة Codex CLI — 8 ملاحظات حقيقيّة، كلّها أُصلِحت</h2>
+  <p class="intro"><code>codex review --uncommitted</code> عمل بنجاح داخل الطرفيّة (لم يكن معطَّلًا، فلم تكن هناك حاجة للبديل الشخصي). كل ملاحظة أدناه تحقّقتُ منها بقراءة الكود الفعلي المعنيّ قبل الإصلاح — لم يُصدَّق أيّ ادّعاء من Codex دون تحقّق مباشر.</p>
+
+  <div class="card codex-card">
+    <div class="tag-row"><span class="pill crit">P1 — حرج</span></div>
+    <h3 style="margin:10px 0 6px;">حسّاس iOS للموقع (-1) يُرفَض بالكامل من تحقّق الخادم</h3>
+    <p><b>المشكلة:</b> نظام تموضع آبل (Core Location) على iOS يُعيد <code>-1</code> لحقلَي الاتّجاه/السرعة عندما تكونا غير متوفّرتين (وليس <code>null</code> — خاصيّة منصّة معروفة). الكود الجديد (البند 14 أعلاه) كان يرسل <code>coords.heading ?? undefined</code> — فلا يُلتقَط <code>-1</code>. الخادم يرفض أي حقل بقيمة سالبة (<code>Field(ge=0)</code>) للطلب <b>بأكمله</b> — أي أنّ الإصلاح الجديد (نبضة الموقع) كان سيكسر أيضًا نبضة الحضور القديمة العاملة على iOS تحديدًا (خطأ أدخلَته هذه الجلسة نفسها، وأثبته <code>git diff</code>: الكود الأصلي قبل هذه الجلسة كان يرسل <code>{lat, lng}</code> فقط).</p>
+    <p><b>الإصلاح:</b> دالّة <code>nonNegative()</code> تُرجِع <code>undefined</code> لأي رقم غير محدود (Infinite) أو أقلّ من صفر، قبل الإرسال. اختبار جديد مخصّص (4 حالات).</p>
+  </div>
+
+  <div class="card codex-card">
+    <div class="tag-row"><span class="pill warn">P2</span></div>
+    <h3 style="margin:10px 0 6px;">إشعارات القوالب المخصَّصة من الإدارة تظهر كمفتاح ترجمة خام غير مُحلَّل</h3>
+    <p><b>المشكلة:</b> عندما يُخصِّص موظّف عمليّات نصّ إشعار معيّن (Template Override)، الخادم يخزّن <b>النصّ الفعلي</b> الذي كتبه الموظّف مباشرة في حقل <code>title_key</code>/<code>body_key</code> (وليس مفتاح ترجمة من السجلّ المعياريّ) — فإضافة <code>.title</code>/<code>.body</code> واستدعاء <code>t()</code> عليه كان سيعرض مفتاحًا غير مُحلَّل حرفيًّا للمستخدم.</p>
+    <p><b>الإصلاح:</b> دالّة كشف <code>looksLikeI18nKey()</code> (نمط regex يميّز مفتاح ترجمة حقيقي من نصّ حرّ) + <code>substitutePlaceholders()</code> لاستبدال العناصر النائبة (<code>{driver_name}</code> مثلًا) في النصّ الحرّ مباشرة دون المرور عبر i18next أصلًا.</p>
+  </div>
+
+  <div class="card codex-card p2">
+    <div class="tag-row"><span class="pill warn">P2</span></div>
+    <h3 style="margin:10px 0 6px;">حالة "معلّق" بين القراءة والأرشفة</h3>
+    <p><b>المشكلة:</b> إشعار "مقروء لكن غير مؤرشَف" غير مرئي في كلّ من قائمة "غير مقروء" وقائمة "المؤرشَف" — إن فشلت خطوة الأرشفة بعد نجاح خطوة القراءة، يختفي الإشعار من الواجهة كليًّا.</p>
+    <p><b>الإصلاح:</b> إعادة محاولة محدودة (3 مرّات، تأخير 300ms) على خطوة الأرشفة، مع توثيق الخطر المتبقّي (يُشفى ذاتيًّا عبر إجراء "أرشفة الكلّ" الجماعي).</p>
+  </div>
+
+  <div class="card codex-card p2">
+    <div class="tag-row"><span class="pill warn">P2</span></div>
+    <h3 style="margin:10px 0 6px;">"أرشفة كل إشعارات اليوم" محدودة صامتًا بأوّل صفحة، وتتوقّف كليًّا عند أوّل فشل</h3>
+    <p><b>الإصلاح:</b> <code>Promise.all()</code> → <code>Promise.allSettled()</code> (فشل عنصر واحد لا يوقف البقيّة)، وجلب صفحة جديدة كاملة (حدّ 1000) بدل الاعتماد على البيانات المعروضة أصلًا (محدودة بـ20 من الخادم افتراضيًّا).</p>
+  </div>
+
+  <div class="card codex-card p2">
+    <div class="tag-row"><span class="pill warn">P2</span></div>
+    <h3 style="margin:10px 0 6px;">علّة تحويل مزدوج للمنطقة الزمنيّة في حدّ الأرشفة اليوميّة</h3>
+    <p><b>المشكلة:</b> <code>endOfTodayDateString()</code> كانت تحسب "نهاية اليوم" ثمّ تأخذ تاريخًا مجرّدًا (بلا وقت) — في توقيت طرابلس (UTC+2)، هذا يجعل الحساب يعود لتاريخ <b>اليوم نفسه</b> خلال نافذة تقريبًا 00:00-02:00 محليًّا، بدل الغد. أُثبِتَت العلّة رياضيًّا وتجريبيًّا (<code>node</code> حقيقي تحت <code>TZ=Africa/Tripoli</code>) قبل الإصلاح وبعده.</p>
+    <p><b>الإصلاح:</b> <code>endOfTodayIsoInstant()</code> — إرسال لحظة زمنيّة ISO كاملة (مطلقة) بدل تاريخ مجرّد.</p>
+  </div>
+
+  <div class="card codex-card p2">
+    <div class="tag-row"><span class="pill warn">P2</span></div>
+    <h3 style="margin:10px 0 6px;">قاعدة الاحتيال تنسب إلغاءات موظّفي العمليّات خطأً للعميل</h3>
+    <p>مفصَّل أعلاه ضمن البند 18 — إضافة شرط <code>EXISTS</code> على <code>audit_log</code> يتحقّق من الفاعل الحقيقي (<code>actor_role = 'CUSTOMER'</code>) في كلا نسختَي القاعدة (الأصليّة والنسخة الداخليّة المكرّرة في <code>operations_router.py</code>).</p>
+  </div>
+
+  <div class="card codex-card p3">
+    <div class="tag-row"><span class="pill info">P3</span></div>
+    <h3 style="margin:10px 0 6px;">خطوة CI قد تُخفي عطلًا حقيقيًّا كـ"صفر مخالفات"</h3>
+    <p><b>المشكلة:</b> <code>node scripts/verify-api-contract.mjs ... || true</code> يمنع فشل الخطوة، لكن قد يُخفي أيضًا عطلًا حقيقيًّا للأداة (لا مجرّد "لا مخالفات") إذ محلّل الفروقات (diff) اللاحق يعتمد على أنماط نصّيّة فقط.</p>
+    <p><b>الإصلاح:</b> اشتراط وجود السطر <code>"verify-api-contract:"</code> حرفيًّا في المخرجات (موجود في كِلا مسارَي النجاح والمخالفات) — تحقّق تجريبيّ مزدوج: تشغيل حقيقي (نظيف/بمخالفات) وتعطّل مُحاكى (<code>throw new Error</code>) للتأكّد أنّ الفحص يميّز الحالتين فعلًا.</p>
+  </div>
+
+  <div class="card codex-card p3">
+    <div class="tag-row"><span class="pill info">P3</span></div>
+    <h3 style="margin:10px 0 6px;">خطوة رفع نتائج الاختبار الفاشلة في المكان الخطأ</h3>
+    <p>إدخال بوّابتَي الـratchet سابقًا فصل بغير قصد خطوة "رفع نتائج الاختبار عند الفشل" الخاصّة بمهمّة <code>web-tests</code> لتصبح آخر خطوة في <code>knip-ratchet</code> (التي لا تُنتِج <code>test-results.xml</code> أصلًا). أُعيدت الخطوة لمكانها الصحيح، وأُزيلَت النسخة الخطأ.</p>
+  </div>
+</section>
+
+<section id="tests">
+  <span class="section-eyebrow">🧪 التحقّق</span>
+  <h2>نتائج الاختبار — مرّتين، صفر انحدار في الحالتين</h2>
+  <p class="intro">تشغيل كامل الحزم مرّتين: بعد تنفيذ البنود الاثنا عشر مباشرة، ثمّ مرّة أخرى بعد كل إصلاحات Codex الثمانية.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>الحزمة</th><th>الأداة</th><th class="num">النتيجة</th><th>الانحدار</th></tr></thead>
+    <tbody>
+      <tr><td>الخلفي (Backend)</td><td class="mono">pytest</td><td class="num">3759 ناجح / 4 مُتخطّى</td><td><span class="pill ok">صفر</span></td></tr>
+      <tr><td>الواجهة (Web)</td><td class="mono">vitest</td><td class="num">1702 ناجح (217 ملفًّا)</td><td><span class="pill ok">صفر</span></td></tr>
+      <tr><td>الجوّال (Mobile)</td><td class="mono">jest</td><td class="num">64 ناجح (14 حزمة)</td><td><span class="pill ok">صفر</span></td></tr>
+      <tr><td>فحص الأنواع الكامل</td><td class="mono">tsc / mypy-equiv</td><td class="num">نظيف</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="plain"><div class="ic">🧾</div><p>اختبارات جديدة أُضيفت خصّيصًا لهذا العمل: سيناريو سباق المحفظة، 8 اختبارات سجلّ تدقيق الموظّفين، 4 اختبارات تهدئة تغيير الاسم، حركة الخريطة السلسة (4 اختبارات جديدة داخل 17 اختبارًا كليًّا للملفّ)، 3 اختبارات ترجمة الصلاحيّات، حسّاس موقع iOS (4 اختبارات)، وحوالي 10 اختبارات جديدة لصندوق الإشعارات (الأرشفة الجماعيّة، التوقيت الزمني، القوالب المخصَّصة).</p></div>
+</section>
+
+<section id="git">
+  <span class="section-eyebrow">📦 الرفع</span>
+  <h2>Git — فرع، التزامان، دمج نظيف، رفع</h2>
+  <ol class="steps">
+    <li><b>فرع جديد:</b> <code>feat/r519-execution</code> (وليس التزامًا مباشرًا على master، احتياطًا لقاعدة "تفريع أوّلًا").</li>
+    <li><b>الالتزام الأوّل</b> <code>abf6203</code>: يلخّص كل البنود الاثني عشر وإصلاحات Codex الثمانية. هوك ما-قبل-الالتزام (husky) شغَّل gitleaks (لا تسريبات) وlint-staged (أعاد تنسيق 5 ملفّات) وفحوصات المنصّة الخاصّة (idempotency، حدود الاستعلامات) — كلّها نجحت.</li>
+    <li><b>الالتزام الثاني</b> <code>458aa34</code>: تنسيق تجميليّ بحت (black/ruff) لملفّات أعاد lint-staged تنسيقها بعد الالتزام الأوّل مباشرة — سلوك معروف موثَّق في ذاكرة المشروع.</li>
+    <li><b>رفع الفرع:</b> <code>git push -u origin feat/r519-execution</code> — نجح.</li>
+    <li><b>دمج نظيف (fast-forward) إلى master:</b> <code>98a9bad..458aa34</code> — 50 ملفًّا، +4391/-316 سطرًا.</li>
+    <li><b>رفع master:</b> <code>git push origin master</code> — نجح (موضع GitHub مكتمل ✅).</li>
+  </ol>
+  <div class="warn-box"><div class="ic">🧹</div><p><b>عزل ملفّات جلسات موازية:</b> اكتُشِفت ملفّات معدَّلة/غير متتبَّعة من عمل جلسة أخرى موازية غير مرتبطة (<code>CLAUDE.md</code>، <code>test_r516_public_flags_db_layer.py</code>، ملفّات <code>app_report/*</code>، <code>web/q</code>) — عُزِلَت بالكامل عن نطاق الالتزام والنشر عبر <code>git stash</code> جزئي واختيار ملفّات صريح، ولم تُلمَس أو تُحذَف.</p></div>
+</section>
+
+<section id="deploy">
+  <span class="section-eyebrow">🚀 النشر</span>
+  <h2>النشر على المواضع الأربعة الإلزاميّة</h2>
+  <p class="intro">وفق القاعدة الإلزاميّة للمشروع: أي تحديث لا يُعتبَر "منشورًا" حتى يصل للمواضع الأربعة كلّها.</p>
+
+  <div class="deploy-flow">
+    <div class="deploy-node done"><div class="dn-ic">🐙</div><div class="dn-t">GitHub</div><div class="dn-s">master · 458aa34</div></div>
+    <div class="deploy-arrow">←</div>
+    <div class="deploy-node done"><div class="dn-ic">💻</div><div class="dn-t">test1 (Kali)</div><div class="dn-s">alembic ab43 · صحّي</div></div>
+    <div class="deploy-arrow">←</div>
+    <div class="deploy-node done"><div class="dn-ic">🖥️</div><div class="dn-t">test/.194</div><div class="dn-s">alembic ab43 · صحّي</div></div>
+    <div class="deploy-arrow">←</div>
+    <div class="deploy-node done"><div class="dn-ic">🌐</div><div class="dn-t">الإنتاج (tawanow.com)</div><div class="dn-s">alembic ab43 · صحّي · بإذن صريح</div></div>
+  </div>
+
+  <div class="subhead">1️⃣ test1 — Kali (هذا الجهاز)</div>
+  <ol class="steps">
+    <li>تعذّر <code>docker compose build</code> (خلل معروف في المشروع: buildx أقدم من 0.17 على هذا الجهاز) — استُخدِم <code>docker build</code> الخام مباشرة بدلًا منه.</li>
+    <li>بناء <code>tawalocal-backend-core:latest</code> و<code>tawalocal-web-frontend:latest</code>.</li>
+    <li>وسم صورة <code>tawalocal-migrate:latest</code> فورًا (الخطوة الإلزاميّة المكتشفة في حادثة 2026-07-16 — بناء backend-core وحده لا يُحدِّث صورة migrate تلقائيًّا).</li>
+    <li><code>docker compose up -d backend-core web-frontend</code> — الهجرة عملت تلقائيًّا عبر <code>depends_on</code>، وصلت لـ<code>ab43 (head)</code>.</li>
+    <li>تحقّق: كلا الحاويتين <span class="pill ok">صحّي (healthy)</span>، <code>/api/health</code> ← 200.</li>
+  </ol>
+
+  <div class="subhead">2️⃣ test/.194 — خادم Ubuntu على الشبكة المحليّة</div>
+  <ol class="steps">
+    <li>لا مستودع git على هذا الخادم — الآليّة المعتمَدة: بناء الصور محليًّا على test1 ثمّ <code>docker save</code> → نقل → <code>docker load</code>.</li>
+    <li>حزمة الصور الثلاث: 424 ميغابايت — نُقِلَت عبر <code>scp</code>، وتحقّقتُ من تطابق <code>sha256sum</code> بين النسخة المحليّة والمنقولة قبل المتابعة.</li>
+    <li><code>docker load</code> نجح للصور الثلاث، ثمّ <code>docker compose up -d</code>.</li>
+    <li>لا خدمة <code>migrate</code> منفصلة في ملفّ compose هذا الخادم — شُغِّلت <code>alembic upgrade head</code> يدويًّا داخل الحاوية، وصلت لـ<code>ab43 (head)</code>.</li>
+    <li>تحقّق: الحاويتان <span class="pill ok">صحّي</span>، فحص داخلي (8091) ← 200، وفحص خارجي حقيقي عبر <code>test.tawanow.com</code> و<code>test2.tawanow.com</code> ← 200 لكليهما.</li>
+    <li>تنظيف: حذف الحزمة المؤقّتة من الخادم البعيد بعد التحقّق.</li>
+  </ol>
+
+  <div class="subhead">3️⃣ الإنتاج — Hetzner (tawanow.com)</div>
+  <div class="info-box"><div class="ic">🔐</div><p><b>بوّابة الإذن الصريح:</b> رغم التفويض الواسع الممنوح مسبقًا لتنفيذ الكود (بما فيه مناطق محظورة)، قواعد المشروع الثابتة تشترط إذنًا صريحًا لكل عمليّة نشر إنتاج على حدة — التفويض العام للكود لا يُغطّي تلقائيًّا لمس الخادم الحيّ. طُلِب هذا الإذن صراحة قبل المتابعة، ومُنِح.</p></div>
+  <ol class="steps">
+    <li><b>نسخة احتياطيّة طازجة أوّلًا (إلزاميّة قبل أي لمس):</b> <code>tawa_backup.sh</code> → <code>tawa-20260718_182958.dump.gz</code> (14 ميغابايت).</li>
+    <li><b>حزم مصدر نظيفة عبر <code>git archive HEAD</code>:</b> وليس نسخ شجرة العمل مباشرة — لأنّ شجرة العمل المحليّة تحتوي ملفّات غير متتبَّعة من جلسة موازية (مثل <code>web/q</code>). تحقّقتُ صراحة أنّ هذه الملفّات <b>غير موجودة</b> داخل الأرشيف الناتج قبل الرفع.</li>
+    <li>نقل أرشيفَي <code>backend/</code> و<code>web/</code> عبر <code>scp</code> واستخراجهما في <code>/home/deploy/platform</code>.</li>
+    <li>بناء <code>backend-core</code> بالطريقة الكلاسيكيّة (<code>DOCKER_BUILDKIT=0</code>، تفادي مشكلة buildx نفسها)، ثمّ وسم <code>tawa-migrate:latest</code> فورًا (نفس الخطوة الإلزاميّة من حادثة 2026-07-16).</li>
+    <li><code>docker compose up -d backend-core</code> — الهجرة عملت تلقائيًّا، خرجت برمز 0، وصلت لـ<code>ab43 (head)</code>.</li>
+    <li>بناء ونشر <code>web-frontend</code> بنفس الطريقة الكلاسيكيّة.</li>
+    <li>تحقّق نهائي: كلتا الحاويتين <span class="pill ok">صحّي</span>، لا أخطاء في سجلّات الخادم خلال الدقائق الأولى بعد النشر، وفحوصات خارجيّة حقيقيّة عبر <code>https://tawanow.com</code> (الواجهة 200، <code>/api/health/ready</code> 200، <code>/dl/download.html</code> 200).</li>
+  </ol>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>الموضع</th><th>alembic</th><th>الحالة</th><th>فحص خارجي</th></tr></thead>
+    <tbody>
+      <tr><td>GitHub</td><td>—</td><td><span class="pill ok">مدمَج + مرفوع</span></td><td>—</td></tr>
+      <tr><td>test1 (Kali)</td><td class="mono">ab43</td><td><span class="pill ok">صحّي</span></td><td class="num">200</td></tr>
+      <tr><td>test/.194</td><td class="mono">ab43</td><td><span class="pill ok">صحّي</span></td><td class="num">200 / 200</td></tr>
+      <tr><td>الإنتاج (tawanow.com)</td><td class="mono">ab43</td><td><span class="pill ok">صحّي</span></td><td class="num">200 / 200 / 200</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="tech">
+  <span class="section-eyebrow">🌐 تقنيات حديثة</span>
+  <h2>تقنيات وأنماط عالميّة مُطبَّقة في هذا العمل</h2>
+  <ul class="checklist">
+    <li><b>نمط SAVEPOINT (تراجع جزئي):</b> <code>begin_nested()</code> بدل تراجع كامل للجلسة — يحمي كتابات شقيقة أخرى في نفس المعاملة عند حلّ سباقات التزامن، بدل حلّ ساذج يُهدِر عملًا صحيحًا آخر.</li>
+    <li><b>نمط "المِصعد" (Ratchet) في CI/CD:</b> مقارنة HEAD مقابل BASE بدل بوّابة صارمة على كامل الشجرة — يسمح بإدخال أدوات فحص جديدة قويّة فورًا دون رفض كل عمل قائم بسبب ديون تقنيّة قديمة، مع منع الديون الجديدة من التراكم أكثر.</li>
+    <li><b>حسّاسات نظام تموضع المنصّات (Platform GPS Sentinels):</b> معالجة صريحة لسلوك iOS الموثَّق (<code>-1</code> بدل <code>null</code>) بدل افتراض تجانس بين المنصّات.</li>
+    <li><b>حركة سلسة بـ<code>requestAnimationFrame</code>:</b> تحريك خرائط حيّة بمعدّل إطارات طبيعي بدل قفزات مفاجئة عند كل تحديث بيانات دوري.</li>
+    <li><b><code>git archive HEAD</code> للنشر النظيف:</b> ضمان أنّ الخادم الحيّ يستقبل فقط الكود المُلتَزَم فعليًّا والمراجَع، لا أي ملفّ محلّي عرضي أو من جلسة عمل موازية.</li>
+    <li><b>مراجعة كود مستقلّة بالذكاء الاصطناعي (Codex CLI) كخطّ دفاع ثانٍ:</b> عين مستقلّة اكتشفت 8 مشاكل حقيقيّة إضافيّة لم تظهر في الاختبارات الآليّة أو المراجعة الأولى — تحقّق شخصي من كل ملاحظة قبل التصديق عليها أو رفضها.</li>
+  </ul>
+</section>
+
+<section id="status">
+  <span class="section-eyebrow">✅ الخلاصة</span>
+  <h2>الحالة النهائية</h2>
+  <div class="plain">
+    <div class="ic">🎯</div>
+    <p><b>كل بند من الاثني عشر مُنفَّذ ومُختبَر، كل ملاحظة من الثماني لمراجعة Codex مُصلَحة ومُختبَرة، الكود مرفوع ومدموج في master على GitHub، والنشر مكتمل ومُتحقَّق منه حيًّا على المواضع الأربعة الإلزاميّة كلّها — بما فيها الإنتاج (tawanow.com) بإذن تشغيلي صريح ونسخة احتياطيّة طازجة مسبقة. صفر انحدار في أي حزمة اختبار، وصفر أخطاء في سجلّات الخادم بعد النشر مباشرة.</b></p>
+  </div>
+</section>
+
+</div>
+
+<footer>تقرير 520 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-18</footer>
+</content>

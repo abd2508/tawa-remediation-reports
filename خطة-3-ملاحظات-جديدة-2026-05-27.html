@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خطة 3 الملاحظات الجديدة — Offline + Registration + Email OTP</title>
+<style>
+  :root{
+    --green:#0e7a4f; --green-bg:#e8f4ee; --green-soft:#dcefe5;
+    --red:#b3261e; --red-bg:#fde7e6;
+    --amber:#b86e00; --amber-bg:#fff3df;
+    --blue:#1a73e8; --blue-bg:#e8f1fe;
+    --purple:#7c3aed; --purple-bg:#f3eafd;
+    --gray-900:#1f1f1f; --gray-700:#4a4a4a; --gray-500:#7a7a7a;
+    --gray-300:#d8d8d8; --gray-100:#f3f3f3; --gray-50:#fafafa; --border:#d8d8d8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font-family:"Noto Naskh Arabic","Amiri","Segoe UI",sans-serif; background:#f7f7f8; color:var(--gray-900); line-height:1.7; font-size:14.5px}
+  .wrap{max-width:1180px; margin:0 auto; padding:24px 18px 80px}
+
+  header{background:linear-gradient(135deg, var(--purple) 0%, #5b21b6 100%); color:white; border-radius:14px; padding:28px 32px; margin-bottom:24px; box-shadow:0 4px 16px rgba(0,0,0,.08)}
+  header h1{margin:0 0 8px; font-size:1.7rem; font-weight:800}
+  header .sub{font-size:1rem; opacity:.92}
+  header .meta{font-size:.82rem; opacity:.85; margin-top:10px; display:flex; gap:18px; flex-wrap:wrap}
+
+  h2{color:var(--green); font-size:1.35rem; font-weight:800; border-bottom:3px solid var(--green); padding-bottom:6px; margin:36px 0 14px}
+  h3{color:var(--gray-900); font-size:1.1rem; font-weight:700; margin:22px 0 10px; padding-right:8px; border-right:4px solid var(--green-bg)}
+  h4{color:var(--gray-700); font-size:.98rem; font-weight:700; margin:14px 0 8px}
+
+  .card{background:white; border:1px solid var(--border); border-radius:12px; padding:16px 20px; margin:12px 0; box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card.green{border-right:5px solid var(--green); background:var(--green-bg)}
+  .card.red{border-right:5px solid var(--red); background:var(--red-bg)}
+  .card.amber{border-right:5px solid var(--amber); background:var(--amber-bg)}
+  .card.blue{border-right:5px solid var(--blue); background:var(--blue-bg)}
+  .card.purple{border-right:5px solid var(--purple); background:var(--purple-bg)}
+
+  .topic-card{background:white; border:1px solid var(--border); border-radius:14px; padding:0; margin:24px 0; box-shadow:0 2px 10px rgba(0,0,0,.06); overflow:hidden}
+  .topic-head{padding:18px 24px; background:linear-gradient(135deg, var(--purple-bg) 0%, #ede4f8 100%); border-bottom:2px solid var(--purple)}
+  .topic-head h3{margin:0; border:none; padding:0; color:var(--purple); font-size:1.2rem; font-weight:800}
+  .topic-tag{display:inline-block; background:var(--purple); color:white; padding:3px 12px; border-radius:6px; font-size:.78rem; font-weight:700; margin-bottom:6px}
+  .topic-body{padding:18px 24px}
+
+  table{width:100%; border-collapse:collapse; background:white; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin:10px 0; font-size:.88rem}
+  th,td{text-align:right; padding:10px 13px; border-bottom:1px solid var(--gray-100); vertical-align:top}
+  th{background:var(--gray-50); font-weight:700; color:var(--gray-700); font-size:.85rem}
+  tr:last-child td{border-bottom:none}
+  td.center{text-align:center}
+  td.mono, .mono{font-family:"Courier New",monospace; font-size:.78rem; color:var(--gray-700); direction:ltr; text-align:left}
+
+  .file-ref{background:var(--gray-100); padding:2px 6px; border-radius:4px; font-family:"Courier New",monospace; font-size:.76rem; color:var(--gray-900); direction:ltr; display:inline-block; border:1px solid var(--gray-300)}
+
+  pre{background:#1f1f1f; color:#e8e8e8; padding:12px 14px; border-radius:6px; overflow-x:auto; font-size:.78rem; line-height:1.55; direction:ltr; margin:8px 0; font-family:"Courier New",monospace}
+  pre.add{background:#1a3a25; border-right:3px solid var(--green)}
+  pre.del{background:#3a1a1a; border-right:3px solid var(--red)}
+
+  .key-fact{padding:10px 14px; margin:12px 0; border-radius:8px; font-weight:600; border-right:5px solid}
+  .key-fact.green{background:var(--green-bg); border-right-color:var(--green)}
+  .key-fact.amber{background:var(--amber-bg); border-right-color:var(--amber); color:#7c4a00}
+  .key-fact.red{background:var(--red-bg); border-right-color:var(--red); color:#7a1714}
+  .key-fact.blue{background:var(--blue-bg); border-right-color:var(--blue)}
+  .key-fact.purple{background:var(--purple-bg); border-right-color:var(--purple)}
+
+  .ok{color:var(--green); font-weight:700}
+  .bad{color:var(--red); font-weight:700}
+  .warn{color:var(--amber); font-weight:700}
+
+  ul.clean{list-style:none; padding:0; margin:8px 0}
+  ul.clean li{padding:5px 0 5px 28px; position:relative}
+  ul.clean li::before{content:"◉"; color:var(--green); position:absolute; right:8px; top:5px; font-size:.85rem}
+  ul.clean.amber li::before{color:var(--amber); content:"⚠"}
+  ul.clean.red li::before{color:var(--red); content:"✗"}
+  ul.clean.purple li::before{color:var(--purple); content:"➤"}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin:14px 0}
+  .stat{background:white; border:1px solid var(--border); border-radius:10px; padding:14px 16px; text-align:center}
+  .stat .num{font-size:1.8rem; font-weight:800; color:var(--green); display:block; line-height:1.1}
+  .stat .num.amber{color:var(--amber)}
+  .stat .num.red{color:var(--red)}
+  .stat .num.purple{color:var(--purple)}
+  .stat .label{font-size:.82rem; color:var(--gray-700); margin-top:4px}
+
+  .approval-box{background:linear-gradient(135deg, #fff8e1 0%, #fff3c4 100%); border:3px solid var(--amber); border-radius:14px; padding:24px 28px; margin:32px 0; box-shadow:0 4px 12px rgba(184, 110, 0, 0.15)}
+  .approval-box h2{color:var(--amber); border:none; margin:0 0 12px; padding:0}
+  .approval-box .checklist{margin:14px 0; padding:0; list-style:none}
+  .approval-box .checklist li{padding:8px 0 8px 32px; position:relative; font-weight:600}
+  .approval-box .checklist li::before{content:"☐"; position:absolute; right:0; top:8px; color:var(--amber); font-size:1.4rem; line-height:1}
+
+  .toc{background:var(--gray-50); border:1px solid var(--border); border-radius:10px; padding:14px 22px; margin-bottom:24px}
+  .toc h3{margin-top:0; color:var(--green); border-right:none}
+  .toc ol{margin:0; padding-right:24px}
+  .toc li{padding:3px 0}
+  .toc a{color:var(--blue); text-decoration:none; font-weight:600}
+
+  details summary{cursor:pointer; padding:8px 12px; background:var(--gray-50); border-radius:6px; font-weight:700; font-size:.92rem; margin:8px 0}
+  details[open] summary{background:var(--green-bg); color:var(--green)}
+
+  footer{text-align:center; color:var(--gray-500); font-size:.82rem; margin-top:40px; padding-top:20px; border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>خطة الـ3 ملاحظات الجديدة من المالك</h1>
+  <div class="sub">Offline-safe verification + Driver handoff + عُيوب التَّسجيل + Email OTP — مَبنية على فحص الكود الفعلي</div>
+  <div class="meta">
+    <span>📅 2026-05-27</span>
+    <span>🎯 3 ملاحظات → 5 إصلاحات (3 backend + 5 frontend + 1 mobile-equivalent)</span>
+    <span>⏱ تَقدير: ~12 ساعة كاملاً، أو 4 موجات مُنفصلة</span>
+    <span>⚠️ يَتطلَّب backend changes — يَحتاج إذن صَريح</span>
+  </div>
+</header>
+
+<div class="toc">
+  <h3>فهرس الخطة</h3>
+  <ol>
+    <li><a href="#sec0">٠. الملخّص + قَرار يَحتاج موافقتك</a></li>
+    <li><a href="#sec1">١. الملاحظة 1: Offline-safe verification + Driver handoff</a></li>
+    <li><a href="#sec2">٢. الملاحظة 2: عُيوب التَّسجيل (show password + per-field errors)</a></li>
+    <li><a href="#sec3">٣. الملاحظة 3: Email OTP بَدلاً من token طَويل</a></li>
+    <li><a href="#sec4">٤. خطة التَّنفيذ المُجزَّأة (4 موجات)</a></li>
+    <li><a href="#sec5">٥. المَخاطر + خطة الاسترداد</a></li>
+    <li><a href="#sec6">٦. صَندوق الموافقة</a></li>
+  </ol>
+</div>
+
+<!-- ════════════════════ 0 ════════════════════ -->
+<h2 id="sec0">٠. الملخّص + قَرار يَحتاج موافقتك</h2>
+
+<div class="stat-grid">
+  <div class="stat"><span class="num">3</span><span class="label">ملاحظات جَوهرية</span></div>
+  <div class="stat"><span class="num amber">5</span><span class="label">إصلاحات تَنفيذية</span></div>
+  <div class="stat"><span class="num purple">3</span><span class="label">backend changes (يَحتاج إذن)</span></div>
+  <div class="stat"><span class="num">12 ساعة</span><span class="label">تَقدير إجمالي</span></div>
+</div>
+
+<table>
+  <thead>
+    <tr><th>الكود</th><th>الملاحظة</th><th>backend؟</th><th>الجُهد</th><th>الأَولوية</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>G-1</strong></td>
+      <td>Offline-safe verification (pickup + handoff codes مُخَزَّنة محلياً مُشَفَّرة)</td>
+      <td><span class="warn">نعم — 2 endpoints جَديدة</span></td>
+      <td>4 ساعات</td>
+      <td>عالية</td>
+    </tr>
+    <tr>
+      <td><strong>G-2</strong></td>
+      <td>Driver handoff (تَبديل السائق + نَقل codes للسائق الجَديد)</td>
+      <td><span class="warn">نعم — 1 endpoint جَديد + driver_emergency kind</span></td>
+      <td>3 ساعات</td>
+      <td>عالية</td>
+    </tr>
+    <tr>
+      <td><strong>G-3</strong></td>
+      <td>Show/Hide password toggle في كل حقول password (4 مَواضع)</td>
+      <td class="ok">لا</td>
+      <td>30 دقيقة</td>
+      <td>عاجلة</td>
+    </tr>
+    <tr>
+      <td><strong>G-4</strong></td>
+      <td>Per-field error highlighting + رسائل feedback تحت كل حقل</td>
+      <td class="ok">لا (لكن backend envelope يُحَسَّن)</td>
+      <td>1.5 ساعة</td>
+      <td>عاجلة</td>
+    </tr>
+    <tr>
+      <td><strong>G-5</strong></td>
+      <td>Email OTP 6-digit بَدلاً من 32-char hex token</td>
+      <td><span class="warn">نعم — 1 endpoint تَعديل</span></td>
+      <td>2 ساعة</td>
+      <td>متوسّطة</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="key-fact amber">
+<strong>قَرار يَحتاج موافقتك:</strong> 3 من 5 إصلاحات (G-1, G-2, G-5) تَتطلَّب تَعديلات backend. <code>backend/</code> ضِمن "Forbidden Zones" في CLAUDE.md ويَحتاج إذن صَريح. هل تَأذن لي بتَعديلات backend؟
+</div>
+
+<!-- ════════════════════ 1 ════════════════════ -->
+<h2 id="sec1">١. الملاحظة 1: Offline-safe verification + Driver handoff</h2>
+
+<div class="topic-card">
+<div class="topic-head">
+  <span class="topic-tag">G-1 + G-2 · الأَكبر</span>
+  <h3>🔐 رَمز التَّسليم يَعمل offline + يَنتقل عند تَبديل السائق</h3>
+</div>
+<div class="topic-body">
+
+<h4>المشكلة كما طَرحتَها:</h4>
+<div class="card amber">
+<p>السائق وَصل لِلتَّسليم. الإنترنت مَقطوع. مَسح QR كود من العميل أو كَتب الرَّمز الذي أَعطاه له العميل، <strong>لكن لا يَستطيع التَّحقُّق</strong> لأن الـbackend غير مُتاح. ربّما رمز قَديم؟ ربّما رمز خاطئ؟ المنصَّة لا تَعرف.</p>
+<p>إضافة: لو تَم تَبديل السائق (driver handoff)، السائق الجَديد يَأتي بدون أيّ بيانات → يَطلب من العميل الرَّمز مَرَّة أُخرى = تَجربة سَيِّئة.</p>
+</div>
+
+<h4>الوَضع الحالي في الكود (مَفحوص):</h4>
+<table>
+  <tbody>
+    <tr>
+      <td><strong>Pickup verification</strong> (السائق ↔ المزوّد)</td>
+      <td>الـbackend يُولِّد <code>pickup_token</code> (HMAC مَوقَّع) + <code>pickup_short_code</code> (4 أَحرف). المزوّد يَكتب أَحدهما → <code>POST /providers/orders/{id}/verify-pickup</code> → backend يَتحقَّق.</td>
+    </tr>
+    <tr>
+      <td><strong>Handoff verification</strong> (العميل ↔ السائق)</td>
+      <td><code>order.delivery_handoff_code</code> = 4 أرقام عَشوائية. السائق يَكتبه → <code>POST /dispatch/orders/{id}/verify-handoff</code> → backend يَتحقَّق + 3 محاولات قُصوى.</td>
+    </tr>
+    <tr>
+      <td><strong>Driver re-assignment</strong></td>
+      <td><span class="bad">❌ غير موجود</span>. <code>driver_emergencies</code> فيه أَنواع (ACCIDENT, VEHICLE_FAILURE, إلخ) لكن لا "REQUEST_REASSIGN" ولا endpoint لنَقل الطلب لسائق آخر.</td>
+    </tr>
+    <tr>
+      <td><strong>Offline storage</strong></td>
+      <td><span class="bad">❌ غير موجود</span>. F-15 الذي بَنيناه اليوم يَدعم queue للـwrites (proof + cash) لكن ليس reads مُسبَقة.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>تَحدٍّ أَمني مُهم 🔒</h4>
+<div class="card red">
+<p><strong>تَخزين الـ4 أرقام الخام (raw code) على جهاز السائق = ثَغرة أَمنية كَبيرة:</strong></p>
+<ul class="clean red">
+  <li>السائق يَستطيع فَتح DevTools / Storage Inspector ورؤية الرَّمز</li>
+  <li>عندها يَتجاوز خطوة "العميل أَعطاني الرَّمز" → يَستطيع التَّسليم وَهمياً (يَأخذ السلع ويَختفي)</li>
+  <li>الـhandoff code فُكرته الكاملة = إثبات أن العميل استلم فعلاً</li>
+</ul>
+</div>
+
+<div class="card green">
+<strong>الحل الأمني المُقترَح: HMAC hashes بَدلاً من raw codes</strong>
+<ul class="clean">
+  <li>الـbackend يَرجع <strong>HMAC hash</strong> للـcode + <strong>server-side secret</strong> (لا raw code)</li>
+  <li>الجَهاز يَستلم الـhash فقط، يَخزّنه في IndexedDB</li>
+  <li>السائق يَكتب الـ4 أرقام التي أَعطاه العميل</li>
+  <li>الجَهاز يَحسب <code>HMAC(input_code, stored_salt)</code> ويُقارنه بالـhash المُخَزَّن</li>
+  <li>إذا تَطابَق → التَّسليم صحيح. الـverification يَتم محلياً</li>
+  <li><strong>السائق لا يَستطيع استخراج الـcode الأَصلي من الـhash</strong> (one-way function)</li>
+  <li>الـrequest يُرسَل عَبر offline queue (F-15) للـbackend ليَسجل الـverification</li>
+</ul>
+</div>
+
+<h4>التَّعديلات المُفَصَّلة:</h4>
+
+<h5>🔧 Backend (1): endpoint جَديد لـpre-fetch الـbundle</h5>
+<pre class="add">// backend/app/modules/dispatch/offline_bundle_router.py (جَديد)
+@router.get("/dispatch/orders/{order_id}/offline-bundle")
+async def get_offline_bundle(order_id, user, db):
+    """
+    Driver fetches an offline-safe verification bundle once the order is
+    DRIVER_ASSIGNED. Returns:
+      - pickup_token (HMAC signed, opaque)
+      - handoff_code_hash (HMAC-SHA256 of the 4-digit code + per-order salt)
+      - handoff_code_salt (the salt used; client needs it for local HMAC)
+    The driver's app stores these in IndexedDB and uses them to verify
+    pickup/handoff inputs offline. The actual raw code is never sent.
+    """
+    # validate driver owns the order
+    # compute HMAC(handoff_code, secret) and return hash + salt
+    return {
+        "pickup_token": order.pickup_token,
+        "handoff_code_hash": hmac_sha256(order.delivery_handoff_code, salt),
+        "handoff_code_salt": salt,
+        "expires_at": ...,
+    }</pre>
+
+<h5>🔧 Frontend (2): IndexedDB store + offline verify hook</h5>
+<pre class="add">// web/src/hooks/useOfflineVerifyBundle.ts (جَديد)
+// عند DRIVER_ASSIGNED → fetch /offline-bundle → save to IndexedDB
+// عند verify → اقرأ من IndexedDB → compute hmac → compare
+// بَعد التَّحقُّق المحلي → POST /verify-handoff (يَدخل في F-15 queue إذا offline)
+
+// web/src/pages/driver/DriverDelivery.tsx
+const { verifyHandoffOffline } = useOfflineVerifyBundle(orderId);
+const onSubmitHandoff = async (code) =&gt; {
+  const localResult = await verifyHandoffOffline(code);  // مَحلِّي
+  if (!localResult.valid) {
+    setError("الرَّمز غير صحيح — تَأكَّد من العميل");
+    return;
+  }
+  // محلياً تَأكَّدنا → أَرسل للـbackend (F-15 يَتولى offline)
+  await ordersApi.verifyHandoff(orderId, code);
+};</pre>
+
+<h5>🔧 Backend (2): Driver re-assignment endpoints</h5>
+<pre class="add">// backend/app/modules/dispatch/reassign_router.py (جَديد)
+
+@router.post("/dispatch/orders/{order_id}/request-reassign")
+async def driver_request_reassign(order_id, body: {reason}, user):
+    """Driver requests OPS to assign another driver (e.g. vehicle broke)."""
+    # Create driver_emergency with kind="REQUEST_REASSIGN"
+    # OPS sees it in /ops/driver-emergencies
+
+@router.post("/operations/orders/{order_id}/reassign-driver")
+async def ops_reassign_driver(order_id, body: {new_driver_id}, user):
+    """OPS approves: transfer order to new driver."""
+    # 1. Cancel old DispatchOffer (state=REVOKED)
+    # 2. Create new DispatchOffer for new_driver (ACCEPTED)
+    # 3. Update order.driver_id = new_driver_id
+    # 4. Send push notification to new driver
+    # 5. Old driver's offline bundle becomes invalid (token regenerated)
+    # 6. New driver fetches fresh /offline-bundle on next online moment</pre>
+
+<h5>🔧 Backend (3): Add driver_emergency kind</h5>
+<pre class="add">// backend/alembic/versions/aa18_emergency_reassign.py (migration)
+op.execute("ALTER TABLE driver_emergencies DROP CONSTRAINT ck_driver_emergencies_kind")
+op.execute("""
+    ALTER TABLE driver_emergencies ADD CONSTRAINT ck_driver_emergencies_kind
+    CHECK (kind IN ('CUSTOMER_NO_ANSWER','WRONG_ADDRESS','UNSAFE_AREA',
+                     'MEDICAL','VEHICLE_FAILURE','ACCIDENT','WEATHER','TRAFFIC',
+                     'REQUEST_REASSIGN'))  -- ← جديد
+""")</pre>
+
+<h5>🔧 Frontend (3): UI للسائق + للأدمن</h5>
+<ul class="clean">
+  <li><strong>DriverProfile</strong>: زر جَديد "🔄 اطلب تَبديل سائق" → modal بـreason → POST</li>
+  <li><strong>OpsDriverEmergencies</strong>: عند رؤية كَيس REQUEST_REASSIGN → dropdown لاختيار driver جَديد + زر "تَبديل" → POST</li>
+  <li><strong>DriverHome للسائق الجَديد</strong>: عند قَبول الـreassignment، يَفتح DriverDelivery ويَجلب الـoffline-bundle تلقائياً</li>
+</ul>
+
+<h4>الأَعراض الجانبية:</h4>
+<ul class="clean amber">
+  <li><strong>تَعقيد دَورة حياة الـorder:</strong> driver_id قد يَتغيَّر → كل الاستعلامات التي تَفلتر بـ<code>WHERE driver_id=X</code> تَحتاج مُراجَعة (cash_collections, settlements)</li>
+  <li><strong>التَّكلفة المالية:</strong> هل السائق الأَول يَتقاضى نِصف الأَجر؟ ربع؟ صفر؟ يَجب قَرار</li>
+  <li><strong>الـSettlement:</strong> الـsettlement يَجب أن يَنسب الطَّلب لِمَن أَكمل التَّسليم، لا مَن قَبِله أَولاً</li>
+  <li><strong>الـoffline bundle له expiry:</strong> لو السائق طَلب reassign بَعد ساعة، الـbundle المُخَزَّن سَيَكون مُنتَهي</li>
+  <li><strong>اختبار شَبكي:</strong> يَحتاج اختبار يَدوي حَقيقي مع airplane mode</li>
+</ul>
+
+</div>
+</div>
+
+<!-- ════════════════════ 2 ════════════════════ -->
+<h2 id="sec2">٢. الملاحظة 2: عُيوب التَّسجيل (show password + per-field errors)</h2>
+
+<div class="topic-card">
+<div class="topic-head">
+  <span class="topic-tag">G-3 + G-4 · Frontend فقط</span>
+  <h3>👁️ زر إظهار الـpassword + 🔴 تَلوين الحقل الخاطئ + feedback</h3>
+</div>
+<div class="topic-body">
+
+<h4>المشكلة كما طَرحتَها:</h4>
+<div class="card amber">
+<ul class="clean amber">
+  <li><strong>عَيب 1:</strong> لا يوجد زر 👁️ لإظهار الـpassword. المُسجِّل لا يَستطيع التَّأكُّد من صحّة ما كَتبه (خاصَّة على الجوال حيث الـtypos كَثيرة).</li>
+  <li><strong>عَيب 2:</strong> عند فَشل التَّسجيل، يَظهر <code>errorMsg</code> عام (مثل "البريد الإلكتروني مَستخدم مُسبَقاً") لكن:
+    <ul style="margin:4px 0">
+      <li>الحقل الخاطئ لا يَتلوَّن بالأحمر</li>
+      <li>لا feedback تحت الحقل يَشرح ماذا يَفعل</li>
+      <li>المُسجِّل يَجب أن يَقرأ الرسالة العامة ويُخمِّن أيّ حقل</li>
+    </ul>
+  </li>
+  <li><strong>التَّأثير على كل الأَدوار:</strong> العميل + المزوّد + السائق + الموظَّف — كلهم يَستخدمون نَفس RegistrationPage</li>
+</ul>
+</div>
+
+<h4>الوَضع الحالي في الكود (مَفحوص):</h4>
+<table>
+  <tbody>
+    <tr>
+      <td>حقول password</td>
+      <td><span class="file-ref">RegistrationPage.tsx:638-661</span> — <code>&lt;input type="password" /&gt;</code> دائماً، لا toggle. (نفس المشكلة في LoginPage)</td>
+    </tr>
+    <tr>
+      <td>error state</td>
+      <td><span class="file-ref">RegistrationPage.tsx:145</span> — <code>useState&lt;string | null&gt;("errorMsg")</code> واحد فقط</td>
+    </tr>
+    <tr>
+      <td>عرض الـerror</td>
+      <td><span class="file-ref">:661</span> — <code>&#123;errorMsg && &lt;div style=&#123;styles.errorBox&#125;&gt;&#123;errorMsg&#125;&lt;/div&gt;&#125;</code> تحت كل النموذج</td>
+    </tr>
+    <tr>
+      <td>backend envelope</td>
+      <td><span class="ok">✅ موجود</span> — <code>{code, message_ar, message_en, details, correlation_id, retryable}</code>. الـdetails يُمكن أن يَحوي معلومات per-field</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>التَّعديلات المُفَصَّلة:</h4>
+
+<h5>🔧 Frontend (1): مكوّن PasswordInput جديد</h5>
+<pre class="add">// web/src/components/PasswordInput.tsx (جَديد)
+interface Props {
+  value: string;
+  onChange: (v: string) =&gt; void;
+  placeholder?: string;
+  autoComplete?: string;
+  minLength?: number;
+  fieldError?: string;  // للـper-field error
+  // ...
+}
+
+export function PasswordInput({ value, onChange, fieldError, ...rest }: Props) {
+  const [visible, setVisible] = useState(false);
+  return (
+    &lt;div style={{ position: "relative" }}&gt;
+      &lt;input
+        type={visible ? "text" : "password"}
+        value={value}
+        onChange={(e) =&gt; onChange(e.target.value)}
+        style={{
+          ...inputStyle,
+          paddingInlineStart: "2.5rem",  // مكان للزر
+          borderColor: fieldError ? "var(--color-status-danger-text)" : undefined,
+        }}
+        {...rest}
+      /&gt;
+      &lt;button
+        type="button"
+        onClick={() =&gt; setVisible(!visible)}
+        aria-label={visible ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+        style={{
+          position: "absolute", left: 8, top: 8, background: "none",
+          border: "none", cursor: "pointer", fontSize: "1.1rem",
+        }}
+      &gt;
+        {visible ? "🙈" : "👁️"}
+      &lt;/button&gt;
+      {fieldError && (
+        &lt;p style={{ color: "var(--color-status-danger-text)", fontSize: "0.78rem", marginTop: "0.25rem" }}&gt;
+          {fieldError}
+        &lt;/p&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</pre>
+
+<h5>🔧 Frontend (2): hook useFieldErrors</h5>
+<pre class="add">// web/src/hooks/useFieldErrors.ts (جَديد)
+// يَستخرج per-field errors من envelope.details
+// envelope shape (مَتَوَقَّع من backend):
+// { code: "VALIDATION", message_ar: "...", details: { fields: { email: "البريد مُستخدم", password: "..." } } }
+
+export function useFieldErrors() {
+  const [errors, setErrors] = useState&lt;Record&lt;string, string&gt;&gt;({});
+  const [generalError, setGeneralError] = useState&lt;string | null&gt;(null);
+
+  const setFromEnvelope = (envelope: ErrorEnvelope | null) =&gt; {
+    if (!envelope) { setErrors({}); setGeneralError(null); return; }
+    const fields = (envelope.details as { fields?: Record&lt;string, string&gt; })?.fields;
+    if (fields && Object.keys(fields).length &gt; 0) {
+      setErrors(fields);
+      setGeneralError(null);  // الحقول كَافية
+    } else {
+      setErrors({});
+      setGeneralError(envelope.message_ar ?? envelope.message_en ?? "حدث خطأ");
+    }
+  };
+
+  const clear = () =&gt; { setErrors({}); setGeneralError(null); };
+  return { errors, generalError, setFromEnvelope, clear };
+}</pre>
+
+<h5>🔧 Frontend (3): تَطبيق على RegistrationPage + LoginPage</h5>
+<pre class="add">// RegistrationPage.tsx
+const { errors: fieldErrors, generalError, setFromEnvelope, clear } = useFieldErrors();
+
+// عند submit:
+.catch((err) =&gt; setFromEnvelope(extractError(err)));
+
+// كل حقل:
+&lt;input
+  value={email}
+  onChange={(e) =&gt; { setEmail(e.target.value); clear(); }}
+  style={{
+    ...styles.input,
+    borderColor: fieldErrors.email ? "var(--color-status-danger-text)" : undefined,
+  }}
+/&gt;
+{fieldErrors.email && &lt;p style={errorTextStyle}&gt;{fieldErrors.email}&lt;/p&gt;}
+
+// حقول password:
+&lt;PasswordInput value={password} onChange={setPassword} fieldError={fieldErrors.password} /&gt;
+&lt;PasswordInput value={confirmPassword} onChange={setConfirmPassword} fieldError={fieldErrors.confirm_password} /&gt;</pre>
+
+<h5>🔧 Backend (اختياري): تَحسين envelope (لو لم يَكن يُرجع per-field فعلاً)</h5>
+<pre class="add">// backend/app/modules/identity/registration_router.py
+# لو الحالي يُرجع message_ar فقط، نُضيف details.fields
+raise ValidationError(
+    code="VALIDATION",
+    message_ar="بيانات غير صحيحة",
+    details={"fields": {"email": "البريد الإلكتروني مُستخدم مسبقاً"}}
+)</pre>
+
+<h4>التَّطبيق على كل الأَدوار:</h4>
+<table>
+  <tbody>
+    <tr><td>customer</td><td class="ok">✅ يَستخدم RegistrationPage مَع PasswordInput</td></tr>
+    <tr><td>provider</td><td class="ok">✅ نَفس الـcomponent</td></tr>
+    <tr><td>driver</td><td class="ok">✅ نَفس الـcomponent</td></tr>
+    <tr><td>staff</td><td class="ok">✅ نَفس الـcomponent</td></tr>
+    <tr><td>LoginPage</td><td class="ok">✅ يَستخدم PasswordInput أيضاً</td></tr>
+  </tbody>
+</table>
+
+</div>
+</div>
+
+<!-- ════════════════════ 3 ════════════════════ -->
+<h2 id="sec3">٣. الملاحظة 3: Email OTP بَدلاً من token طَويل</h2>
+
+<div class="topic-card">
+<div class="topic-head">
+  <span class="topic-tag">G-5 · backend + frontend</span>
+  <h3>📧 رمز رَقمي 6-أَرقام للبريد بَدلاً من 32-حرف hex</h3>
+</div>
+<div class="topic-body">
+
+<h4>المشكلة كما طَرحتَها:</h4>
+<div class="card amber">
+الـemail يَجب أن يُتَحَقَّق منه عند التَّسجيل (مثل phone OTP). الآن: المسجِّل يَكتب أيّ email وَهمي ولا يُتَحَقَّق منه أَبداً. يَجب: يُرسَل رَمز قَصير للبريد، المسجِّل يَكتبه → يُتَأكَّد أنّ البريد ملكه فعلاً.
+</div>
+
+<h4>الوَضع الحالي في الكود (مَفحوص):</h4>
+<table>
+  <tbody>
+    <tr>
+      <td>backend email/verify-request</td>
+      <td><span class="file-ref">registration_router.py:712</span> — يُولِّد <code>secrets.token_hex(16)</code> = <strong>32 حرف hex</strong> (مثل "a3f9b2c8d1e4f6a8b3c9d2e7f1a4b6c8")</td>
+    </tr>
+    <tr>
+      <td>backend email/verify</td>
+      <td><span class="file-ref">:734</span> — يَطلب الـtoken الكامل، يُقارن بالـRedis</td>
+    </tr>
+    <tr>
+      <td>المسجِّل يَجب أن يَكتب 32 حرف</td>
+      <td class="bad">تَجربة سَيِّئة جداً — لا يُمكن لمُستخدم عَادي كَتابتها بدون نَسخ من email</td>
+    </tr>
+    <tr>
+      <td>email provider مُفعَّل؟</td>
+      <td><span class="warn">⚠️ لا</span> — Phase 361 أَضاف email channel كـSMTP-stub. يُكتب الـtoken في logs فقط</td>
+    </tr>
+    <tr>
+      <td>email verification في RegistrationPage</td>
+      <td><span class="bad">❌ لا step</span> — الـauthApi.emailVerifyRequest + emailVerify مَوجودان لكن غير مُستَخدمَين في تَدفُّق التَّسجيل</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4>التَّعديلات المُفَصَّلة:</h4>
+
+<h5>🔧 Backend: تَغيير token من hex إلى 6-digit OTP</h5>
+<pre class="del">// قَبل (32 char hex):
+token = secrets.token_hex(16)  # "a3f9b2c8d1e4f6a8b3c9d2e7f1a4b6c8"</pre>
+<pre class="add">// بعد (6-digit OTP، أَسهل بكثير):
+import secrets
+token = f"{secrets.randbelow(900000) + 100000}"  # "532817"</pre>
+<p>الباقي بدون تَغيير (Redis storage + verify endpoint).</p>
+
+<h5>🔧 Backend: زيادة TTL لـ10 دقائق (الـUX يَحتاج وَقتاً)</h5>
+<pre class="add">await redis.setex(f"email_verify:{body.email}", 600, token)  # 10 دقائق</pre>
+
+<h5>🔧 Frontend: إضافة email verification step في RegistrationPage</h5>
+<pre class="add">// RegistrationPage.tsx — step types جَديدة
+type Step = "role" | "form" | "email_verify" | "pending" | "success";
+
+// بعد POST /auth/register ناجح، إذا email مَوجود:
+if (data.email && !data.email_verified) {
+  await authApi.emailVerifyRequest(data.email);
+  setStep("email_verify");
+}
+
+// step "email_verify":
+&lt;div&gt;
+  &lt;h2&gt;تَحقَّق من بَريدك الإلكتروني&lt;/h2&gt;
+  &lt;p&gt;أَرسلنا رمزاً مكوناً من 6 أَرقام إلى {email}&lt;/p&gt;
+  &lt;input
+    type="text"
+    inputMode="numeric"
+    maxLength={6}
+    placeholder="000000"
+    value={emailCode}
+    onChange={(e) =&gt; setEmailCode(e.target.value)}
+    style={otpInputStyle}
+  /&gt;
+  &lt;button onClick={confirmEmail}&gt;تَأكيد&lt;/button&gt;
+  &lt;button onClick={resendEmail}&gt;إعادة الإرسال&lt;/button&gt;
+&lt;/div&gt;</pre>
+
+<h4>قَرار يَحتاج موافقتك (نطاق الإلزام):</h4>
+<div class="card blue">
+<p>لِمَن يَكون email verification إجباري؟</p>
+<table>
+  <tbody>
+    <tr><td><strong>الخيار أ</strong></td><td>إجباري لكل الأَدوار (يَتوقَّف التَّسجيل حتى يُتَحَقَّق)</td><td>أَمان أَعلى لكن سَيُبطئ التَّسجيل</td></tr>
+    <tr><td><strong>الخيار ب</strong></td><td>إجباري لـprovider/driver/staff، اختياري لـcustomer</td><td>توازن جَيِّد</td></tr>
+    <tr><td><strong>الخيار ج</strong></td><td>اختياري لكل الأَدوار (يُمكن التَّأكيد لاحقاً من Settings)</td><td>أَسهل، أَقل أَمان</td></tr>
+  </tbody>
+</table>
+<p><strong>التَّوصية:</strong> الخيار ب (التَّوازن).</p>
+</div>
+
+<h4>الأَعراض الجانبية:</h4>
+<ul class="clean amber">
+  <li><strong>email provider real مَطلوب:</strong> حالياً الـtoken في logs فقط. يَحتاج SMTP server حقيقي (Gmail OAuth أو SendGrid أو Postmark)</li>
+  <li><strong>التَّكلفة:</strong> SendGrid مَجاني حتى 100/يوم. أَكثر = $20/شَهر</li>
+  <li><strong>Rate limiting:</strong> يَحتاج حِماية من spam (لا يُمكن طَلب OTP 100 مَرَّة)</li>
+  <li><strong>email غير صَحيح بصرياً:</strong> لو المُستخدم كَتب <code>user@gmial.com</code> (typo) → لن يَستلم الـOTP → يَجب feedback "تَأكَّد من البريد"</li>
+</ul>
+
+</div>
+</div>
+
+<!-- ════════════════════ 4 ════════════════════ -->
+<h2 id="sec4">٤. خطة التَّنفيذ المُجزَّأة (4 موجات)</h2>
+
+<table>
+  <thead>
+    <tr><th>الموجة</th><th>المُحتوى</th><th>الوقت</th><th>backend؟</th><th>الأَولوية</th></tr>
+  </thead>
+  <tbody>
+    <tr style="background:#fff5f5">
+      <td><strong>الموجة A: عاجل UX</strong></td>
+      <td>G-3 + G-4 (show password + per-field errors)</td>
+      <td>~2 ساعة</td>
+      <td class="ok">لا</td>
+      <td>عاجلة</td>
+    </tr>
+    <tr>
+      <td><strong>الموجة B: Email OTP</strong></td>
+      <td>G-5 (6-digit OTP + verification step)</td>
+      <td>~2 ساعة</td>
+      <td><span class="warn">backend tweak</span></td>
+      <td>متوسّطة</td>
+    </tr>
+    <tr>
+      <td><strong>الموجة C: Offline verify</strong></td>
+      <td>G-1 (HMAC hash storage + IndexedDB + offline verify hook)</td>
+      <td>~4 ساعات</td>
+      <td><span class="warn">1 endpoint جَديد</span></td>
+      <td>عالية</td>
+    </tr>
+    <tr>
+      <td><strong>الموجة D: Driver handoff</strong></td>
+      <td>G-2 (reassign endpoints + UI + push)</td>
+      <td>~3 ساعات</td>
+      <td><span class="warn">2 endpoints + migration aa18</span></td>
+      <td>عالية</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="card green">
+<strong>التَّوصية:</strong> ابدأ بالموجة A (~2 ساعة، frontend فقط، أَثر فَوري على كل مُستخدم جَديد). ثم B (Email OTP). ثم C+D معاً (يَتشاركان نفس الـoffline-bundle).
+</div>
+
+<!-- ════════════════════ 5 ════════════════════ -->
+<h2 id="sec5">٥. المَخاطر + خطة الاسترداد</h2>
+
+<table>
+  <thead>
+    <tr><th>المَخاطرة</th><th>الاحتمالية</th><th>الأَثر</th><th>الاسترداد</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>backend HMAC implementation خاطئ → false positives</td>
+      <td>منخفضة</td>
+      <td>كَبير (السائق يَتجاوز الـverification)</td>
+      <td>اختبار وِحدة شامل + integration test مع cases سَيِّئة</td>
+    </tr>
+    <tr>
+      <td>تَخزين الـhash في IndexedDB يُحذف عَشوائياً (cleared by browser)</td>
+      <td>متوسّطة</td>
+      <td>السائق يَفشل في التَّحقُّق offline</td>
+      <td>fallback إلى online verify + رسالة واضحة</td>
+    </tr>
+    <tr>
+      <td>Driver reassignment race condition (سائقان يَستلمان نفس الـorder)</td>
+      <td>منخفضة</td>
+      <td>تَناقُض في الـSettlement</td>
+      <td>DB lock + state machine يَفرض atomic transition</td>
+    </tr>
+    <tr>
+      <td>Email OTP spam (مستخدم يَطلب 1000 OTP)</td>
+      <td>متوسّطة</td>
+      <td>email provider quota</td>
+      <td>rate limit صَريح: 3 طلبات/ساعة لكل email</td>
+    </tr>
+    <tr>
+      <td>backwards compatibility — مَستخدمون لديهم email غير مُتَحَقَّق منه</td>
+      <td>عالية</td>
+      <td>لا يَستطيعون تسجيل دخول</td>
+      <td>grandfather clause — الإجبار يَبدأ من تاريخ النَّشر فقط</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ════════════════════ 6 ════════════════════ -->
+<h2 id="sec6">٦. صَندوق الموافقة</h2>
+
+<div class="approval-box">
+<h2>✅ موافقتك على الخطة</h2>
+<p>اختر أحد المسارات (يَحتاج إذن خاص لـbackend changes):</p>
+
+<ul class="checklist">
+  <li><strong>المسار أ — الموجة A فقط (موصى به للبدء):</strong>
+    <br>نَفِّذ G-3 + G-4 (show password + per-field errors) — frontend فقط، 2 ساعة، أَثر فَوري.
+    <br><em>قُل: "ابدأ الموجة A"</em>
+  </li>
+  <li><strong>المسار ب — الموجات A+B (UX + Email):</strong>
+    <br>الموجة A + G-5 (Email OTP). يَتطلَّب backend tweak (تَغيير token_hex → 6-digit). ~4 ساعات.
+    <br><em>قُل: "ابدأ الموجات A+B" + "أَأذن لتَعديل backend"</em>
+  </li>
+  <li><strong>المسار ج — كل الموجات (شامل):</strong>
+    <br>A + B + C + D — كل الـ5 إصلاحات. يَتطلَّب backend + migration aa18. ~11 ساعة.
+    <br><em>قُل: "ابدأ الكل" + "أَأذن لتَعديل backend + migration"</em>
+  </li>
+  <li><strong>المسار د — تَوضيحات قبل البَدء:</strong>
+    <br>عندك أَسئلة على تَفاصيل التَّصميم (HMAC vs raw، أَولوية Email، إلخ).
+    <br><em>قُل: "اِشرح لي [التَّفصيل]"</em>
+  </li>
+  <li><strong>المسار هـ — تَأجيل:</strong>
+    <br>أَريد التَّفكير.
+    <br><em>قُل: "اِنتظر"</em>
+  </li>
+</ul>
+
+<p style="margin-top:18px; font-weight:700">عند اختيارك، أَبدأ التَّنفيذ بالنَّمَط المُجَرَّب: قراءة الكود → تَعديل دَقيق → typecheck → Vitest → build → نَشر → smoke verify → Playwright بصري.</p>
+</div>
+
+<footer>
+خطة 3 ملاحظات جَديدة · مَبنية على فَحص الكود الفعلي · 5 إصلاحات (G-1..G-5) · 4 موجات تَنفيذ
+<br>تَنتظر مُوافقَتك · 2026-05-27
+</footer>
+
+</div>
+</body>
+</html>

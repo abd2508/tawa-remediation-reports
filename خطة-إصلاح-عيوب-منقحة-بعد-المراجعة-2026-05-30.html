@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الخطة المنقّحة بعد المراجعة العميقة — إصلاح عيوب نظام الخبراء (2026-05-30)</title>
+<style>
+  :root{--g:#0e7a4f;--a:#f59e0b;--r:#b3261e;--bg:#f6f8f7;--bd:#e3e9ee;--tx:#1f2a30;--mut:#5d6b75}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,"Segoe UI",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--tx);line-height:1.75}
+  .wrap{max-width:1100px;margin:0 auto;padding:1.5rem}
+  h1{color:var(--g);font-size:1.55rem;margin:.2rem 0}
+  h2{color:var(--g);border-bottom:2px solid var(--bd);padding-bottom:.3rem;margin-top:2rem}
+  h3{margin:1.2rem 0 .3rem;color:#0d3f29}
+  h4{margin:.9rem 0 .25rem;color:var(--mut);font-size:.95rem;text-transform:uppercase;letter-spacing:.05em}
+  .sub{color:var(--mut);font-size:.9rem}
+  .card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:1rem 1.2rem;margin:.8rem 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .new{background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:.5rem .8rem;margin:.4rem 0;font-size:.92rem}
+  .new::before{content:"🆕 جديد من المراجعة: ";font-weight:800;color:#92400e}
+  .changed{background:#dbeafe;border:1px solid #60a5fa;border-radius:8px;padding:.5rem .8rem;margin:.4rem 0;font-size:.92rem}
+  .changed::before{content:"🔄 تصحيح من المراجعة: ";font-weight:800;color:#1e3a8a}
+  .dropped{background:#fee2e2;border:1px solid #f87171;border-radius:8px;padding:.5rem .8rem;margin:.4rem 0;font-size:.92rem}
+  .dropped::before{content:"❌ مُسقَط من الخطة الأصلية: ";font-weight:800;color:#7f1d1d}
+  table{width:100%;border-collapse:collapse;margin:.6rem 0;font-size:.88rem;background:#fff}
+  th,td{border:1px solid var(--bd);padding:.5rem .65rem;text-align:right;vertical-align:top}
+  th{background:#eef4f1;color:var(--g)}
+  code,pre{background:#0f172a;color:#e2e8f0;padding:.05rem .35rem;border-radius:5px;font-family:ui-monospace,Menlo,monospace;font-size:.84em;direction:ltr}
+  pre{display:block;padding:.7rem .9rem;overflow-x:auto;text-align:left;font-size:.78rem;line-height:1.5;white-space:pre}
+  .sev{font-weight:800;padding:.15rem .6rem;border-radius:999px;font-size:.8rem;color:#fff;white-space:nowrap}
+  .s-hi{background:var(--r)}.s-md{background:var(--a);color:#3a2600}.s-lo{background:#64748b}
+  .file{color:#7dd3fc;direction:ltr;display:inline-block}
+  .ok{color:var(--g);font-weight:700}.warn{color:var(--a);font-weight:700}.bad{color:var(--r);font-weight:700}
+  ul li{margin:.2rem 0}
+  .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.5rem;margin:.5rem 0;font-size:.85rem}
+  .meta>div{background:#f1f5f3;padding:.4rem .6rem;border-radius:8px;border:1px solid var(--bd)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>الخطة المنقّحة بعد المراجعة العميقة</h1>
+  <p class="sub">2026-05-30 · مراجعة دقيقة جدّاً للخطة الأصلية مقابل الكود الفعلي مع محاكاة ذهنية لكل خطوة. الإطارات الملوّنة تُبيّن <b style="color:#92400e">إضافات</b>، <b style="color:#1e3a8a">تصحيحات</b>، و<b style="color:#7f1d1d">بنود أُسقطت</b>.</p>
+
+  <h2>منهج المراجعة (ما الذي تغيّر)</h2>
+  <div class="card">
+    <p>لكل بند فحصتُ المسار الفعلي في الكود (الملف:السطر)، حدّدتُ كل المستدعين، حاكيتُ السلوك أثناء البناء وأثناء التشغيل، وبحثتُ عن أثر جانبي خفيّ. النتائج الجوهرية:</p>
+    <ul>
+      <li><span class="bad">عيب كود حقيقي اكتُشف</span> (لم تذكره الخطة الأصلية): <b>KYC-1.A — قائمة <code>VALID_PROVIDER_DOC_TYPES</code> تفتقد <code>MEAT_HANDLING_PERMIT</code></b> ⇒ الجزّار لا يستطيع رفع تصريحه الإلزامي (422).</li>
+      <li>الخطة الأصلية بالغت في تعقيد <b>PROV-1</b> (تفعيل تلقائي عند توقيع العقد بشرط نشر صنف). محاكاة التدفّق الطبيعي (المزوّد يوقّع <b>قبل</b> النشر) كشفت أنّ هذا الشرط <b>لن يتحقّق غالباً</b> ⇒ تبسيط للتصميم.</li>
+      <li><b>PROV-2</b>: الخلفية <b>تُرجِع أصلاً</b> رسائل دقيقة عبر <code>validate_item_completeness</code>؛ المشكلة الفعلية أنّ الواجهة لا تعرضها. تغيير نطاق الإصلاح.</li>
+      <li><b>D-5</b>: ثلاث حالات «بلا سائق» لا واحدة (<code>READY_FOR_PICKUP</code>, <code>AWAITING_DRIVER</code>, <code>NO_DRIVER_ESCALATION</code>) — توسيع الشمول.</li>
+      <li><b>تقييمات (driver_id)</b>: المسار الساذج يولّد N+1 على قائمة الطلبات ⇒ يجب جلب جماعي.</li>
+      <li><b>API-3</b>: لا اختبار يؤكّد 200 ⇒ تغيير 201 آمن.</li>
+    </ul>
+    <p>الترميز اللوني أدناه يميّز <b>كل تعديل</b> عن الخطة الأصلية.</p>
+  </div>
+
+  <!-- ──────── PROV-1 (refined) ──────── -->
+  <h2>١) <span class="sev s-hi">عالٍ</span> PROV-1 — «افتح المتجر» بنقرة واحدة (مُبسَّط)</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الخطورة:</b> عالية</div>
+      <div><b>الجهد المُنقَّح:</b> ~3 ساعات</div>
+      <div><b>Migration؟</b> لا</div>
+    </div>
+
+    <h4>المحاكاة الذهنية أثناء التنفيذ</h4>
+    <ul>
+      <li>المزوّد الطبيعي: يُسجِّل ⇒ يرفع KYC ⇒ OPS يوافق ⇒ <b>يوقّع العقد فوراً</b> (لأنّه أوّل شيء يراه بعد الدخول) ⇒ ثم يجرّب نشر صنف.</li>
+      <li>إذن شرط الخطة الأصلية «active_now=true عند التوقيع <b>إن وُجد</b> صنف منشور» لن يفعل شيئاً للمزوّد الأوّليّ.</li>
+      <li>المخاطر: ربط التفعيل بحدثين (التوقيع، أول نشر) يضاعف المنطق ويُدخل أخطاء حواف، خصوصاً أنّ نفس نقطة التوقيع تخدم السائق أيضاً ⇒ يجب التمييز بالدور.</li>
+    </ul>
+
+    <div class="changed">إسقاط التفعيل التلقائي. الاستعاضة بـ«تفعيل بنقرة واحدة + بانر إرشادي + رسالة خطأ موجِّهة» — أبسط، أوضح، وأقلّ مخاطرة.</div>
+
+    <h4>التصميم النهائي</h4>
+    <ol>
+      <li><b>نقطة API موحّدة:</b>
+        <pre>POST /providers/me/online
+{ "open": true }     ⇒ active_now=true,  is_accepting_orders=true
+{ "open": false }    ⇒ active_now=false, is_accepting_orders=false</pre>
+        يضبط <b>كلا العلَمين</b> ذرّياً، يحدّث <code>updated_at</code>، ويسجِّل حدث تدقيق.
+      </li>
+      <li><b>رسالة الرفض موجِّهة باستخدام آلية موجودة:</b> في <code>order_service.create_order</code> تغيير
+        <pre>raise ValidationError(["Provider is not available"])</pre>
+        إلى
+        <pre>raise ValidationError(["Provider is not available"],
+    code="PROVIDER_OFFLINE",
+    details={"provider_id": str(provider.id)})</pre>
+        <b>المعالج الموجود في <code>order_router.py:349</code> يحترم <code>code</code> و<code>details</code> أصلاً</b> (نمط <code>ZONE_SUSPENDED</code>). يُضاف نصّ عربي مخصّص: <span dir="rtl">«المتجر مغلق حالياً — يرجى المحاولة لاحقاً»</span>.</li>
+      <li><b>الواجهة (ProviderDashboard):</b>
+        <ul>
+          <li>زرّ تبديل واحد «🟢 مفتوح / 🔴 مغلق» يقرأ <code>active_now</code> وينادي <code>POST /providers/me/online</code>.</li>
+          <li><b>بانر استعداد</b> يظهر فقط عندما (<code>active_now=false</code> AND العقد <code>SIGNED</code> AND يوجد صنف منشور): <span dir="rtl">«جاهز للعمل — اضغط «افتح المتجر» لاستقبال الطلبات»</span>. هذا يحلّ مشكلة «الإعداد الكامل بدون تشغيل» تجريبياً.</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h4>الملفّات والأسطر الفعلية</h4>
+    <table>
+      <tr><th>ملف</th><th>السطر</th><th>التغيير</th></tr>
+      <tr><td><span class="file">backend/app/modules/providers/provider_router.py</span></td><td>بعد :1044 (نهاية <code>accept_toggle</code>)</td><td>إضافة <code>POST /me/online</code> + <code>class OnlineBody</code> + audit log. الإبقاء على النقطتين القديمتين دون تغيير (توافق عكسي).</td></tr>
+      <tr><td><span class="file">backend/app/modules/orders/order_service.py</span></td><td>:353</td><td>إضافة <code>code="PROVIDER_OFFLINE"</code> و<code>details</code> + معالج الرسالة العربية في <code>order_router.py:349</code> (نمط ZONE_SUSPENDED).</td></tr>
+      <tr><td><span class="file">web/src/pages/provider/ProviderDashboard.tsx</span></td><td>:قسم الحالة</td><td>زرّ تبديل واحد + بانر «جاهز للعمل» بمنطق العرض المذكور.</td></tr>
+      <tr><td><span class="file">web/src/api/providers.ts</span></td><td>—</td><td>دالّة <code>setOnline(open: boolean)</code>.</td></tr>
+    </table>
+
+    <div class="new">إضافة كود <code>PROVIDER_OFFLINE</code> + رسالة عربية مخصّصة في معالج <code>except ValidationError</code> (يحاكي معالجة ZONE_SUSPENDED القائمة). لا تفعيل تلقائي بل بانر إرشادي.</div>
+    <div class="dropped">تعديل <code>legal_router.sign_contract</code> لتفعيل <code>active_now</code> تلقائياً — أُسقط لتجنّب: (أ) تعقيد التمييز بين الأدوار، (ب) عدم تحقّق الشرط في التدفّق الطبيعي، (ج) أثر جانبي على مسار السائق.</div>
+
+    <h4>الاختبارات</h4>
+    <ul>
+      <li><code>tests/test_phase456_provider_online.py</code> ✓ <code>open=true</code> يضبط العلَمين ✓ <code>open=false</code> يضبطهما ✓ غير المزوّد 403 ✓ الـaudit log مكتوب.</li>
+      <li>تمديد اختبار إنشاء الطلب: <code>active_now=false</code> ⇒ 422 بكود <code>PROVIDER_OFFLINE</code> ورسالة عربية واضحة.</li>
+      <li>اختبار واجهة ProviderDashboard: ظهور البانر حسب الشروط الثلاثة + استدعاء API.</li>
+    </ul>
+  </div>
+
+  <!-- ──────── PROV-2 (refined) ──────── -->
+  <h2>٢) <span class="sev s-md">متوسط</span> PROV-2 — نطاق مُعاد التحديد (FE-only)</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> ~1 ساعة</div><div><b>Migration؟</b> لا</div></div>
+
+    <h4>المحاكاة الذهنية — اكتشاف</h4>
+    <p>قراءة <code>catalog_service.publish_item</code> (:287) و<code>validate_item_completeness</code> (:265) أظهرت أنّ الخلفية <b>تُعيد بالفعل</b> رسائل دقيقة جدّاً:</p>
+    <ul>
+      <li><span dir="ltr">«Item must have at least one ACTIVE variant»</span></li>
+      <li><span dir="ltr">«Variant X must have base_price &gt; 0»</span></li>
+      <li><span dir="ltr">«Food items must have allergen_flags set»</span></li>
+    </ul>
+
+    <div class="changed">المشكلة ليست في الخلفية بل في <b>الواجهة</b> التي لا تستخرج <code>details.errors[0]</code>. نقل الإصلاح بالكامل إلى الواجهة.</div>
+
+    <h4>التغييرات</h4>
+    <table>
+      <tr><th>ملف</th><th>التغيير</th></tr>
+      <tr><td><span class="file">web/src/pages/provider/ProviderCatalog.tsx</span></td><td>عند فشل النشر (422): قراءة <code>extractError().details.errors[0]</code> وعرضه — بدلاً من رسالة عامّة. زرّ النشر مُعطَّل عند عدم وجود variant مع tooltip تفسيري.</td></tr>
+      <tr><td><span class="file">backend/app/modules/catalog/catalog_service.py</span> (:297)</td><td><b>اختياري</b>: إضافة <code>code="ITEM_REQUIRES_VARIANT"</code> عند فقدان الـvariant فقط (للتمييز الآلي عن أخطاء أخرى). تغيير سطرين.</td></tr>
+    </table>
+    <div class="dropped">تعديل مسار «الموافقة على الصنف» في غرفة العمليات — أُسقط؛ مسار مختلف (للأصناف <code>PENDING_APPROVAL</code>، لا <code>DRAFT</code>) ولا حاجة له لإصلاح PROV-2.</div>
+  </div>
+
+  <!-- ──────── KYC-1 (refined + new bug) ──────── -->
+  <h2>٣) <span class="sev s-md">متوسط</span> KYC-1 — مع <b>عيب كود مكتشف</b> 🐞</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> ~2 ساعة</div><div><b>Migration؟</b> لا</div></div>
+
+    <h4>المحاكاة الذهنية — اكتشاف عيب فعلي</h4>
+    <p>تحقّق <code>provider_router.py:691</code> يفرض قائمة <code>VALID_PROVIDER_DOC_TYPES</code> ساكنة (:665):</p>
+    <pre>{ESTABLISHMENT_LICENSE, HEALTH_CERTIFICATE, MANAGER_ID, COMMERCIAL_REGISTER,
+ TAX_CARD, MUNICIPAL_PERMIT, BUSINESS_REG, TRADE_LICENSE, ID_FRONT, ID_BACK,
+ VAT_CERT, OTHER}</pre>
+    <p>قراءة جدول <code>provider_document_policies</code> الحيّ:</p>
+    <pre>ESTABLISHMENT_LICENSE · HEALTH_CERTIFICATE · MANAGER_ID · COMMERCIAL_REGISTER
+TAX_CARD · MUNICIPAL_PERMIT · <b>MEAT_HANDLING_PERMIT</b> · OTHER</pre>
+    <div class="dropped"><span style="color:#7f1d1d">عيب حقيقي:</span> <b><code>MEAT_HANDLING_PERMIT</code> موجود في جدول السياسات (مطلوب للجزّار) لكنّه ليس في القائمة الساكنة.</b> جزّار يحاول رفع تصريحه ⇒ <b>422 دائماً</b>. هذا انحدار صامت لم تذكره الخطة الأصلية.</div>
+
+    <h4>إصلاح متعدّد المستويات</h4>
+    <ol>
+      <li><b>(A) إصلاح العيب فوراً (سطر واحد):</b>
+        <pre>VALID_PROVIDER_DOC_TYPES = { …, "<b>MEAT_HANDLING_PERMIT</b>", … }</pre>
+      </li>
+      <li><b>(B) منع التكرار: اشتقاق ديناميكي.</b> تحويل الثابت من قائمة مكتوبة يدوياً إلى دالّة تقرأ من الجدول عند الإقلاع + ضمّ الرموز القديمة (للتوافق العكسي):
+        <pre>async def _build_valid_doc_types(db):
+    rows = await db.execute(select(ProviderDocumentPolicy.doc_type))
+    return {r[0] for r in rows.all()} | _LEGACY_DOC_TYPES</pre>
+        ذاكرة كاش بسيطة (TTL 5د). يُمنع الانحراف مستقبلاً.
+      </li>
+      <li><b>(C) كشف للواجهة:</b> نقطة <code>GET /providers/me/document-policies</code> ترجع لكل <code>doc_type</code> ينطبق على <code>provider_type</code> الحالي: <code>{doc_type, name_ar, name_en, requires_expiry, is_required}</code>. الواجهة تعرضها كقائمة منسدلة.</li>
+    </ol>
+
+    <div class="new">العنصر (A) هو إصلاح عيب كود قائم؛ يجب نشره فوراً. (B) و(C) تحسينات بنيوية تتبعه.</div>
+
+    <h4>الاختبارات</h4>
+    <ul>
+      <li>اختبار: رفع <code>MEAT_HANDLING_PERMIT</code> لمزوّد <code>provider_type=butcher</code> ⇒ 200.</li>
+      <li>اختبار: كل <code>doc_type</code> في الجدول الحيّ موجود في <code>VALID_PROVIDER_DOC_TYPES</code> (يمنع الانحراف مستقبلاً).</li>
+      <li>اختبار نقطة <code>/document-policies</code>: تُرجع القائمة الصحيحة لنوع المزوّد + لا تُرجع <code>MEAT_HANDLING_PERMIT</code> لمطعم.</li>
+    </ul>
+  </div>
+
+  <!-- ──────── D-5 (refined) ──────── -->
+  <h2>٤) <span class="sev s-md">متوسط</span> D-5 — توزيع تلقائي عند توفّر سائق (موسَّع)</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> ~3 ساعات</div><div><b>Migration؟</b> لا</div></div>
+
+    <h4>المحاكاة الذهنية — تحسينات الشمول والأمان</h4>
+    <ul>
+      <li>قراءة <code>state_transitions.py</code> أظهرت <b>ثلاث</b> حالات «بلا سائق»: <code>READY_FOR_PICKUP</code>, <code>AWAITING_DRIVER</code>, <code>NO_DRIVER_ESCALATION</code>. الخطة الأصلية ذكرت الأولى فقط — توسيع لازم.</li>
+      <li>مسار التصعيد القائم (<code>awaiting_driver_escalation.py</code>) ينقل الحالة بعد مهلة إلى <code>NO_DRIVER_ESCALATION</code> لتراجعها OPS؛ ضمّها يُغني مدير العمليات من العمل اليدوي عندما يصبح سائق جديد متاحاً.</li>
+      <li>سباق: سائقان يصبحان متاحَين بنفس اللحظة قد يحاولان أخذ نفس الطلب. التصميم القائم آمن: <code>create_offer</code> يمنع وجود ACCEPTED، و<code>respond_to_offer</code> يُقفل على <code>state=='SENT'</code>. لكن إنشاء عَرضَين SENT لطلب واحد لسائقَين <b>مُهدِر</b>.</li>
+    </ul>
+
+    <div class="changed">شمول الحالات الثلاث + تجنّب الازدواج: تخطّي الطلبات التي لديها عرض SENT غير منتهٍ بالفعل.</div>
+
+    <h4>التصميم النهائي</h4>
+    <pre>async def try_dispatch_to_newly_available(driver: Driver) -> Optional[DispatchOffer]:
+    """Best-effort: when a driver flips to available, scan eligible orders within
+    a radius and create ONE offer for the nearest. Fail-open."""
+    if driver.current_lat is None or driver.current_lng is None: return None
+    eligible_states = {"READY_FOR_PICKUP", "AWAITING_DRIVER", "NO_DRIVER_ESCALATION"}
+    # candidate orders: in eligible state, no live SENT/ACCEPTED offer
+    no_live_offer = ~exists(
+        select(1).where(DispatchOffer.order_id == Order.id,
+                        DispatchOffer.state.in_(("SENT","ACCEPTED")),
+                        DispatchOffer.expires_at > now()))
+    rows = await session.execute(
+        select(Order, Provider.lat, Provider.lng)
+        .join(Provider, Provider.id == Order.provider_id)
+        .where(Order.order_state.in_(eligible_states),
+               Provider.lat.isnot(None), Provider.lng.isnot(None),
+               no_live_offer)
+        .limit(50))
+    # haversine ≤ 50 km, pick nearest, create_offer (which re-validates ACCEPTED + cash + cash_allowed)
+    …</pre>
+
+    <h4>نقطة التفعيل</h4>
+    <p><code>dispatch_router.set_driver_availability</code> (:360) ⇒ بعد flip→true، استدعاء <code>try_dispatch_to_newly_available</code> في try/except (لا يفشل استجابة المستخدم).</p>
+
+    <h4>الملفّات</h4>
+    <table>
+      <tr><td><span class="file">backend/app/modules/dispatch/dispatch_service.py</span></td><td>دالّة جديدة <code>try_dispatch_to_newly_available</code> بالمنطق أعلاه.</td></tr>
+      <tr><td><span class="file">backend/app/modules/dispatch/dispatch_router.py</span> (:360)</td><td>استدعاء best-effort بعد <code>available=true</code> flip.</td></tr>
+    </table>
+
+    <div class="new">إضافة حالتَي <code>AWAITING_DRIVER</code> و<code>NO_DRIVER_ESCALATION</code> + تخطّي الطلبات التي لها عرض SENT حيّ.</div>
+
+    <h4>الاختبارات</h4>
+    <ul>
+      <li>طلب READY بلا عرض + سائق يصبح متاحاً ⇒ يُنشأ عرض SENT.</li>
+      <li>طلب READY بعرض SENT حيّ ⇒ لا عرض جديد.</li>
+      <li>طلب NO_DRIVER_ESCALATION + سائق يصبح متاحاً ⇒ يُنشأ عرض (الطلب ينتقل تلقائياً للسلسلة الطبيعية).</li>
+      <li>سائق دون إحداثيات ⇒ لا شيء؛ مزوّد دون إحداثيات ⇒ الطلب مُستبعَد من النتائج.</li>
+    </ul>
+  </div>
+
+  <!-- ──────── CUST-6 ──────── -->
+  <h2>٥) <span class="sev s-lo">منخفض</span> CUST-6 — معاينة الرسم</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> 1 ساعة</div></div>
+    <h4>المحاكاة</h4>
+    <p>أظهرت اختبار الخبير أنّ إحداثيات العميل والمزوّد قريبة جدّاً ⇒ <code>distance ≈ 0.4 كم</code> يُعرض <code>0.0</code> بسبب التقريب لخانة عشرية واحدة. ليس عيباً جذرياً.</p>
+    <h4>التغيير</h4>
+    <ul>
+      <li>الخلفية في <code>delivery-quote</code>: إضافة <code>delivery_fee_is_estimate: bool</code> = true عند غياب إحداثيات المزوّد أو <code>distance_km &lt; 0.1</code>.</li>
+      <li>الواجهة (CheckoutPage): شارة «تقديري» عند الراية، وعرض المسافة بدقّة عشرتَين <code>0.40 كم</code>.</li>
+    </ul>
+  </div>
+
+  <!-- ──────── API-3 ──────── -->
+  <h2>٦) <span class="sev s-lo">منخفض</span> API-3 — رمز إنشاء 201</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> 10 دقائق</div></div>
+    <p>الموقع المؤكَّد: <span class="file">backend/app/modules/catalog/catalog_router.py:273</span> ⇒ <code>@router.post("/providers/catalog/items", <b>status_code=201</b>)</code>.</p>
+    <div class="new">بحث في <code>tests/</code> لم يجد اختباراً يؤكّد == 200 ⇒ تغيير آمن. (المُجاوران في :800 و:958 يستخدمان 201 أصلاً.)</div>
+  </div>
+
+  <!-- ──────── Ratings driver_id ──────── -->
+  <h2>٧) ملاحظة UX — كشف <code>driver_id</code> (مع تحذير N+1)</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> 1 ساعة</div></div>
+
+    <h4>المحاكاة الذهنية — اكتشاف خطر أداء</h4>
+    <ul>
+      <li><code>_serialize_order</code> لا يكشف <code>driver_id</code>. تحليله يكلّف استعلاماً إضافياً لـ<code>DispatchOffer ACCEPTED</code>.</li>
+      <li>على نقطة <code>GET /orders</code> (قائمة) بـ20 طلباً ⇒ <b>20 استعلاماً إضافياً</b> (N+1). غير مقبول.</li>
+    </ul>
+
+    <div class="changed">حلّ مجموع جماعي يحاكي نمط <code>_provider_name_map</code>: استعلام واحد <code>SELECT order_id, driver_id FROM dispatch_offers WHERE order_id IN (...) AND state='ACCEPTED'</code> ⇒ خريطة، تُمرَّر إلى <code>_serialize_order(... driver_id=map.get(order.id))</code>.</div>
+
+    <h4>الخصوصية</h4>
+    <p>إخفاء <code>driver_id</code> قبل <code>DRIVER_ASSIGNED</code> (لا داعٍ لكشفه قبل وجود سائق). إظهاره من <code>DRIVER_ASSIGNED</code> فصاعداً.</p>
+  </div>
+
+  <h2>٨) أولويات منقّحة + جهد كلّي</h2>
+  <div class="card">
+    <table>
+      <tr><th>#</th><th>البند</th><th>الجهد</th><th>أثر</th></tr>
+      <tr><td>1</td><td>KYC-1.A (إصلاح <code>MEAT_HANDLING_PERMIT</code>)</td><td>5 دقائق</td><td>سطر واحد — يُنشر فوراً مستقلّاً</td></tr>
+      <tr><td>2</td><td>PROV-1 (تبديل + بانر + كود الرسالة)</td><td>3 ساعات</td><td>أعلى أثر تجربة</td></tr>
+      <tr><td>3</td><td>D-5 (إعادة توزيع)</td><td>3 ساعات</td><td>يحمي الطلبات من التعليق</td></tr>
+      <tr><td>4</td><td>KYC-1.B+C (اشتقاق ديناميكي + نقطة سياسات)</td><td>2 ساعة</td><td>يمنع التكرار المستقبلي</td></tr>
+      <tr><td>5</td><td>PROV-2 (FE display + كود اختياري)</td><td>1 ساعة</td><td>وضوح للمزوّد</td></tr>
+      <tr><td>6</td><td>تقييمات (driver_id بجمع جماعي)</td><td>1 ساعة</td><td>يفتح تقييم السائق</td></tr>
+      <tr><td>7</td><td>CUST-6 + API-3</td><td>~1.5 ساعة</td><td>تجميل</td></tr>
+    </table>
+    <p><b>المجموع المُنقَّح:</b> ~11.5 ساعة (~يوم ونصف). <b>بلا migration</b>. <b>FIN-COR لن يُمَسّ.</b></p>
+  </div>
+
+  <h2>٩) خطّة النشر</h2>
+  <div class="card">
+    <ol>
+      <li><b>دفعة عاجلة (10 دقائق):</b> KYC-1.A فقط — إصلاح عيب كود مكتشف. <code>deploy_be.sh</code> + اختبار رفع <code>MEAT_HANDLING_PERMIT</code>.</li>
+      <li><b>دفعة رئيسية:</b> PROV-1 + D-5 + KYC-1.B/C + PROV-2 + التقييمات + CUST-6 + API-3. اختبارات شاملة محلّياً، ثم <code>deploy_be.sh</code> + <code>deploy_web.sh</code>. لا migrations.</li>
+      <li><b>تحقّق على الإنتاج:</b> إعادة تشغيل <code>expert_customer.sh</code> + <code>expert_provider.sh</code> + <code>expert_lifecycle.sh</code> — يجب أن تنتهي الدورة <b>دون أيّ تدخّل يدوي</b> (لا status/accept-toggle، لا OPS-create-offer).</li>
+      <li><b>تنظيف:</b> <code>cleanup_expert_test_data.sh</code> بعد التحقّق.</li>
+    </ol>
+  </div>
+
+  <h2>١٠) ملخّص ما تغيّر مقابل الخطة الأصلية</h2>
+  <div class="card">
+    <table>
+      <tr><th>البند</th><th>الخطة الأصلية</th><th>الخطة المنقَّحة</th></tr>
+      <tr><td>PROV-1</td><td>نقطة موحّدة + تفعيل تلقائي عند توقيع العقد + رسالة محسّنة</td><td><b>إسقاط</b> التفعيل التلقائي · إضافة <b>بانر «جاهز للعمل»</b> · رسالة موحّدة عبر آلية ZONE_SUSPENDED القائمة</td></tr>
+      <tr><td>PROV-2</td><td>تحسين رسالة backend</td><td>الخلفية صحيحة أصلاً ⇒ تركيز على <b>FE display</b> فقط</td></tr>
+      <tr><td>KYC-1</td><td>نقطة سياسات + قائمة منسدلة</td><td><b>إضافة عيب كود مكتشف</b> (MEAT_HANDLING_PERMIT) + اشتقاق ديناميكي لمنع التكرار</td></tr>
+      <tr><td>D-5</td><td>READY_FOR_PICKUP فقط</td><td>الحالات الثلاث + تخطّي عرض SENT حيّ</td></tr>
+      <tr><td>التقييمات</td><td>إضافة driver_id</td><td>+ <b>تحذير N+1</b> + خريطة جماعية + بوابة خصوصية (≥ DRIVER_ASSIGNED)</td></tr>
+      <tr><td>CUST-6 / API-3</td><td>—</td><td>تأكيد سطر التغيير الدقيق + تأكيد عدم وجود اختبارات تكسر بـ201</td></tr>
+    </table>
+  </div>
+
+  <h2>١١) معايير النجاح بعد التنفيذ</h2>
+  <div class="card">
+    <ol>
+      <li>تشغيل <code>expert_provider.sh</code> ⇒ ينتهي بالمزوّد جاهز للعمل بعد توقيع العقد + نشر صنف، ويظهر «بانر جاهز للعمل» في اللوحة. زرّ واحد يفتح المتجر.</li>
+      <li>تشغيل <code>expert_lifecycle.sh</code> ⇒ بلا حاجة لـ status/accept-toggle/OPS-offer. التوزيع التلقائي يلتقط السائق.</li>
+      <li>رفع <code>MEAT_HANDLING_PERMIT</code> لمزوّد جزّار ⇒ 200.</li>
+      <li>الواجهة تعرض رسالة خطأ النشر الدقيقة (يجب وجود variant) عند المحاولة المبكّرة.</li>
+      <li><code>GET /orders</code> بـ20 طلباً يستخدم استعلاماً واحداً لجلب <code>driver_id</code> (لا N+1).</li>
+    </ol>
+  </div>
+</div>
+</body>
+</html>

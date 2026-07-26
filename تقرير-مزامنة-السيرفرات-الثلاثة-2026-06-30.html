@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مزامنة السيرفرات الثلاثة — تقرير مفصّل</title>
+<style>
+  :root{--bg:#0e1726;--card:#16223a;--card2:#1d2c49;--line:#2c3f63;--ink:#eef3fb;--mut:#9fb3d0;
+    --grn:#34d399;--red:#f87171;--amb:#fbbf24;--blu:#60a5fa;--vio:#a78bfa;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;line-height:1.9;font-size:16px}
+  .wrap{max-width:1020px;margin:0 auto;padding:30px 20px 90px}
+  h1{font-size:25px;margin:0 0 6px}
+  .lead{color:var(--mut);font-size:14px;margin-bottom:20px}
+  h2{font-size:21px;margin:36px 0 12px;display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--line);padding-bottom:8px}
+  h2 .e{font-size:24px}
+  .hero{background:linear-gradient(135deg,#16314a,#0e1726);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 22px;margin:16px 0}
+  .mono{font-family:"JetBrains Mono",Consolas,monospace;direction:ltr;unicode-bidi:embed;display:inline-block}
+  code{background:#0a1120;padding:2px 7px;border-radius:6px;font-size:13px;color:#7dd3fc}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
+  th,td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);background:#0a1120;font-weight:600}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .ok{background:rgba(52,211,153,.16);color:var(--grn)}
+  .bad{background:rgba(248,113,113,.16);color:var(--red)}
+  .warn{background:rgba(251,191,36,.16);color:var(--amb)}
+  .note{border-right:5px solid var(--blu);background:#10203a;padding:12px 16px;border-radius:10px;margin:13px 0}
+  .good{border-right:5px solid var(--grn);background:#0e2a1e;padding:12px 16px;border-radius:10px;margin:13px 0}
+  .warnbox{border-right:5px solid var(--amb);background:#2a230e;padding:12px 16px;border-radius:10px;margin:13px 0}
+  .err{border-right:5px solid var(--red);background:#2a1620;padding:12px 16px;border-radius:10px;margin:13px 0}
+  ul{margin:8px 0}li{margin:6px 0}
+  .foot{margin-top:46px;color:var(--mut);font-size:12.5px;text-align:center;border-top:1px solid var(--line);padding-top:18px}
+  .big{font-size:19px;font-weight:700}
+  .same{color:var(--grn);font-weight:700}
+  .diff{color:var(--red);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>🔗 مزامنة السيرفرات الثلاثة على نسخة واحدة</h1>
+  <div class="lead">جعل الرئيسي + test1 + test متطابقة 100% · بتاريخ 2026-06-30 · مع شرح صادق لما كان ناقصًا وكيف أُصلح</div>
+</div>
+
+<div class="good">
+  <div class="big">✅ النتيجة: السيرفرات الثلاثة الآن <span class="same">متطابقة بالكامل ومثبَتة بالدليل</span> — نفس كود الخلفية + نفس الواجهة + نفس قاعدة البيانات.</div>
+</div>
+
+<!-- THE PROBLEM -->
+<h2><span class="e">🔍</span> ما الذي كان ناقصًا؟ (كنتَ محقًّا)</h2>
+<div class="card">
+  <p>عند فحص دقيق تبيّن أن <b>الواجهات لم تكن متطابقة</b> بين السيرفرات:</p>
+  <table>
+    <thead><tr><th>السيرفر</th><th>الواجهة (قبل)</th></tr></thead>
+    <tbody>
+      <tr><td>الرئيسي (tawanow.com)</td><td class="diff">main-DqYK_yyY.js (قديمة)</td></tr>
+      <tr><td>test (.194)</td><td class="diff">main-DqYK_yyY.js (قديمة)</td></tr>
+      <tr><td>test1 (Kali)</td><td class="same">main-BZ-0KpoU.js (الأحدث) ✅</td></tr>
+    </tbody>
+  </table>
+  <div class="err"><b>سبب الخطأ:</b> اعتمدتُ سابقًا على <b>معرّف صورة Docker</b> للحكم على النسخة، ولم ألاحظ أن الواجهة «المخبوزة» داخل الصورة <b>أقدم</b> من الواجهة الفعلية الموجودة في مجلد البناء <span class="mono">web/dist</span>. لذلك نُشِرت واجهة قديمة على الرئيسي و.194.</div>
+</div>
+
+<!-- THE DISCOVERY -->
+<h2><span class="e">💡</span> اكتشاف مهم: الخلفية كانت متطابقة أصلًا</h2>
+<div class="card">
+  <p>عند التدقيق وجدتُ أن صورتَي الخلفية بدتا «مختلفتين» (<span class="mono">51d909c7</span> مقابل <span class="mono">57bad321</span>)، لكنهما في الحقيقة <b>نفس البناء تمامًا</b>:</p>
+  <ul>
+    <li>لهما <b>نفس وقت البناء بالثانية</b> (10:32:44).</li>
+    <li>أثبتُّ التطابق بحساب <b>بصمة (هاش) كل ملفات كود الخلفية</b> — متطابقة في الثلاثة: <span class="mono">05818571f7b3e44c</span>.</li>
+  </ul>
+  <div class="note"><b>الدرس التقني:</b> أمر <span class="mono">docker save/load</span> بين إصدارات Docker مختلفة <b>يغيّر معرّف الصورة</b> رغم أن المحتوى واحد. لذلك <b>لا يصحّ المقارنة بمعرّف الصورة</b> — بل ببصمة محتوى الكود وبصمة ملف الواجهة المنشور. سجّلتُ هذا الدرس حتى لا يتكرّر.</div>
+</div>
+
+<!-- WHAT I DID -->
+<h2><span class="e">🛠️</span> ما فعلته للمزامنة</h2>
+<div class="card">
+  <ul>
+    <li>حدّدتُ <b>النسخة القانونية</b> = ما يشغّله Kali فعلًا: كود الخلفية <span class="mono">05818571f7b3e44c</span> + الواجهة <span class="mono">main-BZ-0KpoU.js</span> (من <span class="mono">web/dist</span>) + قاعدة <span class="mono">ab01</span>.</li>
+    <li>أنشأتُ <b>صورة واجهة قانونية</b> من حاوية Kali الحيّة (تحوي الواجهة الأحدث) عبر <span class="mono">docker commit</span>.</li>
+    <li>نقلتُ الصورة القانونية ونشرتُها على <b>الرئيسي</b> (عبر الإنترنت) و<b>.194</b> (عبر الشبكة).</li>
+    <li>أعدتُ إنشاء الواجهة على الجهازين — مع <b>حفظ نسخ التراجع</b> (<span class="mono">prev</span>).</li>
+  </ul>
+</div>
+
+<!-- FINAL PROOF -->
+<h2><span class="e">✅</span> الإثبات النهائي (الثلاثة متطابقة)</h2>
+<div class="card">
+<table>
+  <thead><tr><th>السيرفر</th><th>بصمة كود الخلفية</th><th>الواجهة</th><th>قاعدة البيانات</th><th>HTTP</th></tr></thead>
+  <tbody>
+    <tr><td>الرئيسي (tawanow.com)</td><td class="mono same">05818571f7b3e44c</td><td class="mono same">main-BZ-0KpoU.js</td><td class="mono">ab01</td><td><span class="pill ok">200</span></td></tr>
+    <tr><td>test1 (Kali)</td><td class="mono same">05818571f7b3e44c</td><td class="mono same">main-BZ-0KpoU.js</td><td class="mono">ab01</td><td><span class="pill ok">200</span></td></tr>
+    <tr><td>test (.194)</td><td class="mono same">05818571f7b3e44c</td><td class="mono same">main-BZ-0KpoU.js</td><td class="mono">ab01</td><td><span class="pill ok">200</span></td></tr>
+  </tbody>
+</table>
+  <div class="good">
+    الخلفية متطابقة ✅ · الواجهة متطابقة ✅ · قاعدة البيانات <span class="mono">ab01</span> ✅ — على الثلاثة. بيانات الإنتاج الحقيقية سليمة (151 مستخدمًا).
+  </div>
+</div>
+
+<!-- SAFETY -->
+<h2><span class="e">🔙</span> الأمان والتراجع</h2>
+<div class="card">
+  <ul>
+    <li>نسخة الإنتاج الاحتياطية الكاملة (قاعدة بيانات + صور) محفوظة من قبل التحديث.</li>
+    <li>وسوم تراجع للصور على الرئيسي: <span class="mono">aa60-rollback</span> (الأقدم) + <span class="mono">prev-51d909</span> / <span class="mono">prev</span> (السابقة مباشرة).</li>
+    <li>لم تُمَس: بيانات الإنتاج الحقيقية · الخدمات الأخرى · إعدادات Cloudflare والبريد.</li>
+  </ul>
+</div>
+
+<div class="foot">تقرير صادق مبني على تدقيق وتحقّق بالبصمات (hash) لا بمعرّفات الصور · 2026-06-30 · الثلاثة متطابقة بدليل قاطع.</div>
+
+</div>
+</body>
+</html>

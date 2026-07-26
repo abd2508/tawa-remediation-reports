@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>544 — الخطة التنفيذية: محاكاة ذهنية كاملة لكل إصلاح، وكل أثر جانبيّ بعده</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2540; --text:#e8ecf7; --muted:#9aa5c0;
+    --line:#2a3350; --accent:#5b8cff;
+    --done:#1f7a4d; --done-bg:#123425; --done-fg:#7be3ab;
+    --partial:#8a6d1f; --partial-bg:#332a10; --partial-fg:#f0c95b;
+    --not:#9b2c2c; --not-bg:#3a1414; --not-fg:#ff8f8f;
+    --cant:#3a4a6b; --cant-bg:#1a2338; --cant-fg:#9db3e0;
+    --auth:#7a3fc9; --auth-bg:#241a3a; --auth-fg:#c9a8f5;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef1fa; --text:#1a2030; --muted:#5a6480;
+      --line:#dbe0ee; --accent:#2a5fd8;
+      --done:#0f6a3a; --done-bg:#e5f6ec; --done-fg:#0f6a3a;
+      --partial:#8a6d1f; --partial-bg:#fbf1d8; --partial-fg:#8a6d1f;
+      --not:#a12727; --not-bg:#fbe6e6; --not-fg:#a12727;
+      --cant:#3a4a6b; --cant-bg:#e7ecf8; --cant-fg:#3a4a6b;
+      --auth:#7a3fc9; --auth-bg:#f1e8fb; --auth-fg:#5c2c96;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","Cairo","Tahoma",sans-serif; line-height:1.75; margin:0; padding:0 0 60px 0;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+  header.hero{background:linear-gradient(160deg, var(--panel2), var(--bg)); border-bottom:1px solid var(--line); padding:48px 0 36px 0; margin-bottom:32px;}
+  h1{font-size:1.85rem; margin:0 0 10px 0;}
+  h1 .num{color:var(--accent); font-weight:800;}
+  .sub{color:var(--muted); font-size:1.05rem; max-width:920px;}
+  h2{font-size:1.4rem; margin:44px 0 16px 0; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  h3{font-size:1.18rem; margin:26px 0 10px 0; color:var(--accent);}
+  h4{font-size:1rem; margin:18px 0 6px 0; color:var(--text);}
+  p{margin:0 0 14px 0;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:18px;}
+  .item-card{background:var(--panel); border:1px solid var(--line); border-inline-start:5px solid var(--accent); border-radius:10px; padding:18px 22px; margin-bottom:16px;}
+  .item-card.auth{border-inline-start-color:var(--auth);}
+  .item-card.crit{border-inline-start-color:var(--not);}
+  .item-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:8px;}
+  .item-id{font-weight:800; color:var(--accent); font-size:1.05rem;}
+  .badge{display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.8rem; font-weight:700; white-space:nowrap;}
+  .b-phase{background:var(--panel2); color:var(--muted); border:1px solid var(--line);}
+  .b-auth{background:var(--auth-bg); color:var(--auth-fg); border:1px solid var(--auth);}
+  .b-crit{background:var(--not-bg); color:var(--not-fg); border:1px solid var(--not);}
+  .sim{margin:10px 0; padding:10px 14px; border-radius:8px; background:var(--panel2); font-size:0.92rem;}
+  .sim .k{font-weight:700; color:var(--accent);}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:20px 0;}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center;}
+  .stat .n{font-size:1.9rem; font-weight:800; color:var(--accent);}
+  .stat .l{color:var(--muted); font-size:0.85rem; margin-top:4px;}
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:0.9rem; min-width:640px;}
+  th,td{padding:9px 11px; text-align:right; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--panel2); color:var(--muted); font-size:0.78rem;}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--panel2); padding:1px 6px; border-radius:5px; font-size:0.88em; direction:ltr; display:inline-block;}
+  .pipeline{display:flex; flex-wrap:wrap; gap:0; align-items:stretch; margin:24px 0; direction:ltr;}
+  .pnode{flex:1; min-width:150px; background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; direction:rtl;}
+  .pnode .t{font-weight:800; font-size:0.92rem; margin-bottom:4px;}
+  .pnode .d{color:var(--muted); font-size:0.76rem;}
+  .arrow{display:flex; align-items:center; justify-content:center; min-width:28px; color:var(--accent); font-size:1.3rem;}
+  @media (max-width:900px){ .pipeline{flex-direction:column;} .arrow{transform:rotate(90deg);} }
+  .depgraph{display:grid; grid-template-columns:1fr; gap:10px; margin:20px 0;}
+  .depnode{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:12px 16px;}
+  .depnode.root{border-color:var(--accent); border-width:2px;}
+  .depnode .arrow-down{text-align:center; color:var(--accent); font-size:1.2rem; margin:2px 0;}
+  .feeds{color:var(--muted); font-size:0.82rem; margin-top:4px;}
+  .callout{border-inline-start:5px solid var(--accent); background:var(--panel2); border-radius:10px; padding:16px 20px; margin:16px 0;}
+  .callout.crit{border-color:var(--not);}
+  .callout.auth{border-color:var(--auth); background:var(--auth-bg);}
+  .toc{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px 24px;}
+  .toc a{color:var(--text); text-decoration:none; display:block; padding:5px 0; border-bottom:1px dashed var(--line);}
+  .toc a:last-child{border-bottom:none;}
+  .toc a:hover{color:var(--accent);}
+  .domain-h{background:var(--panel2); font-weight:800; padding:9px 14px; border-radius:8px; margin:26px 0 10px 0; display:inline-block;}
+  .checklist{list-style:none; padding:0; margin:14px 0;}
+  .checklist li{background:var(--panel2); border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; gap:10px;}
+  .checklist .cn{font-weight:800; color:var(--accent); min-width:22px;}
+  footer{color:var(--muted); text-align:center; font-size:0.85rem; margin-top:60px; padding-top:24px; border-top:1px solid var(--line);}
+  .kicker{color:var(--accent); font-weight:800; font-size:0.85rem; letter-spacing:0.04em; margin-bottom:6px;}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">تقرير 544 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-21 · خطّة فقط، لا تنفيذ</div>
+  <h1><span class="num">544</span> — الخطّة التنفيذيّة: محاكاة ذهنيّة كاملة لكل إصلاح، ولكل أثر جانبيّ يظهر بعده</h1>
+  <p class="sub">
+    هذه الخطّة تحوِّل نتائج تقرير 543 (79 بندًا مفتوحًا أو جزئيًّا من أصل 108) إلى تسلسل تنفيذ فعليّ. لكل بند: ما الذي سيحدث
+    <strong>أثناء</strong> الإصلاح/البناء (مخاطر النشر، ترتيب الهجرات، تعارض مع اختبارات SQLite)، وما الذي سيحدث <strong>بعده</strong> أثناء
+    التشغيل الحقيقيّ (أعراض جانبيّة على مستخدمين حاليّين، بيانات قديمة، عادات عمل فريق العمليّات) — ثمّ الحلّ المُدرَج ضمن نفس البند، لا كملاحظة منفصلة.
+    السيناريوهات هنا ليست افتراضات نظريّة: أغلبها معمَّم من <strong>3 حوادث حقيقيّة وقعت بالفعل في هذا المشروع</strong> (انظر القسم ②) — لا اختراع لأرقام لإرضاء طلب "مئات السيناريوهات"، بل تطبيق منهجيّ لدروس مُثبَتة على كل بند مفتوح.
+  </p>
+</div></header>
+
+<div class="wrap">
+
+<div class="card toc">
+  <strong>فهرس سريع</strong>
+  <a href="#spine">① العمود الفقريّ للخطّة: ما يُبنى مرّة واحدة أوّلًا</a>
+  <a href="#hazards">② 3 حوادث حقيقيّة سبق وقوعها — القواعد المستخرجة منها</a>
+  <a href="#checklist">③ قائمة التحقّق الموحَّدة — تُطبَّق على كل بند</a>
+  <a href="#phaseA">④ المرحلة A — البنية المشتركة (تُبنى مرّة واحدة)</a>
+  <a href="#phaseB">⑤ المرحلة B — إصلاحات مستقلّة رخيصة (أولويّة قصوى، توازٍ كامل)</a>
+  <a href="#phaseC">⑥ المرحلة C — تعتمد على بنية المرحلة A</a>
+  <a href="#phaseD">⑦ المرحلة D — بناء مجاليّ متوسّط/كبير</a>
+  <a href="#phaseEF">⑧ المرحلتان E وF — تنظيميّة، ومعماريّة مؤجَّلة عمدًا</a>
+  <a href="#auth">⑨ قائمة الإذن التشغيليّ المطلوب قبل التنفيذ</a>
+  <a href="#timeline">⑩ التسلسل الزمنيّ المُقترَح</a>
+</div>
+
+<h2 id="spine">① العمود الفقريّ للخطّة</h2>
+<p>
+  تقرير 543 أثبت أنّ المنصّة تملك بالفعل 3 قطع بنية تحتيّة كانت خطّة 539 اقترحت بناءها، لكنّها <strong>لم تُبنَ فعلًا</strong> رغم مرور أسبوع
+  ونشرتَين كاملتَين. هذه الحقيقة — لا ترقيم المراحل الأصليّ — هي ما يحدِّد الترتيب الحقيقيّ هنا: أيّ إصلاح يعتمد على بنية غير موجودة سيُبنى
+  مرّتين أو ثلاثًا بأشكال مختلفة إن بدأنا به مباشرة.
+</p>
+<div class="depgraph">
+  <div class="depnode root"><strong>A1 — جدول "الإجراء المحكوم" (Governed Action)</strong>
+    <div class="feeds">يُغذّي: D-18 (عكس القيد اليدويّ) · D-46 (تنفيذ الاحتفاظ) · D-49 (سجلّات المحو) · C-11(e) (مسار الطوارئ، يُدمَج هنا لا بمعزل)</div></div>
+  <div class="arrow-down">↓</div>
+  <div class="depnode root"><strong>A2 — مساعد الحجز الذرّيّ (Atomic Reservation)</strong>
+    <div class="feeds">يعتمد أوّلًا على إصلاح D-78 (مسار Postgres في CI، معطوب بصمت اليوم) · يُغذّي: D-32/D-33 (تكرار الطلبات) · D-41 (تعارض POS)</div></div>
+  <div class="arrow-down">↓</div>
+  <div class="depnode root"><strong>A3 — بوّابة تدقيق ساكنة لمحرّك الصلاحيّات (ratchet)</strong>
+    <div class="feeds">تُؤمِّن حملة D-09 (84 ملفًّا) من التراجع أثناء الترحيل · تفتح الطريق لاحقًا لِـD-56 وINIT-1</div></div>
+</div>
+
+<h2 id="hazards">② 3 حوادث حقيقيّة سبق وقوعها في هذا المشروع</h2>
+<p>هذه ليست سيناريوهات مُتخيَّلة — كل واحدة وقعت بالفعل وتوثَّقت في السلسلة نفسها. القواعد المستخرجة منها هي أساس قائمة التحقّق في القسم التالي.</p>
+
+<div class="callout crit">
+  <strong>الحادثة 1 — عيب ترتيب الحفظ في PostgreSQL لم يظهر إلّا في الفحص الحيّ (D-11).</strong>
+  مجموعة الاختبارات الكاملة (3886 اختبارًا) نجحت بالكامل على SQLite، ومراجعة Codex العدائيّة لم تكتشف شيئًا — لكنّ إنشاء حساب فريق
+  عمليّات فشل فورًا على test1 (PostgreSQL الحقيقيّة) بخطأ قيد foreign key، لأنّ SQLite لا يتحقّق من ترتيب الحفظ بنفس الصرامة.
+  <strong>القاعدة:</strong> أي إصلاح يعتمد على حفظ عدّة صفوف مترابطة معًا، أو على قيد/قفل/تزامن حقيقيّ، لا يمكن الوثوق بنتيجة اختباره
+  إلّا على Postgres حقيقيّة.
+</div>
+<div class="callout crit">
+  <strong>الحادثة 2 — فحص إقلاع صارم (D-64) كاد يوقف الإنتاج لولا تسلسل نشر خاصّ.</strong>
+  إضافة فحص "هل قاعدة البيانات على آخر هجرة؟" عند الإقلاع تعني أنّ استبدال الحاوية القديمة بالجديدة <em>قبل</em> تطبيق الهجرات
+  سيرفض الخادم الجديد العمل فورًا = توقّف حقيقيّ. الحلّ: طُبِّقت الهجرات يدويًّا أوّلًا، والحاوية القديمة استمرّت بالخدمة أثناء ذلك،
+  ثمّ استُبدلت فقط بعد تأكيد نجاح الهجرات. <strong>القاعدة:</strong> أي فحص جديد "أكثر تشدّدًا" على مسار الإقلاع يحتاج تسلسل نشر
+  مُعاد ترتيبه بعناية، لا نشرًا آليًّا بالترتيب المعتاد.
+</div>
+<div class="callout crit">
+  <strong>الحادثة 3 — بنية CI تبدو صحيحة لكنّها معطوبة بصمت (D-78).</strong>
+  <code>ci.yml</code> يُشغِّل فعلًا خدمة Postgres ويمرِّر <code>DATABASE_URL</code> — يبدو للوهلة الأولى وكأنّ كل شيء يعمل. لكنّ
+  <code>conftest.py</code> يقرأ <code>TEST_DATABASE_URL</code> (اسمًا مختلفًا) فتُشغَّل 100٪ من الاختبارات على SQLite دون أن يلاحظ أحد.
+  <strong>القاعدة:</strong> "البنية موجودة في ملفّ الإعداد" لا تعني "البنية تعمل فعلًا" — يجب إثبات الاتّصال الفعليّ (سطر سجلّ، فحص متغيّر
+  بيئة داخل الاختبار نفسه) لا افتراض أنّ وجود الخدمة كافٍ.
+</div>
+
+<h2 id="checklist">③ قائمة التحقّق الموحَّدة — تُطبَّق على كل بند من المراحل A–D</h2>
+<p>سبعة أسئلة، كل واحد منها ينبع من الحوادث أعلاه أو من أنماط اكتشفها تقرير 543 نفسه. تُطبَّق حرفيًّا على كل بند أدناه — هذا ما يجعل "مئات السيناريوهات" فحصًا منهجيًّا حقيقيًّا لا عدًّا شكليًّا.</p>
+<ol class="checklist">
+  <li><span class="cn">1</span><span><strong>هل الهجرة إضافيّة فقط؟</strong> (أعمدة/جداول جديدة) أم تحذف/تعدّل شيئًا يعتمد عليه كود قديم؟ — يجب أن تكون إضافيّة فقط أثناء نافذة النشر (درس الحادثة 2).</span></li>
+  <li><span class="cn">2</span><span><strong>هل يمسّ الإصلاح تزامنًا حقيقيًّا؟</strong> (قفل صفّ، قيد فريد، UPSERT) — إن كان كذلك، لا يُصدَّق أي اختبار حتّى يُشغَّل على Postgres حقيقيّة (درس الحادثة 1 و3).</span></li>
+  <li><span class="cn">3</span><span><strong>هل الحقل/المنطق مكرَّر في أكثر من ملفّ؟</strong> — بحث <code>grep</code> صريح لكل نسخة مشابهة قبل إغلاق البند (درس D-39/D-40/D-50 من تقرير 543).</span></li>
+  <li><span class="cn">4</span><span><strong>هل يجعل الإصلاح النظام أكثر تشدّدًا (fail more) على مسار آليّ بلا مراقبة بشريّة؟</strong> — ابدأ بتحذير (log) فترة مراقبة حقيقيّة، ثمّ فرض صارم لاحقًا (نمط D-26/admin_ip_allowlist).</span></li>
+  <li><span class="cn">5</span><span><strong>هل توجد بيانات/صفوف قديمة أُنشئت بالمنطق القديم</strong> ستُقرَأ بالمنطق الجديد؟ — يجب قيمة افتراضيّة آمنة، لا افتراض أنّ كل الصفوف حديثة.</span></li>
+  <li><span class="cn">6</span><span><strong>هل يحتاج التغيير بناءً أصليًّا للجوّال</strong> (لا مجرّد تحديث JS فوريّ)؟ — خطّط لدورة نشر متجر تطبيقات كاملة.</span></li>
+  <li><span class="cn">7</span><span><strong>هل يحتاج إذنًا تشغيليًّا صريحًا؟</strong> (مسار مصادقة حيّ، سياسة PII، عتبة ماليّة، ملفّ مُقفَل بـFIN-COR) — توقّف واطلب الإذن، كما حدث مع D-11 وD-50 سابقًا.</span></li>
+</ol>
+
+<h2 id="phaseA">④ المرحلة A — البنية المشتركة (تُبنى مرّة واحدة، أوّلًا)</h2>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">A1</span><span class="badge b-phase">بناء XL</span></div>
+  <h3>جدول "الإجراء المحكوم" (Governed Action)</h3>
+  <p><strong>التصميم:</strong> جدول عامّ واحد <code>governed_action_requests</code> (النوع، الكيان، الطالب، وقت الطلب، لقطة JSON، الحالة REQUESTED/APPROVED/REJECTED/EXECUTED، المعتمِد، وقت الاعتماد، وقت التنفيذ، مرجع الدليل). يُبنى مرّة، ثمّ D-18/D-46/D-49 كلٌّ يستهلكه بمخطّطه الخاصّ.</p>
+  <div class="sim"><span class="k">أثناء البناء:</span> بناء الجدول وحده بلا استهلاك حقيقيّ = كود ميّت لا يثبته أي اختبار. <strong>الحلّ المُدرَج:</strong> بناء A1 وربط D-18 (عكس القيد اليدويّ، أصغر مستهلك وأكثرها احتواءً) في نفس الدفعة، بحيث يثبت اختبار حقيقيّ أنّ الجدول يعمل قبل تعميمه على D-46/D-49.</div>
+  <div class="sim"><span class="k">بعد الربط بـD-18 (أثر جانبيّ حقيقيّ):</span> عكس القيد اليدويّ يحتاج الآن اعتمادًا مستقلًّا ثانيًا — عمليّة كانت تتمّ بشخص واحد (مثلًا تصحيح خطأ إدخال في نفس اليوم) ستتوقّف الآن حتّى يتصرّف معتمِد ثانٍ. في نوبة ليليّة أو عطلة بموظّف عمليّات واحد فقط، هذا يعني تعطّل تصحيحات عاجلة مشروعة.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج ضمن نفس البند:</span> إضافة مسار طوارئ لـSUPER_ADMIN (يغلق C-11(e) في نفس الوقت بدل بنائه بمعزل) — لكن مقيَّد: أي تنفيذ طارئ يُنشئ صفًّا بحالة <code>EXECUTED_EMERGENCY</code> يتطلّب توقيع SUPER_ADMIN ثانٍ خلال 24 ساعة، وإلّا يظهر بندًا حرِجًا في لوحة المراقبة.</div>
+  <div class="sim"><span class="k">أثر جانبيّ إضافيّ يجب إدراجه في نفس التغيير:</span> "عكس قيد قيد الاعتماد" حالة جديدة لم تكن موجودة بالواجهة — <code>OpsManualJournal.tsx</code> يحتاج شارة/فلترًا واضحًا لهذه الحالة، وإلّا تبدو القيود المعلَّقة وكأنّها قيود عاديّة نشطة (نفس نمط "أُصلح في الخلفيّ، نُسي بالواجهة" الذي وجده تقرير 543 مرارًا).</div>
+</div>
+
+<div class="item-card crit">
+  <div class="item-head"><span class="item-id">A2</span><span class="badge b-phase">بناء M</span><span class="badge b-crit">يعتمد أوّلًا على إصلاح D-78</span></div>
+  <h3>مساعد الحجز الذرّيّ (Atomic Reservation)</h3>
+  <p><strong>التصميم:</strong> دالّة عامّة تنفِّذ <code>INSERT ... ON CONFLICT (key) DO NOTHING RETURNING *</code> لحجز الحالة <code>PROCESSING</code> ذرّيًّا، وعند التعارض تُعيد قراءة الصفّ الفائز الحقيقيّ بدل افتراض نتيجة ثابتة.</p>
+  <div class="sim"><span class="k">قبل أي سطر كود هنا:</span> يجب إصلاح D-78 أوّلًا — سطر واحد (اسم متغيّر البيئة) يجعل مسار Postgres الحقيقيّ في CI يعمل فعلًا. بدون هذا، أي اختبار تزامن يُكتَب لِـA2 سيُشغَّل على SQLite الوهميّة — وهذا بالضبط ما أخفى عيب D-11 (الحادثة 1). اختبار A2 يجب أن يكون من أوّل الاختبارات التي تُشغَّل فعليًّا عبر مسار Postgres الجديد المُصلَح.</div>
+  <div class="sim"><span class="k">أثناء البناء:</span> دلالات <code>INSERT ON CONFLICT ... RETURNING</code> تختلف عن سلوك SQLite تحت جلسات غير متزامنة متزامنة — لا تُصدَّق أي نتيجة اختبار محليّة بلا تكرارها على Postgres حقيقيّة (فحصان مستقلّان: SQLite للسرعة، Postgres للثقة).</div>
+  <div class="sim"><span class="k">بعد الربط بـD-32/D-33 (أثر جانبيّ على العميل):</span> طلب مكرَّر/مُعاد المحاولة (مثلًا الجوّال يعيد المحاولة بعد مهلة، بنفس منطق D-68) سيحصل الآن فورًا على حالة <code>PROCESSING</code> بدل انتظار تنفيذ متزامن كما قد يحدث اليوم. أي كود عميل (جوّال أو ويب) يفترض أنّ "إعادة المحاولة = نفس النتيجة النهائيّة فورًا" سينكسر افتراضه.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> فحص مسار إعادة المحاولة في الجوّال (نفس الملفّ الذي لمسه D-68) للتأكّد أنّه يتعامل مع استجابة PROCESSING بالانتظار/الاستطلاع، لا باعتبارها فشلًا.</div>
+  <div class="sim"><span class="k">أثر جانبيّ على بيانات قديمة:</span> صفوف idempotency قديمة أُنشئت بالمنطق القديم (فحص→إنشاء→تسجيل منفصلَين) موجودة أصلًا في قاعدة البيانات وقت النشر — يجب أن يتعامل الكود الجديد معها بأمان (اعتبارها مكتملة افتراضيًّا إن غاب الحقل الجديد)، لا أن يفترض أنّ كل الصفوف بالشكل الجديد.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">A3</span><span class="badge b-phase">بناء S — الأرخص والأكثر أمانًا في كل الخطّة</span></div>
+  <h3>بوّابة تدقيق ساكنة (ratchet) لمحرّك الصلاحيّات</h3>
+  <p><strong>التصميم:</strong> فحص CI (سكربت grep، بنفس روح <code>api-contract-ratchet</code>/<code>openapi-ratchet</code> الموجودَين فعلًا) يمنع إضافة استدعاء <code>require_role(</code> جديد في ملفّ غير مُدرَج على قائمة الاستثناء الأساسيّة، ويقيس العدد الإجماليّ باتّجاه هابط فقط.</p>
+  <div class="sim"><span class="k">أثناء البناء:</span> بوّابة صفريّة التسامح من اليوم الأوّل ستفشل فورًا (84 ملفًّا تستخدم require_role اليوم). <strong>الحلّ:</strong> يجب أخذ لقطة للعدد/الملفّات الحاليّة كخطّ أساس مسموح به أوّلًا، ثمّ منع أي زيادة عليه فقط — تمامًا كما تعمل بوّابات العقد الموجودة فعلًا.</div>
+  <div class="sim"><span class="k">أثر جانبيّ بعد النشر:</span> لا يوجد — فحص CI فقط، بلا أي تغيير في مسار التشغيل الفعليّ. أقلّ بنود هذه الخطّة خطورة، ويستحقّ التنفيذ الفوريّ لأنّه يوقف تفاقم D-09 فورًا حتّى قبل بدء الترحيل الفعليّ.</div>
+</div>
+
+<h2 id="phaseB">⑤ المرحلة B — إصلاحات مستقلّة رخيصة (أولويّة قصوى، توازٍ كامل)</h2>
+<p>هذه البنود لا تعتمد على أي بنية من المرحلة A — ويجب أن تُنفَّذ أوّلًا، بالتوازي، دون انتظار أي شيء. هي بالضبط ما كان يجب أن يحدث في "المرحلة صفر" الأصليّة.</p>
+
+<div class="item-card crit">
+  <div class="item-head"><span class="item-id">B1 · D-34/35/36/37</span><span class="badge b-crit">CRITICAL — حيّ اليوم</span></div>
+  <h3>إعادة كتابة check_identity_deletion_eligibility</h3>
+  <p><strong>الإصلاح:</strong> استبدال <code>except Exception: pass</code> بإرجاع نفس نتيجة "ارفض الحذف" الموجودة أصلًا في السطر السابق؛ إضافة فحص <code>UNDER_REVIEW</code> + <code>ChargebackCase</code> (نسخ نفس نمط <code>.in_(("OPEN","UNDER_REVIEW"))</code> المستخدَم فعلًا في settlement_service.py/chargeback_router.py)؛ فحص WalletReservation المحجوزة لا الرصيد الموجب فقط؛ التعامل مع مزوّد متعدّد المتاجر بـ<code>.all()</code> لا <code>scalar_one_or_none()</code>.</p>
+  <div class="sim"><span class="k">أثناء البناء:</span> هذه الدالّة تُستدعى من 3 مسارات (حذف ذاتيّ، مهمّة يوميّة مجدولة بلا مراقبة بشريّة، محو نهائيّ). جعلها أكثر تشدّدًا يعني أنّ المهمّة اليوميّة ستتخطّى الآن حالات أكثر بصمت.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> إضافة عدّاد/سجلّ "أسباب تخطّي المهمّة اليوميّة" — إن قفز هذا العدد فجأة بعد النشر، يصبح مرئيًّا فورًا بدل أن يُكتشَف صدفة لاحقًا (تطبيق مباشر لدرس الغياب المتكرّر للمراقبة الذي كشفه هذا التدقيق).</div>
+  <div class="sim"><span class="k">بعد النشر:</span> أي حذف كان "يبدو" مؤهَّلًا سابقًا بالمنطق القديم المعطوب قد يُرفَض الآن بحقّ — يجب إعطاء كل سبب رفض جديد رمزًا مميَّزًا (البنية <code>(code, message)</code> موجودة أصلًا) بدل رسالة عامّة، حتّى لا يبدو الأمر كأنّه عطل جديد لفريق العمليّات.</div>
+  <div class="sim"><span class="k">بوّابة القبول:</span> اختبار جديد يحاكي عطل قاعدة بيانات أثناء فحص النزاع (mock يرفع استثناء) ويتأكّد أنّ الحذف <strong>يُرفَض</strong> لا يُسمَح به — عكس الفجوة الحاليّة تمامًا.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">B2 · D-59/60/61</span><span class="badge b-phase">FIX S</span></div>
+  <h3>توسيع validate_production_settings()</h3>
+  <p><strong>الإصلاح:</strong> إضافة 3 فحوصات (أدوار MFA الإلزاميّة، عتبات COD/المحفظة، صندوق الإشعارات) بنفس نمط تحذير-ثمّ-إلزام المستخدَم فعلًا لـ<code>admin_ip_allowlist</code>.</p>
+  <div class="sim"><span class="k">أثناء البناء — نفس فخّ الحادثة 2 بالضبط:</span> إن أصبحت هذه الفحوصات إلزاميّة فورًا، وكانت قيم الإنتاج الفعليّة اليوم لا تحقّقها (مثلًا mfa_required_roles فارغة فعلًا لأنّ D-11 يفرض TOTP لكل حساب على حدة بمعزل عن هذا الإعداد العامّ)، فسيرفض الخادم الإقلاع في الإنتاج = توقّف ذاتيّ التسبّب، بنفس آليّة D-64 التي احتاجت تسلسل نشر خاصًّا.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> تحذير فقط (log) لدورة نشر كاملة على الأربعة مواضع أوّلًا، مراقبة السجلّات لأيّام على الأقلّ، ثمّ فرض صارم في تغيير لاحق منفصل — لا في نفس الدفعة.</div>
+  <div class="sim"><span class="k">قبل حتّى كتابة الكود:</span> يجب قراءة قيم الإنتاج الفعليّة الحاليّة أوّلًا (لا افتراضها) للتأكّد من أنّها ستجتاز الفحص الجديد أصلًا.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">B3 · D-70</span><span class="badge b-phase">FIX S</span><span class="badge b-auth">إذن إصدار متجر مطلوب</span></div>
+  <h3>تخزين محلّيّ مشفَّر للجوّال (المتجر العامّ)</h3>
+  <p><strong>الإصلاح:</strong> تركيب MMKV (أو مخزن مشفَّر مكافئ) واستبدال الخلفيّة في <code>kv.ts</code>.</p>
+  <div class="sim"><span class="k">أثر جانبيّ على المستخدمين الحاليّين:</span> تركيبات التطبيق الحاليّة لديها بيانات مكتوبة فعلًا في AsyncStorage القديم تحت مفاتيح موجودة. استبدال مباشر يعني أنّ بيانات المستخدم المحفوظة محليًّا (محتوى السلّة، تفضيلات الواجهة) ستبدو وكأنّها اختفت عند أوّل تشغيل بعد التحديث، لأنّ المخزن الجديد يبدأ فارغًا.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> ترحيل لمرّة واحدة عند أوّل تشغيل بعد التحديث — قراءة من المفاتيح القديمة، كتابة في المخزن الجديد، ثمّ مسح القديم. لا إسقاط صامت لبيانات المستخدم أبدًا.</div>
+  <div class="sim"><span class="k">قيد بنائيّ (السؤال 6 من قائمة التحقّق):</span> MMKV وحدة أصليّة (native)، لا JS صرفًا — يحتاج بناء Expo EAS كاملًا، لا تحديثًا فوريًّا (OTA). يُنسَّق مع دورة إصدار متجر التطبيقات الفعليّة، لا يُشحَن كإصلاح عاجل فوريّ.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">B4 · C-10a</span><span class="badge b-phase">FIX XS — الأبسط في كل الخطّة</span></div>
+  <h3>فحص هويّة في finance_second_approve_refund</h3>
+  <p><strong>الإصلاح:</strong> نسخ حرفيّ لنفس فحص 4 أسطر الموجود والمُختبَر فعلًا في <code>finance_approve_refund</code> (سطر 269) إلى <code>finance_second_approve_refund</code>.</p>
+  <div class="sim"><span class="k">أثناء البناء:</span> لا مخاطرة تُذكَر — نسخ نمط مُختبَر فعلًا لنفس الملفّ، دالّة مجاورة.</div>
+  <div class="sim"><span class="k">أثر جانبيّ محتمل:</span> لا شيء على المستقبل؛ يستحقّ استعلامًا للقراءة فقط (بلا أي تعديل) على بيانات الإنتاج للتأكّد ما إذا استُغلَّت هذه الفجوة سابقًا — لتوعية فريق الماليّة فقط، ليس شرطًا لتنفيذ الإصلاح.</div>
+  <div class="sim"><span class="k">بوّابة القبول:</span> اختبار ارتداديّ صريح لهذا السيناريو تحديدًا (طالب=معتمِد ثانٍ ⇒ 403) — لا يوجد اليوم، وهذا بالضبط سبب بقاء الفجوة طويلًا.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">B5 · D-39/D-40/D-50</span><span class="badge b-phase">FIX S/M</span></div>
+  <h3>إغلاق كل "أُصلح في مكان واحد، نُسي مكانه المكرَّر" المكتشَفة في 543</h3>
+  <p><strong>الإصلاح:</strong> تطبيق نفس الإصلاح المُثبَت على كل نسخة مكرَّرة. لـD-50 تحديدًا: الإخفاء موجود بالفعل داخل دالّة مشتركة واحدة (<code>_cp_people_by_role()</code>) — إصلاح مركزيّ واحد يغلق 3 نقاط عرض دفعة واحدة، أرخص بند في هذه الدفعة كلّها.</p>
+  <div class="sim"><span class="k">خطر أداء محدَّد لـD-50:</span> نافذة الكشف المؤقّت (15 دقيقة عبر Redis) مبنيّة أصلًا لصفحة مستخدم واحد. تطبيقها على قائمة (50 عميلًا في صفحة واحدة مثلًا) بفحص Redis منفصل لكل صفّ = 50 استدعاء Redis لكل تحميل صفحة.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> تجميع الفحص عبر <code>MGET</code> واحد لكل معرّفات الصفّ في الصفحة، لا 50 استدعاءً منفصلًا.</div>
+  <div class="sim"><span class="k">أثر جانبيّ على عادة عمل فريق العمليّات:</span> موظّفون اعتادوا رؤية الأرقام كاملة في صفحات العملاء/المزوّدين/السائقين سيرون الآن بيانات مخفيّة فجأة — يستحقّ إشعارًا (بانر داخل التطبيق أو ملاحظة إصدار) لا نشرًا صامتًا، بنفس ما رافق D-11 من "مسار إعادة إرسال دعوة" كصمّام أمان لتغيير مشابه بواجهة الاستخدام.</div>
+  <div class="sim"><span class="k">بوّابة القبول:</span> اختبار واحد مُعامَل (parametrized) عبر الصفحات الست معًا (تفاصيل مستخدم/القائمة/البحث/عملاء/مزوّدين/سائقين) بدل تغطية مبعثرة لكل مسار على حدة — هذا وحده يمنع تكرار هذا النمط مستقبلًا.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">B6 · D-26</span><span class="badge b-auth">بند مجدوَل بالتقويم، لا هندسة إضافيّة</span></div>
+  <h3>تحويل تحذير الموافقة الثانية إلى رفض فعليّ</h3>
+  <p>الكود نفسه يوثّق أنّه "الخطوة 1 من 2". لا عمل هندسيّ إضافيّ مطلوب — فقط: لا يُفعَّل الرفض الفعليّ (409) حتّى يبقى سجلّ التحذير <code>D26_SECOND_APPROVE_AFTER_EXECUTION</code> فارغًا لفترة مراقبة حقيقيّة كافية عبر كل البيئات. هذا بند تقويميّ في متابعة الإطلاق، لا مهمّة برمجيّة جديدة.</p>
+</div>
+
+<h2 id="phaseC">⑥ المرحلة C — تعتمد على بنية المرحلة A</h2>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-18 / D-46 / D-49</span><span class="badge b-phase">BUILD M/L</span></div>
+  <h3>عكس القيد اليدويّ، تنفيذ الاحتفاظ، سجلّات المحو — عبر جدول A1</h3>
+  <p>مُفصَّلة أعلاه ضمن A1 (D-18 يُبنى معه مباشرة كأوّل مستهلك). D-46/D-49 يستهلكان نفس الجدول لاحقًا بمخطّطهما الخاصّ فقط بعد إثبات D-18.</p>
+  <div class="sim"><span class="k">أثر جانبيّ خاصّ بD-46 (الاحتفاظ):</span> تنفيذ الاحتفاظ عبر موافقة يعني أنّ حذفًا كان يحدث تلقائيًّا الآن سينتظر معتمِدًا بشريًّا — إن كان حجم المرشَّحين شهريًّا كبيرًا (آلاف الحسابات الخاملة)، يحتاج هذا سعة مراجعة بشريّة كافية، وإلّا تتراكم طوابير احتفاظ غير مُنفَّذة لأشهر — يستحقّ تقدير الحجم الفعليّ (استعلام قراءة فقط لعدد المرشَّحين الحاليّ) قبل تفعيل بوّابة الموافقة، لا افتراض أنّ الحجم صغير.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-32/D-33/D-41</span><span class="badge b-phase">FIX M</span></div>
+  <h3>تكرار الطلبات وPOS — عبر مساعد A2</h3>
+  <p>مُفصَّلة أعلاه ضمن A2. D-41 (POS) نفس النمط بالضبط: عند التعارض، إعادة قراءة الحالة الحقيقيّة بدل إرجاع "PROCESSED" ثابتة.</p>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-09</span><span class="badge b-crit">BUILD XL — الأكبر والأخطر في كل الخطّة</span><span class="badge b-auth">إذن تشغيليّ مُوصًى به قبل البدء</span></div>
+  <h3>ترحيل 84 ملفًّا من require_role إلى محرّك الصلاحيّات</h3>
+  <div class="sim"><span class="k">لماذا هذا ليس مجرّد استبدال ميكانيكيّ:</span> <code>has_effective_permission</code> يطبِّق دور⊕منح⊖سحب — بعكس <code>require_role</code> الذي يفحص الدور فقط. لبعض المستخدمين، قد يوجد سحب صريح لا يراه require_role اليوم — الترحيل قد <strong>يمنع</strong> فجأة وصولًا كان يعمل، أو العكس: يمنح وصولًا كان ممنوعًا.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج — نمط "الظلّ" (shadow-mode):</span> لكل ملفّ يُرحَّل: تشغيل الفحصَين معًا (القديم والجديد) لمدّة أسبوع كامل لكل دفعة مخاطرة، تسجيل أي <strong>اختلاف</strong> بينهما بلا تفعيل الفحص الجديد فعليًّا، ولا يُفعَّل إلّا بعد صفر اختلافات مُلاحَظة لتلك الدفعة. نفس منطق "تحذير ثمّ إلزام" (B2/D-26) لكن مطبَّق على أخطر بند في الخطّة.</div>
+  <div class="sim"><span class="k">ترتيب الدفعات:</span> الأموال والدفعات ولوحة التحكّم أوّلًا (أعلى خطورة، أصغر حجمًا)، ثمّ operations_router.py أخيرًا (أكبر حجمًا، 110 استدعاء) — تسلسل خطّة 539 الأصليّ لا يزال صحيحًا هنا.</div>
+  <div class="sim"><span class="k">أثر جانبيّ يفتح لاحقًا:</span> D-56 (إزالة وراثة ADMIN الواسعة) لا يصبح آمنًا إلّا بعد اكتمال هذا الترحيل بالكامل — ليس جزئيًّا. أي محاولة لإزالة الوراثة قبل ذلك تكسر وصولًا مشروعًا على الملفّات غير المُرحَّلة بعد.</div>
+</div>
+
+<h2 id="phaseD">⑦ المرحلة D — بناء مجاليّ متوسّط/كبير (مستقلّ عن بنية A)</h2>
+
+<div class="item-card crit">
+  <div class="item-head"><span class="item-id">D-29</span><span class="badge b-crit">أخطر بند بناء ماليّ في كل الخطّة</span></div>
+  <h3>حلّ نزاع الدفع ينفّذ أثرًا ماليًّا حقيقيًّا</h3>
+  <div class="sim"><span class="k">أثناء البناء:</span> يجب استخدام دوالّ LedgerService المزدوجة القيد الموجودة والمُختبَرة فعلًا (نفس ما يستخدمه refund_router.py) لا كتابة منطق ترحيل جديد. أي مسار جديد يحرِّك أموالًا يحتاج اختبار تزامن حقيقيّ عبر Postgres (بعد إصلاح D-78) + فحص اتّزان جديد يُضاف إلى مجموعة <code>finance_invariants.py</code> الموجودة فعلًا في وظيفة db-invariants بـCI.</div>
+  <div class="sim"><span class="k">أثر جانبيّ على بيانات قديمة — الأخطر هنا:</span> نزاعات قُفلت سابقًا بحالة "RESOLVED" بلا أي أثر ماليّ حقيقيّ (بالمنطق القديم) يجب ألّا تُعاد معالجتها بأثر رجعيّ بعد نشر هذا الإصلاح — وإلّا حدث ائتمان مزدوج لتسوية سابقة تمّت خارج النظام يدويًّا. الحلّ: مقارنة <code>resolved_at</code> بتوقيت النشر، أو علم صريح، لضمان أنّ الأثر الماليّ الجديد يُطبَّق فقط على النزاعات التي تُحلّ <em>بعد</em> النشر.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-45</span><span class="badge b-phase">BUILD L</span><span class="badge b-auth">قرار بنية تحتيّة (KMS) — يستحقّ علم المشغّل</span></div>
+  <h3>تشفير مغلّف لأسرار POS</h3>
+  <div class="sim"><span class="k">أثناء البناء — أسرار موجودة فعلًا كنصّ صريح اليوم:</span> يجب هجرة تشفير-في-مكانه (قراءة كل سرّ قائم، تشفيره بالمخطّط الجديد، كتابته)، لا مجرّد بدء التشفير للجديد فقط. يجب أن يعمل قبل أن يتوقّع الكود الجديد نصًّا مشفَّرًا فقط.</div>
+  <div class="sim"><span class="k">خطر عمليّة الهجرة نفسها:</span> فشل استدعاء KMS منتصف الهجرة يجب ألّا يفقد السرّ الأصليّ بشكل دائم. الحلّ: سكربت منفصل، قابل لإعادة التشغيل، بعلامة "مُشفَّر بالفعل" لكل صفّ — بنفس نمط <code>backfill_driver_payable_rename.py</code> الموجود فعلًا لعمليّات مشابهة تحتاج استدعاءات خارجيّة حيّة، لا هجرة alembic مباشرة تستدعي خدمة خارجيّة أثناء النشر.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-44</span><span class="badge b-phase">BUILD M</span></div>
+  <h3>عميل آمن من SSRF لطلبات POS</h3>
+  <div class="sim"><span class="k">أثر جانبيّ على تكامل قائم فعليًّا:</span> أي عنوان POS مسجَّل حاليًّا في الإنتاج يشبه IP خاصًّا (بإعداد DNS غير معتاد لكنّه مشروع) قد يبدأ بالفشل فجأة بمجرّد تفعيل رفض الـIP الخاصّ.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> تدقيق قيم <code>target_url</code> المسجَّلة فعليًّا في الإنتاج <em>قبل</em> تفعيل الحجب، وبناء القائمة البيضاء من المضيفين الفعليّين المسجَّلين اليوم كخطّ أساس، لا افتراض قائمة فارغة من الصفر.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-57</span><span class="badge b-phase">BUILD M</span></div>
+  <h3>توحيد 23 موقع استدعاء لمحلِّل الأعلام</h3>
+  <div class="sim"><span class="k">أثناء البناء:</span> ترحيل يبدو ميكانيكيًّا (استبدال is_enabled() بـis_enabled_3layer()) قد ينقلب علمًا صامتًا إن اختلف اسم/حالة أحرف المفتاح بين المسارين.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> نفس نمط "الظلّ" المستخدَم في D-09 — تسجيل أي اختلاف بين القراءتين لكل موقع استدعاء قبل التبديل الفعليّ.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-04/05/06/07 · D-21/23/24 · D-27 · D-38 · D-42/43 · D-75/76/77/80</span><span class="badge b-phase">FIX/BUILD S–L</span></div>
+  <h3>بنود مجاليّة إضافيّة — خطر بناء محدود، يُطبَّق عليها نفس قائمة التحقّق ⑦ بندًا بندًا</h3>
+  <p>
+    OTP outbox (إعادة استخدام اتّفاقيّة outbox+relay الموجودة فعلًا لـSSE — لا بنية جديدة) · تقسيم سلسلة التدقيق يوميًّا ثمّ إرساء Merkle عبر MinIO Object-Lock الجاهز محليًّا · فصل صلاحيّة تقديم/مراجعة نزاع الدفع (ينتظر دفعة D-09 المتعلّقة بالمال أوّلًا) · إعادة كتابة كشف المحفظة كاستعلام على Ledger القائم (يجب تضمين ManualWalletCredit المُستبعَدة صمتًا اليوم؛ فحص أداء الاستعلام الموحَّد الجديد على حجم بيانات حقيقيّ) · هويّة SKU وقفل تفاؤليّ للكتالوج (ترتيب إلزاميّ: تعيين الهويّة أوّلًا، القفل بعده — لا يمكن قفل نسخة غامضة الهويّة) · تشديد سكربتَي فحص العمليّات وربط الفحص الثنائيّ اللغة والبوّابة i18n داخل pytest/CI فعليًّا لا سكربت يدويّ منفصل فقط.
+  </p>
+</div>
+
+<h2 id="phaseEF">⑧ المرحلتان E وF</h2>
+<div class="card">
+  <h3>المرحلة E — تنظيميّة، ليست كودًا</h3>
+  <p>D-73 (حماية الفرع — تحتاج ترقية خطّة GitHub أو إجراء يدويًّا بالواجهة) · D-74 (وثيقة تتبّع دَين العقد) · D-82 (تعيين ملاّك حقيقيّين للبوّابات التسع).</p>
+  <div class="callout auth">
+    <strong>⚠️ D-83 — تذكير صريح، لا بند عمل:</strong> بصمة SHA256 لملفّ <code>launch_gates.yaml</code> مُقفَلة وموثَّقة في CLAUDE.md. أي تعديل على هذا الملفّ (حتّى لتعيين ملّاك D-82) يجب أن يمرّ عبر طقس إعادة المعايرة الموثَّق (إعادة حساب البصمة وتوثيقها رسميًّا) كتغيير واحد متكامل — لا تعديل عابر أبدًا.
+  </div>
+</div>
+<div class="card">
+  <h3>المرحلة F — بناء معماريّ مؤجَّل عمدًا (مستقبليّ)</h3>
+  <p>D-53 (محرّك حالة/عمل موحَّد) · D-62 (عامل ARQ خلفيّ، ترحيل تدريجيّ يبدأ بأقلّ المهامّ خطورة) · INIT-1 (واجهة قدرات موحَّدة، 500 موضع) · INIT-5 (دمج ~75 صفحة لوحة عمليّات) · D-46 الكامل (ورشة احتفاظ شاملة بعد أن يثبت A1 نفسه بالإنتاج). هذه تحتاج دورة تخطيط مستقلّة خاصّة بها لاحقًا — تُذكَر هنا للاكتمال فقط، لا بعمق تصميميّ الآن، بنفس القرار الذي اتّخذته خطّة 539 الأصليّة بحقّها.</p>
+</div>
+
+<h2 id="auth">⑨ قائمة الإذن التشغيليّ المطلوب قبل التنفيذ</h2>
+<div class="tbl-wrap"><table>
+  <tr><th>البند</th><th>لماذا يحتاج إذنًا</th></tr>
+  <tr><td><strong>D-09</strong> (ترحيل الصلاحيّات، 84 ملفًّا)</td><td>نطاق انفجار كبير على كل مسارات الوصول؛ خطأ واحد يمكن أن يمنع/يمنح وصولًا حسّاسًا على نطاق واسع</td></tr>
+  <tr><td><strong>D-56</strong> (إزالة وراثة ADMIN)</td><td>تغيير مصادقة/تفويض حيّ مباشر، ومشروط أصلًا باكتمال D-09 كاملًا</td></tr>
+  <tr><td><strong>D-26</strong> (تفعيل الرفض الفعليّ)</td><td>تغيير سلوك تشغيليّ ماليّ حيّ — الكود نفسه يشترط فترة مراقبة قبل التفعيل</td></tr>
+  <tr><td><strong>D-45</strong> (تشفير أسرار POS عبر KMS)</td><td>اعتماديّة بنية تحتيّة خارجيّة جديدة (خدمة KMS) — قرار تكلفة/وصول</td></tr>
+  <tr><td><strong>D-70</strong> (نشر فعليّ لتحديث الجوّال المشفَّر)</td><td>دورة إصدار متجر تطبيقات كاملة (بناء أصليّ + مراجعة متجر) — عمل نشر/إصدار</td></tr>
+  <tr><td><strong>أي نشر فعليّ لأيّ بند من هذه الخطّة</strong> على test1/.194/الإنتاج</td><td>قاعدة النشر الإلزاميّة القائمة أصلًا في هذا المشروع (CLAUDE.md) — كل نشر يحتاج إذنًا صريحًا، خصوصًا الإنتاج</td></tr>
+</table></div>
+
+<h2 id="timeline">⑩ التسلسل الزمنيّ المُقترَح</h2>
+<div class="pipeline">
+  <div class="pnode" style="border-color:var(--accent); border-width:2px;"><div class="t">المرحلة A + B معًا</div><div class="d">بناء البنية المشتركة + كل الإصلاحات الرخيصة المستقلّة، بالتوازي الكامل</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">المرحلة C</div><div class="d">البنود المعتمِدة على A، بترتيب المخاطر (الأموال أوّلًا، operations_router.py أخيرًا)</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">المرحلة D</div><div class="d">بناء مجاليّ متوسّط/كبير مستقلّ، يمكن أن يتوازى جزئيًّا مع C</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">D-56 + المرحلة E</div><div class="d">فقط بعد اكتمال D-09 كاملةً + قرارات تنظيميّة</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">المرحلة F</div><div class="d">تخطيط مستقلّ لاحق، خارج نطاق هذه الدفعة</div></div>
+</div>
+<div class="callout">
+  <strong>ملاحظة أخيرة مهمّة:</strong> تقرير 543 أثبت أنّ تصنيف "FIX سهل / المرحلة صفر" في الخطط السابقة لم يتنبّأ بصعوبة التنفيذ الفعليّة —
+  4 بنود CRITICAL مصنَّفة "سهلة" لم تصل للتنفيذ إطلاقًا رغم ذلك. لا تُورَث تقديرات الجهد المتفائلة من التصنيفات القديمة إلى هذه الخطّة —
+  كل بند أعلاه أُعيد تقييمه من واقع الكود اليوم، لا من تصنيف تقرير سابق.
+</div>
+
+<footer>تقرير 544 · تووا (Tawa) — منصّة التوصيل الليبيّة · خطّة تنفيذيّة مبنيّة على تدقيق 543 · محاكاة ذهنيّة لكل بند · 2026-07-21 · خطّة فقط، بانتظار مراجعة المشغّل قبل أي تنفيذ</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تووا — دليل تفعيل أعلام الجلسة · 2026-06-15</title>
+<style>
+  :root{--g:#0f7b3f;--g2:#0a5e30;--ink:#14201a;--muted:#5d6b63;--line:#dfe7e1;--bg:#f4f8f5;--card:#fff;
+    --warn:#b8860b;--warnbg:#fff8e8;--bad:#b0361f;--badbg:#fdeee9;--ok:#0f7b3f;--okbg:#e9f5ee;--info:#1f5b8f;--infobg:#eaf2fa;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 18px 70px}
+  header{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border-radius:16px;padding:24px 28px}
+  header h1{margin:0 0 6px;font-size:1.5rem}
+  .badges{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+  .badge{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:4px 12px;font-size:.82rem}
+  h2{margin:28px 0 12px;font-size:1.2rem;border-right:5px solid var(--g);padding:4px 12px 4px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 18px;margin:13px 0;box-shadow:0 2px 8px rgba(20,32,26,.04)}
+  code,.mono{font-family:"Cascadia Code",Consolas,monospace;background:#eef3ef;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.86em;direction:ltr;display:inline-block}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.88rem;background:#fff}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#eef5f0;color:var(--g2)}
+  .tag{display:inline-block;border-radius:6px;padding:2px 9px;font-size:.78rem;font-weight:700}
+  .t-ok{background:var(--okbg);color:var(--ok)} .t-off{background:#eee;color:#555}
+  .box{border-radius:10px;padding:12px 15px;margin:10px 0}
+  .b-warn{background:var(--warnbg);border:1px solid #f0dca0}
+  .b-info{background:var(--infobg);border:1px solid #bcd6ee}
+  .b-ok{background:var(--okbg);border:1px solid #b9e0c8}
+  ul{margin:6px 0;padding-right:22px} li{margin:4px 0}
+  footer{margin-top:30px;text-align:center;color:var(--muted);font-size:.82rem;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>دليل تفعيل أعلام الجلسة — تووا / Tawa</h1>
+  <p>الأعلام البيئيّة للميزات الخامدة (ليست أعلام العقد المختومة FIN-COR). لكلّ علَم: ماذا · افتراضيّ · كيف يُفعَّل · كيف يُراقَب · كيف يُتراجَع · تبعيات.</p>
+  <div class="badges">
+    <span class="badge">📅 2026-06-15</span>
+    <span class="badge">🔒 FIN-COR مختوم</span>
+    <span class="badge">🟢 المراقبة: /ops/feature-activation</span>
+    <span class="badge">🧱 بلا migration</span>
+  </div>
+</header>
+
+<h2>طريقة التفعيل (عامّة لكلّ الأعلام)</h2>
+<div class="card">
+  <ul>
+    <li><b>أين:</b> متغيّر بيئة في <span class="mono">docker-compose.staging.yml</span> (قيم JSON تتجاوز <span class="mono">.env</span>) ثمّ <span class="mono">deploy/deploy_be.sh</span> (إعادة إنشاء الحاوية تُحمِّل القيمة الجديدة).</li>
+    <li><b>التحقّق بعد النشر:</b> صفحة OPS الجديدة <span class="mono">/ops/feature-activation</span> تعرض ON/OFF الحيّ + عدّ مزوّدي القبول التلقائيّ.</li>
+    <li><b>ليس من الواجهة:</b> هذه الأعلام لا تُبدَّل بزرّ — التغيير عبر البيئة + إعادة نشر فقط (انضباط).</li>
+  </ul>
+  <div class="box b-info">تمييز مهمّ: لوحة <span class="mono">/ops/feature-toggles</span> تدير أعلام العقد <b>المختومة</b> (FIN-COR، مثل <span class="mono">production_payment_enabled</span>). لوحة <span class="mono">/ops/feature-activation</span> (هذا الدليل) تعرض أعلام <b>بيئة الجلسة</b> قراءةً فقط.</div>
+</div>
+
+<h2>الأعلام الخمسة</h2>
+<div class="card">
+  <table>
+    <tr><th>العلَم</th><th>الحالة</th><th>ماذا عند ON</th><th>متغيّر البيئة</th><th>تبعيات / تحذير</th></tr>
+    <tr>
+      <td><span class="mono">complaint_triage_rules_enabled</span></td>
+      <td><span class="tag t-ok">ON افتراضيًّا</span></td>
+      <td>اقتراح فرز الشكاوى مُخزَّن (محرّك قواعد عربيّ محلّيّ)</td>
+      <td><span class="mono">COMPLAINT_TRIAGE_RULES_ENABLED</span></td>
+      <td>الوحيد المُفعَّل أصلًا · استشاريّ (لا يحجب)</td>
+    </tr>
+    <tr>
+      <td><span class="mono">wismo_enabled</span></td>
+      <td><span class="tag t-off">OFF</span></td>
+      <td>إشعارات «أين طلبي» الاستباقيّة لـ5 حالات (PUSH)؛ الـETA يظهر في حدث «arriving»</td>
+      <td><span class="mono">WISMO_ENABLED</span></td>
+      <td>الـETA يظهر في <b>PUSH فقط</b> (لا عارض ويب)؛ قناة واتساب تبقى خاملة حتّى <span class="mono">WA_*</span></td>
+    </tr>
+    <tr>
+      <td><span class="mono">auto_accept_enabled</span></td>
+      <td><span class="tag t-off">OFF</span></td>
+      <td>قبول-تلقائيّ لطلب جديد لمزوّد مُهيّأ</td>
+      <td><span class="mono">AUTO_ACCEPT_ENABLED</span> · <span class="mono">AUTO_ACCEPT_MAX_ACTIVE_ORDERS</span></td>
+      <td><b>بوّابة ثلاثيّة:</b> العامّ ON <b>و</b> المزوّد <span class="mono">auto_accept_orders=true</span> <b>و</b> ضمن السقف</td>
+    </tr>
+    <tr>
+      <td><span class="mono">referral_reward_on_conversion</span></td>
+      <td><span class="tag t-off">OFF</span></td>
+      <td>مكافأة الإحالة تُحتجَز PENDING_CONVERSION وتُستحقّ بعد أوّل طلب مكتمل</td>
+      <td><span class="mono">REFERRAL_REWARD_ON_CONVERSION</span></td>
+      <td>يغيّر توقيت الاستحقاق (لحظة الاسترداد → بعد التحويل)</td>
+    </tr>
+    <tr>
+      <td><span class="mono">cod_fraud_scoring_enabled</span></td>
+      <td><span class="tag t-off">OFF</span></td>
+      <td>تحويل مُسجِّل مخاطر COD من استشاريّ إلى <b>حاجب</b> (HIGH ⇒ 422)</td>
+      <td><span class="mono">COD_FRAUD_SCORING_ENABLED</span></td>
+      <td>أثر سلوكيّ حقيقيّ (يحجب الطلب) — راقب معدّل الحجب بعد التفعيل</td>
+    </tr>
+  </table>
+</div>
+
+<h2>التراجع (Rollback)</h2>
+<div class="card">
+  لأيّ علَم: أعِد متغيّر البيئة إلى افتراضيّه (OFF، عدا triage=ON) ثمّ <span class="mono">deploy_be</span>. لا migration ⇒ لا أثر على المخطّط؛ القاعدة محفوظة.
+  تأكّد من العودة عبر <span class="mono">/ops/feature-activation</span>.
+</div>
+
+<h2>التحقّق النهائيّ (هذه الجلسة)</h2>
+<div class="card">
+  <ul>
+    <li><span class="tag t-ok">✓</span> كنس عدائيّ: كلّ الأعلام OFF افتراضيًّا عدا <span class="mono">complaint_triage_rules_enabled</span> (مؤكَّد من <span class="mono">config.py</span>).</li>
+    <li><span class="tag t-ok">✓</span> بوّابة كاملة: 0 تراجع · FIN-COR PASS · 2404 نجاح / 29 أساس / 0 جديد.</li>
+    <li><span class="tag t-ok">✓</span> D1 سليم: خطّاف <span class="mono">on_order_delivered</span> يستدعي تراكم نقاط الولاء (مسار حيّ، بلا أثر ماليّ — الصرف مختوم).</li>
+    <li><span class="tag t-ok">✓</span> كلّ خطّاف fail-open (WISMO + auto-accept + loyalty) ⇒ الفشل لا يكسر الطلب.</li>
+  </ul>
+</div>
+
+<footer>تووا / Tawa — دليل تفعيل أعلام الجلسة · 2026-06-15 · مبنيّ على الكود · FIN-COR مختوم · بلا commit.</footer>
+</div>
+</body>
+</html>

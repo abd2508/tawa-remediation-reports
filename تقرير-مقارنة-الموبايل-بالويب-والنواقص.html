@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>توا — مقارنة تطبيق الموبايل بالويب + النواقص</title>
+<style>
+  :root{--green:#0F8056;--green-d:#0b5f40;--green-l:#e6f4ee;--amber:#d98a00;--amber-l:#fff6e5;--red:#c0392b;--red-l:#fdecea;--blue:#1f6feb;--blue-l:#e8f0fe;--purple:#6d4aff;--purple-l:#efeaff;--ink:#1c2430;--muted:#5b6776;--line:#e2e8ee;--bg:#f6f8fa;}
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.9;font-size:15.5px}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0b5f40,#0F8056 60%,#15a06c);color:#fff;border-radius:22px;padding:36px 30px;margin-bottom:24px;box-shadow:0 12px 34px rgba(15,128,86,.30)}
+  header.hero h1{margin:0 0 8px;font-size:30px}
+  header.hero p{margin:4px 0;opacity:.96}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:5px 13px;border-radius:999px;font-size:13px;margin:7px 7px 0 0}
+  h2{font-size:23px;margin:40px 0 12px;padding-right:14px;border-right:6px solid var(--green);color:var(--green-d)}
+  h3{font-size:18px;color:var(--green-d);margin:22px 0 8px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin:14px 0;box-shadow:0 2px 12px rgba(20,30,50,.04)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff;border-radius:12px;overflow:hidden;font-size:14px}
+  th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  tr:last-child td{border-bottom:none}
+  .ok{color:var(--green-d);font-weight:700}.warn{color:var(--amber);font-weight:700}.bad{color:var(--red);font-weight:700}
+  code{background:#0f172a;color:#d7e3f4;padding:2px 6px;border-radius:6px;font-size:12.5px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:820px){.grid2,.grid4{grid-template-columns:1fr 1fr}}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .kpi .n{font-size:23px;font-weight:800;color:var(--green-d)}.kpi .l{font-size:12px;color:var(--muted)}
+  .note{border-right:5px solid var(--blue);background:var(--blue-l);padding:12px 16px;border-radius:10px;margin:12px 0}
+  .note.amber{border-color:var(--amber);background:var(--amber-l)}.note.green{border-color:var(--green);background:var(--green-l)}.note.red{border-color:var(--red);background:var(--red-l)}
+  .svgbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0;overflow:auto;text-align:center}
+  .small{font-size:12.5px;color:var(--muted)}.center{text-align:center}
+  ul,ol{margin:8px 0}li{margin:4px 0}
+  .bar{background:#eef2f6;border-radius:8px;height:20px;overflow:hidden;position:relative;min-width:120px}
+  .bar>span{position:absolute;inset:0 auto 0 0;background:var(--green);border-radius:8px}
+  .bar>b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11.5px;color:#0b3a28;font-weight:700}
+  .bar.low>span{background:var(--red)} .bar.mid>span{background:var(--amber)}
+  .tag{display:inline-block;padding:2px 8px;border-radius:7px;font-size:11.5px;font-weight:700}
+  .tag.g{background:var(--green-l);color:var(--green-d)}.tag.r{background:var(--red-l);color:var(--red)}.tag.a{background:var(--amber-l);color:var(--amber)}
+  .done{color:var(--green-d)} .miss{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>📊 توا — هل تطبيق الموبايل مطابق للويب؟ وما الذي ينقصه؟</h1>
+  <p>مقارنة دقيقة مبنية على العدّ الفعلي للصفحات، بلغة بسيطة ورسوم.</p>
+  <p class="small" style="opacity:.9">2026-07-01 · تطبيق React Native مقابل موقع الويب والمنصّة الكاملة</p>
+  <div>
+    <span class="pill">الجواب المختصر: لا، غير مطابق بعد</span>
+    <span class="pill">مبني: 19 شاشة</span>
+    <span class="pill">النطاق الصحيح للموبايل: ~42 شاشة</span>
+    <span class="pill">الويب: 147 صفحة</span>
+  </div>
+</header>
+
+<!-- 1 -->
+<h2>1) هل التطبيق مطابق للويب؟ — الجواب الصريح</h2>
+<div class="card">
+  <p style="font-size:17px"><b class="bad">لا، ليس مطابقاً بعد.</b> لكن من المهم فهم نقطة جوهرية:</p>
+  <div class="note amber">
+    <b>الموبايل لا يُفترض أن يكون نسخة طبق الأصل من الويب.</b> موقع الويب فيه <b>147 صفحة</b>، منها <b>~90 صفحة</b> خاصة بـ<b>غرفة العمليات والإدارة</b> (لوحات ضخمة، جداول، تقارير مالية) — هذه بطبيعتها <b>للحاسوب/الويب</b>، لا للموبايل. تطبيق الموبايل الاحترافي (بموازاة تطبيق Flutter المرجعي) يغطّي: <b>العميل + السائق + المزوّد + نسخة عمليات مصغّرة</b> ≈ <b>42 شاشة</b>.
+  </div>
+  <p>إذن نقارن على مستويين: (أ) مقابل <b>النطاق الصحيح للموبايل</b> (42 شاشة)، (ب) مقابل <b>الويب الكامل</b> (147 صفحة).</p>
+  <div class="grid4" style="margin-top:8px">
+    <div class="kpi"><div class="n">19</div><div class="l">شاشة مبنية في RN</div></div>
+    <div class="kpi"><div class="n">~42</div><div class="l">النطاق الصحيح للموبايل</div></div>
+    <div class="kpi"><div class="n">147</div><div class="l">صفحات الويب الكاملة</div></div>
+    <div class="kpi"><div class="n">~30%</div><div class="l">نسبة اكتمال نطاق الموبايل</div></div>
+  </div>
+</div>
+
+<!-- 2 -->
+<h2>2) الصورة بالرسم</h2>
+<div class="card">
+  <div class="svgbox">
+  <svg width="960" height="300" viewBox="0 0 960 300" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans Arabic,Tahoma" font-size="13">
+    <!-- web full -->
+    <rect x="30" y="30" width="270" height="240" rx="14" fill="#e8f0fe" stroke="#1f6feb" stroke-width="2"/>
+    <text x="165" y="54" text-anchor="middle" font-weight="bold" fill="#1f4fb0">الويب الكامل — 147 صفحة</text>
+    <rect x="50" y="70" width="230" height="34" rx="7" fill="#fff" stroke="#94a3b8"/><text x="165" y="92" text-anchor="middle" font-size="12">عميل 23 · سائق 10 · مزوّد 13</text>
+    <rect x="50" y="112" width="230" height="120" rx="7" fill="#eef2f6" stroke="#94a3b8"/><text x="165" y="150" text-anchor="middle" font-weight="bold" fill="#5b6776">عمليات + إدارة</text><text x="165" y="176" text-anchor="middle" font-size="13" fill="#5b6776">90 صفحة</text><text x="165" y="205" text-anchor="middle" font-size="11.5" fill="#5b6776">(غرفة تحكّم — للويب/الحاسوب)</text>
+    <!-- arrow -->
+    <text x="330" y="150" text-anchor="middle" font-size="13" fill="#5b6776">نطاق</text><text x="330" y="170" text-anchor="middle" font-size="13" fill="#5b6776">الموبايل</text>
+    <line x1="305" y1="185" x2="365" y2="185" stroke="#0F8056" stroke-width="2.5" marker-end="url(#a)"/>
+    <!-- mobile scope -->
+    <rect x="375" y="30" width="250" height="240" rx="14" fill="#e6f4ee" stroke="#0F8056" stroke-width="2"/>
+    <text x="500" y="54" text-anchor="middle" font-weight="bold" fill="#0b5f40">نطاق الموبايل — ~42 شاشة</text>
+    <rect x="395" y="70" width="210" height="30" rx="7" fill="#fff" stroke="#0F8056"/><text x="500" y="90" text-anchor="middle" font-size="12">عميل 14</text>
+    <rect x="395" y="106" width="210" height="30" rx="7" fill="#fff" stroke="#0F8056"/><text x="500" y="126" text-anchor="middle" font-size="12">سائق 8</text>
+    <rect x="395" y="142" width="210" height="30" rx="7" fill="#fff" stroke="#0F8056"/><text x="500" y="162" text-anchor="middle" font-size="12">مزوّد 6</text>
+    <rect x="395" y="178" width="210" height="30" rx="7" fill="#fff" stroke="#0F8056"/><text x="500" y="198" text-anchor="middle" font-size="12">عمليات مصغّرة 5 + مصادقة 9</text>
+    <text x="500" y="245" text-anchor="middle" font-size="11.5" fill="#5b6776">(بموازاة تطبيق Flutter)</text>
+    <!-- built -->
+    <line x1="630" y1="150" x2="690" y2="150" stroke="#0F8056" stroke-width="2.5" marker-end="url(#a)"/>
+    <rect x="700" y="70" width="230" height="160" rx="14" fill="#fff6e5" stroke="#d98a00" stroke-width="2"/>
+    <text x="815" y="96" text-anchor="middle" font-weight="bold" fill="#b06f00">المبني الآن — 19 شاشة</text>
+    <text x="815" y="126" text-anchor="middle" font-size="12" fill="#b06f00">مصادقة 4 · onboarding 3</text>
+    <text x="815" y="150" text-anchor="middle" font-size="12" fill="#b06f00">عميل 8 (النواة)</text>
+    <text x="815" y="174" text-anchor="middle" font-size="12" fill="#b06f00">سائق 1 · مزوّد 1 · عمليات 1</text>
+    <text x="815" y="205" text-anchor="middle" font-size="12.5" fill="#b06f00" font-weight="bold">≈ 30% من نطاق الموبايل</text>
+    <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0F8056"/></marker></defs>
+  </svg>
+  </div>
+</div>
+
+<!-- 3 -->
+<h2>3) المقارنة الدقيقة لكل دور (الويب مقابل المبني)</h2>
+<div class="card">
+  <table>
+    <tr><th>الدور</th><th>صفحات الويب</th><th>مبني في RN</th><th>نسبة الاكتمال</th></tr>
+    <tr>
+      <td><b>🛍️ العميل</b></td><td>23</td><td>8 (النواة)</td>
+      <td><div class="bar mid"><span style="width:35%"></span><b>~35%</b></div></td>
+    </tr>
+    <tr>
+      <td><b>🛵 السائق</b></td><td>10</td><td>1 (رئيسية فقط)</td>
+      <td><div class="bar low"><span style="width:12%"></span><b>~12%</b></div></td>
+    </tr>
+    <tr>
+      <td><b>🏪 المزوّد</b></td><td>13</td><td>1 (رئيسية فقط)</td>
+      <td><div class="bar low"><span style="width:10%"></span><b>~10%</b></div></td>
+    </tr>
+    <tr>
+      <td><b>🛠️ العمليات</b></td><td>90 (للويب)</td><td>1 (لوحة مصغّرة)</td>
+      <td><div class="bar low"><span style="width:8%"></span><b>مصغّر</b></div></td>
+    </tr>
+    <tr>
+      <td><b>🔐 المصادقة + Onboarding</b></td><td>~4</td><td>7</td>
+      <td><div class="bar"><span style="width:100%"></span><b>مكتمل</b></div></td>
+    </tr>
+  </table>
+  <p class="small">ملاحظة: العمليات في الويب 90 صفحة (غرفة تحكّم للحاسوب)؛ الموبايل يحتاج نسخة مصغّرة فقط (~5 شاشات كما Flutter).</p>
+</div>
+
+<!-- 4 -->
+<h2>4) ما الذي ينقص بالتفصيل — لكل دور</h2>
+
+<div class="card">
+  <h3>🛍️ العميل — مبني 8، ناقص 15</h3>
+  <p><span class="done">✅ المبني:</span> الرئيسية · تفاصيل المتجر · السلة · الدفع (COD) · العناوين · الطلبات · تتبّع الطلب · الحساب.</p>
+  <p><span class="miss">❌ الناقص:</span> <b>المحفظة</b> (رصيد/شحن) · <b>الولاء والنقاط</b> · <b>الدعم/المحادثة</b> · <b>التقييمات</b> · البحث المتقدّم/النتائج · صفحة التصنيف · «اطلب أي شيء» · «التسوّق بميزانية» · المشاوير (errand) · التسجيل الكامل · نسيت كلمة المرور · حذف الحساب · تحويل رصيد المحفظة · «عن التطبيق» · إعدادات مفصّلة.</p>
+</div>
+
+<div class="card">
+  <h3>🛵 السائق — مبني 1، ناقص 9</h3>
+  <p><span class="done">✅ المبني:</span> اللوحة الرئيسية (اتصال + عروض + أرباح مبدئية).</p>
+  <p><span class="miss">❌ الناقص (جوهري):</span> <b>شاشة الاستلام</b> (تأكيد الاستلام من المتجر) · <b>شاشة التسليم + إثبات التوصيل</b> (صورة/رمز) · <b>تحصيل النقد (COD)</b> · <b>خريطة السائق الحيّة</b> · سجلّ الرحلات · الملف الشخصي · الإعدادات · <b>KYC/الوثائق</b> · <b>التسويات المالية</b> (deposit/settlement).</p>
+</div>
+
+<div class="card">
+  <h3>🏪 المزوّد — مبني 1، ناقص 12</h3>
+  <p><span class="done">✅ المبني:</span> طابور الطلبات (رئيسية + قبول/جاهز مبدئي).</p>
+  <p><span class="miss">❌ الناقص (جوهري):</span> <b>الكتالوج</b> (إضافة/تعديل الأصناف والأسعار) · <b>شاشة التحضير</b> التفصيلية · <b>الأرباح والدفتر المالي</b> · سجلّ الطلبات · <b>KYC/الوثائق</b> · <b>التسويات</b> · العروض/الترويج · إدارة الموظّفين · الإعدادات · لوحة معلومات المتجر · حالة القبول/الإغلاق.</p>
+</div>
+
+<div class="card">
+  <h3>🛠️ العمليات — مبني 1 (مصغّر)</h3>
+  <p><span class="done">✅ المبني:</span> لوحة مؤشّرات مصغّرة (طلبات/سائقون/شكاوى/مبيعات).</p>
+  <p><span class="miss">❌ الناقص للموبايل (نسخة مصغّرة):</span> الشكاوى · متابعة السائقين · الطلبات العالقة · البوابات · تنبيهات — كافٍ ~5 شاشات. <b>باقي الـ90 صفحة (المالية/التدقيق/التحكّم الكامل) تبقى على الويب</b> — ليست مطلوبة على الموبايل.</p>
+</div>
+
+<!-- 5 -->
+<h2>5) نواقص عامّة (تقنية — ليست شاشات)</h2>
+<div class="card">
+  <table>
+    <tr><th>البند</th><th>الحالة الآن</th><th>المطلوب</th></tr>
+    <tr><td>ربط الخادم الحقيقي</td><td class="warn">محاكاة (Mock) افتراضياً؛ المصادقة الحقيقية جاهزة</td><td>ربط كل الشاشات بالخادم الفعلي + تحويل أشكال البيانات</td></tr>
+    <tr><td>التتبّع الحيّ (SSE)</td><td class="warn">مربوط في الكود، يعمل في الوضع الحقيقي</td><td>تجربة فعلية على الخادم</td></tr>
+    <tr><td>الخرائط</td><td class="bad">غير مبنية بعد</td><td>MapLibre (خريطة السائق + تتبّع العميل)</td></tr>
+    <tr><td>الإشعارات (Push)</td><td class="warn">كود التسجيل جاهز (رمز FCM)</td><td>ملف <code>google-services.json</code> من المشغّل</td></tr>
+    <tr><td>الدفع الإلكتروني</td><td class="ok">نقداً فقط (كالمنصّة)</td><td>يُفعّل لاحقاً حسب المنصّة</td></tr>
+    <tr><td>الاختبارات</td><td class="warn">21 اختبار للمنطق الأساسي</td><td>توسيعها مع كل دور جديد + E2E</td></tr>
+  </table>
+</div>
+
+<!-- 6 -->
+<h2>6) ما هو مكتمل فعلاً (لكي تكون الصورة عادلة)</h2>
+<div class="card">
+  <ul>
+    <li>✅ <b>البنية الاحترافية</b>: Expo SDK 57 · TypeScript · إدارة حالة · طبقة API قابلة للتبديل · تخزين آمن · i18n/RTL · نظام تصميم.</li>
+    <li>✅ <b>تعدّد الأدوار</b>: اختيار الدور + دخول الموظّف/المزوّد بكلمة مرور + دخول العميل/السائق بـ OTP + توجيه حسب الدور.</li>
+    <li>✅ <b>مسار العميل الأساسي كامل</b>: تصفّح ← سلة ← دفع ← طلب ← تتبّع (حساب المال والفكّة صحيح).</li>
+    <li>✅ <b>لوحات رئيسية للأدوار الثلاثة</b> (سائق/مزوّد/عمليات) — أساس قابل للبناء عليه.</li>
+    <li>✅ <b>الجودة</b>: يبني ويعمل على Android (مُثبت بلقطات)، typecheck/lint نظيفان، 21 اختباراً ناجحاً.</li>
+  </ul>
+</div>
+
+<!-- 7 -->
+<h2>7) خطة الإكمال (لتصل إلى تطبيق احترافي كامل)</h2>
+<div class="card">
+  <table>
+    <tr><th>المرحلة</th><th>المحتوى</th><th>تقدير الحجم</th></tr>
+    <tr><td><b>أ) إكمال السائق</b></td><td>استلام · تسليم + إثبات · تحصيل نقد · خريطة · سجلّ · KYC · تسويات</td><td>9 شاشات</td></tr>
+    <tr><td><b>ب) إكمال المزوّد</b></td><td>كتالوج · تحضير · أرباح/دفتر · سجلّ · KYC · تسويات · موظّفون · عروض</td><td>12 شاشة</td></tr>
+    <tr><td><b>ج) إكمال العميل</b></td><td>محفظة · ولاء · دعم · تقييمات · بحث/تصنيف · تسجيل كامل · إعدادات</td><td>15 شاشة</td></tr>
+    <tr><td><b>د) عمليات مصغّرة</b></td><td>شكاوى · سائقون · طلبات عالقة · تنبيهات</td><td>~4 شاشات</td></tr>
+    <tr><td><b>هـ) التقنيات</b></td><td>ربط الخادم الحقيقي · الخرائط · الإشعارات · اختبارات موسّعة</td><td>عرضي</td></tr>
+    <tr><td><b>و) النشر</b></td><td>بناء AAB عبر EAS + رفع Google Play</td><td>يتطلّب بيانات اعتمادك</td></tr>
+  </table>
+  <div class="note green"><b>الترتيب المقترح:</b> سائق ← مزوّد ← إكمال العميل ← عمليات مصغّرة ← ربط الخادم الحقيقي ← النشر. أعرض كل دور على المحاكي عند اكتماله.</div>
+</div>
+
+<!-- 8 -->
+<h2>8) الخلاصة</h2>
+<div class="card">
+  <p><b>الجواب المباشر:</b> التطبيق <b>ليس مطابقاً للويب بعد</b> — هو الآن <b>~30% من نطاق الموبايل الصحيح</b> (نواة العميل + أساس متعدّد الأدوار + دخول الموظّف). والويب أصلاً أوسع (147 صفحة، 90 منها غرفة تحكّم للحاسوب لا تُنقَل للموبايل).</p>
+  <p><b>الأساس قويّ واحترافي</b>، والنواقص واضحة ومحصورة (شاشات السائق والمزوّد والعميل التفصيلية + ربط الخادم + الخرائط + الإشعارات). الطريق للاكتمال مرسوم في القسم 7.</p>
+  <div class="note">أخبرني بأي دور أبدأ الإكمال (أو أمضي بالترتيب المقترح)، وسأبنيه بالكامل وأعرضه على المحاكي.</div>
+</div>
+
+<p class="center small" style="margin:30px 0 10px">— مقارنة الموبايل بالويب + النواقص · توا / Towa · 2026-07-01 —</p>
+
+</div>
+</body>
+</html>

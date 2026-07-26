@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>وثيقة التتبّع الدقيق بالكود (V3) — نواة ذكاء تووا (TIC)</title>
+<style>
+  :root{
+    --bg:#0e1014; --card:#161922; --card2:#1b1f2a; --ink:#e9edf4; --muted:#98a2b3;
+    --line:#272c38; --accent:#5b8cff; --accent2:#8b5bff; --green:#34c98a; --amber:#f0b429; --red:#ef5a64;
+    --green-bg:#102a20; --amber-bg:#2a2410; --red-bg:#2a1517; --blue-bg:#10203c; --pur-bg:#1d1430; --trace-bg:#0a1426;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI","Tahoma","Noto Naskh Arabic",sans-serif;line-height:1.9;font-size:15.5px}
+  .wrap{max-width:1140px;margin:0 auto;padding:26px 20px 90px}
+  header.cover{background:radial-gradient(1200px 400px at 80% -10%,#27306b 0%,transparent 60%),linear-gradient(135deg,#15193a,#1a1330);border:1px solid var(--line);border-radius:20px;padding:32px 28px;margin-bottom:20px}
+  header.cover h1{margin:0 0 6px;font-size:27px}
+  header.cover .sub{color:#c6cfe0;font-size:15px;margin:6px 0}
+  .chips{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-block;border-radius:999px;padding:4px 13px;font-weight:700;font-size:12.5px;border:1px solid}
+  .chip.b{background:#16264a;color:#9fc0ff;border-color:#2c477e}
+  .chip.g{background:#10301f;color:#74e6ab;border-color:#1d5a3b}
+  .chip.p{background:#211543;color:#bda6ff;border-color:#3a2a66}
+  .chip.a{background:#2a2410;color:#ffd166;border-color:#5a4a17}
+  .note{border-radius:14px;padding:14px 18px;margin:16px 0;border:1px solid}
+  .note b{display:block;margin-bottom:3px}
+  .n-red{background:var(--red-bg);border-color:#5a2228}
+  .n-green{background:var(--green-bg);border-color:#1c4a38}
+  .n-amber{background:var(--amber-bg);border-color:#5a4a17}
+  .n-blue{background:var(--blue-bg);border-color:#284468}
+  nav.toc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 22px;margin:18px 0}
+  nav.toc h3{margin:0 0 8px;font-size:14px;color:var(--muted)}
+  nav.toc ol{margin:0;padding-inline-start:20px;columns:2;column-gap:26px}
+  @media(max-width:680px){nav.toc ol{columns:1}}
+  nav.toc a{color:#bcd0ff;text-decoration:none}
+  h2{font-size:21px;margin:38px 0 12px;padding-bottom:8px;border-bottom:2px solid var(--line);scroll-margin-top:14px}
+  h2 .n{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;width:30px;height:30px;line-height:30px;text-align:center;border-radius:8px;font-size:14px;margin-left:8px}
+  h3{font-size:17px;margin:20px 0 8px;color:#d4dcec}
+  p{margin:9px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:13px 0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px;background:var(--card);border-radius:12px;overflow:hidden}
+  th,td{padding:9px 11px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#212636;color:#cfd8e8;font-weight:700}
+  tr:last-child td{border-bottom:none}
+  code{font-family:"Cascadia Code",monospace;direction:ltr;display:inline-block;background:#0c1019;border:1px solid var(--line);border-radius:5px;padding:0 5px;color:#9fd0ff;font-size:12.5px}
+  .trace{background:var(--trace-bg);border:1px solid #1c3358;border-right:3px solid var(--accent);border-radius:8px;padding:8px 12px;margin:8px 0;direction:ltr;text-align:left;font-family:"Cascadia Code",monospace;font-size:12.5px;color:#bcd6ff;overflow-x:auto}
+  .trace .k{color:#7fe6b3}
+  ul,ol{margin:7px 0;padding-inline-start:22px}
+  li{margin:5px 0}
+  .agent{background:var(--card2);border:1px solid var(--line);border-right:4px solid var(--accent);border-radius:12px;padding:15px 18px;margin:14px 0}
+  .agent h4{margin:0 0 8px;font-size:17px;color:#dfe6f2}
+  .field{display:grid;grid-template-columns:130px 1fr;gap:6px;font-size:13.5px;margin:5px 0}
+  .field .fl{color:#8fb6ef;font-weight:700}
+  .pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:700}
+  .p-now{background:#10301f;color:#74e6ab;border:1px solid #1d5a3b}
+  .p-soon{background:#2a2410;color:#ffd166;border:1px solid #5a4a17}
+  .p-def{background:#2a1517;color:#ff9aa2;border:1px solid #5a2228}
+  .codeblock{background:#0a0d14;border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin:9px 0;direction:ltr;text-align:left;font-family:"Cascadia Code",monospace;font-size:12px;line-height:1.6;color:#c9d6ea;overflow-x:auto;white-space:pre}
+  .cm{color:#6b7689}.kw{color:#c792ea}.st{color:#c3e88d}.fn{color:#82aaff}.nm{color:#f78c6c}
+  .foot{margin-top:40px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:16px}
+  a.up{color:#7f93b8;text-decoration:none;font-size:13px}
+  .verify{background:#101e16;border:1px solid #1d5a3b;border-radius:8px;padding:7px 11px;margin:7px 0;font-size:13px;color:#bfe8d2}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="cover">
+  <h1>🔍 وثيقة التتبّع الدقيق بالكود (V3) — نواة ذكاء تووا (TIC)</h1>
+  <div class="sub">كل نقطة في هذه الوثيقة مربوطة بـ <b>ملف : سطر : دالة / حقل</b> فعلي، تم التحقّق منه بقراءة مباشرة للكود. الهدف: أن تتمكّن من <b>تتبّع كل بند في الكود</b> بنفسك.</div>
+  <div class="chips">
+    <span class="chip b">Tawa / تووا — Libya Delivery Platform</span>
+    <span class="chip g">مملوك 100% · CPU · بلا خدمة خارجية للنواة</span>
+    <span class="chip a">بحث وتصميم — لا تنفيذ</span>
+  </div>
+</header>
+
+<div class="note n-amber">
+  <b>📍 كيف تقرأ هذه الوثيقة</b>
+  كل بند مهم تحته صندوق أزرق <span class="trace" style="display:inline-block;padding:1px 8px;margin:0">📍 trace</span> يحوي المسار الدقيق <code>ملف:سطر · دالة/حقل</code>. الأسطر دقيقة وقت كتابة الوثيقة (قراءة مباشرة)؛ إن تغيّر الكود لاحقًا، تتبّع <b>بالاسم</b> (الدالة/الحقل) فالاسم أثبت من رقم السطر.
+</div>
+<div class="note n-red">
+  <b>الحالة: بحث وتصميم فقط — لم يُعدَّل أي ملف.</b> أي تنفيذ = مرحلة مرقّمة بإذنك (Forbidden Zones · FIN-COR · No-Commit).
+</div>
+
+<nav class="toc">
+  <h3>المحتويات</h3>
+  <ol>
+    <li><a href="#s1">جدول التتبّع الرئيسي</a></li>
+    <li><a href="#s2">عقود البيانات (مخطّطات النماذج)</a></li>
+    <li><a href="#s3">بطاقات تتبّع الوكلاء</a></li>
+    <li><a href="#s4">أعلام الإعداد (config) بالسطر</a></li>
+    <li><a href="#s5">نقاط النظام (الجدولة + النقاط النهائية)</a></li>
+    <li><a href="#s6">واجهة النواة (TIC API) المقترحة</a></li>
+    <li><a href="#s7">خط بيانات التدريب الدقيق</a></li>
+    <li><a href="#s8">التعايش الداخلي/الخارجي (مربوط بالكود)</a></li>
+    <li><a href="#s9">النشر + الحوكمة بالتتبّع</a></li>
+    <li><a href="#s10">قائمة تحقّق التتبّع النهائية</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<h2 id="s1"><span class="n">1</span> جدول التتبّع الرئيسي</h2>
+<p>كل مجال ذكاء: تعريف الدالة، موضع الاستدعاء الفعلي، البوابة، وأين تُحقن النواة.</p>
+<table>
+<tr><th>المجال</th><th>الدالة (ملف:سطر)</th><th>موضع الاستدعاء الفعلي</th><th>البوابة</th></tr>
+<tr><td>المخاطر المركّب <span class="pill p-soon">ابدأ هنا</span></td><td><code>ml_scaffold.py:47</code> <code>build_risk_profile</code> → <code>_compute_score:146</code></td><td><code>operations_router.py:4717-4719</code> (نقطة <code>/operations/fraud/risk-profile/{user_id}</code> :4704)</td><td><code>ai_features_toggle</code> (للإجراء الآلي)</td></tr>
+<tr><td>احتيال COD <span class="pill p-now">مربوط فعليًا</span></td><td><code>cod_fraud_scoring.py:70</code> <code>score_cod_risk</code> · <code>is_enforced:33</code></td><td><b><code>order_service.py:666-675</code></b> (وقت إنشاء الطلب) + OPS :374/:407</td><td><code>cod_fraud_scoring_enabled</code> (config:98، False)</td></tr>
+<tr><td>سرعة المعاملات</td><td><code>velocity_signals.py:162</code> <code>score_multi_signal</code></td><td><b>لا مُستدعٍ خارجي</b> — نقيّ خامد خلف toggle</td><td><code>velocity_multi_signal_enabled</code></td></tr>
+<tr><td>توزيع 321-B</td><td><code>dispatch_scoring.py:35</code> <code>score_driver</code> · <code>rank_candidates:97</code></td><td><code>expansion_router.py:41-42</code></td><td><code>cash_aware_dispatch</code> / <code>order_batching</code></td></tr>
+<tr><td>درجة الثقة 321-D</td><td><code>retention_service.py</code> <code>update_driver_trust_scores</code></td><td><b><code>main.py:136/157</code></b> (مجدول) · مهمة <code>main.py:572</code></td><td>وظيفة خلفية — لا لحظية</td></tr>
+<tr><td>سلامة GPS 321-D</td><td><code>proof_router.py</code> <code>validate_proof</code></td><td>داخل التحقّق من الإثبات (يُرجع <code>gps_warning</code>، لا يُحفظ)</td><td>—</td></tr>
+<tr><td>احتيال الأجهزة 321-C</td><td><code>auth_router.py</code> <code>verify_otp</code></td><td>يسجّل <code>SystemEvent(event_type="DEVICE_SHARING_DETECTED")</code> · مسح <code>run_fraud_scan</code></td><td><code>ai_features_toggle</code> (auto-freeze)</td></tr>
+<tr><td>تلخيص 321-E</td><td>—(يدوي اليوم)</td><td><code>OpsIncidentCenter.tsx</code> · <code>OpsHandoff.tsx</code> → يُخزَّن في <code>IncidentRecord.resolution_note</code></td><td>الباب النصّي + tri-state</td></tr>
+</table>
+
+<!-- 2 -->
+<h2 id="s2"><span class="n">2</span> عقود البيانات (مخطّطات النماذج بالحقل والسطر) <a class="up" href="#s1">↑</a></h2>
+<p>هذه هي مدخلات النواة وبيانات تدريبها — بالحقل الدقيق.</p>
+
+<h3>SystemEvent — مصدر التدقيق وبيانات التدريب</h3>
+<div class="trace"><span class="k">📍</span> backend/app/models/infra.py:62 · class SystemEvent(Base)</div>
+<div class="codeblock"><span class="nm">id</span>:str(:66) · <span class="nm">event_type</span>:String(100)(:69) · <span class="nm">severity</span>:String(20)=INFO(:70) · <span class="nm">actor_user_id</span>:str?(:71) · <span class="nm">actor_role</span>?(:72) · <span class="nm">target_type</span>?(:73) · <span class="nm">target_id</span>?(:74) · <span class="nm">module</span>?(:75) · <span class="nm">correlation_id</span>?(:76) · <span class="nm">safe_message</span>:Text(:77) · <span class="nm">metadata_json</span>:JSON(:78) · <span class="nm">created_at</span>(:79)</div>
+
+<h3>النماذج المصدرية للميزات</h3>
+<table>
+<tr><th>النموذج</th><th>الحقل · النوع · السطر</th></tr>
+<tr><td><code>User</code> (user.py:20)</td><td><code>trust_score</code>:Integer=50 (:40) · <code>status</code> (:37) · قيد <code>trust_score BETWEEN 0 AND 100</code> (:68)</td></tr>
+<tr><td><code>Device</code> (user.py:104)</td><td><code>device_fingerprint_hash</code>:String(128) (:113) · <code>status</code> (:115) · فريد <code>(user_id, device_fingerprint_hash)</code> (:129)</td></tr>
+<tr><td><code>Driver</code> (dispatch.py:25)</td><td><code>cash_outstanding_minor</code>:Integer=0 (:38) · <code>cash_limit_minor</code>:Integer=0 (:39) · <code>current_lat/lng</code> (:36-37)</td></tr>
+<tr><td><code>DispatchOffer</code> (dispatch.py:146)</td><td><code>state</code>:String(20)=PENDING (:158) · <code>offered_at</code>:DateTime (:159) · فهرس <code>(state, expires_at)</code> (:187)</td></tr>
+<tr><td><code>DeliveryProof</code> (dispatch.py:243)</td><td><code>lat/lng</code>:Float? (:258-259) · <code>proof_state</code>=PENDING (:264)</td></tr>
+<tr><td><code>IncidentRecord</code> (infra.py:90)</td><td><code>severity</code>=P2 (:98) · <code>resolution_note</code>:Text (:106 ← مسوّدة 321-E هنا) · <code>status</code>=OPEN (:103)</td></tr>
+</table>
+
+<!-- 3 -->
+<h2 id="s3"><span class="n">3</span> بطاقات تتبّع الوكلاء <a class="up" href="#s1">↑</a></h2>
+
+<!-- Agent: composite risk -->
+<div class="agent">
+  <h4>⑤ وكيل المخاطر المركّب — نقطة البداية (322-R02)</h4>
+  <div class="trace"><span class="k">📍 التعريف:</span> ml_scaffold.py:47 build_risk_profile · :112 يستدعي _compute_score · :146 def _compute_score · :142 model_version="rule_based_v1"</div>
+  <div class="trace"><span class="k">📍 الاستدعاء:</span> operations_router.py:4704 @router.get("/operations/fraud/risk-profile/{user_id}") → :4717 import → :4719 return await build_risk_profile(user_id, db)</div>
+  <div class="field"><span class="fl">متّجه الميزات</span><span><code>trust_score</code>, <code>device_sharing_events</code>, <code>gps_mismatches</code>, <code>cash_outstanding_minor</code>, <code>complaint_count</code>, <code>incident_count</code> (ml_scaffold.py:62-108)</span></div>
+  <div class="field"><span class="fl">القاعدة الحالية</span><span>base=trust −min(device·10,30) −min(gps·8,24) −(cash≥200k:15/≥100k:7) −min(compl·5,15) −min(incid·20,40) (ml_scaffold.py:158-178)</span></div>
+  <div class="field"><span class="fl">العقد (المخرَج)</span><span><code>{composite_risk_score:0-100, risk_level, signals{…}, recommendation, model_version}</code> (:123-143)</span></div>
+  <div class="field"><span class="fl">حقن TIC</span><span>استبدل جسم <code>_compute_score</code> (:146) بـ <code>tic_client.score_risk(features)</code> — نفس متّجه الميزات، نفس العقد، <code>model_version</code> يصبح اسم النموذج المُدرَّب.</span></div>
+  <div class="field"><span class="fl">بيانات التدريب</span><span><code>SystemEvent.event_type ∈ {DEVICE_SHARING_DETECTED, GPS_DELIVERY_MISMATCH, ACCOUNT_AUTO_SUSPENDED, BULK_FRAUD_SUSPEND}</code> (ml_scaffold.py:74,83,105) + جدول <code>complaints</code> (:97)</span></div>
+  <div class="field"><span class="fl">التقنية</span><span>LightGBM → ONNX Runtime (CPU، ميلي ثانية)</span></div>
+  <div class="verify">✔ للتحقّق: افتح <code>ml_scaffold.py:146</code> وسترى التعليق «Replace with model.predict() when ML model is ready».</div>
+</div>
+
+<!-- Agent: COD fraud -->
+<div class="agent">
+  <h4>② وكيل الاحتيال والنقد (COD + velocity + 321-A) — المربوط فعليًا</h4>
+  <div class="trace"><span class="k">📍 التعريف:</span> cod_fraud_scoring.py:70 score_cod_risk(db, customer_id) · :33 is_enforced() ← settings.cod_fraud_scoring_enabled</div>
+  <div class="trace"><span class="k">📍 الاستدعاء وقت الطلب:</span> order_service.py:666-675</div>
+  <div class="codeblock"><span class="kw">if</span> payment_method == <span class="st">"CASH"</span> <span class="kw">and</span> fulfillment_type == <span class="st">"DELIVERY"</span>:
+    <span class="kw">from</span> app.modules.fraud <span class="kw">import</span> cod_fraud_scoring <span class="kw">as</span> _fraud
+    <span class="kw">if</span> _fraud.<span class="fn">is_enforced</span>():
+        _risk = <span class="kw">await</span> _fraud.<span class="fn">score_cod_risk</span>(self.session, customer_id)
+        <span class="kw">if</span> _risk.get(<span class="st">"level"</span>) == <span class="st">"HIGH"</span>:
+            <span class="kw">raise</span> ValidationError(code=<span class="st">"COD_FRAUD_HIGH_RISK"</span>, …)</div>
+  <div class="field"><span class="fl">متّجه الميزات</span><span><code>cod_velocity_60min, failed_cod_30d, cod_30d, delivered_cod_30d, account_age_days, trust_score, device_shared_with</code> (cod_fraud_scoring.py:176-184)</span></div>
+  <div class="field"><span class="fl">العقد</span><span><code>{score:0-100, level:LOW|MEDIUM|HIGH, flags[], signals{…}, enforced:bool}</code> (:172-186)</span></div>
+  <div class="field"><span class="fl">حقن TIC</span><span>استبدل منطق التسجيل داخل <code>score_cod_risk</code> بنموذج مُدرَّب — <b>نفس العقد ونفس بوابة <code>is_enforced()</code></b> → التغيير صفري في <code>order_service</code>.</span></div>
+  <div class="field"><span class="fl">أحدث تقنية</span><span>LightGBM/CatBoost + معالجة عدم التوازن (أوزان/focal/SMOTE + عتبة). القاعدة وحدها ~68-74% (cod_fraud_scoring.py:10)</span></div>
+  <div class="verify">✔ للتحقّق: <code>order_service.py:660</code> التعليق «wire the rule-based COD fraud score into gating ONLY WHEN ENABLED».</div>
+</div>
+
+<!-- Agent: dispatch -->
+<div class="agent">
+  <h4>① وكيل التوزيع (321-B)</h4>
+  <div class="trace"><span class="k">📍 التعريف:</span> dispatch_scoring.py:10 DispatchScore · :22 ScoringWeights(eta .35/rel .25/cash .20/comp .10/fair .10) · :35 score_driver(8 args) · :97 rank_candidates</div>
+  <div class="trace"><span class="k">📍 الاستدعاء:</span> expansion_router.py:41 engine = DispatchScoringEngine() · :42 engine.score_driver(...)</div>
+  <div class="field"><span class="fl">مدخلات score_driver</span><span><code>eta_minutes, reliability_score, cash_outstanding_minor, cash_limit_minor, compliance_flags, orders_today, order_payment_method</code> (:35-45)</span></div>
+  <div class="field"><span class="fl">حقن TIC</span><span>استبدل المجموع الموزون الثابت بنموذج <b>learning-to-rank</b>؛ احتفظ بعقد <code>DispatchScore</code> و<code>rank_candidates</code> → drop-in.</span></div>
+</div>
+
+<!-- Agent: velocity -->
+<div class="agent">
+  <h4>وكيل السرعة (مدمج في وكيل الاحتيال)</h4>
+  <div class="trace"><span class="k">📍 التعريف:</span> velocity_signals.py:162 score_multi_signal · :132 verdict_from_score (OK<30, WARN<60, CHALLENGE<80, BLOCK≥80) · أوزان :30-33 (amount 60/device 10/ip 10/geo 20)</div>
+  <div class="field"><span class="fl">ملاحظة تتبّع</span><span>لا مُستدعٍ خارجي (grep فارغ) → <b>نقيّ خامد</b> خلف <code>velocity_multi_signal_enabled</code>؛ المسار القديم amount-only في <code>velocity_check.check_velocity</code> فعّال افتراضيًا (velocity_signals.py:11-13).</span></div>
+  <div class="field"><span class="fl">حقن TIC</span><span>يصبح كاشف شذوذ مُدرَّب (IsolationForest) يُغذّي وكيل الاحتيال؛ نفس نطاقات الحكم.</span></div>
+</div>
+
+<!-- Agent: trust -->
+<div class="agent">
+  <h4>③ وكيل الثقة والنزاهة (321-D)</h4>
+  <div class="trace"><span class="k">📍 التعريف:</span> retention_service.py update_driver_trust_scores (أوزان DELIVERY .25/CASH .20/ACCEPT .20/RATING .20/SENIORITY .15 · MIN_ORDERS 5)</div>
+  <div class="trace"><span class="k">📍 الجدولة:</span> main.py:136 _scheduled_trust_score_update → :157 update_driver_trust_scores(db) · :572 asyncio.create_task</div>
+  <div class="trace"><span class="k">📍 الكتابة:</span> user.trust_score (models/user.py:40, =50, قيد :68) — عبر Driver.user_id · OrderRating.target_type=="DRIVER"</div>
+  <div class="field"><span class="fl">حقن TIC</span><span>وظيفة تدريب/تسجيل offline (تجنّب ~25,000 استعلام لحظي — تحذير 321-D)؛ تحفظ تجاوز GPS من <code>validate_proof</code> كـ <code>SystemEvent("GPS_DELIVERY_MISMATCH")</code> → يغذّي وكيل المخاطر.</span></div>
+</div>
+
+<!-- Agent: device -->
+<div class="agent">
+  <h4>④ وكيل احتيال الأجهزة (321-C)</h4>
+  <div class="trace"><span class="k">📍 الربط:</span> auth_router.py verify_otp → SystemEvent(event_type="DEVICE_SHARING_DETECTED", metadata_json={device_fingerprint, conflicting_user}) · قاعدة في operations_router.run_fraud_scan</div>
+  <div class="field"><span class="fl">الحقل المفتاح</span><span><code>Device.device_fingerprint_hash</code> (user.py:113) + فريد <code>(user_id, device_fingerprint_hash)</code> (:129)</span></div>
+  <div class="field"><span class="fl">حقن TIC</span><span>وكيل رسم بياني/تجميع يكشف <b>حلقات</b> الأجهزة (مثال واقعي بالكود: Grab سنغافورة 5 سائقين/24 حسابًا/58,000$ — 321-C:8).</span></div>
+</div>
+
+<!-- Agent: NL -->
+<div class="agent">
+  <h4>⑥ الوكيل النصّي (321-E + الشكاوى)</h4>
+  <div class="trace"><span class="k">📍 الربط:</span> OpsIncidentCenter.tsx (Post-Mortem ماذا/لماذا/المنع، يُخزَّن JSON في IncidentRecord.resolution_note :106) · OpsHandoff.tsx (ملخّص وردية من snapshot+KPI)</div>
+  <div class="trace"><span class="k">📍 قالب الخارجي:</span> config complaint_triage_vendor (:107، فارغ→قواعد محلية) + complaint_triage_rules_enabled (:110، True)</div>
+  <div class="field"><span class="fl">حقن TIC</span><span>نموذج لغوي صغير مُضبَّط مكمَّم (llama.cpp Q4) يولّد المسوّدة في الخلفية (طابور)؛ هو <b>الوكيل الوحيد</b> المرشّح للباب الخارجي.</span></div>
+</div>
+
+<!-- 4 -->
+<h2 id="s4"><span class="n">4</span> أعلام الإعداد (config.py) بالسطر والافتراضي <a class="up" href="#s1">↑</a></h2>
+<div class="trace"><span class="k">📍</span> backend/app/config.py · class Settings(BaseSettings) (:31)</div>
+<table>
+<tr><th>العلم</th><th>السطر · الافتراضي</th><th>الدلالة</th></tr>
+<tr><td><code>cod_fraud_scoring_enabled</code></td><td>:98 · False</td><td>استشاري→إلزامي لاحتيال COD (بوّابة <code>is_enforced</code>)</td></tr>
+<tr><td><code>cod_fraud_new_account_days</code> / <code>cod_fraud_low_trust_below</code></td><td>:101 (3) / :102 (40)</td><td>عتبات إشارات COD</td></tr>
+<tr><td><code>cash_aware_dispatch_enabled</code></td><td>:136 · False</td><td>اختيار سائق واعٍ بالنقد</td></tr>
+<tr><td><code>order_batching_enabled</code></td><td>:129 · False</td><td>تجميع الطلبات</td></tr>
+<tr><td><code>complaint_triage_vendor</code> / <code>_rules_enabled</code></td><td>:107 ("") / :110 (True)</td><td><b>قالب: قواعد محلية ← LLM خارجي اختياري</b></td></tr>
+<tr><td><code>doc_verify_vendor</code> / <code>doc_verify_external_privacy_ack</code></td><td>:168 / :181 (False)</td><td><b>قالب: باب خارجي ببوابة خصوصية مُلزِمة (DPA)</b></td></tr>
+<tr><td><code>eta_learning_enabled</code> / <code>eta_learning_mode</code></td><td>:241 / :242 (off/auto/on)</td><td><b>قالب: دولاب تعلّم ثلاثي الحالة</b></td></tr>
+<tr><td><code>eta_ewma_alpha</code> / <code>eta_promote_min_cell_ratio</code></td><td>:252 (0.3) / :258 (0.25)</td><td><b>قالب: تنعيم EWMA + حارس ترقية Champion-Challenger</b></td></tr>
+<tr><td><code>customer_risk_high/medium_trust_below</code></td><td>:123 (30) / :124 (50)</td><td>طبقات مخاطر العميل من <code>trust_score</code></td></tr>
+</table>
+
+<!-- 5 -->
+<h2 id="s5"><span class="n">5</span> نقاط النظام: الجدولة + النقاط النهائية <a class="up" href="#s1">↑</a></h2>
+<h3>المجدوِلات (main.py)</h3>
+<div class="trace"><span class="k">📍</span> main.py:36 _scheduled_fraud_scan · :136 _scheduled_trust_score_update (:157 يستدعي update_driver_trust_scores) · :571-572 asyncio.create_task(...)</div>
+<h3>نقاط الذكاء النهائية (operations_router.py) — مؤكَّدة</h3>
+<table>
+<tr><th>المسار</th><th>السطر · الربط</th></tr>
+<tr><td><code>GET /operations/system/ai-features/status</code></td><td>:4391 → <code>get_ai_status_dict()</code> :4400</td></tr>
+<tr><td><code>POST /operations/system/ai-features/toggle</code></td><td>:4403 → <code>set_ai_auto</code> :4409 (SUPER_ADMIN)</td></tr>
+<tr><td><code>POST /operations/fraud/bulk-action</code></td><td>:4506</td></tr>
+<tr><td><code>GET /operations/drivers/{id}/deviation-summary</code></td><td>:4643</td></tr>
+<tr><td><code>GET /operations/fraud/risk-profile/{user_id}</code></td><td>:4704 → <code>build_risk_profile</code> :4719</td></tr>
+<tr><td><code>POST /operations/drivers/{id}/reinstate</code></td><td>:4594</td></tr>
+</table>
+<div class="verify">✔ هذه النقاط تُثبت أن المنصة <b>تعرض الذكاء فعلًا للمشغّل</b> اليوم (rule-based) — والنواة تستبدل المحرّك خلفها دون تغيير المسارات.</div>
+
+<!-- 6 -->
+<h2 id="s6"><span class="n">6</span> واجهة النواة (TIC API) المقترحة — مطابِقة للعقود الحالية <a class="up" href="#s1">↑</a></h2>
+<p>تُصمَّم لتكون <b>drop-in</b>: نفس مدخلات/مخرجات الدوال الحالية، فلا يتغيّر المستدعي.</p>
+<div class="codeblock"><span class="cm"># POST /tic/score-risk   (يطابق ml_scaffold.build_risk_profile)</span>
+<span class="kw">in</span> : {user_id, features:{trust_score, device_sharing_events, gps_mismatches, cash_outstanding_minor, complaint_count, incident_count}}
+<span class="kw">out</span>: {composite_risk_score, risk_level, recommendation, model_version, confidence, engine:"internal"}
+
+<span class="cm"># POST /tic/score-cod-fraud   (يطابق cod_fraud_scoring.score_cod_risk)</span>
+<span class="kw">in</span> : {customer_id, signals:{cod_velocity_60min, failed_cod_30d, account_age_days, trust_score, device_shared_with, …}}
+<span class="kw">out</span>: {score, level:LOW|MEDIUM|HIGH, flags[], model_version, confidence, engine}
+
+<span class="cm"># POST /tic/rank-dispatch   (يطابق DispatchScoringEngine)</span>
+<span class="kw">in</span> : {order:{payment_method}, candidates:[{driver_id, eta_minutes, reliability, cash_outstanding_minor, cash_limit_minor, compliance_flags, orders_today}]}
+<span class="kw">out</span>: {ranked:[{driver_id, score, breakdown}], model_version, engine}
+
+<span class="cm"># POST /tic/summarize-incident   (نصّي — المرشّح الوحيد للباب الخارجي)</span>
+<span class="kw">in</span> : {incident_id, redacted_context}   <span class="cm"># PII منقّى بـ Presidio</span>
+<span class="kw">out</span>: {draft_what, draft_why, draft_prevent, engine:"internal"|"external", redaction_log}</div>
+<div class="verify">✔ كل رد يحمل <code>engine + model_version + confidence</code> → تتبّع تام لمن قرّر (القسم 8).</div>
+
+<!-- 7 -->
+<h2 id="s7"><span class="n">7</span> خط بيانات التدريب الدقيق <a class="up" href="#s1">↑</a></h2>
+<table>
+<tr><th>النموذج</th><th>الميزات (من)</th><th>الوسم (label) من</th></tr>
+<tr><td>المخاطر المركّب</td><td><code>SystemEvent</code> (event_type أعلاه) + <code>complaints</code> + <code>User.trust_score</code> + <code>Driver.cash_outstanding_minor</code></td><td><code>SystemEvent</code> ACCOUNT_AUTO_SUSPENDED / BULK_FRAUD_SUSPEND + قرارات OPS</td></tr>
+<tr><td>احتيال COD</td><td>إشارات <code>score_cod_risk.signals</code> (Order COD velocity/failed/delivered)</td><td>نتيجة الطلب: <code>order_state ∈ {DELIVERED, DELIVERY_FAILED, CANCELLED…}</code></td></tr>
+<tr><td>الثقة</td><td>تسليم/قبول/تقييم/أقدمية/نقد (retention_service)</td><td>الأداء التاريخي (نافذة 30 يومًا)</td></tr>
+<tr><td>الأجهزة</td><td>رسم <code>Device.device_fingerprint_hash</code> عبر <code>user_id</code></td><td><code>DEVICE_SHARING_DETECTED</code> + مراجعة OPS</td></tr>
+</table>
+<div class="note n-green"><b>✔ ربط بـ residual 322-R02:</b> «<code>_compute_score</code> جاهز للاستبدال فور توفّر بيانات تراكمية كافية» — و<code>SystemEvent</code> يجمعها أصلًا، فخط التدريب لا يبدأ من الصفر.</div>
+
+<!-- 8 -->
+<h2 id="s8"><span class="n">8</span> التعايش الداخلي/الخارجي (مربوط بالكود) <a class="up" href="#s1">↑</a></h2>
+<ul>
+<li><b>توجيه حتمي:</b> الرقمي/المالي (risk, cod-fraud, dispatch, trust, device) → <b>داخلي حصرًا</b>. النصّي (summarize-incident) → داخلي افتراضيًا، خارجي فقط عند فتح الباب + تنقية PII.</li>
+<li><b>بطل/متحدٍّ:</b> يُعاد استخدام نمط <code>eta_learning</code> الموجود — حارس ترقية (<code>eta_promote_min_cell_ratio</code> config:258) + تنعيم EWMA (<code>eta_ewma_alpha</code> :252) + بوابة <code>{off,auto,on}</code> (:242). الخارجي = متحدٍّ في الظل حتى يُرقَّى.</li>
+<li><b>سلطة الرقم للداخلي:</b> في القرارات الرقمية الخارجي ممنوع؛ لا «رقمان يتصارعان». الخارجي نصّي فقط.</li>
+<li><b>وسم كامل:</b> كل قرار يُسجَّل في <code>SystemEvent(metadata_json={engine, model_version, confidence})</code> → تتبّع «مَن قرّر».</li>
+<li><b>fail-open:</b> النواة معطّلة → سقوط للقاعدة الحالية (قالب <code>sms_provider.py:30</code> «return SmsResult(SMS_NOT_CONFIGURED)»).</li>
+</ul>
+
+<!-- 9 -->
+<h2 id="s9"><span class="n">9</span> النشر + الحوكمة بالتتبّع <a class="up" href="#s1">↑</a></h2>
+<h3>خدمة النواة في docker-compose (نفس النمط المؤكَّد)</h3>
+<div class="trace"><span class="k">📍</span> docker-compose.yml — نمط backend-core: build · environment · depends_on(condition:service_healthy) · healthcheck · networks:[app-private,data-private] · profiles:[…]</div>
+<div class="codeblock"><span class="nm">tawa-intelligence</span>:
+  build: ./tic
+  environment: {TIC_ENABLED: <span class="st">"false"</span>, DATABASE_URL: …, REDIS_URL: …, TIC_EXTERNAL_ENABLED: <span class="st">"false"</span>, TIC_EXTERNAL_PRIVACY_ACK: <span class="st">"false"</span>}
+  depends_on: {postgres: {condition: service_healthy}, redis: {condition: service_healthy}}
+  healthcheck: [<span class="st">"CMD"</span>, …, <span class="st">"/health"</span>]
+  networks: [app-private, data-private]
+  profiles: [<span class="st">"intelligence"</span>]   <span class="cm"># لا تبدأ تلقائيًا</span></div>
+<h3>الحوكمة (مربوطة)</h3>
+<ul>
+<li>العميل: <code>integrations/tic_client.py</code> (جديد) بنمط <code>sms_provider.py</code> fail-open، خلف <code>config.tic_enabled</code> + <code>ai_features_toggle</code> (core/ai_features_toggle.py:15 is_ai_auto_enabled).</li>
+<li>التدقيق/التنبيه: <code>SystemEvent</code> + <code>core/alert_webhook.py:21 fire_alert</code> (fail-open، dedup 5د :18).</li>
+<li>FIN-COR: لا تغيير <code>contracts/*</code>. كل ما سبق في forbidden zones → مرحلة بإذنك.</li>
+</ul>
+
+<!-- 10 -->
+<h2 id="s10"><span class="n">10</span> قائمة تحقّق التتبّع النهائية <a class="up" href="#s1">↑</a></h2>
+<div class="card">
+<p>افتح كلًّا وتحقّق بنفسك:</p>
+<ul>
+<li>☐ <code>ml_scaffold.py:146</code> — تعليق «Replace with model.predict()».</li>
+<li>☐ <code>order_service.py:666-675</code> — بوّابة احتيال COD الفعلية وقت الطلب.</li>
+<li>☐ <code>cod_fraud_scoring.py:33</code> — <code>is_enforced()</code> ← <code>cod_fraud_scoring_enabled</code>.</li>
+<li>☐ <code>dispatch_scoring.py:35</code> + <code>expansion_router.py:42</code> — التعريف والاستدعاء.</li>
+<li>☐ <code>main.py:136/157/572</code> — جدولة الثقة.</li>
+<li>☐ <code>operations_router.py:4704</code> — نقطة risk-profile.</li>
+<li>☐ <code>models/infra.py:62</code> — حقول <code>SystemEvent</code>.</li>
+<li>☐ <code>models/user.py:40,113</code> — <code>trust_score</code> و<code>device_fingerprint_hash</code>.</li>
+<li>☐ <code>config.py:98,181,242,258</code> — أعلام البوابات والقوالب.</li>
+<li>☐ <code>sms_provider.py:30</code> + <code>ai_features_toggle.py:15</code> + <code>alert_webhook.py:21</code> — أنماط fail-open/toggle/alert.</li>
+</ul>
+</div>
+
+<div class="foot">
+  <b>وثيقة بحث وتصميم قابلة للتتبّع</b> — كل مسار أعلاه من قراءة مباشرة للكود (ملف:سطر:دالة/حقل). الأسطر دقيقة وقت الكتابة؛ تتبّع بالاسم إن تغيّرت. لم يُعدَّل أي ملف. أي بناء = مرحلة مرقّمة بإذنك (FIN-COR PASS · No-Commit · بدء استشاري · Champion-Challenger قبل أي إلزام).
+  <br>Tawa / تووا · New Folder 10 · V3 (تُعمّق V1+V2 بالتتبّع الدقيق).
+</div>
+
+</div>
+</body>
+</html>

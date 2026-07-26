@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خطة قفل التبعيّات (Lockfile) — منصّة تووا — 2026-06-15</title>
+<style>
+  :root{
+    --g:#0f7b3f; --g2:#13a155; --bg:#f4f7f5; --card:#fff; --ink:#1a2421; --mut:#5d6b64;
+    --line:#dfe7e2; --red:#c0392b; --amber:#b9770e; --blue:#1f6feb; --code:#0d2b1c;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);
+       margin:0;line-height:1.85;font-size:16px}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 22px 80px}
+  header{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border-radius:18px;
+         padding:30px 28px;box-shadow:0 8px 26px rgba(15,123,63,.22)}
+  header h1{margin:0 0 8px;font-size:27px}
+  header .sub{opacity:.95;font-size:15px}
+  header .meta{margin-top:14px;font-size:13px;opacity:.9;border-top:1px solid rgba(255,255,255,.25);padding-top:12px}
+  h2{color:var(--g);border-right:5px solid var(--g);padding:4px 12px 4px 0;margin:38px 0 14px;font-size:21px}
+  h3{color:var(--code);margin:22px 0 8px;font-size:17px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:14px 0;
+        box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:780px){.grid2{grid-template-columns:1fr}}
+  code,kbd{background:#eef3ef;border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-family:"Cascadia Code",Consolas,monospace;font-size:14px;direction:ltr;display:inline-block}
+  pre{background:var(--code);color:#d7ffe8;border-radius:12px;padding:16px 18px;overflow:auto;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:13.5px;line-height:1.65}
+  pre .c{color:#7fae93}
+  pre .k{color:#ffd479}
+  pre .r{color:#ff8b7a}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:right;vertical-align:top}
+  th{background:#eaf3 ed;background:#e9f4ee;color:var(--code);font-weight:700}
+  tr:nth-child(even) td{background:#fafdfb}
+  .pill{display:inline-block;border-radius:999px;padding:2px 12px;font-size:12.5px;font-weight:700}
+  .ok{background:#e3f6ea;color:var(--g)}
+  .warn{background:#fdf2dd;color:var(--amber)}
+  .bad{background:#fce6e3;color:var(--red)}
+  .rec{background:#e4eefe;color:var(--blue)}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:center;margin:10px 0}
+  .node{background:#eef3ef;border:1.5px solid var(--line);border-radius:10px;padding:9px 13px;font-size:13.5px;text-align:center;direction:ltr}
+  .node.bad{background:#fce6e3;border-color:#f0b6ae}
+  .node.ok{background:#e3f6ea;border-color:#a9dcbd}
+  .arrow{color:var(--g);font-size:20px;font-weight:700}
+  .callout{border-right:5px solid;border-radius:10px;padding:14px 18px;margin:14px 0}
+  .callout.red{border-color:var(--red);background:#fdeeec}
+  .callout.amber{border-color:var(--amber);background:#fdf6e7}
+  .callout.green{border-color:var(--g);background:#ecf7f0}
+  .callout.blue{border-color:var(--blue);background:#edf3fe}
+  .step{display:flex;gap:14px;margin:12px 0}
+  .step .n{flex:0 0 34px;height:34px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .step .b{flex:1}
+  ul{margin:8px 0}
+  li{margin:5px 0}
+  .small{font-size:13px;color:var(--mut)}
+  footer{margin-top:40px;text-align:center;color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🔒 خطة قفل التبعيّات (Lockfile) — الإصلاح الجذريّ لحتميّة البناء</h1>
+  <div class="sub">منصّة تووا (Tawa) — الخلفيّة (FastAPI/Python) — الانتقال من نطاقات مفتوحة الحلّ إلى بناء حتميّ مُثبَّت بالكامل</div>
+  <div class="meta">
+    التاريخ: 2026-06-15 · النوع: <b>خطّة (لم تُنفَّذ — تنتظر إذن المالك)</b> · النطاق: <code>backend/pyproject.toml</code> · <code>backend/Dockerfile</code> · إعداد البوّابة<br>
+    السياق: متابعة لـ«تثبيت التبعيّات الحرج» + «إغلاق العقد الكامل (23 حدًّا)» — الحدود حدَّت المباشرة؛ هذا يُلغي التباعد والانتقاليّة جذريًّا.
+  </div>
+</header>
+
+<h2>1 · لماذا — المشكلة المُثبَتة بالكود</h2>
+<div class="card">
+  <p>كشفت جلسة اليوم سلسلةً من الأدلّة المباشرة على أنّ بناء الخلفيّة <b>غير حتميّ</b>:</p>
+  <ul>
+    <li><b>لا lockfile.</b> <code>backend/Dockerfile</code> يفعل حرفيًّا <code>pip install --no-cache-dir -e "backend/.[dev]"</code> ⇒ يُحلّ محلّل pip نطاقات <code>pyproject.toml</code> <b>طازجةً في كلّ بناء</b>.</li>
+    <li><b>الحادثة الأمّ:</b> بناء نظيف سحب <code>fastapi 0.137.1</code> (حدّ أعلى مفتوح) ⇒ <code>AttributeError</code> في تَجهيز Prometheus ⇒ <span class="pill bad">HTTP 500 على كلّ طلب</span>. الإنتاج نجا فقط لأنّ صورته أقدم من 0.137.</li>
+    <li><b>اكتشاف التباعد (تحقّق متقاطع بين بيئة البوّابة والحاوية المنشورة):</b> الاختبارات تُحقَّق على مجموعة، والإنتاج يشغّل أخرى — <b>عبر نسخ رئيسيّة</b>.</li>
+  </ul>
+
+  <table>
+    <tr><th>الحزمة</th><th>بيئة البوّابة (الاختبارات)</th><th>الإنتاج المنشور</th><th>الفجوة</th></tr>
+    <tr><td><code>redis</code></td><td>7.4.0</td><td>8.0.0</td><td><span class="pill bad">رئيسيّة</span></td></tr>
+    <tr><td><code>structlog</code></td><td>25.5.0</td><td>26.1.0</td><td><span class="pill bad">رئيسيّة</span></td></tr>
+    <tr><td><code>uvicorn</code></td><td>0.46.0</td><td>0.49.0</td><td><span class="pill warn">3 ثانويّات</span></td></tr>
+    <tr><td><code>python-multipart</code></td><td>0.0.26</td><td>0.0.32</td><td><span class="pill warn">رُقَع</span></td></tr>
+    <tr><td><code>pyotp</code></td><td>2.9.0</td><td>2.10.0</td><td><span class="pill warn">ثانويّة</span></td></tr>
+  </table>
+
+  <div class="callout red">
+    <b>الخلاصة:</b> الحدود العليا (المُضافة اليوم) تمنع القفزة الكاسرة التالية، لكنّها <b>تحدّ التبعيّات المباشرة فقط</b>. يبقى خطران:
+    <ol style="margin:6px 0">
+      <li><b>التبعيّات الانتقاليّة</b> (transitive) غير مثبَّتة إطلاقًا — أيٌّ منها قد ينكسر في بناء نظيف.</li>
+      <li><b>التباعد بوّابة↔إنتاج</b> مستمرّ ضمن الحدود — الاختبارات لا تتحقّق ممّا يشغّله الإنتاج فعلًا.</li>
+    </ol>
+    الـ<b>lockfile</b> يُغلق الاثنين معًا.
+  </div>
+</div>
+
+<h2>2 · الهدف</h2>
+<div class="card">
+  <div class="grid2">
+    <div class="callout green" style="margin:0">
+      <b>بناء حتميّ بالكامل</b><br>
+      كلّ بناء (إنتاج + بوّابة) يثبِّت <b>مجموعة نسخ متطابقة بايتًا</b> — تشمل كلّ تبعيّة انتقاليّة — مع بذور <code>--require-hashes</code> (مناعة ضدّ تبديل الحِزَم وتلف الشبكة).
+    </div>
+    <div class="callout blue" style="margin:0">
+      <b>تحديثات مُتعمَّدة ومُراجَعة</b><br>
+      ترقية أيّ تبعيّة تصبح خطوة واعية: تعديل الحدّ → إعادة توليد القفل → بناء → بوّابة → تحقّق. <b>الاحتكاك هو آليّة الأمان.</b>
+    </div>
+  </div>
+  <p style="margin-top:14px"><b>تتكامل مع الحدود لا تستبدلها:</b> الحدود في <code>pyproject.toml</code> = السياج الخارجيّ (ما يُسمح لمولّد القفل باختياره) · القفل = التثبيت الدقيق للاختيار. حزام وحمّالة.</p>
+</div>
+
+<h2>3 · اختيار الأداة</h2>
+<div class="card">
+  <table>
+    <tr><th>الخيار</th><th>المزايا</th><th>المآخذ</th><th>الحكم</th></tr>
+    <tr>
+      <td><b>pip-tools</b><br><code>pip-compile</code></td>
+      <td>أصليّ لـpip · يولّد <code>requirements.txt</code> مثبَّت + hashes · أقلّ أداة جديدة · يقرأ <code>pyproject.toml</code> مباشرةً</td>
+      <td>أبطأ من uv · يحتاج تشغيلًا على معماريّة الهدف (linux/amd64)</td>
+      <td><span class="pill rec">موصى به</span> — أدنى تغيير، يلائم بناء pip القائم</td>
+    </tr>
+    <tr>
+      <td><b>uv</b><br><code>uv pip compile</code></td>
+      <td>أسرع 10–100× · حلّ ممتاز · بديل مباشر</td>
+      <td>أداة جديدة في السلسلة · تغيير أوسع في الصورة/التدفّق</td>
+      <td><span class="pill warn">بديل لاحق</span> — تحسين سرعة، ليس ضروريًّا الآن</td>
+    </tr>
+  </table>
+  <p class="small">التوصية: <b>pip-tools</b> — الخيار المحافظ الأدنى احتكاكًا لمنصّة مجاورة للمدفوعات. uv يُترك كتحسين أداء اختياريّ بعد الاستقرار.</p>
+</div>
+
+<h2>4 · التصميم</h2>
+
+<h3>4.1 — ملفّا قفل (تشغيل / تطوير)</h3>
+<div class="card">
+  <p><code>pyproject.toml</code> يفصل أصلًا <code>dependencies</code> عن <code>[project.optional-dependencies] dev</code>. نولّد قفلين مثبَّتين بالـhash:</p>
+  <table>
+    <tr><th>الملفّ</th><th>المصدر</th><th>الاستخدام</th></tr>
+    <tr><td><code>backend/requirements.lock</code></td><td><code>dependencies</code> فقط</td><td>صورة <b>الإنتاج</b> (وقت تشغيل، أصغر، سطح هجوم أقلّ)</td></tr>
+    <tr><td><code>backend/requirements-dev.lock</code></td><td><code>dependencies</code> + <code>[dev]</code></td><td><b>البوّابة</b> + الـ<code>.venv</code> المحلّيّ (نفس مجموعة التشغيل + أدوات الاختبار)</td></tr>
+  </table>
+  <pre><span class="c"># توليد القفل — داخل حاوية python:3.12-slim لمطابقة معماريّة البناء تمامًا</span>
+<span class="c"># (الصورة linux/amd64؛ توليده على بيئة مختلفة قد يثبّت wheels خاطئة)</span>
+pip install pip-tools
+pip-compile --generate-hashes --output-file backend/requirements.lock      backend/pyproject.toml
+pip-compile --generate-hashes --extra dev \
+            --output-file backend/requirements-dev.lock backend/pyproject.toml</pre>
+</div>
+
+<h3>4.2 — تعديل Dockerfile</h3>
+<div class="card">
+  <div class="grid2">
+    <div>
+      <p style="margin:0 0 6px"><span class="pill bad">الحاليّ — هشّ</span></p>
+      <pre>COPY backend/pyproject.toml backend/
+RUN pip install --no-cache-dir \
+    -e <span class="r">"backend/.[dev]"</span>
+<span class="c"># ↑ يُحلّ النطاقات طازجةً</span>
+<span class="c">#   كلّ بناء = نسخ مختلفة محتملة</span></pre>
+    </div>
+    <div>
+      <p style="margin:0 0 6px"><span class="pill ok">الهدف — حتميّ</span></p>
+      <pre>COPY backend/pyproject.toml \
+     backend/requirements.lock backend/
+RUN pip install --no-cache-dir \
+    <span class="k">--require-hashes</span> \
+    -r backend/requirements.lock
+COPY backend/ backend/
+RUN pip install --no-cache-dir \
+    <span class="k">--no-deps</span> -e backend/
+<span class="c"># ↑ نسخ مثبَّتة + الحزمة بلا إعادة حلّ</span></pre>
+    </div>
+  </div>
+  <p class="small">ملاحظة: صورة الإنتاج تنتقل إلى <b>قفل التشغيل فقط</b> (لا <code>[dev]</code>) — صورة أصغر وأأمن. هذا تغيير سلوك مقصود (الحاليّ يثبّت dev في الإنتاج)؛ مخاطره منخفضة (أدوات الاختبار غير مستخدَمة وقت التشغيل). البوّابة/الـCI تستخدم <code>requirements-dev.lock</code>.</p>
+</div>
+
+<h3>4.3 — مواءمة البوّابة (يُلغي التباعد)</h3>
+<div class="card">
+  <p>يُعاد بناء الـ<code>.venv</code> المحلّيّ من <code>requirements-dev.lock</code> ⇒ الاختبارات تشغّل <b>نفس</b> مجموعة التشغيل المثبَّتة التي يشغّلها الإنتاج (+ أدوات). <b>هذا يلغي فجوة redis 7.4↔8.0 / structlog 25↔26 جذريًّا.</b></p>
+  <pre><span class="c"># إعداد/مواءمة بيئة البوّابة</span>
+python -m venv backend/.venv
+backend/.venv/bin/pip install --require-hashes -r backend/requirements-dev.lock</pre>
+  <div class="callout amber">
+    <b>⚠️ هذه الخطوة قد تكشف فروقًا:</b> مواءمة الـvenv إلى redis 8 / structlog 26 (ما يشغّله الإنتاج) قد تُظهر اختبارات تتصرّف مختلفًا تحت النسخ الأحدث. <b>هذه ميزة لا عيب</b> — نكتشف الفرق في البوّابة قبل الإنتاج. تتطلّب جلسة عمل لمعالجة أيّ انكسار يظهر.
+  </div>
+</div>
+
+<h2>5 · خطّة الطرح — مراحل آمنة</h2>
+<div class="card">
+  <div class="step"><div class="n">1</div><div class="b"><b>التوليد.</b> إضافة <code>pip-tools</code> لـ<code>[dev]</code>؛ توليد القفلين داخل حاوية <code>python:3.12-slim</code> (مطابقة المعماريّة). المخرجات: <code>requirements.lock</code> + <code>requirements-dev.lock</code> مرتكزان على المجموعة المعروفة-الجيّدة الحاليّة.</div></div>
+  <div class="step"><div class="n">2</div><div class="b"><b>مواءمة البوّابة + بوّابة كاملة.</b> إعادة بناء <code>.venv</code> من قفل التطوير → تشغيل <code>predeploy_gate.sh</code> الكامل. <b>نقطة الحسم:</b> هنا تُحَلّ فجوة البوّابة↔الإنتاج، وقد تظهر فروق سلوك تحت redis 8/structlog 26 — تُعالَج قبل المتابعة.</div></div>
+  <div class="step"><div class="n">3</div><div class="b"><b>تعديل Dockerfile.</b> التثبيت من القفل بـ<code>--require-hashes</code> (تشغيل) + <code>--no-deps -e</code> للحزمة.</div></div>
+  <div class="step"><div class="n">4</div><div class="b"><b>بناء محلّيّ نظيف + إقلاع + دخان.</b> تأكيد أنّ القفل يثبِّت ويُقلع (النقاط 200/401 · <code>/metrics</code> 200) — كما في تحقّق التثبيت.</div></div>
+  <div class="step"><div class="n">5</div><div class="b"><b>النشر.</b> عبر <code>deploy/deploy_be.sh</code> (يعيد بناء الإنتاج من القفل) → تحقّق حيّ على tawanow.com. <span class="small">(يحتاج «واصل النشر».)</span></div></div>
+  <div class="step"><div class="n">6</div><div class="b"><b>التوثيق.</b> <code>backend/DEPENDENCIES.md</code> + سكربت <code>deploy/lock_deps.sh</code> لإعادة توليد القفل بشكل مُعاد الإنتاج، وخطوات الترقية المُتعمَّدة.</div></div>
+</div>
+
+<h2>6 · المخاطر والاعتبارات</h2>
+<div class="card">
+  <table>
+    <tr><th>الخطر</th><th>الأثر</th><th>التخفيف</th></tr>
+    <tr><td>مطابقة المعماريّة (wheels لـlinux/amd64)</td><td>قفل مُولَّد على بيئة مختلفة قد يثبّت wheels خاطئة</td><td>توليد القفل <b>داخل</b> <code>python:3.12-slim</code> (نفس صورة الأساس)</td></tr>
+    <tr><td><code>--require-hashes</code> يلزم بذورًا لكلّ تبعيّة (انتقاليّة)</td><td>تبعيّة بلا hash على PyPI تكسر التثبيت (نادر)</td><td><code>--generate-hashes</code> يتكفّل؛ كلّ تبعيّاتنا لها wheels/sdist</td></tr>
+    <tr><td>الخطوة 2 قد تكشف انكسارًا تحت redis 8/structlog 26</td><td>قد تتطلّب إصلاحات اختبار/كود</td><td>مقصود — نكتشف في البوّابة لا الإنتاج؛ تُخصَّص جلسة</td></tr>
+    <tr><td>احتكاك الصيانة (إعادة قفل لكلّ تحديث)</td><td>خطوة إضافيّة عند الترقية</td><td>هي آليّة الأمان نفسها؛ سكربت <code>lock_deps.sh</code> + توثيق يبسّطانها</td></tr>
+    <tr><td>رقعة أمنيّة لتبعيّة</td><td>لا تُسحب تلقائيًّا (القفل يجمّد)</td><td>إعادة قفل دوريّة مجدولة (يلتقي مع درس «أعِد البناء دوريًّا»)</td></tr>
+  </table>
+</div>
+
+<h2>7 · قرارات للمالك</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>القرار</th><th>التوصية</th></tr>
+    <tr><td>1</td><td>الأداة: pip-tools أم uv؟</td><td><span class="pill rec">pip-tools</span> — أصليّ، أدنى تغيير</td></tr>
+    <tr><td>2</td><td>صورة الإنتاج: قفل تشغيل فقط أم إبقاء dev؟</td><td><span class="pill rec">تشغيل فقط</span> — أصغر وأأمن (تغيير مقصود)</td></tr>
+    <tr><td>3</td><td>توقيت مواءمة الـvenv (الخطوة 2 قد تكشف فروقًا)</td><td>جلسة عمل مخصَّصة — لا تُدمج مع تغييرات أخرى</td></tr>
+    <tr><td>4</td><td>تحديد مجموعة <code>[dev]</code> أيضًا؟</td><td><span class="pill warn">أولويّة أدنى</span> — القفل يغطّيها ضمنًا؛ أدوات اختبار، مخاطرة أقلّ</td></tr>
+  </table>
+</div>
+
+<div class="callout green">
+  <b>الحالة الحاليّة (قبل هذه الخطّة):</b> الحدود العليا للتبعيّات الـ23 مُضافة ومُتحقَّقة (23/23 صالح PEP 508 · كلّها تقبل النسخة الحيّة · 0 تعارض) وتُنشَر الآن. هذه الخطّة هي <b>الطبقة الجذريّة التالية</b> فوق الحدود — لم تبدأ، تنتظر إذنك ثمّ خطّة تنفيذ تفصيليّة لكلّ مرحلة.
+</div>
+
+<footer>
+  منصّة تووا (Tawa) · خطّة قفل التبعيّات · 2026-06-15 · وثيقة تخطيط — لا تغييرات مُنفَّذة · FIN-COR مختوم · بلا commit
+</footer>
+
+</div>
+</body>
+</html>

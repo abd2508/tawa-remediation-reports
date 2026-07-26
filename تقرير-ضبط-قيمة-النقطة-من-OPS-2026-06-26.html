@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير ضبط قيمة النقطة من OPS · تووا · 26 يونيو 2026</title>
+<style>
+  :root{--g:#0a7d4d;--gd:#075c39;--gl:#e6f4ec;--gold:#c8941f;--goldl:#fcf3dd;--ink:#1c2b25;--muted:#5b6b63;--line:#d9e4dd;--blue:#1565c0;--bluel:#e7f0fb;--bg:#f4f8f5;--card:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.9;font-size:15.5px}
+  .wrap{max-width:960px;margin:0 auto;padding:0 18px 90px}
+  header.hero{background:linear-gradient(135deg,#0a7d4d,#075c39 55%,#6a3fb5);color:#fff;padding:44px 30px;border-radius:0 0 26px 26px;box-shadow:0 10px 30px rgba(7,92,57,.25)}
+  header.hero h1{margin:0 0 9px;font-size:23px;font-weight:800}
+  header.hero p{margin:4px 0;opacity:.96}
+  .badge{display:inline-block;background:rgba(255,255,255,.18);padding:7px 15px;border-radius:30px;font-size:13px;margin-top:13px;border:1px solid rgba(255,255,255,.3)}
+  .live{background:#16a34a;color:#fff;padding:3px 11px;border-radius:20px;font-size:13px;font-weight:700}
+  h2{color:var(--gd);font-size:20px;margin:38px 0 12px;padding:13px 16px;background:linear-gradient(90deg,var(--gl),transparent);border-radius:12px;border-right:5px solid var(--g)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:13px 0}
+  .summary{background:var(--gl);border:1px solid #bfe0cd;border-radius:16px;padding:22px 26px;margin:22px 0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line)}
+  th{background:var(--g);color:#fff;font-weight:700;font-size:13px}
+  .tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:700}
+  .ok{background:var(--gl);color:var(--gd)}.off{background:var(--goldl);color:#8a6410}
+  .simple{background:var(--bluel);border-right:5px solid var(--blue);border-radius:10px;padding:13px 17px;margin:12px 0}
+  .simple b{color:var(--blue)}
+  .found{background:var(--goldl);border-right:5px solid var(--gold);border-radius:10px;padding:13px 17px;margin:12px 0}
+  code{background:#eef3f0;padding:1px 6px;border-radius:5px;font-size:12px;direction:ltr;display:inline-block}
+  pre{background:#1c2b25;color:#d6f0e2;padding:11px 14px;border-radius:10px;overflow-x:auto;direction:ltr;text-align:left;font-size:12px;line-height:1.6}
+  ul{margin:6px 0;padding-right:22px}li{margin:5px 0}
+  footer{margin-top:44px;padding-top:20px;border-top:2px solid var(--line);font-size:12.5px;color:var(--muted)}
+  .lead{font-size:16.5px}
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>💰 تقرير ضبط قيمة النقطة من لوحة OPS</h1>
+  <p>المشغّل يضبط «كم نقطة = 1 د.ل» من لوحة الولاء، والقيمة تحرّك سعر الدفع بالنقاط مباشرةً</p>
+  <span class="badge">📅 26 يونيو 2026 · <span class="live">مُثبَت حيّ + تحسين منشور</span> · لا هجرة · لا commits · العقود المختومة سليمة</span>
+</header>
+
+<div class="wrap">
+
+<div class="found"><b>اكتشاف مهمّ (قبل البناء):</b> ضبط قيمة النقطة <b>موجود أصلًا</b> في لوحة الولاء OPS (<code>OpsLoyaltyControl</code> تبويب «الإعدادات» + <code>PUT /operations/loyalty/config</code> بصلاحية SUPER). المفتاح <code>points_per_lyd</code> («كم نقطة = 1 د.ل») قابل للضبط منذ بناء لوحة الولاء. ونقطة الاسترداد الجديدة (الدفع بالنقاط) تقرأ هذه القيمة من نفس الإعداد القابل للضبط — فلم أبنِ مكرّرًا، بل <b>تحقّقتُ من الربط وأضفتُ توضيحًا.</b></div>
+
+<div class="simple"><b>بلغة بسيطة:</b> «قيمة النقطة» = كم تساوي النقطة من المال. تُضبَط بمفتاح <code>points_per_lyd</code> (كم نقطة تعادل 1 دينار). مثلًا 100 → كل نقطة = 0.01 د.ل؛ لو غيّرها المشغّل إلى 50 → كل نقطة = 0.02 د.ل (أثمن). وهذا الرقم <b>يحرّك مباشرةً</b> كم نقطة تُخصَم حين يدفع العميل بالنقاط.</div>
+
+<h2>الإثبات الحيّ — الضبط يحرّك سعر الاسترداد</h2>
+<pre dir="ltr">عند rate 100:  دفع 5.000 د.ل بالنقاط يَخصِم 500 نقطة
+عند rate 50  (ضُبط من OPS):  دفع 5.000 د.ل بالنقاط يَخصِم 250 نقطة
+⟶ ضبط لوحة OPS يحرّك سعر الاسترداد فعلًا ✓  (ثمّ أُعيدت القيمة 100)</pre>
+
+<h2>التحسين الذي أضفتُه (توضيح غير مكرّر)</h2>
+<p>تبويب «الإعدادات» في لوحة الولاء صار يعرض — أسفل حقل <code>points_per_lyd</code> — سطرًا توضيحيًّا حيًّا:</p>
+<ul>
+<li>💰 <b>قيمة النقطة الواحدة</b> = <code>0.0100 د.ل</code> (يتحدّث فورًا مع تغيير الحقل قبل الحفظ).</li>
+<li>🪙 <b>الدفع بالنقاط: مفعّل / معطّل</b> (حالة بوّابة الاسترداد، للقراءة).</li>
+</ul>
+<p style="font-size:13.5px">الخلفية: <code>GET /operations/loyalty/config</code> صار يُرجِع أيضًا <code>point_value_minor</code> + <code>redemption_enabled</code>. الإثبات الحيّ: <code>points_per_lyd=100 · point_value_minor=10 (1 نقطة = 0.01 د.ل) · redemption_enabled=True</code>.</p>
+
+<h2>الجودة والحوكمة</h2>
+<table>
+<tr><th>الفحص</th><th>النتيجة</th></tr>
+<tr><td>الربط OPS→الاسترداد مُثبَت حيًّا (تغيير السعر يغيّر النقاط المخصومة)</td><td><span class="tag ok">✓</span></td></tr>
+<tr><td>العرض المشتقّ حيّ (point_value_minor + redemption_enabled)</td><td><span class="tag ok">مُثبَت</span></td></tr>
+<tr><td>الاختبارات (الولاء + الأوعية + الطلبات) — حدّثتُ توكيدَين قديمَين «مختوم»→يتبع العلَم</td><td><span class="tag ok">55 ✓</span></td></tr>
+<tr><td>الواجهة typecheck</td><td><span class="tag ok">0</span></td></tr>
+<tr><td>الأعلام</td><td><span class="tag off">loyalty_redemption=ON · split=ON · production_payment=OFF</span></td></tr>
+<tr><td>العقود المختومة (FIN-COR)</td><td><span class="tag ok">25ddf010… دون تغيير · لا حركة مال حقيقيّ</span></td></tr>
+</table>
+
+<div class="summary">
+<h3 style="margin-top:0">الخلاصة</h3>
+<p class="lead">قيمة النقطة <b>قابلة للضبط من لوحة OPS أصلًا</b>، و<b>تحرّك سعر الدفع بالنقاط مباشرةً</b> (مُثبَت حيًّا). أضفتُ توضيحًا حيًّا (قيمة النقطة الواحدة + حالة الاسترداد) ليرى المشغّل الأثر قبل الحفظ. <b>لا هجرة · لا commits · العقود المختومة سليمة.</b> بهذا تكتمل منظومة الدفع بالنقاط: ضبط القيمة → الدفع → الدفتر → رؤية العمليّات.</p>
+</div>
+
+<footer>
+<p><b>التحقّق:</b> الربط OPS→الاسترداد مُثبَت (rate 100→500 نقطة، rate 50→250 لنفس 5 د.ل) · GET /operations/loyalty/config يُرجِع point_value_minor=10 + redemption_enabled=True · العرض المشتقّ في الحزمة · 55 اختبار أخضر (+توكيدان حُدِّثا بعد فكّ ختم النقاط) · typecheck 0 · production_payment OFF (لم يُمسّ) · بصمة العقود <code>25ddf010…</code> دون تغيير · لا commits · منشور https://test.tawanow.com (<code>/ops/loyalty</code> تبويب الإعدادات).</p>
+<p style="margin-top:10px">📄 ضبط قيمة النقطة من OPS · منصّة <b>تووا — Tawa Libya Delivery Platform</b> · 26 يونيو 2026 · مجلّد New Folder 10</p>
+</footer>
+
+</div>
+</body>
+</html>

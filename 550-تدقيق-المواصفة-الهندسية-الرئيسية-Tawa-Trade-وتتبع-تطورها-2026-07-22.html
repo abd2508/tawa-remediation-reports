@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تدقيق المواصفة الرئيسية — Tawa Trade</title>
+<style>
+  :root{
+    --bg:#eef1ec;
+    --bg-raised:#ffffff;
+    --bg-sunken:#e4e8e1;
+    --ink:#171f26;
+    --ink-muted:#52606b;
+    --line:rgba(23,31,38,.14);
+    --accent:#1f7a6c;
+    --accent-ink:#0f4e44;
+    --accent-soft:rgba(31,122,108,.10);
+    --good:#2f7d4f;
+    --good-bg:rgba(47,125,79,.12);
+    --bad:#b14428;
+    --bad-bg:rgba(177,68,40,.12);
+    --warn:#a6741c;
+    --warn-bg:rgba(166,116,28,.13);
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
+    --sans: "Segoe UI", "Noto Kufi Arabic", "Dubai", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#10151c;
+      --bg-raised:#161d26;
+      --bg-sunken:#0b0f14;
+      --ink:#e8ebe6;
+      --ink-muted:#9aa7af;
+      --line:rgba(232,235,230,.16);
+      --accent:#57c7b3;
+      --accent-ink:#8fe0d2;
+      --accent-soft:rgba(87,199,179,.14);
+      --good:#4fbf7a;
+      --good-bg:rgba(79,191,122,.14);
+      --bad:#e2704f;
+      --bad-bg:rgba(226,112,79,.16);
+      --warn:#e3b356;
+      --warn-bg:rgba(227,179,86,.16);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10151c; --bg-raised:#161d26; --bg-sunken:#0b0f14;
+    --ink:#e8ebe6; --ink-muted:#9aa7af; --line:rgba(232,235,230,.16);
+    --accent:#57c7b3; --accent-ink:#8fe0d2; --accent-soft:rgba(87,199,179,.14);
+    --good:#4fbf7a; --good-bg:rgba(79,191,122,.14);
+    --bad:#e2704f; --bad-bg:rgba(226,112,79,.16);
+    --warn:#e3b356; --warn-bg:rgba(227,179,86,.16);
+  }
+  :root[data-theme="light"]{
+    --bg:#eef1ec; --bg-raised:#ffffff; --bg-sunken:#e4e8e1;
+    --ink:#171f26; --ink-muted:#52606b; --line:rgba(23,31,38,.14);
+    --accent:#1f7a6c; --accent-ink:#0f4e44; --accent-soft:rgba(31,122,108,.10);
+    --good:#2f7d4f; --good-bg:rgba(47,125,79,.12);
+    --bad:#b14428; --bad-bg:rgba(177,68,40,.12);
+    --warn:#a6741c; --warn-bg:rgba(166,116,28,.13);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0;}
+  body{
+    direction:rtl; text-align:right; font-family:var(--sans);
+    background:var(--bg); color:var(--ink);
+    line-height:1.75; font-size:17px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:0 1.5rem;}
+  .wrap-wide{max-width:1080px; margin:0 auto; padding:0 1.5rem;}
+  h1,h2,h3,h4{text-wrap:balance; font-family:var(--sans); font-weight:800; letter-spacing:0;}
+  p{max-width:66ch; color:var(--ink);}
+  .lede{max-width:70ch;}
+  a{color:var(--accent-ink);}
+  .num{font-variant-numeric:tabular-nums; font-family:var(--mono);}
+
+  /* ---------- Masthead ---------- */
+  .masthead{
+    background:linear-gradient(180deg, var(--bg-sunken), var(--bg) 85%);
+    border-bottom:1px solid var(--line);
+    padding:3.2rem 0 2.4rem;
+  }
+  .eyebrow{
+    font-family:var(--mono); font-size:.78rem; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--accent-ink); font-weight:700; margin:0 0 .9rem;
+  }
+  .title{font-size:2.35rem; line-height:1.18; margin:0 0 .5rem; color:var(--ink);}
+  .subtitle{font-size:1.15rem; color:var(--ink-muted); margin:0 0 1.6rem; max-width:62ch; font-weight:500;}
+  .meta-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden;
+    margin-bottom:1.6rem;
+  }
+  .meta-cell{background:var(--bg-raised); padding:.85rem 1rem;}
+  .meta-k{font-size:.7rem; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.08em; font-family:var(--mono); margin-bottom:.3rem;}
+  .meta-v{font-size:.95rem; font-weight:700;}
+  .verdict-band{
+    display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap;
+    background:var(--accent-soft); border:1px solid var(--accent); border-radius:8px;
+    padding:1rem 1.3rem;
+  }
+  .verdict-score{
+    font-family:var(--mono); font-weight:800; font-size:1.9rem; color:var(--accent-ink);
+    line-height:1; white-space:nowrap;
+  }
+  .verdict-score small{font-size:1rem; font-weight:600; color:var(--ink-muted);}
+  .verdict-text{font-size:.98rem; color:var(--ink); margin:0; max-width:56ch;}
+  .verdict-text b{color:var(--accent-ink);}
+
+  /* ---------- TOC ---------- */
+  .toc{
+    background:var(--bg-raised); border:1px solid var(--line); border-radius:8px;
+    padding:1.1rem 1.4rem; margin:2.2rem 0; font-size:.92rem;
+  }
+  .toc h4{margin:0 0 .6rem; font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-muted);}
+  .toc ol{columns:2; column-gap:2rem; margin:0; padding-inline-start:1.2rem;}
+  .toc li{break-inside:avoid; margin-bottom:.35rem;}
+  .toc a{text-decoration:none; color:var(--ink);}
+  .toc a:hover{color:var(--accent-ink); text-decoration:underline;}
+
+  /* ---------- Sections ---------- */
+  section{padding:2.6rem 0;}
+  section + section{border-top:1px solid var(--line);}
+  .sec-head{display:flex; align-items:baseline; gap:.7rem; margin-bottom:.3rem;}
+  .sec-no{font-family:var(--mono); color:var(--accent); font-weight:800; font-size:1rem;}
+  .sec-title{font-size:1.55rem; margin:0;}
+  .sec-intro{color:var(--ink-muted); margin-top:.2rem; margin-bottom:1.6rem; max-width:70ch;}
+
+  /* ---------- chips ---------- */
+  .chip{
+    display:inline-flex; align-items:center; gap:.3em; padding:.18em .65em; border-radius:4px;
+    font-size:.74rem; font-weight:700; letter-spacing:.02em; white-space:nowrap; font-family:var(--sans);
+  }
+  .chip-bad{background:var(--bad-bg); color:var(--bad);}
+  .chip-warn{background:var(--warn-bg); color:var(--warn);}
+  .chip-good{background:var(--good-bg); color:var(--good);}
+  .chip-info{background:var(--accent-soft); color:var(--accent-ink);}
+
+  /* ---------- Evolution timeline ---------- */
+  .timeline{display:flex; gap:0; overflow-x:auto; padding:1.2rem 0 1.6rem; margin:0 -0.2rem;}
+  .tnode{
+    flex:1 0 220px; position:relative; padding:0 1rem;
+    border-inline-start:2px solid var(--line);
+  }
+  .tnode:first-child{border-inline-start:none;}
+  .tnode.ghost{opacity:.55;}
+  .tnode.ghost .tnode-inner{border-style:dashed;}
+  .tdate{font-family:var(--mono); font-size:.74rem; color:var(--accent-ink); font-weight:700; margin-bottom:.4rem;}
+  .tnode-inner{
+    background:var(--bg-raised); border:1px solid var(--line); border-radius:7px; padding:.9rem 1rem;
+    height:100%;
+  }
+  .tnode h4{font-size:.98rem; margin:0 0 .4rem;}
+  .tnode p{font-size:.86rem; color:var(--ink-muted); margin:0 0 .5rem; max-width:none;}
+  .tnode .tval{font-size:.8rem; color:var(--ink);}
+
+  /* ---------- generic cards ---------- */
+  .card{
+    background:var(--bg-raised); border:1px solid var(--line); border-radius:8px;
+    padding:1.4rem 1.5rem; margin-bottom:1.2rem;
+  }
+  .strength-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem;}
+  .strength{
+    background:var(--bg-raised); border:1px solid var(--line); border-inline-start:4px solid var(--good);
+    border-radius:6px; padding:1rem 1.2rem;
+  }
+  .strength h4{font-size:.98rem; margin:0 0 .4rem;}
+  .strength p{font-size:.88rem; color:var(--ink-muted); margin:0; max-width:none;}
+
+  /* ---------- findings ---------- */
+  .finding{
+    background:var(--bg-raised); border:1px solid var(--line);
+    border-inline-start:5px solid var(--bad);
+    border-radius:8px; padding:1.4rem 1.6rem; margin-bottom:1.4rem;
+  }
+  .finding.sev-warn{border-inline-start-color:var(--warn);}
+  .finding.sev-info{border-inline-start-color:var(--accent);}
+  .f-head{display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; margin-bottom:.5rem;}
+  .f-id{font-family:var(--mono); font-weight:800; color:var(--ink-muted); font-size:.85rem;}
+  .f-title{font-size:1.12rem; margin:0; flex:1 1 auto; min-width:200px;}
+  .f-loc{font-family:var(--mono); font-size:.78rem; background:var(--bg-sunken); padding:.15em .55em; border-radius:4px; color:var(--ink-muted);}
+  .f-block{margin-top:.85rem;}
+  .f-block h5{margin:0 0 .3rem; font-size:.76rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-muted);}
+  .f-block p{margin:0; max-width:none; font-size:.95rem;}
+  .plain{
+    background:var(--accent-soft); border-radius:6px; padding:.7rem 1rem; margin-top:.6rem;
+    font-size:.88rem; color:var(--ink);
+  }
+  .plain b{color:var(--accent-ink);}
+
+  /* ---------- state grid diagram ---------- */
+  .state-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:.8rem; margin:1rem 0;}
+  .state-box{border-radius:7px; padding:.9rem 1rem; text-align:center;}
+  .state-box.defined{border:2px solid var(--good); background:var(--good-bg);}
+  .state-box.undefined{border:2px dashed var(--bad); background:var(--bad-bg); opacity:.9;}
+  .state-box h5{margin:0 0 .3rem; font-size:.92rem;}
+  .state-box span{font-size:.76rem; color:var(--ink-muted); display:block;}
+  .state-box.defined span{color:var(--good);}
+  .state-box.undefined span{color:var(--bad);}
+
+  /* ---------- scope table ---------- */
+  .scope-table{width:100%; border-collapse:collapse; font-size:.92rem; margin:1rem 0;}
+  .scope-table th, .scope-table td{border:1px solid var(--line); padding:.6rem .8rem; text-align:center;}
+  .scope-table th{background:var(--bg-sunken); font-size:.82rem;}
+  .scope-table td:first-child, .scope-table th:first-child{text-align:right; font-weight:700;}
+  .mark-yes{color:var(--good); font-weight:800;}
+  .mark-no{color:var(--bad); font-weight:800;}
+  .mark-part{color:var(--warn); font-weight:800;}
+  .scroll-x{overflow-x:auto;}
+
+  /* ---------- score bars ---------- */
+  .bars{display:flex; flex-direction:column; gap:.85rem; margin:1.2rem 0;}
+  .bar-row{display:grid; grid-template-columns:190px 1fr 46px; align-items:center; gap:.8rem;}
+  .bar-label{font-size:.88rem;}
+  .bar-track{background:var(--bg-sunken); border-radius:5px; height:10px; overflow:hidden; border:1px solid var(--line);}
+  .bar-fill{height:100%; background:var(--accent); border-radius:5px 0 0 5px;}
+  .bar-val{font-family:var(--mono); font-size:.86rem; text-align:left; font-weight:700; color:var(--accent-ink);}
+
+  /* ---------- lists ---------- */
+  ul.tight, ol.tight{padding-inline-start:1.3rem; margin:.6rem 0;}
+  ul.tight li, ol.tight li{margin-bottom:.45rem; font-size:.95rem;}
+  .edit-list{counter-reset:edit;}
+  .edit-item{
+    display:flex; gap:.9rem; align-items:flex-start; padding:.8rem 0;
+    border-bottom:1px solid var(--line);
+  }
+  .edit-item:last-child{border-bottom:none;}
+  .edit-no{
+    counter-increment:edit; font-family:var(--mono); font-weight:800; color:var(--accent-ink);
+    background:var(--accent-soft); border-radius:5px; width:2rem; height:2rem; display:flex;
+    align-items:center; justify-content:center; flex:none; font-size:.85rem;
+  }
+  .edit-item p{margin:0; font-size:.94rem; max-width:none;}
+  .edit-item code{background:var(--bg-sunken); padding:.05em .4em; border-radius:3px; font-size:.85em;}
+
+  code, .code{font-family:var(--mono); font-size:.9em; background:var(--bg-sunken); padding:.05em .4em; border-radius:3px;}
+
+  table.plain-table{width:100%; border-collapse:collapse; font-size:.9rem;}
+  table.plain-table th, table.plain-table td{border:1px solid var(--line); padding:.55rem .75rem; text-align:right;}
+  table.plain-table th{background:var(--bg-sunken); font-size:.8rem;}
+
+  .final-card{
+    background:var(--bg-raised); border:1px solid var(--accent); border-radius:10px;
+    padding:1.8rem 2rem; position:relative;
+  }
+  .final-card::before{
+    content:"الحكم"; position:absolute; top:-.75rem; right:1.4rem; background:var(--accent);
+    color:var(--bg-raised); font-size:.72rem; font-weight:800; padding:.2rem .7rem; border-radius:20px;
+    letter-spacing:.05em;
+  }
+  footer{padding:2rem 0 4rem; color:var(--ink-muted); font-size:.82rem;}
+
+  @media (max-width:640px){
+    .title{font-size:1.7rem;}
+    .toc ol{columns:1;}
+    .state-grid{grid-template-columns:1fr 1fr;}
+    .bar-row{grid-template-columns:120px 1fr 40px;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="masthead">
+    <div class="wrap">
+      <p class="eyebrow">مراجعة هندسية مستقلة · تووا للتجارة (Tawa Trade)</p>
+      <h1 class="title">تدقيق Master Engineering Specification</h1>
+      <p class="subtitle">قراءة كاملة سطرًا بسطر لخمس وثائق (8,383 سطر) تتبّع كيف تطوّر تصميم «تووا للتجارة» من فكرة معمارية أولى إلى مواصفة هندسية قابلة للتتبع — مع تحديد كل فجوة منطقية وعيب اتساق بدقة القسم والسطر.</p>
+
+      <div class="meta-grid">
+        <div class="meta-cell"><div class="meta-k">الوثيقة المُراجَعة</div><div class="meta-v">MES-1.0 · 2026-07-22</div></div>
+        <div class="meta-cell"><div class="meta-k">حجم المراجعة</div><div class="meta-v">5 ملفات · 8,383 سطر</div></div>
+        <div class="meta-cell"><div class="meta-k">المنهج</div><div class="meta-v">قراءة كاملة + تحقّق ملفات (ls) + مطابقة تاريخية</div></div>
+        <div class="meta-cell"><div class="meta-k">النطاق</div><div class="meta-v">التطور · الفجوات · الملاءمة · الإضافات</div></div>
+      </div>
+
+      <div class="verdict-band">
+        <div class="verdict-score">7.6<small>/10</small></div>
+        <p class="verdict-text">
+          <b>الأقوى في سلسلة التقارير الخمسة</b> من حيث الانضباط الهندسي والتتبّع، وتستجيب فعليًا لدروس تدقيقات الحوكمة العامة السابقة على نفس المستودع.
+          لكن التوليف فقَد أثناء الدمج خمس نقاط كانت أكثر اكتمالًا في تقارير سابقة (حالة الفاتورة، النزاعات، الإعلانات، جداول التسوية)، ولم يربط توصياته الأمنية بأسماء دوال/أعطال محدّدة من هذا المستودع تحديدًا.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <nav class="toc">
+      <h4>محتويات التقرير</h4>
+      <ol>
+        <li><a href="#evolution">التطور التاريخي عبر التقارير الخمسة</a></li>
+        <li><a href="#strengths">نقاط القوة الحقيقية</a></li>
+        <li><a href="#findings">العيوب المنطقية والفجوات (MES-01 → MES-07)</a></li>
+        <li><a href="#fit">هل هي مناسبة لهذا البناء تحديدًا؟</a></li>
+        <li><a href="#edits">التعديلات التي سأُجريها عليها</a></li>
+        <li><a href="#additions">إضافات غير موجودة أطلقها من الصفر</a></li>
+        <li><a href="#score">بطاقة الدرجات</a></li>
+        <li><a href="#verdict">الحكم النهائي</a></li>
+      </ol>
+    </nav>
+
+    <!-- ============ 1. EVOLUTION ============ -->
+    <section id="evolution">
+      <div class="sec-head"><span class="sec-no">01</span><h2 class="sec-title">التطور التاريخي عبر التقارير الخمسة</h2></div>
+      <p class="sec-intro">الترتيب الزمني الحقيقي — وليس ترتيب الأسماء — يكشف أن الوثيقة النهائية ليست نتاج أربعة تقارير متتالية عن Trade فقط، بل نتاج مسارين متوازيين التقيا: مسار تصميم Trade نفسه، ومسار تدقيق حوكمة عام لكامل منصة تووا أمدّ Trade بمفرداته الأمنية.</p>
+
+      <div class="timeline">
+        <div class="tnode">
+          <div class="tdate">قبل 07-19</div>
+          <div class="tnode-inner">
+            <h4>R1 — التصميم المفاهيمي</h4>
+            <p>b2b_architecture_report.md</p>
+            <div class="tval">يقرر أن <code>TradeSupplier</code> كيان مستقل تمامًا عن <code>Provider</code>. يضع أول نموذج بيانات ودورة شراء ونزاعات وصلاحيات — لكن بحالة واحدة ضخمة لكل كيان، ودون ربط بملفات المستودع الفعلية.</div>
+          </div>
+        </div>
+        <div class="tnode">
+          <div class="tdate">07-19 / 07-20</div>
+          <div class="tnode-inner">
+            <h4>تدقيقا حوكمة عامّان (مسار موازٍ)</h4>
+            <p>ليسا عن Trade — عن كامل منصة تووا</p>
+            <div class="tval">يوثّقان 15 عيبًا حرجًا مؤكدًا و85 نتيجة (Maker-Checker، ABAC، سلسلة تدقيق مقفلة عالميًا، Feature flags مزدوجة المصدر). هذه المفردات تظهر لاحقًا حرفيًا في تصميم Trade.</div>
+          </div>
+        </div>
+        <div class="tnode ghost">
+          <div class="tdate">07-21 (مُستشهَد به، غير مرفَق)</div>
+          <div class="tnode-inner">
+            <h4>R2 / R3 — غير موجودين في الحزمة</h4>
+            <p>tawa_trade_deep_implementation_review<br>tawa_trade_control_plane_deep_review</p>
+            <div class="tval">وثيقة MES §2 تستشهد بهما كسابقين مباشرين. تحقّقتُ عبر <code>ls</code> على مجلد المصدر: لا وجود لملفّ بهذين الاسمين أو ما يقاربهما. الأرجح أنهما لم يُسلَّما ضمن هذه الحزمة تحديدًا، لا أنهما مُختلَقان.</div>
+          </div>
+        </div>
+        <div class="tnode">
+          <div class="tdate">2026-07-21</div>
+          <div class="tnode-inner">
+            <h4>R4 — مخطط الربط الدقيق</h4>
+            <p>exact_integration_blueprint.md</p>
+            <div class="tval">أول وثيقة تربط كل قرار بملف حقيقي في المستودع (<code>main.py</code>، <code>ProviderService</code>، <code>opsAccess.ts</code>). تضيف: 4 طبقات أحداث، ATP، اعتماد نقد كقرار مورد لا كدفع، تجميع Shadow-first، إعلانات تجارية كاملة (8 جداول)، 20 قرارًا ممنوعًا.</div>
+          </div>
+        </div>
+        <div class="tnode">
+          <div class="tdate">2026-07-22</div>
+          <div class="tnode-inner">
+            <h4>MES-1.0 — التوليف النهائي</h4>
+            <p>master_engineering_specification.md</p>
+            <div class="tval">يضيف: معرّفات تتبّع (TRD-001…025)، C4/ADR، معايير خارجية حقيقية (OpenAPI/ASVS/GS1/UBL)، وسم FACT/ASSUMPTION/GATE. لكنه يُسقط بصمت عناصر كانت موجودة في R1 أو R4 (تفصيلها في القسم 3).</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="plain">
+        <b>الخلاصة العملية:</b> الوثيقة النهائية ترث انضباطها الأمني (Capability بدل Role، ترتيب قفل الـAudit، صدقيّة الواجهة) من مسار تدقيق الحوكمة العام — لا من R2/R3 المفقودين. وهذا في حد ذاته دليل جودة: القرارات الأمنية الحسّاسة مبنية على عيوب حقيقية مثبتة في نفس المستودع، لا على تخمين معماري.
+      </div>
+    </section>
+
+    <!-- ============ 2. STRENGTHS ============ -->
+    <section id="strengths">
+      <div class="sec-head"><span class="sec-no">02</span><h2 class="sec-title">نقاط القوة الحقيقية</h2></div>
+      <p class="sec-intro">قبل سرد العيوب، من المهم تسجيل ما حقّقته الوثيقة فعلًا — لأنها ليست مجرد وصف أدق، بل استجابت لعيوب حقيقية موثّقة في نفس المستودع بدل تكرارها.</p>
+
+      <div class="strength-grid">
+        <div class="strength">
+          <h4>Capability بدل Role واسع</h4>
+          <p>ADR-009 يفرض RBAC+ABAC بدل دور عريض. هذا يردّ مباشرة على عيب <code>ADMIN</code> الذي يرث Operations+Finance+Compliance ويكسر فصل السلطات في النظام الحالي.</p>
+        </div>
+        <div class="strength">
+          <h4>ترتيب قفل واضح للتدقيق</h4>
+          <p>«Business rows أولًا ثم Audit chain أخيرًا» (§10.5، §14.4) يتفادى بالضبط النمط الذي جعل بعض الصلاحيات والتحويلات المالية تُعتمد بينما تسجيل تدقيقها Best-effort ومنفصل.</p>
+        </div>
+        <div class="strength">
+          <h4>النقد طلب موافقة، لا دفع مؤكَّد</h4>
+          <p><code>CASH_REQUESTED → APPROVED/REJECTED</code> يمنع تكرار عيب «الواجهة تقول أُضيف الرصيد بينما الخلفية أنشأت طلبًا معلَّقًا فقط» الموثَّق في شاشة رصيد المحفظة الحالية.</p>
+        </div>
+        <div class="strength">
+          <h4>أعلام مغلقة افتراضيًا + Entitlement + Seal</h4>
+          <p>كل علم Trade هو <code>false</code> بدايةً، والدفع الإلكتروني مختوم (<code>SEALED</code>) صراحة. هذا يتفادى ثنائية مصدر الحقيقة (YAML مقابل قاعدة البيانات) الموثّقة كعيب حقيقي في نظام الأعلام الحالي.</p>
+        </div>
+        <div class="strength">
+          <h4>وسم معرفي صريح ونادر</h4>
+          <p>تصنيف كل بند إلى FACT / DESIGN DECISION / ASSUMPTION / GATE / DEFERRED، وقسم كامل بعنوان «ما لا يمكن اعتباره مكتملًا دون دليل إضافي» — صدق منهجي قلّما يظهر في وثائق تصميم.</p>
+        </div>
+        <div class="strength">
+          <h4>مصفوفة تتبّع فعلية لا مجرد سرد</h4>
+          <p>كل معرّف TRD مربوط بشاشة وجدول وAPI وحدث واختبار في صف واحد — يجعل المواصفة قابلة للتحويل إلى Issues مباشرة، بخلاف السرد النثري في R1.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. FINDINGS ============ -->
+    <section id="findings">
+      <div class="sec-head"><span class="sec-no">03</span><h2 class="sec-title">العيوب المنطقية والفجوات المكتشفة</h2></div>
+      <p class="sec-intro">سبعة عيوب مؤكَّدة من نص الوثيقة نفسه ومقارنته بأسلافه، مرتبة من الأخطر. كل بند يوضّح: أين بالضبط، لماذا هذا مهم بلغة بسيطة، وما الإصلاح.</p>
+
+      <div class="finding">
+        <div class="f-head">
+          <span class="f-id">MES-01</span>
+          <h3 class="f-title">حالة أمر الشراء «المتعامدة» مُعلَنة بستة محاور، ومُعرَّفة فعليًا في محور واحد فقط</h3>
+          <span class="chip chip-bad">حرج</span>
+          <span class="f-loc">§7.2 مقابل §10</span>
+        </div>
+        <div class="f-block">
+          <h5>ماذا يقول النص</h5>
+          <p>القسم 7.2 يقدّم ست حالات متعامدة لأمر الشراء: <code>commercial_state، inventory_state، payment_state، fulfillment_state، invoice_state، exception_state</code>، مع أمثلة Invariants تربطها ببعضها.</p>
+        </div>
+        <div class="state-grid">
+          <div class="state-box defined"><h5>commercial_state</h5><span>مُعرَّف بالكامل في §10.3</span></div>
+          <div class="state-box undefined"><h5>inventory_state</h5><span>يُستدَل عليه من Reservation فقط</span></div>
+          <div class="state-box undefined"><h5>payment_state</h5><span>يُستدَل عليه من Cash Approval فقط</span></div>
+          <div class="state-box undefined"><h5>fulfillment_state</h5><span>مطابقته لحالة Shipment غير مُعلنة</span></div>
+          <div class="state-box undefined"><h5>invoice_state</h5><span>موجود في R4 (10 قيم) وغائب هنا تمامًا</span></div>
+          <div class="state-box undefined"><h5>exception_state</h5><span>لا تعريف له في أي وثيقة من العائلة</span></div>
+        </div>
+        <div class="f-block">
+          <h5>لماذا هذا مهم بلغة بسيطة</h5>
+          <p>الوثيقة تقول لاحقًا: «إذا كانت الفاتورة معتمدة، يجب أن تكون المطابقة في حالة كذا» — لكنها لا تخبر أي مطوّر ما هي القيم الممكنة لـ«حالة الفاتورة» على مستوى أمر الشراء نفسه. كل مطوّر سيخترعها بنفسه، وهذا بالضبط ما تحاول وثيقة التتبّع منعه.</p>
+        </div>
+        <div class="f-block">
+          <h5>الإصلاح</h5>
+          <p>إمّا استكمال تعريف المحاور الخمسة الباقية بنفس دقة <code>commercial_state</code>، أو خفض الادّعاء من «ست حالات متعامدة» إلى ما هو مُنفَّذ فعليًا (حالة واحدة + إشارات ضمنية من كيانات أخرى).</p>
+        </div>
+      </div>
+
+      <div class="finding sev-warn">
+        <div class="f-head">
+          <span class="f-id">MES-02</span>
+          <h3 class="f-title">سلّة متعددة الموردين مقابل أمر شراء أحادي المورد — لا قاعدة تحويل صريحة</h3>
+          <span class="chip chip-warn">مهم</span>
+          <span class="f-loc">§6.1 FE-B04 مقابل §7 / §13 (R4)</span>
+        </div>
+        <div class="f-block">
+          <h5>ماذا يقول النص</h5>
+          <p>شاشة السلة (FE-B04) تعرض «بنود متعددة الموردين، فصل واضح حسب المورد». لكن <code>trade_purchase_orders</code> يحمل <code>supplier_id</code> مفردًا، و<code>trade_checkout_quotes</code> يربط <code>goods_quote_id</code> و<code>delivery_quote_id</code> مفردَين لا قائمة.</p>
+        </div>
+        <div class="plain">
+          <b>ولهذا وزن تاريخي:</b> R1 ذكر صراحةً أن «Multi-supplier single checkout» بند مؤجَّل عمدًا لأنه يضاعف التعقيد. عودة فكرة السلة متعددة الموردين في MES دون حسم آلية تحويلها إلى عدة أوامر شراء مستقلة يعيد فتح تعقيدٍ سبق تأجيله دون حلّه.
+        </div>
+        <div class="f-block">
+          <h5>لماذا هذا مهم بلغة بسيطة</h5>
+          <p>لو اشترى مطعم من ثلاثة موردين في سلة واحدة، هل تصدُر ثلاث فواتير شراء بثلاث موافقات نقد مستقلة؟ الوثيقة لا تقول «نعم» ولا «لا» بشكل صريح — وهذا يعني أن فريق الواجهة وفريق الخلفية قد يبنيان افتراضَين مختلفَين.</p>
+        </div>
+        <div class="f-block">
+          <h5>الإصلاح</h5>
+          <p>إضافة قاعدة صريحة (ومعرّف TRD جديد): السلة تتحوّل عند الدفع إلى N من <code>Checkout Quote</code> و<code>Purchase Order</code>، واحد لكل مورد، بحجزه وموافقة نقده المستقلَّين، مع عرض ذلك بوضوح في واجهة السلة.</p>
+        </div>
+      </div>
+
+      <div class="finding sev-warn">
+        <div class="f-head">
+          <span class="f-id">MES-03</span>
+          <h3 class="f-title">آلة حالة النزاع التجاري اختفت أثناء الدمج، وتكرر بذلك عيبًا معروفًا في النظام الحالي</h3>
+          <span class="chip chip-warn">مهم</span>
+          <span class="f-loc">غائب من MES · موجود في R1 «النزاعات»</span>
+        </div>
+        <div class="f-block">
+          <h5>ماذا يقول النص</h5>
+          <p>R1 يحتوي نموذج نزاع تجاري كامل: عشرة أنواع (SHORTAGE، DAMAGED، COUNTERFEIT_SUSPECTED…) وتسع حالات من <code>OPEN</code> إلى <code>RESOLVED</code>، مع قاعدة صريحة: «لا تُعرَض RESOLVED قبل تنفيذ Credit Note أو Refund أو تسوية دفتر الأستاذ والتحقق منه». في MES، لا يوجد مكافئ موحَّد — فقط حقول حالة على مستوى سطر الاستلام، واستثناءات مطابقة الفاتورة، وقضايا OPS عامة، غير مربوطة ببعضها بوضوح.</p>
+        </div>
+        <div class="plain">
+          <b>لماذا هذا خطير تحديدًا هنا:</b> تدقيق الحوكمة العام على المنصة الحالية وجد بالضبط هذا النمط في نظام رد المبالغ الحالي: «حل النزاع يغيّر الحالة إلى محلول دون تطبيق الأثر المالي (رد/تقسيم/تسوية دفتر) فعليًا». حذف آلة النزاع الموحَّدة من R1 دون استبدالها بمكافئ أقوى يجازف بإعادة إنتاج نفس الفئة من الأعطال في مسار الأموال الجديد.
+        </div>
+        <div class="f-block">
+          <h5>الإصلاح</h5>
+          <p>إعادة بناء آلة نزاع موحَّدة (الأنواع العشرة + الحالات التسع من R1) مربوطة صراحةً بـ<code>trade_matching_exceptions</code> و<code>trade_ops_cases</code>، مع فرض نفس قاعدة «لا إغلاق قبل تنفيذ الأثر المالي والتحقّق منه».</p>
+        </div>
+      </div>
+
+      <div class="finding sev-warn">
+        <div class="f-head">
+          <span class="f-id">MES-04</span>
+          <h3 class="f-title">وحدة إعلانات التجارة اختفت بصمت، دون وسمها حتى بـ«مؤجَّل»</h3>
+          <span class="chip chip-warn">متوسط</span>
+          <span class="f-loc">R4 §38 (8 جداول) مقابل غياب في MES §7/§18/§19.3</span>
+        </div>
+        <div class="f-block">
+          <h5>ماذا يقول النص</h5>
+          <p>R4 خصّص قسمًا كاملًا (38) لإعلانات التجارة: ثماني جداول (<code>trade_campaigns</code>، <code>trade_campaign_creatives</code>…)، قواعد الموافقة والقنوات، وعلم <code>trade_advertising_enabled</code>. في MES: لا معرّف TRD، لا جدول بيانات واحد، لا حزمة بناء في القسم 18، والعلم غائب حتى عن قائمة مفاتيح الإيقاف في §19.3 رغم وجوده في قائمة أعلام R4 §37.</p>
+        </div>
+        <div class="f-block">
+          <h5>لماذا هذا مهم بلغة بسيطة</h5>
+          <p>المنهجية التي أعلنتها الوثيقة نفسها (§1.2) تقول: كل شيء إمّا حقيقة، أو قرار تصميم، أو افتراض، أو بوّابة، أو <b>مؤجَّل صراحة</b>. اختفاء الإعلانات دون أي من هذه الوسوم الخمسة يخالف منهجية الوثيقة بذاتها — لا نعرف إن كان هذا حذفًا متعمَّدًا أم سهوًا في الدمج.</p>
+        </div>
+        <div class="f-block">
+          <h5>الإصلاح</h5>
+          <p>إمّا استعادة القسم كاملًا مع معرّف TRD وحزمة بناء، أو سطر واحد صريح في §23: «إعلانات Trade مؤجَّلة خارج النطاق V1 عمدًا» — الحل الثاني يكفي، المهم ألا يختفي البند دون قرار موثَّق.</p>
+        </div>
+      </div>
+
+      <div class="finding sev-warn">
+        <div class="f-head">
+          <span class="f-id">MES-05</span>
+          <h3 class="f-title">لا مسار محدَّد لتحويل استثناء المطابقة إلى قيد مالي فعلي</h3>
+          <span class="chip chip-warn">متوسط</span>
+          <span class="f-loc">§7 (قاموس البيانات) — غياب trade_settlements / trade_credit_notes / trade_debit_notes</span>
+        </div>
+        <div class="f-block">
+          <h5>ماذا يقول النص</h5>
+          <p>R1 خطّط لجدول <code>trade_settlements</code> مستقل، وR4 أضاف <code>trade_credit_notes</code> و<code>trade_debit_notes</code> صراحةً (§23.3). قاموس بيانات MES (§7) يحتفظ فقط بـ<code>trade_invoices</code> و<code>trade_matching_runs</code> و<code>trade_matching_exceptions</code> — الجداول الثلاثة التي تُنفِّذ فعليًا «التصحيح المالي» بعد اكتشاف فرق غير موجودة.</p>
+        </div>
+        <div class="f-block">
+          <h5>لماذا هذا مهم بلغة بسيطة</h5>
+          <p>عندما تكتشف المنصة أن الفاتورة لا تطابق الاستلام، ماذا يحدث فعليًا بالمال؟ الوثيقة تفتح «استثناء» لكنها لا تقول كيف يُغلَق ماليًا. هذه هي نفس الفجوة المذكورة في MES-03، وتكرارها في جدول البيانات يؤكد أنها ليست سهوًا عابرًا بل نمطًا متكررًا في هذا الإصدار.</p>
+        </div>
+        <div class="f-block">
+          <h5>الإصلاح</h5>
+          <p>إعادة الجداول الثلاثة إلى القسم 7 مع مسار صريح: <code>استثناء ← إشعار دائن/مدين ← قيد دفتر أستاذ ← تحقّق ← إغلاق</code>.</p>
+        </div>
+      </div>
+
+      <div class="finding sev-info">
+        <div class="f-head">
+          <span class="f-id">MES-06</span>
+          <h3 class="f-title">وسم FACT/ASSUMPTION/GATE معلَن منهجيًا، لكن غير مطبَّق داخل النص فعليًا</h3>
+          <span class="chip chip-info">اتساق منهجي</span>
+          <span class="f-loc">§1.2 مقابل كل الأقسام 3–24</span>
+        </div>
+        <div class="f-block">
+          <h5>ماذا يقول النص</h5>
+          <p>القسم 1.2 يعرّف خمسة وسوم رسمية لتصنيف كل بند حسب درجة يقينه. لكن لا يظهر أي وسم فعلي بجانب أي جملة طوال 24 قسمًا تاليًا — حتى القسم 22.1 الذي يناقش صراحةً عدم اليقين حول دعم أدوات المشروع لـOpenAPI 3.2 لا يحمل وسم <code>[ASSUMPTION]</code> رغم أنه المثال المثالي لتطبيقه.</p>
+        </div>
+        <div class="f-block">
+          <h5>لماذا هذا مهم بلغة بسيطة</h5>
+          <p>تعريف نظام تصنيف صارم ثم عدم استخدامه يجعله شعارًا لا أداة عمل. القارئ لا يستطيع تمييز «هذا مؤكَّد من الكود» عن «هذا رأي تصميمي» عن «هذا افتراض بحاجة تحقّق» إلا بالاستنتاج اليدوي — وهذا عكس هدف الوثيقة المعلَن بالضبط.</p>
+        </div>
+        <div class="f-block">
+          <h5>الإصلاح</h5>
+          <p>تطبيق الوسوم كأعمدة/شارات فعلية بجانب كل بند حسّاس، خصوصًا في «خط الأساس التقني» (§3) و«معايير القياس» (§22) وسجل المخاطر (§21).</p>
+        </div>
+      </div>
+
+      <div class="finding sev-info">
+        <div class="f-head">
+          <span class="f-id">MES-07</span>
+          <h3 class="f-title">استشهاد §2 بمصدرين (R2/R3) لم يتحقّق وجودهما في الحزمة المتاحة</h3>
+          <span class="chip chip-info">قابلية تحقّق</span>
+          <span class="f-loc">§2 جدول تسوية التقارير</span>
+        </div>
+        <div class="f-block">
+          <h5>ماذا يقول النص</h5>
+          <p>جدول تسوية التقارير (§2) يستشهد بأربعة مصادر R1–R4. تحقّقتُ عبر <code>ls</code> على المجلد الفعلي: R1 وR4 موجودان بالاسم الدقيق، لكن لا وجود لملفّ باسم <code>tawa_trade_deep_implementation_review_2026-07-21.md</code> ولا <code>tawa_trade_control_plane_deep_review_2026-07-21.md</code>، ولا ما يقاربهما بين نحو 55 ملفًّا أخرى في المجلد نفسه.</p>
+        </div>
+        <div class="plain">
+          <b>توضيح مهم:</b> هذا لا يعني أن الوثيقة اختلقت مصادر — الأرجح أن هذين التقريرين موجودان لدى المستخدم خارج هذه الحزمة تحديدًا بتاريخ 07-21 (يوم مزدحم بعدة تقارير Trade). لكن بما أن الوثيقة تصف نفسها بأنها «سلطة تُلغي التكرار بين التقارير السابقة»، فادّعاء الدمج الكامل غير قابل للتحقّق من هذه الحزمة وحدها.
+        </div>
+        <div class="f-block">
+          <h5>الإصلاح</h5>
+          <p>لا تعديل جوهري مطلوب على المحتوى، لكن يُستحسَن إرفاق R2/R3 فعليًا أو توضيح أن أقسام «التكامل» (§11) و«لوحة العمليات» (§13) امتداد مباشر من R4 وتدقيقَي الحوكمة العامّين، لا من مصدرين منفصلين مخصَّصين لهما.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. FIT ============ -->
+    <section id="fit">
+      <div class="sec-head"><span class="sec-no">04</span><h2 class="sec-title">هل هي مناسبة لهذا البناء تحديدًا؟</h2></div>
+      <p class="sec-intro">البنية العامة — سياق محدود مستقل، جداول <code>trade_*</code> منفصلة، عمّال منفصلون عن الـAPI، عدم لمس <code>orders</code>/<code>Driver</code>/<code>Provider.provider_type</code> — متوافقة تمامًا مع دروس تدقيقَي الحوكمة على هذا المستودع نفسه. لكن في ثلاث نقاط حسّاسة، التوصية بقيت عامة ولم «تُوصَل بالحرف» لأسماء دوال وأعطال محدَّدة موثَّقة سابقًا في هذا المستودع تحديدًا.</p>
+
+      <div class="card">
+        <h4 style="margin-top:0">1 · فخ <code>db.commit()</code> غير المذكور صراحةً</h4>
+        <p style="max-width:none">دالة الوصول للقاعدة في هذا المستودع لا تعتمد المعاملة تلقائيًا؛ كل مسار يغيّر حالة يحتاج <code>db.commit()</code> صريحًا — وهذا بالضبط سبب عطل حرج موثَّق سابقًا (نشر إصدار التطبيق يرجع نجاحًا دون حفظه فعليًا). أمثلة «حدود المعاملة» في §10.5 من MES تفترض ضمنيًا الحفظ الصحيح، لكنها لا تُسمّي هذا الفخ الفعلي رغم أن الوحدة الجديدة تضيف أكثر من 40 جدولًا وعشرات المسارات المرشَّحة لتكرار نفس النمط.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">2 · خطر تكرار <code>_serialize()</code> عبر الموجّهات</h4>
+        <p style="max-width:none">تكرار وجود دالة تسلسل منفصلة لكل Router لنفس النموذج عيب معروف تكرَّر أكثر من مرة في هذا المستودع (تحديث حقل في نسخة واحدة لا يعني وصوله لكل نقطة نهاية). مع أكثر من 25 Router مقترح لـTrade عبر (مشترٍ/مورّد/تكامل/عمليات)، احتمال تكرار نفس الخطأ مرتفع، ولا توجد قاعدة معمارية صريحة في MES تفرض «مُسلسِل واحد لكل Aggregate».</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">3 · سلسلة تدقيق عالمية واحدة ستتشارك بين Retail وTrade</h4>
+        <p style="max-width:none">سلسلة التدقيق الحالية تقفل صفًّا عالميًا واحدًا عند كل كتابة — وهذا ازدحام موثَّق كخطر أداء حتى بمعزل عن Trade. MES يفصل بذكاء GPS/Telemetry عن سلسلة التدقيق (نقطة قوة حقيقية)، لكنه لا يناقش أن أوامر Trade البشرية الحسّاسة (اعتماد نقد، تعليق مورد، تغيير حساب بنكي) ستتزاحم على نفس القفل العالمي مع كل أوامر Retail الحسّاسة الحالية بمجرد التفعيل — دون اقتراح تقسيم السلسلة حسب السياق المحدود (Bounded Context).</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">4 · نقطة إيجابية تستحق التسجيل: نموذج المتجر الواحد لكل حساب شراء صحيح فعليًا</h4>
+        <p style="max-width:none"><code>trade_buyer_accounts.provider_id</code> فريد (UNIQUE) — أي حساب شراء واحد لكل متجر/فرع، لا لكل مالك. هذا يتوافق فعلًا مع كون <code>Provider</code> في هذا المستودع يمثّل متجرًا/فرعًا واحدًا وليس المالك (المالك قد يملك عدة صفوف Provider). الثغرة الوحيدة المتبقية: لا تُوضِّح الوثيقة صراحةً ما إذا كان تجميع طلبات الشراء عبر متاجر المالك الواحد مطلوبًا في V1 أم مؤجَّلًا — نقطة توضيح بسيطة لا عيب حقيقي.</p>
+      </div>
+
+      <div class="plain">
+        <b>الحكم على الملاءمة:</b> التصميم <b>متوافق مبدئيًا</b> مع واقع هذا المستودع في كل قرار معماري كبير، لكنه <b>غير موصول بالحرف</b> في ثلاث نقاط أمان تشغيلي دقيقة يعرفها فريق هذا المشروع تحديدًا من تجربة سابقة موثَّقة.
+      </div>
+    </section>
+
+    <!-- ============ 5. EDITS ============ -->
+    <section id="edits">
+      <div class="sec-head"><span class="sec-no">05</span><h2 class="sec-title">التعديلات التي سأُجريها على الوثيقة</h2></div>
+      <p class="sec-intro">قائمة تحرير مباشرة (Redline) لو كنت سأعدّل النص بنفسي، مرتبة حسب مكان التعديل في الوثيقة لا حسب الأهمية.</p>
+
+      <div class="edit-list">
+        <div class="edit-item"><div class="edit-no">١</div><p>إكمال آلة الحالات الخمس الناقصة في §10، أو خفض الادّعاء في §7.2 إلى ما هو مُنفَّذ فعليًا فقط.</p></div>
+        <div class="edit-item"><div class="edit-no">٢</div><p>إضافة <code>TRD-026</code>: «تفكيك سلّة متعددة الموردين إلى Checkout/PO مستقل لكل مورد»، مع تعديل عقد <code>POST /trade/buyer/purchase-orders</code> ليقبل/يُرجع مصفوفة أوامر لا أمرًا واحدًا.</p></div>
+        <div class="edit-item"><div class="edit-no">٣</div><p>استعادة آلة حالة النزاع التجاري من R1 (10 أنواع، 9 حالات) وربطها صراحةً بـ<code>trade_matching_exceptions</code> و<code>trade_ops_cases</code> بدل تركهما منفصلَين.</p></div>
+        <div class="edit-item"><div class="edit-no">٤</div><p>إعادة <code>trade_credit_notes</code> و<code>trade_debit_notes</code> و<code>trade_settlements</code> إلى قاموس البيانات (§7) مع مسار «استثناء ← إشعار ← قيد ← تحقّق ← إغلاق».</p></div>
+        <div class="edit-item"><div class="edit-no">٥</div><p>حسم مصير إعلانات Trade: إمّا استعادتها بمعرّف TRD وحزمة بناء وعلم صريح، أو سطر واحد في §23 يصنّفها <code>DEFERRED</code> رسميًا.</p></div>
+        <div class="edit-item"><div class="edit-no">٦</div><p>تطبيق وسوم FACT/DESIGN DECISION/ASSUMPTION/GATE/DEFERRED كأعمدة فعلية في جداول §21 (سجل المخاطر) و§22 (خط أساس المعايير)، لا الاكتفاء بتعريفها في §1.2.</p></div>
+        <div class="edit-item"><div class="edit-no">٧</div><p>إضافة سطر صريح في «أمثلة حدود المعاملة» (§10.5) يُسمّي إلزامية <code>db.commit()</code> بعد كل كتابة Trade، بالإشارة إلى العطل الحرج الموثَّق سابقًا في نشر إصدار التطبيق كسابقة تُحتذى تجنُّبها.</p></div>
+        <div class="edit-item"><div class="edit-no">٨</div><p>إضافة قاعدة معمارية في «حدود الاستيراد» (§5): مُسلسِل واحد فقط لكل Aggregate عبر Router المشتري/المورّد/العمليات — لا نسخ متوازية.</p></div>
+        <div class="edit-item"><div class="edit-no">٩</div><p>إضافة فقرة في §14 (الأمن) عن سياسة تقسيم سلسلة التدقيق حسب السياق المحدود (Trade منفصل عن Retail) لتفادي تفاقم ازدحام القفل العالمي المعروف مسبقًا.</p></div>
+        <div class="edit-item"><div class="edit-no">١٠</div><p>تصحيح جدول §2: إمّا إرفاق R2/R3 فعليًا، أو توضيح أن أقسام التكامل ولوحة العمليات امتداد مباشر لـR4 وتدقيقَي الحوكمة العامّين لا لمصدرين منفصلين.</p></div>
+        <div class="edit-item"><div class="edit-no">١١</div><p>توضيح صريح في §7 حول <code>trade_buyer_accounts</code>: هل تجميع الطلبات عبر متاجر المالك الواحد مطلوب في V1 أم مؤجَّل؟</p></div>
+      </div>
+    </section>
+
+    <!-- ============ 6. ADDITIONS ============ -->
+    <section id="additions">
+      <div class="sec-head"><span class="sec-no">06</span><h2 class="sec-title">إضافات غير موجودة في أي نسخة من العائلة</h2></div>
+      <p class="sec-intro">هذه ليست إصلاحات لعيوب موجودة، بل عناصر غائبة تمامًا من كل التقارير الخمسة ولا يمكن اشتقاقها من نص أيٍّ منها.</p>
+      <ul class="tight">
+        <li><b>سيناريو فشل مخصَّص لازدحام سلسلة التدقيق:</b> لا يوجد أي «Quality Scenario» في §17 يغطي «ماذا يحدث عندما تتزاحم أوامر Trade وRetail الحسّاسة معًا على نفس القفل العالمي» رغم أنه خطر حقيقي وموثَّق مسبقًا في هذا المستودع تحديدًا.</li>
+        <li><b>دليل تشغيل يوم الإطلاق التجريبي الأول:</b> من يراقب ماذا في الساعة الأولى؟ من يملك صلاحية الإيقاف الفوري لكل Trade دون موافقة مزدوجة في حالة طارئة من الدرجة الأولى؟ لا يوجد Runbook محدَّد لهذه اللحظة تحديدًا رغم التفصيل الشديد في كل شيء آخر.</li>
+        <li><b>خطة ترحيل لعلاقات تجارية قائمة فعليًا:</b> إن كان هناك موردون يتعاملون فعلًا مع مطاعم/متاجر بشكل غير رسمي خارج المنصة، لا تُذكر آلية «استيراد» هذه العلاقات بدل افتراض أن الجميع يبدأ من الصفر.</li>
+        <li><b>مؤشرات نجاح تجارية، لا هندسية فقط:</b> الوثيقة غنية بمؤشرات SLO/زمن استجابة، لكن خالية من أي مؤشر نجاح تجاري بعد الإطلاق (معدل قبول المورد للطلب خلال مدة محدَّدة، متوسط قيمة السلة، معدل تكرار الشراء).</li>
+        <li><b>عملة المورد الدولي قبل التحويل:</b> تصنيف <code>IMPORTER</code> يفترض موردًا يستورد من الخارج، لكن لا تُذكر سياسة عرض/تخزين سعر بعملة غير الدينار الليبي قبل التحويل النهائي في العرض.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 7. SCORECARD ============ -->
+    <section id="score">
+      <div class="sec-head"><span class="sec-no">07</span><h2 class="sec-title">بطاقة الدرجات</h2></div>
+      <p class="sec-intro">تقييمي الشخصي عبر سبعة أبعاد، من 10. الدرجة الإجمالية بالأعلى (7.6) هي متوسط مرجَّح لهذه الأبعاد.</p>
+      <div class="bars">
+        <div class="bar-row"><div class="bar-label">التتبّع الهندسي (IDs/عقود)</div><div class="bar-track"><div class="bar-fill" style="width:90%"></div></div><div class="bar-val num">9.0</div></div>
+        <div class="bar-row"><div class="bar-label">الأمن وفصل السلطات</div><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div><div class="bar-val num">8.5</div></div>
+        <div class="bar-row"><div class="bar-label">الاستناد لواقع ليبيا/الكود</div><div class="bar-track"><div class="bar-fill" style="width:85%"></div></div><div class="bar-val num">8.5</div></div>
+        <div class="bar-row"><div class="bar-label">جاهزية بدء PR-01 فورًا</div><div class="bar-track"><div class="bar-fill" style="width:80%"></div></div><div class="bar-val num">8.0</div></div>
+        <div class="bar-row"><div class="bar-label">الصدق المعرفي (مُعلَن مقابل مُطبَّق)</div><div class="bar-track"><div class="bar-fill" style="width:70%"></div></div><div class="bar-val num">7.0</div></div>
+        <div class="bar-row"><div class="bar-label">اتساق الحالة الداخلية (§7 مقابل §10)</div><div class="bar-track"><div class="bar-fill" style="width:60%"></div></div><div class="bar-val num">6.0</div></div>
+        <div class="bar-row"><div class="bar-label">اكتمال النطاق التجاري (نزاعات/تسويات/إعلانات)</div><div class="bar-track"><div class="bar-fill" style="width:60%"></div></div><div class="bar-val num">6.0</div></div>
+      </div>
+
+      <div class="scroll-x">
+        <table class="scope-table">
+          <thead><tr><th>العنصر</th><th>R1 (مفاهيمي)</th><th>R4 (مخطط الربط)</th><th>MES (النهائي)</th></tr></thead>
+          <tbody>
+            <tr><td>آلة حالة النزاع التجاري الموحَّدة</td><td class="mark-yes">✓ كاملة</td><td class="mark-part">جزئيًا (استلام فقط)</td><td class="mark-no">✗ غائبة</td></tr>
+            <tr><td>وحدة إعلانات Trade</td><td class="mark-no">✗ غير مذكورة</td><td class="mark-yes">✓ 8 جداول</td><td class="mark-no">✗ اختفت بلا وسم</td></tr>
+            <tr><td>جداول تسوية/إشعار دائن-مدين</td><td class="mark-part">مفهوم عام فقط</td><td class="mark-yes">✓ جداول محدَّدة</td><td class="mark-no">✗ غائبة</td></tr>
+            <tr><td>حالة الفاتورة كمُعدَّد صريح</td><td class="mark-no">✗ غير موجودة</td><td class="mark-yes">✓ 10 قيم</td><td class="mark-no">✗ اختفت</td></tr>
+            <tr><td>معرّفات تتبّع (TRD-IDs)</td><td class="mark-no">✗</td><td class="mark-part">جزئي (Bundles فقط)</td><td class="mark-yes">✓ كامل</td></tr>
+            <tr><td>ربط بملفات مستودع حقيقية</td><td class="mark-no">✗</td><td class="mark-yes">✓ كامل</td><td class="mark-yes">✓ موروث من R4</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 8. VERDICT ============ -->
+    <section id="verdict">
+      <div class="sec-head"><span class="sec-no">08</span><h2 class="sec-title">الحكم النهائي</h2></div>
+
+      <div class="final-card">
+        <p class="lede" style="max-width:none; margin-top:.6rem;">
+          <b>Master Engineering Specification (2026-07-22) هي أقوى وثيقة في سلسلة تصميم Tawa Trade</b>، وتستحق فعليًا لقب «مواصفة قابلة للتحقّق» الذي تدّعيه: معرّفات تتبّع حقيقية، معايير خارجية معتمدة، صدق منهجي حول حدود المراجعة، وقرارات أمنية مبنية على أعطال حقيقية موثَّقة في هذا المستودع تحديدًا لا على تخمين.
+        </p>
+        <p style="max-width:none">
+          لكن عملية «التوليف» التي تدّعيها في §2 لم تكن دمجًا خالصًا — فقدت في الطريق خمسة عناصر كانت أكثر اكتمالًا في أسلافها (آلة النزاع، حالة الفاتورة، الإعلانات، جداول التسوية، وأربعة من ستة محاور حالة PO المُعلَنة)، وطبّقت منهجيتها الخاصة في الوسم المعرفي جزئيًا فقط. كما لم تربط توصياتها الأمنية بأسماء الأعطال والدوال المحدَّدة التي وثّقها هذا المشروع بالذات في مسارات أخرى.
+        </p>
+        <p style="max-width:none; margin-bottom:0">
+          <b>التوصية العملية:</b> الوثيقة صالحة كأساس لبدء <code>PR-01</code> فورًا كما تقترح §18.2، بشرط سدّ الفجوات السبع أعلاه أولًا — تحديدًا MES-01 وMES-03 وMES-05 (حالة الفاتورة، النزاع، التسوية المالية) لأنها الثلاثة الأقرب لتكرار أعطال مالية حقيقية سبق توثيقها في هذا المستودع.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      منهجية هذا التقرير: قراءة كاملة سطرًا بسطر للملفات الخمسة (b2b_architecture_report · comprehensive_control_plane_audit_2026-07-19 · platform_reaudit_2026-07-20 · exact_integration_blueprint_2026-07-21 · master_engineering_specification_2026-07-22)، تحقّق مباشر عبر <code>ls</code> على مجلد المصدر لادّعاءات الاستشهاد في §2، ومطابقة القرارات المعمارية بذاكرة المشروع الموثَّقة عن نفس المستودع. كل رقم قسم ومعرّف جدول مذكور أعلاه منقول حرفيًا من نص الوثائق الخمس.
+    </footer>
+
+  </div>
+</body>
+</html>

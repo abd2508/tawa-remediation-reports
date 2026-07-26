@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>الخطّة المُنقَّحة 449e — بعد المراجعة العميقة بالكود</title>
+<style>
+  :root { --green:#0e7a4f; --green-soft:#e6f3ed; --red:#b3261e; --red-soft:#fde7e6;
+          --amber:#b86e00; --amber-soft:#fff3df; --blue:#1a73e8; --blue-soft:#eef5ff;
+          --purple:#7b1fa2; --purple-soft:#f3e5f5;
+          --gray:#5a5a5a; --border:#d8d8d8; }
+  body { font-family:"Noto Naskh Arabic","Amiri","Segoe UI",Tahoma,sans-serif;
+         max-width:1200px; margin:2rem auto; padding:0 1.25rem; line-height:1.85;
+         color:#1c1c1c; background:#fafafa; }
+  h1 { color:var(--green); border-bottom:3px solid var(--green); padding-bottom:0.5rem; }
+  h2 { color:var(--green); margin-top:2.5rem; background:var(--green-soft);
+       padding:0.6rem 0.9rem; border-radius:0 6px 6px 0; border-right:4px solid var(--green); }
+  h3 { color:#224d3a; margin-top:1.6rem; }
+  h4 { margin-top:1rem; margin-bottom:0.3rem; color:#333; }
+  .meta { color:var(--gray); font-size:0.92rem; margin-bottom:1.5rem; }
+  .badge { display:inline-block; padding:0.15rem 0.6rem; border-radius:999px;
+           font-size:0.82rem; font-weight:700; }
+  .badge.p0 { background:var(--red-soft); color:var(--red); }
+  .badge.p1 { background:var(--amber-soft); color:var(--amber); }
+  .badge.p2 { background:var(--blue-soft); color:var(--blue); }
+  .badge.replan { background:var(--red); color:white; }
+  .badge.major { background:#ff9800; color:white; }
+  .badge.minor { background:var(--blue); color:white; }
+  .badge.cancel { background:var(--gray); color:white; }
+  .badge.ok { background:var(--green); color:white; }
+  .badge.new { background:var(--purple); color:white; }
+  .wave { background:white; border:2px solid var(--border); border-radius:14px;
+          padding:1.4rem 1.6rem; margin:1.5rem 0; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+  .wave.w1 { border-color:var(--red); }
+  .wave.w2 { border-color:var(--purple); }
+  .wave.w3 { border-color:var(--amber); }
+  .wave.w4 { border-color:var(--blue); }
+  .wave.w5 { border-color:#ed9c00; }
+  .wave.w6 { border-color:#2e7d32; }
+  .wave.w7 { border-color:#666; }
+  .wave-head { display:flex; justify-content:space-between; align-items:baseline;
+               border-bottom:2px dashed var(--green-soft); padding-bottom:0.5rem;
+               margin-bottom:1rem; }
+  .wave-head .title { font-weight:800; color:var(--green); font-size:1.3rem; }
+  .item { background:#fafafa; border-right:4px solid var(--gray); padding:0.9rem 1.1rem;
+          margin:0.7rem 0; border-radius:6px; }
+  .item h4 { margin-top:0; }
+  .item.p0 { border-color:var(--red); background:#fffbfb; }
+  .item.p1 { border-color:var(--amber); background:#fffcf6; }
+  .item.p2 { border-color:var(--blue); background:#f9fbff; }
+  .item.cancel { border-color:var(--gray); background:#f5f5f5; opacity:0.7; }
+  .item.new { border-color:var(--purple); background:#faf5ff; }
+  .label { font-weight:700; color:var(--gray); display:inline-block; min-width:90px; }
+  code { background:#f6f6f6; border:1px solid #eaeaea; border-radius:4px;
+         padding:0.05rem 0.35rem; font-size:0.9em; direction:ltr; display:inline-block;
+         font-family:"Fira Code","JetBrains Mono",monospace; }
+  pre { background:#1e1e2e; color:#e6e6e6; padding:0.85rem 1rem; border-radius:8px;
+        overflow-x:auto; direction:ltr; font-family:"Fira Code",monospace;
+        font-size:0.82rem; line-height:1.55; }
+  pre.diff .add { color:#98c379; }
+  pre.diff .del { color:#e06c75; }
+  pre.sql { background:#fdf6e3; color:#586e75; border:1px solid #eee8d5; }
+  table { width:100%; border-collapse:collapse; margin:0.75rem 0; background:white;
+          border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+  th, td { border:1px solid var(--border); padding:0.55rem 0.75rem; text-align:right; vertical-align:top; }
+  th { background:var(--green-soft); color:var(--green); font-weight:700; }
+  tr.bad td { background:#fff5f5; }
+  tr.ok td { background:#f0faf4; }
+  .file { font-family:"Fira Code",monospace; direction:ltr; display:inline-block; color:#224d3a; font-size:0.88em; }
+  .kpi { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+         gap:0.6rem; margin:1rem 0; }
+  .kpi .box { background:white; border:1px solid var(--border); border-radius:8px;
+              padding:0.7rem 0.9rem; text-align:center; }
+  .kpi .box .v { font-size:1.5rem; font-weight:800; color:var(--green); }
+  .kpi .box .l { font-size:0.82rem; color:var(--gray); }
+  .toc { background:white; border:1px solid var(--border); border-radius:8px; padding:1rem 1.5rem; }
+  .toc a { color:var(--green); text-decoration:none; }
+  ul.compact li { margin:0.18rem 0; }
+  .discovery { background:#fff3df; border-right:5px solid var(--amber); padding:0.7rem 1rem;
+               border-radius:6px; margin:0.5rem 0; font-size:0.92rem; }
+  .acc { background:#e6f3ed; color:#0e7a4f; padding:0.5rem 0.8rem; border-radius:6px;
+         margin-top:0.5rem; font-size:0.9rem; }
+  .risk { background:#fff3df; color:#b86e00; padding:0.5rem 0.8rem; border-radius:6px;
+          margin-top:0.5rem; font-size:0.9rem; }
+  .delta { background:#f3e5f5; color:#7b1fa2; padding:0.5rem 0.8rem; border-radius:6px;
+           margin-top:0.5rem; font-size:0.9rem; font-weight:600; }
+  .question { background:var(--blue-soft); color:var(--blue); padding:0.7rem 1rem;
+              border-radius:6px; margin:0.5rem 0; font-weight:600; }
+</style>
+</head>
+<body>
+
+<h1>الخطّة المُنقَّحة 449e — بعد المراجعة العميقة بالكود</h1>
+<div class="meta">
+  📅 <strong>التاريخ:</strong> 2026-05-26 &nbsp;·&nbsp;
+  🔬 <strong>منهج المراجعة:</strong> أنا قَرأت W1 شخصياً + 3 subagents لـW3-W7 = ~140 ملفّاً مَفحوصاً &nbsp;·&nbsp;
+  📊 <strong>التَّعديلات:</strong> 17 تَعديل · 30 عيب جديد مَخفيّ · 7 أسئلة قرار
+  &nbsp;·&nbsp; 📄 <strong>الأصل:</strong>
+    <a href="خطة-إصلاح-شاملة-بعد-المحاكاة-449d.html">449d</a>
+</div>
+
+<div class="kpi">
+  <div class="box"><div class="v">22</div><div class="l">عيب من المحاكاة</div></div>
+  <div class="box"><div class="v">30</div><div class="l">🚨 عيب جديد كَشفته المراجعة</div></div>
+  <div class="box"><div class="v">3</div><div class="l">بنود تَحتاج إعادة تَخطيط</div></div>
+  <div class="box"><div class="v">2</div><div class="l">بنود تُلغى (مُنفَّذة فعلاً)</div></div>
+  <div class="box"><div class="v">7</div><div class="l">أسئلة لك للقرار</div></div>
+  <div class="box"><div class="v">~16 س</div><div class="l">تَقدير مُحدَّث (كان 12)</div></div>
+</div>
+
+<div class="toc">
+<strong>محتويات الخطّة المُنقَّحة</strong>
+<ul class="compact">
+  <li><a href="#summary">١. ملخّص المراجعة — ماذا تَغيّر؟</a></li>
+  <li><a href="#discoveries">٢. أهمّ 10 اكتشافات جديدة لم نَكن نَعرفها</a></li>
+  <li><a href="#questions">٣. 7 أسئلة قرار قبل أن أُنفّذ</a></li>
+  <li><a href="#w1">٤. الموجة W1 المُنقَّحة — P0 الفوريّ</a></li>
+  <li><a href="#w2">٥. الموجة W2 — نَشر 449 + 449b (بلا تَغيير)</a></li>
+  <li><a href="#w3">٦. الموجة W3 المُنقَّحة — P1 (تَعديل جوهريّ)</a></li>
+  <li><a href="#w4">٧. الموجة W4 المُنقَّحة — Aliases + RBAC + drift</a></li>
+  <li><a href="#w5">٨. الموجة W5 المُنقَّحة — UX (2 بند يُلغى)</a></li>
+  <li><a href="#w6">٩. الموجة W6 المُنقَّحة — سياسات + جغرافيا</a></li>
+  <li><a href="#w7">١٠. الموجة W7 المُنقَّحة — عقد + i18n</a></li>
+  <li><a href="#new-wave">١١. <strong>الموجة الجديدة W0 (دفاع في العمق)</strong></a></li>
+  <li><a href="#timeline">١٢. الجدول الزمنيّ المُحدَّث</a></li>
+</ul>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="summary">١. ملخّص المراجعة — ماذا تَغيّر؟</h2>
+
+<div class="discovery">
+<strong>🔑 الاكتشاف الأهمّ:</strong> الـrootcause لـP0-1 (accept_timeout sweep failure) <strong>أَعمق ممّا ظَننّا:</strong>
+الـSSE handlers (7 منها في الـrepo) يَفتحون <code>AsyncSessionLocal</code> داخل streams طويلة. عند انقطاع العميل، <code>CancelledError</code> يُلغي coroutine، لكنّ <code>get_db()</code> لا يَفعل rollback في finally → asyncpg connection يَبقى aborted في pool → كل background job يَستعيره يَفشل.
+<br/><br/>
+الإصلاح المُقترَح في 449d (pool منفصل للـsweep) <strong>يَحلّ الأعراض فقط</strong>. الحلّ الجذريّ يَحتاج: (أ) تَعديل <code>get_db()</code> ليَفعل rollback، (ب) تَعديل SSE handlers لإغلاق الـsession قبل بدء stream الطويل، (ج) pool منفصل للـbackground (دفاع في العمق).
+</div>
+
+<div class="discovery">
+<strong>🎯 الاكتشاف الثاني الأهمّ:</strong> الـrootcause لـP0-3 (wallet topup 500) <strong>مَزدوج:</strong>
+<ol>
+<li>الـbackend يَفشل بـ500 بدل 422 (السبب المعلوم في الخطّة)</li>
+<li><strong>الجزء الجديد:</strong> <code>GET /customer/me</code> يُرجع <code>user_id</code> (لا <code>id</code>)! الـsim D2 فعل <code>customer_id = me.get("id")</code> → <code>None</code> → fallback <code>"self"</code> → FK violation → 500. هذا نفسه عيب M11 (API contract drift) الذي صَنّفناه P2. <strong>إنّه P0 لأنّه يَكسر مَسار wallet كامل.</strong></li>
+</ol>
+</div>
+
+<div class="discovery">
+<strong>🚨 ثلاثة بنود تَحتاج إعادة تَخطيط جوهريّ:</strong>
+<ul class="compact">
+<li><strong>W3-1 (H2):</strong> الـdiff في الخطّة يَستخدم <code>item.base_price_minor</code> — <strong>هذا الحقل غير موجود في <code>CatalogItem</code></strong> (السعر على <code>ItemVariant.base_price</code>). الكود المُقترَح يَفشل بـAttributeError. <strong>+ اكتشاف منفصل:</strong> <code>GET /providers/{id}/catalog</code> العام لا يَفلتر بـ<code>provider.status</code> ⇒ مُزوّد PENDING بصنف PUBLISHED يَظهر علناً (تَسرّب مُختلف عمّا ظَننّا).</li>
+<li><strong>W3-4 (H8):</strong> الـquery الذي اقترحناه إصلاحه في <code>/operations/dashboard</code> — <strong>هذا الـendpoint لا يُرجع <code>pending_onboarding</code> أصلاً</strong>. الحقل في <code>/operations/kpi</code> (سطر 1190) والـquery يَستخدم <code>Provider.status='PENDING'</code> فقط (يَفوت السائقين كاملاً).</li>
+<li><strong>W4-4 (M11):</strong> «backward-compatible» مع تَحويل <code>detail:[]</code> → envelope <strong>مُتناقضان</strong>. اختبارات قائمة تَفحص <code>detail[0]</code> ستَنكسر. الحلّ: إبقاء <code>detail</code> تَحت <code>details</code> في الـenvelope.</li>
+</ul>
+</div>
+
+<div class="discovery">
+<strong>❌ بَندان يُلغيان (مُنفَّذان فعلاً):</strong>
+<ul class="compact">
+<li><strong>W5-2 (M5):</strong> شَرح <code>delivery_handoff_code</code> — <strong>مُنفَّذ بالفعل عبر مكوّن <code>HandoffCodeCard</code></strong> الموجود (لكن D1 لم تَره ربّما لأنّ الطلب لم يَصل EN_ROUTE). يَجب التَّحقّق لماذا لم يَظهر بدل إعادة بنائه.</li>
+<li><strong>W6-4 (M9):</strong> endpoint عام للشكاوى — <strong>موجود فعلاً عبر <code>POST /support/sessions</code></strong> (مرحلة 151). لا حاجة لـmigration aa17 لـnullable order_id.</li>
+</ul>
+</div>
+
+<div class="discovery">
+<strong>💡 عيب جديد كَشفته المراجعة (يَحتاج موجة جديدة):</strong> 5 تَعريفات مختلفة لـ<code>class ValidationError</code> عبر الـapp + <code>make_localized_error()</code> كُتب ولم يُستخدَم + middleware Idempotency يَنطبق على <strong>4 مَسارات فقط</strong> من ~150 POST. هذه «hardening عَرضيّ» تَحتاج موجة <strong>W0 (دفاع في العمق)</strong> منفصلة.
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="discoveries">٢. أهمّ 10 اكتشافات جديدة لم نَكن نَعرفها</h2>
+
+<table>
+<thead><tr><th>#</th><th>الاكتشاف</th><th>الموجة المُتأثّرة</th><th>الخطورة</th></tr></thead>
+<tbody>
+<tr class="bad"><td>D-1</td><td><strong>السبب الجذريّ لـaccept_timeout sweep أَعمق:</strong> SSE → CancelledError → asyncpg pool corruption</td><td>W1-1</td><td>🔴 يَلمس 12+ موقع</td></tr>
+<tr class="bad"><td>D-2</td><td><code>/customer/me</code> يُرجع <code>user_id</code> لا <code>id</code> ← السبب الحقيقيّ لـwallet topup 500 + M11 ليس مجرّد UX</td><td>W1-3 + W4-4</td><td>🔴 يَكسر FE/mobile clients</td></tr>
+<tr class="bad"><td>D-3</td><td><code>base_price_minor</code> غير موجود على <code>CatalogItem</code> (على <code>ItemVariant</code> فقط)</td><td>W3-1</td><td>🔴 الإصلاح يَفشل compile</td></tr>
+<tr class="bad"><td>D-4</td><td>KPI <code>pending_onboarding</code> في <code>/operations/kpi</code> لا <code>/operations/dashboard</code> + يَفوت السائقين كاملاً</td><td>W3-4</td><td>🟠 إعادة تَخطيط</td></tr>
+<tr class="bad"><td>D-5</td><td><code>GET /providers/{id}/catalog</code> العام لا يَفلتر بـ<code>provider.status</code> ⇒ تَسريب أصناف مُزوّد PENDING علناً</td><td>W3-1 +</td><td>🔴 ثغرة منفصلة</td></tr>
+<tr class="bad"><td>D-6</td><td>الـPII الفِعليّ في <code>/providers/{id}</code> يُسرَّب عبر <code>display_name.ar</code> (يُملأ بـ<code>full_name</code> للمالك) لا عبر <code>contact_phone</code></td><td>W3-2</td><td>🔴 الإصلاح يَلمس registration_router</td></tr>
+<tr class="bad"><td>D-7</td><td><code>require_active_role</code> سيَحجب <code>GET /drivers/me/status</code> من السائق PENDING — الذي هو المُستهدف!</td><td>W3-3</td><td>🟠 يَحتاج <code>require_role</code></td></tr>
+<tr class="bad"><td>D-8</td><td>Dio mobile لا يَتبع 308 افتراضياً ⇒ aliases يَكسر mobile</td><td>W4-1</td><td>🟠 يَحتاج fix في mobile + backend</td></tr>
+<tr class="bad"><td>D-9</td><td>5 تَعريفات مختلفة لـ<code>ValidationError</code> + <code>make_localized_error()</code> كُتب ولم يُستخدَم + 5 سياسات مَوازية</td><td>W0 (جديد)</td><td>🟠 هندسة فوضى</td></tr>
+<tr class="bad"><td>D-10</td><td>middleware Idempotency-Key يَنطبق على <strong>4 مَسارات فقط</strong> من ~150 POST</td><td>W7-3 +</td><td>🟠 ثغرة replay على معظم الـAPI</td></tr>
+</tbody>
+</table>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="questions">٣. 7 أسئلة قرار قبل أن أُنفّذ</h2>
+
+<div class="question">
+<strong>س-1 (P0-1 root cause):</strong> هل أَعمل الإصلاحات الـ3 معاً (pool منفصل + get_db rollback + SSE session-close مبكر) أم فقط pool منفصل (الأقلّ مخاطرة لكن لا يَحلّ السبب)؟
+</div>
+
+<div class="question">
+<strong>س-2 (Wallet semantics):</strong> هل العميل يَستطيع شَحن محفظة شخص آخر (مثل والده)؟ أم الـsemantic «شَحن محفظتي فقط»؟
+<br/><em>توصيتي:</em> CUSTOMER → self فقط، SUPER → أيّ شخص. تَوافق؟
+</div>
+
+<div class="question">
+<strong>س-3 (Catalog price model):</strong> اكتشاف D-3: السعر على <code>ItemVariant</code> لا <code>CatalogItem</code>. هل نُحدّد «الصنف منشور = على الأقلّ variant واحد بـbase_price &gt; 0»؟ أم نُضيف <code>base_price_minor</code> لـ<code>CatalogItem</code> كـmigration؟
+<br/><em>توصيتي:</em> الأوّل (لا migration، يَتّفق مع تَصميم الـvariants).
+</div>
+
+<div class="question">
+<strong>س-4 (KPI pending):</strong> هل نَدمج DRIVER + PROVIDER في رقم واحد، أم نُعطي 3 أرقام منفصلة (<code>pending_providers</code>, <code>pending_drivers</code>, <code>pending_documents</code>)؟
+<br/><em>توصيتي:</em> 3 أرقام منفصلة + إجمالي (أوضح للمشرف).
+</div>
+
+<div class="question">
+<strong>س-5 (Mobile 308):</strong> إصلاح Dio mobile لاتّباع 308 يَحتاج commit في mobile_app. هل نَفعل aliases على الـbackend فقط (يَكسر mobile) أم نُؤجّلها حتى نُحدّث mobile معاً؟
+<br/><em>توصيتي:</em> aliases تَعمل لـweb + curl، mobile يَستخدم paths صحيحة من بداية اليوم → آمن.
+</div>
+
+<div class="question">
+<strong>س-6 (W5-2 handoff code):</strong> مُنفَّذ فعلاً عبر <code>HandoffCodeCard</code>. لماذا لم يَره D1؟ نَتحقّق أوّلاً قبل إلغائه أم نَحذفه من الخطّة؟
+<br/><em>توصيتي:</em> نَتحقّق (sim ثانٍ يَصل EN_ROUTE)، الأرجح أنّه يَعمل ولم تَرَه D1 لأنّ الطلب لم يَتجاوز AWAITING_PROVIDER.
+</div>
+
+<div class="question">
+<strong>س-7 (Address phone):</strong> <code>Address</code> model لا يَحوي <code>phone</code> أصلاً. هل نُضيفه بـmigration (لكلّ عنوان رقم بديل) أم نَستخدم <code>customer.phone</code> فقط؟
+<br/><em>توصيتي:</em> إضافة <code>phone</code> nullable على Address (سياق طرابلس: يَطلب من المنزل ويُريد رقم زوجته للسائق).
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="w1">٤. الموجة W1 المُنقَّحة — P0 الفوريّ</h2>
+
+<div class="wave w1">
+<div class="wave-head">
+<div class="title">🔴 W1 المُنقَّحة (4 بنود الآن، كان 3)</div>
+<div>~4.5 س (كان 3 س) · 0 migration</div>
+</div>
+
+<div class="item p0">
+<h4>W1-1 المُنقَّح · إصلاح accept_timeout sweep <span class="badge major">إعادة تَخطيط</span></h4>
+<div class="delta">
+🚨 <strong>تَغيّر جذريّ:</strong> الإصلاح الأصلي (pool منفصل) يُعالج الأعراض. الحلّ الكامل يَحتاج 3 طبقات:
+</div>
+
+<p><strong>الطبقة 1 (السبب الجذريّ في get_db):</strong></p>
+<pre class="diff"><span class="del">async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session</span>
+<span class="add">async def get_db():
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        except BaseException:  # incl. CancelledError, GeneratorExit
+            await session.rollback()
+            raise</span></pre>
+
+<p><strong>الطبقة 2 (SSE handlers — 7 ملفّات):</strong> فَصل auth check (session قصيرة) عن stream (لا session). نَمَط:</p>
+<pre>async def stream_endpoint(...):
+    # short-lived session for auth check ONLY
+    async with AsyncSessionLocal() as auth_db:
+        order = await auth_db.get(Order, order_id)
+        if order is None:
+            return Response(404)
+        # validate ABAC, then RELEASE session
+    # stream loop uses Redis only (no session held)
+    return StreamingResponse(_redis_subscribe_loop(...))</pre>
+
+<p><strong>الطبقة 3 (دفاع في العمق — sweep pool منفصل):</strong></p>
+<pre>from sqlalchemy.pool import NullPool
+sweep_engine = create_async_engine(
+    settings.database_url, pool_pre_ping=True, poolclass=NullPool,
+)
+SweepSessionLocal = async_sessionmaker(sweep_engine, ...)
+# الـsweep يَستخدمه:
+async with SweepSessionLocal() as db:
+    try:
+        ...
+    except InFailedSQLTransactionError:
+        await db.rollback()
+        continue</pre>
+
+<p><strong>الملفّات:</strong> <span class="file">backend/app/db/session.py</span> · <span class="file">backend/app/modules/sse/{order_tracking,provider_stream,fleet_stream,sse_router}.py</span> · <span class="file">backend/app/main.py</span></p>
+
+<div class="risk">⚠ مخاطر: 7 SSE handlers تَحتاج تَعديل + 3 background loops يَجب تَحويلها لـSweepSessionLocal. لكنّ الطبقة 1 وحدها تَكفي للـPOST/PUT (90% من الطلبات).</div>
+
+<div class="acc">✓ <strong>القبول:</strong> 0 <code>InFailedSQLTransactionError</code> في logs ساعة كاملة بعد النشر + tests stress: 100 SSE connect/cancel متوالية لا تَفسد الـpool.</div>
+
+<div class="risk">⏱ <strong>تَقدير مُحدَّث:</strong> 1.5 ساعة (كان 30 دقيقة) — بسبب 7 SSE handlers + اختبارات stress.</div>
+</div>
+
+<div class="item p0">
+<h4>W1-2 المُنقَّح · فتح اعتماد السائق <span class="badge minor">تَعديل بسيط</span></h4>
+<div class="delta">
+🎯 <strong>اكتشاف:</strong> الـregistration <strong>يَجمع</strong> vehicle_make/model/plate فعلاً (RegisterBody:135-137، router:400-402)، والـFE فيه الحقول. <strong>المشكلة:</strong> الحقول <em>اختياريّة</em> في الـUI (label «اختياري»)، لذا الـAgent في الـsim تَجاهلها. الـapprove يَفشل لاحقاً لأن الحقول null.
+</div>
+
+<p><strong>الإصلاح الحقيقيّ (ليس endpoint جديد):</strong></p>
+<ol>
+<li><strong>FE (RegistrationPage):</strong> جَعل make/model/plate <strong>إلزاميّة</strong> لـCAR/MOTORCYCLE/SCOOTER (إزالة «(اختياري)»). تَأكيد قبل submit.</li>
+<li><strong>Backend (registration_router.py):</strong> إضافة validation عند <code>vehicle_type IN (CAR, MOTORCYCLE)</code> + الحقول الـ3 يَجب أن تَكون موجودة → 422 برسالة عربية واضحة قبل DB write.</li>
+<li><strong>Backend (operations_router.py:849):</strong> إضافة endpoint جديد <code>PATCH /operations/drivers/{id}/vehicle</code> لـSUPER ليُعالج السائقين القُدامى الذين سَجّلوا قبل الإصلاح.</li>
+</ol>
+
+<div class="acc">✓ sim ثانٍ: السائق يُسجّل بـmake/model/plate من البداية → approve مباشر 200 → availability يَعمل → location_events &gt; 0.</div>
+<div class="risk">⚠ منخفضة — التَّعديل backward-compatible (الحقول كانت optional في الـmodel، تَصبح required في الـvalidation فقط).</div>
+<div class="risk">⏱ تَقدير: 1 ساعة (لم يَتغيّر).</div>
+</div>
+
+<div class="item p0">
+<h4>W1-3 المُنقَّح · إصلاح wallet topup 500 <span class="badge major">إضافة جوهريّة</span></h4>
+<div class="delta">
+🎯 <strong>اكتشاف جديد:</strong> الـrootcause مُزدوَج. الجزء الثاني (تَوحيد <code>/customer/me</code> ليُرجع <code>id</code>) <strong>يُحلّ M11 أيضاً</strong> وليس فقط P0-3.
+</div>
+
+<p><strong>الإصلاح (4 طبقات):</strong></p>
+<ol>
+<li><strong>صَلابة backend:</strong> فَحص وجود الـuser قبل <code>get_or_create_wallet</code> → 422 برسالة واضحة بدل 500 FK.</li>
+<li><strong>منع إساءة الاستخدام:</strong> إذا الـrole = CUSTOMER، فَرض <code>beneficiary_user_id == user.user_id</code>. SUPER يَستطيع لشخص آخر.</li>
+<li><strong>تَوحيد source_method:</strong> <code>Literal</code> في الـschema يُحدّد القائمة المَقبولة.</li>
+<li><strong>🆕 توحيد <code>/customer/me</code>:</strong> إضافة <code>id</code> كـalias لـ<code>user_id</code> (يَحلّ FE/mobile clients التي تَتوقّع <code>id</code>). هذا يُغني عن بَند M11 الكبير في W4-4.</li>
+</ol>
+
+<p><strong>التَّأثير على الـUI:</strong> اختياريّ — جَعل <code>beneficiary_user_id</code> اختيارياً في WalletTopupRequest (default = authenticated user). أنظف.</p>
+
+<div class="acc">✓ topup ينجح / لا 500 ضدّ user غير موجود (422) / CUSTOMER لا يَستطيع شَحن شخص آخر (403) / `/customer/me` يَحوي <code>id</code> + <code>user_id</code>.</div>
+<div class="risk">⏱ 1 ساعة (لم يَتغيّر).</div>
+</div>
+
+<div class="item p0 new">
+<h4>W1-4 <span class="badge new">جديد</span> · إصلاح <code>/providers/{id}/catalog</code> تَسريب أصناف PENDING</h4>
+<div class="delta">
+🚨 <strong>اكتشاف D-5:</strong> الـendpoint العامّ يَعرض أصناف مُزوّد PENDING للجمهور. هذا تَسريب أمنيّ مُنفصل عن H2.
+</div>
+<p><strong>الإصلاح:</strong> في <code>provider_router.list_provider_catalog</code> (للزائر): فَلتر <code>WHERE provider.status='ACTIVE' AND provider.is_accepting_orders=true</code>. لو غير ACTIVE → 404 (لا 200 بقائمة فارغة، لتَجنّب الـenumeration).</p>
+<div class="acc">✓ مُزوّد PENDING في الـsim → /providers/{id}/catalog = 404 للزائر.</div>
+<div class="risk">⏱ 20 دقيقة.</div>
+</div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="w2">٥. الموجة W2 — نَشر 449 + 449b (بلا تَغيير)</h2>
+<p>الـcode + migration جاهزة من 449/449b. النَشر يَحلّ 7 عيوب فوراً. لا تَعديل من المراجعة. <strong>~30 دقيقة.</strong></p>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="w3">٦. الموجة W3 المُنقَّحة — P1 (تَعديل جوهريّ)</h2>
+
+<div class="wave w3">
+<div class="wave-head">
+<div class="title">🟠 W3 المُنقَّحة</div>
+<div>~3 س (كان 2.5 س)</div>
+</div>
+
+<div class="item p1">
+<h4>W3-1 المُنقَّح · منع نشر صنف بسعر null <span class="badge replan">إعادة تَخطيط</span></h4>
+<div class="delta">
+🚨 D-3: الـdiff الأصلي يَستخدم <code>item.base_price_minor</code> غير موجود. السعر على <code>ItemVariant.base_price</code>.
+</div>
+<p><strong>الإصلاح المُحدَّث (يَتطلّب جوابك على س-3):</strong></p>
+<pre class="diff"><span class="add"># في catalog_router.publish_item:
+if provider.status != "ACTIVE":
+    raise ValidationError(...)
+
+# جلب الـvariants للصنف
+variants = await db.execute(
+    select(ItemVariant).where(ItemVariant.catalog_item_id == item.id)
+)
+if not any(v.base_price is not None and v.base_price &gt; 0 for v in variants):
+    raise ValidationError("لا يُمكن نشر صنف بلا variant مُسعَّر")</span></pre>
+<p><strong>+ إصلاح D-5:</strong> <code>/providers/{id}/catalog</code> يَفلتر بـprovider.status (نُقل إلى W1-4 لأنّه أمنيّ).</p>
+<div class="acc">✓ مُزوّد PENDING يُحاول publish → 422؛ ACTIVE بـvariants بلا سعر → 422؛ ACTIVE + variant مُسعَّر → 200.</div>
+</div>
+
+<div class="item p1">
+<h4>W3-2 المُنقَّح · إخفاء PII <span class="badge major">تَعديل</span></h4>
+<div class="delta">
+🚨 D-6: PII يُسرَّب عبر <code>display_name.ar</code> (يُملأ بـ<code>full_name</code> للمالك في registration:365) لا عبر <code>contact_phone</code>.
+</div>
+<p><strong>الإصلاح المُحدَّث (طبقتان):</strong></p>
+<ol>
+<li><strong>registration_router.py:365</strong> — عند إنشاء Provider، <code>display_name.ar = business_name</code> (لا full_name).</li>
+<li><strong>provider_router.py:_provider_public_dict</strong> — للـanon: لا يَحوي <code>display_name</code> أبداً (يَحوي فقط <code>business_name</code> + <code>provider_type</code> + <code>city</code>).</li>
+<li><strong>migration البيانات الموجودة:</strong> SQL منفصل (لا alembic) لتَحديث <code>providers.display_name->>ar</code> ليُساوي <code>business_name</code> لكل الصفوف القائمة.</li>
+</ol>
+<div class="acc">✓ anon GET /providers/{id} → لا full_name ولا phone للمالك. providers الموجودون أُصلِحوا أيضاً.</div>
+</div>
+
+<div class="item p1">
+<h4>W3-3 المُنقَّح · <code>GET /drivers/me/status</code> <span class="badge minor">تَعديل بسيط</span></h4>
+<div class="delta">
+🚨 D-7: <code>require_active_role</code> يَحجب PENDING — وهو المُستهدف! يَجب استخدام <code>require_role</code>.
+</div>
+<div class="acc">✓ سائق PENDING يَستطيع استدعاء الـendpoint ويَرى ما يَنقصه.</div>
+</div>
+
+<div class="item p1">
+<h4>W3-4 المُنقَّح · إصلاح KPI <span class="badge replan">إعادة تَخطيط كاملة</span></h4>
+<div class="delta">
+🚨 D-4: الـquery في <code>/operations/kpi</code> لا <code>/operations/dashboard</code>. يَفوت السائقين كاملاً. + سؤال س-4 (3 أرقام منفصلة؟).
+</div>
+<p><strong>الإصلاح (بعد جوابك على س-4):</strong> تَوسيع الـquery في <code>/operations/kpi</code>:</p>
+<pre class="sql">SELECT
+  (SELECT COUNT(*) FROM providers WHERE status='PENDING') AS pending_providers,
+  (SELECT COUNT(*) FROM drivers WHERE status='PENDING') AS pending_drivers,
+  (SELECT COUNT(*) FROM provider_documents WHERE status='PENDING') AS pending_docs_provider,
+  (SELECT COUNT(*) FROM driver_documents WHERE status='PENDING') AS pending_docs_driver</pre>
+<p>الـresponse يَحوي 4 أرقام منفصلة + إجمالي. الـFE OpsDashboard يَعرضها في بطاقات منفصلة.</p>
+</div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="w4">٧. الموجة W4 المُنقَّحة — Aliases + RBAC + drift</h2>
+
+<div class="wave w4">
+<div class="wave-head"><div class="title">🔵 W4 المُنقَّحة</div><div>~2 س (كان 1.5)</div></div>
+
+<div class="item p2">
+<h4>W4-1 المُنقَّح · 308 aliases <span class="badge minor">تَحذير mobile</span></h4>
+<div class="delta">🚨 D-8: Dio mobile لا يَتبع 308 افتراضياً (يَحتاج <code>followRedirects: true</code>). + ترتيب middleware حَرِج.</div>
+<p><strong>الإصلاح:</strong></p>
+<ol>
+<li>middleware يُسجَّل <strong>بعد CORS، قبل RateLimit</strong>.</li>
+<li>اختبار: web (curl/axios يَتبع 308) + Flutter mobile (يَحتاج تَأكّد).</li>
+<li><strong>توصية:</strong> ablation — أَطلق الـaliases على staging قبل أن يَعتمد عليها mobile. Mobile يَستخدم paths صحيحة من اليوم.</li>
+</ol>
+</div>
+
+<div class="item p2">
+<h4>W4-2 · RBAC fix <span class="badge ok">بلا تَغيير</span></h4>
+<p>صَحيح كما في 449d.</p>
+</div>
+
+<div class="item p2">
+<h4>W4-3 المُنقَّح · provider_name في POST /orders <span class="badge minor">تَنبيه</span></h4>
+<div class="delta">🚨 W3-2 (إخفاء display_name) قد يَتعارض مع <code>_provider_name_map</code> الذي يَستخدم display_name. <strong>الإصلاح:</strong> استخدم <code>business_name</code> مباشرةً (هو الاسم التجاري الصحيح).</div>
+</div>
+
+<div class="item p2">
+<h4>W4-4 المُنقَّح · تَوحيد API contract <span class="badge replan">إعادة تَخطيط</span></h4>
+<div class="delta">🚨 جزء «id alias» مَنقول إلى W1-3 (لأنّه يَكسر wallet). المتبقّي في W4-4 = توحيد error envelope بدون كَسر تَوافق.</div>
+<p><strong>الإصلاح المُحدَّث:</strong></p>
+<pre># exception_handlers.py الجديد:
+async def validation_handler(request, exc):
+    return JSONResponse(422, {
+        "code": "VALIDATION_ERROR",
+        "message_ar": "بيانات غير صالحة",
+        "message_en": "Validation error",
+        "details": {"errors": jsonable_encoder(exc.errors())},
+        # detail يَبقى للـtoolchains القديمة:
+        "detail": exc.errors(),
+    })</pre>
+<p><strong>اختبار regression أوّلاً:</strong> <code>grep -r '"detail":' backend/tests/ | wc -l</code> لمعرفة كم اختبار يَفحص <code>detail[0]</code>.</p>
+</div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="w5">٨. الموجة W5 المُنقَّحة — UX (2 بند يُلغى)</h2>
+
+<div class="wave w5">
+<div class="wave-head"><div class="title">🟡 W5 المُنقَّحة</div><div>~1.5 س (كان 2 س)</div></div>
+
+<div class="item p2">
+<h4>W5-1 المُنقَّح · countdown timer <span class="badge minor">اسم config مُختلف</span></h4>
+<div class="delta">🚨 الاسم الفعليّ <code>provider_order_accept_timeout_seconds</code> (ثوانٍ من feature_toggles) لا <code>provider_response_timeout_minutes</code>.</div>
+</div>
+
+<div class="item cancel">
+<h4>W5-2 · شرح handoff_code <span class="badge cancel">يُلغى (مُنفَّذ فعلاً)</span></h4>
+<p>مُنفَّذ بالفعل عبر مكوّن <code>HandoffCodeCard</code>. <strong>إجراء:</strong> sim ثانٍ للتَّأكّد. إن لم يَظهر، نَفحص لماذا (state machine؟ visibility condition؟).</p>
+</div>
+
+<div class="item p2">
+<h4>W5-3 المُنقَّح · SSE في تَتبّع العميل <span class="badge minor">poll الحقيقي 15ث</span></h4>
+<div class="delta">🚨 الـpoll الحاليّ 15ث (ليس 60ث كما في تَقرير D1). الـoptimization حقيقيّة لكن أقلّ خَطورة ممّا ظَننّا.</div>
+</div>
+
+<div class="item p2">
+<h4>W5-4 · banner للمزوّد <span class="badge ok">بلا تَغيير</span></h4>
+</div>
+
+<div class="item p2">
+<h4>W5-5 المُنقَّح · PATCH status <span class="badge minor">السلوك مختلف</span></h4>
+<div class="delta">🚨 الـbackend يُرجع <code>PENDING_APPROVAL</code> (لا DRAFT) — التَّقرير الأصلي D1 كان غير دقيق. <strong>الإصلاح:</strong> إضافة header/banner في الـFE يَشرح «الصنف يَنتظر موافقة OPS» بدل عَرض «PENDING_APPROVAL» نَصّيّاً.</div>
+</div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="w6">٩. الموجة W6 المُنقَّحة — سياسات + جغرافيا</h2>
+
+<div class="wave w6">
+<div class="wave-head"><div class="title">🟢 W6 المُنقَّحة</div><div>~1 س (كان 1.5)</div></div>
+
+<div class="item p2"><h4>W6-1 · radius cap <span class="badge ok">بلا تَغيير</span></h4></div>
+<div class="item p2"><h4>W6-2 · qty cap + OTP <span class="badge ok">بلا تَغيير</span></h4></div>
+<div class="item p2"><h4>W6-3 · radius_km في search <span class="badge ok">بلا تَغيير</span></h4></div>
+
+<div class="item cancel">
+<h4>W6-4 · endpoint عام للشكاوى <span class="badge cancel">يُلغى</span></h4>
+<p><strong>مَوجود فعلاً</strong> عبر <code>POST /support/sessions</code> (مرحلة 151). <strong>لا حاجة</strong> لـmigration aa17 ولا تَطوير جديد. ربّما يَلزم فقط ربط FE «اتصل بالدعم» بهذا الـendpoint.</p>
+</div>
+
+<div class="item p2">
+<h4>W6-5 · «وضعية مشغول» للسائق <span class="badge minor">يَحتاج migration</span></h4>
+<div class="delta">🚨 إضافة عمود <code>availability_state</code> يَتطلّب migration aa17. <strong>سؤال س-جانبي:</strong> هل نُؤجّله لموجة لاحقة لتَجنّب migration هنا؟ توصيتي: نَعم، يَنتظر العميل النهائي.</div>
+</div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="w7">١٠. الموجة W7 المُنقَّحة — عقد + i18n</h2>
+
+<div class="wave w7">
+<div class="wave-head"><div class="title">⚪ W7 المُنقَّحة</div><div>~1.5 س (كان 1 س)</div></div>
+
+<div class="item p2">
+<h4>W7-1 المُنقَّح · تَوحيد envelope + i18n <span class="badge major">إعادة scope</span></h4>
+<div class="delta">🚨 <code>make_localized_error()</code> كُتب ولم يُستخدَم. 5 تَعريفات مختلفة لـ<code>ValidationError</code>. الـscope الحقيقيّ أكبر.</div>
+<p><strong>الإصلاح المُوسَّع:</strong></p>
+<ol>
+<li>تَوحيد كل تَعريفات <code>ValidationError</code> في <code>app/core/exceptions.py</code>.</li>
+<li>middleware عُلويّ يَلتقط أيّ HTTPException + RequestValidationError → envelope موحَّد.</li>
+<li>كل enum validator يَستخدم <code>make_localized_error</code> الموجود (تَفعيل ما هو مكتوب لكن مُهمَل).</li>
+</ol>
+</div>
+
+<div class="item p2">
+<h4>W7-2 المُنقَّح · إصلاح إسقاط حقول العنوان <span class="badge major">يَحتاج migration</span></h4>
+<div class="delta">🚨 <code>Address.phone</code> غير موجود في الـmodel أصلاً. إضافته = migration. + <code>delivery_notes_default</code> المُخزَّن <strong>لا يَصل للسّائق</strong> أصلاً.</div>
+<p><strong>الإصلاح (يَتطلّب جوابك على س-7):</strong></p>
+<ol>
+<li><strong>migration aa17:</strong> إضافة <code>addresses.phone</code> (nullable String(30)).</li>
+<li><strong>Pydantic <code>extra="forbid"</code></strong> + إضافة <code>notes</code> alias لـ<code>delivery_notes_default</code>.</li>
+<li><strong>إصلاح تَدفّق الـnotes للسائق:</strong> <code>get_order_for_driver</code> يَجب أن يَحوي <code>delivery_address.delivery_notes_default</code> + <code>delivery_address.phone</code>.</li>
+</ol>
+</div>
+
+<div class="item p2">
+<h4>W7-3 المُنقَّح · Idempotency-Key <span class="badge major">scope أكبر</span></h4>
+<div class="delta">🚨 middleware يَنطبق على <strong>4 مَسارات فقط</strong>. بقيّة الـPOSTs بلا حِماية replay على الإطلاق.</div>
+<p><strong>الإصلاح:</strong> تَوسيع middleware لكلّ POST تَحت <code>/orders/*</code>, <code>/wallets/*</code>, <code>/dispatch/*</code>, <code>/providers/me/*</code>. توثيق في openapi.</p>
+</div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="new-wave">١١. <strong>الموجة الجديدة W0 — دفاع في العمق</strong> <span class="badge new">جديدة</span></h2>
+
+<div class="wave" style="border-color:var(--purple)">
+<div class="wave-head">
+<div class="title">🟣 W0 — هَندسة فوضى نَكشفها</div>
+<div>~2 س · لا migration · لا تَغيير سلوك</div>
+</div>
+
+<p>هذه الموجة لم تَكن في 449d. كَشفتها المراجعة. أنا أُوصي بها <strong>قبل W3-W7</strong> لتَوحيد البنية:</p>
+
+<table>
+<thead><tr><th>البند</th><th>الفجوة</th><th>الإصلاح</th></tr></thead>
+<tbody>
+<tr><td>W0-1</td><td>5 تَعريفات لـ<code>ValidationError</code> عبر الـapp</td><td>توحيد في <code>app/core/exceptions.py</code> + import الكلّ منها</td></tr>
+<tr><td>W0-2</td><td><code>make_localized_error()</code> كُتب ولم يُستخدَم</td><td>تَفعيله في كل validation errors</td></tr>
+<tr><td>W0-3</td><td>5 سياسات مَوازية في <code>Address.tag</code> (يَسقط صامتاً)</td><td><code>extra="forbid"</code> + رفض 422 على tag غير معروف</td></tr>
+<tr><td>W0-4</td><td>3 طُرق لإنشاء session في الـbackground loops</td><td>توحيد helper <code>get_sweep_session()</code> + استخدامه في 3+ مواقع</td></tr>
+<tr><td>W0-5</td><td>1 enum مفقود (vehicle_type في Pydantic) — يَقبل أيّ string</td><td>تَحويله <code>Literal</code> + رسالة عربية</td></tr>
+</tbody>
+</table>
+
+<p><strong>توصيتي:</strong> W0 قبل W3 — يُسهّل كل الموجات اللاحقة لأنّ الـvalidation patterns تَكون موحَّدة.</p>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="timeline">١٢. الجدول الزمنيّ المُحدَّث</h2>
+
+<table>
+<thead><tr><th>الموجة</th><th>محتوى</th><th>تَقدير 449d</th><th>تَقدير 449e</th><th>Δ</th></tr></thead>
+<tbody>
+<tr class="bad"><td><strong>W1</strong> 🔴</td><td>P0 (4 بنود الآن)</td><td>3 س</td><td><strong>4.5 س</strong></td><td>+1.5</td></tr>
+<tr><td><strong>W2</strong> 🟣</td><td>نَشر 449/449b</td><td>30 د</td><td>30 د</td><td>=</td></tr>
+<tr class="bad"><td><strong>W0</strong> 🟣 جديد</td><td>دفاع في العمق</td><td>—</td><td><strong>2 س</strong></td><td>+2</td></tr>
+<tr><td><strong>W3</strong> 🟠</td><td>P1 (4 بنود مُنقَّحة)</td><td>2.5 س</td><td><strong>3 س</strong></td><td>+0.5</td></tr>
+<tr><td><strong>W4</strong> 🔵</td><td>aliases + RBAC</td><td>1.5 س</td><td><strong>2 س</strong></td><td>+0.5</td></tr>
+<tr class="ok"><td><strong>W5</strong> 🟡</td><td>UX (3 بنود فقط، -2)</td><td>2 س</td><td><strong>1.5 س</strong></td><td>-0.5</td></tr>
+<tr class="ok"><td><strong>W6</strong> 🟢</td><td>سياسات (4 بنود فقط، -1)</td><td>1.5 س</td><td><strong>1 س</strong></td><td>-0.5</td></tr>
+<tr class="bad"><td><strong>W7</strong> ⚪</td><td>عقد (scope أكبر)</td><td>1 س</td><td><strong>1.5 س</strong></td><td>+0.5</td></tr>
+<tr style="background:#e6f3ed"><td colspan="2"><strong>الإجمالي</strong></td><td><strong>12 س</strong></td><td><strong>~16 س</strong></td><td><strong>+4 س</strong></td></tr>
+</tbody>
+</table>
+
+<div class="discovery" style="margin-top:1.5rem">
+<strong>🎯 خلاصة المراجعة:</strong>
+<ol>
+<li>الخطّة 449d كانت <strong>مُسطّحة</strong> — تَفترض الواقع. المراجعة كشفت 30 اكتشافاً جديداً.</li>
+<li><strong>إصلاحان حرجان كان سيُكسران</strong> (W3-1 يَستخدم حقل غير موجود؛ W3-4 يُعدّل endpoint خاطئ).</li>
+<li><strong>اكتشاف مَخفيّ خطير:</strong> الـSSE handlers تُلوّث pool الـHTTP لكل background job (D-1).</li>
+<li><strong>تَوفير وقت:</strong> 2 بَند يُلغيان (W5-2 + W6-4 مُنفَّذان فعلاً) — توفير ~30 دقيقة.</li>
+<li><strong>تَكلفة إضافيّة:</strong> W0 جديد + W1 موسَّع + W7 موسَّع = +4 ساعات. <strong>لكن النتيجة:</strong> منصّة أمتن بكثير.</li>
+</ol>
+</div>
+
+<div class="question" style="margin-top:1.5rem">
+<strong>🎯 أحتاج إجابتك على 7 الأسئلة (§3) قبل أن أبدأ التَّنفيذ.</strong> أهمّها:
+<ul class="compact">
+<li>س-1 (3 طبقات لـP0-1 أم طبقة واحدة فقط؟)</li>
+<li>س-2 (wallet semantics: self فقط للـCUSTOMER؟)</li>
+<li>س-7 (إضافة <code>Address.phone</code> migration؟)</li>
+</ul>
+</div>
+
+<hr style="margin:2rem 0; border:none; border-top:1px solid var(--border);" />
+<p style="text-align:center; color:var(--gray); font-size:0.85rem;">
+الخطّة المُنقَّحة 449e — بعد مراجعة عميقة بالكود · 7 أسئلة قرار · بانتظار جوابك · 2026-05-26
+</p>
+
+</body>
+</html>

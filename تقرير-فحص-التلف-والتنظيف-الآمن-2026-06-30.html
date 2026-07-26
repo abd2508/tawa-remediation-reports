@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فحص التلف والتنظيف الآمن — تقرير مفصّل</title>
+<style>
+  :root{--bg:#0e1726;--card:#16223a;--card2:#1d2c49;--line:#2c3f63;--ink:#eef3fb;--mut:#9fb3d0;
+    --grn:#34d399;--red:#f87171;--amb:#fbbf24;--blu:#60a5fa;--vio:#a78bfa;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;line-height:1.9;font-size:16px}
+  .wrap{max-width:1020px;margin:0 auto;padding:30px 20px 90px}
+  h1{font-size:25px;margin:0 0 6px}
+  .lead{color:var(--mut);font-size:14px;margin-bottom:20px}
+  h2{font-size:21px;margin:36px 0 12px;display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--line);padding-bottom:8px}
+  h2 .e{font-size:24px}
+  .hero{background:linear-gradient(135deg,#16314a,#0e1726);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 22px;margin:16px 0}
+  .mono{font-family:"JetBrains Mono",Consolas,monospace;direction:ltr;unicode-bidi:embed;display:inline-block}
+  code{background:#0a1120;padding:2px 7px;border-radius:6px;font-size:13px;color:#7dd3fc}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px}
+  th,td{text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--mut);background:#0a1120;font-weight:600}
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .ok{background:rgba(52,211,153,.16);color:var(--grn)}
+  .bad{background:rgba(248,113,113,.16);color:var(--red)}
+  .warn{background:rgba(251,191,36,.16);color:var(--amb)}
+  .note{border-right:5px solid var(--blu);background:#10203a;padding:12px 16px;border-radius:10px;margin:13px 0}
+  .good{border-right:5px solid var(--grn);background:#0e2a1e;padding:12px 16px;border-radius:10px;margin:13px 0}
+  .warnbox{border-right:5px solid var(--amb);background:#2a230e;padding:12px 16px;border-radius:10px;margin:13px 0}
+  ul{margin:8px 0}li{margin:6px 0}
+  .stepnum{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--blu);color:#04121f;align-items:center;justify-content:center;font-weight:800;margin-left:8px}
+  .foot{margin-top:46px;color:var(--mut);font-size:12.5px;text-align:center;border-top:1px solid var(--line);padding-top:18px}
+  .big{font-size:19px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hero">
+  <h1>🩺 فحص التلف وتنظيف شجرة العمل — بأمان ودقّة</h1>
+  <div class="lead">فحص شامل لتلف ext4 · محاولة استرجاع · تنظيف قابل للتراجع · بتاريخ 2026-06-30</div>
+</div>
+
+<div class="good">
+  <div class="big">✅ النتيجة الأهم: <b>كل الكود المتتبَّع (على GitHub + المنشور على السيرفرات الثلاثة) سليم 100% — صفر تلف.</b> التلف كان محصورًا في ملفّات لم تُحفَظ في git قط، ولا تؤثّر على التشغيل.</div>
+</div>
+
+<!-- WHAT WAS CHECKED -->
+<h2><span class="e">🔬</span> ماذا فحصت بالضبط</h2>
+<div class="card">
+  <p>فحصت شجرة العمل كاملة بحثًا عن «تلف ext4» (ملفّات مليئة بـ null bytes أو فقدت أسطرها) باستخدام أداة فحص دقيقة (Python — لأن أدوات أخرى تتعامل مع null بشكل خاطئ).</p>
+  <table>
+    <thead><tr><th>الفئة</th><th>النتيجة</th></tr></thead>
+    <tbody>
+      <tr><td>ملفّات الكود المتتبَّعة (في git / على GitHub / المنشورة)</td><td><span class="pill ok">0 تالف ✅</span></td></tr>
+      <tr><td>سلامة مستودع git (<span class="mono">git fsck</span>)</td><td><span class="pill ok">نظيف ✅</span></td></tr>
+      <tr><td>ملفّات غير متتبَّعة (لم تُحفَظ في git قط)</td><td><span class="pill bad">326 تالف 🔴</span></td></tr>
+    </tbody>
+  </table>
+  <div class="note"><b>الترجمة البسيطة:</b> كل ما هو «محفوظ» في المشروع سليم. التالف فقط هو ملفّات جديدة كانت على القرص لكنها <b>لم تُحفَظ بعد</b> في نظام النسخ (git) عندما حدث تلف القرص.</div>
+</div>
+
+<!-- THE PATH -->
+<h2><span class="e">🛤️</span> المسار الذي اخترته ونفّذته</h2>
+
+<div class="card">
+  <p><span class="stepnum">1</span><b>محاولة الاسترجاع أولًا</b> (الأعلى قيمة)</p>
+  <p>بحثت في مخزن git كاملًا (الكائنات المعلّقة + سجلّ التغييرات + المخبّأ) عن نسخ سليمة قديمة من الملفّات المفقودة. <b>النتيجة: غير قابلة للاسترجاع</b> — لأنها لم تُحفَظ في git إطلاقًا (صفر تاريخ)، وعملية الاستعادة السابقة شملت المحفوظ فقط.</p>
+</div>
+
+<div class="card">
+  <p><span class="stepnum">2</span><b>تنظيف آمن قابل للتراجع + توثيق</b></p>
+  <ul>
+    <li>📦 <b>أرشفة</b> كل الملفّات التالفة (326) في ملف مضغوط <b>خارج المستودع</b> — تراجع كامل إن لزم.</li>
+    <li>📋 <b>جرد مصنّف</b> يوثّق بالضبط ما ضاع (لإعادة كتابته لاحقًا عند الحاجة).</li>
+    <li>🧹 <b>إزالتها</b> من شجرة العمل — <b>دون لمس أي ملف محفوظ</b> (0 حذف من المتتبَّع).</li>
+  </ul>
+</div>
+
+<div class="card">
+  <p><span class="stepnum">3</span><b>إكمال «آخر نسخة» على GitHub</b></p>
+  <p>بعد التنظيف ظهرت ملفّات <b>سليمة</b> كانت ناقصة من git: قفل الاعتماديات (<span class="mono">requirements*.lock</span>) + <b>خط NotoSansArabic</b> (يستخدمه التصميم). ضممتها ودفعتها (<span class="mono">c419a1f</span>، فاحص الأسرار: لا تسريبات).</p>
+</div>
+
+<!-- WHAT WAS LOST -->
+<h2><span class="e">📋</span> ما ضاع بالضبط (موثّق — يُعاد عند الحاجة فقط)</h2>
+<div class="card">
+  <p>الـ326 ملفًا تنقسم إلى:</p>
+  <table>
+    <thead><tr><th>النوع</th><th>العدد</th><th>ملاحظة</th></tr></thead>
+    <tbody>
+      <tr><td>قمامة مولّدة (كاش/سجلّات/آثار اختبار)</td><td>251</td><td>تُعاد توليدها تلقائيًا — لا قيمة</td></tr>
+      <tr><td>سكربتات <span class="mono">deploy/</span> + <span class="mono">deploy/waf/</span></td><td>30</td><td>أدوات تشغيل/أمان</td></tr>
+      <tr><td>خدمة <span class="mono">intelligence/</span> (ذكاء/احتيال)</td><td>9</td><td>ليست ضمن المكدّس المُشغَّل</td></tr>
+      <tr><td>ميزات موبايل (loyalty/blocklist/totp/locale)</td><td>7</td><td>تطبيق منفصل</td></tr>
+      <tr><td>تقارير + سكربتات web + تجاوز compose</td><td>8</td><td>—</td></tr>
+      <tr><td>أخرى</td><td>21</td><td>—</td></tr>
+    </tbody>
+  </table>
+  <div class="warnbox"><b>مهم:</b> لا شيء من المفقود جزء من المنصّة المُشغَّلة (backend + web). لذلك <b>الموقع الرئيسي وسيرفرا التست يعملون بشكل كامل دون أي تأثّر</b>.</div>
+</div>
+
+<!-- SAFETY -->
+<h2><span class="e">🛡️</span> الأمان (لا شيء دُمّر نهائيًا)</h2>
+<div class="card">
+  <ul>
+    <li>📦 الأرشيف القابل للتراجع: <span class="mono">/home/a/Desktop/APP/_corrupted_quarantine_*.tar.gz</span></li>
+    <li>📋 جرد ما ضاع: <span class="mono">/home/a/Desktop/APP/CORRUPTED_FILES_INVENTORY_*.md</span></li>
+    <li>✅ لم يُحذف أو يُمسّ أي ملف محفوظ (متتبَّع) — الكود المنشور سليم.</li>
+  </ul>
+</div>
+
+<!-- FINAL STATE -->
+<h2><span class="e">✅</span> الحالة النهائية</h2>
+<div class="card">
+<table>
+  <thead><tr><th>البند</th><th>الحالة</th></tr></thead>
+  <tbody>
+    <tr><td>الكود المتتبَّع / المنشور / GitHub</td><td><span class="pill ok">نظيف · 0 تلف</span></td></tr>
+    <tr><td>التلف المتبقّي في شجرة العمل</td><td><span class="pill ok">0</span></td></tr>
+    <tr><td>GitHub</td><td><span class="pill ok">متزامن (c419a1f)</span></td></tr>
+    <tr><td><span class="mono">tawanow.com</span> · <span class="mono">test1</span> · <span class="mono">test</span></td><td><span class="pill ok">200 · 200 · 200</span></td></tr>
+    <tr><td>نسخة احتياطية من التالف</td><td><span class="pill ok">محفوظة (تراجع ممكن)</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="foot">تقرير صادق مبني على فحص دقيق (Python) ومحاولة استرجاع وتنظيف قابل للتراجع · 2026-06-30 · لا شيء محفوظ مُسّ · المنصّة المُشغَّلة سليمة بالكامل.</div>
+
+</div>
+</body>
+</html>

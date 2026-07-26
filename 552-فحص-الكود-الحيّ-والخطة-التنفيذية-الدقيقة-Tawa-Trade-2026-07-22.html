@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فحص الكود الحيّ + الخطة التنفيذية الدقيقة — Tawa Trade</title>
+<style>
+  :root{
+    --bg:#eef1ec; --bg-raised:#ffffff; --bg-sunken:#e4e8e1;
+    --ink:#171f26; --ink-muted:#52606b; --line:rgba(23,31,38,.14);
+    --accent:#1f7a6c; --accent-ink:#0f4e44; --accent-soft:rgba(31,122,108,.10);
+    --good:#2f7d4f; --good-bg:rgba(47,125,79,.12);
+    --bad:#b14428; --bad-bg:rgba(177,68,40,.12);
+    --warn:#a6741c; --warn-bg:rgba(166,116,28,.13);
+    --refer:#5b5fa6; --refer-bg:rgba(91,95,166,.11);
+    --info:#2f6690; --info-bg:rgba(47,102,144,.11);
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
+    --sans: "Segoe UI", "Noto Kufi Arabic", "Dubai", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#10151c; --bg-raised:#161d26; --bg-sunken:#0b0f14;
+      --ink:#e8ebe6; --ink-muted:#9aa7af; --line:rgba(232,235,230,.16);
+      --accent:#57c7b3; --accent-ink:#8fe0d2; --accent-soft:rgba(87,199,179,.14);
+      --good:#4fbf7a; --good-bg:rgba(79,191,122,.14);
+      --bad:#e2704f; --bad-bg:rgba(226,112,79,.16);
+      --warn:#e3b356; --warn-bg:rgba(227,179,86,.16);
+      --refer:#a3a6e8; --refer-bg:rgba(163,166,232,.16);
+      --info:#7fb7e0; --info-bg:rgba(127,183,224,.16);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10151c; --bg-raised:#161d26; --bg-sunken:#0b0f14;
+    --ink:#e8ebe6; --ink-muted:#9aa7af; --line:rgba(232,235,230,.16);
+    --accent:#57c7b3; --accent-ink:#8fe0d2; --accent-soft:rgba(87,199,179,.14);
+    --good:#4fbf7a; --good-bg:rgba(79,191,122,.14);
+    --bad:#e2704f; --bad-bg:rgba(226,112,79,.16);
+    --warn:#e3b356; --warn-bg:rgba(227,179,86,.16);
+    --refer:#a3a6e8; --refer-bg:rgba(163,166,232,.16);
+    --info:#7fb7e0; --info-bg:rgba(127,183,224,.16);
+  }
+  :root[data-theme="light"]{
+    --bg:#eef1ec; --bg-raised:#ffffff; --bg-sunken:#e4e8e1;
+    --ink:#171f26; --ink-muted:#52606b; --line:rgba(23,31,38,.14);
+    --accent:#1f7a6c; --accent-ink:#0f4e44; --accent-soft:rgba(31,122,108,.10);
+    --good:#2f7d4f; --good-bg:rgba(47,125,79,.12);
+    --bad:#b14428; --bad-bg:rgba(177,68,40,.12);
+    --warn:#a6741c; --warn-bg:rgba(166,116,28,.13);
+    --refer:#5b5fa6; --refer-bg:rgba(91,95,166,.11);
+    --info:#2f6690; --info-bg:rgba(47,102,144,.11);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .doc{direction:rtl; text-align:right; font-family:var(--sans); background:var(--bg); color:var(--ink); line-height:1.75; font-size:17px; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 1.5rem;}
+  h1,h2,h3,h4{text-wrap:balance; font-weight:800;}
+  p{max-width:72ch; color:var(--ink);}
+  code{font-family:var(--mono); font-size:.9em; background:var(--bg-sunken); padding:.05em .4em; border-radius:3px;}
+  .num{font-variant-numeric:tabular-nums; font-family:var(--mono);}
+
+  .masthead{background:linear-gradient(180deg,var(--bg-sunken),var(--bg) 85%); border-bottom:1px solid var(--line); padding:3.2rem 0 2.2rem;}
+  .eyebrow{font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; margin:0 0 .9rem;}
+  .title{font-size:2.25rem; line-height:1.18; margin:0 0 .5rem;}
+  .subtitle{font-size:1.08rem; color:var(--ink-muted); margin:0 0 1.5rem; max-width:68ch; font-weight:500;}
+  .meta-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-bottom:1.3rem;}
+  .meta-cell{background:var(--bg-raised); padding:.8rem 1rem;}
+  .meta-k{font-size:.68rem; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.07em; font-family:var(--mono); margin-bottom:.25rem;}
+  .meta-v{font-size:.92rem; font-weight:700;}
+  .legend{display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.1rem;}
+
+  .toc{background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:1.1rem 1.4rem; margin:2rem 0; font-size:.92rem;}
+  .toc h4{margin:0 0 .6rem; font-size:.82rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-muted);}
+  .toc ol{columns:2; column-gap:2rem; margin:0; padding-inline-start:1.2rem;}
+  .toc li{break-inside:avoid; margin-bottom:.32rem;}
+  .toc a{text-decoration:none; color:var(--ink);}
+  .toc a:hover{color:var(--accent-ink); text-decoration:underline;}
+
+  section{padding:2.5rem 0;}
+  section + section{border-top:1px solid var(--line);}
+  .sec-head{display:flex; align-items:baseline; gap:.7rem; margin-bottom:.3rem;}
+  .sec-no{font-family:var(--mono); color:var(--accent); font-weight:800;}
+  .sec-title{font-size:1.5rem; margin:0;}
+  .sec-intro{color:var(--ink-muted); margin:.2rem 0 1.5rem; max-width:74ch;}
+  h3.sub{font-size:1.1rem; margin:1.5rem 0 .6rem;}
+
+  .tag{display:inline-flex; align-items:center; gap:.3em; padding:.16em .6em; border-radius:4px; font-size:.72rem; font-weight:700; white-space:nowrap;}
+  .tag-code{background:var(--accent-soft); color:var(--accent-ink);}
+  .tag-doc{background:var(--refer-bg); color:var(--refer);}
+  .tag-web{background:var(--info-bg); color:var(--info);}
+  .tag-new{background:var(--good-bg); color:var(--good);}
+  .tag-unverified{background:var(--warn-bg); color:var(--warn);}
+  .tag-bad{background:var(--bad-bg); color:var(--bad);}
+  .tag-warn{background:var(--warn-bg); color:var(--warn);}
+  .tag-good{background:var(--good-bg); color:var(--good);}
+
+  .plain{background:var(--accent-soft); border-radius:6px; padding:.75rem 1.05rem; margin:.9rem 0; font-size:.9rem;}
+  .plain b{color:var(--accent-ink);}
+  .card{background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:1.3rem 1.5rem; margin-bottom:1.1rem;}
+  .card-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1rem;}
+
+  .scroll-x{overflow-x:auto; margin:1rem 0;}
+  table.grid{width:100%; border-collapse:collapse; font-size:.85rem; min-width:680px;}
+  table.grid th, table.grid td{border:1px solid var(--line); padding:.55rem .65rem; text-align:right; vertical-align:top;}
+  table.grid th{background:var(--bg-sunken); font-size:.76rem; position:sticky; top:0;}
+  table.grid td:first-child, table.grid th:first-child{font-weight:700; white-space:nowrap;}
+  .mark-yes{color:var(--good); font-weight:800;}
+  .mark-no{color:var(--bad); font-weight:800;}
+  .mark-part{color:var(--warn); font-weight:800;}
+
+  .bug{background:var(--bg-raised); border:1px solid var(--line); border-inline-start:5px solid var(--bad); border-radius:8px; padding:1.2rem 1.4rem; margin-bottom:1.1rem;}
+  .bug.sev-warn{border-inline-start-color:var(--warn);}
+  .bug.sev-info{border-inline-start-color:var(--info);}
+  .bug.sev-good{border-inline-start-color:var(--good);}
+  .b-head{display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.45rem;}
+  .b-id{font-family:var(--mono); font-weight:800; color:var(--ink-muted); font-size:.82rem;}
+  .b-title{font-size:1.02rem; margin:0; flex:1 1 auto; min-width:200px;}
+  .b-loc{font-family:var(--mono); font-size:.74rem; background:var(--bg-sunken); padding:.1em .5em; border-radius:4px; color:var(--ink-muted);}
+  .b-row{display:grid; grid-template-columns:110px 1fr; gap:.6rem; font-size:.9rem; margin-top:.35rem;}
+  .b-row b{color:var(--ink-muted); font-weight:700; font-size:.78rem; text-transform:uppercase; letter-spacing:.03em;}
+
+  .phase{background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:1.2rem 1.4rem; margin-bottom:1rem;}
+  .phase h4{margin:0 0 .5rem; font-size:1.02rem; display:flex; align-items:center; gap:.6rem;}
+  .phase-tag{font-family:var(--mono); font-size:.72rem; background:var(--accent-soft); color:var(--accent-ink); padding:.15em .55em; border-radius:4px;}
+  .phase ul{margin:.4rem 0 0; padding-inline-start:1.3rem;}
+  .phase li{font-size:.92rem; margin-bottom:.35rem;}
+  .phase li b{color:var(--ink);}
+
+  ul.tight, ol.tight{padding-inline-start:1.3rem; margin:.6rem 0;}
+  ul.tight li, ol.tight li{margin-bottom:.4rem; font-size:.95rem;}
+
+  .final-card{background:var(--bg-raised); border:1px solid var(--accent); border-radius:10px; padding:1.7rem 2rem; position:relative;}
+  .final-card::before{content:"الخلاصة"; position:absolute; top:-.7rem; right:1.3rem; background:var(--accent); color:var(--bg-raised); font-size:.7rem; font-weight:800; padding:.18em .65em; border-radius:20px;}
+  footer{padding:2rem 0 4rem; color:var(--ink-muted); font-size:.8rem;}
+  @media (max-width:640px){ .title{font-size:1.6rem;} .toc ol{columns:1;} .b-row{grid-template-columns:1fr;} }
+</style>
+
+</head>
+<body>
+<div class="doc">
+  <div class="masthead">
+    <div class="wrap">
+      <p class="eyebrow">فحص كود حيّ + خطة تنفيذية · Tawa Trade داخل منصة تووا</p>
+      <h1 class="title">فحص الكود الحيّ والخطة التنفيذية الدقيقة</h1>
+      <p class="subtitle">هذا التقرير مبني على فحص فعلي لكود المستودع الحيّ (<code>/home/a/Desktop/APP/platform</code>، الفرع <code>fix/r535-c16-c05-audit-logging-2026-07-19</code>، Commit <code>8172d58</code>) — لا على الوثائق التصميمية فقط. يحدّد بدقة: أين الوضع الحالي فعليًا، أين نُصلح، أين نبني من الصفر، وكيف تُصمَّم صلاحيات وغرفة تحكّم Trade على القالب الحقيقي الموجود بالفعل في الكود.</p>
+      <div class="meta-grid">
+        <div class="meta-cell"><div class="meta-k">المستودع المفحوص</div><div class="meta-v">platform @ 8172d58</div></div>
+        <div class="meta-cell"><div class="meta-k">طريقة الفحص</div><div class="meta-v">5 وكلاء فحص كود حيّ + بحث تقني</div></div>
+        <div class="meta-cell"><div class="meta-k">يُكمِّل</div><div class="meta-v">تقارير 550 و551 (تصميم Trade)</div></div>
+        <div class="meta-cell"><div class="meta-k">النطاق</div><div class="meta-v">كل الأخطاء · إصلاح/بناء · صلاحيات · بحث تقني</div></div>
+      </div>
+      <div class="legend">
+        <span class="tag tag-code">مؤكَّد من الكود الحيّ الآن</span>
+        <span class="tag tag-doc">من وثائق تصميم Trade الخمس</span>
+        <span class="tag tag-web">من بحث تقني/عالمي هذه الجلسة</span>
+        <span class="tag tag-new">قرار/توصية جديدة هنا</span>
+        <span class="tag tag-unverified">غير مؤكَّد/بحث لم يكتمل</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <nav class="toc">
+      <h4>محتويات التقرير</h4>
+      <ol>
+        <li><a href="#method">منهج الفحص وحدوده</a></li>
+        <li><a href="#headline">الاكتشافات الأهم</a></li>
+        <li><a href="#bugs">كل الأخطاء — نقطة نقطة</a></li>
+        <li><a href="#fixbuild">أين نُصلح، أين نبني</a></li>
+        <li><a href="#room">تصميم قسم Trade داخل غرفة التحكّم</a></li>
+        <li><a href="#plan">الخطة التنفيذية المرحلية الدقيقة</a></li>
+        <li><a href="#tech">البحث التقني الحديث</a></li>
+        <li><a href="#mobile">قرار الموبايل المسجَّل رسميًا</a></li>
+        <li><a href="#verdict">الحكم الختامي</a></li>
+      </ol>
+    </nav>
+
+    <!-- METHOD -->
+    <section id="method">
+      <div class="sec-head"><span class="sec-no">00</span><h2 class="sec-title">منهج الفحص وحدوده</h2></div>
+      <p class="sec-intro">فُحص الكود عبر خمسة وكلاء مستقلّين قرأوا ملفات حقيقية بأسماء ودوال وأسطر محدَّدة (لا تخمينًا)، بالتوازي مع بحث تقني عالمي. حدثت أعطال متكرّرة في خدمة الذكاء الاصطناعي نفسها أثناء البحث التقني (تقييد معدّل من جهة الخادم، لا حدّ استخدام المستخدم)، أُعيد تشغيلها لاحقًا وأُكمِلت جميع محاور البحث التقني الستة (القسم 06) — لا محاور معلَّقة متبقّية في هذه النسخة.</p>
+    </section>
+
+    <!-- HEADLINE -->
+    <section id="headline">
+      <div class="sec-head"><span class="sec-no">01</span><h2 class="sec-title">الاكتشافات الأهم</h2></div>
+      <div class="card-grid">
+        <div class="card"><h4 style="margin-top:0">قالب صلاحيات جاهز فعليًا لما طلبتَه بالضبط <span class="tag tag-good">إيجابي</span></h4><p style="max-width:none">المزوّد (Provider) يملك بالفعل نظام صلاحيات مُكوَّن من ثلاث طبقات: صلاحيات قابلة للمنح للموظفين، صلاحيات حصرية للمالك لا تُمنَح أبدًا، وخط أساس افتراضي للموظف. هذا هو القالب الدقيق لما طلبتَه: «صلاحية عامة اسمها Trade وتحتها صلاحيات مختلفة» — سنكرّره حرفيًّا لـTrade بدل اختراع نموذج جديد.</p></div>
+        <div class="card"><h4 style="margin-top:0">CLAUDE.md (ذاكرة المشروع) نفسه قديم <span class="tag tag-bad">خطر توثيقي</span></h4><p style="max-width:none">يذكر رأس Alembic <code>ab36</code> بينما الرأس الفعلي <code>ab60</code> — أي متأخّر 24 هجرة كاملة. كما يحمل تناقضًا داخليًا حول <code>wallet_peer_transfer</code> (قسم "توقّفات صارمة" يقول يجب أن يبقى false، بينما قسم FIN-COR يوثّق أنه فُكّ ختمه فعليًا في 2026-06-19).</p></div>
+        <div class="card"><h4 style="margin-top:0">محرّك الصلاحيات الحقيقي مُفعَّل لا Shadow <span class="tag tag-good">إيجابي</span></h4><p style="max-width:none">نظام Grant/Revoke الفعلي يعمل بالفعل ومُطبَّق على كامل سطح المزوّد. «الوضع الظلّي (Shadow)» المذكور في الالتزامات الأخيرة يخصّ فقط ترحيل ~84 ملفًّا في OPS ما زالت تستخدم فحص الدور القديم، وليس النظام كلّه.</p></div>
+        <div class="card"><h4 style="margin-top:0">تجاوز الأعلام ثلاثية الطبقات ما زال واسعًا <span class="tag tag-bad">خطر حقيقي قائم</span></h4><p style="max-width:none">موقعان فقط من أصل 26 يستخدمان الحلّ الكامل. 24 موقعًا (الدفع، المحفظة، ميزات متقدّمة) تتجاوز طبقة قاعدة البيانات والبوّابات كليًّا، بلا أي فحص CI يمنع تكرار هذا مستقبلًا.</p></div>
+        <div class="card"><h4 style="margin-top:0">لا محرّك قضايا عامّ في المنصة كلها <span class="tag tag-bad">فجوة معمارية</span></h4><p style="max-width:none">7 لوحات عمليات مستقلّة تمامًا اليوم (شكاوى، حوادث، استثناءات نقدية، مراجعة احتيال، صندوق مستندات، طلبات عالقة، طوارئ سائقين) — لا يوجد محرّك واحد. أي محرّك قضايا لـTrade يجب أن يُبنى بذهنية «هذا هو المحرّك العام الأول»، لا لوحة ثامنة منعزلة.</p></div>
+        <div class="card"><h4 style="margin-top:0">المحاسبة المزدوجة صارمة وMaker-Checker حقيقي <span class="tag tag-good">إيجابي</span></h4><p style="max-width:none">دفتر الأستاذ يفرض توازن Debit/Credit فعليًّا، والفصل بين مُعِدّ القيد ومعتمده مُطبَّق بالكود (مانع صريح لموافقة الشخص على قيده هو) — أساس متين لضمّ حسابات <code>TRADE_*</code> دون بناء محرّك محاسبي جديد.</p></div>
+        <div class="card"><h4 style="margin-top:0">لا مطابقة ثلاثية (PO/فاتورة/استلام) إطلاقًا <span class="tag tag-bad">فجوة كاملة</span></h4><p style="max-width:none">لا يوجد أي نموذج أمر شراء أو فاتورة أو استلام في الكود اليوم. هذا كله أرض بكر لـTrade — بناء صرف، لا إصلاح.</p></div>
+        <div class="card"><h4 style="margin-top:0">علامة حوكمة تستحق المتابعة <span class="tag tag-warn">يحتاج إجراء</span></h4><p style="max-width:none">تقارير داخلية في المستودع (بترقيم مختلف عن ملفاتنا) تشير إلى أن عمل TOTP/بصمة الجهاز للموبايل دخل عبر «عملية موازية غير موثَّقة» بسؤال مفتوح حول تفويضها، رغم أنه أُدمِج لاحقًا في الفرع الرئيسي.</p></div>
+      </div>
+    </section>
+
+    <!-- BUGS -->
+    <section id="bugs">
+      <div class="sec-head"><span class="sec-no">02</span><h2 class="sec-title">كل الأخطاء — نقطة نقطة</h2></div>
+      <p class="sec-intro">كل بند مستقلّ تمامًا، بدليله وأثره على خطة Trade تحديدًا.</p>
+
+      <div class="bug"><div class="b-head"><span class="b-id">BUG-01</span><h3 class="b-title">CLAUDE.md يعرض رأس Alembic خاطئًا (متأخّر 24 هجرة)</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>CLAUDE.md</code> يذكر <code>ab36</code> (وُثِّق 2026-07-16)؛ الرأس الفعلي اليوم <code>ab60</code></span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>أي خطة Trade تعتمد على "الحالة الحالية" الموصوفة في هذا الملف قد تبني على افتراضات قديمة عن الهجرات</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>تصحيح فوري للرقم + إضافة فحص CI يقارن رأس Alembic الفعلي بالرقم الموثَّق في CLAUDE.md، يفشل عند الاختلاف</span></div>
+      </div>
+
+      <div class="bug"><div class="b-head"><span class="b-id">BUG-02</span><h3 class="b-title">تناقض داخلي في CLAUDE.md حول wallet_peer_transfer</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span>قسم "توقّفات صارمة" يقول: يجب أن يبقى false. قسم FIN-COR أسفله يوثّق: فُكّ ختمه 2026-06-19 (المالك)</span></div>
+        <div class="b-row"><b>الأثر</b><span>مخاطرة أن يعتمد مطوّر جديد للنص الأول (القاعدة الصارمة) ويتجاهل الاستثناء الموثَّق</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>حذف القسم الأول أو تحديثه ليعكس الحالة الفعلية بوضوح، لا تركهما متجاورين متناقضين</span></div>
+      </div>
+
+      <div class="bug sev-warn"><div class="b-head"><span class="b-id">BUG-03</span><h3 class="b-title">ADMIN ما زال يرث Operations+Finance+Compliance</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>backend/app/core/roles.py</code>: <code>ROLE_INHERITS[ADMIN] = {OPERATIONS_AGENT, FINANCE_AGENT, COMPLIANCE_AGENT}</code> — بتصميم متعمَّد لتفادي إعادة كتابة 109 موقع نداء</span></div>
+        <div class="b-row"><b>الأثر</b><span>لا يمسّ Trade مباشرة إن بُنيت صلاحيات Trade كطبقة Grant/Revoke منفصلة (كما نوصي)، لكنه يبقى فجوة فصل سلطات عامة في المنصة</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>خارج نطاق Trade تحديدًا؛ يُترك كإصلاح منصّة عامّ منفصل</span></div>
+      </div>
+
+      <div class="bug sev-warn"><div class="b-head"><span class="b-id">BUG-04</span><h3 class="b-title">ترحيل الصلاحيات (D-09) ما زال Shadow-mode لـ23 نقطة نهاية في operations_router.py</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>backend/app/core/permission_shadow.py</code>: <code>shadow_check_permission()</code> يسجّل تحذيرًا فقط، لا يرفض أبدًا؛ نُفِّذ على 23 نقطة من operations_router.py، لا كل الملف (~85 نقطة أخرى بلا تغطية بعد)</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>لا يمسّ Trade مباشرة لو استُخدم <code>require_permission</code>/<code>require_trade_permission</code> منذ اليوم الأول بدل <code>require_role</code></span></div>
+        <div class="b-row"><b>الإصلاح</b><span>خارج Trade؛ استمرار مرحلة 3 (التفعيل الفعلي بعد أسبوع مراقبة نظيفة لكل موقع) على مسارها الحالي</span></div>
+      </div>
+
+      <div class="bug sev-warn"><div class="b-head"><span class="b-id">BUG-05</span><h3 class="b-title">سلسلة التدقيق ما زالت صفًّا عالميًّا واحدًا مقفلًا (تسلسل موثوق أُصلح، الازدحام لا)</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>backend/app/core/audit.py</code>: سلسلة Hash SHA-256 موجودة (التزوير مُصلَح)؛ لكن الطرف الحالي للسلسلة صفّ واحد <code>id="GLOBAL"</code> يُقفَل <code>FOR UPDATE</code> عند كل كتابة</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>أوامر Trade البشرية الحسّاسة (اعتماد نقد، تعليق مورد) ستتشارك نفس القفل العالمي مع كل أوامر Retail الحسّاسة — قد يتفاقم الازدحام عند تفعيل Trade فوق حمل Retail القائم</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>يُنصَح بتقسيم السلسلة حسب Bounded Context (Trade منفصل عن Retail) <b>قبل</b> إطلاق Trade، لا بعده</span></div>
+      </div>
+
+      <div class="bug"><div class="b-head"><span class="b-id">BUG-06</span><h3 class="b-title">24 من 26 موقع نداء للأعلام تتجاوز الحلّ ثلاثي الطبقات كليًّا</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span>فقط <code>carts/router.py:133</code> و<code>operations_router.py:3591</code> يستخدمان <code>is_enabled_3layer</code>؛ الباقي (الدفع، المحفظة، الميزات المتقدّمة، الرواتب) يستخدم <code>is_enabled()</code> القديم الذي يقرأ YAML المُجمَّع في الذاكرة فقط، متجاوزًا طبقتَي DB والبوّابة كليًّا. لا فحص CI يمنع إضافة موقع جديد بهذا النمط</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>خطر مباشر وحقيقي: لو كتب مطوّر Trade علمًا جديدًا بنفس النمط القديم (نسخ-لصق من ملف مجاور)، سيتكرّر نفس العيب فورًا دون أن يلاحظه أحد لغياب الفحص الآلي</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>(1) إلزام صريح: كل علم Trade عبر <code>is_enabled_3layer</code> حصرًا. (2) إضافة فحص Static/CI يمنع أي استدعاء <code>is_enabled(</code> جديد خارج قائمة استثناء موثَّقة — هذا إصلاح منصّة عامّ يفيد Trade مباشرة ويستحق الأولوية قبل PR-01</span></div>
+      </div>
+
+      <div class="bug sev-warn"><div class="b-head"><span class="b-id">BUG-07</span><h3 class="b-title">لا محرّك قضايا/عمل عامّ — 7 لوحات معزولة بالفعل</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>OperatorActionItem</code> (operator_action_items) هو متتبّع مرحلي لإغلاق نتائج تدقيق، لا محرّك قضايا (لا entity_type/entity_id/assignee/SLA). العمل التشغيلي اليوم موزَّع على شكاوى/حوادث/استثناءات نقدية/مراجعة احتيال/صندوق مستندات/طلبات عالقة/طوارئ سائقين — كل واحدة Router وجدول وقسم تنقّل مستقلّ</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>يُعيد صياغة GAP-08 من تقرير 551: لم يكن هناك محرّك عامّ أصلًا لتُكرِّره Trade خطأً — الفرصة الحقيقية هي أن يُبنى محرّك قضايا Trade <b>كأول محرّك عامّ في المنصة</b>، مصمَّم بحيث يمكن للّوحات السبع الحالية الانتقال إليه لاحقًا</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>بناء <code>work_items</code> عامّ (وليس <code>trade_ops_cases</code> منعزلًا) بحقول: entity_type/entity_id/owner_team/assignee/required_capability/sla_policy_id/due_at — Trade أول مستهلك، لا الوحيد</span></div>
+      </div>
+
+      <div class="bug sev-warn"><div class="b-head"><span class="b-id">BUG-08</span><h3 class="b-title">الواجهة الأمامية (OPS/Provider) لا تعرف الصلاحيات الفعلية للحساب، فقط الدور</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>opsAccess.ts</code> و<code>providerAccess.ts</code>: خرائط ثابتة Role→Routes، لا استدعاء لصلاحيات الحساب الفعلية من الخادم</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>لو منح مالك مورد صلاحية Trade فرعية لموظف عبر Grant، سيملك الموظف الوصول الفعلي عبر الـAPI لكن لن يرى رابط التنقّل المناظر في الواجهة إلا بتعديل صريح للخريطة الثابتة — انجراف حقيقي موروث</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>إما (أ) قبول هذا القيد والاكتفاء بتحديث الخرائط الثابتة يدويًّا مع كل صلاحية Trade جديدة (حلّ عملي سريع)، أو (ب) بناء نقطة نهاية "صلاحياتي الفعلية" يقرأها الواجهة الأمامية — الأخير أفضل هندسيًّا لكنه تحسين منصّة عامّ خارج نطاق Trade وحده</span></div>
+      </div>
+
+      <div class="bug"><div class="b-head"><span class="b-id">BUG-09</span><h3 class="b-title">تضارب افتراضي: opsAccess يرفض المسار غير المعروف، providerAccess يسمح به</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>opsAccess.ts::canAccessOpsPath()</code> يفشل مُغلَقًا للمسارات غير المعروفة (إصلاح D-55 موثَّق)؛ <code>providerAccess.ts::canAccessProviderPath()</code> ما زال يفشل مفتوحًا للمسارات غير المعروفة</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>بوابة المشتري التجاري (<code>/provider-portal/trade/*</code>) تعيش داخل نطاق <code>providerAccess.ts</code> — إن نُسي تسجيل مسار Trade جديد صراحةً، سيُسمح به افتراضيًّا بدل رفضه، عكس التوصية الصريحة في تقرير 551 (Default-deny)</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>توحيد السلوك الافتراضي إلى الرفض في <code>providerAccess.ts</code> أيضًا (نفس منطق D-55)، أو على الأقل معاملة كل مسار <code>/provider-portal/trade/*</code> برفض افتراضي صريح مستقلّ حتى لو بقي باقي الملف كما هو</span></div>
+      </div>
+
+      <div class="bug"><div class="b-head"><span class="b-id">BUG-10</span><h3 class="b-title">لا غلاف أمان للمعاملة — db.commit() يدويّ في 102 ملفًّا</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>get_db()</code> (backend/app/db/session.py) يُرجِع فقط عند الفشل (rollback عند استثناء)، لا يعتمد تلقائيًّا عند النجاح؛ لا Unit-of-Work أو Decorator يغلّف هذا</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>خطر مباشر مع أكثر من 40 جدولًا وعشرات نقاط النهاية الجديدة لـTrade — نفس فئة العطل التي سبّقت عطلًا حرجًا موثَّقًا سابقًا (نشر إصدار التطبيق دون commit)</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>لا يُصلَح على مستوى المنصّة ضمن نطاق Trade، لكن يُضاف كقاعدة صريحة في مواصفة Trade: كل Service جديد يُختَم بمراجعة صريحة "هل استُدعي commit()؟" ضمن Definition of Done لكل PR</span></div>
+      </div>
+
+      <div class="bug sev-info"><div class="b-head"><span class="b-id">BUG-11</span><h3 class="b-title">استثناءات التسوية ثنائية الحالة فقط (Open/Resolved) — لا خط أنابيب متعدّد المراحل</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>ReconciliationException</code> (backend/app/models/payment.py): status إما OPEN أو RESOLVED فقط؛ لا INVESTIGATING/PROPOSED_RESOLUTION/APPROVED/REPAIRED/VERIFIED</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>يؤكّد فجوة MES-05 من تقرير 551 (لا مسار لإغلاق استثناء المطابقة ماليًّا) — لا يوجد شيء جاهز في الكود لـTrade ليمتدّ منه؛ يجب بناء خط الأنابيب الأغنى من الصفر</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>بناء (لا إصلاح): <code>trade_matching_exceptions</code> بخط أنابيب متعدّد المراحل صريح، مع فرصة تعميمه لاحقًا على استثناءات Retail أيضًا</span></div>
+      </div>
+
+      <div class="bug sev-info"><div class="b-head"><span class="b-id">BUG-12</span><h3 class="b-title">تشفير المغلف KMS (D-45) موجود لكنه غير مُفعَّل فعليًّا</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span>الكود مبنيّ لكن <code>aws_kms_key_id=""</code> — أي مفتاح غير مُهيَّأ، فالتشفير خامل رغم وجوده</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>لو اعتمد تصميم أسرار موصلات Trade (Connector credentials) على وجود هذا التشفير "لأنه مذكور كمُصلَح"، فسيكتشف لاحقًا أنه غير فعّال عمليًّا</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>تفعيل مفتاح KMS فعليًّا قبل تخزين أي سرّ موصل Trade حقيقي، لا الاعتماد على الكود وحده</span></div>
+      </div>
+
+      <div class="bug"><div class="b-head"><span class="b-id">BUG-13</span><h3 class="b-title">صندوق صادر الإشعارات (Outbox) موجود لكنه مطفأ افتراضيًّا</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>notifications_outbox_enabled: bool = False</code> — المسار الحيّ اليوم إرسال داخليّ مباشر (Fail-open) لا معاملة واحدة مع الإشعار</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>تصميم Trade (تقرير 551) يفترض «الإشعار يُكتَب في نفس معاملة تغيير الحالة» — هذا صحيح للجزء الداخلي (NotificationRecord)، لكن الإرسال الخارجي الفعلي (SMS/Email) سيبقى Fail-open حتى يُفعَّل هذا العلم</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>تفعيل <code>notifications_outbox_enabled=true</code> قبل إطلاق Trade (بعد اختبار الترحيل الفعلي) — إصلاح منصّة عامّ يفيد Trade مباشرة</span></div>
+      </div>
+
+      <div class="bug sev-warn"><div class="b-head"><span class="b-id">BUG-14</span><h3 class="b-title">9 بوّابات إطلاق كلّها مفتوحة، 7 منها حاجبة</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span><code>launch_gates.yaml</code>: GATE_LEGAL، GATE_PAYMENT_SANDBOX، GATE_MAP_PROVIDER، GATE_SECURITY_PENTEST، GATE_DR_RUNBOOK، GATE_TAX_ACCOUNTING، GATE_OPERATIONS_READINESS — كلّها <code>open</code></span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>قرار عدم الإطلاق العام يبقى قائمًا بمعزل عن Trade تمامًا؛ Trade يمكن أن يُبنى ويُختبَر داخليًّا (Pilot) دون انتظار هذه البوّابات، لكن لا يجوز فتح Trade للعامّة قبلها هي أيضًا</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>لا علاقة مباشرة بـTrade؛ إشارة سياقية فقط لضبط توقّعات الإطلاق العام</span></div>
+      </div>
+
+      <div class="bug sev-warn"><div class="b-head"><span class="b-id">BUG-15</span><h3 class="b-title">علامة حوكمة: عمل موبايل حسّاس دخل عبر مسار غير موثَّق</h3><span class="tag tag-code">كود حيّ</span></div>
+        <div class="b-row"><b>الدليل</b><span>تقارير داخلية في المستودع (ترقيم مختلف عن ملفاتنا، بعنوان "تحقيق جلسة موازية") توثّق أن عمل بصمة الجهاز وTOTP للموبايل ظهر في الفرع دون مسار مراجعة موثَّق، بسؤال مفتوح حول من فوّضه</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>لا علاقة مباشرة بكود Trade، لكنه مؤشّر حوكمة عامّ يستحق المتابعة الإدارية قبل منح صلاحيات Trade الحسّاسة (مثل مفاتيح موصلات الموردين) لأي عملية مشابهة</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>ليس إصلاح كود؛ إجراء إداري — توثيق مسار تفويض واضح لأي تعديل مستقبلي حسّاس، خصوصًا في Trade حيث ستُدار أسرار موردين وحسابات بنكية</span></div>
+      </div>
+
+      <div class="bug sev-info"><div class="b-head"><span class="b-id">BUG-16</span><h3 class="b-title">أغلب نتائج تدقيقَي 07-19/07-20 (D-01..D-85) غير مُعاد التحقّق فرديًّا</h3><span class="tag tag-unverified">غير مؤكَّد</span></div>
+        <div class="b-row"><b>الدليل</b><span>الوكيل تحقّق مباشرة من نحو 20 بندًا فقط بدليل كود صريح؛ البقية (أغلبية D-01 حتى D-85) لم تُفحَص فرديًّا بسبب ضيق الوقت — وُسمت UNKNOWN صراحةً لا FIXED افتراضًا</span></div>
+        <div class="b-row"><b>الأثر على Trade</b><span>لا يجوز افتراض أن أي عيب غير مذكور هنا قد أُصلح؛ القاعدة: تحقّق مباشرةً قبل البناء فوق أي افتراض من تقارير 07-19/07-20 القديمة</span></div>
+        <div class="b-row"><b>الإصلاح</b><span>جولة تحقّق مخصّصة لاحقًا إن رغب المستخدم، منفصلة عن نطاق Trade</span></div>
+      </div>
+
+      <h3 class="sub">فجوات تصميم Trade نفسه (من تقرير 551، ما زالت قائمة، مُعاد تأكيدها بعد الفحص الحقيقي)</h3>
+      <div class="scroll-x">
+        <table class="grid">
+          <thead><tr><th>المعرّف</th><th>الوصف</th><th>الحالة بعد فحص الكود</th></tr></thead>
+          <tbody>
+            <tr><td>MES-01</td><td>حالة PO المتعامدة مُعلَنة بستة محاور، مُعرَّفة في واحد فقط</td><td>ما زالت قائمة — لا علاقة بالكود الحالي (ميزة لم تُبنَ بعد)</td></tr>
+            <tr><td>MES-02</td><td>سلّة متعددة الموردين بلا قاعدة تحويل لأوامر منفصلة</td><td>ما زالت قائمة</td></tr>
+            <tr><td>MES-03/MES-05</td><td>آلة النزاع وجداول التسوية اختفت من التصميم النهائي</td><td><b>مؤكَّدة الآن بدليل كود إضافي</b>: لا وجود لأي مطابقة ثلاثية أو خط أنابيب استثناء متعدّد المراحل في الكود الحالي — الفجوة أعمق ممّا افتُرض، فلا "امتداد" ممكن، بل بناء كامل</td></tr>
+            <tr><td>GAP-08</td><td>ازدواجية محرّك القضايا</td><td><b>أُعيد تأطيرها (BUG-07)</b>: لا يوجد محرّك عامّ أصلًا ليُكرَّر — الفرصة أكبر ممّا ظُنّ</td></tr>
+            <tr><td>GAP-09</td><td>صلاحيات Trade غير مربوطة بالأدوار</td><td><b>محلولة الآن بدقّة أكبر</b>: القالب الحقيقي (Tier-A/Tier-S/Baseline) موجود بالفعل في كود المزوّد — القسم 04 يطبّقه حرفيًّا</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- FIX vs BUILD -->
+    <section id="fixbuild">
+      <div class="sec-head"><span class="sec-no">03</span><h2 class="sec-title">أين نُصلح، أين نبني</h2></div>
+      <p class="sec-intro">تصنيف صريح لكل بند: إصلاح لعيب منصّة قائم (له صلة مباشرة أو غير مباشرة بـTrade) مقابل بناء ميزة جديدة كليًّا لا يوجد لها أساس سابق.</p>
+
+      <h3 class="sub">إصلاح (Fix) — عيوب منصّة قائمة، بعضها إلزامي قبل PR-01</h3>
+      <div class="scroll-x">
+        <table class="grid">
+          <thead><tr><th>البند</th><th>الأولوية</th><th>لماذا قبل Trade تحديدًا</th></tr></thead>
+          <tbody>
+            <tr><td>BUG-06 — إلزام is_enabled_3layer + فحص CI</td><td class="mark-yes">إلزامي قبل PR-01</td><td>أعلام Trade يجب ألا تنضمّ لـ24 موقعًا متجاوزًا موجودًا فعلًا</td></tr>
+            <tr><td>BUG-13 — تفعيل صندوق الإشعارات الصادر</td><td class="mark-yes">إلزامي قبل الإطلاق التجريبي</td><td>تصميم Trade يفترض هذا السلوك صراحةً</td></tr>
+            <tr><td>BUG-09 — توحيد الرفض الافتراضي في providerAccess.ts</td><td class="mark-yes">إلزامي قبل فتح مسارات Trade في الواجهة</td><td>بوابة Trade تعيش داخل نفس الملف المتساهل افتراضيًّا</td></tr>
+            <tr><td>BUG-05 — تقسيم سلسلة التدقيق حسب النطاق</td><td class="mark-part">مستحسَن قبل الإطلاق، غير حاجب</td><td>يمنع تفاقم ازدحام معروف مسبقًا عند إضافة حمل Trade</td></tr>
+            <tr><td>BUG-12 — تفعيل مفتاح KMS فعليًّا</td><td class="mark-yes">إلزامي قبل تخزين أول سرّ موصل مورد حقيقي</td><td>Trade سيخزّن أسرار موصلات ERP وحسابات بنكية موردين</td></tr>
+            <tr><td>BUG-01/02 — تصحيح CLAUDE.md</td><td class="mark-part">سريع ومنخفض الجهد</td><td>يمنع بناء قرارات على معلومات قديمة</td></tr>
+            <tr><td>BUG-08 — وعي الواجهة بالصلاحيات الفعلية</td><td class="mark-part">مستحسَن، قابل للتأجيل بحلّ يدوي مؤقت</td><td>يمسّ أي صلاحية Trade فرعية تُمنَح لموظف لاحقًا</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">بناء (Build) — لا أساس سابق لتمديده، أرض بكر بالكامل</h3>
+      <ul class="tight">
+        <li>هوية Trade: <code>trade_suppliers</code>، <code>trade_supplier_memberships</code>، <code>trade_buyer_accounts</code></li>
+        <li>الكتالوج والمخزون والعروض التجارية بكامل تفاصيلها</li>
+        <li>أمر الشراء والحجز والاقتباس (Quote/Reservation/PO)</li>
+        <li>الشحن والمركبات التجارية (لا يجوز تمديد <code>Driver.vehicle_type</code>)</li>
+        <li>الاستلام والفاتورة والمطابقة الثلاثية بالكامل — لا شيء موجود ليُمتَدّ منه</li>
+        <li>خط أنابيب استثناء التسوية متعدّد المراحل (يمكن تعميمه لاحقًا على Retail، لكنه يُبنى الآن من أجل Trade)</li>
+        <li>صلاحيات Trade الثلاثية الطبقات (تُبنى بقالب Provider الموجود، لكنها بيانات/جداول جديدة كليًّا)</li>
+        <li>محرّك قضايا Trade (يُبنى كأول محرّك عامّ في المنصة، تفصيله في BUG-07)</li>
+      </ul>
+    </section>
+
+    <!-- CONTROL ROOM SECTION -->
+    <section id="room">
+      <div class="sec-head"><span class="sec-no">04</span><h2 class="sec-title">تصميم قسم Trade داخل غرفة التحكّم (لا غرفة منفصلة)</h2></div>
+      <p class="sec-intro">تأكيدًا لطلبك: Trade <b>ليست</b> غرفة تحكّم مستقلّة. هي القسم العاشر داخل <code>opsNav.ts</code> الحالي (9 أقسام، 90 مدخلًا مؤكَّدًا بالعدّ المباشر اليوم)، ويسري عليها بالضبط نفس نظام الصلاحيات الذي يحكم بقية الغرفة — لا نظام موازٍ.</p>
+
+      <h3 class="sub">الصلاحية العامّة الحاكمة + الصلاحيات الفرعية تحتها</h3>
+      <p style="max-width:76ch">القالب الحقيقي الذي وجدناه في كود المزوّد (وليس اختراعًا جديدًا) هو ثلاث طبقات بالضبط لما وصفتَه:</p>
+      <div class="scroll-x">
+        <table class="grid">
+          <thead><tr><th>الطبقة</th><th>في كود المزوّد اليوم (القالب)</th><th>مكافئها في Trade</th></tr></thead>
+          <tbody>
+            <tr><td>خط الأساس الافتراضي</td><td><code>PROVIDER_STAFF_BASELINE</code> — يملكها كل موظف تلقائيًّا دون طلب</td><td><code>TRADE_STAFF_BASELINE</code>: مثل <code>trade:access</code> (الدخول لمشاهدة القسم فقط) + قراءات منخفضة الخطر</td></tr>
+            <tr><td>القابلة للمنح</td><td><code>PROVIDER_PERMS_GRANTABLE</code> (~19 صلاحية) — يمنحها المالك اختياريًّا لموظف محدَّد</td><td><code>TRADE_PERMS_GRANTABLE</code>: <code>trade_supplier:review</code>، <code>trade_order:intervene</code>، <code>trade_receipt:review</code>، إلخ (القائمة الكاملة في تقرير 551 القسم 05)</td></tr>
+            <tr><td>حصرية المالك/الحوكمة العليا</td><td><code>PROVIDER_PERMS_OWNER_ONLY</code> (~11 صلاحية، <code>is_grantable=False</code>) — لا تُمنَح أبدًا جزئيًّا</td><td><code>TRADE_PERMS_OWNER_ONLY</code>: <code>trade_supplier:approve</code>، <code>trade_settlement:approve</code>، <code>trade_feature_flags:write</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="plain"><b>التنفيذ:</b> إضافة <code>require_trade_permission(permission)</code> يُقلّد بالحرف سلسلة <code>require_provider_permission</code> الحالية (دور → حالة محظورة → صفّ نشط من القاعدة → تعليق الملف التشغيلي → الصلاحية الفعلية) — لا اختراع آلية تفويض جديدة. كل صلاحية Trade تُسجَّل في <code>PermissionCatalog</code> بـ<code>category="trade"</code>. وبما أن بوّابة CI (A3 ratchet) تمنع نمو استخدام <code>require_role</code> الخام دون استثناء موثَّق، فكل نقطة نهاية Trade يجب أن تُكتَب بـ<code>require_permission</code>/<code>require_trade_permission</code> منذ أول سطر، لا <code>require_role</code>.</p>
+
+      <h3 class="sub">مكان القسم في التنقّل</h3>
+      <p style="max-width:76ch">يُضاف قسم عاشر في <code>opsNav.ts</code> بعنوان "التجارة" (Trade)، وكل مدخل ورقة فيه يُسجَّل بمقابل صريح في <code>opsAccess.ts</code> (بنفس انضباط الأقسام التسعة الحالية) — لا اعتماد على السلوك الافتراضي.</p>
+
+      <h3 class="sub">النقد والمال — تأكيد صريح لسؤالك</h3>
+      <p style="max-width:76ch"><b>نعم، هذا صحيح تمامًا.</b> النقد والمحاسبة الخاصة بـTrade لا تُبنى كنظام مستقلّ. تُفتَح حسابات جديدة بادئتها <code>TRADE_*</code> (مثل <code>TRADE_SUPPLIER_PAYABLE_{supplier_id}</code>، <code>TRADE_REVENUE</code>، <code>TRADE_INVENTORY_ASSET</code>) داخل نفس محرّك <code>ChartOfAccount</code>/<code>LedgerAccount</code>/<code>LedgerEntry</code> الحالي المؤكَّد بالكود، وتُرحَّل عبر نفس <code>LedgerService.post_journal()</code> الذي يفرض توازن Debit/Credit. تظهر هذه الحسابات في تبويب "المالية" ضمن قسم Trade نفسه داخل غرفة التحكّم (لا صفحة محاسبة منفصلة)، وتخضع لنفس قاعدة Maker-Checker المؤكَّدة بالكود (<code>require_not_self_approval</code>) — مُعِدّ القيد لا يعتمده. الحسابات مُسمّاة "Trade" فقط للتمييز التقريري، لكنها جزء واحد من دفتر أستاذ تووا الموحَّد، لا منصّة مالية موازية.</p>
+    </section>
+
+    <!-- EXECUTION PLAN -->
+    <section id="plan">
+      <div class="sec-head"><span class="sec-no">05</span><h2 class="sec-title">الخطة التنفيذية المرحلية الدقيقة</h2></div>
+      <p class="sec-intro">كل مرحلة تحدّد بالاسم: عناصر إصلاح (من القسم 03) وعناصر بناء، دون خلط.</p>
+
+      <div class="phase"><h4><span class="phase-tag">Phase 0</span>إصلاحات منصّة إلزامية قبل أي كود Trade</h4>
+        <ul>
+          <li><b>[إصلاح]</b> BUG-06: فحص CI يمنع <code>is_enabled(</code> جديدًا خارج قائمة استثناء</li>
+          <li><b>[إصلاح]</b> BUG-13: تفعيل <code>notifications_outbox_enabled</code> بعد اختبار ترحيل حقيقي</li>
+          <li><b>[إصلاح]</b> BUG-01/02: تصحيح CLAUDE.md (رأس Alembic + التناقض)</li>
+        </ul>
+      </div>
+      <div class="phase"><h4><span class="phase-tag">Phase 1</span>العقود والصلاحيات والهوية <span class="tag tag-doc">R4/MES §1-7</span></h4>
+        <ul>
+          <li><b>[بناء]</b> عقود Trade (أعلام، معرّفات تتبّع، آلات حالة) — أعلام مغلقة افتراضيًّا</li>
+          <li><b>[بناء]</b> <code>trade_suppliers</code>، <code>trade_supplier_memberships</code>، <code>trade_buyer_accounts</code></li>
+          <li><b>[بناء، بقالب موجود]</b> <code>TRADE_PERMS_GRANTABLE/OWNER_ONLY/STAFF_BASELINE</code> + <code>require_trade_permission</code> بنفس نمط Provider الحالي</li>
+        </ul>
+      </div>
+      <div class="phase"><h4><span class="phase-tag">Phase 2</span>الكتالوج والتكامل للقراءة فقط</h4>
+        <ul>
+          <li><b>[بناء]</b> منتج/متغيّر/عبوة/عرض مورد، مزامنة بثلاثة أوضاع (API/Edge Connector/دفعي)</li>
+          <li><b>[بناء]</b> بحث Trade كنسخة مُفهرَسة مستقلّة عن التجزئة</li>
+        </ul>
+      </div>
+      <div class="phase"><h4><span class="phase-tag">Phase 3</span>المخزون والحجز (Shadow أولًا)</h4>
+        <ul><li><b>[بناء]</b> ATP، الحجز الذري، حالات الحداثة (طازج/تحذير/قديم)</li></ul>
+      </div>
+      <div class="phase"><h4><span class="phase-tag">Phase 4</span>أمر الشراء والنقد</h4>
+        <ul>
+          <li><b>[بناء]</b> Quote/PO/Cash Approval — يحتاج حسم MES-01 (حالة PO المتعامدة) وMES-02 (سلّة متعددة الموردين) أولًا</li>
+        </ul>
+      </div>
+      <div class="phase"><h4><span class="phase-tag">Phase 5</span>الشحن والتتبّع</h4>
+        <ul><li><b>[بناء]</b> مركبات/شحنات/تجميع Shadow-first — لا تمديد لنموذج سائق التجزئة</li></ul>
+      </div>
+      <div class="phase"><h4><span class="phase-tag">Phase 6</span>الاستلام والفاتورة والمطابقة الثلاثية</h4>
+        <ul>
+          <li><b>[بناء كامل]</b> لا أساس سابق — استلام/فاتورة/مطابقة ثلاثية من الصفر</li>
+          <li><b>[بناء]</b> خط أنابيب استثناء متعدّد المراحل (يسدّ BUG-11/MES-05) + إشعارات دائن/مدين</li>
+        </ul>
+      </div>
+      <div class="phase"><h4><span class="phase-tag">Phase 7</span>قسم Trade في غرفة التحكّم + محرّك القضايا</h4>
+        <ul>
+          <li><b>[بناء]</b> القسم العاشر في opsNav.ts + التسجيل الكامل في opsAccess.ts</li>
+          <li><b>[بناء طموح]</b> <code>work_items</code> عامّ (يسدّ BUG-07) — Trade أول مستهلك</li>
+        </ul>
+      </div>
+      <div class="phase"><h4><span class="phase-tag">Phase 8</span>إطلاق تجريبي محدود</h4>
+        <ul><li>مورد واحد + مشترٍ واحد، قراءة فقط أولًا، ثم تفعيل تدريجي حسب سلّم R4 §19.2</li></ul>
+      </div>
+    </section>
+
+    <!-- TECH -->
+    <section id="tech">
+      <div class="sec-head"><span class="sec-no">06</span><h2 class="sec-title">البحث التقني الحديث</h2></div>
+      <p class="sec-intro">نتائج بحث هذه الجلسة، مع تعليم صريح لما لم يكتمل.</p>
+
+      <h3 class="sub">الفوترة الإلكترونية (UBL/Peppol/ZATCA) <span class="tag tag-web">بحث تقني</span></h3>
+      <p style="max-width:76ch">لا مكتبة Python ناضجة مهيمنة لتوليد UBL. الأقرب: <code>factur-x</code> (إصدار 6.5، نشط، يولّد UBL من قاموس Python بمفاتيح EN-16931). لمرجعية تدفّق CSID/التصديق السعودي: <code>ZatcaPython</code> (للقراءة لا الاعتماد المباشر). الإمارات (PINT AE، نموذج خماسي الزوايا، تدريجي 2026-2027) وعُمان (PINT OM، جديد تمامًا أبريل 2026) يفرضان الفوترة الإلكترونية إقليميًّا عبر مزوّدي نقطة وصول (ASP) — <b>ليبيا لا تفرض شيئًا حتى الآن</b>، فهذا غير حاجب لكنه اتجاه إقليمي يستحق المراقبة إن تعامل Trade مع موردين مستوردين عبر الحدود.</p>
+
+      <h3 class="sub">تكامل الكتالوج/EDI الحديث <span class="tag tag-web">بحث تقني</span></h3>
+      <p style="max-width:76ch">لا معيار مفتوح محايد يحلّ محلّ EDI للموردين الصغار — النمط السائد 2025-2026 هو REST+Webhook خاص لكل منصّة (توثيق Ankorstore العلني نموذج جيّد للاقتداء)، بينما تحويل EDI إلى JSON عبر خدمات وسيطة (Stedi، EDI2XML) هو الحلّ الشائع لا معيار موحَّد. <code>GS1 Digital Link</code> حقيقي (Sunrise 2027) لكن أدوات Python له إمّا مهجورة أو غير مدعومة رسميًّا. <code>GDSN</code> مستوى مؤسسي بحت (تسعير يبدأ من آلاف الدولارات شهريًّا) — غير عملي لمورد ليبي صغير؛ حضور GS1 ليبيا اسميّ فقط (جمعية ترقيم) بلا برنامج مزامنة بيانات. نمط CSV/SFTP «EDI الفقراء» ممارسة غير رسمية مؤكَّدة، تطابق تمامًا وضع «الدفعي» المخطَّط أصلًا في تصميم Trade (R4 §9.1) — لا حاجة لتغيير هذا الجزء من الخطة.</p>
+
+      <h3 class="sub">قوائم انتظار وصندوق صادر Postgres الحديثة <span class="tag tag-web">بحث تقني — اكتمل لاحقًا</span></h3>
+      <p style="max-width:76ch">أقوى مرشّح للمكدّس الحالي (Python/SQLAlchemy 2.0، بلا Kafka): <code>pgqueuer</code> (v1.2.0، ~1.5 ألف نجمة، الأكثر تطوّرًا فعليًّا) — يجمع إيقاظ <code>LISTEN/NOTIFY</code> مع <code>FOR UPDATE SKIP LOCKED</code> كخطّة احتياطية، حدود تزامن لكل نوع مهمّة، مقاييس Prometheus، وأمثلة FastAPI جاهزة؛ يستخدم <code>asyncpg</code>/<code>psycopg</code> مباشرة لا SQLAlchemy. البديل <code>pgmq</code> (v1.12.0، نشط، يدعم PostgreSQL 14-18) أنضج كمشروع لكن أقلّ اندماجًا مع FastAPI مباشرة؛ يوجد غلاف SQLAlchemy مجتمعي (<code>pgmq-sqlalchemy</code>) لكنه مبكر جدًّا (~29 نجمة). <code>Procrastinate</code> (v3.9.0) بديل ناضج آخر بتوثيق نشر إنتاجي مخصَّص. لا توجد مكتبة جاهزة مهيمنة لنمط Outbox نفسه في SQLAlchemy — يبقى نمطًا يُبنى يدويًّا (كتابة صفّ Outbox في نفس معاملة الكتابة التجارية، ثم Relay منفصل يسحبها)؛ الفكرة العملية: جداول <code>pgqueuer</code>/<code>pgmq</code> نفسها يمكن أن تخدم كصندوق Outbox وطابور معًا، فيدمجان في آلية واحدة بدل بناء اثنتين منفصلتين. PostgreSQL 17 يضيف GUC جديدًا (<code>notify_buffers</code>) يخفّف عنق زجاجة كان يصيب مكتبات LISTEN/NOTIFY تحديدًا؛ PostgreSQL 18 يضيف <code>RETURNING OLD/NEW</code> (مفيد لسحب-وقراءة ذرّية) وB-tree Skip Scan يُسرّع استعلامات <code>SKIP LOCKED</code> المركّبة — كلاهما اعتبارات ترقية مستقبلية بما أنّ المكدّس الحالي على PostgreSQL 16، لا قدرات متاحة الآن.</p>
+
+      <h3 class="sub">بدائل تحسين المسارات (VROOM/Timefold) مقابل OR-Tools <span class="tag tag-web">بحث تقني — اكتمل لاحقًا</span></h3>
+      <p style="max-width:76ch"><b>التوصية الواضحة: <code>VROOM</code> خيارًا أوّل، و<code>PyVRP</code> بديلًا Python خالصًا.</b> <code>VROOM</code> (v1.15.0، نشط فعليًّا) يغطّي بالضبط القيود المطلوبة: سعة متعدّدة الأبعاد (وزن+حجم معًا)، «مهارات» إلزامية (تُترجَم مباشرة لأهلية التبريد/الخطورة/المعدّات)، نوافذ زمنية، مستودعات متعدّدة، أولويات، واستراحات السائق. يعمل كخدمة HTTP جانبية (Sidecar) صغيرة، أو عبر غلاف <code>pyvroom</code> مباشرة داخل عملية عامل Python دون قفزة شبكة إضافية — الأنسب لمعمارية Monolith وحدوي بعمّال منفصلين. يحتاج مصفوفة مسافة/زمن خارجية (OSRM كخيار افتراضي، وهو موجود أصلًا في docker-compose الحالي). البديل <code>PyVRP</code> (نشط، MIT، Python خالص بلا وسيط) أنسب إن أُريد تجنّب أي عملية منفصلة كليًّا، بخارطة طريق معلنة نحو آلاف نقاط التوقّف بحلول 2026. أمّا <code>Timefold</code> (خليفة OptaPlanner، مجّاني بترخيص Apache 2.0 لنسخة المجتمع) فأقوى لكنه مبالغ فيه لمسألة توجيه شحن بحتة — يستحق النظر فقط إن دُمج لاحقًا مع جدولة نوبات السائقين ضمن نفس المُحلّ. القياس المرجعي المتاح لـVROOM (~360 مللي ثانية لمئة توقّف) لا يغطّي آلاف التوقّفات دفعة واحدة — يحتاج اختبار تحميل فعلي بحجم توّا قبل الاعتماد الكامل.</p>
+
+      <h3 class="sub">تغطية KYC/التحقّق التجاري لليبيا <span class="tag tag-web">بحث تقني — اكتمل لاحقًا</span></h3>
+      <p style="max-width:76ch"><b>النتيجة صريحة وحاسمة: لا تحقّق آلي متاح لليبيا اليوم، إلا لفحص العقوبات فقط.</b> لم يُؤكَّد أي مزوّد عالمي (Stripe Identity، Onfido/Entrust، Jumio، Trulioo، Veriff) دعمًا لليبيا؛ والأخطر أنّ <code>Sumsub</code> يستثني ليبيا صراحةً بنص تعاقدي ضمن قائمة دول محظورة (مع كوبا وإيران وكوريا الشمالية والسودان وروسيا وسوريا) — رفض تعاقدي كامل، لا مجرّد نقص تغطية. مزوّدو الشرق الأوسط المتخصّصون (Uqudo، Signzy، FaceKi) يغطّون الإمارات والسعودية ومصر والأردن فقط، بلا أي إشارة لليبيا. لا واجهة برمجية عامّة للسجلّ التجاري الليبي إطلاقًا؛ استخراج السجلّ يتطلّب وكيلًا محليًّا ويستغرق 30+ يومًا عبر خدمات يدوية متخصّصة (InfobelPRO، Schmidt &amp; Schmidt، Qabas). <b>النقطة الإيجابية الوحيدة:</b> فحص العقوبات وقوائم PEP (مطابقة أسماء لا وثائق) قابل للأتمتة فعليًّا حتى لكيانات ليبية — قوائم OFAC/الأمم المتحدة/الاتحاد الأوروبي تتضمّن أصلًا كيانات وأفرادًا ليبيّين مرتبطين بنظام القذّافي، وتُفحَص افتراضيًّا عبر أي مزوّد فحص عقوبات قياسي (ComplyAdvantage، أو أداة OFAC المجانية كحدّ أدنى). <b>التوصية العملية لـTrade:</b> التحقّق من السجلّ التجاري وهوية الممثّل والحساب البنكي يبقى مراجعة يدوية بالكامل من فريق الامتثال الداخلي لتووا (مستندات مرفوعة + مطابقة يدوية)؛ الأتمتة الوحيدة المُجدية هي طبقة فحص عقوبات/PEP خفيفة التكلفة تُضاف فوق المراجعة اليدوية، لا بديلًا عنها — ويُوثَّق هذا القرار صراحةً كي لا يُفترَض لاحقًا وجود مزوّد تحقّق آلي غير موجود فعليًّا.</p>
+    </section>
+
+    <!-- MOBILE -->
+    <section id="mobile">
+      <div class="sec-head"><span class="sec-no">07</span><h2 class="sec-title">قرار الموبايل المسجَّل رسميًا</h2></div>
+      <p class="sec-intro">هذا القرار <b>موثَّق فعليًّا بالفعل</b> في <code>CLAUDE.md</code> منذ 2026-07-18 بتفويض صريح من المالك — لسنا بحاجة لتسجيله من جديد، بل لتأكيده وربطه بواقع الكود.</p>
+      <div class="plain">
+        <b>النص الموثَّق حرفيًّا:</b> «تطوير الموبايل هو React Native حصرًا من الآن فصاعدًا. <code>apps/mobile/</code> (React Native) هو العميل الوحيد المدعوم للموبايل. <code>mobile_app/</code> (Flutter) مُجمَّد/مهجور — لا مزيد من عمل الميزات أو الإصلاحات أو البناء ضده. هذا قرار تشغيلي صريح من المالك، لا تقييمًا تقنيًّا لأي من التقنيتَين. أي عمل موبايل مستقبلي يستهدف <code>apps/mobile/</code> حصرًا. لا تقترح أو تستأنف عمل Flutter دون تعليمات صريحة معادلة تعكس هذا القرار.»
+      </div>
+      <p style="max-width:76ch">تحقّق فحص الكود من هذا مباشرة: مجلّد Flutter (<code>mobile_app/</code>) موجود فعليًّا لكنه <b>خارج مستودع Git كليًّا</b> (غير متتبَّع)، بلا أي خطوة في CI، وآخر لمسة له تعود على الأرجح لعملية استعادة القرص التالفة في 2026-06-29 لا تطويرًا فعليًّا. بالمقابل <code>apps/mobile/</code> (React Native 0.86.0 + Expo SDK 57) هو المتتبَّع والفعّال. أي عمل Trade على الموبايل مستقبلًا (مثل تتبّع الشحنات لسائق Trade) يستهدف <code>apps/mobile/</code> حصرًا دون نقاش.</p>
+    </section>
+
+    <!-- VERDICT -->
+    <section id="verdict">
+      <div class="sec-head"><span class="sec-no">08</span><h2 class="sec-title">الحكم الختامي</h2></div>
+      <div class="final-card">
+        <p style="max-width:none; margin-top:.6rem">فحص الكود الحيّ غيّر الصورة إيجابيًّا في نقطة جوهرية: <b>القالب الدقيق الذي طلبتَه بالضبط</b> — «صلاحية Trade عامّة وتحتها صلاحيات مختلفة» — موجود بالفعل ومُختبَر عمليًّا في نظام صلاحيات المزوّد الحالي. لسنا بحاجة لاختراعه؛ فقط لتكراره بأمانة لـTrade.</p>
+        <p style="max-width:none">في المقابل، كشف الفحص أن بعض ما بدا في تقارير 07-19/07-20 وكأنه "مُصلَح" هو في الواقع جزئيّ أو مطفأ افتراضيًّا (KMS، Outbox، تجاوز الأعلام الواسع)، وأن CLAUDE.md نفسه — الذاكرة التشغيلية للمشروع — متأخّر عن الواقع بمقدار ملموس. هذا يعزّز أهمية القاعدة التي طبّقناها هنا: <b>لا شيء يُفترَض مُصلَحًا دون دليل كود مباشر حاليّ</b>.</p>
+        <p style="max-width:none; margin-bottom:0"><b>التوصية العملية:</b> نفّذ Phase 0 (الإصلاحات الثلاثة الإلزامية) قبل أي سطر كود Trade، ثم ابدأ Phase 1 مباشرةً بالقالب الثلاثي الطبقات المؤكَّد من الكود. لا تبدأ Phase 4 (أمر الشراء) قبل حسم MES-01/MES-02 صراحةً — فهما الفجوتان الوحيدتان في تصميم Trade نفسه القادرتان على تغيير شكل الجداول الأساسية بعد إنشائها.</p>
+      </div>
+    </section>
+
+    <footer>
+      يكمِّل هذا التقرير تقريرَي 550 و551 (تحليل وثائق التصميم) بفحص فعلي للكود الحيّ + بحث تقني عبر عدّة جلسات متتالية (بعض الوكلاء تعرّض لأعطال Rate-limit من جهة الخدمة وأُعيد تشغيله). كل محاور البحث التقني الستة في القسم 06 مكتملة الآن. كل رقم ملف وسطر واقتباس مذكور أعلاه منقول حرفيًّا من نتائج الفحص المباشر.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

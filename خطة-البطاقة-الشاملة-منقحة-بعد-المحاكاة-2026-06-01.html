@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خطة البطاقة الشاملة — منقّحة بعد المحاكاة — تووا — 2026-06-01</title>
+<style>
+  :root{
+    --bg:#0f1419; --card:#1a212b; --card2:#222b38; --line:#2e3a4a;
+    --txt:#e7eef6; --mut:#9fb0c3; --pri:#2ec28a;--pri2:#1f9e6e;
+    --red:#ff5d5d; --amber:#ffba49; --blue:#5ab0ff; --green:#37d399; --purp:#b79bff;
+    --redbg:#3a1c1f; --amberbg:#3a2f1a; --greenbg:#16302a; --bluebg:#16283a; --purpbg:#241a3a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.8;font-size:15px}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
+  header.head{background:linear-gradient(135deg,#16302a,#16283a);border:1px solid var(--line);border-radius:18px;padding:30px 28px;margin-bottom:22px}
+  header.head h1{margin:0 0 6px;font-size:22px}
+  header.head .sub{color:var(--mut);font-size:14px}
+  .pill{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:3px 12px;margin:4px 4px 0 0;font-size:12.5px;color:var(--mut)}
+  h2{margin:30px 0 12px;font-size:20px;border-right:4px solid var(--pri);padding-right:12px}
+  h3{margin:16px 0 8px;font-size:16px;color:var(--blue)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+  code{background:#0b0f14;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:12px;color:#cfe9ff;font-family:ui-monospace,Consolas,monospace;direction:ltr;display:inline-block}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:var(--card2);color:var(--mut);font-weight:700}
+  .ok{color:var(--green)}.bad{color:var(--red)}.warn{color:var(--amber)}
+  ul,ol{margin:8px 0;padding-right:22px}li{margin:4px 0}
+  .muted{color:var(--mut);font-size:13px}
+  .defect{background:var(--redbg);border:1px solid #5a2b2e;border-radius:9px;padding:11px 14px;margin:9px 0;font-size:13.4px}
+  .fix{background:var(--greenbg);border:1px solid #225244;border-radius:9px;padding:9px 13px;margin:7px 0;font-size:13.2px}
+  .sim{background:#10171f;border-right:3px solid var(--blue);border-radius:8px;padding:10px 13px;margin:8px 0;font-size:13.2px}
+  .ws{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0}
+  .ws .h{font-weight:800;font-size:15px;margin-bottom:6px;color:var(--green)}
+  .ev{font-size:12px;color:var(--mut);border-right:2px solid var(--pri2);padding-right:8px;margin:6px 0}
+  .note{background:var(--amberbg);border:1px solid #5a4a24;border-radius:10px;padding:11px 14px;margin:12px 0;font-size:13.4px}
+  .decide{background:var(--purpbg);border:1px solid #43356b;border-radius:10px;padding:12px 14px;margin:10px 0}
+  .foot{margin-top:40px;border-top:1px solid var(--line);padding-top:16px;color:var(--mut);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="head">
+  <h1>🔬 خطة البطاقة الشاملة — منقّحة بعد المحاكاة الذهنيّة</h1>
+  <div class="sub">منصّة تووا / Toowa — مراجعة دقيقة مقابل الكود + عيوب تقنيّة مستخرجة · 2026-06-01</div>
+  <div style="margin-top:12px">
+    <span class="pill">🧭 للمراجعة — لم يُنفَّذ شيء</span>
+    <span class="pill">🛡️ 4 عيوب تقنيّة مكتشفة ومُعالَجة في الخطّة</span>
+  </div>
+</header>
+
+<div class="card">
+  <b>ماذا أضافت هذه المراجعة؟</b> قارنتُ كل مسار بالكود وحاكيتُ بناءه، فظهرت <b class="bad">عيوب تقنيّة حقيقيّة</b> كانت ستُسقط التنفيذ أو تُحدث أثراً جانبيّاً صامتاً. أُدرجت الإصلاحات في الخطّة (DEF-A..D + تحديدات دقيقة).
+</div>
+
+<!-- ===== العيوب ===== -->
+<h2>أولاً: العيوب التقنيّة المكتشفة (والحلّ المُدمَج)</h2>
+
+<div class="defect">
+  <b class="bad">DEF-A (حرج) — انهيار async عند قراءة العلاقات:</b> علاقات <code>User</code> (roles/devices/sessions/addresses) مُعرّفة بـ<code>relationship()</code> <b>بلا تحميل eager</b> → الوصول إليها بعد <code>db.get(User,id)</code> في جلسة async <b>يرمي MissingGreenlet</b>. (الكود الحاليّ يجلب الأدوار بـ<code>select(Role)</code> صريح لهذا السبب بالذات.)
+  <div class="fix"><b>الحلّ في الخطّة:</b> WS-2 يستعلم عن devices/sessions/addresses بـ<code>select()</code> صريح (أو <code>selectinload</code>) — <b>ممنوع</b> <code>u.devices</code> مباشرةً.</div>
+  <div class="ev">شاهد: models/user.py:62-65 (relationship بلا lazy) · control_panel_router.py:565 (roles عبر select صريح).</div>
+</div>
+
+<div class="defect">
+  <b class="bad">DEF-B (حرج) — كتابة داخل نقطة قراءة:</b> <code>WalletService.get_balance(id)</code> يستدعي <code>get_or_create_wallet</code> الذي <b>يُنشئ صفّ محفظة + flush</b> إن غابت → مجرّد <b>عرض</b> مستخدم بلا محفظة سيُنشئ له واحدة (أثر جانبيّ في GET).
+  <div class="fix"><b>الحلّ في الخطّة:</b> WS-2 يقرأ المحفظة بـ<code>select(WalletAccount).where(user_id==id)</code> فقط → يُرجع الرصيد أو <code>null</code> إن لا محفظة. <b>ممنوع</b> <code>get_balance</code>.</div>
+  <div class="ev">شاهد: wallet_service.py:67-89 (get_or_create_wallet يضيف ويفلَش).</div>
+</div>
+
+<div class="defect" style="border-color:#225244;background:var(--greenbg)">
+  <b class="ok">DEF-C (فُحص — مُطمئن):</b> <code>phone_hash</code> = <code>sha256(phone)</code> <b>موحّد</b> في كل مواقع الكتابة (auth <code>_phone_hash:95</code> = registration:55). إذن استعلام WS-3 عن <code>otp_events</code>/<code>login_attempts</code> بـ<code>sha256(phone)</code> <b>موثوق</b> (لا تناقض كما خشيت سابقاً). + <code>login_attempts</code> فيه <code>user_id</code> أيضاً (نُفضّله).
+</div>
+
+<div class="defect">
+  <b class="bad">DEF-D — نطاق الاختبارات المتأثّرة (دقيق) + تغيير عقد خصوصيّة:</b> إزالة الإخفاف تكسر اختبارات محدّدة <b>يجب تحديثها في نفس الدفعة</b>:
+  <ul>
+    <li><code>test_phase396_gate_remediation_endpoints.py:129-137</code> — <b>اختبار إخفاء صريح</b> (يتأكّد أنّ الهاتف مُخفى وآخر 4 محفوظة والخام لا يُسرَّب). تحديثه = <b>عكس عقد الخصوصيّة رسميّاً</b> → يُوثَّق كقرار مالك.</li>
+    <li><code>test_phase7_control_panel.py:141-142</code> (<code>_redacted</code>+phone_full) و<code>226-227</code> (المحفظة مُخفاة + <code>_redacted</code>).</li>
+    <li><code>test_phase159_cp_audit_log.py:131</code> (<code>_redacted</code>).</li>
+  </ul>
+  <div class="fix"><b>الحلّ في الخطّة:</b> تحديث الأربعة لتتوقّع القيم الكاملة + الإبقاء على مفتاح <code>_redacted: []</code> فارغاً (توافق خلفيّ للواجهة إن كانت تقرأه).</div>
+</div>
+
+<div class="defect">
+  <b class="warn">DEF-E (تحقّق إدخال):</b> <code>hash_password</code> <b>يرمي ValueError</b> إن كانت كلمة المرور &lt;8 أحرف → نقطة «إعادة التعيين» يجب أن تتحقّق وتُرجع <b>422</b> (لا 500).
+  <div class="fix"><b>الحلّ:</b> WS-4 تتحقّق من الطول قبل التجزئة + رسالة خطأ مترجمة.</div>
+</div>
+
+<!-- ===== Workstreams منقّحة ===== -->
+<h2>ثانياً: مسارات العمل (منقّحة)</h2>
+
+<div class="ws">
+  <div class="h">WS-1 · إزالة الإخفاء</div>
+  تجاوز <code>_mask_phone/_mask_email/_mask_wallet_number</code> في القوائم (users:534 · customers/drivers/providers:615/621) + التفاصيل:568 + المحافظ → قيم كاملة. إبقاء <code>_redacted: []</code> فارغاً. الحارس بدور OPS يبقى.
+</div>
+
+<div class="ws">
+  <div class="h">WS-2 · إثراء التفاصيل <span class="muted">(مع DEF-A + DEF-B)</span></div>
+  إضافة كل حقول User (عدا <code>password_hash</code>+<code>totp_secret</code>) + <code>password_set</code>/<code>totp_enabled</code> (bool) + حسب الدور (Provider incl. opening_hours/is_accepting_orders/active_now · Driver+مركبة+cash · CustomerProfile). الرصيد بـ<code>select(WalletAccount)</code> (لا إنشاء). العلاقات (devices/sessions/addresses) بـ<code>select()</code> صريح.
+  <div class="sim"><b>محاكاة:</b> 4-5 استعلامات صريحة لمستخدم واحد (مقبول). لا أثر كتابة. لا MissingGreenlet. last_login/آخر تغيير من السجلّ لا من صفّ User (DEF سابق D-1).</div>
+</div>
+
+<div class="ws">
+  <div class="h">WS-3 · سجلّ النشاط <span class="muted">(نقطة جديدة)</span></div>
+  <code>GET /control-panel/users/{id}/activity?limit=50&offset=</code> (OPS): دمج <code>audit_log</code> (actor_id OR target_id) + <code>login_attempts</code> (user_id) + <code>otp_events</code> (phone_hash=<code>sha256(phone)</code>) → مرتّب بالأحدث، صفحات. (الطلبات لا تُكرَّر.)
+</div>
+
+<div class="ws">
+  <div class="h">WS-4 · السرّان: حالة + أزرار <span class="muted">(مع DEF-E)</span></div>
+  التفاصيل: <code>password_set</code>/<code>totp_enabled</code> فقط. نقطتان جديدتان SUPER_ADMIN + مُدقَّقتان: <code>POST .../reset-password</code> (المدير يُدخل كلمة المرور؛ تحقّق طول ≥8 → 422 وإلّا؛ <code>hash_password</code>؛ لا سرّ يُرجَع) · <code>POST .../disable-totp</code> (تفريغ <code>totp_secret</code>+<code>totp_enabled=False</code>).
+</div>
+
+<div class="ws">
+  <div class="h">WS-5 · بحث بالمعرّف/الطلبيّة <span class="muted">(اختياريّ — مؤجّل افتراضيّاً)</span></div>
+  توسيع <code>search_users</code> لمطابقة id + نقطة بحث طلب. <span class="muted">(يُنصح بدفعة تالية لإبقاء هذه مركّزة.)</span>
+</div>
+
+<div class="ws">
+  <div class="h">WS-6 · الواجهة</div>
+  درج كل من ControlPanelCustomers/Drivers/Providers/Users: توسيع «معلومات» + تبويب «السجلّ» + حالة السرّين + زرّان (SUPER_ADMIN). الطلبات تبقى تبويباً.
+</div>
+
+<!-- ===== مصفوفة ===== -->
+<h2>ثالثاً: مصفوفة التأثير (منقّحة)</h2>
+<div class="card">
+  <table>
+    <tr><th>الطبقة</th><th>ملفّات تُعدَّل</th><th>اختبارات</th><th>قيود حرجة</th></tr>
+    <tr><td>خلفيّة</td><td><code>control_panel_router.py</code> (+ استدعاء نماذج Provider/Driver/CustomerProfile/WalletAccount/audit/password_service)</td><td>تحديث: phase396:129-137 · phase7:141-142,226-227 · phase159:131 — وإضافة: activity · reset · disable · RBAC</td><td>select صريح للعلاقات (DEF-A) · لا get_balance (DEF-B) · طول كلمة المرور (DEF-E)</td></tr>
+    <tr><td>واجهة</td><td>ControlPanelCustomers/Drivers/Providers/Users + api/controlPanel.ts</td><td>تحديث/إضافة اختبارات الدرج والتبويب</td><td>—</td></tr>
+  </table>
+</div>
+
+<!-- ===== الحوكمة ===== -->
+<h2>رابعاً: الحوكمة</h2>
+<div class="note">
+  <ul style="margin:0">
+    <li>إزالة الإخفاء + <b>عكس اختبار الخصوصيّة الصريح</b> (phase396) = <b>قرار مالك موثّق</b> (لوحة داخليّة محروسة بدور OPS).</li>
+    <li>السرّان لا يُعرضان خاماً أبداً (مستحيل/خطر) — حالة + إعادة ضبط فقط، SUPER_ADMIN + مُدقَّق.</li>
+    <li><b>لا migration</b> · <b>لا مساس بـFIN-COR/المالية</b> · بلا commit. نشر <code>deploy_be.sh</code>+<code>deploy_web.sh</code> + تحقّق حيّ قراءة-فقط.</li>
+  </ul>
+</div>
+
+<!-- ===== البوابة ===== -->
+<h2>خامساً: التسلسل والبوابة</h2>
+<div class="card">
+  <ol>
+    <li>خلفيّة: WS-1→WS-4 + تحديث/إضافة اختبارات pytest (مع DEF-A/B/E).</li>
+    <li>واجهة: WS-6 + Vitest.</li>
+    <li>بوابة: <code>pytest</code> أخضر · <code>typecheck/lint/build</code> · <code>FIN-COR PASS</code>.</li>
+    <li>نشر تدريجيّ + تحقّق حيّ + توثيق الذاكرة.</li>
+  </ol>
+</div>
+
+<!-- ===== قرارات ===== -->
+<h2>🟣 قرارات قبل التنفيذ</h2>
+<div class="decide"><b>#1 — WS-5 (بحث بالمعرّف/الطلبيّة):</b> هذه الدفعة أم التالية؟ (أوصي: التالية)</div>
+<div class="decide"><b>#2 — إعادة تعيين كلمة المرور:</b> المدير يُدخلها (أوصي — لا سرّ يُرجَع) أم يولّدها النظام؟</div>
+<div class="decide"><b>#3 — حجم سجلّ النشاط:</b> 50 + «عرض المزيد» (أوصي) أم غيره؟</div>
+
+<div class="foot">
+  مراجعة دقيقة مقابل الكود + محاكاة كل مسار · العيوب مُضمَّنة (DEF-A..E) · لم يُنفَّذ شيء.<br>
+  تووا / Toowa — لوحة التحكم والعمليات (OPS) · 2026-06-01
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,742 @@
+<meta charset="utf-8">
+<title>الخطة التنفيذية الدقيقة — محاكاة ذهنية شاملة لتسع نقاط — تقرير 514</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 76ch; color: var(--ink); }
+  p.lead { font-size: 1.08rem; color: var(--ink-muted); max-width: 66ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.87em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🧭"; position: absolute; left: -10px; top: -50px; font-size: 13rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1020px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 2.05rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 28ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 68ch; font-size: 1.06rem; }
+  .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.75rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.78rem; color: rgba(255,255,255,0.78); }
+
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.8rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 13px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+
+  section { margin: 54px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.45rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 1rem; color: var(--ink-muted); max-width: 74ch; margin-bottom: 24px; }
+  .question { font-size: 0.95rem; color: var(--ink-faint); border-right: 3px solid var(--border); padding-right: 12px; margin: 10px 0 22px; max-width: 70ch; }
+
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.95rem; max-width: 64ch; }
+  .plain b { color: var(--accent-deep); }
+
+  .analogy { background: var(--accent-2-tint); border: 1px dashed var(--accent-2); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; }
+  .analogy .k { font-size: 0.76rem; font-weight: 800; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .analogy p { margin: 0; font-size: 0.92rem; color: var(--ink); max-width: 64ch; }
+
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.95rem; max-width: 66ch; }
+  .warn-box b { color: var(--warn-ink); }
+
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.95rem; max-width: 66ch; }
+  .crit-box b { color: var(--crit-ink); }
+
+  .pipeline { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 8px 4px 16px; }
+  .pl-stage { flex: 0 0 auto; min-width: 118px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px; }
+  .pl-node { width: 52px; height: 52px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; background: var(--surface); border: 2px solid var(--ok-border); box-shadow: var(--shadow); color: var(--ok-ink); margin-bottom: 8px; }
+  .pl-node.stop { border-color: var(--crit-border); color: var(--crit-ink); background: var(--crit-bg); }
+  .pl-node.pending { border-color: var(--warn-border); color: var(--warn-ink); background: var(--warn-bg); }
+  .pl-stage .t { font-size: 0.8rem; font-weight: 700; color: var(--ink); }
+  .pl-stage .d { font-size: 0.7rem; color: var(--ink-faint); margin-top: 2px; max-width: 130px; }
+  .pl-arrow { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 26px; margin-top: -26px; }
+  .pl-arrow svg { width: 22px; height: 12px; }
+  .pl-arrow path { stroke: var(--ok-border); stroke-width: 2.5; fill: none; }
+
+  .vflow { display: flex; flex-direction: column; gap: 0; margin: 18px 0; padding: 20px; background: var(--surface-2); border: 1px dashed var(--border); border-radius: var(--radius); }
+  .vf-step { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px 18px; box-shadow: var(--shadow); }
+  .vf-step b { display: block; font-size: 0.95rem; margin-bottom: 2px; }
+  .vf-step span.d { color: var(--ink-faint); font-size: 0.82rem; }
+  .vf-step.ok { border-color: var(--ok-border); }
+  .vf-step.stop { border-color: var(--crit-border); background: var(--crit-bg); }
+  .vf-step.stop b { color: var(--crit-ink); }
+  .vf-step.pending { border-style: dashed; background: transparent; color: var(--ink-faint); box-shadow: none; }
+  .vf-arrow { align-self: center; color: var(--ink-faint); font-size: 1.1rem; padding: 4px 0; }
+
+  .layers { display: flex; flex-direction: column; gap: 7px; margin: 18px 0; padding: 18px; background: var(--surface-2); border: 1px dashed var(--border); border-radius: var(--radius); }
+  .layer { border-radius: 9px; padding: 11px 16px; font-size: 0.88rem; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--border); background: var(--surface); }
+  .layer.exists { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .layer.missing { background: transparent; border-style: dashed; color: var(--ink-faint); }
+  .layer .tag { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.03em; white-space: nowrap; }
+
+  .feature { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 22px 24px; margin-bottom: 26px; }
+  .feature .fhead { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+  .feature .fnum { font-family: var(--font-display); font-weight: 800; font-size: 0.76rem; background: var(--accent-tint); color: var(--accent-deep); border-radius: 999px; padding: 3px 12px; }
+  .feature h3 { font-size: 1.08rem; margin: 0; }
+  .feature .simple-answer { color: var(--ink-muted); font-size: 0.92rem; margin: 10px 0 4px; }
+
+  .phase-head { display: flex; align-items: center; gap: 10px; margin: 40px 0 16px; }
+  .phase-head .pnum { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex: 0 0 auto; }
+  .phase-head h3 { margin: 0; font-size: 1.15rem; }
+  .phase-head .pdesc { color: var(--ink-faint); font-size: 0.82rem; }
+
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 8px; display: flex; align-items: center; gap: 6px; }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+
+  ol.steps { margin: 10px 0; padding-inline-start: 22px; }
+  ol.steps li { margin-bottom: 9px; color: var(--ink); font-size: 0.92rem; }
+  ol.steps li b { color: var(--accent-deep); }
+  ul.simple-list { margin: 10px 0; padding-inline-start: 22px; }
+  ul.simple-list li { margin-bottom: 8px; color: var(--ink-muted); font-size: 0.92rem; }
+  ul.simple-list li b { color: var(--ink); }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.84rem; min-width: 560px; }
+  thead th { text-align: right; font-family: var(--font-display); font-weight: 700; background: var(--surface-2); color: var(--ink-muted); font-size: 0.72rem; letter-spacing: 0.03em; padding: 10px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.mono { font-family: var(--font-mono); font-size: 0.8rem; }
+  td.center { text-align: center; }
+  td.yes { color: var(--ok-ink); font-weight: 800; text-align: center; }
+  td.no { color: var(--crit-ink); font-weight: 800; text-align: center; }
+  td.scenario { font-weight: 600; }
+  td.mitigation { color: var(--ink-muted); }
+
+  .evidence-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin: 14px 0; font-size: 0.85rem; }
+  .evidence-box .k { font-weight: 800; color: var(--accent-deep); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+  .evidence-box .row { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+  .evidence-box .row:last-child { border-bottom: none; }
+  .evidence-box .row .l { color: var(--ink-faint); min-width: 210px; flex: 0 0 auto; }
+  .evidence-box .row .v { font-family: var(--font-mono); font-size: 0.82rem; color: var(--ink); direction: ltr; unicode-bidi: isolate; }
+
+  .verdict-card { border-radius: 18px; padding: 26px 26px; margin: 20px 0; border: 2px solid; }
+  .verdict-card.ready { background: linear-gradient(135deg, var(--ok-bg), var(--surface)); border-color: var(--ok-border); }
+  .verdict-card .vtitle { font-size: 1.15rem; font-weight: 800; color: var(--accent-deep); margin-bottom: 6px; }
+
+  .final-verdict { background: linear-gradient(135deg, var(--accent-tint), var(--surface)); border: 2px solid var(--accent); border-radius: 20px; padding: 32px 30px; text-align: center; margin: 24px 0; }
+  .final-verdict .big { font-size: 3rem; margin-bottom: 10px; }
+  .final-verdict h3 { font-size: 1.25rem; color: var(--accent-deep); margin: 0 0 8px; }
+  .final-verdict p { margin: 0 auto; color: var(--ink-muted); font-size: 0.95rem; max-width: 60ch; }
+
+  hr.div { border: none; border-top: 1px dashed var(--border); margin: 46px 0; }
+  footer { margin-top: 72px; padding: 24px 0; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--ink-faint); text-align: center; }
+  a { color: var(--accent-deep); }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="inner">
+      <span class="kicker">🧭 خطة تنفيذية دقيقة — تقرير 514 — بعد محاكاة ذهنية شاملة</span>
+      <h1>من التقرير التحليليّ (513) إلى خطة تنفيذ دقيقة — بمحاكاة ذهنية لكل سيناريوهات البناء والتشغيل</h1>
+      <p class="lead">
+        هذا التقرير يحوّل التسع نقاط التي فُحِصت سابقًا إلى خطوات تنفيذ مرتّبة، بعد تشغيل فحص أساسيّ حقيقيّ
+        (اختبارات + بناء + تنسيق) على شجرة العمل الحاليّة، ومحاكاة ذهنية لكل نقطة على حدة: ماذا يحدث أثناء الإصلاح
+        أو البناء، وماذا يحدث بعد التشغيل الفعليّ على المنصّة الحيّة — مع فحص خاصّ لجاهزية "الطلب المجمّع" لفكّ
+        ختمه. اكتُشِف أثناء الفحص <b>خللٌ حقيقيّ قائم فعليًّا</b> في تزامن إلغاء الطلبات، غير مرتبط بأيّ نقطة من
+        التسع، وأُضيف للخطة كبند أولويّة.
+      </p>
+      <div class="hero-stats">
+        <div class="s"><div class="n">9</div><div class="l">نقاط حُوِّلت لخطوات تنفيذ</div></div>
+        <div class="s"><div class="n">1</div><div class="l">خلل تزامن حقيقيّ مكتشَف بالكود الحاليّ</div></div>
+        <div class="s"><div class="n">40+</div><div class="l">سيناريو بناء/تشغيل مع حلّ لكلّ واحد</div></div>
+        <div class="s"><div class="n">3698</div><div class="l">اختبار خلفيّ ناجح فعليًّا الآن (فحص حيّ)</div></div>
+        <div class="s"><div class="n">25</div><div class="l">ملفًّا يفشل فحص التنسيق حاليًّا — يُصلَح أوّلًا</div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#baseline">الفحص الأساسيّ</a>
+    <a href="#bug">خلل حقيقيّ مكتشَف</a>
+    <a href="#unseal">جاهزية الطلب المجمّع</a>
+    <a href="#roadmap">خريطة المراحل</a>
+    <a href="#phase1">المرحلة 1 — واجهة فقط</a>
+    <a href="#phase2">المرحلة 2 — خلفيّة محكومة</a>
+    <a href="#phase3">المرحلة 3 — نظام تقييم الأداء</a>
+    <a href="#final">الخلاصة</a>
+  </nav>
+
+  <section id="baseline">
+    <div class="section-eyebrow">🩺 الخطوة صفر</div>
+    <h2>الفحص الأساسيّ الحقيقيّ — قبل أيّ تنفيذ</h2>
+    <p class="intro">قبل وضع أيّ خطوة تنفيذيّة، شُغِّلت مجموعة الاختبارات والبناء فعليًّا على شجرة العمل الحاليّة (التي
+    تحوي الـ59 ملفًّا غير المحفوظة) للحصول على صورة حقيقيّة، لا افتراض.</p>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الفحص</th><th>النتيجة</th><th>التفصيل</th></tr></thead>
+        <tbody>
+          <tr><td>الاختبارات الخلفيّة</td><td class="yes">✓ نجاح</td><td>3698 اختبارًا ناجحًا، 4 متجاوَزة، 0 فاشل</td></tr>
+          <tr><td>فحص الأنواع (TypeScript)</td><td class="yes">✓ نجاح</td><td>0 خطأ</td></tr>
+          <tr><td>Lint</td><td class="yes">✓ نجاح</td><td>0 خطأ، 7 تحذيرات غير معطِّلة (موجودة مسبقًا)</td></tr>
+          <tr><td>البناء (Build)</td><td class="yes">✓ نجاح</td><td>خروج بلا أخطاء، 42 ملفًّا مُخزَّنًا مسبقًا</td></tr>
+          <tr><td>فحص التنسيق (Prettier)</td><td class="no">✗ فشل</td><td><b>25 ملفًّا</b> تخالف التنسيق — من ضمن الـ59 ملفًّا غير المحفوظة</td></tr>
+          <tr><td>ختم سلامة العقود (FIN-COR)</td><td class="yes">✓ نجاح</td><td>لم يُمَسّ أيّ ملفّ محميّ</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warn-box">
+      <div class="ic">⚠️</div>
+      <p><b>عائق فعليّ أمام أيّ نشر:</b> 25 من الملفّات الـ59 يفشلان فحص التنسيق تلقائيًّا. هذا يعني أنه <b>قبل</b> أيّ
+      حفظ رسميّ للكود (نقطة 9 من التقرير السابق)، يجب أوّلًا تشغيل أمر إصلاح التنسيق التلقائيّ (<code>npm run format --write</code>)
+      وإعادة التحقّق من نجاح البناء والاختبارات — هذه أوّل خطوة فعليّة في أيّ تنفيذ قادم، بلا استثناء.</p>
+    </div>
+
+    <div class="crit-box">
+      <div class="ic">🧭</div>
+      <p><b>تضارب مكتشَف في رقم آخر تحديث لقاعدة البيانات (Alembic):</b> الفحص الحيّ للكود يُظهِر أن آخر تحديث فعليّ
+      هو <code>ab40</code>، بينما تنصّ وثيقة <code>CLAUDE.md</code> على أنه <code>ab36</code>. هذا لا يؤثّر على
+      الملفّات الـ59 الحاليّة (لا تحتوي أيّ تحديث بقاعدة البيانات)، لكنه <b>تضارب توثيقيّ حقيقيّ</b> يجب توضيحه معك
+      قبل أيّ عمل خلفيّ جديد (كل النقاط 2، 3، 6، 7، 8 تحتاج تحديثات قاعدة بيانات تُبنى فوق الرقم الصحيح) — يُنصَح
+      بجولة تحقّق سريعة لمعرفة أيّهما صحيح فعليًّا على كل سيرفر قبل البدء بأيّ تحديث جديد.</p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="bug">
+    <div class="section-eyebrow">🐞 اكتشاف غير مخطَّط له</div>
+    <h2>خلل تزامن حقيقيّ — موجود بالكود الآن، مستقلّ عن التسع نقاط</h2>
+    <p class="intro">أثناء تتبّع "دورة حياة الطلب" (النقطة 8)، تبيّن أن خدمتين خلفيّتين منفصلتين قد تعملان على <b>نفس
+    الطلب في نفس اللحظة تقريبًا</b> دون أيّ حماية من التعارض — وهذا موجود بالكود الحاليّ فعلًا، وليس افتراضًا لميزة مستقبليّة.</p>
+
+    <div class="plain">
+      <div class="ic">🔍</div>
+      <p>خدمة "رصد تخلّي السائق" (<code>driver_abandonment_service.py</code>) تُقفِل الطلب بأمان قبل تعديله (نمط <code>FOR UPDATE</code>
+      الصحيح). لكن خدمة "لا يوجد سائق" (<code>stale_no_driver_service.py</code>) <b>لا تفعل ذلك</b> — تقرأ الطلب ثم
+      تعدّله لاحقًا دون قفل، ما يفتح نافذة زمنيّة صغيرة يمكن أن تحاول فيها الخدمتان معًا تعديل نفس الطلب.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>السيناريو الأسوأ المحتمل</th><th>الأثر</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">الخدمتان تحاولان معالجة نفس الطلب بفارق أجزاء من الثانية</td><td class="mitigation">تعارض حالة، أو إشعار مضاعَف للسائق، أو خصم مضاعَف على سجلّ موثوقيّته لنفس الحادثة</td></tr>
+          <tr><td class="scenario">حاليًّا — بحسب الفحص — التعارض نادر الحدوث (يتطلّب توقيتًا شديد التقارب)</td><td class="mitigation">لكنه ممكن رياضيًّا وغير محميّ بالكود، وسيصبح أكثر احتمالًا مع زيادة حجم الطلبات</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="analogy">
+      <div class="k">الحلّ الدقيق — بنفس النمط المُستخدَم فعليًّا بمكان آخر بالمشروع</div>
+      <p>يوجد بالفعل حلّ لنفس نوع المشكلة في نظام "الموافقة على تغيير الاسم" (<code>operations_router.py</code>): تحديث
+      "مشروط" (compare-and-swap) — أي "عدّل هذا الصفّ فقط إن كانت حالته لا تزال كما توقّعتها". نفس النمط بالضبط يمكن
+      نسخه لخدمة <code>stale_no_driver_service.py</code>: بدل قراءة الطلب ثم تعديله في خطوتين منفصلتين، يصبح التعديل
+      خطوة واحدة ذرّية تتحقّق من الحالة وتُعدِّل في نفس الوقت — فإن كانت خدمة أخرى قد غيّرت الطلب للتوّ، لا يحدث شيء
+      بدل أن يحدث تعارض.</p>
+    </div>
+
+    <div class="evidence-box">
+      <div class="k">أدلّة من الكود</div>
+      <div class="row"><span class="l">الخدمة المحميّة (نموذج صحيح)</span><span class="v">backend/app/modules/dispatch/driver_abandonment_service.py:102-114 (FOR UPDATE)</span></div>
+      <div class="row"><span class="l">الخدمة غير المحميّة (الخلل)</span><span class="v">backend/app/modules/orders/stale_no_driver_service.py:60-68</span></div>
+      <div class="row"><span class="l">النمط الجاهز للنسخ</span><span class="v">operations_router.py:7571-7584 (تحديث مشروط)</span></div>
+    </div>
+    <div class="tag-row"><span class="pill crit">🐞 خلل حقيقيّ قائم</span><span class="pill ok">✓ الحلّ نمط مُثبَت بالمشروع نفسه</span><span class="pill neutral">تعديل خلفيّ صغير ودقيق</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="unseal">
+    <div class="section-eyebrow">🔓 فحص مخصَّص طلبته صراحةً</div>
+    <h2>هل السلّة/الطلب المجمّع جاهز لفكّ الختم؟</h2>
+    <p class="intro">فحص عميق ومخصَّص لهذا السؤال بالذات: تتبُّع بنية الطلب المجمّع، حساب العمولة، منطق السائق،
+    الإلغاء والاسترداد، وتغطية الاختبارات — لتحديد جاهزيّته الفعليّة قبل تفعيله لمستخدمين حقيقيّين.</p>
+
+    <div class="verdict-card ready">
+      <div class="vtitle">✅ الحكم: جاهز لفكّ الختم بشروط تشغيليّة — لا مالية</div>
+      <p style="max-width:70ch; color:var(--ink); margin:0;">البنية المالية والتقنيّة <b>سليمة وصحيحة بالكامل</b> —
+      لا وجود لأيّ خلل ماليّ أو محاسبيّ. الفجوة الوحيدة تشغيليّة: طاقم العمليّات لا "يرى" حاليًّا أن عدّة طلبات
+      منفصلة تنتمي لنفس عمليّة الدفع.</p>
+    </div>
+
+    <div class="subhead">✓ ما تمّ التحقّق منه وثبت أنه سليم</div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الجانب</th><th>الحالة</th><th>الدليل</th></tr></thead>
+        <tbody>
+          <tr><td>بنية الطلب</td><td class="yes">✓ سليمة</td><td>طلب أصل واحد + طلب مستقلّ فرعيّ لكلّ مزوّد — نفس النمط المعتمَد عالميًّا (Amazon / Uber Eats)</td></tr>
+          <tr><td>الدفع والذرّيّة (Atomicity)</td><td class="yes">✓ سليم</td><td>عمليّة واحدة "الكلّ أو لا شيء" — لا يمكن أن يُدفَع نصف الطلب فقط</td></tr>
+          <tr><td>حساب العمولة</td><td class="yes">✓ سليم</td><td>تُحسَب لكلّ طلب فرعيّ بمعزل عن الآخرين — لا تشويه أو دمج خاطئ</td></tr>
+          <tr><td>الاسترداد عند رفض مزوّد</td><td class="yes">✓ سليم</td><td>تحرير المبلغ المحجوز يحدث تلقائيًّا وفوريًّا، مع إشعار العميل</td></tr>
+          <tr><td>إلغاء العميل لطلب فرعيّ واحد</td><td class="yes">✓ سليم ومختبَر</td><td>الطلبات الأخرى بالمجموعة تستمرّ دون تأثّر — مؤكَّد باختبار آليّ فعليّ</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subhead">⚠️ الفجوات التشغيليّة (وليست ماليّة) — يجب سدّها قبل الإطلاق الكامل</div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الفجوة</th><th>الأثر المحتمَل</th><th>الحلّ المقترَح</th></tr></thead>
+        <tbody>
+          <tr><td>لوحة العمليّات لا تُظهِر أن عدّة طلبات "مجموعة واحدة"</td><td>موظّف يُلغي طلبًا فرعيًّا واحدًا دون أن يدرك أن العميل دفع طلبًا مجمَّعًا كاملًا</td><td>إضافة شارة بسيطة "جزء من مجموعة رقم كذا" بشاشة الطلبات — تعديل واجهة صغير</td></tr>
+          <tr><td>كلّ مزوّد بالمجموعة يحصل على توصيل مستقلّ (سائق مختلف محتمَل)</td><td>العميل يتوقّع توصيلة واحدة، فيتفاجأ بسائقَين ومواعيد مختلفة</td><td>ليس خللًا تقنيًّا — توثيق واضح لطاقم العمليّات + رسالة تنبيه للعميل عند الدفع: "قد تصل طلباتك في أوقات منفصلة"</td></tr>
+          <tr><td>لا رسالة إشعار "موحَّدة" عند رفض جزء من المجموعة</td><td>العميل يستلم إشعارًا عامًّا لطلب واحد، دون سياق أنه جزء من مجموعة أكبر</td><td>تحسين لاحق (غير عاجل) — إشعار يذكر بقيّة المجموعة</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subhead">🚀 خطوات فكّ الختم الفعليّة</div>
+    <ol class="steps">
+      <li><b>قبل الفكّ:</b> إضافة شارة "جزء من مجموعة" بشاشة طلبات لوحة العمليّات (تعديل واجهة صغير، نصف يوم عمل تقريبًا).</li>
+      <li><b>قبل الفكّ:</b> كتابة دليل تشغيليّ من صفحة واحدة لطاقم العمليّات يشرح: ما هو الطلب المجمّع، كيف يظهر، ماذا يعني إلغاء طلب فرعيّ واحد.</li>
+      <li>تغيير <code>group_order_enabled: false → true</code> في <code>contracts/feature_flags.yaml</code> (بإذن تشغيليّ صريح، لأن الملفّ محميّ بختم FIN-COR).</li>
+      <li>إعادة توليد بصمة الختم والتحقّق منها عبر السكربت المخصَّص لذلك.</li>
+      <li>تفعيل تجريبيّ محدود (فترة تجريبيّة أوّليّة) مع مراجعة يوميّة من طاقم العمليّات للطلبات المجمَّعة تحديدًا.</li>
+      <li>بعد التأكّد من استقرار التجربة، الإطلاق الكامل + نشر على المواضع الأربعة.</li>
+    </ol>
+    <div class="tag-row"><span class="pill ok">✓ لا خلل ماليّ</span><span class="pill warn">⚠ يحتاج شارة واجهة + دليل تشغيليّ أوّلًا</span><span class="pill info">توصية: تجربة محدودة قبل الإطلاق الكامل</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="roadmap">
+    <div class="section-eyebrow">🗺️ الترتيب</div>
+    <h2>خريطة المراحل — ما الذي يُنفَّذ أوّلًا ولماذا</h2>
+    <p class="intro">الترتيب هنا ليس حسب رقم النقطة الأصليّ، بل حسب الاعتماديّة الفعليّة: ما يمكن تنفيذه بأمان اليوم
+    (واجهة فقط) أوّلًا، ثم ما يحتاج إذنًا لمرحلة خلفيّة، ثم المشروع الأكبر أخيرًا.</p>
+
+    <div class="pipeline">
+      <div class="pl-stage"><div class="pl-node pending">0️⃣</div><div class="t">الفحص الأساسيّ</div><div class="d">إصلاح تنسيق 25 ملفًّا + توضيح رقم Alembic</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🎨</div><div class="t">المرحلة 1</div><div class="d">واجهة فقط — بلا مخاطر خلفيّة</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🔐</div><div class="t">المرحلة 2</div><div class="d">تحتاج إذن مرحلة خلفيّة</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node" style="background:var(--accent);border-color:var(--accent-deep);color:#fff;">📊</div><div class="t">المرحلة 3</div><div class="d">مشروع تقييم الأداء المتكامل</div></div>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>المرحلة</th><th>البنود</th><th>يحتاج إذن خلفيّة؟</th><th>الحجم التقديريّ</th></tr></thead>
+        <tbody>
+          <tr><td><b>0 — بوّابة الدخول</b></td><td>إصلاح التنسيق، توضيح Alembic، إصلاح خلل التزامن</td><td class="center">جزئيًّا (إصلاح الخلل خلفيّ)</td><td class="center">~نصف يوم</td></tr>
+          <tr><td><b>1 — واجهة فقط</b></td><td>1) اتصل بنا · 4) شرح التوصيل المجانيّ · 5أ) توحيد الإشعارات · 9) نشر الملفّات الـ59</td><td class="center">لا</td><td class="center">2–3 أيام</td></tr>
+          <tr><td><b>2 — خلفيّة محكومة</b></td><td>2) فكّ ختم الطلب المجمّع · 5ب) هاتف/بريد المزوّد · 6) تعديل الهاتف/البريد · 7) مهلة السلّة · 8) إصلاح خلل التزامن</td><td class="center">نعم</td><td class="center">~1.5–2 أسبوع</td></tr>
+          <tr><td><b>3 — مشروع جديد</b></td><td>3) نظام تقييم أداء المنصّة</td><td class="center">نعم</td><td class="center">~8–12 يوم عمل</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ============ PHASE 1 ============ -->
+  <section id="phase1">
+    <div class="section-eyebrow">🎨 المرحلة 1</div>
+    <h2>واجهة فقط — بلا مخاطر على الخادم أو قاعدة البيانات</h2>
+    <p class="intro">هذه البنود الأربعة يمكن تنفيذها بأمان دون لمس "المناطق المحظورة" (الخادم/النماذج/الهجرات)، وتُشكِّل أسرع قيمة ملموسة للمستخدم.</p>
+
+    <div class="phase-head"><div class="pnum">1</div><div><h3>أيقونة "اتصل بنا" — ظاهرة على الشاشة الرئيسيّة</h3><div class="pdesc">النقطة 1 من التقرير السابق</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">الميزة جاهزة بالكامل بالخلف؛ الناقص فقط زرّ ظاهر بالشاشة الرئيسيّة وتعبئة بيانات التواصل من لوحة التحكّم.</p>
+      <div class="subhead">خطوات التنفيذ</div>
+      <ol class="steps">
+        <li>تعبئة رقم الهاتف/واتساب/البريد الرسميّ عبر <code>PATCH /operations/contact-settings</code> من لوحة التحكّم.</li>
+        <li>إضافة زرّ "ℹ️ حول التطبيق" بصفحة الشاشة الرئيسيّة للعميل (<code>HomePage.tsx</code>)، يُحيل إلى <code>/about</code> الموجودة أصلًا.</li>
+        <li>لا حاجة لمفتاح ترجمة جديد — المفتاح <code>customer.about</code> موجود أصلًا بالثلاث لغات.</li>
+      </ol>
+      <div class="subhead">ماذا سيحدث أثناء الإصلاح</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">تجاوز الزرّ لعرض الشاشة على الجوّالات الصغيرة</td><td class="mitigation">استخدام نفس تنسيق الأزرار الموجود مسبقًا بالصفحة (متجاوب أصلًا)</td></tr>
+            <tr><td class="scenario">اختبار الشاشة الرئيسيّة قد يحتاج تحديثًا بعد إضافة الزرّ</td><td class="mitigation">ملفّ <code>HomePage.test.tsx</code> موجود ويُحدَّث بسطر واحد لإضافة معرِّف الزرّ الجديد</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="subhead">ماذا سيحدث بعد التشغيل الفعليّ</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">لو نُشِر الزرّ قبل تعبئة بيانات التواصل</td><td class="mitigation">لا كسر — الصفحة مبنيّة أصلًا لتعرض رسالة افتراضيّة "الدعم متاح عبر الدردشة" حتى لو كانت البيانات فارغة</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tag-row"><span class="pill ok">✓ منخفض المخاطر</span><span class="pill neutral">نصف يوم عمل</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">2</div><div><h3>توضيح تكلفة "التوصيل المجانيّ" بالعروض</h3><div class="pdesc">النقطة 4 من التقرير السابق</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">إضافة جملة توضيحيّة صغيرة بجانب خيار "توصيل مجانيّ" بشاشة عروض المزوّد، بثلاث لغات — دون أيّ تغيير بمنطق الحساب لأنه سليم أصلًا.</p>
+      <div class="subhead">النصّ المقترَح (جاهز للاستخدام مباشرة)</div>
+      <div class="evidence-box">
+        <div class="k">عربيّ</div>
+        <div class="row"><span class="v" style="direction:rtl; unicode-bidi:isolate;">"تغطّي هذه الميزة رسوم توصيلك الخاصّة (إن كنتَ تستخدم التوصيل الذاتيّ) أو رسوم توا القياسيّة (إن كنتَ تستخدم توصيل توا). لا يمكن دمجها مع خصومات أخرى."</span></div>
+        <div class="k" style="margin-top:10px;">English</div>
+        <div class="row"><span class="v" style="direction:ltr;">"Free delivery covers the provider's own self-delivery fee or the platform's standard delivery fee (whichever applies). Cannot be combined with other discounts."</span></div>
+        <div class="k" style="margin-top:10px;">Français</div>
+        <div class="row"><span class="v" style="direction:ltr;">"La livraison gratuite couvre les frais de livraison du fournisseur ou les frais standards de la plateforme (selon le mode de livraison). Ne peut pas être combinée avec d'autres remises."</span></div>
+      </div>
+      <div class="subhead">خطوات التنفيذ</div>
+      <ol class="steps">
+        <li>إضافة مفتاح ترجمة جديد (تمّ التأكّد أنه لا يتعارض مع أيّ مفتاح من الـ1124 مفتاحًا الجديدة المعلَّقة حاليًّا).</li>
+        <li>إضافة سطر نصّيّ صغير أسفل خيار "توصيل مجانيّ" مباشرة في <code>PromotionsManager.tsx</code>.</li>
+      </ol>
+      <div class="subhead">ماذا سيحدث أثناء الإصلاح</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">الملفّ نفسه به تعديلات محليّة معلَّقة غير محفوظة</td><td class="mitigation">تمّ التأكّد أن هذا التعديل لا يتقاطع مع ما هو معلَّق حاليًّا بنفس الملفّ — إضافة نظيفة</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="subhead">ماذا سيحدث بعد التشغيل الفعليّ</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">مزوّد يفعِّل توصيلًا مجانيًّا بحجم طلبات كبير فيخسر إيراد التوصيل كاملًا دون قصد</td><td class="mitigation">النصّ التوضيحيّ يقلِّل الاحتمال؛ حماية إضافيّة (تأكيد قبل التفعيل أو سقف للخصم) قرار منفصل يحتاج موافقتك لاحقًا</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tag-row"><span class="pill ok">✓ منخفض المخاطر</span><span class="pill neutral">نصّ فقط، لا منطق</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">3</div><div><h3>توحيد قسم الإشعارات بين الأدوار الثلاثة</h3><div class="pdesc">جزء من النقطة 5 (الجزء الآمن للتوحيد فقط)</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">تبيّن أن العميل والسائق يستخدمان بالفعل نفس الطريقة تمامًا لحفظ تفضيلات الإشعارات بالخادم — لذا استخراج مكوّن واحد مشترك آمن تقنيًّا 100%. أمّا توحيد "اللغة" فمختلف (انظر التحذير أدناه).</p>
+      <div class="warn-box">
+        <div class="ic">⚠️</div>
+        <p><b>تحذير مهمّ من الفحص:</b> لغة العميل مخزَّنة بجدول بيانات مختلف تمامًا عن لغة السائق. دمج شاشة اللغة
+        بين الأدوار الثلاثة <b>حاليًّا غير آمن</b> وقد يكسر حفظ التفضيل لأحد الأدوار بصمت. لذا هذه المرحلة تشمل <b>توحيد
+        الإشعارات فقط</b>، وتُستبعَد اللغة من هذا البند إلى أن يُبنى مسار خلفيّ موحَّد لها لاحقًا.</p>
+      </div>
+      <div class="subhead">خطوات التنفيذ</div>
+      <ol class="steps">
+        <li>استخراج قسم "تفضيلات الإشعارات" الحاليّ من صفحتَي العميل والسائق إلى مكوّن واحد مشترك.</li>
+        <li>إعادة استخدامه بنفس الشكل بصفحتَي العميل والسائق (بلا تغيير سلوك).</li>
+        <li>ترك إضافة القسم نفسه لصفحة المزوّد كخطوة تالية منفصلة (تحتاج نقطة نهاية خلفيّة جديدة له، انظر المرحلة 2).</li>
+      </ol>
+      <div class="subhead">ماذا سيحدث أثناء الإصلاح</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">ملفّات اختبار كلّ من إعدادات العميل والسائق تعتمد على الشكل الحاليّ للقسم</td><td class="mitigation">تحديث الاختبارات لتتحقّق من المكوّن الجديد بدل الكود المضمَّن — تعديل ميكانيكيّ بلا تغيير بالسلوك المُختبَر</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tag-row"><span class="pill ok">✓ آمن تقنيًّا (إشعارات فقط)</span><span class="pill crit">✗ لا تُوحَّد اللغة الآن</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">4</div><div><h3>نشر الملفّات الـ59 على المواضع الأربعة</h3><div class="pdesc">النقطة 9 من التقرير السابق</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">بعد إصلاح التنسيق (بوّابة الدخول أعلاه)، يصبح الحفظ والنشر آمنًا. الترتيب أدناه يتضمّن حماية محدَّدة ضدّ حادثة معروفة سبق وقوعها بهذا المشروع تحديدًا (انزلاق منفذ الحاوية).</p>
+      <div class="subhead">خطوات التنفيذ بالترتيب</div>
+      <ol class="steps">
+        <li><b>محليًّا:</b> <code>npm run format --write</code> ثم إعادة تشغيل typecheck/lint/build للتأكّد من النجاح.</li>
+        <li>التحقّق من <code>git status --short</code> يُظهِر فقط الملفّات الـ59 المقصودة (لا ملفّات غريبة من جلسات أخرى) — درس مستفاد من حادثة سابقة بهذا المشروع تحديدًا.</li>
+        <li>حفظ رسميّ (commit) بمسارات صريحة، لا <code>git add -A</code>.</li>
+        <li>الدفع لـ GitHub، ثم test1 (Kali)، ثم test (.194)، مع اختبار دخان (smoke test) بعد كلّ موضع قبل الانتقال للتالي.</li>
+        <li>الإنتاج (tawanow.com) — <b>بإذن تشغيليّ منفصل صريح فقط</b> — بعد نسخة احتياطيّة كاملة مسبقة.</li>
+      </ol>
+      <div class="subhead">ماذا سيحدث أثناء النشر — أهمّ المخاطر</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">انزلاق منفذ الحاوية (8080 مقابل 8081) بعد إعادة إنشاء الحاوية — حادثة سبق حدوثها بهذا المشروع</td><td class="mitigation">استخدام <code>docker cp</code> لحقن الملفّات بالحاوية القائمة بدل <code>docker compose recreate</code></td></tr>
+            <tr><td class="scenario">جرف ملفّات غريبة عند الحفظ الرسميّ بسبب عمل متزامن بنفس شجرة العمل</td><td class="mitigation">مسارات صريحة فقط بأمر الإضافة، والتحقّق من قائمة الملفّات المرحَّلة قبل الحفظ</td></tr>
+            <tr><td class="scenario">نشر جزئيّ يترك المواضع الأربعة غير متطابقة</td><td class="mitigation">اختبار دخان بعد كلّ موضع قبل الانتقال للتالي؛ مقارنة بصمة الحزمة النهائيّة بين المواضع</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tag-row"><span class="pill warn">⚠ يتطلّب إذنًا صريحًا للإنتاج</span><span class="pill ok">✓ لا تغييرات بقاعدة البيانات بهذه الدفعة</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ============ PHASE 2 ============ -->
+  <section id="phase2">
+    <div class="section-eyebrow">🔐 المرحلة 2</div>
+    <h2>خلفيّة محكومة — تحتاج إذن تشغيل مرحلة خلفيّة صريح</h2>
+    <div class="crit-box">
+      <div class="ic">🛑</div>
+      <p><b>بوّابة حوكميّة:</b> كل بنود هذه المرحلة تلمس <code>backend/app/modules</code> أو <code>backend/app/models</code>
+      أو <code>backend/alembic</code> — وهي "مناطق محظورة" صراحة أثناء مراحل الواجهة بحسب <code>CLAUDE.md</code>.
+      هذا ليس عائقًا تقنيًّا بل بوّابة قرار: تُنفَّذ هذه المرحلة فقط بعد إذن تشغيليّ صريح منك لفتح مرحلة خلفيّة، وليس
+      كجزء من أيّ عمل واجهة عاديّ.</p>
+    </div>
+
+    <div class="phase-head"><div class="pnum">5</div><div><h3>إصلاح خلل تزامن الطلبات (المُكتشَف أعلاه) + إصلاح "دورة حياة الطلب"</h3><div class="pdesc">النقطة 8 + الخلل المُكتشَف</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">أوّل بند بهذه المرحلة — الأصغر حجمًا والأعلى أولويّة، لأنه إصلاح خلل قائم فعليًّا وليس ميزة جديدة.</p>
+      <div class="subhead">خطوات التنفيذ</div>
+      <ol class="steps">
+        <li>تعديل <code>stale_no_driver_service.py</code> ليستخدم "تحديثًا مشروطًا" (نفس نمط <code>operations_router.py:7571-7584</code>) بدل القراءة ثم التعديل المنفصلَين.</li>
+        <li>اختبار آليّ جديد يحاكي تشغيل الخدمتين على نفس الطلب في نفس اللحظة، للتأكّد أن واحدة فقط تفوز.</li>
+      </ol>
+      <div class="subhead">ماذا سيحدث بعد الإصلاح</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">هل يوقف هذا أيّ سلوك حاليّ يعمل بشكل صحيح؟</td><td class="mitigation">لا — التعديل يضيف حماية دون تغيير أيّ مسار نجاح طبيعيّ؛ الاختبارات الحاليّة (3698 ناجحة) يجب أن تبقى ناجحة بلا تغيير</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tag-row"><span class="pill crit">🐞 إصلاح خلل قائم</span><span class="pill ok">✓ نمط مُثبَت، مخاطرة منخفضة</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">6</div><div><h3>تعديل هاتف السائق (ربط الخادم الجاهز بواجهة جديدة)</h3><div class="pdesc">جزء من النقطة 6</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">أسرع بند بهذه المرحلة — الخادم جاهز بالكامل (طلب/تأكيد برمز تحقّق)، والمطلوب فقط واجهة جديدة تستخدمه.</p>
+      <div class="subhead">خطوات التنفيذ</div>
+      <ol class="steps">
+        <li>إضافة قسم "تعديل الهاتف" بصفحة إعدادات السائق، بنفس نمط حقل الهاتف + رمز التحقّق.</li>
+        <li>ربطه مباشرة بنقطتَي النهاية الجاهزتَين أصلًا للطلب والتأكيد.</li>
+      </ol>
+      <div class="subhead">ماذا سيحدث بعد التشغيل الفعليّ</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">إغراق الرمز (OTP-bombing) — إرسال طلبات متكرّرة لاستنزاف حصّة الرسائل النصّيّة</td><td class="mitigation">تأكيد أن حدّ المعدَّل الحاليّ لهذه الخدمة مماثل لبقيّة نقاط التحقّق بالرمز بالمنصّة قبل الإطلاق</td></tr>
+            <tr><td class="scenario">جهازان لنفس السائق يطلبان تغيير الهاتف بنفس اللحظة</td><td class="mitigation">الكود الحاليّ يتعامل مع هذا أصلًا — رمز واحد صالح فقط لكلّ طلب جديد يُلغي السابق</td></tr>
+            <tr><td class="scenario">رقم الهاتف الجديد يُسجَّل لحساب آخر أثناء انتظار السائق لتأكيد التغيير</td><td class="mitigation">الخادم يعيد فحص التفرّد لحظة التأكيد لا لحظة الطلب فقط، ويرفض بوضوح إن كان الرقم صار مُستخدَمًا</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tag-row"><span class="pill ok">✓ الخادم جاهز 95%</span><span class="pill neutral">أسرع بند بالمرحلة</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">7</div><div><h3>تعديل هاتف/بريد المزوّد — بموافقة، بتوسيع نظام الموافقة الحاليّ</h3><div class="pdesc">باقي النقطة 6</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">توسيع نظام "الموافقة على تغيير الاسم" الموجود ليشمل الهاتف والبريد أيضًا — بدل بناء نظام جديد منفصل.</p>
+      <div class="subhead">خطوات التنفيذ</div>
+      <ol class="steps">
+        <li>إضافة عمود جديد لنوع الحقل (اسم/هاتف/بريد) لجدول طلبات الموافقة الحاليّ، بدل إنشاء جدول منفصل.</li>
+        <li>هجرة قاعدة بيانات صغيرة (تُبنى فوق الرقم الصحيح بعد توضيح تضارب Alembic بالخطوة صفر).</li>
+        <li>نقاط نهاية جديدة لطلب تغيير هاتف/بريد المزوّد، تُغذّي نفس طابور المراجعة الحاليّ بلوحة العمليّات.</li>
+        <li>تعديل بسيط بشاشة طابور المراجعة لعرض نوع الحقل المطلوب تغييره بجانب القيمة القديمة والجديدة.</li>
+      </ol>
+      <div class="subhead">ماذا سيحدث أثناء البناء</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">صفوف قديمة بالجدول ليس لها قيمة بالعمود الجديد</td><td class="mitigation">تعبئتها تلقائيًّا بقيمة "اسم" أثناء الهجرة نفسها، قبل جعل العمود إلزاميًّا</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tag-row"><span class="pill warn">⚠ يحتاج هجرة قاعدة بيانات</span><span class="pill ok">✓ يُعيد استخدام نظام مُثبَت</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">8</div><div><h3>مهلة انتهاء صلاحيّة السلّة + التحقّق قبل الدفع</h3><div class="pdesc">النقطة 7</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">إعداد رقميّ جديد قابل للتحكّم من لوحة التحكّم (بنفس نمط الإعدادات الرقميّة الحاليّة)، مع فحص فوريّ للسعر والتوفّر قبل تحريك أيّ مبلغ ماليّ.</p>
+      <div class="subhead">خطوات التنفيذ</div>
+      <ol class="steps">
+        <li>إعداد جديد "مهلة السلّة بالدقائق" بلوحة تبديل المزايا، بنفس نمط الإعدادات الرقميّة الموجود.</li>
+        <li>عدّاد تنازليّ بواجهة السلّة (استشاريّ فقط — للعرض، ليس مصدر الحقيقة).</li>
+        <li>فحص إلزاميّ جديد يُدرَج تحديدًا <b>قبل</b> خطوة تحريك المبلغ الماليّ بعمليّة الدفع (لا بعدها) — يتحقّق من السعر الحاليّ بكتالوج المزوّد وحالة فتح/إغلاق المتجر.</li>
+      </ol>
+      <div class="subhead">ماذا سيحدث بعد التشغيل الفعليّ — أهمّ السيناريوهات</div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+          <tbody>
+            <tr><td class="scenario">انتهاء مهلة السلّة أثناء تحويل العميل لبوّابة الدفع الخارجيّة</td><td class="mitigation">علامة "قفل مؤقّت" منفصلة عن انتهاء الصلاحيّة — لا تُبطَل السلّة إن كانت عمليّة دفع قيد التنفيذ فعليًّا</td></tr>
+            <tr><td class="scenario">فرق ساعة بين جهاز العميل والخادم يجعل العدّاد المعروض مضلِّلًا</td><td class="mitigation">العدّاد استشاريّ فقط؛ الفحص الفعليّ عند الدفع يعتمد على ساعة الخادم لا الجهاز</td></tr>
+            <tr><td class="scenario">السعر انخفض (لا ارتفع) وقت الدفع — هل يُحاسَب العميل بالسعر الأعلى القديم؟</td><td class="mitigation">لا — يُسمَح بالانخفاض دائمًا (لصالح العميل)، ويُرفَض فقط الارتفاع، مع رسالة واضحة تطلب تأكيدًا جديدًا</td></tr>
+            <tr><td class="scenario">تطبيق جوّال قديم لا يعرف عن حقل انتهاء الصلاحيّة الجديد</td><td class="mitigation">الحقل اختياريّ بالكامل بالردّ؛ التطبيق القديم يستمرّ بالعمل، والفحص الفعليّ عند الدفع يبقى ساريًا له كذلك</td></tr>
+            <tr><td class="scenario">العميل يضغط "ادفع" باللحظة نفسها التي تُلغي فيها مهمّة مجدولة الطلب لانتهاء صلاحيّته</td><td class="mitigation">فحص الدفع يتحقّق أن الطلب لم يُلغَ للتوّ قبل تحريك أيّ مبلغ؛ إن حدث التعارض يظهر للعميل خطأ واضح بدل خصم خاطئ</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="analogy">
+        <div class="k">أسلوب حديث يستحقّ التبنّي</div>
+        <p>بدل حذف الصنف نهائيًّا لحظة انتهاء توفّره، يُفضَّل "تعطيله" فقط (علامة غير متوفّر) بدل حذفه من السجلّ —
+        هذا يحافظ على سجلّ الطلبات القديمة سليمًا للمراجعة والمحاسبة لاحقًا، وهو أسلوب معياريّ بمنصّات التجارة الحديثة.</p>
+      </div>
+      <div class="tag-row"><span class="pill warn">⚠ يحتاج هجرة/إعداد خلفيّ جديد</span><span class="pill ok">✓ يُعيد استخدام نمط إعداد رقميّ مُثبَت</span></div>
+    </div>
+
+    <div class="phase-head"><div class="pnum">9</div><div><h3>فكّ ختم الطلب المجمّع (تنفيذ فعليّ)</h3><div class="pdesc">النقطة 2 — تفصيلها الكامل بقسم منفصل أعلاه</div></div></div>
+    <div class="feature">
+      <p class="simple-answer">راجع القسم المخصَّص "هل السلّة/الطلب المجمّع جاهز لفكّ الختم؟" أعلاه — يُنفَّذ كآخر بند بهذه المرحلة، بعد إضافة شارة "جزء من مجموعة" بلوحة العمليّات.</p>
+      <div class="tag-row"><span class="pill ok">✓ التفاصيل الكاملة أعلاه</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ============ PHASE 3 ============ -->
+  <section id="phase3">
+    <div class="section-eyebrow">📊 المرحلة 3</div>
+    <h2>نظام تقييم أداء المنصّة — مشروع متكامل جديد</h2>
+    <p class="intro">النقطة 3 من التقرير السابق. هذا أكبر بند بالخطّة كلّها، ويُقسَّم لمراحل فرعيّة واضحة يمكن تسليم كلّ واحدة منها بشكل مستقلّ.</p>
+
+    <div class="pipeline">
+      <div class="pl-stage"><div class="pl-node">🗄️</div><div class="t">1. المخطَّط</div><div class="d">جداول جديدة + هجرة (~يوم)</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">⚙️</div><div class="t">2. التجميع</div><div class="d">خدمة + مهمّة مجدولة (~3-4 أيام)</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🔌</div><div class="t">3. الواجهة البرمجيّة</div><div class="d">نقاط نهاية جديدة (~يوم)</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node" style="background:var(--accent);border-color:var(--accent-deep);color:#fff;">📈</div><div class="t">4. اللوحة</div><div class="d">شاشة جديدة بالعمليّات (~2-3 أيام)</div></div>
+    </div>
+
+    <div class="subhead">إعادة استخدام مُثبَتة (تُخفِّض الحجم الفعليّ)</div>
+    <ul class="simple-list">
+      <li><b>قفل تعدّد التشغيل:</b> نفس نمط القفل عبر Redis المُستخدَم فعلًا بمهمّة "المطابقة الماليّة" اليوميّة — يُنسَخ حرفيًّا.</li>
+      <li><b>سجلّ التشغيل والتتبّع (متابعة نجاح/فشل كلّ دورة):</b> نفس نمط الجدولَين المُستخدَمَين بنفس المهمّة الماليّة.</li>
+      <li><b>حساب المؤشّرات الخام:</b> منطق موجود أصلًا بخدمة التحليلات الحاليّة، يُعاد استخدامه بدل إعادة كتابته.</li>
+    </ul>
+
+    <div class="subhead">قرارات تحتاج توقيعك الصريح قبل البدء بالبرمجة</div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>القرار</th><th>لماذا لا يمكن اتّخاذه تقنيًّا وحده</th></tr></thead>
+        <tbody>
+          <tr><td>هل حدود "اليوم" بتوقيت ليبيا المحلّي أم توقيت غرينتش؟</td><td>يغيّر معنى كلّ رقم تاريخيّ محفوظ — قرار تشغيليّ لا تقنيّ</td></tr>
+          <tr><td>أوزان المؤشّرات المكوِّنة للدرجة المركَّبة (مثلًا: التسليم 30%، الشكاوى 20%...)</td><td>تُرجِّح أولويّة تشغيليّة (هل الالتزام بالوقت أهمّ من رضا العميل؟) — قرار عمل بحت</td></tr>
+          <tr><td>حدود الدرجات (ممتاز/جيّد/يحتاج تحسين) — عند أيّ رقم بالضبط؟</td><td>معيار نجاح المنصّة يجب أن يُحدَّده صاحب القرار لا الكود</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subhead">ماذا سيحدث في اليوم الأوّل بعد الإطلاق</div>
+    <div class="warn-box">
+      <div class="ic">📭</div>
+      <p>اللوحة ستظهر <b>فارغة تقريبًا</b> يوم الإطلاق — لا يوجد تاريخ محفوظ من قبل، فلا يمكن رسم خطّ اتّجاه لـ30 يومًا
+      ماضية. الحلّ المطلوب بالتصميم نفسه: رسالة واضحة "بيانات الأداء ستبدأ بالتجمّع تلقائيًّا، تحقّق غدًا" بدل رسم
+      بيانيّ فارغ مُضلِّل.</p>
+    </div>
+
+    <div class="subhead">ماذا سيحدث أثناء التشغيل الفعليّ — أهمّ المخاطر</div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>سيناريو</th><th>الحلّ</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">مهمّة التجميع اليوميّة تفحص كل جدول الطلبات الضخم بلا فهرسة كافية → بطء وضغط على قاعدة الإنتاج</td><td class="mitigation">إضافة فهرسَين جديدَين على تاريخ الطلب قبل أوّل تشغيل للمهمّة، لا بعده</td></tr>
+          <tr><td class="scenario">تعطُّل صامت لمهمّة التجميع ليوم واحد — فجوة بالسجلّ التاريخيّ دون أن يلاحظها أحد</td><td class="mitigation">تنبيه تلقائيّ عند فشل الدورة + شارة تحذير واضحة بأعلى اللوحة تُظهِر تاريخ آخر تجميع ناجح</td></tr>
+          <tr><td class="scenario">تشغيل نفس مهمّة اليوم مرّتين بالخطأ → تكرار البيانات</td><td class="mitigation">"تحديث بدل إدراج" (upsert) بمفتاح فريد لكلّ يوم — تشغيلها مرّتين ينتج نفس النتيجة تمامًا، لا تكرارًا</td></tr>
+          <tr><td class="scenario">عدّة موظّفي عمليّات يفتحون نطاقات تاريخ واسعة بنفس اللحظة</td><td class="mitigation">حدّ أقصى لعدد الأيّام بكلّ استعلام (365 يومًا كحدّ أقصى) + فهرسة مناسبة</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tag-row"><span class="pill neutral">~8-12 يوم عمل واقعيّ</span><span class="pill warn">⚠ يحتاج 3 قرارات عمل صريحة قبل البدء</span><span class="pill ok">✓ إعادة استخدام كبيرة من الأنماط الحاليّة</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="final">
+    <div class="section-eyebrow">🏁 الخلاصة</div>
+    <h2>الخلاصة النهائيّة</h2>
+
+    <div class="final-verdict">
+      <div class="big">🧭</div>
+      <h3>خطّة من 4 مراحل، مبنيّة على فحص حيّ فعليّ، لا افتراض</h3>
+      <p>كل بند بهذه الخطّة مبنيّ على قراءة الكود الفعليّة وتشغيل الاختبارات الحقيقيّة، لا على تخمين. اكتُشِف أثناء
+      الفحص خللٌ تزامن حقيقيّ قائم بالكود اليوم (غير مرتبط بأيّ من التسع نقاط)، وأُضيف كأولويّة بالمرحلة الثانية.
+      الطلب المجمّع تبيّن أنه <b>سليم ماليًّا بالكامل</b> ويحتاج فقط تحسينات تشغيليّة بسيطة قبل فكّ ختمه.</p>
+    </div>
+
+    <ul class="simple-list">
+      <li><b>البوّابة صفر (إلزاميّة قبل أيّ شيء):</b> إصلاح تنسيق 25 ملفًّا، توضيح تضارب رقم Alembic (ab36 مقابل ab40).</li>
+      <li><b>أهمّ اكتشاف غير مخطَّط له:</b> خلل تزامن حقيقيّ بخدمتَي إلغاء الطلبات — الحلّ جاهز وموجود كنمط مُثبَت بالمشروع نفسه، إصلاح صغير وآمن.</li>
+      <li><b>الطلب المجمّع:</b> جاهز ماليًّا وتقنيًّا لفكّ الختم؛ الفجوة الوحيدة تشغيليّة (شارة واجهة بلوحة العمليّات + دليل تشغيليّ) — يُنصَح بتجربة محدودة أوّلًا.</li>
+      <li><b>المرحلة الأسرع قيمة (واجهة فقط):</b> اتصل بنا، شرح التوصيل المجانيّ، توحيد الإشعارات، نشر الملفّات المعلَّقة — لا مخاطر خلفيّة.</li>
+      <li><b>المرحلة الأكبر مخاطرة (تحتاج إذن مرحلة خلفيّة):</b> تعديل الهاتف/البريد، مهلة السلّة، فكّ ختم الطلب المجمّع، إصلاح خلل التزامن.</li>
+      <li><b>المشروع الأكبر:</b> نظام تقييم الأداء — ~8 إلى 12 يوم عمل واقعيّ، يحتاج 3 قرارات عمل صريحة منك قبل بدء البرمجة (التوقيت، الأوزان، حدود الدرجات).</li>
+      <li><b>لا شيء نُفِّذ فعليًّا خلال هذا الفحص</b> — خطّة تنفيذيّة دقيقة بانتظار توجيهك لبدء أيّ مرحلة.</li>
+    </ul>
+  </section>
+
+  <footer>
+    تووا (Tawa) — تقرير رقم 514 · 2026-07-17 · خطّة تنفيذيّة مبنيّة على فحص حيّ فعليّ (اختبارات + بناء + تتبّع كود) — بلا تنفيذ فعليّ بعد
+  </footer>
+
+</div>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير دورة موظّفي التسوية (SettlementAgent) — تدقيق كود + اختبار حيّ (21 عيبًا، 1 حاجزة، 4 مؤكَّدة حيًّا)</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.8; margin:0; font-size:16px;}
+  .wrap{max-width:1260px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:960px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.med .num{color:var(--med)} .stat.ok .num{color:var(--ok)}
+  .stat .lbl{color:var(--muted); font-size:.82rem; margin-top:4px}
+  section{margin:44px 0}
+  h2.sec-title{font-size:1.5rem; border-inline-start:5px solid var(--accent); padding-inline-start:14px; margin-bottom:18px; color:#fff}
+  h2.sec-title.blocker{border-color:var(--blocker)}
+  h2.sec-title.cluster{border-color:var(--accent2); font-size:1.3rem}
+  p.lead{color:var(--muted); max-width:960px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 24px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+  .card-title{font-size:1.1rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.live{background:rgba(255,45,85,.12); color:#ff6b8f; border:1px solid rgba(255,45,85,.35)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .orig{background:var(--panel2); border-radius:10px; padding:10px 16px; margin:10px 0; font-size:.9rem; color:var(--muted)}
+  .orig b{color:var(--text)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.78rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem}
+  th,td{border:1px solid var(--border); padding:9px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .fine-list{background:rgba(55,201,135,.05); border:1px dashed rgba(55,201,135,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+  .shallow-list{background:rgba(111,211,255,.05); border:1px dashed rgba(111,211,255,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>💰 تقرير دورة موظّفي التسوية (SettlementAgent) — تدقيق كود + اختبار حيّ فعليّ</h1>
+  <div class="sub">تنفيذًا للتوجيه القائم ("بعد الجوّال، ادخل مباشرة في دورة موظّفي التسوية"): سادسة دورات التدقيق. على خلاف كل الأدوار السابقة، <b>"موظّف التسوية" ليس دورًا منصّاتيًّا مستقلًّا</b> — بل <b>منح صلاحيّة (grant)</b> مُحايد الدور يُضاف فوق حساب موجود بالفعل (سائق/مزوّد/عميل/أو "REP" بلا دور منصّاتيّ آخر)، يفتح "وضع الوكيل" على صفحة ويب مشتركة، ليقوم صاحبه بتسوية أرصدة أطراف أخرى (نقدًا أو إلكترونيًّا) ضمن حدود يضبطها المشغّل. هذه الدورة تجمع 5 وكلاء تدقيق كود متوازية + <b>اختبار حيّ فعليّ</b> (بخلاف دورة الجوّال) على المسارات الآمنة فقط.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-11</div>
+    <div class="badge">🧪 <b>البيئة:</b> tawalocal (Docker محلّي، 127.0.0.1:8080)</div>
+    <div class="badge">✅ <b>حدود الاختبار الحيّ:</b> رؤية المنح (404↔200)، رفض الحدود، تحقّق الرمز، تقديم النزاع، عرض حالة المعاملة — <b>لا اكتمال حيازة نقديّة، لا تغيير عدّاد سيولة فعليّ</b> (نفس حدّ دورة العمليّات لـMoney-F1/F2/F3)</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat"><div class="num">21</div><div class="lbl">إجمالي العيوب</div></div>
+    <div class="stat blocker"><div class="num">1</div><div class="lbl">حاجزة (BLOCKER)</div></div>
+    <div class="stat high"><div class="num">12</div><div class="lbl">خطورة عالية (HIGH)</div></div>
+    <div class="stat med"><div class="num">4</div><div class="lbl">خطورة متوسّطة (MED)</div></div>
+    <div class="stat"><div class="num">4</div><div class="lbl">خطورة منخفضة (LOW)</div></div>
+    <div class="stat ok"><div class="num">4</div><div class="lbl">مؤكَّدة حيًّا بدليل API+DB</div></div>
+  </div>
+</header>
+
+<div class="toc">
+  <ul>
+    <li><a href="#methodology">المنهجيّة وما الجديد في هذه الدورة</a></li>
+    <li><a href="#blocker">العطب الحاجز</a></li>
+    <li><a href="#lifecycle">دورة حياة المنح + التوثيق (KYC) + التسلسل الهرميّ</a></li>
+    <li><a href="#agent-flow">تدفّق عمل الوكيل نفسه</a></li>
+    <li><a href="#party-flow">تدفّق الطرف المقابل (الحزب)</a></li>
+    <li><a href="#money-math">سلامة الأرقام الماليّة والتزامن</a></li>
+    <li><a href="#mobile">تغطية الجوّال</a></li>
+    <li><a href="#carry-forward">مرساة مُرحَّلة من دورات سابقة</a></li>
+    <li><a href="#strengths">ما يعمل جيّدًا فعلًا</a></li>
+    <li><a href="#coverage">حدود التغطية</a></li>
+    <li><a href="#roadmap">خارطة طريق الإصلاح</a></li>
+  </ul>
+</div>
+
+<section id="methodology">
+  <h2 class="sec-title">🔬 المنهجيّة وما الجديد في هذه الدورة</h2>
+  <p class="lead">5 وكلاء تدقيق كود متوازية بدل 6-9 المعتادة، لأنّ هذه القدرة أضيق نطاقًا من دور منصّاتيّ كامل: (1) دورة حياة المنح/التوثيق/التسلسل الهرميّ، (2) تدفّق عمل الوكيل نفسه (بما في ذلك فرضيّة هويّة "REP" الجديدة)، (3) تدفّق الطرف المقابل عبر كل أنواع الأطراف، (4) سلامة الأرقام الماليّة والتزامن (الأولويّة القصوى، بما فيها فحص الحدّ الفاصل لختم wallet_cash_out)، (5) تغطية الجوّال. على خلاف دورة الجوّال (471) التي كانت تدقيق كود بحتًا لسبب موثَّق، <b>هذه الدورة تضمّنت اختبارًا حيًّا فعليًّا</b> على tawalocal — لأنّ هذا هو نفس الباك إند الذي اختُبِر بعمق في دورة العمليّات (469)، ولا سبب لتوريث قرار "صفر اختبار حيّ" من دورة الجوّال بلا مبرّر مطابق. الحدّ الفاصل: <b>آمن</b> = رؤية المنح، رفض الحدود، تحقّق الرمز، تقديم النزاع، عرض الحالة (لا تُحرِّك مالًا). <b>يبقى تدقيق كود فقط</b> = اكتمال حيازة النقد الفعليّة وتغيير عدّاد السيولة — بنفس منطق دورة العمليّات لِـMoney-F1/F2/F3 (المخاطرة بإرباك الحزمة المحليّة أو تحريك صفوف دفتر أستاذ حقيقيّة مقابل يقين إضافيّ صفريّ).</p>
+</section>
+
+<section id="blocker">
+  <h2 class="sec-title blocker">🛑 العطب الحاجز — إيداع السائق عبر Flutter لا يمكن إكماله أبدًا</h2>
+  <div class="card blocker">
+    <div class="card-head"><div class="card-title">PT5/MB4 (مؤكَّد من وكيلَين مستقلَّين) — تطبيق Flutter لا يستدعي إطلاقًا نقطة نهاية "تأكيد" الطرف، الإيداع يعلق أبديًّا عند "بانتظار الوكيل"</div>
+      <div class="tag-row"><span class="tag blocker">BLOCKER</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>المسار الوحيد من <code>AGENT_VERIFIED</code> إلى <code>SETTLED</code> يتطلّب أن يستدعي <b>الطرف نفسه</b> (السائق) <code>POST /settlement/transactions/{id}/confirm</code> بعد تحقّق الوكيل — تصميم "صانع-مدقّق" (maker-checker) حقيقيّ يطابق نمط <code>wallet_peer_transfer</code>. لكنّ <code>settlement_screen.dart</code> على Flutter <b>لا يحتوي أيّ استدعاء لهذا المسار إطلاقًا</b> — فقط إنشاء + استخراج رمز + استطلاع (polling) ينتظر <code>SETTLED</code> للأبد. زرّ "إلغاء" المحليّ الوحيد لا يستدعي أيّ API، يمسح الحالة محليًّا فقط. تعليق رأس الملف نفسه ("استطلع حتى يسوّي الوكيل الأمر") <b>يصف التصميم خطأً</b> — الوكيل وحده لا يستطيع إتمامها، هذا تصميم ثنائيّ الأطراف بالفعل، والنصف الثاني المطلوب غائب كليًّا من عميل الجوّال. سائق يستخدم الجوّال حصرًا لا يملك أيّ طريقة لإنهاء إيداعه، حتى بعد أن يمسحه وكيل حقيقيّ فعليًّا.</p>
+  </div>
+</section>
+
+<section id="lifecycle">
+  <h2 class="sec-title">🪪 دورة حياة المنح + التوثيق (KYC) + التسلسل الهرميّ</h2>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">AL5 — مسار المنح المباشر يتجاوز خطّ أنابيب KYC كليًّا؛ حارس منع الازدواج غير متماثل بين المسارَين</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag live">مؤكَّد حيًّا (دليل DB)</span></div></div>
+    <p><code>POST /operations/settlement-agents</code> (المنح المباشر) ينشئ صفًّا بـ<code>is_active=True</code> فورًا، بلا أيّ خطوة توثيق. فحص الازدواج فيه يتحقّق فقط من المنح <b>النشطة</b> — لا من صفّ <code>PENDING</code> من مسار التوثيق (<code>agent_admin_router.py</code>، الذي يتحقّق من كليهما). لا <code>UniqueConstraint</code> على <code>user_id</code> (فهرس فقط) — يسمح المخطّط بأكثر من صفّ لكل مستخدم.</p>
+    <div class="orig"><b>الإثبات الحيّ:</b> وُثِّق مستخدم تجريبيّ عبر مسار KYC → صفّ <code>PENDING/is_active=false</code> صحيح. أثناء انتظاره، مُنح نفس المستخدم عبر المسار المباشر → صفّ ثانٍ <code>is_active=true</code> نجح، <code>kyc_status</code> لا يزال "PENDING" (لم يُعتمَد قطّ). استعلام DB أكّد وجود صفّين فعليَّين لنفس <code>user_id</code>.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">AL1/AG4 (مؤكَّد من وكيلين، مؤكَّد حيًّا) — "لم يُمنح قطّ" و"مسحوب/مرفوض" يُعطيان استجابة 404 متطابقة حرفيًّا</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag live">مؤكَّد حيًّا (بايت-لبايت)</span></div></div>
+    <p>رفض التوثيق لا يأخذ سببًا/نصًّا إطلاقًا، فقط يقلب <code>is_active=False</code>. <code>GET /settlement/agent/me</code> يتحقّق من <code>is_active=True</code> فقط — وكيل مرفوض أو مسحوب يحصل على نفس 404 لمن لم يتقدّم قطّ. لا نقطة نهاية تعيد للمتقدّم حالة توثيقه أو أيّ سبب — أسوأ من نمط "السبب لا يصل للمستخدم" المتكرّر، لأنّ حتى <b>واقعة</b> الرفض غير مرئيّة، لا السبب فقط.</p>
+    <div class="orig"><b>الإثبات الحيّ:</b> استدعاء <code>/settlement/agent/me</code> قبل أيّ منح → 404. بعد المنح → 200 بتفاصيل كاملة. بعد السحب → 404 <b>بنفس الحمولة تمامًا</b> <code>{"detail":{"code":"NO_SETTLEMENT_GRANT"}}</code>.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">AL2 — اعتماد التوثيق منفصل كليًّا عن مراجعة الوثائق الفعليّة</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p><code>approve-kyc</code> يقلب الحالة إلى "APPROVED" بلا أيّ تحقّق من وجود وثيقة مُرفَقة أو معتمَدة. تعليق الوحدة نفسه يزعم أنّ "إرفاق ومراجعة الوثائق" شرط للتفعيل — الكود لا يفرض ذلك. يمكن تفعيل وكيل بصفر ملفّات مرفوعة.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">AL3 — زرّ "رفض" بنقرة واحدة في لوحة العمليّات يمكنه إلغاء تفعيل وكيل نشط يحمل سيولة حقيقيّة، بلا تأكيد وبلا فحص السيولة</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>زرّ الرفض يظهر لأيّ وكيل ليس حالته REJECTED بالفعل — يشمل وكلاء APPROVED/نشطين فعليًّا — بلا حوار تأكيد. مسارا "قتل" مختلفان (سحب صريح مقابل رفض-توثيق) بسجلّات تدقيق مختلفة (<code>revoked_at</code> يُسجَّل في أحدهما فقط) لنفس الإجراء التشغيليّ فعليًّا.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">AL4/MM6 (مؤكَّد من وكيلين) — سحب/رفض وكيل لا يُصالِح سيولته؛ تختفي صامتًا من لوحة تعرّض السيولة الشبكيّة اليوميّة والمراجعة اليوميّة الآليّة كليهما</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>لا مسار سحب/رفض يفحص <code>current_float_minor</code>. لوحة "تعرّض السيولة" (<code>/operations/settlement/float-exposure</code>) تجمع المجموع <code>WHERE is_active=true</code> فقط — اللحظة التي يُسحَب فيها وكيل يحمل نقدًا حقيقيًّا، يختفي رصيده من إجماليّ المراقبة بلا تنبيه ولا فرض مصالحة. الأسوأ: فحص المصالحة اليوميّ الآليّ (<code>AGENT_FLOAT_MISMATCH</code>) يشترك في نفس فلتر <code>is_active=true</code> — فالوكيل المسحوب بسيولة متبقّية غير مرئيّ لكلتا آليّتي الرقابة، لا لوحدة واحدة فقط.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>AL6</td><td><span class="tag med" style="padding:2px 8px">MED</span></td><td>لا فحص هويّة/دور/حالة على <code>user_id</code> الممنوح في أيّ من المسارَين — حساب مُعلَّق/محظور يمكن منحه صفًّا (خاملًا حتى إعادة تفعيله لاحقًا بلا إعادة تدقيق)؛ لا فصل واجبات يمنع منح الصلاحيّة لحساب OPERATIONS_AGENT/SUPER_ADMIN نفسه.</td></tr>
+    <tr><td>AL7</td><td><span class="tag low" style="padding:2px 8px">LOW</span></td><td><code>principal_role</code> نصّ حرّ غير مُتحقَّق منه (خلافًا لـ<code>channels</code>/<code>vehicle_ownership</code> المُتحقَّق منهما) — حقل عرض تجميليّ فقط، أثر منخفض.</td></tr>
+    <tr><td>AL8</td><td><span class="tag low" style="padding:2px 8px">LOW</span></td><td>تعيين "الوكيل الأب" لا يفحص حالة الأب نفسه — تجميليّ بحت بما أنّ التسلسل الهرميّ مؤكَّد خامل ماليًّا كليًّا (انظر القسم المؤكَّد سليم).</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم: لا حلقة أب→ابن→أب ممكنة بنيويًّا (الأب يجب أن يكون قمّة الشجرة، والعقدة ذات الأبناء لا يمكن تعشيشها) — يحدّ الشجرة بعمقين بالضبط بالبناء · رابط الأب/الابن خاملٌ ماليًّا فعليًّا كما هو موثَّق (لا حساب/حدّ يشير لـ<code>parent_agent_id</code> إطلاقًا) · السحب يوقف التشغيل فعليًّا وفوريًّا (خلافًا لنمط "التعليق لا يُعلِّق فعليًّا" المتكرّر في دورة العمليّات) — كل إجراء يستعلم <code>is_active</code> عند كل طلب، لا علَمًا مخبَّأً في الجلسة · مراجعة الوثائق تصميم يدويّ متّسق مع بقيّة المنصّة، لا انحراف خاصّ بالتسوية.</div>
+</section>
+
+<section id="agent-flow">
+  <h2 class="sec-title">🧑‍💼 تدفّق عمل الوكيل نفسه</h2>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">AG1 — قيد القناة يُتجاوَز صامتًا لمعاملات القناة "FULL"</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag live">مؤكَّد حيًّا</span></div></div>
+    <p>كود الفحص يتحقّق فقط من <code>channel=="CASH"</code> أو <code>=="ELECTRONIC"</code> — لا يعالج <code>"FULL"</code> إطلاقًا (قيمة حقيقيّة في <code>TXN_CHANNELS</code>). نقطة تسوية مُصرَّح لها بـCASH فقط (أو ELECTRONIC فقط) تتجاوز كلا الشرطين ويُقبَل التحقّق. أيّ طرف يطلب <code>channel="FULL"</code> بلا أيّ فحص توافق عند الإنشاء، وأيّ نقطة تسوية — حتى المقيَّدة — تستطيع معالجة الشقّين.</p>
+    <div class="orig"><b>الإثبات الحيّ:</b> أُنشئ منح CASH-فقط، أنشأ سائق حقيقيّ معاملة <code>channel="FULL"</code> بمبالغ حقيقيّة من رصيده (33,750 نقدًا + 2,000 إلكترونيًّا)، استخرج رمزًا، ونقطة التسوية CASH-فقط استدعت <code>/settlement/agent/verify</code> بالرمز → <b>HTTP 200</b>، الحالة تحوّلت لـ<code>AGENT_VERIFIED</code>. لم يُستدعَ "تأكيد" لتفادي أيّ تحريك مال فعليّ (يبقى ذلك تدقيق كود فقط).</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">AG2 — بحث الرمز اليدويّ عالميّ، غير مُحدَّد النطاق، وغير فريد — أسوأ من نمط رمز الاستلام المُدقَّق سابقًا</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>الرمز اليدويّ ذو 6 أرقام بلا أيّ قيد تفرّد في قاعدة البيانات. استعلام التحقّق بلا أيّ سياق نطاق — يلتقط ببساطة أحدث معاملة نشطة تطابق الرمز <b>عبر المنصّة بأكملها</b>. بالمقارنة مع نمط رمز الاستلام المدقَّق سابقًا (محدَّد النطاق بطلب معروف مسبقًا)، هذا بحث أعمى عالميّ. تصادم رمزَي طرفين مختلفين (احتمال يتّسع مع حجم نقاط التسوية) يجعل الوكيل يسوّي صامتًا معاملة <b>الطرف الخطأ</b>، بينما تصبح المعاملة الأقدم المتصادمة غير قابلة للوصول أبدًا برمزها الخاصّ.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>AG3/MM5</td><td><span class="tag med" style="padding:2px 8px">MED</span></td><td><code>commission_bps</code> بلا حدّ أعلى في مساري المنح المباشر والتعديل (خلافًا لمسار التوثيق المُقيَّد بشكل صحيح 0-10000)، ولا قيد CHECK على العمود في قاعدة البيانات — لكن تتبّع كل استخدام لـ<code>commission_minor</code> يؤكّد أنّه <b>لا يُخصَم من السيولة ولا يُطبَّق على أيّ دفتر أستاذ إطلاقًا</b> اليوم — رقم عرض/تسجيل فقط، لا فعل ماليّ حاليًّا. غير معروض للوكيل نفسه في واجهة نجاح الويب رغم توفّره في الحمولة.</td></tr>
+    <tr><td>AG5</td><td><span class="tag low" style="padding:2px 8px">LOW</span></td><td>واجهة نجاح وضع الوكيل على الويب تُشفِّر حالة نجاح واحدة فقط (<code>AGENT_VERIFIED</code>) بلا أيّ خريطة لبقيّة الحالات. لا نقطة نهاية للوكيل لمعرفة ما آل إليه أمر معاملة تحقّق منها سابقًا (هل أكّدها الطرف؟ نازعها؟ انتهت صلاحيّتها؟) — رغم أنّ النقد غالبًا يتبادَل فعليًّا عند لحظة التحقّق.</td></tr>
+  </table>
+
+  <div class="insight">
+    <h4>فرضيّة هويّة "REP" — لم تثبت ثغرة</h4>
+    <p><code>principal_role</code> حقل عرض/تخزين مؤقّت بحت. مسار التوثيق ينشئ صفّ <code>Role(role="CUSTOMER")</code> حقيقيًّا لأيّ مستخدم جديد بالكامل عبر هذا المسار (أو يعيد استخدام دوره الموجود). تسجيل الدخول يقرأ من صفوف الدور الحقيقيّة، لا من <code>principal_role</code> إطلاقًا. حامل منح "REP" يدخل عاديًّا كعميل عبر تدفّق OTP/كلمة المرور القياسيّ، ثم يرى زرّ التسوية بشكل منفصل عبر فحص المنح — لا ثغرة توثيق.</p>
+  </div>
+  <div class="fine-list">مؤكَّد سليم: منع التسوية الذاتيّة يعمل بشكل صحيح، لا التفاف عليه · حارس "مُطالَب به مسبقًا" يمنع وكيلًا ثانيًا من خطف معاملة تحقّق منها وكيل آخر بالفعل · مسار QR/الرمز: توقيع HMAC وانتهاء الصلاحيّة مُتحقَّق منهما بشكل صحيح، وأكواد خطأ مميّزة (<code>BAD_TOKEN</code>، <code>TOKEN_EXPIRED</code>) تصل حرفيًّا للمستخدم — أفضل بوضوح من نمط رمز الاستلام المدقَّق في دورة السائق (الذي وحّد كل الأخطاء في رسالة عامّة واحدة) · حدود لكل معاملة/يوميّة/سقف سيولة تُحلّ بشكل صحيح لكل وكيل مع قيمة عامّة احتياطيّة · فحص السياج الجغرافيّ آمن الفشل بشكل صحيح · حجب النزاع المفتوح يمنع تحقّقًا جديدًا ضدّ طرف بنزاع غير محلول.</div>
+</section>
+
+<section id="party-flow">
+  <h2 class="sec-title">🚚 تدفّق الطرف المقابل (الحزب)</h2>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">PT1 — تدفّق تسوية الطرف مقيَّد بالسائق حصرًا رغم تصميمه المُعلَن كـ"محايد الدور، أيّ طرف"</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>كل نقاط نهاية الطرف الثمانية مقفلة على دور السائق حصرًا، رغم أنّ آليّة الفحص نفسها تدعم عدّة أدوار (وتُستخدَم كذلك فعليًّا في مسار الوكيل). حساب رصيد الطرف نفسه يستعلم نموذج السائق حصرًا — مزوّد/عميل/REP يحصل على 404 "غير قابل للتسوية" حتى لو أُزيل قيد الدور. واجهة الويب الوحيدة لهذا المسار (<code>/driver/settle</code>) مقصورة على السائق أيضًا — لا معادل لأيّ دور آخر إطلاقًا.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">PT2 — سباق تأكيد/نزاع؛ لا قفل صفّ على المعاملة نفسها</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>كل من التأكيد والنزاع يبدآن بقراءة عاديّة بلا قفل على صفّ المعاملة (فقط صفّ السائق مُقفَل، وفي فرع النقد فقط). سيناريو ملموس: الوكيل يتحقّق → <code>AGENT_VERIFIED</code>؛ الطرف يستدعي تأكيد بينما يستدعي (الوكيل أو الطرف) نزاعًا في نفس اللحظة تقريبًا؛ كلاهما يقرأ <code>AGENT_VERIFIED</code> قبل التزام أيّ منهما؛ التأكيد يحرّك المال ويختم دفتر الأستاذ ويضبط الحالة SETTLED؛ النزاع يضبط الحالة DISPUTED مع سبب — أيّهما يلتزم أخيرًا "يفوز" بعمود الحالة بينما تبقى آثار الطرف الآخر (المال المُحرَّك، أو سبب النزاع) قائمة بغضّ النظر — حالة غير متّسقة مع الآثار الفعليّة التي وقعت.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>PT4</td><td><span class="tag med" style="padding:2px 8px">MED</span><br><span class="tag live" style="padding:2px 8px">LIVE</span></td><td>تقديم نزاع لا يُجمَّد ضدّ إعادة تقديمه — استدعاء ثانٍ على معاملة DISPUTED بالفعل ينجح صامتًا، يستبدل سبب النزاع بلا أيّ خطأ ALREADY_DISPUTED. واجهة الطرف لا تميّز DISPUTED/EXPIRED عن معاملة معلَّقة حيّة — نفس الشارة/الزرّ يظهر للجميع. انحراف enum مؤكَّد: <code>PARTY_CONFIRMED</code> و<code>VOID</code> معرَّفتان في نموذج القاعدة لكن <b>لا يُخصِّص أيّ كود لهما إطلاقًا</b> — أعضاء enum ميّتون في الباك إند نفسه، لا مجرّد فجوة واجهة.</td></tr>
+  </table>
+  <div class="orig"><b>الإثبات الحيّ (PT4):</b> على نفس معاملة FULL أعلاه (بعد تحقّق الوكيل)، قدّم السائق نزاعًا (200، DISPUTED)، ثم قدّم نزاعًا ثانيًا بسبب مختلف (200 مجدَّدًا، لا خطأ). استعلام DB أكّد أنّ <code>dispute_reason</code> هو نصّ النزاع <b>الثاني</b> — استبدال صامت للسبب الأوّل، بلا أيّ حماية.</div>
+
+  <div class="fine-list">مؤكَّد سليم: (مرحَّل من تقرير 468، مُعاد التحقّق منه هنا) تأكيد الطرف لا يزال يفلتر <code>settlement_id IS NULL</code> بشكل صحيح قبل ختم صفوف الأرباح · منع التسوية الذاتيّة نقطة اختناق واحدة، بلا التفاف · <code>/settlement/points</code> و<code>/points/nearby</code> يستبعدان النقاط المسحوبة/غير النشطة بشكل صحيح، لا تسرّب.</div>
+</section>
+
+<section id="money-math">
+  <h2 class="sec-title">🧮 سلامة الأرقام الماليّة والتزامن</h2>
+
+  <div class="insight">
+    <h4>✅ لا خرق لختم FIN-COR (wallet_cash_out) — أهمّ نتيجة سلبيّة في هذا التدقيق</h4>
+    <p>فُحص كل سطر يمسّ المال في نطاق هذا الوكيل كأولويّة قصوى. <code>settle-float</code> يُحرِّك فقط عدّاد سيولة داخليّ + يسجّل صفّ حيازة نقديّة (سجلّ حيازة فعليّة، لا عمليّة محفظة). الشقّ الإلكترونيّ ينشئ صفّ تسوية بحالة PENDING، بتعليق صريح "الصرف الفعليّ مرهون بـproduction_payment_enabled" (حاليًّا false). بحث شامل في وحدة التسوية لأيّ مرجع لـ<code>WalletAccount</code> يعيد صفر نتيجة. ادّعاء تعليق الوحدة نفسها (النقد = حيازة فعليّة فقط؛ الإلكترونيّ لا يُشغِّل أبدًا سحبًا/تحويلًا من المحفظة) مؤكَّد صحيحًا بالكود، لا مجرّد ادّعاء.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">MM1 — فحص سقف السيولة والحدّ اليوميّ يتمّان مرّة واحدة فقط عند التحقّق، ولا يُعاد فحصهما إطلاقًا عند نقطة التغيير الفعليّة المنفصلة (اكتشاف رئيسيّ جديد)</div>
+      <div class="tag-row"><span class="tag high">HIGH — أخطر اكتشاف ماليّ هذه الدورة</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>فحص "تجاوز سقف السيولة" و"تجاوز الحدّ اليوميّ" يقعان في <code>agent/verify</code> — التي <b>لا تلمس</b> عدّاد السيولة إطلاقًا. عدّاد السيولة يُغيَّر فعليًّا فقط في <code>party_confirm_and_settle</code> — دالّة <b>لا تحتوي أيّ استدعاء</b> لإعادة حلّ الحدود أو إعادة فحص السقف/الحدّ اليوميّ على الإطلاق. سلسلة ملموسة بلا حاجة لتوقيت دقيق (سقف=10,000، الرصيد=0): سائق أ ينشئ معاملة 9,000 → الوكيل يتحقّق (يفحص 0+9,000≤10,000 → ينجح، الرصيد ما زال 0 لأنّ التحقّق لا يُغيّره) → قبل أن يؤكّد أ، سائق ب ينشئ معاملة 9,000 أخرى → الوكيل يتحقّق (يفحص 0+9,000≤10,000 <b>مجدَّدًا نفس الصفر</b> → ينجح) → أ يؤكّد (الرصيد→9,000) → ب يؤكّد (الرصيد→18,000) — <b>تجاوز السقف بنسبة 80%</b> بلا أن يعيد أيّ استدعاء تأكيد فحص السقف إطلاقًا. سيناريو تشغيليّ واقعيّ لنقطة تعالج عدّة سائقين على التوالي، لا سباقًا اصطناعيًّا دقيق التوقيت.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>MM4</td><td><span class="tag med" style="padding:2px 8px">MED</span></td><td>لا فحص تجميعيّ عبر التسلسل الهرميّ للسيولة — لكن تعليق النموذج نفسه يصرّح صراحة أنّ الرابط "إشرافيّ فقط" ولا يمسّ الجوهر الماليّ عمدًا. N وكيل فرعيّ، كلّ واحد تحت سقفه الخاصّ، يمكن أن يحملوا مجتمعين سيولة أكبر بكثير ممّا يوحي به سقف أيّ وكيل واحد — فجوة تصميم مُفصَح عنها، لا خلل خفيّ، لكنّها تستحقّ إبلاغ المشغّل بأنّ "الوكيل الرئيسيّ" قد لا يعني تشغيليًّا ما يفترضه مدير.</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم: فحص "الحدّ لكل معاملة" غير تراكميّ بطبيعته، بلا أيّ تعرّض TOCTOU (خلافًا للسقف/الحدّ اليوميّ) · قيم سالبة/صفريّة لتجاوزات الحدود عبر مسار المنح غير المُقيَّد غير ضارّة (الحلّ يتجاهل أيّ تجاوز ≤0 ويعود للقيمة العامّة) · إجماليّ لوحة "تعرّض السيولة" لا ينحرف عن مجموع العدّادات الحيّة لكل وكيل — نفس الجدول/العمود، استعلام حيّ لا مخبَّأ (فقط فلتر <code>is_active</code> يخلق نقطة عمياء، انظر AL4/MM6) · إعادة التأكيد متكرّرة الفاعليّة (idempotent) بشكل صحيح على حالة SETTLED، لا ازدواج عند إعادة المحاولة · فحص المصالحة اليوميّ الآليّ (<code>AGENT_FLOAT_MISMATCH</code>) حسابيّ حقيقيّ فعليًّا ومُفعَّل، ليس وصفيًّا/استشاريًّا فقط — كان سيكتشف تلقائيًّا لاحقًا (خلال ~24 ساعة) أيّ فساد ناتج عن MM1 أعلاه، لكنّه اكتشاف مؤخَّر لا وقائيّ، ويشترك في نفس نقطة AL4/MM6 العمياء لحسابات <code>is_active</code>.</div>
+</section>
+
+<section id="mobile">
+  <h2 class="sec-title">📱 تغطية الجوّال</h2>
+  <p class="lead">راجع <a href="#blocker">القسم الحاجز أعلاه</a> لـPT5/MB4. الاكتشافات الإضافيّة من وكيل تغطية الجوّال:</p>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">MB5 — حالتا DISPUTED وEXPIRED غير معالجتَين على Flutter؛ استطلاع مضلِّل بلا نهاية بعد فشل فعليّ للمعاملة</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>شاشة الإيداع تُفرِّع فقط على <code>AGENT_VERIFIED</code> مقابل "كل ما عداه" (رسالة عامّة "بانتظار تأكيد الوكيل")، والاستطلاع يتوقّف فقط عند <code>SETTLED</code>. كلّ من DISPUTED (قابلة للوصول فعليًّا عبر مسار النزاع) وEXPIRED (قابلة للوصول عبر انتهاء صلاحيّة الرمز أثناء التحقّق) تُنتِجان نفس الرسالة العامّة ولا توقفان الاستطلاع — الشاشة تستمرّ في قول "بانتظار تأكيد الوكيل" للأبد حتى بعد أن تكون المعاملة قد فشلت/انتهت/دخلت نزاعًا فعليًّا.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">PT6/MB6 (مؤكَّد من وكيلين، يوسّع E3 المُرحَّل) — نفس عطب فقدان رمز الخطأ من الويب يتكرّر حرفيًّا في عميل Flutter، بمعالجة احتياطيّة أسوأ</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>نفس شكل الخطأ المُغلَّف (<code>{"detail":{"code":...}}</code>) الذي يُفوّت رسائل التسوية المحدَّدة على الويب (E3، تقرير 468) يفوّته أيضًا مستخرج الخطأ في Flutter — لكن الاحتياط هناك أسوأ: بينما يب يتدرّج لرسالة عامّة موضوعيّة حسب رمز HTTP، Flutter يسقط دائمًا إلى "حدث خطأ غير متوقّع" العامّة تمامًا، بلا أيّ طبقة احتياط حسب الحالة إطلاقًا — لكل من SELF_SETTLEMENT_FORBIDDEN وOVER_DAILY_LIMIT وOVER_FLOAT_CAP وON_HOLD_DISPUTE وTOKEN_EXPIRED وغيرها.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>MB2</td><td><span class="tag low" style="padding:2px 8px">LOW</span></td><td>محفظة العميل على Flutter تعرض "وكيل تسوية" كقناة شحن رصيد — تدفّق مختلف تمامًا (شحن محفظة، لا وحدة التسوية) لا يناقض غياب وضع الوكيل، لكنّه المكان الوحيد الذي تظهر فيه كلمة "وكيل" لمستخدم نهائيّ على Flutter.</td></tr>
+  </table>
+
+  <div class="shallow-list">إفصاح نطاق (لا عيوب): Flutter بلا أيّ كود لوضع الوكيل إطلاقًا (صفر نتائج بحث) — من يُمنح صلاحيّة الوكيل لا يملك طريقة لتشغيلها من الجوّال، الويب فقط. React Native بلا أيّ كود تسوية إطلاقًا (يتّسق مع كون RN سقالة مبكّرة، تقرير 471). لا مسار "تقدَّم لتكون وكيل تسوية" في أيّ من تطبيقَي الجوّال — الويب حصرًا.</div>
+  <div class="fine-list">مؤكَّد سليم: آليّات الشاشة حتى نقطة التعليق سليمة تمامًا (بطاقة الرصيد، قائمة النقاط القريبة، عرض QR/الرمز) · بطاقة حدّ النقد تطابق منطق الباك إند بدرجات تحذير صحيحة · الشاشة محايدة فعليًّا تجاه نوع الطرف المقابل (لا افتراض أنّه سائق تحديدًا) — القيد فقط في مستوى الدور/التوجيه، لا منطق الشاشة نفسها.</div>
+</section>
+
+<section id="carry-forward">
+  <h2 class="sec-title cluster">⚓ مرساة مُرحَّلة من دورات سابقة (مُستشهَد بها، لا مُعادة العدّ)</h2>
+  <table>
+    <tr><th>المرساة</th><th>الحالة الآن</th></tr>
+    <tr><td>Money-F3 (تقرير 469) — قراءة/كتابة غير مُقفلة لعدّاد السيولة</td><td>ما زالت مفتوحة، مؤكَّدة بنفس الأسطر تقريبًا. تُوسَّع هنا بزاوية جديدة أخطر (MM1): ليست مجرّد سباق تزامن دقيق التوقيت، بل انفصال بنيويّ حتميّ بين نقطة الفحص ونقطة التغيير.</td></tr>
+    <tr><td>E1 (تقرير 468) — تصميم "ختم التسوية" الصحيح لدى الطرف</td><td>مُعاد التحقّق منه، لا يزال سليمًا وبلا تغيير.</td></tr>
+    <tr><td>E3 (تقرير 468) — فقدان رمز الخطأ في شكل الاستجابة المُغلَّفة</td><td>مؤكَّد لا يزال قائمًا على الويب، ومؤكَّد الآن أيضًا على Flutter تحديدًا لأوّل مرّة (PT6/MB6) بمعالجة احتياطيّة أسوأ هناك.</td></tr>
+  </table>
+</section>
+
+<section id="strengths">
+  <h2 class="sec-title">✅ ما يعمل جيّدًا فعلًا</h2>
+  <div class="fine-list">
+    <b>لا خرق لختم wallet_cash_out إطلاقًا</b> — أهمّ نتيجة إيجابيّة في كل الدورة، مؤكَّدة بتتبّع كل سطر ماليّ في النطاق.<br>
+    <b>السحب يوقف التشغيل فعليًّا وفوريًّا</b> — نمط سليم نادر مقارنة بعطب "التعليق لا يُعلِّق فعليًّا" المتكرّر مرارًا في دورة العمليّات.<br>
+    <b>مسار QR/الرمز في وضع الوكيل مبنيّ بإتقان</b> — توقيع، انتهاء صلاحيّة، أكواد خطأ مميّزة تصل حرفيًّا — أفضل من نمط رمز الاستلام المدقَّق سابقًا في دورة السائق.<br>
+    <b>فحص المصالحة اليوميّ الآليّ حقيقيّ وفعليّ، لا وصفيّ/استشاريّ فقط</b> — رياضيّات صحيحة مقابل صفوف حقيقيّة، سيكتشف فسادًا محتملًا خلال يوم واحد.<br>
+    <b>التسلسل الهرميّ للوكلاء خامل ماليًّا بتصميم مُفصَح عنه</b>، لا ثغرة خفيّة — لا حلقات ممكنة بنيويًّا.<br>
+    <b>منع التسوية الذاتيّة نقطة اختناق واحدة سليمة</b> عبر كل المسارات المؤدّية للتسوية.
+  </div>
+</section>
+
+<section id="coverage">
+  <h2 class="sec-title">📏 حدود التغطية</h2>
+  <div class="shallow-list">
+    <b>لم يُختبَر حيًّا:</b> اكتمال حيازة النقد الفعليّة (CashHandover)، تغيير عدّاد السيولة الفعليّ، <code>settle-float</code> — عمدًا، لنفس سبب دورة العمليّات مع Money-F1/F2/F3.<br>
+    <b>لم يُختبَر حيًّا:</b> سباق التأكيد/النزاع (PT2) وسباق settle-float المتزامن (مُوسَّع من Money-F3) — يتطلّبان توقيتًا دقيقًا لطلبين متزامنين حقيقيّين؛ الإثبات بقراءة الكود المباشرة كافٍ ودقيق بما يكفي لهذا الصنف من الادّعاء.<br>
+    <b>بيانات اختبار تُركت كدليل</b> (tawalocal فقط، لا مال حقيقيّ أو إنتاج مُلامَس): منحان تجريبيّان (أحدهما مسحوب، والآخر ازدواج نشط)، ومعاملة واحدة بحالة نزاع.
+  </div>
+</section>
+
+<section id="roadmap">
+  <h2 class="sec-title">🗺️ خارطة طريق مقترحة للإصلاح (بالأولويّة)</h2>
+  <table>
+    <tr><th>الأولويّة</th><th>الإصلاح</th><th>لماذا الآن</th></tr>
+    <tr><td><b>P0</b></td><td>إضافة استدعاء "تأكيد" الطرف المفقود في <code>settlement_screen.dart</code> على Flutter.</td><td>سائق يستخدم الجوّال حصرًا لا يملك طريقة لإتمام أيّ إيداع تسوية إطلاقًا.</td></tr>
+    <tr><td><b>P0</b></td><td>إعادة فحص سقف السيولة/الحدّ اليوميّ داخل <code>party_confirm_and_settle</code> نفسها، لا عند التحقّق فقط؛ قفل صفّ <code>SettlementAgent</code> عند كل تغيير (MM1 + Money-F3).</td><td>تجاوز سقف حتميّ تحت استخدام تشغيليّ عاديّ، لا سباق نادر.</td></tr>
+    <tr><td><b>P1</b></td><td>معالجة <code>channel=="FULL"</code> صراحة في فحص القناة (AG1)، وربط استعلام الرمز اليدويّ بنطاق محدَّد + قيد تفرّد على العمود (AG2).</td><td>كلاهما مؤكَّد حيًّا؛ AG1 مؤكَّد قابلًا للاستغلال بمعاملة حقيقيّة واحدة.</td></tr>
+    <tr><td><b>P1</b></td><td>توحيد مسارَي منح/رفض الوكيل في مسار واحد يفرض التوثيق دائمًا، مع قيد تفرّد على <code>user_id</code> (AL5).</td><td>مؤكَّد حيًّا وبدليل DB — بوّابة التوثيق بأكملها قابلة للتجاوز اليوم.</td></tr>
+    <tr><td><b>P2</b></td><td>ربط سحب/رفض الوكيل بفحص <code>current_float_minor==0</code> أو تنبيه إلزاميّ (AL4/MM6)؛ توسيع فلتر لوحة التعرّض والمصالحة اليوميّة ليشمل الوكلاء المسحوبين ذوي السيولة المتبقّية.</td><td>نقطة عمياء حقيقيّة في مراقبة تعرّض المنصّة الماليّ.</td></tr>
+    <tr><td><b>P2</b></td><td>معالج استثناء عامّ موحَّد لشكل خطأ التسوية (يحلّ E3/PT6/MB6 من مصدر واحد، يمسّ الويب وFlutter معًا).</td><td>يتكرّر على منصّتين بمعالجة احتياطيّة مختلفة، إصلاح باك إند واحد يحلّه على كليهما.</td></tr>
+  </table>
+</section>
+
+<footer>
+  تقرير 472 — دورة موظّفي التسوية (SettlementAgent)، تدقيق كود + اختبار حيّ · تووا (Tawa) Libya Delivery Platform · بيئة tawalocal المحليّة · 2026-07-11
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>

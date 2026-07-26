@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير إصلاح عطل التسجيل (المزوّد/السائق) + الكاش — tawanow</title>
+<style>
+  :root{
+    --green:#1b7f4f;--green-d:#0f5c38;--amber:#9a6b00;--red:#b3261e;--blue:#1558b0;--purple:#6b3fa0;
+    --bg:#f5f7f6;--card:#fff;--ink:#17241e;--muted:#5b6b63;--line:#dde6e1;
+    --ok:#e8f5ee;--okl:#9fd6b7;--warn:#fdf4e3;--warnl:#e9cd8f;--bad:#fdecea;--badl:#f0b3ad;--blbg:#e7eefb;--bll:#b9cdf0;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;line-height:1.82}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f5c38,#1b7f4f);color:#fff;border-radius:18px;padding:34px;box-shadow:0 10px 30px rgba(15,92,56,.25)}
+  header.hero h1{margin:0 0 8px;font-size:22px;line-height:1.5}
+  header.hero p{margin:4px 0;opacity:.95;font-size:13px}
+  .meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+  .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:12px}
+  h2{margin:34px 0 13px;font-size:20px;color:var(--green-d);border-right:6px solid var(--green);padding:9px 14px 9px 0;background:linear-gradient(90deg,#eef6f1,transparent)}
+  h3{margin:18px 0 8px;font-size:15.5px;color:var(--green-d)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:13px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.4px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#eef6f1;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fbfdfc}
+  .ok{background:var(--ok)!important}.warn{background:var(--warn)!important}.bad{background:var(--bad)!important}
+  code{background:#eef2ef;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-family:"Cascadia Code",Consolas,monospace;font-size:11px;direction:ltr;display:inline-block}
+  .diag{background:#0e1f18;border-radius:12px;padding:16px;color:#d7ffe9;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.2px;line-height:1.7;overflow:auto;white-space:pre}
+  .diag .y{color:#ffd479}.diag .r{color:#ff9a8c}.diag .g{color:#7fffb0}.diag .b{color:#8cc6ff}.diag .m{color:#d9a8ff}.diag .w{color:#fff}
+  .simple{background:#eef6ff;border:1px solid var(--bll);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.8px}
+  .simple b{color:var(--blue)}
+  .good{background:#f3fbf6;border:1px solid var(--okl);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.8px}
+  .good b{color:var(--green-d)}
+  .badbox{background:var(--bad);border:1px solid var(--badl);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.6px}
+  .badbox b{color:var(--red)}
+  .warnbox{background:var(--warn);border:1px solid var(--warnl);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.6px}
+  .warnbox b{color:var(--amber)}
+  .shot{margin:14px 0}
+  .shot img{width:100%;max-width:380px;border:1px solid var(--line);border-radius:12px;display:block;background:#fafbfa;box-shadow:0 3px 12px rgba(0,0,0,.08)}
+  .shot .cap{font-size:11.5px;color:var(--muted);margin-top:6px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  @media(max-width:760px){.pair{grid-template-columns:1fr}}
+  .dash{display:flex;flex-wrap:wrap;gap:9px;margin:8px 0}
+  .kpi{flex:1 1 150px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center}
+  .kpi.g{background:var(--ok);border-color:var(--okl)}.kpi.b{background:var(--bad);border-color:var(--badl)}
+  .kpi .n{font-size:15px;font-weight:800;color:var(--green-d)}.kpi.b .n{color:var(--red)}
+  .kpi .l{font-size:10.5px;color:var(--muted)}
+  .footer{margin:30px 0 8px;text-align:center;color:var(--muted);font-size:11.6px}
+  ul{margin:5px 0;padding-right:20px}li{margin:3px 0;font-size:12.6px}
+  .tagr{display:inline-block;font-size:10px;font-weight:800;background:var(--bad);color:var(--red);border:1px solid var(--badl);border-radius:5px;padding:1px 8px}
+  .tagg{display:inline-block;font-size:10px;font-weight:800;background:var(--ok);color:var(--green-d);border:1px solid var(--okl);border-radius:5px;padding:1px 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير إصلاح عطل التسجيل (المزوّد + السائق) ومشكلة الكاش</h1>
+  <p>عطلٌ حقيقيّ — لا مجرّد كاش — شُخِّص بإعادة إنتاج حيّة، أُصلِح بطبقتين، وأُثبِت بالصور على tawanow.com · 2026-06-23</p>
+  <div class="meta">
+    <span>🔴 السبب: <code>/geo/reverse</code> 401 → توجيه للرئيسيّة</span>
+    <span>✅ الإصلاح: geo عامّ + حارس مُعترِض</span>
+    <span>✅ مُثبَت حيّاً (مزوّد + سائق)</span>
+    <span>🟡 الكاش: فحص فوريّ + كلّ 60 ثانية</span>
+  </div>
+</header>
+
+<!-- 0 -->
+<h2>٠) لوحة النتائج</h2>
+<div class="dash">
+  <div class="kpi b"><div class="n">عطل حقيقيّ</div><div class="l">ليس كاشاً — أُعيد إنتاجه بمتصفّح نظيف</div></div>
+  <div class="kpi g"><div class="n">✅ مزوّد</div><div class="l">الخريطة تعمل · الدبّوس + العنوان · لا توجيه</div></div>
+  <div class="kpi g"><div class="n">✅ سائق</div><div class="l">Enter لا يُغلق · القوائم تعمل</div></div>
+  <div class="kpi g"><div class="n">🟡 الكاش</div><div class="l">10 دقائق → 60 ثانية + فحص فوريّ</div></div>
+  <div class="kpi g"><div class="n">🔒 آمن</div><div class="l">FIN-COR + nginx لم تُمَسّ · byte-identical</div></div>
+</div>
+
+<!-- 1 -->
+<h2>١) ماذا بلّغتَ عنه</h2>
+<div class="card">
+  <div class="badbox"><b>الشكوى:</b> «عند إنشاء حساب مزوّد أو سائق، أذهب إلى الخريطة وأختار موقعاً — <b>فتُغلق شاشة إنشاء الحساب وترجع إلى الصفحة الرئيسيّة</b>». + «المتصفّح يحتفظ بالنسخة القديمة ولا يُظهر التحديث».</div>
+  <div class="simple">🟦 <b>لم أُخمّن.</b> فتحتُ الموقع الحيّ بمتصفّح <b>نظيف</b> (بلا كاش)، وأعدتُ إنتاج العطل خطوةً بخطوة، وقرأتُ سجلّ المتصفّح لأعرف السبب <b>القاطع</b> — قبل أيّ إصلاح.</div>
+</div>
+
+<!-- 2 -->
+<h2>٢) التشخيص — السبب الحقيقيّ (دليل قاطع)</h2>
+<div class="card">
+  <p>عند النقر على الخريطة لاختيار الموقع، كشف سجلّ المتصفّح هذا التسلسل:</p>
+  <div class="diag"><span class="r">[ERROR] 401 (Unauthorized) @ /api/geo/reverse?lat=32.88…&lng=13.19…</span>   ← النقر على الخريطة
+<span class="r">[ERROR] 401 (Unauthorized) @ /api/auth/refresh</span>                       ← محاولة تجديد فاشلة
+<span class="r">[ERROR] 401 (Unauthorized) @ /api/auth/refresh</span>
+        │
+        ▼  ثمّ: تسجيل خروج تلقائيّ + توجيه إلى /welcome  (الشاشة «تُغلق»)</div>
+  <div class="badbox"><b>السبب بلغة بسيطة:</b> اختيار الموقع على الخريطة يستدعي خدمة «ترجمة الإحداثيّات إلى عنوان» (<code>/geo/reverse</code>). هذه الخدمة كانت <b>تتطلّب تسجيل دخول</b> — لكنّك <b>أثناء إنشاء الحساب لم تسجّل الدخول بعد!</b> فيردّ الخادم <b>401 (غير مُصرّح)</b>، فيظنّ التطبيق أنّ جلستك انتهت → <b>يُخرجك ويُعيدك للرئيسيّة</b>.</div>
+  <div class="simple">🟦 لهذا كان يحدث في <b>المزوّد</b> (يستخدم الخريطة) — أمّا <b>السائق</b> فيستخدم قوائم منطقة/مدينة (لا خريطة)، وخطره كان مختلفاً: مفتاح <b>Enter</b> يُرسل النموذج مبكراً.</div>
+</div>
+
+<!-- 3 -->
+<h2>٣) الإصلاح — طبقتان</h2>
+<div class="card">
+  <table>
+    <tr><th>الطبقة</th><th>التغيير</th><th>لماذا</th></tr>
+    <tr class="ok"><td><b>الخلفيّة (الجذر)</b></td><td>جعل <code>/geo/reverse</code> · <code>/geo/geocode</code> · <code>/geo/eta</code> <b>عامّة</b> (إزالة اشتراط الدخول)</td><td>التسجيل يحتاجها <b>قبل</b> الدخول · خدمات ترجمة عناوين غير حسّاسة (محميّة بحدّ المعدّل بالـIP)</td></tr>
+    <tr class="ok"><td><b>الواجهة (دفاع عميق)</b></td><td>مُعترِض الشبكة <b>لا يُخرج/يُوجّه</b> عند أيّ 401 من <code>/geo/*</code></td><td>حتى لو ردّت خدمة عناوين 401 يوماً، لا تَخطف جلستك — تُتجاهَل بصمت فقط</td></tr>
+  </table>
+  <h3>الفرق — قبل وبعد</h3>
+  <div class="diag"><span class="y">قبل:</span> نقر الخريطة → /geo/reverse → <span class="r">401</span> → refresh → <span class="r">401</span> → <span class="r">خروج + توجيه /welcome</span>  ✗ الشاشة تُغلق
+<span class="y">بعد:</span> نقر الخريطة → /geo/reverse → <span class="g">200</span> → العنوان يُملأ تلقائيّاً  ✓ الشاشة تبقى</div>
+  <div class="good"><b>فائدة عمليّة:</b> بما أنّ الجذر في الخلفيّة، التسجيل صار يعمل <b>حتى على النسخة القديمة المخزّنة في متصفّحك</b> — لا حاجة لمسح الكاش لتجربته.</div>
+</div>
+
+<!-- 4 -->
+<h2>٤) الإثبات بالصور (حيّ على tawanow.com)</h2>
+
+<div class="card">
+  <h3><span class="tagg">مزوّد ✅</span> بعد الإصلاح — الخريطة تعمل والشاشة تبقى</h3>
+  <div class="simple">🟦 ملأتُ الاسم «محمد علي الاختبار» → ذهبتُ للخريطة → نقرتُ لاختيار الموقع. النتيجة: <b>دبّوس أزرق وُضِع، العنوان تعبّأ تلقائيّاً، الاسم بقي محفوظاً، والشاشة لم تُغلق.</b></div>
+  <div class="shot">
+    <img src="shots_demo/fixed-registration-map.png" alt="تسجيل المزوّد بعد الإصلاح">
+    <div class="cap">تسجيل المزوّد — الدبّوس على الخريطة + العنوان التلقائيّ + النموذج سليم (لم يُغلق)</div>
+  </div>
+</div>
+
+<div class="card">
+  <h3><span class="tagg">سائق ✅</span> يعمل — Enter لا يُغلق + قوائم المنطقة/المدينة</h3>
+  <div class="simple">🟦 السائق لا يستخدم خريطة (قوائم منطقة/مدينة). اختبرتُ خطره: ضغطتُ <b>Enter</b> في حقل — <b>الشاشة بقيت والبيانات لم تُمسَح</b>. وسلسلة «طرابلس الكبرى → طرابلس المركز» عملت.</div>
+  <div class="shot">
+    <img src="shots_demo/driver-registration-ok.png" alt="تسجيل السائق يعمل">
+    <div class="cap">تسجيل السائق — الاسم «أحمد السائق التجريبي» + المنطقة/المدينة + الشركة «تويوتا» محفوظة، النموذج سليم</div>
+  </div>
+</div>
+
+<table>
+  <tr><th>الاختبار الحيّ</th><th>المزوّد</th><th>السائق</th></tr>
+  <tr class="ok"><td>الشاشة بقيت (لم تُغلق/تُوجَّه)</td><td>✅ <code>/register</code></td><td>✅ <code>/register</code></td></tr>
+  <tr class="ok"><td>البيانات المُدخَلة بقيت محفوظة</td><td>✅ الاسم</td><td>✅ الاسم + الشركة</td></tr>
+  <tr class="ok"><td>اختيار الموقع</td><td>✅ دبّوس + عنوان تلقائيّ (<code>/geo/reverse=200</code>)</td><td>✅ قائمة المنطقة→المدينة</td></tr>
+</table>
+
+<!-- 5 -->
+<h2>٥) مشكلة الكاش — لماذا «لا يظهر التحديث»</h2>
+<div class="card">
+  <table>
+    <tr><th>السبب</th><th>الإصلاح</th></tr>
+    <tr class="ok"><td>لا فحص فوريّ عند فتح/تحديث الصفحة (هذا سبب «لا يظهر»)</td><td>✅ فحص <b>فوريّ</b> عند كلّ تحميل → زرّ «تحديث متاح» يظهر مباشرةً</td></tr>
+    <tr class="ok"><td>الفحص الدوريّ كان كلّ <b>10 دقائق</b></td><td>✅ صار كلّ <b>60 ثانية</b> (آمن: يفحص التبويب المرئيّ فقط)</td></tr>
+  </table>
+  <div class="warnbox"><b>لماذا ليس تلقائيّاً 100%؟</b> الوضع «اسأل ثمّ حدّث» <b>مقصود</b>: التحديث التلقائيّ الكامل كان يَمسح نماذج الدفع/التسجيل قيد التعبئة (نفس مشكلتك!). فالآن يظهر زرّ <b>«تحديث متاح»</b> خلال ~60 ثانية، وتضغطه وقتما تشاء — دون أن يُضيّع عملك.</div>
+  <div class="simple">🟦 <b>لجلب النسخة الجديدة على متصفّحك مرّة واحدة:</b> أغلق كلّ تبويبات الموقع ثمّ افتحه — أو امسح بيانات الموقع (في كروم: DevTools → Application → Clear site data). بعدها تظهر التحديثات تلقائيّاً خلال 60 ثانية.</div>
+</div>
+
+<!-- 6 -->
+<h2>٦) السلامة + الملفّات</h2>
+<table>
+  <tr><th>الفحص</th><th>النتيجة</th></tr>
+  <tr class="ok"><td>منشور ومُتحقَّق حيّاً</td><td>✅ <code>/geo/reverse</code>=200 · <code>/</code>=200 · <code>/api</code>=200 · 6/6 صحّيّة · 0 tracebacks</td></tr>
+  <tr class="ok"><td>المزامنة</td><td>✅ byte-identical (المحلّي = الإنتاج · backend <code>74a89f96</code> · web <code>19c40ce2</code>)</td></tr>
+  <tr class="ok"><td>الحماية</td><td>✅ FIN-COR ثابت · nginx لم يُمَسّ (<code>938310a0</code>) · لا migration</td></tr>
+  <tr><td>ملفّات غُيِّرت</td><td>خلفيّة: <code>geo_router.py</code> · واجهة: <code>api/client.ts</code> · <code>PwaReloadPrompt.tsx</code></td></tr>
+</table>
+
+<div class="footer">
+  عطل تسجيل المزوّد/السائق كان حقيقيّاً (<code>/geo/reverse</code> 401 → توجيه للرئيسيّة)، لا كاشاً · أُصلِح بطبقتين (geo عامّ + حارس مُعترِض) + إصلاح الكاش (فحص فوريّ + 60 ثانية) · أُثبِت حيّاً بالصور للمزوّد والسائق على tawanow.com · FIN-COR + nginx لم تُمَسّ · byte-identical · 6/6 صحّيّة · 2026-06-23
+</div>
+
+</div>
+</body>
+</html>

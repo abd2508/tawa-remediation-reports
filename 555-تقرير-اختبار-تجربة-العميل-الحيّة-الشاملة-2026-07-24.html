@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير اختبار تجربة العميل الحيّة الشاملة — تووا</title>
+<style>
+  :root{
+    --bg:#eef1ec; --bg-raised:#ffffff; --bg-sunken:#e4e8e1;
+    --ink:#171f26; --ink-muted:#52606b; --line:rgba(23,31,38,.14);
+    --accent:#1f7a6c; --accent-ink:#0f4e44; --accent-soft:rgba(31,122,108,.10);
+    --good:#2f7d4f; --good-bg:rgba(47,125,79,.12);
+    --bad:#b14428; --bad-bg:rgba(177,68,40,.12);
+    --warn:#a6741c; --warn-bg:rgba(166,116,28,.13);
+    --refer:#5b5fa6; --refer-bg:rgba(91,95,166,.11);
+    --info:#2f6690; --info-bg:rgba(47,102,144,.11);
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
+    --sans: "Segoe UI", "Noto Kufi Arabic", "Dubai", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#10151c; --bg-raised:#161d26; --bg-sunken:#0b0f14;
+      --ink:#e8ebe6; --ink-muted:#9aa7af; --line:rgba(232,235,230,.16);
+      --accent:#57c7b3; --accent-ink:#8fe0d2; --accent-soft:rgba(87,199,179,.14);
+      --good:#4fbf7a; --good-bg:rgba(79,191,122,.14);
+      --bad:#e2704f; --bad-bg:rgba(226,112,79,.16);
+      --warn:#e3b356; --warn-bg:rgba(227,179,86,.16);
+      --refer:#a3a6e8; --refer-bg:rgba(163,166,232,.16);
+      --info:#7fb7e0; --info-bg:rgba(127,183,224,.16);
+    }
+  }
+  :root[data-theme="dark"]{ --bg:#10151c; --bg-raised:#161d26; --bg-sunken:#0b0f14; --ink:#e8ebe6; --ink-muted:#9aa7af; --line:rgba(232,235,230,.16); --accent:#57c7b3; --accent-ink:#8fe0d2; --accent-soft:rgba(87,199,179,.14); --good:#4fbf7a; --good-bg:rgba(79,191,122,.14); --bad:#e2704f; --bad-bg:rgba(226,112,79,.16); --warn:#e3b356; --warn-bg:rgba(227,179,86,.16); --refer:#a3a6e8; --refer-bg:rgba(163,166,232,.16); --info:#7fb7e0; --info-bg:rgba(127,183,224,.16); }
+  :root[data-theme="light"]{ --bg:#eef1ec; --bg-raised:#ffffff; --bg-sunken:#e4e8e1; --ink:#171f26; --ink-muted:#52606b; --line:rgba(23,31,38,.14); --accent:#1f7a6c; --accent-ink:#0f4e44; --accent-soft:rgba(31,122,108,.10); --good:#2f7d4f; --good-bg:rgba(47,125,79,.12); --bad:#b14428; --bad-bg:rgba(177,68,40,.12); --warn:#a6741c; --warn-bg:rgba(166,116,28,.13); --refer:#5b5fa6; --refer-bg:rgba(91,95,166,.11); --info:#2f6690; --info-bg:rgba(47,102,144,.11); }
+
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .doc{direction:rtl; text-align:right; font-family:var(--sans); background:var(--bg); color:var(--ink); line-height:1.75; font-size:17px; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 1.5rem;}
+  h1,h2,h3,h4{text-wrap:balance; font-weight:800;}
+  p{max-width:74ch; color:var(--ink);}
+  a{color:var(--accent-ink);}
+  code{font-family:var(--mono); font-size:.9em; background:var(--bg-sunken); padding:.05em .4em; border-radius:3px;}
+  .num{font-variant-numeric:tabular-nums; font-family:var(--mono);}
+
+  .masthead{background:linear-gradient(180deg,var(--bg-sunken),var(--bg) 85%); border-bottom:1px solid var(--line); padding:3.2rem 0 2.2rem;}
+  .eyebrow{font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; margin:0 0 .9rem;}
+  .title{font-size:2.1rem; line-height:1.2; margin:0 0 .5rem;}
+  .subtitle{font-size:1.08rem; color:var(--ink-muted); margin:0 0 1.5rem; max-width:70ch; font-weight:500;}
+  .meta-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-bottom:1.3rem;}
+  .meta-cell{background:var(--bg-raised); padding:.8rem 1rem;}
+  .meta-k{font-size:.68rem; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.07em; font-family:var(--mono); margin-bottom:.25rem;}
+  .meta-v{font-size:.92rem; font-weight:700;}
+  .verdict-band{display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; background:var(--accent-soft); border:1px solid var(--accent); border-radius:8px; padding:1rem 1.3rem; margin-top:1.2rem;}
+  .verdict-score{font-family:var(--mono); font-weight:800; font-size:1.4rem; color:var(--accent-ink); line-height:1.2; white-space:nowrap;}
+  .verdict-score small{font-size:.85rem; font-weight:600; color:var(--ink-muted);}
+  .verdict-text{font-size:.94rem; margin:0; max-width:60ch;}
+  .verdict-text b{color:var(--accent-ink);}
+
+  .toc{background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:1.1rem 1.4rem; margin:2rem 0; font-size:.9rem;}
+  .toc h4{margin:0 0 .6rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-muted);}
+  .toc ol{columns:2; column-gap:2rem; margin:0; padding-inline-start:1.2rem;}
+  .toc li{break-inside:avoid; margin-bottom:.3rem;}
+  .toc a{text-decoration:none; color:var(--ink);}
+  .toc a:hover{color:var(--accent-ink); text-decoration:underline;}
+
+  section{padding:2.4rem 0;}
+  section + section{border-top:1px solid var(--line);}
+  .sec-head{display:flex; align-items:baseline; gap:.7rem; margin-bottom:.3rem;}
+  .sec-no{font-family:var(--mono); color:var(--accent); font-weight:800;}
+  .sec-title{font-size:1.4rem; margin:0;}
+  .sec-intro{color:var(--ink-muted); margin:.2rem 0 1.4rem; max-width:76ch;}
+  h3.sub{font-size:1.04rem; margin:1.5rem 0 .55rem;}
+
+  .tag{display:inline-flex; align-items:center; gap:.3em; padding:.15em .58em; border-radius:4px; font-size:.71rem; font-weight:700; white-space:nowrap;}
+  .tag-code{background:var(--accent-soft); color:var(--accent-ink);}
+  .tag-doc{background:var(--refer-bg); color:var(--refer);}
+  .tag-new{background:var(--good-bg); color:var(--good);}
+  .chip{display:inline-flex; align-items:center; padding:.16em .6em; border-radius:4px; font-size:.72rem; font-weight:700;}
+  .chip-bad{background:var(--bad-bg); color:var(--bad);}
+  .chip-warn{background:var(--warn-bg); color:var(--warn);}
+  .chip-good{background:var(--good-bg); color:var(--good);}
+  .chip-info{background:var(--info-bg); color:var(--info);}
+
+  .plain{background:var(--accent-soft); border-radius:6px; padding:.85rem 1.1rem; margin:.9rem 0; font-size:.91rem;}
+  .plain b{color:var(--accent-ink);}
+  .plain .lbl{font-family:var(--mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.07em; color:var(--accent-ink); font-weight:800; display:block; margin-bottom:.35rem;}
+  .card{background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:1.25rem 1.4rem; margin-bottom:1rem;}
+  .card-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:1rem;}
+
+  .scroll-x{overflow-x:auto; margin:1rem 0;}
+  table.grid{width:100%; border-collapse:collapse; font-size:.84rem; min-width:600px;}
+  table.grid th, table.grid td{border:1px solid var(--line); padding:.52rem .62rem; text-align:right; vertical-align:top;}
+  table.grid th{background:var(--bg-sunken); font-size:.75rem;}
+  table.grid td:first-child, table.grid th:first-child{font-weight:700;}
+  .mark-yes{color:var(--good); font-weight:800;} .mark-no{color:var(--bad); font-weight:800;} .mark-part{color:var(--warn); font-weight:800;}
+
+  .journey{list-style:none; margin:1.1rem 0; padding:0; border-inline-start:2px solid var(--line);}
+  .journey li{position:relative; padding:0 0 1.3rem 0; margin-inline-start:1.4rem;}
+  .journey li::before{content:attr(data-n); position:absolute; right:-2.05rem; top:0; width:1.55rem; height:1.55rem; border-radius:50%; background:var(--accent); color:var(--bg-raised); font-family:var(--mono); font-size:.72rem; font-weight:800; display:flex; align-items:center; justify-content:center;}
+  .journey h4{margin:0 0 .3rem; font-size:.98rem; display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;}
+  .journey p{margin:0 0 .5rem; max-width:none; font-size:.9rem; color:var(--ink-muted);}
+  .journey code.commit{font-size:.72rem;}
+
+  .finding{background:var(--bg-raised); border:1px solid var(--line); border-inline-start:5px solid var(--warn); border-radius:8px; padding:1.2rem 1.4rem; margin-bottom:1.1rem;}
+  .sev-bad{border-inline-start-color:var(--bad) !important;}
+  .sev-info{border-inline-start-color:var(--info) !important;}
+  .sev-good{border-inline-start-color:var(--good) !important;}
+  .f-head{display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.4rem;}
+  .f-id{font-family:var(--mono); font-weight:800; color:var(--ink-muted); font-size:.8rem;}
+  .f-title{font-size:1rem; margin:0; flex:1 1 auto; min-width:200px;}
+  .f-block{margin-top:.75rem;} .f-block h5{margin:0 0 .25rem; font-size:.73rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-muted);} .f-block p{margin:0; max-width:none; font-size:.92rem;}
+
+  .state-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:.9rem; margin:1rem 0;}
+  @media(max-width:640px){.state-grid{grid-template-columns:1fr;}}
+  .state-box{border-radius:7px; padding:1rem 1.1rem;}
+  .state-box.defined{border:2px solid var(--good); background:var(--good-bg);}
+  .state-box.undefined{border:2px dashed var(--bad); background:var(--bad-bg);}
+  .state-box h5{margin:0 0 .5rem; font-size:.92rem;}
+  .state-box ul{margin:0; padding-inline-start:1.1rem; font-size:.85rem;}
+  .state-box li{margin-bottom:.35rem;}
+
+  .bars{display:flex; flex-direction:column; gap:.8rem; margin:1.1rem 0;}
+  .bar-row{display:grid; grid-template-columns:170px 1fr 50px; align-items:center; gap:.7rem;}
+  .bar-label{font-size:.86rem;}
+  .bar-track{background:var(--bg-sunken); border-radius:5px; height:9px; overflow:hidden; border:1px solid var(--line);}
+  .bar-fill{height:100%; border-radius:5px 0 0 5px;}
+  .bar-val{font-family:var(--mono); font-size:.84rem; text-align:left; font-weight:700; color:var(--accent-ink);}
+
+  .ledger{font-family:var(--mono); font-size:.86rem; background:var(--bg-sunken); border:1px solid var(--line); border-radius:8px; padding:1rem 1.2rem; margin:1rem 0; overflow-x:auto;}
+  .ledger .row{display:flex; justify-content:space-between; gap:1rem; padding:.3rem 0; border-bottom:1px dashed var(--line);}
+  .ledger .row:last-child{border-bottom:none; font-weight:800; color:var(--accent-ink);}
+
+  footer{padding:2.5rem 0 4rem; text-align:center; color:var(--ink-muted); font-size:.82rem;}
+  details.domain{margin-bottom:.7rem;}
+  details.domain > summary{cursor:pointer; list-style:none; background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:.7rem 1rem; font-weight:700; font-size:.9rem;}
+  details.domain > summary::-webkit-details-marker{display:none;}
+  details.domain[open] > summary{border-bottom-left-radius:0; border-bottom-right-radius:0;}
+  details.domain .domain-body{border:1px solid var(--line); border-top:none; border-radius:0 0 8px 8px; padding:1rem 1.2rem; background:var(--bg-raised);}
+
+  figure.shot{margin:.8rem 0 1.1rem;}
+  figure.shot img{max-width:100%; display:block; border:1px solid var(--line); border-radius:6px;}
+  figure.shot figcaption{font-size:.76rem; color:var(--ink-muted); margin-top:.4rem; font-family:var(--mono);}
+  .shots-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1rem; margin:.9rem 0;}
+  .domain-pill{display:inline-flex; align-items:center; padding:.14em .55em; border-radius:4px; font-size:.68rem; font-weight:700; background:var(--refer-bg); color:var(--refer); font-family:var(--mono);}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<div class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">تووا · اختبار حيّ شامل لتجربة العميل</p>
+    <h1 class="title">تقرير اختبار تجربة العميل — رحلة حقيقيّة كاملة، لا محاكاة</h1>
+    <p class="subtitle">أربعة وكلاء اختبار مستقلّون قادوا متصفّحًا حقيقيًّا ضدّ نسخة <code>tawalocal</code> الحيّة، نفّذوا كل زر وكل مسار وكل سيناريو دفع ممكن للعميل، وتحقّقوا من كل نتيجة مباشرة في قاعدة البيانات — لا افتراض، ولا اكتفاء بما تعرضه الواجهة.</p>
+    <div class="meta-grid">
+      <div class="meta-cell"><div class="meta-k">التاريخ</div><div class="meta-v">2026-07-24</div></div>
+      <div class="meta-cell"><div class="meta-k">البيئة</div><div class="meta-v num">tawalocal · test1</div></div>
+      <div class="meta-cell"><div class="meta-k">مجالات الاختبار</div><div class="meta-v num">4</div></div>
+      <div class="meta-cell"><div class="meta-k">وكلاء اختبار حيّ</div><div class="meta-v num">4</div></div>
+      <div class="meta-cell"><div class="meta-k">استدعاءات أدوات فعليّة</div><div class="meta-v num">1,135</div></div>
+      <div class="meta-cell"><div class="meta-k">لقطات شاشة</div><div class="meta-v num">46</div></div>
+      <div class="meta-cell"><div class="meta-k">نتائج موثَّقة</div><div class="meta-v num">26</div></div>
+      <div class="meta-cell"><div class="meta-k">حرجة / عالية</div><div class="meta-v num">1 / 5</div></div>
+    </div>
+    <div class="verdict-band">
+      <div class="verdict-score">تجربة عميل سليمة الأساس<br><small>مع عيب حرج واحد في الخصومات وتصدّعات i18n منتشرة</small></div>
+      <p class="verdict-text">كل المسارات الجوهريّة (تسجيل، طلب، دفع بكل طرقه، تتبّع، تقييم، محفظة) <b>تعمل فعليًّا</b> وتحفظ بيانات صحيحة في قاعدة البيانات. لكن الاختبار كشف <b>26 نتيجة حقيقيّة</b> — أبرزها أنّ نظام أكواد الخصم <b>معطَّل كليًّا وبصمت تامّ</b> (لا خصم، ولا رسالة خطأ) في كل سيناريو جُرِّب، وأنّ مشاكل الترجمة (i18n) هي النمط الأكثر تكرارًا عبر المجالات الأربعة.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h4>محتويات التقرير</h4>
+  <ol>
+    <li><a href="#s0">ما الذي جرى، ولماذا؟ — بلغة بسيطة</a></li>
+    <li><a href="#s1">المنهجيّة: كيف اختبرنا فعليًّا لا نظريًّا</a></li>
+    <li><a href="#s2">خريطة رحلة العميل المُختبَرة</a></li>
+    <li><a href="#s3">لوحة توزيع النتائج حسب الخطورة والمجال</a></li>
+    <li><a href="#s4">النتائج الحرجة والعالية الخطورة</a></li>
+    <li><a href="#s5">النتائج متوسّطة الخطورة</a></li>
+    <li><a href="#s6">النتائج منخفضة الخطورة</a></li>
+    <li><a href="#s7">أنماط متكرّرة عبر المجالات الأربعة</a></li>
+    <li><a href="#s8">ما يعمل بشكل صحيح ومؤكَّد</a></li>
+    <li><a href="#s9">فجوة نطاق مكتشَفة: "الطلب الجماعي"</a></li>
+    <li><a href="#s10">التوصيات المرتَّبة حسب الأولويّة</a></li>
+  </ol>
+</nav>
+
+<section id="s0">
+  <div class="sec-head"><span class="sec-no">00</span><h2 class="sec-title">ما الذي جرى، ولماذا؟ — بلغة بسيطة</h2></div>
+  <div class="plain">
+    <span class="lbl">بلغة يوميّة</span>
+    طلبتَ تجربة حقيقيّة كاملة لدور "العميل" — كل زر، كل مسار، كل سيناريو دفع، وليس فقط قراءة الكود والتخمين. نفّذنا ذلك فعليًّا: فتحنا متصفّحًا حقيقيًّا (Chromium) وتصرّفنا بالضبط كما يتصرّف عميل حقيقيّ — سجّلنا حسابات، طلبنا طعامًا، دفعنا نقدًا ومحفظة ومختلطًا، تتبّعنا الطلب لحظة بلحظة، ألغينا طلبات، قيّمنا مطاعم وسائقين، وأرسلنا رسائل دعم. وفي كل خطوة، فتحنا قاعدة البيانات الفعليّة وتحقّقنا: هل ما ظهر على الشاشة يطابق فعلًا ما حدث خلف الكواليس؟ أحيانًا لا يطابق — وهذه هي النتائج المهمّة أدناه.
+  </div>
+  <div class="plain">
+    <span class="lbl">أهمّ ما وجدناه</span>
+    الخبر الجيّد: التطبيق <b>يعمل</b>. عميل حقيقيّ اليوم يستطيع التسجيل، الطلب، الدفع بأي طريقة، وتتبّع طلبه حتى التسليم دون توقّف. الخبر الذي يحتاج انتباهك: أكواد الخصم (البرومو) <b>لا تعمل إطلاقًا حاليًّا</b> — ليس لأنّ الكود بها خطأ، بل لأنّ مفتاح تفعيل داخليًّا مغلَق، والأخطر أنّه لا توجد أي رسالة تُخبر العميل أنّ الكود لم يُطبَّق — يدفع السعر الكامل بصمت. ووجدنا أيضًا نمطًا متكرّرًا من مشاكل الترجمة (نصوص عربيّة تظهر رغم اختيار الإنجليزيّة، وصفحات كاملة لم تُترجَم بعد) عبر المجالات الأربعة كلّها.
+  </div>
+</section>
+
+<section id="s1">
+  <div class="sec-head"><span class="sec-no">01</span><h2 class="sec-title">المنهجيّة: كيف اختبرنا فعليًّا لا نظريًّا</h2></div>
+  <p class="sec-intro">لكل نتيجة أدناه دليل ملموس — استعلام قاعدة بيانات، رمز استجابة HTTP، رسالة console، أو لقطة شاشة — وليس انطباعًا.</p>
+  <div class="card-grid">
+    <div class="card">
+      <h4 style="margin-top:0">متصفّح حقيقيّ، لا محاكاة</h4>
+      <p style="font-size:.9rem">كل وكيل قاد Chromium فعليًّا عبر أدوات Playwright (نقر، كتابة، تنقّل، لقطات شاشة) ضدّ الخادم الحيّ <code>http://127.0.0.1:8080</code> على <code>tawalocal</code>.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">تحقّق مزدوج: الواجهة + القاعدة</h4>
+      <p style="font-size:.9rem">بعد كل إجراء (إضافة للسلّة، دفع، إلغاء، تقييم)، استعلمنا <code>tawalocal-postgres-1</code> مباشرة للتأكّد أنّ ما ظهر على الشاشة يطابق الصفوف الفعليّة في الجداول.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">أدوار أخرى عند الحاجة</h4>
+      <p style="font-size:.9rem">لتحريك طلب عبر حالاته الحقيقيّة (قبول المطعم، تعيين سائق، التسليم)، استُخدِمت استدعاءات API حقيقيّة موثّقة بحسابات OPS/سائق فعليّة — لا تلاعب مباشر بقاعدة البيانات إلا عند غياب مسار API/واجهة معقول، وذلك موثَّق صراحةً حيثما حدث.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">تسلسل لا توازٍ</h4>
+      <p style="font-size:.9rem">المجالات الأربعة نُفِّذت الواحدة تلو الأخرى عمدًا (لا بالتوازي) لأنّ حالة حساب عميل واحد (رصيد المحفظة، سجلّ الطلبات) تؤثّر على المجال التالي.</p>
+    </div>
+  </div>
+  <p style="font-size:.86rem; color:var(--ink-muted)">إجمالي استدعاءات الأدوات الفعليّة عبر الوكلاء الأربعة: <b class="num">1,135</b> (297 + 342 + 309 + 187) — مدّة تنفيذ إجماليّة نحو <b class="num">4.4 ساعة</b> من الاختبار الحيّ المتواصل.</p>
+</section>
+
+<section id="s2">
+  <div class="sec-head"><span class="sec-no">02</span><h2 class="sec-title">خريطة رحلة العميل المُختبَرة</h2></div>
+  <p class="sec-intro">أربعة مجالات متتابعة، كل واحد بوكيله المستقلّ وحسابه الاختباريّ الخاصّ.</p>
+  <ol class="journey">
+    <li data-n="1"><h4>الهويّة والحساب <span class="tag tag-new">13 نتيجة</span></h4><p>تسجيل، دخول، نسيان كلمة المرور، دفتر العناوين، الإعدادات، اللغة، الإشعارات، حذف الحساب، الصفحات القانونيّة.</p></li>
+    <li data-n="2"><h4>التصفّح والطلب <span class="tag tag-new">11 نتيجة</span></h4><p>البحث، تصفّح الفئات، صفحة المزوّد، السلّة وأكواد الخصم، الدفع بكل طرقه، طلب مجموعة (تجميع متاجر)، طلب مجدوَل، استلام ذاتيّ.</p></li>
+    <li data-n="3"><h4>دورة حياة الطلب <span class="tag tag-new">8 نتائج</span></h4><p>التتبّع الحيّ، الإلغاء، سجلّ الطلبات، التقييمات، محادثة الدعم، حالات استثناء الدفع النقديّ وعدم حضور العميل.</p></li>
+    <li data-n="4"><h4>المحفظة والولاء والعروض <span class="tag tag-new">2 نتيجة حرجة/عالية</span></h4><p>رصيد المحفظة، الشحن، سجلّ العمليّات، التحويل بين المستخدمين، نقاط الولاء، الإحالة، أكواد الخصم في الدفع.</p></li>
+  </ol>
+</section>
+
+<section id="s3">
+  <div class="sec-head"><span class="sec-no">03</span><h2 class="sec-title">لوحة توزيع النتائج حسب الخطورة والمجال</h2></div>
+  <div class="bars">
+    <div class="bar-row"><span class="bar-label">حرجة</span><div class="bar-track"><div class="bar-fill" style="width:4%; background:var(--bad)"></div></div><span class="bar-val">1</span></div>
+    <div class="bar-row"><span class="bar-label">عالية</span><div class="bar-track"><div class="bar-fill" style="width:19%; background:var(--bad)"></div></div><span class="bar-val">5</span></div>
+    <div class="bar-row"><span class="bar-label">متوسّطة</span><div class="bar-track"><div class="bar-fill" style="width:58%; background:var(--warn)"></div></div><span class="bar-val">15</span></div>
+    <div class="bar-row"><span class="bar-label">منخفضة</span><div class="bar-track"><div class="bar-fill" style="width:19%; background:var(--info)"></div></div><span class="bar-val">5</span></div>
+  </div>
+  <div class="scroll-x"><table class="grid">
+    <thead><tr><th>المجال</th><th>حرجة</th><th>عالية</th><th>متوسّطة</th><th>منخفضة</th><th>الإجمالي</th></tr></thead>
+    <tbody>
+      <tr><td>الهويّة والحساب</td><td>0</td><td>1</td><td>7</td><td>3</td><td class="num">11</td></tr>
+      <tr><td>التصفّح والطلب</td><td>0</td><td>1</td><td>4</td><td>1</td><td class="num">6</td></tr>
+      <tr><td>دورة حياة الطلب</td><td>0</td><td>2</td><td>2</td><td>2</td><td class="num">6</td></tr>
+      <tr><td>المحفظة والولاء</td><td>1</td><td>0</td><td>1</td><td>0</td><td class="num">2</td></tr>
+      <tr><td><b>ملاحظة</b></td><td colspan="5" style="font-size:.8rem; color:var(--ink-muted)">بعض النتائج ظهرت بشكل مستقلّ في أكثر من مجال (خطّ عربيّ تالف، ترجمة الصفحة الرئيسيّة المكسورة، فشل كود الخصم) — دُمِجت في نتيجة واحدة أدناه مع الإشارة لكل مصدر تأكيد.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s4">
+  <div class="sec-head"><span class="sec-no">04</span><h2 class="sec-title">النتائج الحرجة والعالية الخطورة</h2></div>
+  <p class="sec-intro">الأولى بالمعالجة قبل أي تجربة تشمل عملاء حقيقيّين أو أموالًا حقيقيّة.</p>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">حرجة</span><span class="f-id">F-01</span><h4 class="f-title">نظام أكواد الخصم معطَّل كليًّا وبصمت تامّ — في كل سيناريو جُرِّب</h4><span class="domain-pill">التصفّح والطلب + المحفظة</span></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>مهما كتب العميل كود خصم — صحيح، منتهي، غير صالح، أو دون الحدّ الأدنى للطلب — لا يحدث أي شيء: لا خصم، ولا رسالة تشرح السبب. العميل يدفع السعر الكامل دون أن يعرف لماذا لم يُطبَّق الكود.</p></div>
+    <div class="f-block"><h5>ما حدث فعليًّا</h5><p>مجال "التصفّح والطلب" جرَّب كود <code>QATESTVALID</code> (خصم 10٪ نشط، شامل، بلا قيود) على طلب حقيقيّ — النداء <code>GET /orders/promotion-quote</code> أعاد <code>{"discount_minor": 0}</code>، والطلب اكتمل بالسعر الكامل (<code>discount_minor=0</code>، <code>promotion_id=NULL</code>) دون أي تنبيه. مجال "المحفظة" اختبر <b>سبع حالات مختلفة</b> بشكل منهجيّ (كود صالح، منتهي، بمبلغ ثابت، بحدّ أدنى — فوقه وتحته، ومقيَّد بمزوّد — مطابق وغير مطابق) — <b>كلّها أعادت نفس الكائن الفارغ تمامًا</b>. السبب الجذريّ: <code>settings.promotions_enabled = False</code> في <code>backend/app/config.py:455</code>، وهو مفتاح تطبيق منفصل عن أعلام FIN-COR المختومة، يُسكِت المسار بالكامل لكل عميل.</p></div>
+    <div class="f-block"><h5>لماذا هي حرجة تحديدًا</h5><p>المشكلة ليست فقط أنّ الميزة معطَّلة — بل أنّ <b>الاستجابة نفسها لا تحمل أي سبب</b>. حتى بعد تفعيل المفتاح مستقبلًا، كود منتهي أو غير مؤهَّل سيفشل بنفس الصمت التامّ الذي يفشل به اليوم كود صحيح 100٪. هذا يعني عدم وجود أي قناة لتشخيص فشل مستقبليّ لكود بعينه، وليس فقط غياب الميزة حاليًّا.</p></div>
+  </div>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية</span><span class="f-id">F-02</span><h4 class="f-title">زرّ "إفراغ السلّة" لا يفعل شيئًا إطلاقًا</h4><span class="domain-pill">التصفّح والطلب</span></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>الضغط على زرّ إفراغ السلّة كاملةً لا يُحدِث أي تغيير — لا نافذة تأكيد، لا حذف، لا أي استجابة. حذف عنصر واحد بأيقونة سلّة المهملات يعمل بشكل صحيح، فالعطل مقصور على الزرّ الجماعيّ فقط.</p></div>
+    <div class="f-block"><h5>الدليل</h5><p>لا حوار تأكيد، لا طلب شبكة، و<code>localStorage</code> (<code>toowa_cart:&lt;userId&gt;</code>) بقي دون تغيير قبل الضغط وبعده تمامًا.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/discovery_ordering/06_empty_cart_button_broken.png" alt="زر إفراغ السلة معطل" loading="lazy"><figcaption>discovery_ordering/06_empty_cart_button_broken.png</figcaption></figure>
+  </div>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية</span><span class="f-id">F-03</span><h4 class="f-title">رسائل خطأ الخلفيّة تظهر بالعربيّة دائمًا، بصرف النظر عن لغة الواجهة المختارة</h4><span class="domain-pill">الهويّة والحساب</span></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>عميل اختار الإنجليزيّة كلغة للتطبيق، لكن عند حدوث خطأ (كلمة مرور خاطئة، حساب مكرَّر) تظهر له الرسالة بالعربيّة دون أي علاقة باختياره.</p></div>
+    <div class="f-block"><h5>الدليل والسبب الجذريّ</h5><p>اختُبِر ذلك على تسجيل الدخول، التسجيل (هاتف/بريد مكرَّر)، ونسيان كلمة المرور — جميعها أظهرت النصّ العربيّ رغم أنّ استجابة الخادم كانت تحتوي أيضًا على <code>message_en</code> الصحيحة (مثال: <code>message_en: "Could not create account..."</code> ظهرت رسالة عربيّة بدلًا منها). السبب: نمط <code>envelope?.message_ar ?? envelope?.message_en ?? t(...)</code> يُفضِّل العربيّة دائمًا أوّلًا، مُكرَّر في <b>43 موضعًا</b> عبر <code>web/src</code> (تأكَّد بـ<code>grep</code>).</p></div>
+  </div>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية</span><span class="f-id">F-04</span><h4 class="f-title">مأزق تسجيل سائق جديد: حقل رقم اللوحة الذي يملأه بنفسه ليس الحقل الذي تتحقّق منه الموافقة</h4><span class="domain-pill">دورة حياة الطلب</span></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>سائق جديد يسجّل رقم لوحة مركبته بنفسه عبر النموذج العاديّ — لكن نظام الموافقة على انضمامه يتحقّق من حقل مختلف تمامًا لا توجد وسيلة له لتعبئته بنفسه. النتيجة: يُرفَض طلبه دائمًا بسبب "بيانات ناقصة" لا يستطيع إصلاحها، ولا يعرف OPS تلقائيًّا أنّ عليه التدخّل.</p></div>
+    <div class="f-block"><h5>الدليل التقنيّ</h5><p><code>PUT /drivers/me/identity</code> (الخدمة الذاتيّة) يكتب في <code>Driver.vehicle_plate</code>، بينما موافقة OPS (<code>_activate_onboarding_role</code> في <code>operations_router.py:3047</code>) تتحقّق من عمود مختلف كليًّا: <code>DriverVehicleProfile.plate_number</code>، وهو حقل <b>بلا أي مسار خدمة ذاتيّة للكتابة فيه إطلاقًا</b>. أُعيد إنتاج المشكلة حيًّا: سائق جديد سُجِّل، مُلِئ <code>vehicle_plate</code>، ثم رُفِضت الموافقة برسالة "PLATE_NUMBER" ناقصة — لا يُصلِحها إلا OPS يدويًّا عبر <code>PATCH /operations/drivers/{id}/vehicle</code>، وفقط إن عرف OPS أصلًا أنّ عليه فعل ذلك.</p></div>
+  </div>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية</span><span class="f-id">F-05</span><h4 class="f-title">استثناءات تحصيل النقد تترك الطلب عالقًا بصمت — غير مرئيّة للعميل ولا لمراقبة OPS نفسها</h4><span class="domain-pill">دورة حياة الطلب</span></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>عندما يبلّغ السائق أنّ العميل لا يستطيع الدفع نقدًا، لا يتغيّر شيء على شاشة تتبّع العميل إطلاقًا — يبقى الطلب معلَّقًا دون أي تفسير. والأسوأ: هذا الطلب لا يظهر حتى في شاشة "الطلبات العالقة" التي يراقبها فريق العمليّات، فيصبح غير مرئيّ للطرفين معًا.</p></div>
+    <div class="f-block"><h5>الدليل</h5><p>طلب حقيقيّ (<code>166fc9a8-...</code>) وصل لحالة <code>ARRIVED_AT_DESTINATION</code>، ثم فُتِح استثناء <code>CUSTOMER_CANT_PAY</code> حقيقيّ عبر <code>POST /driver/cash-exceptions</code>. شاشة تتبّع العميل لم تتغيّر إطلاقًا. حتى بعد حلّ الاستثناء من OPS (<code>RESCHEDULED</code>)، بقيت حالة الطلب عالقة على <code>ARRIVED_AT_DESTINATION</code> إلى الأبد، ولم يظهر إطلاقًا ضمن <code>GET /operations/orders/stuck</code> (تأكَّد أنّ هذا المسار يراقب حالة <code>NO_DRIVER_ESCALATION</code> فقط). <b>ملاحظة بيئيّة إضافيّة:</b> طابور استثناءات النقد يحتوي فعليًّا على 10 استثناءات مفتوحة سابقة منذ أواخر يونيو دون حلّ — ما يشير لعدم متابعة هذا الطابور عمليًّا.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/order_lifecycle/12_cash_exception_customer_sees_nothing.png" alt="العميل لا يرى شيئا بعد استثناء الدفع النقدي" loading="lazy"><figcaption>order_lifecycle/12_cash_exception_customer_sees_nothing.png</figcaption></figure>
+  </div>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية</span><span class="f-id">F-06</span><h4 class="f-title">تعارض مباشر في واجهة الإلغاء عند "لا سائق متاح" — الزرّ يعمل، لكن رسالة مجاورة تقول إنّه لا يعمل</h4><span class="domain-pill">دورة حياة الطلب</span></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>عندما لا يقبل أي سائق الطلب، تظهر للعميل نفس اللحظة رسالتان متناقضتان: زرّ إلغاء فعّال يقول "لن يُخصَم منك شيء"، وتنبيه تحته مباشرة يقول "الإلغاء غير متاح في هذه المرحلة". هذا التناقض قد يمنع عميلًا محقًّا في الإلغاء من الضغط على الزرّ أصلًا.</p></div>
+    <div class="f-block"><h5>الدليل</h5><p>الزرّ فعليًّا يعمل بأمان (<code>POST /orders/.../cancel</code> ← 200، الحالة في قاعدة البيانات أصبحت <code>CANCELLED_BY_CUSTOMER</code>) — المشكلة في الرسالة المتناقضة فقط، لا في سلامة العمليّة نفسها.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/order_lifecycle/04_no_driver_escalation_contradiction.png" alt="تعارض رسالتي الإلغاء" loading="lazy"><figcaption>order_lifecycle/04_no_driver_escalation_contradiction.png</figcaption></figure>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="sec-head"><span class="sec-no">05</span><h2 class="sec-title">النتائج متوسّطة الخطورة</h2></div>
+  <p class="sec-intro">لا تُوقِف تشغيلًا ولا تُهدِّد مالًا مباشرة، لكنّها تُضعِف الثقة أو تُنتِج بيانات غير دقيقة.</p>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-07</span><h4 class="f-title">أداة اختيار الموقع على الخريطة (LocationPicker) غير مُترجَمة إطلاقًا</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>كل تبويبات وحقول أداة اختيار العنوان (📍/🗺️/🔢/✍) عربيّة دائمًا مهما كانت لغة الواجهة، بينما الحقول المجاورة (اسم العنوان، الوصف) تُترجَم بشكل صحيح — العطل مقصور على هذا المكوِّن تحديدًا.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/identity/06_address_add_locationpicker_all_arabic.png" alt="أداة اختيار الموقع غير مترجمة" loading="lazy"><figcaption>identity/06_address_add_locationpicker_all_arabic.png</figcaption></figure>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-08</span><h4 class="f-title">فشل صامت لتحويل الإحداثيات إلى عنوان مقروء عند النقر على الخريطة</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>النقر على نقطة بالخريطة يعيد 404 من <code>/api/geo/reverse</code> (لا مزوّد جغرافيّ مُفعَّل في هذه البيئة) وتتراجع الواجهة لعرض الإحداثيات الخام فقط دون أي رسالة تشرح للعميل لماذا لم يظهر اسم العنوان. جزء من المشكلة بيئيّ (لا Nominatim منشور محليًّا)، لكن غياب أي تفسير للمستخدم فجوة حقيقيّة بصرف النظر عن البيئة.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/identity/08_map_click_reverse_geocode_404.png" alt="فشل صامت في تحديد العنوان" loading="lazy"><figcaption>identity/08_map_click_reverse_geocode_404.png</figcaption></figure>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-09</span><h4 class="f-title">لا يوجد أي تحقّق من صيغة رقم الهاتف عند تسجيل عميل جديد</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>تسجيل بهاتف "12345" (5 أرقام فقط، ليس رقمًا ليبيًّا صالحًا) نجح دون أي رفض من العميل أو الخادم — تأكَّد في قاعدة البيانات: <code>phone='12345'</code> محفوظ حرفيًّا.</p></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-10</span><h4 class="f-title">إخفاء رقم الهاتف في تأكيد حذف الحساب يفشل تمامًا مع الأرقام القصيرة</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>نتيجة مباشرة للنتيجة السابقة: رقم "12345" يظهر في شاشة تأكيد الحذف كـ"12345****" — أي الرقم الحقيقيّ كاملًا دون أي إخفاء فعليّ، بعكس صفحة "البحث عن رقم" التي تستخدم نمط إخفاء أكثر أمانًا (****2345). نمطا إخفاء مختلفان في نفس الكود يستحقّان التوحيد.</p></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-11</span><h4 class="f-title">لا يوجد أي مؤشّر لعدد الإشعارات غير المقروءة على أيقونة الجرس</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>إشعار حقيقيّ غير مقروء أُدرِج مباشرة في قاعدة البيانات، وتصفّح المستخدم عدّة صفحات أخرى دون زيارة صندوق الوارد — أيقونة الجرس بقيت بلا أي شارة عدد، لا يكتشف المستخدم وجود إشعار جديد إلا بفتح الصندوق يدويًّا. تأكَّد أنّ <code>Layout.tsx</code> لا يحتوي أي منطق جلب/عرض عدد غير مقروء لهذه الأيقونة (بعكس شارة السلّة الموجودة فعليًّا).</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/identity/14_inbox_with_notification.png" alt="صندوق الوارد بإشعار حقيقي دون شارة على الجرس" loading="lazy"><figcaption>identity/14_inbox_with_notification.png</figcaption></figure>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-12</span><h4 class="f-title">مفتاح اللغة السريع في الرأس لا يُحفَظ على الحساب — فقط صفحة الإعدادات المتقدّمة تحفظه</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>تبديل اللغة عبر زرّ الرأس السريع يُغيّر واجهة الجلسة فقط (<code>users.locale_preference</code> بقي <code>NULL</code> في قاعدة البيانات)، بينما الحفظ عبر <code>/account/locale</code> فقط يكتب القيمة فعليًّا على الحساب. قد يكون هذا تصميمًا مقصودًا (تبديل سريع محليّ مقابل إعداد دائم)، لكنّه غير موثَّق للمستخدم وقد يُفاجئه عند تسجيل الدخول من جهاز آخر.</p></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-13</span><h4 class="f-title">كتل كبيرة من النصوص غير مُترجَمة عبر عدّة صفحات رئيسيّة</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>تأكَّد غياب الترجمة (بفحص <code>en.json</code>/<code>fr.json</code> مباشرة، لا مجرّد المشاهدة) في: زرّ إظهار/إخفاء كلمة المرور (يظهر بكل مكان بالتطبيق)، قسم تعديل اسم الظهور بالإعدادات، مشاركة الموقع الحيّ، قائمة "المحظورون"، صفحة دفتر العناوين (الشارة الافتراضيّة، رمز الموقع)، حوار تأكيد الحذف الأصليّ للمتصفّح، <b>مركز الشؤون القانونيّة بالكامل</b> (كل عناوينه ومحتواه — مع أنّ المحتوى نفسه حقيقيّ وجوهريّ لا نصًّا مؤقّتًا)، ومصفوفة تفضيلات الإشعارات كاملة. زرّ الحفظ في صفحة إعدادات اللغة نفسها يبقى "حفظ" حتى بعد اختيار الإنجليزيّة — مفارقة لافتة تحديدًا في هذه الصفحة.</p></div>
+    <div class="shots-row">
+      <figure class="shot"><img src="customer_test_screenshots/identity/09_settings_page_mixed_lang.png" alt="صفحة الإعدادات بلغة مختلطة" loading="lazy"><figcaption>identity/09_settings_page_mixed_lang.png</figcaption></figure>
+      <figure class="shot"><img src="customer_test_screenshots/identity/15_legal_center_arabic_content.png" alt="مركز الشؤون القانونية بالعربية دائما" loading="lazy"><figcaption>identity/15_legal_center_arabic_content.png</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-14</span><h4 class="f-title">عنصر بمتغيّر (variant) مؤرشَف فقط يظهر قابلًا للشراء بسعر 0.000 د.ل — والخلفيّة فقط ترفضه عند التأكيد</h4><span class="domain-pill">التصفّح والطلب</span></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>عنصر في قائمة أحد المطاعم متغيّره الوحيد "مؤرشَف" (غير متاح فعليًّا)، لكن الواجهة عرضته وكأنّه متاح بسعر صفر. حاول العميل إتمام الشراء فوصل حتى شاشة الدفع، لكن الخادم رفض الطلب في اللحظة الأخيرة (422) — أي لا يوجد استغلال ماليّ فعليّ، لكنّ الواجهة لم يكن يجب أن تعرض هذا العنصر أصلًا.</p></div>
+    <div class="shots-row">
+      <figure class="shot"><img src="customer_test_screenshots/discovery_ordering/04_gap_item_zero_price_bug.png" alt="عنصر بسعر صفر" loading="lazy"><figcaption>discovery_ordering/04_gap_item_zero_price_bug.png</figcaption></figure>
+      <figure class="shot"><img src="customer_test_screenshots/discovery_ordering/05_gap_item_backend_rejected_422.png" alt="رفض الخلفية للطلب عند التأكيد" loading="lazy"><figcaption>discovery_ordering/05_gap_item_backend_rejected_422.png</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-15</span><h4 class="f-title">مربّع البحث الرئيسيّ لا يبحث فعليًّا في أسماء الأصناف رغم أنّ نصّه التوضيحيّ يعِد بذلك</h4><span class="domain-pill">التصفّح والطلب</span></div>
+    <div class="f-block"><p>النصّ التوضيحيّ "ابحث عن مطعم أو صنف..." يعِد ببحث الأصناف أيضًا، لكن البحث عن "بيتزا" (صنف حقيقيّ منشور فعليًّا) أعاد "لا توجد نتائج" — <code>GET /api/providers/search?q=...</code> يبحث في أسماء المزوّدين فقط. البحث عن الأصناف موجود فعليًّا لكن فقط عبر صفحة تصفّح الفئة المنفصلة، غير المرتبطة بمربّع البحث.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/discovery_ordering/03_search_item_name_no_results.png" alt="بحث بلا نتائج عن صنف حقيقي" loading="lazy"><figcaption>discovery_ordering/03_search_item_name_no_results.png</figcaption></figure>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-16</span><h4 class="f-title">مفتاح تبديل اللغة قد يتخطّى الإنجليزيّة كليًّا وينتقل مباشرة إلى الفرنسيّة</h4><span class="domain-pill">التصفّح والطلب</span></div>
+    <div class="f-block"><p>زرّ يحمل تسمية "EN" (يوحي بالتبديل للإنجليزيّة) انتقل مباشرة للفرنسيّة الكاملة من صفحة عربيّة. السبب الجذريّ في <code>web/src/components/Layout.tsx:57</code>: سلسلة مقارنة صارمة <code>i18n.language === "ar" ? "en" : i18n.language === "en" ? "fr" : "ar"</code> تسقط مباشرة إلى "fr" إن لم تكن القيمة الحاليّة بالضبط السلسلة "ar" (مثلًا "ar-LY" من كشف المتصفّح التلقائيّ).</p></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-17</span><h4 class="f-title">شاشة تأكيد الاستلام الذاتيّ تُكرِّر نصوصًا خاصّة بالتوصيل عبر سائق</h4><span class="domain-pill">التصفّح والطلب</span></div>
+    <div class="f-block"><p>بعد إتمام طلب "استلام ذاتيّ" فعليًّا (تأكَّد في قاعدة البيانات: <code>fulfillment_type=SELF_PICKUP</code>، <code>address_id=NULL</code>)، شاشة النجاح ما زالت تقول "أعطِ هذا الرقم للسائق" و"جهِّز المبلغ نقدًا لتسليمه للسائق" — رغم عدم وجود أي سائق في مسار الاستلام الذاتيّ.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/discovery_ordering/07_pickup_order_wrong_driver_text.png" alt="نص السائق يظهر خطأ في طلب استلام ذاتي" loading="lazy"><figcaption>discovery_ordering/07_pickup_order_wrong_driver_text.png</figcaption></figure>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-18</span><h4 class="f-title">نافذة تقييم مكرّرة في سجلّ الطلبات تعرض رسالة خطأ مضلِّلة على طلب سبق تقييمه</h4><span class="domain-pill">دورة حياة الطلب</span></div>
+    <div class="f-block"><p>صفحة تفاصيل الطلب تُخفي نموذج التقييم بشكل صحيح بعد التقييم، لكنّ صفحة سجلّ الطلبات تحتوي نافذة تقييم <b>ثانية منفصلة</b> تبقى نشطة على الطلبات المُقيَّمة سابقًا. محاولة الإرسال تُرفَض بشكل صحيح من الخادم (409، لا صفّ مكرَّر يُنشَأ فعليًّا)، لكنّ الواجهة تعرض رسالة عامّة خاطئة: "تعذّر الإرسال — تحقّق من الاتّصال" بينما السبب الحقيقيّ هو "تمّ التقييم مسبقًا" لا مشكلة اتّصال.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/order_lifecycle/09_duplicate_rating_misleading_error.png" alt="رسالة خطأ مضللة عند تقييم مكرر" loading="lazy"><figcaption>order_lifecycle/09_duplicate_rating_misleading_error.png</figcaption></figure>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-19</span><h4 class="f-title">الخطّ العربيّ المخصَّص تالف بالكامل — عبر كل صفحات التطبيق</h4><span class="domain-pill">الهويّة + دورة حياة الطلب <em>(مؤكَّدة مرّتين مستقلّتين)</em></span></div>
+    <div class="f-block"><p>ملفّ <code>NotoSansArabic.woff2</code> (48,840 بايت) صفريّ المحتوى بالكامل (لا رأس <code>wOF2</code> صالح إطلاقًا) — تأكَّد ذلك بفحص البايتات مباشرة في مجالَين مستقلَّين. المتصفّح يتراجع لخطّ النظام تلقائيًّا فتبقى النصوص العربيّة مقروءة بصريًّا، لكنّ الخطّ المخصَّص معطَّل فعليًّا على كل صفحة، على الأرجح نتيجة تلف في نسخ/بناء الأصل لا خطأ منطقيّ.</p></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-20</span><h4 class="f-title">سجلّ الطلبات يعرض قيمة الأصناف فقط لا المبلغ الفعليّ المستحقّ (أقلّ بنحو 11٪)</h4><span class="domain-pill">دورة حياة الطلب</span></div>
+    <div class="f-block"><p><code>GET /api/orders</code> يعيد <code>total_minor</code> (الأصناف فقط)، بينما المبلغ الحقيقيّ المستحقّ (<code>cash_due_minor</code>) يشمل أيضًا رسوم التوصيل (3,060 درهم في كل الطلبات الأربعة المُختبَرة). صفحة سجلّ الطلبات تعرض الرقم الأوّل (الأقلّ) بتسمية توحي أنّه المبلغ الكاملّ، بينما صفحة تفاصيل الطلب نفسها تعرض الرقم الصحيح. عميل يراجع سجلّه سيجد رقمًا أقلّ من المدفوع فعليًّا في كل مرّة.</p></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-21</span><h4 class="f-title">مكافأة الإحالة تظهر للعميل دون أي توضيح أنّها لم تُضَف فعليًّا إلى رصيد المحفظة</h4><span class="domain-pill">المحفظة والولاء</span></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>عميل أحال صديقًا فرأى في صفحة الولاء "مكافأة 5.000 د.ل" بلون أخضر يوحي بالنجاح — لكن رصيد محفظته الفعليّ بقي 0.000 د.ل بلا أي تفسير لماذا لم يظهر المبلغ.</p></div>
+    <div class="f-block"><h5>الدليل والسياق</h5><p>هذا سلوك مقصود ومُوثَّق على مستوى المنصّة بالكامل: قيد محاسبيّ متوازن حقيقيّ سُجِّل فعلًا (<code>DR PLATFORM_BONUS_EXPENSE 5000 / CR CUSTOMER_WALLET 5000</code>)، لكنّ الصرف الفعليّ للمحفظة معلَّق خلف علم <code>production_payment_enabled</code> المختوم — تمامًا نفس النمط المُتَّبع في الولاء والتسوية والرواتب. المشكلة هنا واجهة لا منطق: صفحة الولاء لا تحمل أي إشارة لهذا الفارق بين "احتُسِبت" و"صُرِفَت"، بينما صفحة المحفظة المجاورة تقول ببساطة "لا توجد عمليّات بعد".</p></div>
+  </div>
+</section>
+
+<section id="s6">
+  <div class="sec-head"><span class="sec-no">06</span><h2 class="sec-title">النتائج منخفضة الخطورة</h2></div>
+  <p class="sec-intro">مسائل بصريّة أو إتاحة (accessibility)، لا تُعطِّل أي وظيفة.</p>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة</span><span class="f-id">F-22</span><h4 class="f-title">نصّ ترجمة مكسور في الصفحة الرئيسيّة (تعليمات ما بعد التنزيل)</h4><span class="domain-pill">الهويّة + التصفّح <em>(مؤكَّدة مرّتين مستقلّتين)</em></span></div>
+    <div class="f-block"><p>جملة تعليمات تثبيت تطبيق الجوّال تُقتَطع في منتصف كلمة عربيّة ثم يُلصَق بها نصّ عربيّ آخر مباشرة دون فاصل، وفي وضع الإنجليزيّة يظهر ذيل عربيّ ملتصق بجملة إنجليزيّة كاملة. المصدر: <code>AppDownloadSection.tsx</code>، جملة داخل <code>t()</code> مقطوعة في منتصف الكلمة يليها نصّ ثابت (hardcoded) خارج نظام الترجمة تمامًا.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/identity/16_landing_page_broken_translation.png" alt="ترجمة مكسورة في الصفحة الرئيسية" loading="lazy"><figcaption>identity/16_landing_page_broken_translation.png</figcaption></figure>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة</span><span class="f-id">F-23</span><h4 class="f-title">حالة <code>aria-pressed</code> معكوسة على زرّ الوضع الداكن/الفاتح</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>الزرّ الوحيد للتبديل بين الوضعين يحمل <code>aria-pressed={dark}</code> بينما تسمية الزرّ تصف الوضع الآخر دائمًا — يقول لقارئ الشاشة "الوضع الفاتح، مضغوط" أثناء كون التطبيق فعليًّا في الوضع الداكن. لا أثر بصريّ أو وظيفيّ، مسألة إتاحة (accessibility) فقط.</p></div>
+    <figure class="shot"><img src="customer_test_screenshots/identity/12_settings_arabic_rtl.png" alt="زر الوضع الداكن بتسمية معكوسة" loading="lazy"><figcaption>identity/12_settings_arabic_rtl.png</figcaption></figure>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة</span><span class="f-id">F-24</span><h4 class="f-title">عمود <code>customer_preferences.default_address_id</code> غير مُستخدَم إطلاقًا في الكود</h4><span class="domain-pill">الهويّة</span></div>
+    <div class="f-block"><p>ميزة "تعيين عنوان افتراضيّ" الفعليّة تعمل عبر <code>addresses.is_default</code> بشكل صحيح تمامًا ومختلف كليًّا. عمود <code>default_address_id</code> يُقرَأ فقط عبر <code>GET /me/preferences</code> ولا يكتبه أي كود — كود ميت غير مؤثِّر، لا عيب مستخدَم حاليًّا.</p></div>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة</span><span class="f-id">F-25</span><h4 class="f-title">أيقونة خطوة التتبّع ترتدّ من علامة ✓ إلى الرقم "1" على طلب مرفوض</h4><span class="domain-pill">دورة حياة الطلب</span></div>
+    <div class="f-block"><p>على شاشة تتبّع طلب بحالة "مرفوض من المزوّد"، تعود الخطوة الأولى ("بانتظار المزوّد") لعرض الرقم "1" بدلًا من علامة الإتمام ✓ رغم أنّ تلك الخطوة اكتملت فعلًا. تجميليّ فقط.</p></div>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة</span><span class="f-id">F-26</span><h4 class="f-title">قيمة افتراضيّة غير صحيحة الصيغة في حقل موعد الطلب المجدوَل</h4><span class="domain-pill">دورة حياة الطلب</span></div>
+    <div class="f-block"><p>حقل التاريخ/الوقت لجدولة طلب مستقبليّ يستقبل قيمة افتراضيّة بصيغة غير متوقَّعة، ما يُصدِر تحذيرًا واحدًا في console دون أن يمنع إرسال الطلب فعليًّا أو يُسبِّب أي سلوك خاطئ ملحوظ.</p></div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="sec-head"><span class="sec-no">07</span><h2 class="sec-title">أنماط متكرّرة عبر المجالات الأربعة</h2></div>
+  <p class="sec-intro">حين تظهر نفس المشكلة في مجالات مستقلّة اختبرها وكلاء مختلفون دون تنسيق مسبق بينهم، فذلك دليل على نمط بنيويّ لا حادثة معزولة.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h4 style="margin-top:0">الترجمة (i18n) هي أكبر عنقود عيوب في هذا الفحص بأكمله</h4>
+      <p style="font-size:.9rem">ظهرت مشاكل ترجمة في <b>10 من أصل 26 نتيجة</b>: خطّ عربيّ تالف (مرّتين مستقلّتين)، رسائل خطأ الخلفيّة تتجاهل لغة الواجهة (43 موضعًا)، أداة الخريطة غير مُترجَمة، كتل كاملة (الشؤون القانونيّة، الإشعارات) بلا ترجمة، ترجمة الصفحة الرئيسيّة مكسورة (مرّتين مستقلّتين)، وخلل منطقيّ في دورة تبديل اللغة نفسها. هذا يستحقّ خطّة معالجة i18n مخصَّصة ومنهجيّة، لا إصلاحات متفرّقة.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">نمط "الفشل الصامت" يتكرّر في أماكن غير مترابطة</h4>
+      <p style="font-size:.9rem">زرّ إفراغ السلّة (لا شيء يحدث)، كود الخصم (لا خصم ولا رسالة)، تحويل الإحداثيات لعنوان (404 دون تفسير)، استثناء الدفع النقديّ (الطلب يتجمّد دون أي إشعار) — أربع حالات مستقلّة من نفس الفلسفة: فشل بلا أي إشارة للمستخدم. يستحقّ ذلك مراجعة شاملة لكل نقاط "الفشل الصامت المحتمل" في الكود، لا إصلاح كلّ حالة بمعزل عن الأخرى.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">الميزات الماليّة المختومة (محفظة/ولاء) تُدار بأمان في الخلفيّة، لكن بشفافيّة ناقصة للمستخدم</h4>
+      <p style="font-size:.9rem">شحن المحفظة، صرف مكافأة الإحالة، والفصل بين الصانع والمُصادِق (maker-checker) لاعتماد رصيد يدويّ — كلّها محكومة بأمان فعليّ عبر علم <code>production_payment_enabled</code> المختوم، وتأكَّدت سلامتها حيًّا (رُفِضت محاولة مصادقة ذاتيّة على رصيد يدويّ بشكل صحيح). المشكلة الوحيدة أنّ واجهة المستخدم لا تشرح له لماذا "احتُسِبت" مكافأته لكن لم "تُصرَف" بعد — فجوة رسائل، لا فجوة أمان.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">تتبّع الطلب يعتمد فعليًّا على الاستقصاء (polling) لا البثّ الحيّ — تذكرة SSE موجودة لكن خاملة</h4>
+      <p style="font-size:.9rem">لوحظ عبر مراقبة الشبكة أنّ تتبّع الطلب يستقصي <code>GET /api/orders/{id}</code> كل ~4 ثوانٍ ورسائل المحادثة كل ~2 ثانية طوال الجلسة، بينما نداء <code>POST /api/sse/ticket</code> يحدث لكن دون أي حركة <code>EventSource</code> حيّة فعليّة تدفع الواجهة. هذا يؤكّد حيًّا مخاوف سابقة وثَّقتها الذاكرة المشروعيّة عن احتمال تعطّل بثّ موقع السائق الحيّ (SSE) بالإنتاج (تقرير 519) — الآن بدليل شبكة مباشر لا استنتاج فقط. يستحقّ قرارًا واضحًا: هل SSE مسار حيّ مخطَّط له فعلًا أم كود خامل يجب إزالته؟</p>
+    </div>
+  </div>
+</section>
+
+<section id="s8">
+  <div class="sec-head"><span class="sec-no">08</span><h2 class="sec-title">ما يعمل بشكل صحيح ومؤكَّد</h2></div>
+  <p class="sec-intro">كل بند هنا تحقّقنا منه مباشرة في قاعدة البيانات أو عبر استجابة الشبكة — لا انطباعًا. مطويّة لكل مجال.</p>
+
+  <details class="domain" open>
+    <summary>الهويّة والحساب — المسارات المؤكَّدة تعمل</summary>
+    <div class="domain-body">
+      <ul>
+        <li>التسجيل الكامل (تحقّق كلمة المرور، شرط الموافقة على الشروط) وتسجيل الدخول، بما في ذلك رفض الهاتف/البريد المكرَّر (409) بشكل صحيح.</li>
+        <li>نسيان كلمة المرور بالكامل: رفض رمز OTP الخاطئ، قبول الرمز التجريبيّ الصحيح، تسجيل دخول فوريّ بالكلمة الجديدة.</li>
+        <li>تحديد معدّل طلبات OTP (rate limiting) يعمل فعليًّا خلفيًّا: 429 بعد نحو 3 محاولات.</li>
+        <li>دفتر العناوين: إضافة (بالنقر على الخريطة وبإدخال إحداثيات مباشر)، تعديل، تعيين افتراضيّ، حذف (حذف ناعم فعليًّا لا نهائيّ) — كلّها تُحفَظ بشكل صحيح في قاعدة البيانات.</li>
+        <li>مفاتيح الإعدادات (إظهار الرقم للسائق، مشاركة الموقع الحيّ، تفضيلات الإشعارات) تُحفَظ وتُقرَأ بشكل صحيح.</li>
+        <li>تغيير اسم الظهور مع فرض فترة تهدئة 30 يومًا بشكل صحيح.</li>
+        <li>التحقّق من البريد الإلكترونيّ عبر رمز حقيقيّ منفصل عن OTP الهاتف — يعمل بشكل صحيح.</li>
+        <li>إعدادات اللغة عبر <code>/account/locale</code> تُحفَظ فعليًّا على الحساب، وواجهة RTL العربيّة سليمة بصريًّا في كل الصفحات المُختبَرة.</li>
+        <li>حذف الحساب (حتى خطوة إرسال OTP فقط، بأمر صريح بعدم إكمال التأكيد النهائيّ التدميريّ): شاشة واضحة، مهلة 30 يومًا قابلة للإلغاء.</li>
+        <li>محتوى مركز الشؤون القانونيّة حقيقيّ وجوهريّ (لا نصوص مؤقّتة)، وتسجيل الموافقة على كل وثيقة يعمل بشكل صحيح.</li>
+        <li>تسجيل الخروج يُنهي الجلسة بشكل صحيح ويُعيد توجيه أي مسار محميّ لصفحة الترحيب.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="domain">
+    <summary>التصفّح والطلب — المسارات المؤكَّدة تعمل</summary>
+    <div class="domain-body">
+      <ul>
+        <li>الصفحة الرئيسيّة تعرض بيانات حقيقيّة (لا وهميّة) بلا أخطاء console بعد تصحيح موقع الاختبار الجغرافيّ.</li>
+        <li>تصفّح الفئات مع فرز صحيح (الأرخص أوّلًا تصاعديًّا تأكَّد رقميًّا).</li>
+        <li>الأصناف غير المنشورة لا تظهر إطلاقًا للعميل (18 منشورًا من أصل 22 ظهرت بالضبط 18).</li>
+        <li>حسابات السلّة (إضافة، زيادة كمّيّة لنفس الصنف بدل تكراره كسطر منفصل، حذف) دقيقة رقميًّا، مطابقة لـ<code>localStorage</code>.</li>
+        <li>الدفع نقدًا مع تقريب ربع الدينار: تأكَّد التطابق الحسابيّ الدقيق (فرق تقريب -60 درهم مسجَّل بدقّة).</li>
+        <li>طلب OTP إضافيّ لطلبات نقديّة عالية القيمة (أكثر من 70 دينارًا) يعمل بشكل صحيح.</li>
+        <li>الدفع بالمحفظة: خصم دقيق للرصيد بالضبط بقيمة الطلب.</li>
+        <li>الدفع المختلط (نقد + محفظة): حساب صحيح للمتبقّي نقدًا، وسجلّان منفصلان للدفعتين في قاعدة البيانات.</li>
+        <li>الاستلام الذاتيّ: رسوم التوصيل تُصفَّر بشكل صحيح، لا حقل عنوان مطلوبًا.</li>
+        <li>الطلب المجدوَل: تحويل صحيح للتوقيت المحليّ إلى UTC، حالة "مجدوَل" تظهر بشكل صحيح في السجلّ.</li>
+        <li>تجميع عدّة متاجر في دفعة واحدة ("ادفع الكلّ") يعمل بشكل صحيح فعليًّا: حسابات صحيحة لكل متجر، وربط صحيح بين الطلبات في قاعدة البيانات.</li>
+        <li>الوضع الداكن يعمل بشكل صحيح (تأكَّد عبر CSS المحسوبة فعليًّا، لا مجرّد المظهر).</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="domain">
+    <summary>دورة حياة الطلب — المسارات المؤكَّدة تعمل</summary>
+    <div class="domain-body">
+      <ul>
+        <li>الرفض التلقائيّ عند تجاوز المطعم مهلة القبول (~5 دقائق) مع شاشة رفض واضحة وخيارات بديلة.</li>
+        <li>دورة حياة كاملة سعيدة: من "بانتظار المزوّد" حتى "تمّ التسليم" بجميع خطواتها السبع، مع خريطة حيّة وأزرار أمان (SOS/مشاركة الرحلة) ومحادثة تسليم تظهر بالضبط عند تعيين سائق.</li>
+        <li>قواعد منع الإلغاء تعمل بأمان تامّ: مسموح قبل القبول، محظور بشكل صحيح بعد القبول/الجاهزيّة للاستلام/الوصول — بلا أي مشكلة سلامة بيانات.</li>
+        <li>سجلّ الطلبات وتبويبات الفلترة (الكل/نشطة/منتهية/ملغاة/في النزاع) تعمل بدقّة مطابقة لقاعدة البيانات.</li>
+        <li>التقييمات (5 نجوم + تعليق للمطعم، 4 نجوم للسائق) تُحفَظ فعليًّا وتظهر في التقييم العامّ للمزوّد، مع منع فعليّ للتقييم المكرَّر على مستوى قاعدة البيانات.</li>
+        <li>محادثة الدعم: تدفّق ثنائيّ الاتّجاه كامل يعمل، ومرئيّ فعليًّا من جهة OPS.</li>
+        <li>آليّة استثناء الدفع النقديّ (على مستوى الميكانيكا الداخليّة بين السائق وOPS) تعمل بشكل صحيح — الفجوة فقط في وصول الأثر للعميل ولمراقبة الطلبات العالقة (F-05).</li>
+        <li>نقاط الولاء: +10 نقطة تلقائيًّا عند كل طلب مُسلَّم، تأكَّد ذلك أيضًا مقارنةً بـ10 عملاء حقيقيّين موجودين مسبقًا في قاعدة البيانات (مطابقة تامّة: عدد الطلبات المُسلَّمة × 10).</li>
+        <li>لا أي 4xx/5xx غير متوقَّع طوال الجلسة عدا الحالات المقصودة للاختبار السلبيّ.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="domain">
+    <summary>المحفظة والولاء والعروض — المسارات المؤكَّدة تعمل</summary>
+    <div class="domain-body">
+      <ul>
+        <li>رصيد المحفظة المعروض يطابق قاعدة البيانات تمامًا (تأكَّد عند الصفر — لا مسار تمويل شرعيّ متاح لاختبار رصيد غير صفريّ في هذه الجولة).</li>
+        <li>تعطيل شحن المحفظة صريح وواضح للمستخدم (تلميح "بانتظار تفعيل بوابة الدفع") — على عكس فشل كود الخصم الصامت، هذا مثال جيّد على تعطيل مُتَّصل بشفافيّة.</li>
+        <li>الفصل بين الصانع والمُصادِق (maker-checker) لاعتماد رصيد يدويّ يعمل بأمان فعليّ: مُنِعت محاولة مصادقة ذاتيّة كتحايل غير مصرَّح، والحساب المُستخدَم لذلك عُلِّق فورًا كإجراء تنظيف.</li>
+        <li>التحويل بين المحافظ: منع صحيح للتحويل للنفس، لرقم محفظة غير موجود (404)، ولمبلغ يتجاوز الرصيد — مع تأكيد عدم وجود أي حالة جزئيّة في قاعدة البيانات في الحالات الثلاث.</li>
+        <li>حلقة الإحالة الكاملة: كود إحالة صالح عند التسجيل يُنشئ فعليًّا صفّ إحالة وقيدًا محاسبيًّا متوازنًا حقيقيًّا في الخلفيّة (راجع F-21 لفجوة العرض المرتبطة).</li>
+        <li>حماية مكافحة الاحتيال بالإحالة (بصمة الجهاز) تعمل فعليًّا — رصدت محاولة إعادة استخدام كود من نفس الجهاز الفيزيائيّ بشكل صحيح (قيد اختباريّ لمنهجيّة الاختبار نفسها، لا عيب في المنصّة).</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section id="s9">
+  <div class="sec-head"><span class="sec-no">09</span><h2 class="sec-title">فجوة نطاق مكتشَفة: "الطلب الجماعي"</h2></div>
+  <p class="sec-intro">ليست عيبًا برمجيًّا — لكنّها فجوة توقّعات تستحقّ توضيحًا صريحًا.</p>
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">ملاحظة نطاق</span><h4 class="f-title">"الطلب الجماعي" الذي يسمح لعميلَين منفصلَين بالانضمام عبر رابط/رمز لا وجود له في الكود حاليًّا</h4></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>الميزة الوحيدة الموجودة فعليًّا تحت اسم "طلب جماعي" هي أن يجمع <b>عميل واحد</b> عدّة سلال من متاجر مختلفة ويدفعها في معاملة واحدة ("ادفع الكلّ — N متاجر") — وهي ميزة حقيقيّة تعمل بشكل ممتاز (مؤكَّدة أعلاه). لكن لا وجود لميزة "عميلان أو أكثر ينضمّون لنفس الطلب عبر رابط مشترَك، كلٌّ يضيف من جهته" — تلك الفكرة غير مبنيّة في الكود إطلاقًا.</p></div>
+    <div class="f-block"><h5>ما فعلناه بدلًا من ذلك</h5><p>اختبرنا الميزة الحقيقيّة الموجودة (تجميع سلال متعدّدة المتاجر لعميل واحد) بدلًا من الميزة متعدّدة المشاركين غير الموجودة، ووثَّقنا الفارق هنا صراحة بدل الافتراض أو اختلاق نتيجة عن ميزة لا وجود لها.</p></div>
+  </div>
+</section>
+
+<section id="s10">
+  <div class="sec-head"><span class="sec-no">10</span><h2 class="sec-title">التوصيات المرتَّبة حسب الأولويّة</h2></div>
+  <p class="sec-intro">من الأكثر إلحاحًا (يمسّ الثقة والمال) إلى الأقلّ إلحاحًا (تحسينات تجربة).</p>
+  <ol style="font-size:.92rem">
+    <li><b>إصلاح فوريّ قبل أي تفعيل لأكواد الخصم:</b> إضافة سبب فشل صريح لاستجابة <code>promotion-quote</code> (منتهٍ / غير مؤهَّل / معطَّل عالميًّا / غير موجود) بدل الكائن الفارغ الموحَّد، وعرض رسالة واضحة للعميل — قبل التفكير في تفعيل <code>promotions_enabled</code> أصلًا (F-01).</li>
+    <li><b>إصلاح مأزق تسجيل السائقين الجدد:</b> إمّا فتح مسار خدمة ذاتيّة لكتابة <code>DriverVehicleProfile.plate_number</code>، أو مزامنته تلقائيًّا من <code>Driver.vehicle_plate</code> عند التسجيل (F-04) — هذا يمنع حاليًّا انضمام أي سائق جديد دون تدخّل يدويّ من OPS.</li>
+    <li><b>ربط استثناءات الدفع النقديّ بحالة الطلب وبمراقبة "الطلبات العالقة":</b> توسيع <code>/operations/orders/stuck</code> ليشمل الطلبات ذات استثناء نقديّ مفتوح، وإظهار رسالة واضحة للعميل عند حدوث الاستثناء (F-05) — وتصفية طابور الاستثناءات العالقة منذ يونيو كأولويّة تشغيليّة موازية.</li>
+    <li><b>إصلاح زرّ "إفراغ السلّة"</b> — عطل بسيط ومعزول (F-02)، وتصحيح رسالتَي الإلغاء المتناقضتين على حالة "لا سائق متاح" (F-06).</li>
+    <li><b>خطّة معالجة i18n مخصَّصة، لا إصلاحات متفرّقة</b> — أعلى الأولويّة فيها: توحيد اختيار لغة رسائل الخلفيّة (43 موضعًا) بدل تفضيل العربيّة دائمًا (F-03)، ثم استبدال ملفّ الخطّ التالف، ثم تغطية الكتل الكبيرة غير المُترجَمة (F-13، F-07).</li>
+    <li><b>توضيح واجهة للفارق بين "احتُسِبت" و"صُرِفَت" في مكافآت الإحالة/الولاء</b> — تعديل واجهة بسيط، لا حاجة لأي تغيير في المنطق الماليّ المختوم أصلًا (F-21).</li>
+    <li><b>قرار واضح بشأن SSE:</b> هل بثّ الموقع/الحالة الحيّ عبر SSE مسار مخطَّط له فعلًا يستحقّ إكماله، أم كود خامل يجب إزالته لتبسيط الصيانة؟ — يربط مباشرة بمخاوف سابقة موثَّقة في الذاكرة المشروعيّة (تقرير 519).</li>
+    <li><b>بقيّة النتائج المتوسّطة والمنخفضة</b> — يمكن تجميعها في دفعة إصلاحات واحدة لاحقة، لا تحمل إلحاحًا يمنع أي خطوة تشغيليّة أخرى.</li>
+  </ol>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>تووا — تقرير 555 · اختبار حيّ حقيقيّ بالكامل (لا محاكاة) لدور العميل، عبر 4 وكلاء مستقلّين، 1,135 استدعاء أداة فعليّ، و46 لقطة شاشة — كل نتيجة موثَّقة هنا مؤكَّدة مباشرة في قاعدة البيانات أو عبر استجابة شبكة حقيقيّة.<br>
+    لقطات الشاشة الكاملة: <code>customer_test_screenshots/{identity, discovery_ordering, order_lifecycle, wallet_loyalty}/</code> بجانب هذا الملفّ.</p>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

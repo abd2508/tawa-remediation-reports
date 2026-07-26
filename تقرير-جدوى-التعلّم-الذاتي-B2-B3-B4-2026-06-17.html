@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تووا — جدوى التعلّم الذاتي (B2·B3·B4): تقييم من واقع الكود</title>
+<style>
+  :root{--bg:#0f1419;--card:#1a222c;--card2:#222c38;--ink:#e8eef4;--muted:#9fb0c0;--line:#2c3a48;
+    --green:#2ecc71;--amber:#f0a020;--red:#e74c3c;--new:#7d5fff;--blue:#4aa3df}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.85;font-size:15px}
+  .wrap{max-width:1160px;margin:0 auto;padding:28px 20px 80px}
+  header.top{background:linear-gradient(135deg,#10241f,#0c151d);border:1px solid #1f4a3a;border-radius:16px;padding:30px 28px;margin-bottom:22px}
+  header.top h1{margin:0 0 6px;font-size:24px}
+  header.top .sub{color:var(--muted);font-size:14px}
+  .verdict{margin-top:14px;background:#102a1c;border:1px solid #2e7d4f;border-radius:12px;padding:14px 18px;font-size:15px}
+  .verdict b{color:#7fe0a8}
+  h2{font-size:21px;margin:36px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+  h3{font-size:17px;margin:18px 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#13202c;color:#cfe0ee;font-weight:700}
+  code{background:#0c151d;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12px;color:#ffd9a0;direction:ltr;display:inline-block}
+  .axis{border-right:5px solid var(--line);padding:16px 20px;margin:18px 0;background:var(--card2);border-radius:0 12px 12px 0}
+  .axis.b2{border-color:var(--green)}.axis.b3{border-color:var(--amber)}.axis.b4{border-color:var(--blue)}
+  .axis h3{margin:0 0 4px}
+  .badge{display:inline-block;border-radius:6px;padding:2px 10px;font-size:11.5px;font-weight:800}
+  .b-excellent{background:var(--green);color:#06210f}.b-good{background:var(--blue);color:#05202a}.b-guarded{background:var(--amber);color:#241a05}
+  .simple{background:#16241a;border:1px solid #244a32;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13.5px}
+  .simple b{color:#86e0a8}
+  .real{background:#0e1a24;border:1px solid #1d3445;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13px}
+  .real b{color:#86c5ff}
+  .warn-box{background:#241a10;border:1px solid #5a3d20;border-radius:8px;padding:10px 14px;margin:8px 0;font-size:13px}
+  .warn-box b{color:#f0b86a}
+  .diagram{background:#0a1016;border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0;direction:ltr;text-align:left;
+           font-family:"Courier New",monospace;font-size:12px;color:#cfe0ee;overflow-x:auto;white-space:pre;line-height:1.5}
+  .good{color:var(--green)}.warn{color:var(--amber)}.bad{color:var(--red)}
+  ul{margin:8px 0;padding-right:22px}li{margin:5px 0}
+  footer{margin-top:40px;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--line);padding-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>🧠 هل نبني B2·B3·B4 لتتعلّم ذاتيًّا وتتطوّر كلّ يوم؟ — تقييم من واقع الكود</h1>
+  <div class="sub">فكرة المالك: بناء واحد + بيانات بسيطة → تتطوّر تلقائيًّا بتراكم البيانات اليوميّة بلا تعديل لاحق · تقييم صادق مبنيّ على الأكواد والبيانات الفعليّة · 2026-06-17</div>
+  <div class="verdict"><b>الحكم المختصر:</b> <b class="good">نعم — الفكرة صحيحة وسليمة هندسيًّا، والبنية الداعمة موجودة في المشروع فعلًا</b> (البيانات الأرضيّة مُلتقَطة + حلقات دوريّة بقفل Redis قائمة، بل «إعادة حساب ثقة السائق كلّ 6س» هي نظام تعلّم ذاتيّ يعمل الآن). <b>مع 3 تحفّظات صادقة:</b> B2 ممتازة، B4 جيّدة، B3 ممكنة <b>لكن يجب أن تبقى محروسة (إنسان في الحلقة)</b>؛ و«بلا تعديل أبدًا» يصحّ على <b>التعلّم</b> لا على <b>الحُرّاس والمراقبة</b> (تُبنى مرّة وتبقى)؛ والمنصّة <b>قبل الإطلاق (بلا بيانات بعدُ)</b> فالتطوّر يبدأ بعد الحركة الحقيقيّة.</div>
+</header>
+
+<!-- ═══════════ THE PATTERN ═══════════ -->
+<h2>① النمط المعماريّ: «دولاب البيانات» (Data Flywheel) — وهو ما تصفه فكرتك</h2>
+<div class="card">
+  <p>ما تصفه (بناء واحد يتطوّر بالبيانات) هو نمط معروف وراسخ في الأنظمة الإنتاجيّة اسمه <b>«دولاب البيانات»</b> أو <b>التعلّم المتراكم (online/continual learning)</b>. مكوّناته الأربعة:</p>
+  <div class="diagram">  ┌─────────────────────────────────────────────────────────────┐
+  │  1) تنبّؤ ببداية بسيطة (cold-start heuristic)  ← يعمل فورًا بلا بيانات │
+  │  2) تسجيل (تنبّؤ + النتيجة الفعليّة)            ← يُلتقَط تلقائيًّا  │
+  │  3) مهمّة دوريّة تُعيد حساب المعاملات من المتراكم ← قفل Redis كلّ Xس │
+  │  4) المُتنبِّئ يقرأ المعاملات المتعلّمة + حارس + احتياطيّ            │
+  └─────────────────────────────────────────────────────────────┘
+        ▲                                                    │
+        └──────────────  كلّ يوم أذكى (بلا تعديل كود)  ◄──────┘</div>
+  <p><b>المفتاح:</b> تبني الأنابيب الأربعة <b>مرّة واحدة</b>؛ بعدها المعاملات (المعرفة) تتحسّن تلقائيًّا كلّ دورة. <b class="good">والمشروع يملك 3 من الـ4 جاهزة سلفًا.</b></p>
+</div>
+
+<h2>② ما الذي يملكه المشروع فعلًا (من واقع الكود)</h2>
+<table>
+  <tr><th>المكوّن</th><th>الحالة في الكود</th></tr>
+  <tr><td><b>البيانات الأرضيّة (B2 ETA)</b></td><td><span class="good">موجودة</span> — <code>order.preparation_started_at · prepared_at · picked_up_at · delivered_at</code> ⇒ الزمن الفعليّ للتحضير والتوصيل <b>مُلتقَط مجّانًا</b> (النتيجة الحقيقيّة لكلّ تنبّؤ)</td></tr>
+  <tr><td><b>تاريخ الطلب (B4 تنبّؤ)</b></td><td><span class="good">موجود</span> — <code>order.created_at + provider_id + delivery_lat/lng</code> + فهرس <code>idx_orders_provider_id</code> ⇒ سلسلة زمنيّة للطلب حسب (الساعة × المنطقة × المزوّد)</td></tr>
+  <tr><td><b>تسميات الاحتيال (B3)</b></td><td><span class="warn">موجودة كـ«غير مباشرة»</span> — <code>FinancialDispute · ChargebackCase · customer_debt (عدم حضور) · DELIVERY_FAILED</code> ⇒ نتائج تُستعمل كـlabels، لكنّها <b>متأخّرة ونادرة</b></td></tr>
+  <tr><td><b>بنية المهامّ الدوريّة</b></td><td><span class="good">موجودة وراسخة</span> — <code>main.py</code> فيه حلقات بقفل Redis: مسح احتيال كلّ 6س · <b>إعادة حساب ثقة السائق كلّ 6س</b> · إطلاق المجدول كلّ دقيقة · مسح حضور السائق. <b>«إعادة حساب الثقة» = حلقة تعلّم ذاتيّ قائمة فعلًا.</b></td></tr>
+  <tr><td><b>المُتنبِّئون (المقاعد)</b></td><td><span class="good">موجودة</span> — <code>eta_service.time_to_door_minutes</code> (مُعامل <code>travel_factor</code>) · <code>ml_scaffold._compute_score</code> (<code>trained_model.predict</code> مُعلَّم) · <code>compute_batch_optimized</code></td></tr>
+</table>
+<p class="real"><b>الخلاصة:</b> 3 من 4 مكوّنات جاهزة (البيانات + المهامّ الدوريّة + المقاعد). الناقص الوحيد: <b>طبقة تسجيل (تنبّؤ↔نتيجة) + جدول معاملات متعلّمة + المهمّة التي تربطهما</b> — وهي <b>قابلة للبناء مرّة واحدة</b>.</p>
+
+<!-- ═══════════ B2 ═══════════ -->
+<h2>③ B2 — ETA متعلّم <span class="badge b-excellent">جدوى ممتازة (الحالة المثاليّة)</span></h2>
+<div class="axis b2">
+  <div class="simple"><b>🧑 بكلام بسيط:</b> النظام يتوقّع «يصل خلال 15 دقيقة»، ثمّ يرى متى وصل <b>فعلًا</b> (محفوظ تلقائيًّا). كلّ يوم يقارن توقّعه بالواقع ويُصحّح نفسه: «هذا الحيّ أبطأ»، «هذا المطعم يتأخّر وقت العشاء». بلا تدخّل بشريّ.</div>
+  <div class="real"><b>⚙️ من واقع الكود:</b> النتيجة الأرضيّة <b>مجّانيّة</b>: <code>delivered_at − picked_up_at</code> = زمن التوصيل الفعليّ. تبني: (1) تسجيل (المسافة، المنطقة، الساعة → الزمن الفعليّ) عند كلّ تسليم؛ (2) مهمّة كلّ 6س (مثل حلقة الثقة الموجودة) تحسب معامل تصحيح لكلّ (منطقة×ساعة) من المتوسّط المتراكم؛ (3) <code>time_to_door_minutes</code> يقرأ المعامل المتعلّم بدل <code>settings.eta_correction_factor</code> الثابت، مع <b>1.0 كبداية باردة</b> وحارس يقصّ المعامل في نطاق [0.5, 2.0].</div>
+  <div class="diagram">اليوم 1:   معامل = 1.0 (بداية باردة)        → ETA تقريبيّ
+بعد أسبوع: معامل(وسط البلد، 19:00) = 1.4  → ETA أدقّ تلقائيًّا
+بعد شهر:   معاملات دقيقة لكلّ حيّ وساعة     → ETA دقيق جدًّا   (بلا تعديل كود)</div>
+  <p><b class="good">الحكم: نعم، بناء واحد يتطوّر يوميًّا بلا تعديل.</b> النتيجة الأرضيّة فوريّة وآليّة ⇒ أنظف حالة «دولاب بيانات». لا قرارات خطرة (ETA معلومة، لا تحجب أحدًا).</p>
+</div>
+
+<!-- ═══════════ B4 ═══════════ -->
+<h2>④ B4 — تنبّؤ الطلب <span class="badge b-good">جدوى جيّدة</span> · VROOM منفصل</h2>
+<div class="axis b4">
+  <div class="simple"><b>🧑 بكلام بسيط:</b> النظام يَعُدّ كم طلبًا جاء كلّ ساعة في كلّ منطقة، فيتعلّم «الجمعة 8 مساءً ذروة في هذا الحيّ»، ويقترح نشر سائقين أكثر وسعة نقد أكبر مسبقًا — فيمنع تجويع النقد قبل حدوثه (يربط جذر B1/W2).</div>
+  <div class="real"><b>⚙️ من واقع الكود:</b> تاريخ الطلب مُلتقَط (<code>created_at + provider_id + المنطقة</code>). تبني مُتنبِّئًا إحصائيًّا بسيطًا (متوسّط أُسّيّ متحرّك EWMA لكلّ ساعة×منطقة) في مهمّة دوريّة ⇒ يتحسّن مع كلّ يوم بيانات. بداية باردة: ساذج (متوسّط عامّ). <b>VROOM شيء منفصل:</b> خدمة توجيه طرق خارجيّة (تُنشَر مرّة، ليست «تعلُّمًا») — لا تدخل دولاب البيانات.</div>
+  <p><b class="good">الحكم: نعم للتنبّؤ (يتطوّر ذاتيًّا).</b> VROOM = نشر خدمة لا تعلُّم. القيمة الكاملة بعد تراكم تاريخ حقيقيّ.</p>
+</div>
+
+<!-- ═══════════ B3 ═══════════ -->
+<h2>⑤ B3 — احتيال أذكى <span class="badge b-guarded">جدوى مشروطة — يجب أن تبقى محروسة</span></h2>
+<div class="axis b3">
+  <div class="simple"><b>🧑 بكلام بسيط:</b> هنا الحذر مطلوب. تعليم النظام «من المحتال» يحتاج أن نعرف <b>من كان محتالًا فعلًا</b> — وهذا لا يأتي فورًا (ردّ المدفوعات يصل بعد أسابيع، والاحتيال نادر). والأخطر: نظام يُعدّل <b>قرار الحجب</b> تلقائيًّا قد «يتعلّم» نمطًا خاطئًا ويحجب عملاء صالحين، أو يخدعه محتالٌ يتكيّف. لذا يتعلّم <b>التقييم</b> ذاتيًّا، لكن <b>قرار الحجب يبقى محافظًا تحت رقابة بشريّة</b>.</div>
+  <div class="real"><b>⚙️ من واقع الكود:</b> المُسجِّل <code>ml_scaffold</code> حيّ ويقرأ إشارات (ثقة، مشاركة جهاز، عدم تطابق GPS). التسميات غير المباشرة موجودة (<code>FinancialDispute · ChargebackCase · customer_debt · DELIVERY_FAILED</code>). يمكن مهمّة دوريّة تُعيد معايرة أوزان الإشارات من هذه النتائج. <b>لكن:</b> (أ) التسميات <b>متأخّرة + نادرة + غير متوازنة</b> ⇒ تعلُّم بطيء وحسّاس؛ (ب) المُسجِّل <b>موصول بالحجب الحيّ للـCOD</b> ⇒ تعديل ذاتيّ للحجب = خطر مباشر.</div>
+  <div class="warn-box"><b>⚠️ الشرط الإلزاميّ:</b> اجعل <b>التقييم</b> يتعلّم ذاتيًّا (آمن، استشاريّ)، لكن أبقِ <b>عتبة الحجب ثابتة ومحروسة</b> + مراقبة <code>would-block-rate</code> (موجودة) + مراجعة بشريّة دوريّة. هذا ليس «بلا تعديل أبدًا» — بل «تعلُّم ذاتيّ للدرجة + حارس بشريّ للقرار». التعلّم الكامل المستقلّ للحجب <b>غير آمن</b> في الاحتيال (إجماع صناعيّ).</div>
+  <p><b class="warn">الحكم: نعم للتعلّم الذاتيّ للدرجة، لا للحجب المستقلّ تمامًا.</b> يُبنى مرّة، لكنّه يحتاج إنسانًا في الحلقة دائمًا — وهذا صحيح ومقصود.</p>
+</div>
+
+<!-- ═══════════ HONEST CAVEATS ═══════════ -->
+<h2>⑥ الحقيقة الصادقة حول «بلا تعديل مرّة أخرى»</h2>
+<div class="card">
+  <p>الجزء الذي يتطوّر بلا تعديل كود = <b>المعاملات/الأوزان المتعلّمة</b> (نعم، تتحسّن كلّ يوم تلقائيًّا). لكن أيّ نظام يتعلّم ذاتيًّا يحتاج <b>3 أشياء تُبنى مرّة وتبقى</b> (ليست «تعديلًا متكرّرًا» بل تشغيلًا سليمًا):</p>
+  <ul>
+    <li><b>حُرّاس (Guardrails):</b> قصّ القيم المتعلّمة في نطاق عاقل (مثلًا معامل ETA بين 0.5–2.0) كي لا تكسر شذوذةُ بيانات التوزيعَ أو الحجب. <b>تُبنى مرّة.</b></li>
+    <li><b>مراقبة (Monitoring):</b> لوحة تُظهر دقّة التنبّؤ والانحراف (drift) — لتعرف إن «تعلّم» النظام شيئًا خاطئًا. <b>تُبنى مرّة.</b></li>
+    <li><b>بداية باردة (Cold-start):</b> احتياطيّ بسيط يعمل حتى تتراكم البيانات. <b>تُبنى مرّة.</b></li>
+  </ul>
+  <p>فالجواب الدقيق: <b class="good">نعم تبني مرّة ويتطوّر يوميًّا بلا إعادة برمجة لمنطق التعلّم</b> — لكنّك <b>تراقبه</b> وتُعدّل الحُرّاس نادرًا. «أبنيه وأنساه تمامًا للأبد» وهمٌ هندسيّ لأيّ نظام تعلّم؛ «أبنيه ويتعلّم وحده مع رقابة خفيفة» حقيقة.</p>
+</div>
+
+<!-- ═══════════ TAWA REALITY ═══════════ -->
+<h2>⑦ واقع تووا العمليّ الآن (مهمّ جدًّا)</h2>
+<div class="warn-box">
+  <b>المنصّة قبل الإطلاق العامّ — بلا حركة طلبات عضويّة</b> (آخر طلب قبل 13 يومًا، 0 طلب/24س). فدولاب البيانات <b>لا يملك ما يتعلّم منه بعدُ</b>. لو بنيناه الآن، يعمل بـ«البداية الباردة» (heuristics) ويبقى ساكنًا حتى الإطلاق، ثمّ يبدأ التطوّر. وB3 يحتاج وقتًا أطول (ردّ المدفوعات يصل بعد أسابيع من التسليم). فالتسلسل الواقعيّ:
+  <div class="diagram">بناء الأنابيب الآن  →  بداية باردة (heuristics)  →  الإطلاق + حركة حقيقيّة
+  →  أسابيع: B2/B4 تتحسّن  →  شهور: B3 يجمع تسميات كافية  →  ذكاء متراكم</div>
+  <b>أي: «بناء واحد الآن» صحيح ومجدٍ — لكنّ القيمة تظهر بعد الإطلاق وتراكم البيانات، لا فورًا.</b>
+</div>
+
+<!-- ═══════════ VERDICT ═══════════ -->
+<h2>⑧ الحكم النهائيّ المُجمَّع</h2>
+<table>
+  <tr><th>المحور</th><th>هل يصحّ البناء الذاتيّ التطوّر؟</th><th>الشرط</th></tr>
+  <tr><td><b>B2</b> ETA</td><td><span class="badge b-excellent">نعم — مثاليّ</span></td><td>النتيجة الأرضيّة مجّانيّة؛ آمن (لا حجب)؛ بناء واحد + حارس نطاق</td></tr>
+  <tr><td><b>B4</b> تنبّؤ الطلب</td><td><span class="badge b-good">نعم — جيّد</span></td><td>تاريخ الطلب متاح؛ مُتنبِّئ إحصائيّ يتحسّن؛ VROOM نشرٌ منفصل</td></tr>
+  <tr><td><b>B3</b> احتيال</td><td><span class="badge b-guarded">نعم للدرجة · لا للحجب المستقلّ</span></td><td>تسميات متأخّرة/نادرة؛ <b>إنسان في الحلقة + حارس عتبة إلزاميّ</b></td></tr>
+</table>
+<div class="card">
+  <p><b>فكرتك صحيحة وذكيّة</b>، والبنية التحتيّة (بيانات + مهامّ دوريّة + مقاعد) موجودة في المشروع — بل أحد أنظمة التعلّم الذاتيّ (إعادة حساب ثقة السائق) يعمل الآن. <b>نستطيع البناء بهذه الطريقة</b> (بناء واحد للأنابيب + بداية باردة + حُرّاس)، فيتطوّر B2 وB4 يوميًّا بلا إعادة برمجة، ويتطوّر تقييم B3 ذاتيًّا مع إبقاء قرار الحجب محروسًا. التحذير الوحيد الصادق: «بلا أيّ تعديل/رقابة للأبد» مبالغة لأيّ نظام تعلّم — الصحيح «يتعلّم وحده مع حُرّاس ومراقبة تُبنى مرّة». وعمليًّا: القيمة تتراكم <b>بعد</b> الإطلاق وتدفّق البيانات الحقيقيّة.</p>
+  <p style="color:var(--muted);font-size:13px">إن أردت، الخطوة التالية المنطقيّة: أبدأ بـ<b>B2 (ETA المتعلّم)</b> — الأنظف والأكثر أمانًا والأعلى أثرًا — ببناء طبقة التسجيل + جدول المعاملات + المهمّة الدوريّة + الحارس، خلف علَم، فيعمل بالبداية الباردة الآن ويتطوّر تلقائيًّا بعد الإطلاق.</p>
+</div>
+
+<footer>
+  تووا (Tawa) — جدوى التعلّم الذاتي B2·B3·B4 · تقييم من واقع الكود والبيانات · 2026-06-17 · الخلاصة: نعم نستطيع (دولاب بيانات: بناء واحد + بداية باردة + حُرّاس) · B2 مثاليّ · B4 جيّد · B3 محروس · القيمة بعد الإطلاق
+</footer>
+
+</div>
+</body>
+</html>

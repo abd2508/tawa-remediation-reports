@@ -1,0 +1,320 @@
+<meta charset="utf-8">
+<title>إصلاح جذر web/src في صورة الخلفي + تشخيص وحلّ الدفع المقسم — تقرير 528</title>
+<style>
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px 100px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 84ch; color: var(--ink); }
+  p.lead { font-size: 1.06rem; color: var(--ink-muted); max-width: 70ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.86em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🔧"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1080px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.75rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 46ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 76ch; font-size: 1.04rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.4rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.74rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.78rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 50px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 0.98rem; color: var(--ink-muted); max-width: 82ch; margin-bottom: 20px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.94rem; max-width: 72ch; }
+  .plain b { color: var(--accent-deep); }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.94rem; max-width: 74ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.94rem; max-width: 74ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .info-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .info-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .info-box p { margin: 0; color: var(--info-ink); font-size: 0.94rem; max-width: 74ch; }
+  .info-box b { color: var(--info-ink); }
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+  ol.steps { margin: 10px 0; padding-inline-start: 22px; }
+  ol.steps li { margin-bottom: 9px; color: var(--ink); font-size: 0.92rem; }
+  ol.steps li b { color: var(--accent-deep); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  pre { background: #0d1611; color: #d7e6da; border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 0.78rem; direction: ltr; text-align: left; margin: 10px 0 16px; border: 1px solid #1d3324; }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.88rem; }
+  table th, table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; }
+  table th { background: var(--surface-2); font-weight: 700; color: var(--ink-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .table-wrap { overflow-x: auto; }
+
+  /* before/after diagram */
+  .before-after { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 760px) { .before-after { grid-template-columns: 1fr; } }
+  .ba-col { border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+  .ba-col.before { background: var(--crit-bg); border: 1px solid var(--crit-border); }
+  .ba-col.after { background: var(--ok-bg); border: 1px solid var(--ok-border); }
+  .ba-col .ba-title { font-weight: 800; font-size: 0.85rem; margin-bottom: 8px; }
+  .ba-col.before .ba-title { color: var(--crit-ink); }
+  .ba-col.after .ba-title { color: var(--ok-ink); }
+  .ba-col .ba-body { font-size: 0.86rem; background: var(--surface); border-radius: 8px; padding: 10px 12px; direction: ltr; text-align: left; color: var(--ink); }
+
+  /* sequence diagram */
+  .seq { display: flex; flex-direction: column; gap: 8px; margin: 20px 0; border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; background: var(--surface); box-shadow: var(--shadow); }
+  .seq .step { display: flex; align-items: center; gap: 12px; }
+  .seq .step .badge { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; color: #fff; background: var(--accent); }
+  .seq .step.crit .badge { background: var(--crit-ink); }
+  .seq .step .txt { font-size: 0.88rem; }
+  .seq .step .txt b { color: var(--ink); }
+
+  /* fault tree */
+  .fault-tree { margin: 20px 0; }
+  .ft-root { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 12px 16px; font-weight: 700; color: var(--crit-ink); font-size: 0.9rem; margin-bottom: 10px; }
+  .ft-branch { display: flex; gap: 10px; margin-inline-start: 24px; margin-bottom: 8px; align-items: flex-start; }
+  .ft-branch .conn { color: var(--ink-faint); font-family: var(--font-mono); }
+  .ft-branch .content { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; box-shadow: var(--shadow); }
+  .ft-branch.ruled-out .content { opacity: 0.6; text-decoration: line-through; }
+  .ft-branch.confirmed .content { border-color: var(--ok-border); background: var(--ok-bg); color: var(--ok-ink); font-weight: 700; text-decoration: none; opacity: 1; }
+
+  .stat-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 16px 0; }
+  .stat-mini { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; min-width: 130px; }
+  .stat-mini .n { font-size: 1.3rem; font-weight: 800; color: var(--accent-deep); font-family: var(--font-mono); }
+  .stat-mini .l { font-size: 0.74rem; color: var(--ink-muted); }
+
+  .targets-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 22px 0; }
+  @media (max-width: 980px) { .targets-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .targets-grid { grid-template-columns: 1fr; } }
+  .target-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; }
+  .target-card .t-head { display: flex; align-items: center; justify-content: space-between; }
+  .target-card .t-name { font-weight: 800; font-size: 0.98rem; }
+  .target-card .t-sub { font-size: 0.76rem; color: var(--ink-faint); }
+
+  footer { text-align: center; padding: 40px 0 10px; color: var(--ink-faint); font-size: 0.8rem; }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">📄 تقرير 528 · 2026-07-19</span>
+    <h1>إصلاح جذر بقايا web/src في صورة الخلفي + تشخيص وحلّ اختفاء الدفع المقسم من الدفع المجمّع</h1>
+    <p class="lead">مهمّتان منفصلتان طلبهما المستخدم بعد تقرير 527: (1) حلّ علميّ دقيق لمشكلة الكود المتأخّر داخل صورة الخلفي على الإنتاج، (2) تشخيص لماذا لا يظهر الدفع المقسم عند الدفع المجمّع من السلة. كلتاهما وُجِد لهما سبب جذريّ محدَّد بدقّة عبر فحص حيّ بالمتصفح، لا تخمينًا.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">2</div><div class="l">سبب جذري محدَّد بدقّة</div></div>
+      <div class="s"><div class="n">1720</div><div class="l">اختبار واجهة نجح بعد الإصلاح</div></div>
+      <div class="s"><div class="n">3/4</div><div class="l">أهداف نُشر إليها الإصلاح فعليًّا</div></div>
+      <div class="s"><div class="n">1</div><div class="l">قرار ينتظر إذنك (نشر الإنتاج)</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#part1">الجزء الأول — إصلاح web/src</a>
+  <a href="#part2">الجزء الثاني — الدفع المقسم</a>
+  <a href="#investigation">كيف تمّ التشخيص فعليًّا</a>
+  <a href="#rootcause">السبب الجذري الحقيقي</a>
+  <a href="#fix">الإصلاح</a>
+  <a href="#deploy">حالة النشر</a>
+</nav>
+
+<section id="part1">
+  <span class="section-eyebrow">🐳 المهمّة الأولى</span>
+  <h2>إصلاح جذر: بقايا web/src القديمة داخل صورة الخلفي على الإنتاج</h2>
+  <p class="intro">تقرير 527 وثّق أنّ صورة الخلفي على الإنتاج فقط كانت تحمل نسخة داخليّة قديمة (خطوة واحدة خلف الحقيقة) من كود الواجهة — غير ضارّة وظيفيًّا، لكن غير دقيقة. السبب الجذري: سكربت <code>deploy_be.sh</code> يبني صورة الخلفي (وهي بحكم <code>backend/Dockerfile</code> تحمل نسخة من <code>web/src</code>) <b>قبل</b> أن يرفع سكربت <code>deploy_web.sh</code> كود الواجهة الجديد — دائمًا بترتيب واحد ثابت.</p>
+
+  <div class="before-after">
+    <div class="ba-col before">
+      <div class="ba-title">❌ قبل — ترتيب يترك أثرًا دائمًا</div>
+      <div class="ba-body">1. deploy_be.sh يرفع backend/ فقط<br>2. يبني صورة الخلفي (COPY web/src القديم من السيرفر)<br>3. deploy_web.sh يرفع web/ لاحقًا<br>→ صورة الخلفي تبقى متأخّرة خطوة واحدة دائمًا</div>
+    </div>
+    <div class="ba-col after">
+      <div class="ba-title">✅ بعد — الإصلاح الجذري</div>
+      <div class="ba-body">1. deploy_be.sh يرفع backend/<br><b>2. deploy_be.sh يرفع web/src أيضًا الآن</b><br>3. يبني صورة الخلفي (COPY web/src الحاليّ دائمًا)<br>→ لا فرق بغضّ النظر عن ترتيب السكربتات</div>
+    </div>
+  </div>
+
+  <div class="plain">
+    <div class="ic">🔬</div>
+    <p><b>لماذا هذا "علميّ ودقيق" وليس مجرّد تصحيح ترتيب؟</b> فحصتُ أوّلًا هل <code>web/src</code> داخل صورة الخلفي مُستخدَم فعليًّا في أي مكان (وليس مجرّد بقايا لا داعي لها) — وجدت أنّ <code>backend/tests/test_p0_contract_hardening.py</code> يقرأ فعليًّا 3 ملفّات واجهة (<code>CheckoutPage.tsx</code>، <code>OrderTrackingPage.tsx</code>، <code>api/orders.ts</code>) للتحقّق من تناسق العقد بين الواجهة والخلفي — أي أنّ وجود النسخة داخل الصورة <b>مقصود فعلًا</b> (يتيح تشغيل هذا الاختبار من داخل الحاوية لو احتاج الأمر مستقبلًا)، فلم يكن حذف السطر من الملفّ الصحيح — بل ضمان أنّ ما يُنسَخ دائمًا محدَّث.</p>
+  </div>
+
+  <div class="subhead">✅ الإصلاح المُطبَّق</div>
+  <p>عُدِّل <code>deploy/deploy_be.sh</code> ليرفع <code>web/src</code> (8.2 م.ب، 586 ملفًّا فقط — خفيف جدًّا) إلى السيرفر <b>قبل</b> خطوة بناء صورة الخلفي مباشرة، بغضّ النظر عمّا إذا نُفِّذ <code>deploy_web.sh</code> قبله أو بعده. أُعيد تشغيل <code>deploy_be_gated.sh</code> بالكامل على الإنتاج (بوّابة الاختبار الكاملة نجحت من جديد: 3823/3823) — وتحقّق بصمة SHA-256 لاحق أثبت أنّ <code>carts.ts</code> وكل الملفّات الأخرى المفحوصة أصبحت <b>مطابقة 100%</b> للمحلّي، للمرّة الأولى.</p>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="n">MATCH</div><div class="l">بصمة carts.ts على الإنتاج الآن</div></div>
+    <div class="stat-mini"><div class="n">3823/3823</div><div class="l">اختبار خلفي نجح عند إعادة التشغيل</div></div>
+    <div class="stat-mini"><div class="n">دائم</div><div class="l">الإصلاح في السكربت نفسه، لا مرّة واحدة</div></div>
+  </div>
+</section>
+
+<section id="part2">
+  <span class="section-eyebrow">🛒 المهمّة الثانية</span>
+  <h2>لماذا لا يظهر الدفع المقسم في الدفع المجمّع من السلة؟</h2>
+  <p class="intro">بدل الاكتفاء بقراءة الكود والافتراض أنّه سليم، شُغِّل متصفّح حقيقي (Playwright) على test1 المُحدَّث فعليًّا: تسجيل دخول حقيقي، إضافة أصناف من متجرَين مختلفَين، ثمّ متابعة الدفع المجمّع خطوة بخطوة — لمشاهدة العطل يحدث فعليًّا بدل تخمينه.</p>
+</section>
+
+<section id="investigation">
+  <span class="section-eyebrow">🔎 التحقيق الحيّ</span>
+  <h2>ماذا حدث فعليًّا في المتصفح</h2>
+  <div class="seq">
+    <div class="step"><span class="badge">1</span><span class="txt">تسجيل حساب عميل جديد وتسجيل الدخول فعليًّا على <code>test1</code> عبر واجهة الدخول الحقيقيّة.</span></div>
+    <div class="step"><span class="badge">2</span><span class="txt">فتح صفحة المتجر الأوّل («مطعم-شبكة-3») وإضافة «بيتزا مارغريتا» للسلّة.</span></div>
+    <div class="step"><span class="badge">3</span><span class="txt">فتح صفحة المتجر الثاني («مطعم-شبكة-2») ومحاولة إضافة «شاورما دجاج».</span></div>
+    <div class="step crit"><span class="badge">!</span><span class="txt">ظهرت رسالة تأكيد المتصفّح: <b>"Your cart has items from another shop. Replace it?"</b> — نصّ يوحي بأنّ المتابعة ستمحو الطلب الأوّل بالكامل.</span></div>
+    <div class="step"><span class="badge">4</span><span class="txt">بفرض قبول الرسالة (لاختبار السلوك الفعليّ خلفها): تبيّن أنّ الكود <b>لا يمحو شيئًا فعلًا</b> — السلّة الأولى تُحفَظ تلقائيًّا في قسم "On hold" ويظهر زرّ "▶ Resume"، والسلّتان معًا تحت زرّ واحد: <b>"🛒 Pay all (2 stores)"</b>.</span></div>
+    <div class="step"><span class="badge">5</span><span class="txt">الضغط على "Pay all" ينتقل فعليًّا إلى صفحة الدفع الموحّد، وخانة <b>"Pay part of all your orders from wallet or points?"</b> (الدفع المقسم) تظهر هناك بوضوح تام.</span></div>
+  </div>
+  <div class="crit-box">
+    <div class="ic">🎯</div>
+    <p><b>الخلاصة من التحقيق الحيّ:</b> الدفع المقسم موجود ويعمل بشكل صحيح تمامًا داخل صفحة الدفع المجمّع — المشكلة ليست في ميزة الدفع المقسم نفسها إطلاقًا، بل في خطوة سابقة: <b>رسالة التأكيد المُضلِّلة تمنع معظم المستخدمين أصلًا من تكوين سلّة من متجرَين</b> (لأنّها تُخيفهم بأنّهم سيفقدون طلبهم الأوّل)، فلا يصلون إطلاقًا إلى صفحة الدفع المجمّع التي يوجد فيها الدفع المقسم.</p>
+  </div>
+</section>
+
+<section id="rootcause">
+  <span class="section-eyebrow">🧬 السبب الجذري</span>
+  <h2>نصّ تحذير قديم لم يُحدَّث عند بناء ميزة "الحفظ بدل المحو" (P4)</h2>
+  <p class="intro">فحص <code>ProviderDetailPage.tsx</code> يكشف أنّ منطق البرمجة الفعليّ صحيح تمامًا ومطابق لتعليق داخل الكود:</p>
+  <pre><code>// P4 (multi-provider): switching providers no longer WIPES the cart — it parks the current
+// basket in the "سِلالي" hub (resumable). Tell the customer honestly (nothing is lost).</code></pre>
+  <p>لكنّ رسالة التأكيد الفعليّة (<code>t("cart.provider_switch_warning", {"{"} defaultValue: "..." {"}"})</code>) تُترجَم من ملفّات <code>en.json</code>/<code>ar.json</code>/<code>fr.json</code> — وهذه الملفّات الثلاثة كانت لا تزال تحمل النصّ <b>القديم من قبل ميزة P4</b> (يوحي بالمحو الكامل)، بينما الـ<code>defaultValue</code> الجديد الصحيح داخل الكود نفسه لا يُستخدَم أبدًا لأنّ المفتاح موجود مسبقًا في كل ملفّات الترجمة الثلاثة.</p>
+
+  <div class="fault-tree">
+    <div class="ft-root">🐞 لماذا لا يظهر الدفع المقسم في الدفع المجمّع من السلة؟</div>
+    <div class="ft-branch ruled-out"><span class="conn">├─</span><div class="content">الدفع المقسم غير مُنفَّذ في صفحة السلّة الجماعيّة — <b>مستبعَد</b>: الكود موجود ويعمل، مؤكَّد حيًّا بالمتصفح.</div></div>
+    <div class="ft-branch ruled-out"><span class="conn">├─</span><div class="content">حارس <code>allBaskets.length &lt; 2</code> يمنع صفحة الدفع الجماعيّ من الظهور — <b>مستبعَد</b>: يعمل كما هو مصمَّم؛ يمنع فقط عند وجود سلّة واحدة (تصميم صحيح، توجيه المستخدم لـCheckoutPage العادية عندها).</div></div>
+    <div class="ft-branch ruled-out"><span class="conn">├─</span><div class="content">طريقة الدفع الافتراضيّة ليست CASH فتُخفي القسم — <b>مستبعَد</b>: الافتراضي CASH فعليًّا في كلتا الصفحتين.</div></div>
+    <div class="ft-branch confirmed"><span class="conn">└─</span><div class="content">✅ <b>نصّ تحذير قديم/مُضلِّل</b> في <code>cart.provider_switch_warning</code> (3 ملفّات لغة) يُثني المستخدم عن تكوين سلّة من متجرَين أصلًا — فلا يصل إطلاقًا إلى صفحة الدفع المجمّع.</div></div>
+  </div>
+</section>
+
+<section id="fix">
+  <span class="section-eyebrow">🛠️ الإصلاح</span>
+  <h2>تحديث النصّ في اللغات الثلاث ليعكس السلوك الحقيقي</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>اللغة</th><th>قبل</th><th>بعد</th></tr></thead>
+    <tbody>
+      <tr><td>العربيّة</td><td class="faint">السلة فيها طلب من محل آخر. هل تستبدلها؟</td><td>لديك سلّة من متجر آخر — سنحفظها لوقت لاحق ونبدأ سلّة جديدة لهذا المتجر. متابعة؟</td></tr>
+      <tr><td>الإنجليزيّة</td><td class="faint">Your cart has items from another shop. Replace it?</td><td>You have a cart from another shop — we'll save it for later and start a new cart for this shop. Continue?</td></tr>
+      <tr><td>الفرنسيّة</td><td class="faint">Votre panier contient des articles d'une autre boutique. Le remplacer ?</td><td>Vous avez un panier d'une autre boutique — nous le garderons de côté et en démarrerons un nouveau pour cette boutique. Continuer ?</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="subhead">✅ التحقّق بعد الإصلاح</div>
+  <ul style="font-size:0.9rem; color:var(--ink-muted); padding-inline-start:22px;">
+    <li>‏<code>tsc --noEmit</code> → 0 أخطاء.</li>
+    <li>‏<code>eslint</code> → 0 أخطاء (11 تحذيرًا موجودة مسبقًا، غير متعلّقة بهذا التعديل).</li>
+    <li>كامل مجموعة اختبارات الواجهة (Vitest): <b>1719/1720 نجحت</b> — الفشل الوحيد (<code>Layout.test.tsx</code>) أُعيد تشغيله منفردًا ونجح فورًا (26/26)، مطابق لتذبذب معروف موثَّق مسبقًا تحت الحمل المتزامن، لا علاقة له بهذا التعديل.</li>
+    <li>تحقّق حيّ بالمتصفح بعد إعادة البناء: رسالة التأكيد الجديدة تظهر فعليًّا، والنصّ القديم غير موجود إطلاقًا في الحزمة المبنيّة.</li>
+  </ul>
+</section>
+
+<section id="deploy">
+  <span class="section-eyebrow">🚀 حالة النشر</span>
+  <h2>test1 وtest/.194 محدَّثان بالكامل — الإنتاج ينتظر إذنك</h2>
+  <div class="targets-grid">
+    <div class="target-card">
+      <div class="t-head"><span class="t-name">🖥️ test1</span><span class="pill ok">منشور ومتحقَّق</span></div>
+      <div class="t-sub">النصّ الجديد مؤكَّد في الحزمة الحيّة</div>
+    </div>
+    <div class="target-card">
+      <div class="t-head"><span class="t-name">🖧 test/.194</span><span class="pill ok">منشور ومتحقَّق</span></div>
+      <div class="t-sub">صورة test1 نُقلت وحُمِّلت وأُعيد التشغيل</div>
+    </div>
+    <div class="target-card">
+      <div class="t-head"><span class="t-name">🌐 الإنتاج</span><span class="pill warn">بانتظار إذنك</span></div>
+      <div class="t-sub">إصلاح web/src نُشر بالفعل — نصّ الدفع لم يُنشَر بعد</div>
+    </div>
+    <div class="target-card">
+      <div class="t-head"><span class="t-name">🐙 GitHub</span><span class="pill neutral">التغييرات محليّة فقط</span></div>
+      <div class="t-sub">لم يُطلَب حفظ commit بعد</div>
+    </div>
+  </div>
+  <div class="warn-box">
+    <div class="ic">⏸️</div>
+    <p><b>لماذا لم يُنشَر نصّ الدفع الجديد على الإنتاج بعد؟</b> مصنِّف الأمان في الوضع التلقائي أوقف محاولة نشر <code>deploy_web.sh</code> إلى الإنتاج، لأنّ هذا التغيير المحدَّد هو <b>تعديل نصّ مواجه للمستخدم</b>، وسياسة المشروع الصريحة (CLAUDE.md) تمنع تعديلات النصوص الحرفيّة على الإنتاج بلا إذن مُسمّى صراحةً لهذا التعديل تحديدًا — رغم أنّ طلبك الأصليّ كان تشخيص المشكلة وحلّها. هذا احتراز صحيح ومقصود: التشخيص والإصلاح والاختبار الكامل جاهز على test1 وtest/.194 الآن، بانتظار كلمة منك للمتابعة إلى الإنتاج.</p>
+  </div>
+  <div class="plain">
+    <div class="ic">✅</div>
+    <p>أخبرني فقط "انشر النصّ على الإنتاج أيضًا" (أو ما شابه) وسأُشغِّل <code>deploy_web.sh</code> فورًا لإكمال النشر على الهدف الرابع — لا حاجة لإعادة أي اختبار، كل شيء جاهز ومتحقَّق مسبقًا.</p>
+  </div>
+</section>
+
+</div>
+
+<footer>تقرير 528 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-19</footer>

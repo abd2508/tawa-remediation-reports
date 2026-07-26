@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تنفيذ P14 — السلة الموحدة متعددة المزودين</title>
+<style>
+  :root {
+    --bg: #0B0F1A;
+    --surface: #131929;
+    --surface2: #1a2438;
+    --border: #1E2D47;
+    --text: #BEC8DC;
+    --text-dim: #7A8BA0;
+    --accent: #4A9EFF;
+    --accent2: #6AB8FF;
+    --good: #34C77A;
+    --warn: #E8A825;
+    --crit: #FF5C5C;
+    --info: #8B7CF6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    font-size: 15px; line-height: 1.7;
+    display: flex; min-height: 100vh;
+  }
+
+  /* Sidebar */
+  nav {
+    width: 240px; min-width: 240px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    position: sticky; top: 0;
+    height: 100vh; overflow-y: auto;
+    padding: 24px 0;
+    order: 2;
+  }
+  nav h3 {
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text-dim); padding: 0 20px 8px; margin-top: 16px;
+  }
+  nav h3:first-child { margin-top: 0; }
+  nav a {
+    display: block; padding: 7px 20px;
+    color: var(--text-dim); text-decoration: none; font-size: 13px;
+    border-right: 3px solid transparent;
+    transition: color .15s, border-color .15s;
+  }
+  nav a:hover, nav a.active {
+    color: var(--accent); border-right-color: var(--accent);
+    background: rgba(74,158,255,.06);
+  }
+  nav .logo {
+    padding: 0 20px 20px; border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  nav .logo-title { font-size: 15px; font-weight: 700; color: var(--accent); }
+  nav .logo-sub { font-size: 11px; color: var(--text-dim); }
+
+  /* Main */
+  main { flex: 1; padding: 48px 64px; max-width: 900px; order: 1; }
+
+  h1 { font-size: 32px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 8px; }
+  h2 { font-size: 22px; font-weight: 700; color: #fff; margin-top: 52px; margin-bottom: 16px;
+       padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  h3 { font-size: 17px; font-weight: 600; color: var(--accent2); margin-top: 28px; margin-bottom: 10px; }
+  h4 { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 16px; margin-bottom: 6px; }
+  p { margin-bottom: 12px; }
+
+  .hero-meta {
+    display: flex; gap: 16px; flex-wrap: wrap; margin: 20px 0 40px;
+  }
+  .hero-chip {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 14px; font-size: 13px;
+  }
+  .hero-chip span { color: var(--accent); font-weight: 600; }
+
+  /* Status chips */
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 4px; padding: 3px 9px; font-size: 12px; font-weight: 600;
+    letter-spacing: .04em;
+  }
+  .chip-ok { background: rgba(52,199,122,.15); color: var(--good); border: 1px solid rgba(52,199,122,.3); }
+  .chip-warn { background: rgba(232,168,37,.15); color: var(--warn); border: 1px solid rgba(232,168,37,.3); }
+  .chip-crit { background: rgba(255,92,92,.15); color: var(--crit); border: 1px solid rgba(255,92,92,.3); }
+  .chip-info { background: rgba(139,124,246,.15); color: var(--info); border: 1px solid rgba(139,124,246,.3); }
+  .chip-dim { background: rgba(122,139,160,.1); color: var(--text-dim); border: 1px solid var(--border); }
+
+  /* Cards */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+  }
+
+  /* Summary grid */
+  .summary-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 18px 20px; text-align: center;
+  }
+  .stat-num { font-size: 36px; font-weight: 800; line-height: 1; }
+  .stat-num.ok { color: var(--good); }
+  .stat-num.acc { color: var(--accent); }
+  .stat-label { font-size: 12px; color: var(--text-dim); margin-top: 4px; letter-spacing: .06em; }
+
+  /* Tables */
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { background: var(--surface2); color: var(--text-dim);
+       text-transform: uppercase; letter-spacing: .07em; font-size: 11px;
+       padding: 10px 14px; text-align: right; }
+  td { padding: 10px 14px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: rgba(74,158,255,.03); }
+
+  /* Code */
+  pre {
+    background: #0a0e18; border: 1px solid var(--border); border-radius: 6px;
+    padding: 16px 18px; overflow-x: auto; font-size: 12.5px; line-height: 1.6;
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    margin: 12px 0;
+  }
+  code {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    background: rgba(74,158,255,.1); color: var(--accent2);
+    padding: 1px 5px; border-radius: 3px; font-size: 13px;
+  }
+
+  /* SVG diagrams */
+  .diagram-wrap {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px; margin: 20px 0; overflow-x: auto;
+  }
+  .diagram-wrap svg { max-width: 100%; display: block; margin: 0 auto; }
+
+  /* Deploy targets */
+  .deploy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 16px 0; }
+  .deploy-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .deploy-card.ok { border-color: rgba(52,199,122,.4); }
+  .deploy-card .target-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .deploy-card .target-url { font-size: 12px; color: var(--text-dim); }
+
+  /* Bug cards */
+  .bug-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px 20px; margin-bottom: 12px;
+    border-right: 4px solid var(--good);
+  }
+  .bug-card.was-crit { border-right-color: var(--crit); }
+  .bug-id { font-size: 10px; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+  .bug-title { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 6px; }
+  .bug-desc { font-size: 13.5px; color: var(--text-dim); margin-bottom: 8px; }
+
+  /* Phase steps */
+  .phase-step { display: flex; gap: 16px; margin-bottom: 20px; }
+  .phase-num {
+    width: 32px; height: 32px; min-width: 32px;
+    border-radius: 50%; background: var(--surface2);
+    border: 2px solid var(--accent); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px; margin-top: 2px;
+  }
+  .phase-num.done { background: var(--good); border-color: var(--good); color: #fff; }
+
+  /* Scenario table */
+  .sc-pass td { background: rgba(52,199,122,.03); }
+  .sc-warn td { background: rgba(232,168,37,.03); }
+
+  /* Alert box */
+  .alert {
+    border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 14px;
+  }
+  .alert-info { background: rgba(139,124,246,.1); border: 1px solid rgba(139,124,246,.3); }
+  .alert-warn { background: rgba(232,168,37,.1); border: 1px solid rgba(232,168,37,.3); }
+  .alert-ok { background: rgba(52,199,122,.1); border: 1px solid rgba(52,199,122,.3); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  @media (max-width: 900px) {
+    body { flex-direction: column; }
+    nav { width: 100%; height: auto; position: static; order: 1; }
+    main { padding: 24px 20px; order: 2; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .deploy-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav>
+  <div class="logo">
+    <div class="logo-title">توا — P14</div>
+    <div class="logo-sub">السلة الموحدة متعددة المزودين</div>
+  </div>
+  <h3>نظرة عامة</h3>
+  <a href="#summary">ملخص التنفيذ</a>
+  <a href="#tests">نتائج الاختبارات</a>
+  <a href="#bugs">الأخطاء المُصلَحة</a>
+  <h3>التنفيذ</h3>
+  <a href="#phases">مراحل التنفيذ</a>
+  <a href="#scenarios">سيناريوهات الاستخدام</a>
+  <a href="#architecture">البنية المعمارية</a>
+  <h3>النشر</h3>
+  <a href="#deploy">حالة النشر</a>
+  <a href="#fincor">سلامة العقود</a>
+  <a href="#next">الخطوات التالية</a>
+</nav>
+
+<!-- Main -->
+<main>
+
+  <h1>تقرير تنفيذ P14<br>السلة الموحدة متعددة المزودين</h1>
+  <div class="hero-meta">
+    <div class="hero-chip">التاريخ: <span>6 يوليو 2026</span></div>
+    <div class="hero-chip">الفرع: <span>master</span></div>
+    <div class="hero-chip">الـ Commit: <span>9273550</span></div>
+    <div class="hero-chip">الملف: <span>CartGroupCheckoutPage.tsx</span></div>
+    <div class="hero-chip">الحجم: <span>404 → 1058 سطر</span></div>
+  </div>
+
+  <!-- ═══ SUMMARY ═══ -->
+  <h2 id="summary">ملخص التنفيذ</h2>
+
+  <p style="color:var(--text-dim)">
+    هذا التقرير يوثّق التنفيذ الكامل لمشروع P14 — السلة الموحدة متعددة المزودين.
+    الهدف: تمكين العميل من الشراء من أكثر من متجر في طلب واحد، مع معالجة صحيحة للدفع
+    ورمز OTP وفشل المزود الجزئي. كل شيء بُني وراجعه وكيلان مستقلان
+    ثم اختبرهما وكيل ثالث لتتبع السيناريوهات.
+  </p>
+
+  <div class="summary-grid">
+    <div class="stat-card"><div class="stat-num ok">1367</div><div class="stat-label">اختبارات ناجحة</div></div>
+    <div class="stat-card"><div class="stat-num ok">0</div><div class="stat-label">أخطاء TypeScript</div></div>
+    <div class="stat-card"><div class="stat-num ok">0</div><div class="stat-label">أخطاء Lint</div></div>
+    <div class="stat-card"><div class="stat-num acc">5</div><div class="stat-label">أخطاء حرجة مُصلَحة</div></div>
+    <div class="stat-card"><div class="stat-num acc">6</div><div class="stat-label">مراحل مُنفَّذة</div></div>
+    <div class="stat-card"><div class="stat-num ok">4</div><div class="stat-label">مواقع مُنشَر عليها</div></div>
+  </div>
+
+  <div class="alert alert-ok">
+    <strong>✓ الحالة النهائية:</strong> FIN-COR PASS — جميع الاختبارات تعمل —
+    النشر مكتمل على الأربعة مواقع.
+  </div>
+
+  <!-- ═══ TESTS ═══ -->
+  <h2 id="tests">نتائج الاختبارات</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>نوع الاختبار</th><th>النتيجة</th><th>التفاصيل</th></tr>
+      <tr>
+        <td>Vitest (Frontend)</td>
+        <td><span class="chip chip-ok">✓ 1367 / 1367</span></td>
+        <td>182 ملف اختبار — لا أخطاء جديدة</td>
+      </tr>
+      <tr>
+        <td>TypeScript typecheck</td>
+        <td><span class="chip chip-ok">✓ 0 أخطاء</span></td>
+        <td><code>npm run typecheck</code> — نجاح تام</td>
+      </tr>
+      <tr>
+        <td>ESLint</td>
+        <td><span class="chip chip-ok">✓ 0 أخطاء</span></td>
+        <td><code>npm run lint</code> — نظيف</td>
+      </tr>
+      <tr>
+        <td>Build</td>
+        <td><span class="chip chip-ok">✓ نجاح</span></td>
+        <td><code>npm run build</code> — exit 0</td>
+      </tr>
+      <tr>
+        <td>FIN-COR</td>
+        <td><span class="chip chip-ok">✓ PASS</span></td>
+        <td>SHA256 مطابق لملفي العقد المحميين</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══ BUGS ═══ -->
+  <h2 id="bugs">الأخطاء المُصلَحة (5 أخطاء)</h2>
+
+  <p style="color:var(--text-dim)">
+    بناءً على التحليل العميق ومقارنة أفضل الممارسات العالمية
+    (Stripe / Grab / Talabat / Uber Eats / Amazon) — اكتُشفت وأُصلحت 5 أخطاء حرجة:
+  </p>
+
+  <div class="bug-card was-crit">
+    <div class="bug-id">BUG-1 — حالة سباق (Race Condition)</div>
+    <div class="bug-title">أسعار التوصيل تظهر بيانات قديمة عند تغيير العنوان بسرعة</div>
+    <div class="bug-desc">
+      لو غيّر العميل عنوان التوصيل بسرعة، الطلبات القديمة كانت تكتب فوق الجديدة.
+      النتيجة: يظهر سعر توصيل غلط.
+    </div>
+    <strong>الإصلاح:</strong> نمط <code>cancelled flag</code> — عند تغيير العنوان، يُلغى الطلب القديم فوراً.
+    <pre>useEffect(() => {
+  let cancelled = false;
+  cartsApi.quote(selectedAddressId, providerIds)
+    .then(({ data }) => {
+      if (cancelled) return; // ← تجاهل النتيجة القديمة
+      setQuotes(data.providers);
+    });
+  return () => { cancelled = true; }; // ← تنظيف عند التغيير
+}, [selectedAddressId]);</pre>
+  </div>
+
+  <div class="bug-card was-crit">
+    <div class="bug-id">BUG-2 — خطأ مالي حرج (Duplicate Orders)</div>
+    <div class="bug-title">انقطاع الشبكة يُنشئ طلبين مكررين</div>
+    <div class="bug-desc">
+      الكود القديم يُولّد مفتاح أمان جديد عند كل خطأ — حتى لو الخادم استقبل الطلب
+      (مثل خطأ 504 Timeout). عند الإعادة، يُنشأ طلب ثانٍ مكرر.
+    </div>
+    <strong>الإصلاح (نمط Stripe):</strong> نحفظ المفتاح قبل الإرسال، ولا نُجدّده إلا عند أخطاء 4xx فقط.
+    <pre>// 1. احفظ قبل الإرسال
+sessionStorage.setItem("tawa_group_idem", idemKeyRef.current);
+
+// 2. في معالج الخطأ
+const status = err?.response?.status;
+if (status >= 400 && status < 500) {
+  // خطأ العميل = مفتاح جديد آمن
+  idemKeyRef.current = genUUID();
+  sessionStorage.removeItem("tawa_group_idem");
+}
+// 5xx / انقطاع شبكة = احتفظ بنفس المفتاح للإعادة الآمنة</pre>
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-id">BUG-3 — إمكانية وصول (ARIA Accessibility)</div>
+    <div class="bug-title">المكفوفون لا يسمعون رسائل الخطأ</div>
+    <div class="bug-desc">
+      عنصر الخطأ كان يُضاف/يُحذف من DOM ديناميكياً.
+      قارئات الشاشة لا تُعلن عن العناصر الجديدة في بعض المتصفحات.
+    </div>
+    <strong>الإصلاح:</strong> العنصر يبقى دائماً موجوداً في DOM، نُغيّر محتواه فقط.
+    <pre>&lt;div role="alert" aria-live="assertive" aria-atomic="true"&gt;
+  {errorMsg &amp;&amp; &lt;div style={s.errorBox}&gt;{errorMsg}&lt;/div&gt;}
+&lt;/div&gt;</pre>
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-id">BUG-4 — موثوقية البيانات</div>
+    <div class="bug-title">فشل جلب اسم متجر واحد يُعطّل عرض جميع المتاجر</div>
+    <div class="bug-desc">
+      <code>Promise.all</code> القديم: إذا فشل طلب واحد، يفشل الكل.
+    </div>
+    <strong>الإصلاح:</strong> استخدام <code>Promise.allSettled</code> — كل طلب مستقل عن الآخر.
+    <pre>Promise.allSettled(pids.map(pid => providersApi.get(pid)))
+  .then(results => {
+    results.forEach((r, i) => {
+      if (r.status === "fulfilled") {
+        names[pids[i]] = r.value.data.name || "متجر";
+      }
+      // "rejected" لا يوقف عرض بقية المتاجر
+    });
+  });</pre>
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-id">BUG-5 — تجربة المستخدم (Focus Management)</div>
+    <div class="bug-title">قارئ الشاشة لا يُعلن عن نجاح الطلب تلقائياً</div>
+    <div class="bug-desc">
+      بعد نجاح الطلب، لم يكن التركيز ينتقل لعنوان "تم الطلب!" تلقائياً.
+    </div>
+    <strong>الإصلاح:</strong> ننقل التركيز برمجياً عند ظهور شاشة النجاح.
+    <pre>useEffect(() => {
+  if (successOrders !== null) {
+    successHeadingRef.current?.focus(); // ← قارئ الشاشة يُعلن النجاح
+  }
+}, [successOrders !== null ? 1 : 0]);</pre>
+  </div>
+
+  <!-- ═══ PHASES ═══ -->
+  <h2 id="phases">مراحل التنفيذ</h2>
+
+  <div class="alert alert-info">
+    المراحل 1–6 مُنفَّذة بالكامل.
+    المراحل 7–8 (OrderGroupPage + تجميع السجل التاريخي) مُرجَأة.
+  </div>
+
+  <div class="phase-step">
+    <div class="phase-num done">1</div>
+    <div>
+      <h4>تحليل عميق ومقارنة دولية</h4>
+      <p>دراسة 810,000 رمز عبر 12 وكيل بحثي. مقارنة مع Grab (إندونيسيا)،
+      Talabat (الخليج)، Amazon Fresh، Stripe. تحديد 5 أخطاء حرجة و7 قرارات معمارية.</p>
+    </div>
+  </div>
+
+  <div class="phase-step">
+    <div class="phase-num done">2</div>
+    <div>
+      <h4>إضافة حقول المصادقة في SubOrderRequest</h4>
+      <p>في <code>web/src/api/carts.ts</code> — إضافة <code>otp_action_token?</code>
+      و <code>wallet_session_token?</code> حتى يحمل كل طلب فرعي توكن مصادقته المستقل.</p>
+    </div>
+  </div>
+
+  <div class="phase-step">
+    <div class="phase-num done">3</div>
+    <div>
+      <h4>إعادة كتابة CartGroupCheckoutPage.tsx كاملاً</h4>
+      <p>من 404 سطر إلى 1058 سطر. إضافة إدارة حالة الدفع (نقداً/محفظة)،
+      فحص الرصيد مسبقاً، ملاحظات لكل سلة، عرض أسماء المزودين.</p>
+    </div>
+  </div>
+
+  <div class="phase-step">
+    <div class="phase-num done">4</div>
+    <div>
+      <h4>نظام OTP داخلي متعدد الطلبات</h4>
+      <p>عند طلب رمز OTP لطلب معين، يظهر النموذج أسفل بطاقة ذلك المتجر مباشرة
+      دون إعادة توجيه. كل طلب فرعي يحمل توكنه في <code>otpTokens[index]</code>.</p>
+    </div>
+  </div>
+
+  <div class="phase-step">
+    <div class="phase-num done">5</div>
+    <div>
+      <h4>معالجة الشروط والديون</h4>
+      <p>شروط لم يقبلها المستخدم: تُعرض للموافقة ثم يُعاد الإرسال تلقائياً.
+      الديون المعلقة: زر "سداد الديون ومتابعة".</p>
+    </div>
+  </div>
+
+  <div class="phase-step">
+    <div class="phase-num done">6</div>
+    <div>
+      <h4>شاشة النجاح + حفظ خريطة المجموعة</h4>
+      <p>شاشة النجاح تظهر فوراً من بيانات الاستجابة. ثم يُجلب رمز التسليم
+      بشكل غير متزامن عبر <code>Promise.allSettled</code>.
+      يُحفظ <code>group_id → [order_ids]</code> في localStorage.</p>
+    </div>
+  </div>
+
+  <div class="phase-step">
+    <div class="phase-num">7</div>
+    <div>
+      <h4>صفحة OrderGroupPage <span class="chip chip-dim" style="font-size:11px">مُرجَأ</span></h4>
+      <p>صفحة لعرض تفاصيل مجموعة الطلبات. تحتاج موافقة منفصلة.</p>
+    </div>
+  </div>
+
+  <div class="phase-step">
+    <div class="phase-num">8</div>
+    <div>
+      <h4>تجميع السجل التاريخي <span class="chip chip-dim" style="font-size:11px">مُرجَأ</span></h4>
+      <p>مؤشر بصري في سجل الطلبات لتجميع الطلبات ذات group_id مشترك.</p>
+    </div>
+  </div>
+
+  <!-- ═══ SCENARIOS ═══ -->
+  <h2 id="scenarios">سيناريوهات الاستخدام (وكيل تتبع السيناريوهات)</h2>
+
+  <p style="color:var(--text-dim)">
+    وكيل مستقل راجع الكود بعين نقدية وتتبّع كل بند عبر جميع السيناريوهات الممكنة:
+  </p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>#</th><th>السيناريو</th><th>النتيجة</th><th>ملاحظة</th></tr>
+      <tr class="sc-pass">
+        <td>S1</td>
+        <td>دفع ناجح بالنقد من سلتين</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>شاشة نجاح فورية + رمز تسليم غير متزامن</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S2</td>
+        <td>دفع ناجح بالمحفظة</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>فحص رصيد مسبق + منع إذا غير كافٍ</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S3</td>
+        <td>OTP مطلوب لأحد المزودين</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>نموذج OTP داخلي — السلة الأخرى لا تتأثر</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S4</td>
+        <td>تغيير العنوان بسرعة</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>BUG-1 مُصلَح — لا بيانات قديمة</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S5</td>
+        <td>انقطاع شبكة + إعادة محاولة</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>BUG-2 مُصلَح — لا طلبات مكررة</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S6</td>
+        <td>فشل جلب اسم مزود</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>BUG-4 مُصلَح — يُعرض "متجر" للمزود الفاشل</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S7</td>
+        <td>شروط جديدة لم يوافق عليها</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>عرض الشرط → موافقة → إعادة إرسال تلقائية</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S8</td>
+        <td>ديون معلقة</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>زر "سداد الديون" + منع الإرسال حتى السداد</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S9</td>
+        <td>رمز OTP منتهي الصلاحية</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>مؤقت إعادة الإرسال + رسالة واضحة</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S10</td>
+        <td>الحد الأدنى للطلب غير مكتمل</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>تحذير مسبق + تعطيل زر الإرسال</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S11</td>
+        <td>التصفح الخاص (localStorage محظور)</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>try/catch يمنع انهيار الصفحة</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S12</td>
+        <td>قارئ الشاشة — رسائل الخطأ</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>BUG-3 مُصلَح — role=alert دائماً في DOM</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S13</td>
+        <td>قارئ الشاشة — نجاح الطلب</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>BUG-5 مُصلَح — التركيز ينتقل لعنوان النجاح</td>
+      </tr>
+      <tr class="sc-pass">
+        <td>S14</td>
+        <td>حذف سلة أثناء التسعير</td>
+        <td><span class="chip chip-ok">✓ يعمل</span></td>
+        <td>إذا تبقت سلة واحدة لا يعيد حساب التسعير الجماعي</td>
+      </tr>
+      <tr class="sc-warn">
+        <td>S15</td>
+        <td>Wallet step-up (مبلغ كبير)</td>
+        <td><span class="chip chip-warn">⚠ جزئي</span></td>
+        <td>startWalletStepUp مُنفَّذ، التحقق من العتبة يعتمد على الخادم</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══ ARCHITECTURE ═══ -->
+  <h2 id="architecture">البنية المعمارية — شرح مبسّط</h2>
+
+  <h3>كيف تعمل السلة الموحدة؟</h3>
+  <p style="color:var(--text-dim)">
+    تخيّل أنك تشتري من مطعم بيتزا ومن متجر عطور في نفس الوقت.
+    بدلاً من طلبين منفصلين، توا تجمعهما في طلب واحد. الصفحة تتأكد من الدفع
+    والمصادقة لكل متجر بشكل مستقل، ثم ترسلهما معاً.
+  </p>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 720 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a1" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#4A9EFF"/>
+        </marker>
+        <marker id="a2" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#34C77A"/>
+        </marker>
+        <marker id="a3" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#FF5C5C"/>
+        </marker>
+      </defs>
+
+      <!-- Step 1: Customer -->
+      <rect x="10" y="90" width="100" height="60" rx="8" fill="#131929" stroke="#4A9EFF" stroke-width="1.5"/>
+      <text x="60" y="118" fill="#BEC8DC" font-size="12" text-anchor="middle" font-weight="600">العميل</text>
+      <text x="60" y="134" fill="#7A8BA0" font-size="10" text-anchor="middle">سلة A + سلة B</text>
+
+      <!-- Arrow 1→2 -->
+      <path d="M110 120 L155 120" stroke="#4A9EFF" stroke-width="2" marker-end="url(#a1)"/>
+
+      <!-- Step 2: Checkout Page -->
+      <rect x="155" y="75" width="140" height="90" rx="8" fill="#131929" stroke="#4A9EFF" stroke-width="1.5"/>
+      <text x="225" y="105" fill="#BEC8DC" font-size="12" text-anchor="middle" font-weight="600">CartGroup</text>
+      <text x="225" y="120" fill="#BEC8DC" font-size="12" text-anchor="middle" font-weight="600">CheckoutPage</text>
+      <text x="225" y="137" fill="#7A8BA0" font-size="10" text-anchor="middle">يجمع الطلبات</text>
+      <text x="225" y="151" fill="#7A8BA0" font-size="10" text-anchor="middle">+ يتحقق من الدفع</text>
+
+      <!-- Arrow 2→3 -->
+      <path d="M295 120 L340 120" stroke="#4A9EFF" stroke-width="2" marker-end="url(#a1)"/>
+
+      <!-- Step 3: API -->
+      <rect x="340" y="90" width="130" height="60" rx="8" fill="#131929" stroke="#1E2D47"/>
+      <text x="405" y="118" fill="#BEC8DC" font-size="12" text-anchor="middle" font-weight="600">POST /carts</text>
+      <text x="405" y="134" fill="#7A8BA0" font-size="10" text-anchor="middle">/checkout</text>
+
+      <!-- Arrow 3→4 success -->
+      <path d="M470 105 L530 70" stroke="#34C77A" stroke-width="1.5" marker-end="url(#a2)"/>
+      <!-- Arrow 3→4 error -->
+      <path d="M470 135 L530 165" stroke="#FF5C5C" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#a3)"/>
+
+      <!-- Step 4a: Success -->
+      <rect x="530" y="40" width="130" height="55" rx="8" fill="#0f2018" stroke="#34C77A" stroke-width="1.5"/>
+      <text x="595" y="64" fill="#34C77A" font-size="12" text-anchor="middle" font-weight="600">✓ نجاح</text>
+      <text x="595" y="82" fill="#7A8BA0" font-size="10" text-anchor="middle">شاشة التأكيد</text>
+
+      <!-- Step 4b: Error/OTP -->
+      <rect x="530" y="145" width="130" height="55" rx="8" fill="#1a1529" stroke="#8B7CF6" stroke-width="1.5"/>
+      <text x="595" y="169" fill="#8B7CF6" font-size="12" text-anchor="middle" font-weight="600">OTP / خطأ</text>
+      <text x="595" y="186" fill="#7A8BA0" font-size="10" text-anchor="middle">معالجة داخلية</text>
+
+      <!-- Arrow: error back to page -->
+      <path d="M530 185 L225 170 L225 167" stroke="#8B7CF6" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#a1)"/>
+
+      <!-- Labels -->
+      <text x="360" y="240" fill="#7A8BA0" font-size="11" text-anchor="middle">المسار الأخضر: نجاح — المسار الأرجواني: خطأ يُعالَج داخل الصفحة</text>
+    </svg>
+  </div>
+
+  <h3>نمط مانع التكرار (Idempotency)</h3>
+  <p style="color:var(--text-dim)">
+    كيف نضمن أن انقطاع الشبكة لا ينتج طلبين؟ نحفظ "بصمة" الطلب قبل إرساله.
+    إذا انقطعت الشبكة، نُعيد نفس البصمة. الخادم يعرف أن هذا الطلب وصله قبلاً.
+  </p>
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 680 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="b1" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#4A9EFF"/>
+        </marker>
+      </defs>
+      <rect x="10" y="55" width="130" height="50" rx="6" fill="#131929" stroke="#4A9EFF" stroke-width="1.5"/>
+      <text x="75" y="77" fill="#BEC8DC" font-size="11" text-anchor="middle">1. احفظ المفتاح</text>
+      <text x="75" y="93" fill="#7A8BA0" font-size="10" text-anchor="middle">في sessionStorage</text>
+      <path d="M140 80 L178 80" stroke="#4A9EFF" stroke-width="2" marker-end="url(#b1)"/>
+
+      <rect x="178" y="55" width="130" height="50" rx="6" fill="#131929" stroke="#1E2D47"/>
+      <text x="243" y="77" fill="#BEC8DC" font-size="11" text-anchor="middle">2. أرسل الطلب</text>
+      <text x="243" y="93" fill="#7A8BA0" font-size="10" text-anchor="middle">+ المفتاح معه</text>
+      <path d="M308 70 L346 45" stroke="#34C77A" stroke-width="1.5" marker-end="url(#b1)"/>
+      <path d="M308 90 L346 115" stroke="#FF5C5C" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#b1)"/>
+
+      <rect x="346" y="20" width="130" height="45" rx="6" fill="#0f2018" stroke="#34C77A"/>
+      <text x="411" y="41" fill="#34C77A" font-size="11" text-anchor="middle">2xx — امسح المفتاح</text>
+      <text x="411" y="57" fill="#7A8BA0" font-size="10" text-anchor="middle">انتهى بأمان</text>
+
+      <rect x="346" y="95" width="130" height="45" rx="6" fill="#1a0f0f" stroke="#FF5C5C"/>
+      <text x="411" y="116" fill="#FF5C5C" font-size="11" text-anchor="middle">5xx / شبكة</text>
+      <text x="411" y="131" fill="#7A8BA0" font-size="10" text-anchor="middle">احتفظ بالمفتاح</text>
+      <path d="M476 120 L530 120 L530 80 L178 80" stroke="#FF5C5C" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#b1)"/>
+
+      <text x="600" y="82" fill="#7A8BA0" font-size="10" text-anchor="middle">إعادة</text>
+      <text x="600" y="96" fill="#7A8BA0" font-size="10" text-anchor="middle">آمنة</text>
+    </svg>
+  </div>
+
+  <h3>الملفات المُعدَّلة</h3>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>الملف</th><th>نوع التغيير</th><th>التفاصيل</th></tr>
+      <tr>
+        <td><code>CartGroupCheckoutPage.tsx</code></td>
+        <td><span class="chip chip-crit">إعادة كتابة كاملة</span></td>
+        <td>404 → 1058 سطر — 5 إصلاحات + 6 ميزات جديدة</td>
+      </tr>
+      <tr>
+        <td><code>web/src/api/carts.ts</code></td>
+        <td><span class="chip chip-info">إضافة حقول</span></td>
+        <td><code>otp_action_token?</code> و <code>wallet_session_token?</code></td>
+      </tr>
+      <tr>
+        <td><code>ProviderDashboard.test.tsx</code></td>
+        <td><span class="chip chip-info">تحسين الاختبار</span></td>
+        <td>QueryClientProvider + MSW handler للحساب النشط</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══ DEPLOY ═══ -->
+  <h2 id="deploy">حالة النشر على الأربعة مواقع</h2>
+
+  <div class="deploy-grid">
+    <div class="deploy-card ok">
+      <div class="target-name">✅ GitHub (الهدف 1)</div>
+      <div class="target-url">github.com/abd2508/tawa-platform</div>
+      <div style="margin-top:8px; font-size:13px">
+        Commit: <code>9273550</code> — master<br>
+        <code>git push origin master</code> ✓
+      </div>
+    </div>
+    <div class="deploy-card ok">
+      <div class="target-name">✅ Kali محلي (الهدف 2)</div>
+      <div class="target-url">127.0.0.1:8080 — tawalocal</div>
+      <div style="margin-top:8px; font-size:13px">
+        بناء: <code>main-BlXuelzj.js</code><br>
+        HTTP 200 — Container healthy ✓
+      </div>
+    </div>
+    <div class="deploy-card ok">
+      <div class="target-name">✅ Ubuntu .194 (الهدف 3)</div>
+      <div class="target-url">192.168.178.194:8091 — tawa-test</div>
+      <div style="margin-top:8px; font-size:13px">
+        بناء: <code>main-D8vGWMDM.js</code><br>
+        HTTP 200 ✓
+      </div>
+    </div>
+    <div class="deploy-card ok">
+      <div class="target-name">✅ Hetzner Staging (الهدف 4)</div>
+      <div class="target-url">staging.tawanow.com</div>
+      <div style="margin-top:8px; font-size:13px">
+        بناء: <code>main-BlXuelzj.js</code><br>
+        Container healthy ✓
+      </div>
+    </div>
+  </div>
+
+  <h3>تسلسل النشر الآمن</h3>
+  <div class="card">
+    <ol style="padding-right:22px; line-height:2.1; color: var(--text-dim)">
+      <li><strong style="color:var(--text)">FIN-COR</strong> — تحقق SHA256 من ملفي العقد ✓</li>
+      <li><strong style="color:var(--text)">Vitest</strong> — 1367 اختبار — 0 إخفاقات ✓</li>
+      <li><strong style="color:var(--text)">TypeScript + Lint + Build</strong> — 0 أخطاء ✓</li>
+      <li><strong style="color:var(--text)">GitHub</strong> — git push origin master → 9273550 ✓</li>
+      <li><strong style="color:var(--text)">Kali</strong> — إعادة بناء + إعادة تشغيل + تأكيد HTTP 200 ✓</li>
+      <li><strong style="color:var(--text)">Ubuntu .194</strong> — رفع المصدر + إعادة بناء + HTTP 200 ✓</li>
+      <li><strong style="color:var(--text)">Hetzner</strong> — رفع المصدر + إعادة بناء + Container healthy ✓</li>
+    </ol>
+  </div>
+
+  <!-- ═══ FINCOR ═══ -->
+  <h2 id="fincor">سلامة العقود المالية (FIN-COR)</h2>
+
+  <div class="alert alert-ok">
+    ✅ <strong>PASS</strong> — كلا ملفي العقد لم يُمَس. الأعلام المحمية سليمة.
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>الملف</th><th>SHA256</th><th>الحالة</th></tr>
+      <tr>
+        <td><code>contracts/feature_flags.yaml</code></td>
+        <td style="font-family:monospace;font-size:11px;direction:ltr">25ddf010...1f91557</td>
+        <td><span class="chip chip-ok">✓ مطابق</span></td>
+      </tr>
+      <tr>
+        <td><code>contracts/launch_gates.yaml</code></td>
+        <td style="font-family:monospace;font-size:11px;direction:ltr">6c78dc89...cd68414</td>
+        <td><span class="chip chip-ok">✓ مطابق</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <p style="color:var(--text-dim); font-size:13.5px; margin-top:12px">
+    الأعلام المحمية: <code>wallet_cash_out=false</code> ·
+    <code>wallet_peer_transfer=false</code> ·
+    <code>production_payment_enabled=false</code>
+    — جميعها لم تُعدَّل.
+  </p>
+
+  <!-- ═══ NEXT ═══ -->
+  <h2 id="next">الخطوات التالية</h2>
+
+  <div class="alert alert-warn">
+    جميع الخطوات التالية تحتاج موافقة المشغّل — لا تُنفَّذ تلقائياً.
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>المرحلة</th><th>الوصف</th><th>الأولوية</th></tr>
+      <tr>
+        <td>P14-7</td>
+        <td>صفحة OrderGroupPage — عرض تفاصيل مجموعة الطلبات</td>
+        <td><span class="chip chip-warn">متوسطة</span></td>
+      </tr>
+      <tr>
+        <td>P14-8</td>
+        <td>تجميع بصري في سجل الطلبات للطلبات المرتبطة</td>
+        <td><span class="chip chip-dim">منخفضة</span></td>
+      </tr>
+      <tr>
+        <td>Stage-2</td>
+        <td>تطبيق migrations aa01–aa15 عند إعادة بناء صورة الـ DB</td>
+        <td><span class="chip chip-crit">يحتاج موافقة</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <hr>
+  <p style="color:var(--text-dim); font-size:13px; text-align:center; padding-bottom:32px">
+    تقرير تنفيذ P14 — منصة توا للتوصيل في ليبيا<br>
+    تم الإنشاء: 6 يوليو 2026 · master · Commit: 9273550
+  </p>
+
+</main>
+
+<script>
+const sections = document.querySelectorAll('h2[id]');
+const links = document.querySelectorAll('nav a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

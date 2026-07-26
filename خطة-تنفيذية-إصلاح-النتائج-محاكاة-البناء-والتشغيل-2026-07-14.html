@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الخطة التنفيذية — إصلاح النتائج + محاكاة البناء والتشغيل</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --purple:#7c3aed; --purple-bg:#f1eafe;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --code-bg:#f1f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+      --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+      --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+      --purple:#b79bff; --purple-bg:#241a3d;
+      --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --code-bg:#0f1018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+    --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+    --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+    --purple:#b79bff; --purple-bg:#241a3d;
+    --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --code-bg:#0f1018;
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --purple:#7c3aed; --purple-bg:#f1eafe;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --code-bg:#f1f2f7;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","Tahoma","Geeza Pro","Noto Naskh Arabic",sans-serif; line-height:1.75; margin:0; font-size:16px;}
+  .wrap{max-width:1100px; margin:0 auto; padding:28px 20px 90px;}
+  header.hero{background:linear-gradient(135deg,var(--accent),#2563eb); color:#fff; border-radius:18px; padding:34px 28px; margin-bottom:26px; box-shadow:0 10px 30px rgba(0,0,0,.15);}
+  header.hero h1{margin:0 0 10px; font-size:1.65rem; line-height:1.5;}
+  header.hero p{margin:0; opacity:.95;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+  .meta-chip{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:6px 14px; border-radius:999px; font-size:.85rem;}
+
+  h2{font-size:1.35rem; margin:44px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px;}
+  h3{font-size:1.12rem; margin:22px 0 10px;}
+  h4{font-size:1rem; margin:16px 0 8px; color:var(--accent);}
+  .lead{color:var(--sub); margin-bottom:18px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,.03);}
+
+  .simple{background:var(--blue-bg); border-inline-start:4px solid var(--blue); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.94rem;}
+  .simple b{color:var(--blue);}
+  .warn{background:var(--amber-bg); border-inline-start:4px solid var(--amber); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.94rem;}
+  .warn b{color:var(--amber);}
+  .gate{background:var(--purple-bg); border-inline-start:4px solid var(--purple); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.94rem;}
+  .gate b{color:var(--purple);}
+
+  table{width:100%; border-collapse:collapse; font-size:.9rem;}
+  .tbl-wrap{overflow-x:auto; border-radius:12px; border:1px solid var(--border);}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{background:var(--code-bg); font-size:.82rem; color:var(--sub);}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--code-bg); padding:2px 6px; border-radius:6px; font-size:.85em; direction:ltr; display:inline-block; unicode-bidi:embed;}
+  pre{background:var(--code-bg); padding:14px; border-radius:10px; overflow-x:auto; direction:ltr; text-align:left; font-size:.82rem; border:1px solid var(--border);}
+
+  .badge{display:inline-block; padding:3px 11px; border-radius:999px; font-size:.76rem; font-weight:700; white-space:nowrap;}
+  .badge.t1{background:var(--green-bg); color:var(--green);}
+  .badge.t2{background:var(--blue-bg); color:var(--blue);}
+  .badge.t3{background:var(--red-bg); color:var(--red);}
+  .badge.t4{background:var(--gray-bg); color:var(--gray);}
+  .badge.t5{background:var(--amber-bg); color:var(--amber);}
+  .badge.safe{background:var(--green-bg); color:var(--green);}
+  .badge.gated{background:var(--purple-bg); color:var(--purple);}
+
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px;}
+  .toc ol{columns:2; padding-inline-start:20px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.92rem;}
+  .toc li{margin-bottom:6px;}
+
+  /* work package card */
+  .wp{border:1px solid var(--border); border-radius:16px; padding:20px 22px; margin-bottom:20px; background:var(--card);}
+  .wp-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+  .wp-title{font-weight:800; font-size:1.05rem;}
+  .wp-file{color:var(--sub); font-size:.83rem; margin-top:3px;}
+  .badges{display:flex; gap:6px; flex-wrap:wrap;}
+
+  .schema-grid{display:grid; grid-template-columns:1fr; gap:10px; margin-top:14px;}
+  .schema-item{border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:var(--code-bg);}
+  .schema-item .sh-label{font-weight:700; font-size:.85rem; color:var(--accent); margin-bottom:5px; display:flex; align-items:center; gap:6px;}
+  .schema-item p{margin:4px 0; font-size:.9rem;}
+
+  .sim-cols{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .sim-col{border-radius:10px; padding:12px 14px;}
+  .sim-col.build{background:var(--blue-bg); border:1px solid var(--blue);}
+  .sim-col.build .sh-label{color:var(--blue);}
+  .sim-col.runtime{background:var(--green-bg); border:1px solid var(--green);}
+  .sim-col.runtime .sh-label{color:var(--green);}
+  @media (max-width:680px){.sim-cols{grid-template-columns:1fr;}}
+
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:16px 0; font-size:.86rem;}
+  .flow .box{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:10px 14px; text-align:center; flex:1; min-width:110px;}
+  .flow .box.bad{border-color:var(--red); background:var(--red-bg); color:var(--red); font-weight:700;}
+  .flow .box.ok{border-color:var(--green); background:var(--green-bg); color:var(--green); font-weight:700;}
+  .flow .box.mid{border-color:var(--amber); background:var(--amber-bg); color:var(--amber); font-weight:700;}
+  .flow .arrow{color:var(--sub); font-size:1.3rem;}
+
+  .timeline{display:flex; flex-direction:column; gap:0; margin:20px 0;}
+  .tl-row{display:flex; gap:16px; position:relative; padding-bottom:24px;}
+  .tl-row:last-child{padding-bottom:0;}
+  .tl-dot{width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; flex-shrink:0; z-index:1;}
+  .tl-row:not(:last-child)::before{content:""; position:absolute; top:34px; bottom:0; right:16px; width:2px; background:var(--border);}
+  .tl-content{flex:1; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px;}
+  .tl-content h4{margin:0 0 6px;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:18px 0;}
+  .stat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center;}
+  .stat .num{font-size:1.7rem; font-weight:800; color:var(--accent);}
+  .stat .lbl{color:var(--sub); font-size:.82rem; margin-top:4px;}
+
+  footer{text-align:center; color:var(--sub); font-size:.85rem; margin-top:50px; padding-top:20px; border-top:1px solid var(--border);}
+  ul.clean{padding-inline-start:20px;}
+  ul.clean li{margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🗺️ الخطة التنفيذية لإصلاح النتائج<br>محاكاة ذهنية كاملة لما يحدث أثناء الإصلاح، أثناء البناء، وأثناء التشغيل بعد النشر</h1>
+  <p>هذه الخطة مبنية مباشرة على تقرير "تدقيق التدقيق" (29 عطلاً مؤكداً بالكود والاختبار الحي). لكل إصلاح: السبب الجذري، الحل، من يتأثر به، ماذا يحدث في لحظة البناء والنشر، ماذا يتغيّر في سلوك النظام بعد التشغيل، وما هي الأعراض الجانبية المتوقعة وحلّها.</p>
+  <div class="meta-row">
+    <span class="meta-chip">📋 26 حزمة عمل من أصل 29 نتيجة</span>
+    <span class="meta-chip">🧠 محاكاة بناء + تشغيل لكل حزمة</span>
+    <span class="meta-chip">🚦 5 مستويات مخاطر مرتّبة زمنياً</span>
+    <span class="meta-chip">🔒 كل بند مُعلَّم: آمن أم يحتاج إذن المشغّل</span>
+  </div>
+</header>
+
+<div class="gate">
+  <b>⚠️ قيد حاكم يجب قراءته قبل أي شيء آخر:</b> هذا المستند <b>مقترح للموافقة</b>، وليس أمراً بالتنفيذ الفوري. حسب قواعد المشروع (<code>CLAUDE.md</code>)، حالة المشروع الحالية هي "الأعمال الهندسية المتراكمة اكتملت — بانتظار المشغّل"، ولا يجوز تعديل أي كود دون طلب صريح، خصوصاً في مناطق محظورة (قاعدة البيانات، الهجرات، العقود، الاختبارات، وحدات الخلفية المالية). لذلك كل حزمة عمل أدناه مُعلَّمة بوضوح: <span class="badge safe">آمن — واجهة فقط</span> يمكن البدء به بأقل مخاطرة، أو <span class="badge gated">يحتاج إذن المشغّل</span> لأنه يمسّ المال أو قاعدة البيانات أو النشر.
+</div>
+
+<div class="card toc">
+  <b>محتويات الخطة</b>
+  <ol class="toc">
+    <li><a href="#method">١. منهجية المحاكاة الذهنية (الأجزاء الستة لكل إصلاح)</a></li>
+    <li><a href="#tiers">٢. خريطة المخاطر والتسلسل الزمني</a></li>
+    <li><a href="#cross">٣. الأثر العابر للحزم — أخطر نقطة في كل الخطة</a></li>
+    <li><a href="#t1">٤. المستوى الأول — إصلاحات شبه معدومة المخاطر</a></li>
+    <li><a href="#t2">٥. المستوى الثاني — تحتاج فحص المستهلكين والعقد</a></li>
+    <li><a href="#t3">٦. المستوى الثالث — عالية الخطورة، تحتاج إذناً ومراحل</a></li>
+    <li><a href="#t4">٧. المستوى الرابع — البنية التحتية والحوكمة</a></li>
+    <li><a href="#t5">٨. المستوى الخامس — جودة الواجهة والجوّال</a></li>
+    <li><a href="#timeline">٩. الجدول الزمني المقترح للتنفيذ</a></li>
+    <li><a href="#decisions">١٠. جدول القرارات المطلوبة من المشغّل</a></li>
+    <li><a href="#crosswalk">ملحق — مطابقة كل نتيجة بحزمتها</a></li>
+  </ol>
+</div>
+
+<h2 id="method">١. منهجية المحاكاة الذهنية</h2>
+<p class="lead">لكل حزمة عمل أدناه، طبّقنا نفس الأسئلة الستة — هذا هو المقصود بـ"محاكاة ماذا سيحدث أثناء الإصلاح والبناء، وأثناء التشغيل بعد ذلك":</p>
+<div class="schema-grid">
+  <div class="schema-item"><div class="sh-label">1️⃣ السبب الجذري</div><p>لماذا يحدث العطل فعلياً؟ — سطر الكود بالضبط، لا وصف عام.</p></div>
+  <div class="schema-item"><div class="sh-label">2️⃣ الإصلاح المقترح</div><p>ما هو التغيير المحدد المطلوب؟</p></div>
+  <div class="schema-item"><div class="sh-label">3️⃣ نصف قطر الانفجار (من يتأثر؟)</div><p>كل شاشة وتطبيق وجدول بيانات يستدعي هذا الكود أو يعتمد على شكل رده الحالي.</p></div>
+  <div class="schema-item"><div class="sh-label">4️⃣ محاكاة لحظة البناء والنشر</div><p>ماذا يحدث في الدقائق التي يُنشر فيها الإصلاح؟ هل توجد هجرة قاعدة بيانات؟ هل تنقطع الخدمة؟ ماذا يحدث للطلبات التي كانت "في الطريق" في تلك اللحظة بالضبط؟</p></div>
+  <div class="schema-item"><div class="sh-label">5️⃣ محاكاة ما بعد التشغيل</div><p>بعد أن يعمل الإصلاح لساعات/أيام، ما هو السلوك الجديد الذي سيلاحظه المستخدمون والموظفون؟ هل تتغيّر الأرقام المعروضة؟ هل تظهر حالات حدية جديدة لم تكن ممكنة قبل الإصلاح؟</p></div>
+  <div class="schema-item"><div class="sh-label">6️⃣ الأعراض الجانبية وحلّها</div><p>ما الذي قد "ينكسر" بسبب هذا الإصلاح تحديداً، رغم أنه يصلح المشكلة الأصلية؟ وما هو الحل المُدرَج لهذا العرض الجانبي نفسه — لا يُترك بلا حل.</p></div>
+</div>
+<div class="simple"><b>بلغة بسيطة:</b> تخيّل أنك تُصلح تسريب ماء في المطبخ. السؤال ليس فقط "كيف أوقف التسريب؟" — بل أيضاً: هل سأحتاج لقطع الماء عن كل الشقة أثناء الإصلاح (محاكاة البناء)؟ وبعد الإصلاح، هل سيتغيّر ضغط الماء في باقي الحنفيات (محاكاة التشغيل)؟ وهل الأنبوب الجديد يحتاج قطعة تثبيت لم تكن موجودة من قبل (عرض جانبي)؟</div>
+
+<h2 id="tiers">٢. خريطة المخاطر والتسلسل الزمني</h2>
+<div class="flow">
+  <div class="box ok">المستوى 1<br>آمن، فوري<br>4 حزم</div>
+  <div class="arrow">←</div>
+  <div class="box mid">المستوى 2<br>يحتاج فحص مستهلكين<br>4 حزم</div>
+  <div class="arrow">←</div>
+  <div class="box bad">المستوى 3<br>حرِج، مرحلي، بإذن<br>5 حزم</div>
+  <div class="arrow">←</div>
+  <div class="box">المستوى 4<br>بنية تحتية/حوكمة<br>6 حزم</div>
+  <div class="arrow">←</div>
+  <div class="box">المستوى 5<br>جودة واجهة/جوّال<br>7 حزم</div>
+</div>
+<p class="lead">الترتيب ليس عشوائياً: المستوى الأول لا يعتمد على شيء ولا يؤثر على شيء آخر، فيبدأ أولاً لبناء الثقة بسرعة. المستوى الثالث (خصوصاً نظام منع التكرار) يجب أن يكتمل ويُختبر جيداً <b>قبل</b> أي توسّع مستقبلي في الدفع الإلكتروني، لأنه يمسّ كل عملية مالية في النظام.</p>
+
+<h2 id="cross">٣. الأثر العابر للحزم — أخطر نقطة في كل هذه الخطة</h2>
+<div class="card" style="border-color:var(--red);">
+  <h3 style="color:var(--red); margin-top:0;">🕸️ نظام منع التكرار (Idempotency) ليس "إصلاحاً واحداً" — إنه يمسّ كل عملية دفع في النظام</h3>
+  <p>وجدنا أن <b>14 ملفاً مختلفاً</b> في الويب والجوّال يرسل رأس <code>Idempotency-Key</code> فعلياً: صفحة الدفع (Checkout)، تحويل المحفظة، قائمة الانتظار غير المتصلة (offline outbox) في الويب والجوّال معاً، طلبات التوصيل، عروض السائق، وغيرها. أي تغيير في طريقة تخزين هذا المفتاح يمسّ <b>كل هذه المسارات في آنٍ واحد</b>، وليس فقط الثلاثة المذكورة في تعليق الكود (شحن المحفظة، الاسترداد، عروض التوصيل).</p>
+  <div class="flow">
+    <div class="box">صفحة الدفع (ويب)</div>
+    <div class="box">تحويل المحفظة</div>
+    <div class="box">قائمة الانتظار (ويب)</div>
+    <div class="box">قائمة الانتظار (جوّال)</div>
+    <div class="box">طلبات التوصيل</div>
+    <div class="box">عروض السائق</div>
+  </div>
+  <div class="flow"><div class="box bad" style="flex:0 0 100%;">كلها ← تعتمد على نفس آلية <code>idempotency:{المفتاح}</code> في نظام واحد</div></div>
+  <p class="warn"><b>العرض الجانبي الأخطر في كل الخطة:</b> لو غيّرنا شكل المفتاح المخزَّن (لإضافة اسم المستخدم والمسار كما يوصي الإصلاح رقم T3-1)، فإن كل المفاتيح <b>القديمة</b> المخزَّنة حالياً (صالحة حتى 24 ساعة) تصبح "يتيمة" فجأة — لا يستطيع أي طلب قديم إيجادها بالشكل الجديد. لو أعاد عميل إرسال طلب دفع يعتقد أنه لم يكتمل (لأن جهازه لم يستلم الرد الأول قبل النشر)، فسيُنفَّذ الطلب <b>من جديد</b> لأن النظام الجديد لا "يتذكّر" المفتاح القديم — وهذا يعني خطر "خصم مزدوج" حقيقي في نافذة النشر تحديداً. <b>هذا مُدرَج بالتفصيل مع الحل في حزمة T3-1 أدناه — لا يجوز نشر هذا الإصلاح دون خطة انتقال.</b></p>
+</div>
+
+<h2 id="t1">٤. المستوى الأول — إصلاحات شبه معدومة المخاطر <span class="badge t1">ابدأ هنا أولاً</span></h2>
+<p class="lead">لا تلمس قاعدة البيانات، ولا تغيّر شكل أي رد يعتمد عليه تطبيق آخر، ومغطاة بأنماط اختبار موجودة مسبقاً في المشروع.</p>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T1-1 — كلمة المرور الظاهرة بنص صريح في لوحة التحكم</div><div class="wp-file"><code>web/src/components/ops/UserExtraDetails.tsx:184</code></div></div>
+    <div class="badges"><span class="badge t1">مستوى 1</span><span class="badge safe">آمن — واجهة فقط</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p>حقل الإدخال معرَّف بـ<code>type="text"</code> بدل <code>type="password"</code> — خطأ نسخ ولصق على الأرجح عند بناء الشاشة.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>تغيير سطر واحد فقط: <code>type="text"</code> ← <code>type="password"</code>.</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>هذا الحقل مستخدَم فقط داخل شاشة تفاصيل المستخدم في لوحة العمليات، ولا يستدعيه أي كود آخر أو اختبار يعتمد على أن الحقل من نوع "نص".</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا شيء — تغيير CSS/HTML بحت، لا هجرة، لا انقطاع خدمة، ينشر فوراً مع بقية الواجهة.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>موظف العمليات يرى نقاطاً سوداء بدل النص عند كتابة كلمة مرور جديدة — لا تغيير وظيفي آخر.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية</div><p><b>لا يوجد عرض جانبي متوقع.</b> هذا من أندر الإصلاحات التي لا تحمل أي مخاطرة تذكر — مرشّح مثالي ليكون أول شيء يُنفَّذ.</p></div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T1-2 — انهيار 5 نقاط نهاية إدارية عند إدخال رقم صفحة سالب</div><div class="wp-file"><code>control_panel_router.py</code>، <code>finance_router.py</code>، <code>operations_router.py</code> — 24+ موضعاً مشابهاً</div></div>
+    <div class="badges"><span class="badge t1">مستوى 1</span><span class="badge gated">يحتاج إذناً (تعديل خلفية)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p>تعريف المعامل <code>limit: int = Query(default=N, le=200)</code> يحدد الحد الأعلى فقط، بلا حد أدنى — فتقبل قيماً سالبة تصل لقاعدة البيانات كـ<code>LIMIT -1</code> فتنهار.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>إضافة <code>ge=0</code> (أو <code>ge=1</code>) إلى كل تعريف — سطر واحد لكل نقطة نهاية، نمط متطابق يمكن تطبيقه دفعة واحدة عبر الملفات الثلاثة (24+ موضعاً حسب الفحص الشامل، وليس 5 فقط كما ظهر في العينة الأولى).</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>كل شاشة في لوحة العمليات ولوحة التحكم تستدعي هذه القوائم — لكن التغيير <b>لا يغيّر الشكل الطبيعي للرد</b>، فقط يرفض القيم غير المنطقية بأدب (422) بدل الانهيار (500). لا يوجد مستهلك يعتمد فعلياً على إرسال قيمة سالبة.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا هجرة قاعدة بيانات. نشر خلفية عادي (rolling deploy) — أثناء دقيقة التبديل بين النسخة القديمة والجديدة، قد تستقبل بعض الطلبات النسخة القديمة (لا حماية) وبعضها الجديدة (محمية) — هذا سلوك طبيعي غير ضار لأن كلا النسختين تُرجع رداً منطقياً لطلب سليم.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>أي طلب بقيمة <code>limit</code> سالبة أو غير منطقية يعيد الآن رسالة تحقق واضحة (422) بدل شاشة "خطأ داخلي" مخيفة للموظف. لا تغيير على أي استخدام طبيعي.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية</div><p>لا نتوقع عرضاً جانبياً حقيقياً. الاحتمال الوحيد النظري: لو كانت واجهة أمامية ما (غير مكتشفة في الفحص) ترسل عمداً <code>limit=0</code> كإشارة لـ"أرجع الكل" (نمط شائع في بعض الأنظمة)، فسيتغيّر سلوكها. <b>الحل الوقائي:</b> اختيار <code>ge=1</code> بدل <code>ge=0</code> إن أراد الفريق منع هذا الاحتمال بالكامل، أو فحص كل استدعاءات الواجهة الأمامية بـ<code>grep "limit=0"</code> (بحث سريع لا يستغرق دقائق) قبل النشر للتأكد.</p></div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T1-3 — إحداثيات NaN تُقبل في البحث عن المتاجر بدل أن تُرفض</div><div class="wp-file"><code>backend/app/modules/providers/provider_router.py:171-172</code></div></div>
+    <div class="badges"><span class="badge t1">مستوى 1</span><span class="badge gated">يحتاج إذناً (تعديل خلفية)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p><code>lat: Optional[float] = Query(None)</code> بلا قيد على القيم المنطقية؛ Python/Pydantic تقبل السلسلة النصية "NaN" وتحوّلها لقيمة عائمة خاصة تمر دون رفض.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>إضافة تحقق صريح: رفض القيمة إن كانت <code>NaN</code> أو غير منتهية (Infinity)، أو تقييد النطاق الجغرافي المنطقي (<code>ge=-90, le=90</code> لخط العرض، <code>ge=-180, le=180</code> لخط الطول).</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>نقطة بحث المتاجر تُستدعى من شاشات العميل الرئيسية (البحث، الصفحة الرئيسية) وتطبيق الجوّال. القيود المضافة لا تمنع أي إحداثية جغرافية حقيقية على وجه الأرض — فقط القيم غير المنطقية.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا هجرة. نشر خلفية عادي بلا انقطاع.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>أي جهاز يرسل إحداثية تالفة (خطأ في GPS، تطبيق قديم لم يحدَّث بعد) يستقبل الآن 422 واضحاً بدل نتائج عشوائية غير مرتبطة بموقعه الحقيقي.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية</div><p><b>احتمال حقيقي:</b> لو كان أي تطبيق (خصوصاً جوّال قديم لم يُحدَّث) يرسل أحياناً إحداثية فارغة أو تالفة كسلوك طبيعي عند فشل GPS مؤقتاً، فسيبدأ يستقبل خطأ بدل نتائج "افتراضية" كان يعرضها سابقاً (نتائج بلا ترتيب حسب المسافة). <b>الحل:</b> قبل النشر، فحص كود تطبيقَي الجوّال (Flutter وReact Native) للتأكد أنهما يرسلان قيمة فارغة (لا شيء) بدل NaN عند فشل تحديد الموقع — لا NaN نفسها — بحيث يستمران بالعمل بلا ترتيب جغرافي بدل الحصول على خطأ.</p></div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T1-4 — انهيار تصدير الشكاوى عند عدم تحديد فلتر الحالة</div><div class="wp-file"><code>operations_router.py</code> — دالة <code>export_complaints_csv</code>، حول السطر 5710</div></div>
+    <div class="badges"><span class="badge t1">مستوى 1</span><span class="badge gated">يحتاج إذناً (تعديل خلفية)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p><code>text(sql).bindparams(state=state or None)</code> — عندما تكون القيمة None، لا تستطيع مكتبة قاعدة البيانات (SQLAlchemy) تحديد نوعها تلقائياً، فتفشل.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>تحديد نوع المعامل صراحةً: <code>bindparams(bindparam("state", type_=String))</code>، أو أبسط: بناء الاستعلام بفرعين منفصلين (مع فلتر / بلا فلتر) بدل الاعتماد على شرط SQL شرطي مع قيمة فارغة.</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>زر "تصدير الكل" في شاشة الشكاوى فقط. لا يوجد مستهلك آخر لهذه الدالة.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا هجرة. نشر خلفية عادي.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>زر "تصدير الكل" (بلا فلتر) يعمل الآن ويُخرج كل الشكاوى في ملف CSV واحد، بدل الانهيار.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية</div><p>إن كان عدد الشكاوى كبيراً جداً وقت التصدير الكامل (الاستعلام محدود بحد أقصى 5000 صف حسب الكود الحالي)، فقد يستغرق التصدير وقتاً أطول من التصدير المفلتر — لكن هذا سلوك متوقع ومقبول لعملية "تصدير الكل"، وليس عطلاً جديداً.</p></div>
+</div>
+
+<h2 id="t2">٥. المستوى الثاني — تحتاج فحص المستهلكين والعقد <span class="badge t2">افحص قبل النشر</span></h2>
+<p class="lead">هذه الإصلاحات تغيّر <b>شكل</b> الرد أو <b>عدد</b> النتائج التي تراها الشاشات — يجب فحص كل من يعتمد على الشكل القديم قبل النشر.</p>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T2-1 — البحث لا يعمل إلا بالعربية</div><div class="wp-file"><code>backend/app/core/search_service.py:213-221</code></div></div>
+    <div class="badges"><span class="badge t2">مستوى 2</span><span class="badge gated">يحتاج إذناً (خلفية + قد يحتاج هجرة)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p>استعلام البحث يقارن فقط بالحقل العربي <code>names_json->>'ar'</code>، متجاهلاً الحقلين الإنجليزي والفرنسي المخزَّنين فعلياً في قاعدة البيانات لكل صنف.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>تغيير الاستعلام إلى: <code>GREATEST(similarity(ar), similarity(lower(en)), similarity(lower(fr)))</code> بدل الاعتماد على العربي فقط.</p></div>
+  </div>
+  <div class="warn">
+    <b>اكتشاف مهم أثناء التخطيط:</b> فحصنا ملفات الهجرة (migrations) فوجدنا أن فهرس تسريع البحث الإنجليزي (<code>idx_catalog_items_name_en_trgm</code>) <b>موجود بالفعل</b> منذ شهرين تقريباً (بُني في مرحلة سابقة من المشروع) — لكن كود الاستعلام لم يُحدَّث لاستخدامه قط! هذا يعني: <b>إصلاح البحث الإنجليزي لا يحتاج أي هجرة جديدة إطلاقاً</b> — تعديل استعلام فقط. أما البحث الفرنسي، فلا يوجد له فهرس مطلقاً — يحتاج <b>هجرة قاعدة بيانات جديدة</b> لإنشاء فهرس مشابه، وإلا سيعمل البحث الفرنسي لكن ببطء شديد على كتالوج كبير (بحث تسلسلي كامل بدل فهرس سريع).
+  </div>
+  <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>كل شاشة بحث في الويب والجوّال، والصفحة الرئيسية (اقتراحات المنتجات)، وأي تقرير تحليلي يعتمد على نتائج البحث.</p></div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p><b>الجزء الإنجليزي:</b> نشر خلفية عادي، الفهرس جاهز مسبقاً، لا انقطاع. <b>الجزء الفرنسي:</b> هجرة <code>CREATE INDEX</code> — على حجم الكتالوج الحالي (200 صنف) فورية تماماً، لكن في بيئة إنتاج بآلاف الأصناف يُنصح باستخدام <code>CREATE INDEX CONCURRENTLY</code> لتفادي قفل الجدول لحظياً أثناء البناء (المشروع يستخدم هذا الأسلوب في هجرة أخرى، فهو نمط معروف للفريق).</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>عملاء يكتبون بالإنجليزية أو الفرنسية يبدأون برؤية نتائج فوراً. <b>تنبيه مهم:</b> نتائج البحث <b>بالعربية أيضاً</b> قد تتغيّر في الترتيب أو العدد — لأن <code>GREATEST(...)</code> قد يُدخل صنفاً لم يكن يظهر سابقاً إن كان اسمه الإنجليزي أو الفرنسي أقرب تشابهاً من اسمه العربي لنفس الاستعلام.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية وحلّها</div>
+  <p><b>العرض 1:</b> نتائج البحث العربي القديمة قد "تتزحزح" في الترتيب لعملاء معتادين على ترتيب معيّن. <b>الحل:</b> اختبار A/B أو مقارنة قبل/بعد على أشهر 50 كلمة بحث قبل النشر الكامل، للتأكد أن الترتيب العربي لم يتأثر سلباً.</p>
+  <p><b>العرض 2:</b> بحث فرنسي بطيء إن نُشر قبل إنشاء الفهرس المخصص له. <b>الحل:</b> عدم فصل نشر الاستعلام عن نشر الهجرة — يجب أن يصلا معاً، أو تفعيل الفرنسية بعلم ميزة منفصل حتى يجهز الفهرس.</p>
+  </div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T2-2 — ترقيم الصفحات غير موجود في قائمة التسويات المالية</div><div class="wp-file"><code>backend/app/modules/finance/settlement_router.py:64</code></div></div>
+    <div class="badges"><span class="badge t2">مستوى 2</span><span class="badge gated">يحتاج إذناً (خلفية + واجهة)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p>الدالة <code>list_settlements</code> لا تحتوي على معامل <code>page</code> أو <code>offset</code> إطلاقاً — فقط <code>limit</code> بحد أقصى 200، والترتيب الأحدث أولاً دائماً.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>إضافة معامل <code>offset</code> حقيقي (أو ترقيم بالمؤشر cursor-based)، وإضافة عدد إجمالي (<code>total_count</code>) في الرد حتى تعرف الواجهة كم صفحة متبقية.</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>شاشتا <code>OpsSettlementCenter.tsx</code> و<code>OpsFinanceDashboard.tsx</code> في لوحة العمليات، وملف <code>web/src/api/finance.ts</code> الذي يستدعي هذا المسار.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا هجرة قاعدة بيانات (البيانات موجودة، فقط طريقة استرجاعها تتغيّر). لكن <b>شكل الرد يتغيّر</b> (إضافة حقل <code>total_count</code>) — يجب نشر تحديث الخلفية والواجهة في نفس النافذة الزمنية أو التأكد أن الواجهة القديمة تتجاهل الحقل الجديد بأمان (عادة الحال في JSON، لكن يُنصح بالتأكيد).</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>زر "الصفحة التالية" في شاشة التسويات (إن كان موجوداً في الواجهة وغير مفعَّل حالياً بسبب هذا العطل بالذات) يبدأ بالعمل فعلياً لأول مرة، ويكشف تسويات لم تكن مرئية من قبل لأي موظف مالية.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية وحلّها</div><p><b>عرض جانبي محتمل:</b> بما أن هذه الميزة (التنقّل بين الصفحات) كانت "معطَّلة فعلياً" منذ وقت طويل دون أن يلاحظها أحد، فمن المحتمل أن كود الواجهة الأمامية المرتبط بها (أزرار، حالة الصفحة الحالية) لم يُختبر بجديّة ضد بيانات حقيقية متعددة الصفحات — قد تظهر أعطال واجهة صغيرة (مثل عدم تعطيل زر "السابق" في الصفحة الأولى) لم تكن ظاهرة من قبل لأن الميزة لم تُستخدم فعلياً قط. <b>الحل:</b> اختبار يدوي سريع لشاشة التسويات بعد النشر مباشرة، مع بيانات تتجاوز 50 سجلاً (متوفرة الآن: 157 تسوية في بيئة الاختبار).</p></div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T2-3 — خطأ خادم 500 عند تكرار طلب استرجاع كلمة المرور</div><div class="wp-file"><code>backend/app/modules/identity/registration_router.py</code> — دالة <code>password_reset_request</code></div></div>
+    <div class="badges"><span class="badge t2">مستوى 2</span><span class="badge gated">يحتاج إذناً (خلفية — مصادقة)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p>عند تفعيل حد المعدل الأمني (طلبات OTP متكررة)، يرمي الكود استثناء <code>OTPRateLimitError</code> بلا معالجة — بخلاف مسار تسجيل الدخول العادي في <code>auth_router.py</code> الذي يتعامل مع نفس الحالة بشكل صحيح فعلاً.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>نسخ نفس نمط المعالجة الموجود والمُختبَر أصلاً في <code>auth_router.py:257</code> (معالجة <code>OTPRateLimitError</code> وإرجاع رسالة "الرجاء الانتظار" بدل الانهيار).</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>شاشة "نسيت كلمة المرور" في الويب (<code>ForgotPasswordPage.tsx</code>) <b>وأيضاً</b> تطبيق الجوّال — كلاهما يستدعي هذا المسار (اكتُشف أن الجوّال يستخدمه أيضاً بعد ميزة "نسيت كلمة المرور" المضافة حديثاً).</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا هجرة. تعديل خلفية بحت، نمط جاهز ومُختبَر من مكان آخر في نفس الملفات.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>مستخدم يطلب استرجاع كلمة المرور عدة مرات بسرعة يستقبل الآن رسالة واضحة "انتظر قليلاً" بدل شاشة عطل عام مخيفة.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية</div><p>لا يوجد عرض جانبي متوقع — هذا استنساخ لنمط معالجة موجود ومُختبَر فعلياً في نفس المشروع، وليس حلاً مبتكراً جديداً يحمل مخاطرة غير معروفة.</p></div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T2-4 — حدود معدل الطلبات (Rate Limit) لا تطابق العقد الموثّق رسمياً</div><div class="wp-file"><code>backend/app/core/rate_limiter.py</code> مقابل <code>contracts/rate_limits.yaml</code></div></div>
+    <div class="badges"><span class="badge t2">مستوى 2</span><span class="badge gated">قرار سياسة قبل الكود</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p>هذا <b>ليس عطلاً برمجياً</b> بل انحراف بين وثيقتين: الكود يطبّق 20 طلب/دقيقة لإنشاء الطلبات، والعقد الموثّق يقول 10 طلبات/10 دقائق — نفس الانحراف في الشكاوى (10/دقيقة مقابل 5/ساعة موثّقة) والحد العام (180/دقيقة مقابل 60/دقيقة موثّقة).</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح — يحتاج قراراً أولاً لا كوداً</div><p><b>هذا القرار للمشغّل حصراً:</b> هل الرقم الصحيح هو ما في الكود (الأكثر تساهلاً)، أم ما في العقد (الأكثر تشدداً)؟ الكود هو ما يعمل فعلياً اليوم في الإنتاج، لكن العقد قد يعكس سياسة أمنية مقصودة لم تُطبَّق بعد. لا يجوز لأي مطوّر "يصلح" هذا بتخمين الجهة الصحيحة.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>يعتمد كلياً على القرار: لو اعتُمد رقم العقد الأكثر تشدداً، فالنشر بحد ذاته بسيط (تعديل قيمة رقمية)، لكن يجب مراقبة معدل رفض الطلبات (429) بعد النشر مباشرة لأن أي تشديد مفاجئ قد يحجب عملاء شرعيين نشطين.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>لو شُدِّد الحد، سيلاحظ فريق الدعم زيادة في شكاوى "النظام يرفض طلبي" من عملاء نشطين حقاً (وليس مسيئين) خلال الأيام الأولى، حتى يتأقلم الفريق مع الحد الجديد.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية وحلّها</div><p>أي تشديد مفاجئ لحدود المعدل قد يمنع عملاء حقيقيين في مواسم الذروة (كثرة الطلبات المتتالية). <b>الحل:</b> تطبيق أي تشديد تدريجياً (مثلاً 15/دقيقة كخطوة وسطى قبل 10/10-دقائق مباشرة)، مع مراقبة نسبة 429 يومياً لأسبوع كامل قبل القفل النهائي على القيمة المستهدفة.</p></div>
+</div>
+
+<h2 id="t3">٦. المستوى الثالث — عالية الخطورة، تحتاج إذناً ومراحل <span class="badge t3">الأهم في الخطة كلها</span></h2>
+<p class="lead">هذه الحزم تمسّ المال مباشرة أو أمان تسجيل الدخول. كل واحدة منها تحتاج مرحلة انتقالية موثّقة، لا نشراً مباشراً.</p>
+
+<div class="wp" style="border-color:var(--red); border-width:2px;">
+  <div class="wp-head">
+    <div><div class="wp-title">T3-1 — إعادة تصميم نظام منع التكرار (Idempotency) — الأخطر في الخطة كلها</div><div class="wp-file"><code>backend/app/core/idempotency_middleware.py</code></div></div>
+    <div class="badges"><span class="badge t3">مستوى 3</span><span class="badge gated">يحتاج إذناً + خطة مرحلية إلزامية</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري (ثلاث مشاكل مترابطة في نفس الملف)</div>
+    <p>1) المفتاح المخزَّن <code>idempotency:{key}</code> غير مربوط بهوية المستخدم أو المسار، ويُرجَع الرد المخزَّن <b>قبل</b> تنفيذ أي فحص هوية (لأن هذا الكود يعمل كـ<code>Middleware</code> يُنفَّذ قبل نظام المصادقة الخاص بكل مسار).<br>2) لو فشل حفظ الرد في الذاكرة بعد تنفيذ العملية، يُعاد تنفيذها من جديد.<br>3) لا يوجد "قفل" يمنع طلبين متزامنين بنفس المفتاح من التنفيذ معاً.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح المقترح (بالترتيب)</div>
+    <ol style="padding-inline-start:20px; margin:4px 0;">
+      <li>تغيير شكل المفتاح ليصبح: <code>idempotency:{معرف_المستخدم}:{المسار}:{المفتاح}</code> بدل المفتاح وحده.</li>
+      <li>نقل هذا الفحص من "Middleware عام" إلى فحص يُنفَّذ <b>بعد</b> التحقق من الهوية داخل كل مسار (تغيير هيكلي، لا مجرد تعديل سطر).</li>
+      <li>استخدام أمر ذرّي (<code>SET NX</code> في Redis) بدل "اقرأ ثم اكتب" لمنع التنفيذ المزدوج عند التزامن.</li>
+      <li>عند فشل حفظ الرد بعد التنفيذ، تسجيل الخطأ فقط دون إعادة تنفيذ العملية.</li>
+    </ol></div>
+  </div>
+  <div class="warn"><b>نصف قطر الانفجار — الأوسع في كل هذه الخطة:</b> 14 ملفاً مختلفاً في الويب والجوّال يرسل هذا الرأس فعلياً (راجع القسم ٣ أعلاه) — أي مسار دفع أو حجز أو طلب في كل من الويب والجوّال يمر عبر هذا الكود.</div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر — الأخطر في كل هذه الخطة</div><p>لحظة النشر تحديداً تحمل خطراً حقيقياً: أي مفتاح مخزَّن بالشكل القديم يصبح "غير موجود" فوراً بالنسبة للنظام الجديد. أي عميل كان قد أرسل طلب دفع في الدقائق الأخيرة قبل النشر، ولم يستلم بعد الرد على جهازه (لانقطاع شبكة مثلاً)، وحاول جهازه المحاولة تلقائياً بعد النشر مباشرة بنفس المفتاح القديم — <b>سيُنفَّذ الطلب من جديد كأنه طلب جديد كلياً</b>، لأن النظام الجديد لا يرى المفتاح القديم إطلاقاً.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر (بعد استقرار كامل)</div><p>السلوك يصبح أكثر أماناً بشكل ملموس: لا يمكن لطلب أن يستلم رد شخص آخر، ولا يمكن تنفيذ عملية مرتين بالخطأ عند ضغط الزر مرتين أو انقطاع الشبكة مؤقتاً. لا تغيير ملحوظ لأي مستخدم يستخدم النظام بشكل طبيعي.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الحل لخطر نافذة النشر — إلزامي، لا اختياري</div>
+  <p><b>خطة انتقال من ثلاث خطوات:</b></p>
+  <ol style="padding-inline-start:20px;">
+    <li><b>قبل النشر بـ24 ساعة:</b> نشر إصدار "وسيط" يكتب بالشكلين معاً (القديم والجديد) لكل عملية جديدة، بحيث يمتلئ النظام تدريجياً بمفاتيح متوافقة مع الشكلين.</li>
+    <li><b>وقت النشر الفعلي:</b> تفعيل القراءة بالشكل الجديد فقط، مع إبقاء فحص احتياطي للشكل القديم لمدة 24 ساعة إضافية (نافذة TTL الحالية) قبل حذفه كلياً.</li>
+    <li><b>مراقبة:</b> تنبيه فوري لأي ارتفاع غير طبيعي في عدد عمليات الدفع/الاسترداد خلال أول ساعتين بعد النشر — مؤشر مباشر على تنفيذ مزدوج إن حدث.</li>
+  </ol>
+  <p style="color:var(--red); font-weight:700;">لا يجوز نشر هذا الإصلاح دفعة واحدة بلا هذه الخطوات الثلاث — الخطر مالي مباشر (خصم مزدوج محتمل) لا تجربة استخدام فقط.</p>
+  </div>
+  <div class="tbl-wrap" style="margin-top:12px;">
+  <table>
+    <tr><th>سيناريو إضافي</th><th>ماذا يحدث بالتحديد</th><th>الحل المُدرَج</th></tr>
+    <tr><td><b>التراجع عن النشر (Rollback)</b></td><td>لو ظهرت مشكلة واحتجنا العودة للكود القديم بعد بضع ساعات، فالكود القديم <b>لا يعرف قراءة</b> شكل المفتاح الجديد (المرتبط بالمستخدم والمسار) — كل عملية "طلب حالي" وقت التراجع تُعامَل كأنها جديدة كلياً، بنفس خطر التنفيذ المزدوج الذي كنا نُصلحه.</td><td>التراجع مسموح فقط خلال "نافذة الكتابة المزدوجة" (الخطوة 1 من خطة الانتقال أعلاه، حيث يُكتب بالشكلين معاً). بعد انتهاء هذه النافذة، أي تراجع يجب أن يُرافقه إيقاف مؤقت لاستقبال طلبات الدفع/الاسترداد الجديدة لبضع دقائق فقط، لا تراجعاً "صامتاً" وقت الذروة.</td></tr>
+    <tr><td><b>نشر تدريجي عبر عدة نسخ من الخادم (rolling deploy)</b></td><td>أثناء دقائق التبديل، قد تعمل نسخة قديمة ونسخة جديدة من الخادم في آنٍ واحد خلف نفس موازن الأحمال. طلب بمفتاح واحد قد يصل مرة للنسخة القديمة ومرة للنسخة الجديدة (لو أعاد المستخدم المحاولة يدوياً) فيريا صورتين مختلفتين لنفس المفتاح.</td><td>نفس حل نافذة الكتابة المزدوجة يغطي هذه الحالة تلقائياً — طالما كل نسخة (قديمة أو جديدة) تكتب بالشكلين، فكلتاهما تقرآن نفس الحالة الصحيحة أثناء فترة الانتقال.</td></tr>
+    <tr><td><b>التعارض مع حزمة T3-5 (قائمة الانتظار غير المتصلة)</b></td><td>كلا الإصلاحين يعدّلان نفس مسارات إعادة الإرسال (الدفع، التحويل). لو نُشر أحدهما بمعزل عن الآخر، فقد تُعاد محاولة إرسال عملية من قائمة انتظار الويب القديمة (بلا تصفية حسب المستخدم) بمفتاح مطابق للشكل الجديد بالخطأ، فيسبب سلوكاً غير متوقع لم يُختبر.</td><td><b>يجب نشر T3-1 وT3-5 في نفس دفعة النشر بالضبط</b>، لا دفعتين منفصلتين ولو بيوم واحد بينهما — هذا مذكور كقيد إلزامي، لا اقتراح.</td></tr>
+  </table>
+  </div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T3-2 — استرداد كامل مدفوع بالنقاط فقط قد ينهار (متغيّر يُستخدم قبل إنشائه)</div><div class="wp-file"><code>backend/app/modules/finance/refund_router.py</code> — حول السطور 379-424</div></div>
+    <div class="badges"><span class="badge t3">مستوى 3</span><span class="badge gated">يحتاج إذناً (مالي)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p>متغيّر <code>journal_id</code> يُنشأ فقط داخل فروع معالجة الاسترداد النقدي/المحفظة/الائتمان، لكن مسار "استرداد كامل مدفوع بنقاط الولاء فقط" (حالة نادرة جداً) لا يمر بأي من هذه الفروع، ثم يحاول الكود لاحقاً استخدام <code>journal_id</code> رغم أنه لم يُنشأ.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>تهيئة <code>journal_id = None</code> صراحةً في بداية الدالة، ومعالجة حالة "استرداد بالنقاط فقط" كفرع مستقل يُنشئ سجل دفتر مناسب لها (حركة نقاط، لا حركة نقدية).</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>مسار استرداد الطلبات فقط، وتحديداً الحالة النادرة (طلب دُفع بالكامل بنقاط الولاء دون أي مبلغ نقدي/محفظة). يمسّ الدفتر المحاسبي مباشرة.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا هجرة قاعدة بيانات. تعديل منطق برمجي بحت. يُنصح بإضافة اختبار آلي لهذه الحالة تحديداً (لا يبدو أنها مغطاة حالياً) <b>قبل</b> النشر — هذا النوع من الأعطال المالية يجب أن يكون له اختبار يمنع رجوعه مستقبلاً.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>عميل نادر يطلب استرداد طلب دُفع بالكامل بنقاط الولاء يحصل على استرداد ناجح فعلياً، بدل خطأ 500 غامض حالياً.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية</div><p>يجب التأكد أن سجل الدفتر الجديد لهذه الحالة (استرداد نقاط بحتة) لا "يخترع" حركة نقدية وهمية بالخطأ — فحص يدوي لرصيد نقاط الولاء ودفتر الحسابات بعد أول استرداد حقيقي من هذا النوع بعد النشر.</p></div>
+  <div class="tbl-wrap" style="margin-top:12px;">
+  <table>
+    <tr><th>سيناريو إضافي</th><th>ماذا يحدث بالتحديد</th><th>الحل المُدرَج</th></tr>
+    <tr><td><b>التراجع عن النشر</b></td><td>مخاطرة منخفضة جداً — الكود القديم يعود لرمي الخطأ في هذه الحالة النادرة فقط، بلا أي أثر على الحالات الأخرى الشائعة (نقدي/محفظة).</td><td>قبل التراجع، تصدير أي طلب استرداد "نقاط فقط" وصل أثناء نافذة الإصلاح الجديد للتأكد أن سجل دفتره سليم يدوياً، لأن التراجع لا يمحو ما تم إنشاؤه فعلاً.</td></tr>
+    <tr><td><b>التقاطع مع نظام منع التكرار (T3-1)</b></td><td>مسار الاسترداد (<code>/finance/refunds</code>) هو أحد المسارات الثلاثة المحمية أصلاً بنظام منع التكرار. لو نُشر هذا الإصلاح <b>قبل</b> إصلاح T3-1، فإن سباق التنفيذ المزدوج الموصوف هناك قد "يضاعف" نفس عملية الاسترداد بالنقاط مرتين في نفس اللحظة تقريباً — وهذا يجعل تتبّع أي خلل لاحق أصعب لأنه يخلط بين عطلين مختلفين.</td><td>يُفضَّل نشر T3-2 <b>بعد</b> استقرار T3-1 لا قبله، رغم أنهما تقنياً مستقلان، لتفادي تشخيص مضلَّل لو ظهر عطل مالي مركّب من الاثنين معاً.</td></tr>
+  </table>
+  </div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T3-3 — فشل تعديل العمولة بعد استرداد/نزاع يُبتلع بصمت دون أي متابعة</div><div class="wp-file"><code>refund_router.py</code>، <code>chargeback_router.py</code></div></div>
+    <div class="badges"><span class="badge t3">مستوى 3</span><span class="badge gated">يحتاج إذناً (مالي)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري — تصميم مقصود لكنه ناقص</div><p>الكود يحيط عملية "عكس العمولة" بـ<code>try/except</code> يسجّل الخطأ فقط دون رفعه، بتعليق صريح يقول: "يجب ألا يمنع عطل عكس العمولة استرداد العميل الذي تقرر فعلاً". هذا قرار سليم من ناحية تجربة العميل (لا تعطّل استرداده بسبب خطأ داخلي)، لكنه <b>ناقص</b> لأنه لا يترك أي أثر قابل للمتابعة غير سطر في سجلات النظام.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح — ليس "أوقف الابتلاع" بل "أضف متابعة"</div><p><b>لا يجوز</b> ببساطة رفع الاستثناء (raise) لأن هذا سيعطّل استرداد العميل — بل يجب <b>الإبقاء</b> على نجاح الاسترداد، مع إضافة: تسجيل الحالة في جدول "مهام تحتاج مراجعة يدوية" (نفس النمط المستخدم فعلاً في استثناءات التسوية العالقة الموجودة أصلاً في النظام)، بحيث تظهر لموظف المالية بدل أن تختفي في سجل النظام فقط.</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>كل عمليات الاسترداد الكامل والنزاعات الخاسرة. لا يغيّر تجربة العميل إطلاقاً — فقط يضيف رؤية للفريق المالي.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>يحتاج على الأرجح جدولاً جديداً أو استخدام جدول موجود مشابه لتسجيل "حالات تحتاج مراجعة" — إن استُخدم جدول جديد، فهذه هجرة قاعدة بيانات بسيطة (إضافة جدول، لا تعديل بيانات موجودة، مخاطرة منخفضة).</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>فريق المالية يبدأ برؤية قائمة "حالات عمولة تحتاج مراجعة يدوية" لأول مرة — وقد تظهر فيها حالات قديمة متراكمة من قبل هذا الإصلاح لم تكن مرئية سابقاً.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية وحلّها</div><p><b>عرض متوقع ومرغوب فعلاً:</b> بمجرد تفعيل هذه المتابعة، قد تظهر فجأة عدة حالات "قديمة" (لم تكن معروفة) تحتاج تصحيحاً يدوياً للعمولة. هذا ليس عطلاً جديداً بل كشفاً لعطل قديم متراكم — الحل المُدرَج هو تخصيص جلسة مطابقة مالية واحدة بعد النشر لمراجعة القائمة الأولية وتصفيرها، ثم تصبح المتابعة روتينية بعد ذلك.</p></div>
+  <div class="tbl-wrap" style="margin-top:12px;">
+  <table>
+    <tr><th>سيناريو إضافي</th><th>ماذا يحدث بالتحديد</th><th>الحل المُدرَج</th></tr>
+    <tr><td><b>التراجع عن النشر</b></td><td>لو أُلغي الإصلاح لاحقاً، يعود "جدول المراجعة اليدوية" الجديد فارغاً من أي كتابة جديدة — لكن الحالات المُسجَّلة فيه أثناء فترة التشغيل تبقى موجودة، فلا يجوز تجاهلها.</td><td>قبل أي تراجع، تصدير كل ما في جدول المراجعة إلى تقرير يُسلَّم لفريق المالية، حتى لا "تختفي" حالات لم تُعالَج بعد لمجرد التراجع عن الكود.</td></tr>
+    <tr><td><b>فشل الكتابة إلى جدول المراجعة نفسه</b></td><td>الإصلاح يضيف خطوة جديدة (تسجيل في جدول) — لو فشلت هذه الخطوة تحديداً (مثلاً بسبب ضغط على قاعدة البيانات)، يجب ألا تتكرر نفس غلطة "الابتلاع الصامت الأصلية" في الخطوة الجديدة نفسها.</td><td>تطبيق نفس نمط "best-effort محاط بتسجيل صريح" على خطوة الكتابة الجديدة أيضاً، مع تنبيه منفصل (لا صامت) إن فشلت الكتابة نفسها أكثر من مرة متتالية — إشارة أن جدول المراجعة نفسه به مشكلة تستحق انتباهاً فورياً لا مجرد سطر سجل.</td></tr>
+    <tr><td><b>التقاطع مع حزمة T3-4 (الاستثناءات العالقة)</b></td><td>كلا الإصلاحين يغذّيان نفس فريق المالية بقوائم "تحتاج مراجعة يدوية" من مصدرين مختلفين (عمولة معكوسة فشلت / تسوية عالقة). دون تمييز واضح، قد يخلط الفريق بين نوعي الحالات.</td><td>عرض القائمتين في شاشتين أو تبويبين منفصلين بعنوانين واضحين مختلفين، لا قائمة واحدة مدمجة، لتفادي الخلط بين نوعي المشكلة أثناء المراجعة.</td></tr>
+  </table>
+  </div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T3-4 — 28 استثناء تسوية عالق (897 دينار تقريباً) بلا حل</div><div class="wp-file">واجهة المطابقة المالية (reconciliation)</div></div>
+    <div class="badges"><span class="badge t3">مستوى 3</span><span class="badge gated">عملية مالية، لا كود فقط</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p><b>هذا ليس عطلاً برمجياً بل تراكماً تشغيلياً:</b> 27 حالة "مبلغ محفظة عالق بلا تسوية" وحالة واحدة "نقد غير محسوب"، تراكمت من طلبات مرفوضة أو مُسلَّمة دون إغلاق مالي كامل، ولم يعالجها أحد بعد.</p></div>
+    <div class="schema-item"><div class="sh-label">"الإصلاح" — إجراء تشغيلي وليس تعديل كود</div><p>مراجعة كل حالة من الـ28 يدوياً من قبل فريق المالية عبر شاشة استثناءات المطابقة الموجودة أصلاً، وتحديد الإجراء الصحيح لكل حالة (إعادة المبلغ، تسويته لطرف معيّن، أو ترحيله). <b>الأولوية للحالات الـ12 المرتبطة بطلبات مُسلَّمة فعلاً</b> — أموال محتجزة رغم اكتمال الخدمة.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء</div><p>لا بناء تقني — عملية تشغيلية بحتة عبر الشاشة الموجودة فعلاً. الكود الذي يعرض هذه الحالات يعمل بشكل سليم بالفعل (كما تحقّقنا في تقرير التدقيق).</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل</div><p>بعد حل كل الحالات، شاشة استثناءات المطابقة تعود إلى الصفر — لكن هذا لا يمنع تراكماً جديداً مستقبلاً ما لم تُضَف مراجعة دورية منتظمة (أسبوعية مثلاً) بدل تركها تتراكم لأشهر.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأثر الجانبي — توصية إضافية</div><p>التوصية الحقيقية هنا ليست تقنية: إضافة تنبيه آلي (مثلاً بريد أسبوعي لفريق المالية) عندما يتجاوز عدد الاستثناءات العالقة رقماً معيّناً (5 مثلاً)، لمنع تكرار هذا التراكم إلى 28 حالة مرة أخرى مستقبلاً.</p></div>
+  <div class="tbl-wrap" style="margin-top:12px;">
+  <table>
+    <tr><th>سيناريو إضافي</th><th>ماذا يحدث بالتحديد</th><th>الحل المُدرَج</th></tr>
+    <tr><td><b>ظهور استثناءات جديدة أثناء المراجعة اليدوية للـ28 حالة</b></td><td>المراجعة قد تستغرق أياماً، والنظام يعمل باستمرار — قد تظهر حالات عالقة جديدة (طلبات مرفوضة جديدة) أثناء العمل على القائمة القديمة، فيختلط "القديم" بـ"الجديد" ويصعب قياس التقدّم.</td><td>أخذ "لقطة" (snapshot) واحدة لقائمة الـ28 الحالية في بداية جلسة المراجعة، والعمل عليها حصراً حتى تصفيرها، مع تتبّع أي حالات جديدة تظهر لاحقاً في دفعة منفصلة تالية — لا خلطهما في نفس الجهد.</td></tr>
+    <tr><td><b>قرار خاطئ على حالة مالية حقيقية</b></td><td>القرار البشري لكل حالة (إعادة/تسوية/ترحيل) هو تدخل مالي مباشر — قرار خاطئ على حالة واحدة من الـ12 المرتبطة بطلبات مُسلَّمة فعلاً قد يعني خسارة مزدوجة (خسارة الاستثناء الأصلي + خطأ التصحيح).</td><td>مراجعة مزدوجة (شخصان لا شخص واحد) لكل حالة من الحالات الـ12 عالية القيمة تحديداً قبل اعتماد أي إجراء نهائي عليها.</td></tr>
+  </table>
+  </div>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">T3-5 — قائمة الانتظار غير المتصلة في الويب غير مربوطة بهوية المستخدم</div><div class="wp-file"><code>web/src/offline/outbox.ts</code></div></div>
+    <div class="badges"><span class="badge t3">مستوى 3</span><span class="badge gated">يحتاج إذناً (أمان/هوية)</span></div>
+  </div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري</div><p>العمليات المؤجلة (بسبب انقطاع إنترنت) تُخزَّن محلياً بلا حقل يربطها بمعرّف المستخدم صاحبها، ولا تُمسح عند تسجيل الخروج، وتُحذف (بدل أن تُحفظ لإعادة المحاولة) عند استلام رمز خطأ 401.</p></div>
+    <div class="schema-item"><div class="sh-label">الإصلاح</div><p>إضافة حقل <code>userId</code> لكل عملية مؤجلة عند إنشائها، تصفية القائمة عند إعادة الإرسال بحيث تُرسل فقط عمليات المستخدم الحالي، مسح القائمة بالكامل عند تسجيل الخروج الصريح، وتغيير معالجة 401 من "حذف" إلى "إبقاء مع محاولة تحديث الرمز أولاً".</p></div>
+    <div class="schema-item"><div class="sh-label">نصف قطر الانفجار</div><p>كل مسار يستخدم قائمة الانتظار: الدفع في صفحة الطلب، تحويل المحفظة، أي عملية تحدث أثناء انقطاع اتصال مؤقت. يتقاطع مباشرة مع إصلاح نظام منع التكرار (T3-1) لأن كليهما يمسّ نفس مسارات الإرسال.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا هجرة قاعدة بيانات (التخزين محلي في المتصفح، لا خادم). لكن العمليات المخزَّنة محلياً على أجهزة المستخدمين <b>قبل</b> النشر لن تحتوي على حقل <code>userId</code> الجديد — يجب أن يتعامل الكود الجديد مع عمليات "قديمة الشكل" الموجودة فعلاً في متصفحات المستخدمين بأمان (تجاهلها أو معاملتها كمملوكة للمستخدم الحالي حصراً، لا رفض صامت).</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>مستخدم يبدّل حسابه على نفس الجهاز (تسجيل خروج ثم دخول بحساب آخر) لن يجد عمليات الحساب السابق معلّقة له بالخطأ. عملية انقطع اتصالها ثم عاد لاحقاً (مثل انقطاع شبكة قصير) لا تُفقد بعد الآن بمجرد استلام 401 عابر.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية</div><p>يجب تنسيق هذا الإصلاح <b>مع</b> إصلاح نظام منع التكرار (T3-1) وليس بمعزل عنه — كلاهما يعدّل نفس مسارات إعادة الإرسال. تنفيذهما في نفس دفعة النشر (لا دفعتين منفصلتين) يقلّل خطر تعارض غير متوقع بينهما.</p></div>
+  <div class="tbl-wrap" style="margin-top:12px;">
+  <table>
+    <tr><th>سيناريو إضافي</th><th>ماذا يحدث بالتحديد</th><th>الحل المُدرَج</th></tr>
+    <tr><td><b>التراجع عن النشر</b></td><td>الكود القديم لا يقرأ حقل <code>userId</code> إطلاقاً — فالتراجع آمن من ناحية عدم الانهيار (يتجاهل الحقل الجديد بلا مشكلة)، لكنه يُعيد فتح نفس الثغرة الأصلية (عمليات غير مربوطة بهوية) فوراً.</td><td>التراجع مقبول تقنياً في أي وقت بلا خطر تعطّل، لكنه يعني العودة الفورية للمخاطرة الأصلية — يجب أن يكون قراراً واعياً لا تراجعاً تلقائياً.</td></tr>
+    <tr><td><b>تبويب متصفح قديم بقي مفتوحاً وقت النشر (بلا تحديث الصفحة)</b></td><td>مستخدم فتح تبويب الويب قبل النشر ولم يُحدِّث الصفحة (لا إغلاق/فتح جديد) يستمر بتشغيل كود JavaScript القديم بلا حقل <code>userId</code> في ذاكرته المحلية، حتى لو كان الخادم الخلفي مُحدَّثاً بالفعل.</td><td>هذا الجزء من الإصلاح واجهة بحتة (لا خادم) — التبويب القديم يستمر بالسلوك القديم فقط حتى يُحدِّث المستخدم الصفحة (عادة يحدث تلقائياً خلال ساعات قليلة عبر آليات تحديث المتصفح القياسية)، ولا يتطلب إجراءً إضافياً لأن لا تعارض فعلياً بين نسختي الواجهة والخادم في هذه الحالة تحديداً.</td></tr>
+    <tr><td><b>التعارض مع حزمة T3-1 (مذكور أعلاه في T3-1 أيضاً)</b></td><td>راجع الجدول في نهاية حزمة T3-1 — نفس القيد الإلزامي بالنشر معاً ينطبق هنا بالمثل.</td><td>—</td></tr>
+  </table>
+  </div>
+</div>
+
+<h2 id="t4">٧. المستوى الرابع — البنية التحتية والحوكمة</h2>
+<p class="lead">لا تمسّ منطق التطبيق مباشرة، لكنها تمسّ سلامة عمليات النشر والنسخ الاحتياطي — يجب معالجتها قبل أي نشر إنتاجي مستقبلي واسع.</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>الحزمة</th><th>السبب الجذري بإيجاز</th><th>الإصلاح</th><th>محاكاة سريعة (بناء/تشغيل)</th><th>عرض جانبي وحلّه</th></tr>
+<tr>
+  <td><b>T4-1</b><br>سكربت النشر يمسح كل أحجام Docker</td>
+  <td><code>docker volume ls -q | xargs -r docker volume rm</code> في <code>deploy/deploy_to_staging.sh:55</code> — بلا تحديد اسم المشروع.</td>
+  <td>تقييد الأمر بأحجام هذا المشروع فقط (فلترة بالاسم/التسمية Label)، أو حذفه كلياً إن لم يكن ضرورياً.</td>
+  <td><b>بناء:</b> لا شيء يتغيّر في سلوك النشر الطبيعي. <b>تشغيل:</b> يمنع كارثة مستقبلية محتملة لا يُحدث فرقاً يومياً.</td>
+  <td>التأكد أن أي حجم بيانات (قاعدة بيانات محلية للاختبار) يعتمد فعلياً على هذا الأمر للتنظيف الدوري لا يتعطل — استبداله بأمر مفلتر بدل حذفه بالكامل.</td>
+</tr>
+<tr>
+  <td><b>T4-2</b><br>StrictHostKeyChecking=no في عدة سكربتات</td>
+  <td>يعطّل التحقق من هوية الخادم عبر SSH — نظرياً يفتح الباب لهجوم "الوسيط" على شبكة غير موثوقة.</td>
+  <td>استبداله بـ<code>accept-new</code> (نمط أكثر أماناً موجود بالفعل في أحد السكربتات كمرجع) بدل التعطيل الكامل.</td>
+  <td><b>بناء:</b> لا شيء. <b>تشغيل:</b> أول اتصال بخادم جديد قد يطلب تأكيداً يدوياً لمرة واحدة بدل المرور صامتاً.</td>
+  <td>لو كانت السكربتات تعمل ضمن قنوات آلية (CI) بلا تدخل بشري ممكن، فقد يفشل الاتصال الأول. الحل: تثبيت مفتاح الخادم المعروف مسبقاً (known_hosts) في بيئة CI بدل الاعتماد على القبول التلقائي وقت التشغيل.</td>
+</tr>
+<tr>
+  <td><b>T4-3</b><br>بيانات دخول MinIO افتراضية كخيار احتياطي في الكود</td>
+  <td><code>minioadmin/minioadmin123</code> مكتوبة كقيمة احتياطية صريحة في الكود وملف Docker.</td>
+  <td>إزالة القيمة الاحتياطية، وجعل غياب الإعداد الحقيقي يوقف الخدمة بوضوح بدل العمل ببيانات معروفة للجميع.</td>
+  <td><b>بناء:</b> لو كانت بيئة ما تعتمد فعلياً على القيمة الاحتياطية دون أن تدري (لم تضبط متغير البيئة)، ستتعطل عند النشر — وهذا مقصود ومطلوب ليكشف الاعتماد الخفي فوراً بدل السكوت عنه.</td>
+  <td>فحص كل البيئات (محلية، اختبار، إنتاج) للتأكد أن كل واحدة لديها قيمة حقيقية مضبوطة قبل إزالة القيمة الاحتياطية — وإلا ستتعطل خدمة تخزين الملفات فجأة.</td>
+</tr>
+<tr>
+  <td><b>T4-4</b><br>ملفا حالة المشروع تالفان تماماً وأداة الفحص تقول "سليم"</td>
+  <td><code>PROJECT_STATE.md</code> و<code>APP_TAWA_PROFILE.md</code> كلاهما صفر بايت فعلي (بايتات فارغة بالكامل)، والأداة تتحقق من "وجود" الملف لا صحة محتواه.</td>
+  <td>استعادة الملفين من نسخة سليمة (Git أو نسخة احتياطية)، وتعديل أداة الفحص لترفض أي ملف بمحتوى فارغ أو غير منطقي بدل قبوله صامتاً.</td>
+  <td><b>بناء:</b> لا شيء تقني. <b>تشغيل:</b> أي قرار حوكمي مستقبلي يعتمد على هذه الأداة يصبح موثوقاً بعد الإصلاح، بعد أن كان يعتمد على بيانات وهمية.</td>
+  <td>لا عرض جانبي حقيقي — هذا إصلاح "تصحيحي" بحت لا يغيّر أي سلوك تشغيلي للمستخدمين.</td>
+</tr>
+<tr>
+  <td><b>T4-5</b><br>بيئة الاختبار الآلي (CI) لا تختبر نفس ما يُنشر فعلياً</td>
+  <td>صورة الإنتاج تثبّت نسخاً مقفلة ومؤمَّنة (lock file)، بينما CI يثبّت نطاقات نسخ مرنة — ولا توجد بوابات اختبار للجوّال أو الترحيلات أو التغطية.</td>
+  <td>تحديث CI ليثبّت من نفس ملف القفل المستخدم في صورة الإنتاج، وإضافة بوابات تدريجية (ابدأ بفحص ترحيلات قاعدة البيانات، ثم أضف اختبارات الجوّال لاحقاً).</td>
+  <td><b>بناء:</b> أول تشغيل لـ CI بالنسخ المقفلة قد يكشف تعارضات نسخ لم تكن ظاهرة من قبل مع النطاقات المرنة — هذا "كشف" وليس "كسر" جديد. <b>تشغيل:</b> ثقة أعلى بأن كل ما يمر عبر CI هو فعلاً ما سيُنشر.</td>
+  <td>قد يتباطأ CI مؤقتاً وقد تظهر أعطال اختبار لم تكن مرئية بنسخ مختلفة — يُنصح بتنفيذ هذا في فرع منفصل أولاً ومراجعة النتائج قبل جعله بوابة إلزامية للدمج.</td>
+</tr>
+<tr>
+  <td><b>T4-6</b><br>صورة osrm بنسخة غير مثبّتة (latest) في بيئة staging</td>
+  <td><code>docker-compose.staging.yml</code> يستخدم <code>osrm/osrm-backend:latest</code> بدل رقم نسخة ثابت (البيئة الأساسية للإنتاج مثبَّتة بشكل صحيح فعلاً على <code>v5.27.1</code>).</td>
+  <td>تثبيت نفس رقم النسخة المستخدم في الإنتاج (<code>v5.27.1</code>) في ملف staging أيضاً، لضمان تطابق البيئتين.</td>
+  <td><b>بناء:</b> إعادة بناء حاوية staging بنسخة محددة بدل "الأحدث" — قد تتغيّر نتائج حساب المسافات/الطرق طفيفاً إن كانت النسخة الحالية "الأحدث" مختلفة فعلياً عن v5.27.1. <b>تشغيل:</b> سلوك حساب المسافات في staging يصبح مطابقاً تماماً للإنتاج، فتختفي فروقات اختبار كانت تُنسب خطأً لأكواد أخرى بينما سببها فرق نسخة الخدمة فقط.</td>
+  <td>لا عرض جانبي متوقع سوى تحسّن في موثوقية بيئة الاختبار نفسها.</td>
+</tr>
+</table>
+</div>
+
+<h2 id="t5">٨. المستوى الخامس — جودة الواجهة والجوّال</h2>
+<div class="tbl-wrap">
+<table>
+<tr><th>الحزمة</th><th>السبب الجذري</th><th>الإصلاح</th><th>ماذا يتغيّر بعد التشغيل؟</th></tr>
+<tr>
+  <td><b>T5-1</b><br>تطبيق الجوّال (React Native) لا يستقبل التحديثات اللحظية</td>
+  <td>يستمع فقط لنوع إشعار عام "message"، بينما الخادم يبث أنواعاً محددة مثل "تغيّر حالة الطلب".</td>
+  <td>تحديث المستمع في التطبيق ليتعرف على الأنواع المحددة الفعلية التي يبثها الخادم.</td>
+  <td>العميل يرى تحديث حالة الطلب فوراً على تطبيق الجوّال بدل الاعتماد الصامت على إعادة السؤال الدوري (المرة كل بضع ثوانٍ). <b>عرض جانبي:</b> ضغط أقل على الخادم (طلبات أقل تكراراً) — إيجابي لا يحتاج حلاً.</td>
+</tr>
+<tr>
+  <td><b>T5-2</b><br>تسجيل إشعارات الجوّال يفشل بسبب حالة الأحرف</td>
+  <td>التطبيق يرسل "IOS"/"ANDROID"، الخادم يتوقع "ios"/"android".</td>
+  <td>توحيد حالة الأحرف عند الإرسال (حرف صغير) لتطابق ما يتوقعه الخادم.</td>
+  <td>إشعارات الدفع (Push) تبدأ بالوصول فعلياً للمستخدمين الذين كانت مكتومة لديهم صامتاً. <b>عرض جانبي محتمل:</b> ارتفاع مفاجئ في عدد الإشعارات المُرسَلة فعلياً بعد أن كانت تفشل صامتاً — تأكد أن محتوى الإشعارات وتكرارها مضبوط جيداً قبل أن يبدأ الجميع باستقبالها فعلياً لأول مرة.</td>
+</tr>
+<tr>
+  <td><b>T5-3</b><br>نظاما تسليم ورديات متوازيان في لوحة العمليات</td>
+  <td>جدولان منفصلان (<code>OpsHandoff</code> و<code>OpsShiftHandoff</code>) بمسارين مختلفين، لم يُدمَجا عند بناء النظام الثاني.</td>
+  <td>قرار منتج أولاً: أيّهما يبقى؟ ثم ترحيل بيانات النظام المُستبعَد إلى الباقي (هجرة بيانات، لا حذف مباشر) قبل إزالة الكود المكرر.</td>
+  <td>موظفو العمليات يستخدمون نظاماً واحداً موثوقاً بدل احتمال البحث في المكان الخطأ. <b>عرض جانبي:</b> فقدان سجلات تاريخية إن حُذف الجدول المُستبعَد بلا ترحيل — يجب ترحيل البيانات التاريخية لا حذفها.</td>
+</tr>
+<tr>
+  <td><b>T5-4</b><br>صفحتان تظهران فارغتين تماماً بدل رسالة خطأ</td>
+  <td><code>OpsFinanceDashboard.tsx:153</code> و<code>OpsPromotions.tsx:44-45</code> — حالة "لا بيانات ولا خطأ واضح" تُرجع فراغاً تاماً.</td>
+  <td>عرض رسالة "لا توجد بيانات" أو "تعذّر التحميل، أعد المحاولة" بدل الفراغ الصامت.</td>
+  <td>موظف العمليات يفهم أن الصفحة "فارغة لأن لا بيانات" أو "معطلة مؤقتاً"، بدل الشك في أن المتصفح أو حسابه به مشكلة. لا عرض جانبي متوقع.</td>
+</tr>
+<tr>
+  <td><b>T5-5</b><br>نصوص عربية مكتوبة مباشرة بدل نظام الترجمة في نحو نصف صفحات لوحة العمليات</td>
+  <td>لم تُستخدم دالة الترجمة <code>t()</code> عند بناء هذه الصفحات، فالنص العربي مكتوب حرفياً في الكود.</td>
+  <td>استبدال النصوص الثابتة تدريجياً بمفاتيح ترجمة، صفحة تلو الأخرى (لا دفعة واحدة ضخمة الخطر).</td>
+  <td>تبديل لغة الواجهة (لو استُخدم مستقبلاً لدعم لغة ثالثة رسمياً في لوحة العمليات) يعمل بشكل كامل بدل جزئي. <b>لا عرض جانبي</b> إن نُفِّذ تدريجياً صفحة بصفحة مع اختبار كل صفحة على حدة.</td>
+</tr>
+<tr>
+  <td><b>T5-6</b><br>كود ميت: مكوّن ومكتبة غير مستخدَمين</td>
+  <td><code>CascadeAffectedField.tsx</code> بلا أي مستورد إنتاجي، ومكتبة <code>class-variance-authority</code> مثبَّتة بلا استخدام إطلاقاً.</td>
+  <td>حذف المكوّن غير المستخدَم (بعد التأكد من حذف اختباره أيضاً)، وإزالة المكتبة من <code>package.json</code>.</td>
+  <td>حجم حزمة الويب يصغر قليلاً (أثر أداء إيجابي بسيط). <b>لا عرض جانبي</b> — كلاهما مؤكَّد أنه غير مستخدَم بأي شاشة حقيقية.</td>
+</tr>
+<tr>
+  <td><b>T5-7</b><br>الفارق بين "دليل الواجهة البرمجية الرسمي" (110 مسار) والواقع الحي (531 مساراً)</td>
+  <td>الدليل الموثَّق (<code>contracts/openapi.yaml</code>) لم يُحدَّث منذ فترة طويلة بينما نمت الواجهة الفعلية بسرعة أكبر.</td>
+  <td>توليد الدليل تلقائياً من الخادم الحي (<code>app.openapi()</code>) بدل كتابته يدوياً، لضمان تطابق دائم بدل انجراف متكرر.</td>
+  <td>أدوات توليد أنواع البيانات وفحص التوافق تصبح موثوقة على كامل الواجهة بدل 20% منها فقط. <b>عرض جانبي محتمل:</b> نقاط نهاية كانت مخفية عمداً بـ<code>include_in_schema=False</code> قد تظهر بالخطأ في الدليل المولَّد تلقائياً إن لم يُحافَظ على هذا الإعداد أثناء التوليد الآلي — يجب مراجعة القائمة المستثناة قبل اعتماد التوليد التلقائي الكامل.</td>
+</tr>
+</table>
+</div>
+
+<h2 id="timeline">٩. الجدول الزمني المقترح للتنفيذ</h2>
+<div class="timeline">
+  <div class="tl-row">
+    <div class="tl-dot" style="background:var(--green);">1</div>
+    <div class="tl-content"><h4>الأسبوع الأول — المستوى 1 كاملاً (4 حزم)</h4><p>لا يحتاج قرارات معقدة، مخاطرة شبه معدومة. يبني ثقة سريعة ويُنجز 4 من 29 نتيجة فوراً.</p></div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-dot" style="background:var(--blue);">2</div>
+    <div class="tl-content"><h4>الأسبوع الثاني والثالث — المستوى 2 (4 حزم)</h4><p>يبدأ بإصلاح البحث الإنجليزي أولاً (لا يحتاج هجرة، الفهرس جاهز) بالتوازي مع فحص مستهلكي واجهة التسويات. قرار حدود المعدل (T2-4) يُرفَع للمشغّل بالتوازي دون انتظار باقي الحزمة.</p></div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-dot" style="background:var(--red);">3</div>
+    <div class="tl-content"><h4>الأسبوع الرابع حتى السادس — المستوى 3 (5 حزم، الأبطأ عمداً)</h4><p>نظام منع التكرار (T3-1) يبدأ أولاً بخطته المرحلية الثلاثية الموصوفة أعلاه — لا يُنشر دفعة واحدة. تُنسَّق حزمة قائمة الانتظار غير المتصلة (T3-5) معه في نفس نافذة النشر لأنهما يتقاطعان.</p></div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-dot" style="background:var(--gray);">4</div>
+    <div class="tl-content"><h4>بالتوازي مع كل ما سبق — المستوى 4 (البنية التحتية، 6 حزم)</h4><p>لا يعتمد على أي من المستويات الأخرى، يمكن لفريق منفصل (أو نفس الفريق في فترات فراغ) تنفيذه بالتوازي دون انتظار.</p></div>
+  </div>
+  <div class="tl-row">
+    <div class="tl-dot" style="background:var(--amber);">5</div>
+    <div class="tl-content"><h4>مستمر — المستوى 5 (جودة الواجهة، 7 حزم)</h4><p>لا يوجد سبب لتأجيله، لكنه الأقل إلحاحاً. يُنفَّذ تدريجياً بلا ضغط زمني، صفحة أو حزمة في كل مرة.</p></div>
+  </div>
+</div>
+
+<h2 id="decisions">١٠. جدول القرارات المطلوبة من المشغّل قبل البدء</h2>
+<div class="tbl-wrap">
+<table>
+<tr><th>القرار</th><th>لماذا لا يمكن لمطوّر اتخاذه بمفرده</th><th>مرتبط بالحزمة</th></tr>
+<tr><td>الموافقة على البدء بتنفيذ أي حزمة من المستوى 1 فأعلى</td><td>حالة المشروع الحالية "بانتظار المشغّل" رسمياً — لا تعديل كود دون طلب صريح</td><td>الكل</td></tr>
+<tr><td>هل الرقم الصحيح لحدود معدل الطلبات هو ما في الكود أم ما في العقد الموثّق؟</td><td>قرار سياسة أمنية/تجربة مستخدم، لا قرار تقني بحت</td><td>T2-4</td></tr>
+<tr><td>الموافقة على خطة الانتقال المرحلية لنظام منع التكرار (3 خطوات، نافذة 24 ساعة)</td><td>يمسّ كل عملية مالية في النظام — يحتاج توقيتاً منسّقاً مع فريق العمليات، لا نشراً عشوائياً</td><td>T3-1</td></tr>
+<tr><td>تخصيص وقت فريق المالية لحل الاستثناءات الـ28 العالقة يدوياً</td><td>ليس عملاً برمجياً، بل قرارات مالية لكل حالة على حدة</td><td>T3-4</td></tr>
+<tr><td>أيّ من نظامَي تسليم الورديات المتوازيَين يبقى؟</td><td>قرار منتج/تنظيمي حول سير عمل الموظفين، لا قرار كود</td><td>T5-3</td></tr>
+</table>
+</div>
+
+<div class="stat-grid">
+  <div class="stat"><div class="num">26</div><div class="lbl">حزمة عمل تغطي 29 نتيجة</div></div>
+  <div class="stat"><div class="num">5</div><div class="lbl">مستويات مخاطر</div></div>
+  <div class="stat"><div class="num">5</div><div class="lbl">قرارات تحتاج المشغّل قبل البدء</div></div>
+  <div class="stat"><div class="num">1</div><div class="lbl">حزمة تحتاج خطة انتقال إلزامية (T3-1)</div></div>
+</div>
+
+<h2 id="crosswalk">ملحق — جدول مطابقة: كل نتيجة من تقرير التدقيق (29) مقابل حزمة العمل التي تعالجها</h2>
+<p class="lead">للتأكد أن لا نتيجة من الـ29 المؤكَّدة في تقرير "تدقيق التدقيق" أُغفلت من هذه الخطة — كل سطر أدناه يقابل رقماً في ذلك التقرير.</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>#</th><th>النتيجة (من تقرير التدقيق)</th><th>حزمة العمل هنا</th></tr>
+<tr><td>1</td><td>البحث لا يعمل إلا بالعربية</td><td><b>T2-1</b></td></tr>
+<tr><td>2</td><td>خطأ 500 عند تكرار طلب استرجاع كلمة المرور</td><td><b>T2-3</b></td></tr>
+<tr><td>3</td><td>انهيار 5 نقاط نهاية عند <code>limit=-1</code></td><td><b>T1-2</b></td></tr>
+<tr><td>4</td><td>انهيار تصدير الشكاوى بلا فلتر حالة</td><td><b>T1-4</b></td></tr>
+<tr><td>5</td><td>كلمة المرور تظهر بنص صريح</td><td><b>T1-1</b></td></tr>
+<tr><td>6</td><td>ترقيم الصفحات غير موجود في التسويات</td><td><b>T2-2</b></td></tr>
+<tr><td>7</td><td>إحداثيات NaN تُقبل في بحث المتاجر</td><td><b>T1-3</b></td></tr>
+<tr><td>8</td><td>منع التكرار: استرجاع رد قبل فحص الهوية</td><td rowspan="3"><b>T3-1</b> (الثلاثة معاً)</td></tr>
+<tr><td>9</td><td>منع التكرار: تنفيذ مزدوج عند فشل حفظ الرد</td></tr>
+<tr><td>10</td><td>منع التكرار: لا قفل عند التزامن</td></tr>
+<tr><td>11</td><td>فجوة عقد OpenAPI (110 مقابل 531 مساراً)</td><td><b>T5-7</b></td></tr>
+<tr><td>12</td><td>استرداد بالنقاط فقط قد ينهار (journal_id)</td><td><b>T3-2</b></td></tr>
+<tr><td>13</td><td>فشل عكس العمولة يُبتلع بصمت</td><td><b>T3-3</b></td></tr>
+<tr><td>14</td><td>قائمة الانتظار غير المتصلة غير مربوطة بالمستخدم</td><td><b>T3-5</b></td></tr>
+<tr><td>15</td><td>ملفا حالة المشروع تالفان وأداة الفحص تقول "سليم"</td><td><b>T4-4</b></td></tr>
+<tr><td>16</td><td>CI لا يثبّت نفس نسخ الإنتاج / بوابات ناقصة</td><td><b>T4-5</b></td></tr>
+<tr><td>17</td><td>28 استثناء تسوية عالق (897 دينار)</td><td><b>T3-4</b></td></tr>
+<tr><td>18</td><td>حدود المعدل لا تطابق العقد الموثّق</td><td><b>T2-4</b></td></tr>
+<tr><td>19</td><td>الجوّال (RN) لا يستقبل تحديثات SSE اللحظية</td><td><b>T5-1</b></td></tr>
+<tr><td>20</td><td>حالة أحرف رمز إشعارات الجوّال (IOS/ios)</td><td><b>T5-2</b></td></tr>
+<tr><td>21</td><td>نظاما تسليم ورديات متوازيان</td><td><b>T5-3</b></td></tr>
+<tr><td>22</td><td>مكتبة <code>class-variance-authority</code> غير مستخدَمة</td><td rowspan="2"><b>T5-6</b> (الاثنان معاً)</td></tr>
+<tr><td>23</td><td>مكوّن <code>CascadeAffectedField.tsx</code> ميت</td></tr>
+<tr><td>24</td><td>بيانات دخول MinIO افتراضية في الكود</td><td><b>T4-3</b></td></tr>
+<tr><td>25</td><td>سكربت النشر يمسح كل أحجام Docker</td><td><b>T4-1</b></td></tr>
+<tr><td>26</td><td><code>StrictHostKeyChecking=no</code> في عدة سكربتات</td><td><b>T4-2</b></td></tr>
+<tr><td>27</td><td>صورة <code>osrm:latest</code> غير مثبَّتة النسخة (staging)</td><td><b>T4-6</b></td></tr>
+<tr><td>28</td><td>صفحتا OpsFinanceDashboard وOpsPromotions فارغتان (return null)</td><td><b>T5-4</b></td></tr>
+<tr><td>29</td><td>نحو نصف صفحات لوحة العمليات بلا نظام ترجمة كامل</td><td><b>T5-5</b></td></tr>
+</table>
+</div>
+<p class="simple"><b>النتيجة:</b> 29 من 29 نتيجة مؤكَّدة في تقرير التدقيق لها حزمة عمل واضحة في هذه الخطة — لا نتيجة أُغفلت أو تُركت بلا مسار إصلاح محدد.</p>
+
+<footer>
+  خطة تنفيذية مبنية على تقرير "تدقيق التدقيق" (14 يوليو 2026) — كل حزمة فُحصت بستة محاور: السبب، الحل، من يتأثر، محاكاة البناء، محاكاة التشغيل، والأعراض الجانبية وحلّها · مقترح ينتظر موافقة المشغّل · لم يُعدَّل أي كود مصدري أثناء إعداد هذا المستند
+</footer>
+
+</div>
+</body>
+</html>

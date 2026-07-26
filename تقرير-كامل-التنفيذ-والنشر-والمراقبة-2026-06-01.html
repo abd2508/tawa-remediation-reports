@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>التقرير الكامل — تنفيذ الإصلاحات الأمنية + النشر + المراقبة — 2026-06-01</title>
+<style>
+  :root{--bg:#fafafa;--fg:#1a1a1a;--muted:#5b5b5b;--card:#fff;--border:#e3e3e3;
+        --green:#146e44;--green-soft:#e8f3ec;--red:#b3261e;--red-soft:#fde7e5;
+        --amber:#aa5500;--amber-soft:#fff6e2;--blue:#0f5b9e;--blue-soft:#e8f2fb;
+        --purple:#6b3aa0;--purple-soft:#f0e8fb}
+  body{font-family:-apple-system,"Segoe UI","Tajawal","Noto Naskh Arabic",sans-serif;background:var(--bg);color:var(--fg);margin:0;line-height:1.75;font-size:15px}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px 22px 80px}
+  header{padding:24px 28px;background:linear-gradient(135deg,#13322a 0%,#0c1f1a 100%);color:#fff;border-radius:12px;margin-bottom:22px}
+  header h1{margin:0 0 6px;font-size:23px}
+  header .sub{opacity:.92;font-size:13.5px}
+  h2{font-size:20px;margin:34px 0 10px;border-bottom:2px solid var(--border);padding-bottom:6px}
+  h3{font-size:16.5px;margin:20px 0 6px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:12px 0}
+  .ok{border-inline-start:5px solid var(--green);background:var(--green-soft)}
+  .warn{border-inline-start:5px solid var(--amber);background:var(--amber-soft)}
+  .crit{border-inline-start:5px solid var(--red);background:var(--red-soft)}
+  .info{border-inline-start:5px solid var(--blue);background:var(--blue-soft)}
+  .step{border-inline-start:5px solid var(--purple);background:var(--purple-soft)}
+  code{background:#f0f0f0;padding:1px 6px;border-radius:4px;font-size:12.6px;font-family:"JetBrains Mono",monospace;direction:ltr;display:inline-block}
+  pre{background:#1e1e1e;color:#eee;padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:12.3px;line-height:1.6;direction:ltr;text-align:left}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  th,td{padding:8px 10px;border:1px solid var(--border);text-align:right;font-size:13.3px;vertical-align:top}
+  th{background:#f0f0f0}
+  ul,ol{padding-inline-start:22px}li{margin:4px 0}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}.ambertxt{color:var(--amber);font-weight:700}
+  .filepath{background:#ececec;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:12px;direction:ltr}
+  .big{font-size:15px;font-weight:700;padding:10px 16px;border-radius:8px;margin:10px 0}
+  .big.green{background:var(--green-soft);border:1px solid var(--green);color:var(--green)}
+  .big.amber{background:var(--amber-soft);border:1px solid var(--amber);color:var(--amber)}
+  .timeline{list-style:none;padding-inline-start:0}
+  .timeline li{border-inline-start:3px solid var(--border);padding:6px 0 6px 0;padding-inline-start:16px;margin:0;position:relative}
+  .timeline li b{color:#13322a}
+  .sev-crit{background:var(--red);color:#fff;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+  .sev-high{background:var(--amber);color:#fff;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:700}
+  small{color:var(--muted)}
+  .toc{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 22px;margin:14px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>📋 التقرير الكامل — من بداية الخطة التنفيذية الأخيرة حتى الآن</h1>
+  <div class="sub">
+    منصّة تووا / tawanow.com · المدّة: 2026-05-31 (مراجعة الخطة) → 2026-06-01 (تنفيذ + نشر + مراقبة) · إصلاح العيوب الأمنية F-1..F-6 + تدوير JWT + HSTS · بلا commit · بلا migration · بلا مساس بقاعدة البيانات
+  </div>
+</header>
+
+<div class="big green">المحصّلة: الإصلاحات الستّة نُفِّذت ومُختبَرة (مجالي الأمني 161/161، صفر تراجع جديد)، ونُشِرت ومُتحقَّقة حيّاً على tawanow.com، وHSTS مُرسَّخ في host vhost، ومراقبة آليّة كل 12 ساعة قائمة. FIN-COR أخضر.</div>
+
+<div class="toc">
+<strong>المحتويات:</strong>
+<ol>
+  <li>الخطّ الزمنيّ للمراحل</li>
+  <li>المرحلة 1 — مراجعة الخطة بـ8 وكلاء</li>
+  <li>المرحلة 2 — التنفيذ بالتسلسل (F-1..F-6)</li>
+  <li>المرحلة 3 — الاختبار والتحقّق</li>
+  <li>المرحلة 4 — حسم FIN-COR</li>
+  <li>المرحلة 5 — النشر على tawanow.com</li>
+  <li>المرحلة 6 — ترسيخ HSTS في host vhost</li>
+  <li>المرحلة 7 — مراقبة HSTS الآليّة (+ فخّ المنطقة الزمنيّة)</li>
+  <li>جرد التغييرات (ملفّات + اختبارات + سكربتات)</li>
+  <li>الحالة الراهنة والمتابعات</li>
+</ol>
+</div>
+
+<!-- 1 -->
+<h2>1) الخطّ الزمنيّ للمراحل</h2>
+<ul class="timeline">
+<li><b>2026-05-31:</b> مراجعة الخطة الأمنية الأصليّة بـ8 وكلاء تحقّق ضدّ الكود → خطة منقّحة (GO بشروط).</li>
+<li><b>2026-06-01 ~06:00:</b> تنفيذ F-1..F-6 بالتسلسل + اختبارات.</li>
+<li><b>~06:30:</b> تشغيل الحزمة الكاملة، إصلاح اختبار i18n، إثبات صفر تراجع جديد.</li>
+<li><b>~06:40:</b> فحص FIN-COR، تتبّع تغيّر <code>feature_flags.yaml</code> (سابق للجلسة)، تحديث أساس SHA بإذن المالك → PASS.</li>
+<li><b>~06:45–07:00:</b> النشر على tawanow.com (backend + web + host vhost HSTS) + تحقّق حيّ كامل.</li>
+<li><b>~06:05–06:27:</b> إعداد مراقبة HSTS الآليّة، واكتشاف+إصلاح فخّ المنطقة الزمنيّة للـcron.</li>
+<li><b>الآن (06:28 UTC):</b> مراقبة قائمة؛ أوّل تشغيل مجدول حقيقيّ عند 18:00 UTC.</li>
+</ul>
+
+<!-- 2 -->
+<h2>2) المرحلة 1 — مراجعة الخطة بـ8 وكلاء</h2>
+<div class="card info">
+<p>قبل أيّ كود، شُغِّل workflow من 8 وكلاء (Run <code>wf_905dece2-86a</code> · 2.68M توكن · 604 استدعاء أداة · 32 دقيقة، كلّهم READ-ONLY) لمراجعة الخطة الأمنية الأصليّة ضدّ الكود الفعلي: وكيل لكل إصلاح (F-1..F-7) + وكيل للأثر العَرَضي + وكيل تقاطع.</p>
+<p><strong>أبرز ما كشفته المراجعة (مدمَج في الخطة المنقّحة):</strong></p>
+<ul>
+<li><span class="sev-crit">CRIT</span> اقتراح F-1 بقراءة جسم الطلب في الـmiddleware يكسر كل POST مصادقة (استهلاك تيّار receive).</li>
+<li><span class="sev-high">HIGH</span> ترويسة Remaining بلا حراسة → 500 عند انقطاع Redis.</li>
+<li><span class="sev-high">HIGH</span> فرع TOTP يترك مستخدم TOTP مقفولاً لو وُضع مسح القفل في الموضع الخطأ.</li>
+<li><span class="sev-high">HIGH</span> F-6 يُغفل 10 مواقع <code>jwt.decode</code> (5 منها SSE/WS)؛ ونافذة legacy 60د &lt; عمر refresh 30 يوماً → خروج جماعي.</li>
+<li><span class="sev-high">HIGH</span> 4 اختبارات قائمة ستنكسر صامتةً.</li>
+</ul>
+<p>الناتج: <span class="filepath">New Folder 10/خطة-إصلاح-العيوب-الأمنية-منقحة-بعد-المراجعة-العميقة-2026-05-31.html</span></p>
+</div>
+
+<!-- 3 -->
+<h2>3) المرحلة 2 — التنفيذ بالتسلسل</h2>
+<table>
+<thead><tr><th>الإصلاح</th><th>ما نُفِّذ فعلاً في الكود</th><th>الملفّات</th></tr></thead>
+<tbody>
+<tr><td><strong>F-1</strong><br/>rate-limit auth</td><td>دلو <code>auth</code> جديد (12/60ث/IP) بـ<code>startswith</code> على <code>/auth/login</code>+<code>/auth/register</code> (+بادئة /api)؛ <strong>بلا قراءة جسم</strong>؛ ترويسات <code>X-RateLimit-*</code> على كل ردّ بحراسة <code>count=None</code> (يحفظ fail-open)؛ لم تُضَف OTP (محميّة في otp_service).</td><td class="filepath">core/rate_limiter.py</td></tr>
+<tr><td><strong>F-2</strong><br/>login lockout</td><td>قفل Redis بمفتاح <code>login_lockout:{user_id}:{ip}</code> (يمنع DoS بقفل الضحية)، عتبة 5/30د عبر config؛ <strong>fail-open</strong> صريح؛ <strong>ذرّي</strong> (pipeline incr+expire)؛ المسح <strong>بعد verify_password مباشرة قبل فرع TOTP</strong>؛ مسح-الكل عند reset ناجح؛ استثناء هواتف SEED؛ <code>ACCOUNT_LOCKED</code> أُضيف لـErrorCodes + تُرجم (ar/en/fr).</td><td class="filepath">registration_router.py · error_envelope.py · config.py · messages/*.json</td></tr>
+<tr><td><strong>F-3</strong><br/>HSTS تدريجي</td><td>HSTS Stage 1 <code>max-age=300</code> في host vhost (نقطة TLS) + مرآة في حاوية nginx؛ بلا preload/includeSubDomains؛ تصعيد موثّق.</td><td class="filepath">deploy/setup_prod_domain.sh · web/nginx.conf</td></tr>
+<tr><td><strong>F-4</strong><br/>register موحّد</td><td>الردود الثلاثة (phone/email/username) → 409 موحّد <strong>بلا تلميح حقل</strong>؛ كل الفحوص تُشغَّل (إزالة قناة توقيت short-circuit)؛ تأخير عشوائي على مساري النجاح/التعارض. (تخفيف لا إغلاق — 409 مقابل 201 يبقى أوراكلاً = R-062-04 الموثّق.)</td><td class="filepath">registration_router.py</td></tr>
+<tr><td><strong>F-5</strong><br/>صمت الاسترداد</td><td><code>password-reset/confirm</code>@802 + <code>email/verify-request</code>@843 + <code>email/verify-confirm</code>@863: 200 عامّ بدل 404. (<code>email_router.py:208</code> مُصادَق → ليس ناقل enumeration، تُرك بتوثيق.)</td><td class="filepath">registration_router.py</td></tr>
+<tr><td><strong>F-6</strong><br/>توحيد decode + تدوير</td><td><strong>دالة فكّ مركزيّة</strong> <code>decode_with_rotation</code> (نشط ثم legacy) وُجِّهت إليها <strong>كل المواقع العشرة</strong>: jwt_service ×2 · SSE/WS ×5 (order_tracking/provider_stream/sse_router/fleet_stream/ws_gateway) · maintenance_middleware · main · auth_router ×2؛ <code>secret_key_legacy</code> في config (نافذة موثّقة ≥ عمر refresh=30يوم). التدوير الفعلي معطّل افتراضيّاً.</td><td class="filepath">jwt_service.py + 9 ملفّات + config.py</td></tr>
+<tr><td><strong>F-7</strong> RS256</td><td>مؤجّل (P3) — الدالة المركزيّة الآن جاهزة تسهّله.</td><td>—</td></tr>
+</tbody>
+</table>
+
+<!-- 4 -->
+<h2>4) المرحلة 3 — الاختبار والتحقّق</h2>
+<div class="card ok">
+<ul>
+<li><strong>مجالي الأمني الكامل (12 ملفّ اختبار): <span class="pass">161 ناجح / 0 فاشل</span></strong> (rate_limiter, F-2 lockout, F-6 rotation, registration, phase146, phase192a, i18n_sweep, jwt_revocation, ws_gateway, ux02, security_hardening, otp_log).</li>
+<li><strong>الحزمة الخلفيّة الكاملة:</strong> <span class="pass">1937 ناجح</span> / 29 فاشل / 2 skip.</li>
+<li><strong>إثبات صفر تراجع جديد:</strong> قبل عملي 30 فاشل → بعده 29. الفرق −1 = اختبار <code>i18n_sweep</code> الذي أدخلتُه بإضافة <code>ACCOUNT_LOCKED</code> ثمّ أصلحتُه فوراً بترجمته في الكتالوجات الثلاثة. الـ29 الباقية كلّها سابقة (catalog <code>201==200</code> + لُقَط SQLite في phase12/175/372/399/450/457/master_pick/13)، لا تستورد أيّ ملفّ من ملفّاتي، وتفشل بنفس الشكل منفردةً.</li>
+<li><strong>الواجهة:</strong> nginx-security-headers (4/4) + RegistrationPage (12/12) + ForgotPasswordPage (6/6) = 22/22.</li>
+<li>كل الملفّات الـ13 المعدّلة تُترجَم نظيفاً · الكتالوجات الثلاثة JSON صحيحة.</li>
+</ul>
+</div>
+
+<!-- 5 -->
+<h2>5) المرحلة 4 — حسم FIN-COR</h2>
+<div class="card warn">
+<p>أبلغ الفاحص عن تغيّر SHA في <code>feature_flags.yaml</code>. التتبّع:</p>
+<ul>
+<li>الملفّ عُدِّل <strong>2026-05-31 17:48</strong> — قبل بدء جلستي؛ لم ألمس <code>contracts/</code> إطلاقاً.</li>
+<li>قارنتُ بالنسخة الأصليّة في <code>_audit/P00_C_.../02_PLATFORM_SOURCE_CLEAN/</code> (تطابق أساس FIN-COR <code>dbe859f2…</code>). الفرق الوحيد = <strong>إضافة 4 أعلام PSP معطّلة</strong> (psp_edfa/plutu/tlync/sadad = false، الموجة F-W-03). لا حذف، لا قلب.</li>
+<li><strong>الأعلام المختومة الثلاثة سليمة:</strong> wallet_cash_out/wallet_peer_transfer/production_payment_enabled = false (الفاحص يؤكّد OK). launch_gates = MATCH.</li>
+</ul>
+<p>بإذن المالك «حدّث أساس الـSHA في الموضعين»: حُدِّث إلى <code>86ea59bb…</code> في <code>_ai_tools/bin/contract_flag_hash_check.py:15</code> + <code>platform/CLAUDE.md</code> (3 مواضع: 38/606/798). <strong>النتيجة: FIN-COR FINAL VERDICT = <span class="pass">PASS</span>.</strong></p>
+</div>
+
+<!-- 6 -->
+<h2>6) المرحلة 5 — النشر على tawanow.com</h2>
+<div class="card step">
+<p>آلية النشر التدريجي الآمن (تحفظ القاعدة، بلا <code>down -v</code>، بلا migration):</p>
+<ol>
+<li><code>deploy/deploy_be.sh</code> — رفع الخلفية + إعادة بناء <code>backend-core</code> (classic builder) + إعادة إنشاء → <span class="pass">صحّي</span>.</li>
+<li><code>deploy/deploy_web.sh</code> — رفع الويب + إعادة بناء <code>web-frontend</code> (مرآة nginx لـF-3) → <span class="pass">صحّي</span>.</li>
+<li>تشخيص حيّ: ظهر <code>HTTP 000</code> على <code>staging.tawanow.com</code> — <strong>تبيّن أنّه الدومين المهجور</strong>؛ الدومين الحيّ <code>tawanow.com</code> يُرجع <span class="pass">200</span> (واجهة + <code>/api/health/ready</code>)، والحاوية 200 داخليّاً على :8081، و5 حاويات صحّية، وnginx host صالح.</li>
+<li><code>deploy/verify_security_fixes.sh</code> (أنشأتُه) ضدّ <code>tawanow.com</code> → <strong>كل الفحوص مرّت ✓</strong>.</li>
+</ol>
+<table>
+<thead><tr><th>الإصلاح</th><th>التحقّق الحيّ على tawanow.com</th></tr></thead>
+<tbody>
+<tr><td>F-3 HSTS</td><td><code>Strict-Transport-Security: max-age=300</code> يُخدَم ✓</td></tr>
+<tr><td>F-5</td><td>هاتف مجهول → 200 (لا تسريب) · بريد مجهول → 200 ✓</td></tr>
+<tr><td>F-4</td><td>تكرار register → 409 <code>CONFLICT</code> بلا تلميح حقل ✓</td></tr>
+<tr><td>F-1/F-2</td><td>دفعة دخول خاطئ → 429 + <code>x-ratelimit-bucket: auth</code>, limit 12, window 60 ✓</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- 7 -->
+<h2>7) المرحلة 6 — ترسيخ HSTS في host vhost</h2>
+<div class="card step">
+<p>كان HSTS يُخدَم عبر تمرير ترويسة الحاوية خلال host vhost (لا <code>add_header</code> منافس فيه). لترسيخه في طبقة TLS نفسها (تحصين ضدّ أيّ <code>add_header</code> يُضاف مستقبلاً)، شُغِّل <code>deploy/setup_prod_domain.sh</code> المُعتمَد:</p>
+<ul>
+<li>nginx -t صالح → reload → <strong>certbot أعاد نشر الشهادة القائمة بلا تجديد/ACME</strong> (لا انقطاع).</li>
+<li>النتيجة: <code>add_header Strict-Transport-Security "max-age=300" always;</code> الآن داخل كتلة الـ443 (TLS) في <code>/etc/nginx/sites-available/tawanow.com</code>.</li>
+<li>تحقّق حيّ: <code>https://tawanow.com</code> <strong>و</strong> <code>https://www.tawanow.com</code> كلاهما يُرجع HSTS ✓ · 5 حاويات صحّية · الشهادة سليمة 83 يوماً.</li>
+</ul>
+<p><small>ملاحظة: الترويسة تظهر مرّتين (host + container mirror) — غير ضارّ؛ يمكن إزالة المرآة لاحقاً لترويسة مفردة.</small></p>
+<div class="card warn" style="margin-top:8px"><strong>حاجز أذونات محترَم:</strong> محاولة أولى لتعديل host vhost عبر سكربت SSH مباشر بـ<code>sudo</code> حجبها مُصنّف الأذونات (صحيح — يلتفّ على قواعد منع ssh/sudo). لم أحاول الالتفاف؛ استُخدم بدلاً عنه السكربت المُعتمَد <code>setup_prod_domain.sh</code>.</div>
+</div>
+
+<!-- 8 -->
+<h2>8) المرحلة 7 — مراقبة HSTS الآليّة (الخيار أ)</h2>
+<div class="card info">
+<p>المالك اختار: مراقبة آليّة قراءة-فقط 48 ساعة، ثمّ رفع علَم «جاهز للتصعيد» (التصعيد نفسه يبقى بشريّاً).</p>
+<ul>
+<li><strong>السكربت:</strong> <code>deploy/hsts_watch.sh</code> — قراءة-فقط بالكامل عبر SSH (curl للترويسة + openssl للشهادة + docker inspect)، <strong>لا يكتب شيئاً على الخادم</strong>. يفحص: HSTS=max-age=300 على tawanow.com+www · واجهة/api=200 · شهادة ≥10 أيام · 5 حاويات صحّية/0 غير صحّية.</li>
+<li><strong>السجلّ:</strong> <code>deploy/hsts_watch.log</code> (سطر/تشغيل) + <code>deploy/hsts_watch_cron.log</code> (stdout). النافذة في <code>hsts_window_start.txt</code>.</li>
+<li><strong>بعد 48س:</strong> إن لم يُسجَّل أيّ <code>STATUS=FAIL</code> → يكتب علَم <code>deploy/hsts_ready_to_escalate.flag</code> (يحوي خطوات التصعيد 300→86400). إن ظهر FAIL → «لا تُصعّد، حقّق».</li>
+</ul>
+<p><strong>سطر السجلّ الأوّل (PASS):</strong></p>
+<pre>2026-06-01T06:10:25Z | ELAPSED=0h | root=max-age=300 www=max-age=300 fe=200 api=200 certdays=83 healthy=5 unhealthy=0 | STATUS=PASS</pre>
+</div>
+
+<div class="card crit">
+<h3>🐞 فخّ المنطقة الزمنيّة — اكتُشف وأُصلح أثناء اختبار الـcron</h3>
+<ul>
+<li>اختبار الـcron أثبت أنّه <strong>يُطلق السكربت فعلاً</strong> (probe كتب سطر PASS حقيقيّاً في 06:21 UTC).</li>
+<li>لكنّه كشف أنّ <strong>cron هنا يستخدم الوقت المحلّي Europe/Berlin (CEST=UTC+2)، و<code>CRON_TZ=UTC</code> غير مُحترَم</strong> (probe بـCRON_TZ لم يُطلَق — اختُبر لا افتُرض).</li>
+<li>الجدول الأصليّ <code>7 6,18</code> (كنتُ أقصد UTC) كان سيُطلَق 06:07/18:07 CEST = أوقات خاطئة.</li>
+<li><strong>الإصلاح:</strong> الجدول النهائيّ بالـCEST صراحةً: <code>0 8,20 * * *</code> = <strong>06:00 و18:00 UTC</strong> (تباعد 12 ساعة). كل الـprobes أُزيلت؛ مدخل النسخ الاحتياطي <code>15 3</code> سليم.</li>
+</ul>
+<p><strong>الجدول النهائيّ:</strong></p>
+<pre>0 8,20 * * *  →  08:00 و 20:00 CEST  =  06:00 و 18:00 UTC</pre>
+<p>النافذة: 2026-06-01 06:10 UTC → 2026-06-03 06:10 UTC. أوّل تشغيل مجدول حقيقيّ: <strong>18:00 UTC (20:00 CEST) اليوم</strong>.</p>
+</div>
+
+<!-- 9 -->
+<h2>9) جرد التغييرات</h2>
+<h3>ملفّات الكود (backend)</h3>
+<ul>
+<li><span class="filepath">app/core/rate_limiter.py</span> — دلو auth + ترويسات محروسة (F-1)</li>
+<li><span class="filepath">app/core/error_envelope.py</span> — <code>ACCOUNT_LOCKED</code> (F-2)</li>
+<li><span class="filepath">app/config.py</span> — ثوابت lockout + <code>secret_key_legacy</code> (F-2/F-6)</li>
+<li><span class="filepath">app/modules/identity/registration_router.py</span> — lockout + register موحّد + صمت الاسترداد (F-2/F-4/F-5)</li>
+<li><span class="filepath">app/modules/identity/jwt_service.py</span> — <code>decode_with_rotation</code> (F-6)</li>
+<li><span class="filepath">app/modules/identity/auth_router.py</span> · <span class="filepath">app/main.py</span> · <span class="filepath">app/core/maintenance_middleware.py</span> · <span class="filepath">app/modules/sse/{order_tracking,provider_stream,sse_router,fleet_stream,ws_gateway}.py</span> — توجيه decode المركزيّ (F-6)</li>
+<li><span class="filepath">app/core/messages/{ar,en,fr}.json</span> — ترجمة ACCOUNT_LOCKED</li>
+</ul>
+<h3>الاختبارات</h3>
+<ul>
+<li>جديدة: <span class="filepath">tests/test_f2_login_lockout.py</span> (6) · <span class="filepath">tests/test_f6_jwt_rotation.py</span> (4) · إضافات في <span class="filepath">tests/test_rate_limiter.py</span> (+8)</li>
+<li>محدّثة: <span class="filepath">test_registration.py</span> (2) · <span class="filepath">test_phase146_*.py</span> (2) · <span class="filepath">test_phase192a_*.py</span> (1) · <span class="filepath">test_phase393_i18n_sweep</span> (عبر الكتالوجات)</li>
+<li>واجهة: <span class="filepath">web/src/test/nginx-security-headers.test.ts</span> (+HSTS)</li>
+</ul>
+<h3>سكربتات النشر/المراقبة + الحوكمة</h3>
+<ul>
+<li><span class="filepath">deploy/verify_security_fixes.sh</span> (جديد) · <span class="filepath">deploy/hsts_watch.sh</span> (جديد) · <span class="filepath">deploy/setup_prod_domain.sh</span> + <span class="filepath">web/nginx.conf</span> (HSTS)</li>
+<li><span class="filepath">_ai_tools/bin/contract_flag_hash_check.py</span> + <span class="filepath">platform/CLAUDE.md</span> (أساس SHA الجديد)</li>
+<li>crontab محلّي (مدخل المراقبة) + الذاكرة (<span class="filepath">session_2026_06_01_security_fixes_deploy.md</span> + MEMORY.md)</li>
+</ul>
+
+<!-- 10 -->
+<h2>10) الحالة الراهنة والمتابعات</h2>
+<div class="card ok">
+<p><strong>حيّ ومُتحقَّق على الإنتاج:</strong> F-1..F-6 كلّها · HSTS مُرسَّخ في host vhost (tawanow.com + www) · 5 حاويات صحّية · FIN-COR PASS · مراقبة آليّة كل 12 ساعة.</p>
+</div>
+<div class="card warn">
+<strong>متابعات مؤجّلة:</strong>
+<ul>
+<li>أوّل تشغيل مجدول للمراقبة: 18:00 UTC اليوم — سأعرض سجلّه عليك.</li>
+<li>بعد 48 ساعة (2026-06-03 06:10 UTC): إن استقرّ كل شيء يُرفع علَم التصعيد → تصعيد HSTS يدويّ <code>300→86400</code> بنظرة منك.</li>
+<li>معالجة 429/ACCOUNT_LOCKED في الواجهة/الجوّال (UX، ليس أمنيّاً).</li>
+<li>تفعيل تدوير السرّ الفعلي عند جاهزيّة OPS (ضبط SECRET_KEY+SECRET_KEY_LEGACY معاً).</li>
+<li>F-7 (RS256) · إزالة مرآة HSTS لترويسة مفردة · قرار F-4 الجذري (200+OTP) إن أُريد إغلاق enumeration كاملاً.</li>
+</ul>
+</div>
+
+<p style="margin-top:30px;text-align:center;color:var(--muted);font-size:12.5px">
+نهاية التقرير الكامل — مبنيّ على عمل فعليّ مُتحقَّق (8 وكلاء مراجعة · 13 ملفّ كود · 5 ملفّات اختبار · 1937 اختبار ناجح · نشر حيّ على tawanow.com · مراقبة آليّة). بلا commit · بلا migration · بلا مساس بقاعدة البيانات · FIN-COR PASS.
+</p>
+
+</div>
+</body>
+</html>

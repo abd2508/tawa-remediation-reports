@@ -1,0 +1,819 @@
+<title>محاكاة OPS Catalog Pause — منصة تووا</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0C1520;
+    --surface:     #182535;
+    --surface2:    #1E2F42;
+    --thead:       #243447;
+    --border:      #2A3D52;
+    --text:        #E2EAF4;
+    --text-dim:    #A8BEDB;
+    --text-muted:  #6A88A4;
+    --amber:       #D4870A;
+    --amber-light: #F5B240;
+    --blue:        #2978C4;
+    --blue-light:  #5AAEF0;
+
+    /* category hues */
+    --cat-A: #D97706;
+    --cat-B: #DC2626;
+    --cat-C: #2563EB;
+    --cat-D: #7C3AED;
+    --cat-E: #059669;
+    --cat-F: #0891B2;
+    --cat-G: #0284C7;
+    --cat-H: #6B7280;
+    --cat-I: #4F46E5;
+    --cat-J: #BE185D;
+
+    /* risk */
+    --risk-high-bg:   #3B1010;
+    --risk-high-txt:  #F87171;
+    --risk-mid-bg:    #362208;
+    --risk-mid-txt:   #FBBF24;
+    --risk-low-bg:    #0B2517;
+    --risk-low-txt:   #34D399;
+  }
+
+  html { background: var(--bg); color: var(--text); font-size: 15px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    direction: rtl;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Page header ── */
+  .page-header {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 56px 24px 40px;
+    text-align: center;
+  }
+  .eyebrow {
+    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--amber-light);
+    margin-bottom: 14px;
+  }
+  .page-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2.4rem;
+    font-weight: normal;
+    color: var(--text);
+    text-wrap: balance;
+    line-height: 1.25;
+    margin-bottom: 16px;
+  }
+  .page-sub {
+    color: var(--text-dim);
+    max-width: 580px;
+    margin: 0 auto 32px;
+    font-size: 0.95rem;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  .meta-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+  }
+  .meta-chip strong { color: var(--amber-light); }
+
+  /* ── Legend ── */
+  .legend {
+    max-width: 960px;
+    margin: 0 auto 28px;
+    padding: 0 24px;
+  }
+  .legend-inner {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    align-items: center;
+  }
+  .legend-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: .05em;
+  }
+  .legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .cat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 9px;
+    border-radius: 3px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    white-space: nowrap;
+  }
+  .cat-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Table wrapper ── */
+  .table-wrap {
+    padding: 0 16px 40px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table {
+    width: 100%;
+    min-width: 1080px;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    font-variant-numeric: tabular-nums;
+  }
+  col.col-num  { width: 44px; }
+  col.col-cat  { width: 110px; }
+  col.col-trig { width: 200px; }
+  col.col-what { width: 210px; }
+  col.col-risk { width: 80px; }
+  col.col-sol  { width: 240px; }
+  col.col-plan { width: 210px; }
+
+  thead th {
+    background: var(--thead);
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: 11px 12px;
+    border-bottom: 2px solid var(--border);
+    text-align: right;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  thead th:first-child {
+    text-align: center;
+    border-radius: 0 6px 0 0;
+  }
+  thead th:last-child {
+    border-radius: 6px 0 0 0;
+  }
+
+  tbody tr:nth-child(odd)  { background: var(--surface);  }
+  tbody tr:nth-child(even) { background: var(--surface2); }
+  tbody tr:hover { background: #1E3248; }
+
+  tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .num {
+    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px 2px 7px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    white-space: nowrap;
+  }
+
+  .risk-high { background: var(--risk-high-bg); color: var(--risk-high-txt); }
+  .risk-mid  { background: var(--risk-mid-bg);  color: var(--risk-mid-txt); }
+  .risk-low  { background: var(--risk-low-bg);  color: var(--risk-low-txt); }
+
+  td.plan-cell {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+  td.plan-cell code {
+    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 0.73rem;
+    background: #0D1C2B;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--blue-light);
+    word-break: break-all;
+  }
+  td.sol-cell {
+    font-size: 0.82rem;
+  }
+  td.sol-cell code {
+    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 0.73rem;
+    background: #0D1C2B;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--blue-light);
+  }
+
+  /* ── Discoveries ── */
+  .discoveries {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 64px;
+  }
+  .disc-header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 36px;
+  }
+  .disc-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.5rem;
+    font-weight: normal;
+    color: var(--text);
+  }
+  .disc-sub {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+  }
+  .disc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+  }
+  .disc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .disc-card::before {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .disc-card:nth-child(1)::before { background: var(--cat-D); }
+  .disc-card:nth-child(2)::before { background: var(--cat-A); }
+  .disc-card:nth-child(3)::before { background: var(--cat-G); }
+  .disc-card:nth-child(4)::before { background: var(--cat-J); }
+  .disc-card:nth-child(5)::before { background: var(--cat-E); }
+
+  .disc-num {
+    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .disc-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    text-wrap: balance;
+    line-height: 1.4;
+  }
+  .disc-card-body {
+    font-size: 0.83rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .disc-card-body code {
+    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+    font-size: 0.75rem;
+    background: #0D1C2B;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--blue-light);
+  }
+  .disc-scenarios {
+    margin-top: 10px;
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+  }
+
+  @media (max-width: 700px) {
+    .page-title { font-size: 1.7rem; }
+    .disc-grid  { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="page-header">
+  <p class="eyebrow">Tawa Platform · OPS Feature Simulation · P3</p>
+  <h1 class="page-title">محاكاة ذهنية — إيقاف منتج من OPS</h1>
+  <p class="page-sub">
+    38 سيناريو تغطي دورة حياة الإيقاف كاملةً: من السلة النشطة إلى الطلبات المؤكدة،
+    من الإيقاف المزدوج إلى استعادة المحتوى المعدَّل، من الكاش الفارسي إلى انتهاء الصلاحية الزمنية.
+  </p>
+  <div class="meta-row">
+    <span class="meta-chip">POST /operations/catalog/items/{id}/pause</span>
+    <span class="meta-chip">DELETE /operations/catalog/items/{id}/pause</span>
+    <span class="meta-chip">migration: <strong>ab14</strong></span>
+    <span class="meta-chip">permission: <strong>OPS staff only</strong></span>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-inner">
+    <span class="legend-label">الفئات:</span>
+    <div class="legend-items">
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-A) 18%,transparent);color:var(--cat-A)"><span class="cat-dot" style="background:var(--cat-A)"></span>A سلة نشطة</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-B) 18%,transparent);color:var(--cat-B)"><span class="cat-dot" style="background:var(--cat-B)"></span>B طلب نشط</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-C) 18%,transparent);color:var(--cat-C)"><span class="cat-dot" style="background:var(--cat-C)"></span>C تعديل المزوّد</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-D) 18%,transparent);color:var(--cat-D)"><span class="cat-dot" style="background:var(--cat-D)"></span>D إيقاف مزدوج</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-E) 18%,transparent);color:var(--cat-E)"><span class="cat-dot" style="background:var(--cat-E)"></span>E استعادة</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-F) 18%,transparent);color:var(--cat-F)"><span class="cat-dot" style="background:var(--cat-F)"></span>F كاش Frontend</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-G) 18%,transparent);color:var(--cat-G)"><span class="cat-dot" style="background:var(--cat-G)"></span>G SSE إشعار</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-H) 18%,transparent);color:var(--cat-H)"><span class="cat-dot" style="background:var(--cat-H)"></span>H سجل تدقيق</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-I) 18%,transparent);color:var(--cat-I)"><span class="cat-dot" style="background:var(--cat-I)"></span>I أجهزة متعددة</span>
+      <span class="cat-pill" style="background:color-mix(in srgb,var(--cat-J) 18%,transparent);color:var(--cat-J)"><span class="cat-dot" style="background:var(--cat-J)"></span>J صلاحيات</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main table -->
+<div class="table-wrap">
+  <table>
+    <colgroup>
+      <col class="col-num">
+      <col class="col-cat">
+      <col class="col-trig">
+      <col class="col-what">
+      <col class="col-risk">
+      <col class="col-sol">
+      <col class="col-plan">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>الفئة</th>
+        <th>المشغّل (Trigger)</th>
+        <th>ما يحدث</th>
+        <th>الخطر</th>
+        <th>الحل</th>
+        <th>تعديل الخطة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- A: سلة نشطة -->
+      <tr>
+        <td class="num">01</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-A) 20%,transparent);color:var(--cat-A)"><span class="cat-dot" style="background:var(--cat-A)"></span>A</span></td>
+        <td>زبون يضيف المنتج للسلة ثم OPS يوقفه قبل أن يكمل الزبون الدفع</td>
+        <td>الزبون يضغط "تأكيد الطلب" — هل ينشئ الطلب أم لا؟ الـ API لا يعلم بالإيقاف</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">POST /orders يُعيد التحقق من <code>ops_paused_at</code> قبل تأكيد أي بند؛ يُرجع 409 مع رسالة واضحة</td>
+        <td class="plan-cell">إضافة خطوة "pause-gate" في validation layer لـ <code>POST /orders</code></td>
+      </tr>
+      <tr>
+        <td class="num">02</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-A) 20%,transparent);color:var(--cat-A)"><span class="cat-dot" style="background:var(--cat-A)"></span>A</span></td>
+        <td>شاشة السلة مفتوحة عند الزبون وOPS يوقف منتجاً فيها</td>
+        <td>واجهة السلة تبقى كما هي؛ المنتج يظهر متاحاً وزر الإتمام فعّال</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">Frontend يشترك في SSE أو يُعيد تحقق Cart عند الضغط على "تأكيد"؛ الـ API هو البوابة الحتمية</td>
+        <td class="plan-cell">cart checkout-click يستدعي <code>GET /cart/validate</code> فورياً قبل الانتقال لصفحة الدفع</td>
+      </tr>
+      <tr>
+        <td class="num">03</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-A) 20%,transparent);color:var(--cat-A)"><span class="cat-dot" style="background:var(--cat-A)"></span>A</span></td>
+        <td>200 زبون لديهم المنتج X في سلاتهم — OPS يوقفه</td>
+        <td>200 سلة نشطة تحتاج إبطالاً متزامناً؛ لا آلية حالية لإشعارهم</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell"><code>POST /pause</code> يُصدر حدث <code>catalog.item.paused</code>؛ كل مستخدم يرى رسالة عند أول تفاعل تالٍ مع السلة</td>
+        <td class="plan-cell">إضافة publish لـ Redis pub-sub عند كل إيقاف؛ frontend يستقبل ويُحدّث حالة السلة</td>
+      </tr>
+      <tr>
+        <td class="num">04</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-A) 20%,transparent);color:var(--cat-A)"><span class="cat-dot" style="background:var(--cat-A)"></span>A</span></td>
+        <td>زبون على صفحة الدفع (آخر خطوة قبل الدفع) — OPS يوقف في تلك اللحظة</td>
+        <td>الزبون يُكمل الدفع → Backend يحاول إنشاء الطلب → يجب أن يفشل</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">التحقق من الإيقاف يكون <em>قبل</em> معالجة الدفع؛ إن وُجد إيقاف → رفض 409 + إعادة توجيه للسلة</td>
+        <td class="plan-cell">pre-payment gate في <code>POST /orders</code> يفحص <code>ops_paused_at</code> على كل line-item قبل أي charge</td>
+      </tr>
+
+      <!-- B: طلب نشط -->
+      <tr>
+        <td class="num">05</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-B) 20%,transparent);color:var(--cat-B)"><span class="cat-dot" style="background:var(--cat-B)"></span>B</span></td>
+        <td>منتج في طلب بحالة PENDING — OPS يوقفه بعد إنشاء الطلب</td>
+        <td>الطلب موجود في DB ومؤكد؛ الإيقاف لا يلغيه تلقائياً</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">الإيقاف يمنع الطلبات الجديدة فقط (forward-only)؛ يُعلَم OPS بالطلبات الحالية لمراجعتها يدوياً</td>
+        <td class="plan-cell">توثيق دلالة الإيقاف بوضوح؛ إضافة حقل <code>contains_paused_item</code> في order-flags لتنبيه OPS</td>
+      </tr>
+      <tr>
+        <td class="num">06</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-B) 20%,transparent);color:var(--cat-B)"><span class="cat-dot" style="background:var(--cat-B)"></span>B</span></td>
+        <td>منتج في طلب يُحضَّر فعلياً من المزوّد — OPS يوقفه أثناء التحضير</td>
+        <td>التحضير يكمل طبيعياً؛ الإيقاف لا أثر ميكانيكي على طلب قيد التنفيذ</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">لا تدخل مطلوب؛ OPS يتلقى تنبيهاً بوجود طلب نشط عند محاولة إيقاف منتج قيد التحضير</td>
+        <td class="plan-cell">رد <code>POST /pause</code> يتضمن <code>active_orders_count</code> لإعلام OPS قبل الإيقاف</td>
+      </tr>
+      <tr>
+        <td class="num">07</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-B) 20%,transparent);color:var(--cat-B)"><span class="cat-dot" style="background:var(--cat-B)"></span>B</span></td>
+        <td>منتج سُلِّم للزبون فعلاً — OPS يوقفه بأثر رجعي</td>
+        <td>الطلب المكتمل لا يتأثر؛ الإيقاف يؤثر على الطلبات المستقبلية فقط</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">لا إجراء مطلوب؛ audit log يسجل timestamp الإيقاف بعد التسليم</td>
+        <td class="plan-cell">لا تعديل في الخطة</td>
+      </tr>
+      <tr>
+        <td class="num">08</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-B) 20%,transparent);color:var(--cat-B)"><span class="cat-dot" style="background:var(--cat-B)"></span>B</span></td>
+        <td>زبون يطلب استرداد على طلب — OPS يوقف منتجاً في نفس الطلب في الوقت ذاته</td>
+        <td>منطق الاسترداد قد يتحقق من حالة المنتج ويفشل بسبب الإيقاف</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">Refund API يُهمل <code>ops_paused_at</code> كلياً؛ الإيقاف يؤثر على الإتاحة فقط وليس على المالية</td>
+        <td class="plan-cell">إضافة test case: استرداد على طلب يحتوي منتجاً موقوفاً → يجب أن يكتمل الاسترداد بنجاح</td>
+      </tr>
+
+      <!-- C: تعديل المزوّد -->
+      <tr>
+        <td class="num">09</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-C) 20%,transparent);color:var(--cat-C)"><span class="cat-dot" style="background:var(--cat-C)"></span>C</span></td>
+        <td>المزوّد يعدّل سعر منتج موقوف من OPS</td>
+        <td>السعر يُحفظ في DB لكن المنتج لا يُعرض؛ هل يجوز التعديل أثناء الإيقاف؟</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">السماح بالتعديل مع تسجيل حدث <code>MODIFIED_WHILE_PAUSED</code>؛ OPS يتلقى إشعاراً بالتعديل</td>
+        <td class="plan-cell"><code>PUT /catalog/items/{id}</code> يُسجّل audit event إضافي عند وجود <code>ops_paused_at</code></td>
+      </tr>
+      <tr>
+        <td class="num">10</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-C) 20%,transparent);color:var(--cat-C)"><span class="cat-dot" style="background:var(--cat-C)"></span>C</span></td>
+        <td>المزوّد يعدّل مخزون/كمية منتج موقوف</td>
+        <td>التعديل يُحفظ وسيسري بعد رفع الإيقاف</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">السماح؛ الرد يتضمن <code>{"pause_active": true, "note": "التعديل يسري بعد رفع الإيقاف"}</code></td>
+        <td class="plan-cell">إضافة حقل <code>pause_active</code> في رد <code>PUT /catalog/items/{id}</code> عند الإيقاف</td>
+      </tr>
+      <tr>
+        <td class="num">11</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-C) 20%,transparent);color:var(--cat-C)"><span class="cat-dot" style="background:var(--cat-C)"></span>C</span></td>
+        <td>المزوّد يحاول حذف أو أرشفة منتج موقوف من OPS</td>
+        <td>إن نُفِّذ: سجل الإيقاف يصبح orphan؛ إن مُنع: المزوّد عالق</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">منع الحذف 409 ما دام <code>ops_paused_at IS NOT NULL</code>؛ رسالة: "المنتج موقوف من OPS — تواصل مع الدعم"</td>
+        <td class="plan-cell"><code>DELETE /catalog/items/{id}</code> يفحص <code>ops_paused_at</code>؛ إضافة 409 response في الـ spec</td>
+      </tr>
+      <tr>
+        <td class="num">12</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-C) 20%,transparent);color:var(--cat-C)"><span class="cat-dot" style="background:var(--cat-C)"></span>C</span></td>
+        <td>المزوّد يرفع صوراً جديدة لمنتج موقوف</td>
+        <td>رفع الصورة يكتمل لكن المنتج لا يزال مخفياً</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">السماح؛ لا حاجة لحجب رفع الصور؛ التعديل يُسجَّل في audit log</td>
+        <td class="plan-cell">لا تعديل في الخطة؛ audit log يشمل image_update خلال فترة الإيقاف</td>
+      </tr>
+
+      <!-- D: إيقاف مزدوج -->
+      <tr>
+        <td class="num">13</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-D) 20%,transparent);color:var(--cat-D)"><span class="cat-dot" style="background:var(--cat-D)"></span>D</span></td>
+        <td>المزوّد يوقف منتجه — OPS يوقفه أيضاً في وقت لاحق</td>
+        <td>حالتا إيقاف مستقلتان؛ رفع إحداهما فقط لا يُظهر المنتج</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">منطق الإتاحة: <code>visible = provider_active AND ops_paused_at IS NULL</code>؛ كلا الشرطين مطلوبان</td>
+        <td class="plan-cell">catalog listing query يطبّق AND للشرطين؛ توثيق compound visibility rule بوضوح في الـ spec</td>
+      </tr>
+      <tr>
+        <td class="num">14</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-D) 20%,transparent);color:var(--cat-D)"><span class="cat-dot" style="background:var(--cat-D)"></span>D</span></td>
+        <td>المزوّد يرفع إيقافه الخاص بينما إيقاف OPS لا يزال فعّالاً</td>
+        <td>إن كان منطق الإتاحة صحيحاً: المنتج يبقى مخفياً؛ إن كان خاطئاً: يظهر خطأً</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">integration test: <code>provider_active=true, ops_paused_at IS NOT NULL</code> → المنتج لا يظهر</td>
+        <td class="plan-cell">إضافة test case تغطي هذه الحالة تحديداً بعد تطبيق migration ab14</td>
+      </tr>
+      <tr>
+        <td class="num">15</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-D) 20%,transparent);color:var(--cat-D)"><span class="cat-dot" style="background:var(--cat-D)"></span>D</span></td>
+        <td>OPS يرفع إيقافه بينما إيقاف المزوّد لا يزال فعّالاً</td>
+        <td>OPS يعتقد أن المنتج عاد، لكنه لا يزال مخفياً؛ غير واضح في واجهة OPS</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">رد <code>DELETE /pause</code> يتضمن <code>still_hidden_reason: "provider_paused"</code> لإعلام OPS بالوضع الفعلي</td>
+        <td class="plan-cell">restore endpoint يُرجع visibility state الكامل للمنتج بعد رفع إيقاف OPS</td>
+      </tr>
+      <tr>
+        <td class="num">16</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-D) 20%,transparent);color:var(--cat-D)"><span class="cat-dot" style="background:var(--cat-D)"></span>D</span></td>
+        <td>كلاهما يرفع الإيقاف (بأي ترتيب) — المنتج يجب أن يظهر</td>
+        <td>النتيجة الصحيحة إن كان المنطق صحيحاً؛ يجب اختبار الترتيبين</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">اختبار parametrized: OPS أولاً ثم المزوّد، والعكس — كلا الترتيبين يجب أن يُنتجا visibility صحيحة</td>
+        <td class="plan-cell">إضافة parametrized test لكلا الترتيبين في test suite</td>
+      </tr>
+      <tr>
+        <td class="num">17</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-D) 20%,transparent);color:var(--cat-D)"><span class="cat-dot" style="background:var(--cat-D)"></span>D</span></td>
+        <td>OPS يوقف منتجاً معطَّلاً كلياً من المزوّد (suspended)</td>
+        <td>الإيقاف زائد لكن يُسجَّل؛ موظف OPS قد لا يعلم بالتعطيل الأصلي</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">رد <code>POST /pause</code> يتضمن <code>already_hidden_reason: "provider_suspended"</code> لوعي OPS</td>
+        <td class="plan-cell">pause endpoint يُرجع current visibility state + سبب الإخفاء الحالي في الرد</td>
+      </tr>
+
+      <!-- E: استعادة -->
+      <tr>
+        <td class="num">18</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-E) 20%,transparent);color:var(--cat-E)"><span class="cat-dot" style="background:var(--cat-E)"></span>E</span></td>
+        <td>OPS يستعيد المنتج — المزوّد يجب أن يعلم عبر SSE</td>
+        <td>حدث <code>ops_pause_lifted</code> يُرسَل للمزوّد عبر SSE</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell"><code>DELETE /pause</code> يُصدر SSE event للمزوّد مع <code>item_id</code> و <code>ops_pause_lifted</code></td>
+        <td class="plan-cell">إضافة <code>ops_pause_lifted</code> لـ SSE event enum؛ provider app يعرض toast "تمت الاستعادة"</td>
+      </tr>
+      <tr>
+        <td class="num">19</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-E) 20%,transparent);color:var(--cat-E)"><span class="cat-dot" style="background:var(--cat-E)"></span>E</span></td>
+        <td>المزوّد يعدّل محتوى المنتج أثناء الإيقاف — OPS يستعيده تلقائياً</td>
+        <td>المحتوى المعدَّل يظهر فوراً بعد الاستعادة رغم أنه لم يُراجَع</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">restore endpoint يفحص <code>updated_at > ops_paused_at</code>؛ إن صح → يُرجع 202 "requires re-review" بدلاً من 200</td>
+        <td class="plan-cell">إضافة re-review gate في <code>DELETE /pause</code>؛ OPS يرى تحذير "المحتوى عُدِّل أثناء الإيقاف"</td>
+      </tr>
+      <tr>
+        <td class="num">20</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-E) 20%,transparent);color:var(--cat-E)"><span class="cat-dot" style="background:var(--cat-E)"></span>E</span></td>
+        <td>OPS يحاول استعادة منتج حذفه المزوّد أثناء الإيقاف</td>
+        <td>Restore endpoint يجد 404 — المنتج غير موجود</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">منع الحذف أثناء الإيقاف (سيناريو 11) يحمي من هذا؛ إن حدث بطريقة ما: restore endpoint يُرجع 404 مع <code>reason: "item_deleted"</code></td>
+        <td class="plan-cell">الحماية الأساسية في سيناريو 11؛ إضافة defensive 404 handler في restore endpoint</td>
+      </tr>
+      <tr>
+        <td class="num">21</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-E) 20%,transparent);color:var(--cat-E)"><span class="cat-dot" style="background:var(--cat-E)"></span>E</span></td>
+        <td>موظف OPS مختلف عن من أوقف يقوم بالاستعادة</td>
+        <td>ops_paused_by يُشير للموقِف الأصلي؛ الاستعادة تأتي من مستخدم آخر</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">أي موظف OPS يمكنه الاستعادة؛ audit log يسجّل <code>ops_restored_by</code> و <code>ops_restored_at</code> بشكل مستقل</td>
+        <td class="plan-cell">تتبع metadata الاستعادة منفصلاً؛ لا يُشترط أن يكون المستعيد هو نفس الموقِف</td>
+      </tr>
+
+      <!-- F: كاش Frontend -->
+      <tr>
+        <td class="num">22</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-F) 20%,transparent);color:var(--cat-F)"><span class="cat-dot" style="background:var(--cat-F)"></span>F</span></td>
+        <td>قائمة المنتجات محفوظة في browser cache — OPS يوقف منتجاً فيها</td>
+        <td>الزبون يرى المنتج متاحاً طوال فترة انتهاء الكاش</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">API listing headers: <code>Cache-Control: max-age=30, must-revalidate</code>؛ SSE يُرسل invalidation event</td>
+        <td class="plan-cell">catalog listing API يُقيّد cache TTL بـ 30 ثانية max؛ إضافة SW cache-clear عند pause event</td>
+      </tr>
+      <tr>
+        <td class="num">23</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-F) 20%,transparent);color:var(--cat-F)"><span class="cat-dot" style="background:var(--cat-F)"></span>F</span></td>
+        <td>صفحة تفاصيل المنتج مفتوحة — OPS يوقفه</td>
+        <td>زر "إضافة للسلة" يبقى فعّالاً؛ الزبون يستطيع الإضافة من الصفحة المخزَّنة</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell"><code>POST /cart/items</code> يفحص <code>ops_paused_at</code>؛ يُرجع 409 <code>{"error": "item_currently_unavailable"}</code></td>
+        <td class="plan-cell">add-to-cart API هو البوابة الحتمية بغض النظر عن حالة الـ cache؛ إضافة test case لهذا</td>
+      </tr>
+      <tr>
+        <td class="num">24</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-F) 20%,transparent);color:var(--cat-F)"><span class="cat-dot" style="background:var(--cat-F)"></span>F</span></td>
+        <td>نتائج البحث محفوظة في Redis — OPS يوقف منتجاً في النتائج</td>
+        <td>المنتج يظهر في البحث حتى انتهاء cache TTL</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">search cache TTL ≤ 60 ثانية؛ <code>POST /pause</code> يُصدر invalidation لـ search cache بالـ item_id</td>
+        <td class="plan-cell">search service يشترك في <code>catalog.item.paused</code> event ويحذف المنتج من نتائج مخزَّنة</td>
+      </tr>
+      <tr>
+        <td class="num">25</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-F) 20%,transparent);color:var(--cat-F)"><span class="cat-dot" style="background:var(--cat-F)"></span>F</span></td>
+        <td>صفحة فئة المتجر تُظهر badge "متوفر" على المنتج — OPS يوقفه</td>
+        <td>badge يبقى خاطئاً حتى انتهاء الكاش؛ UX مضلِّل</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">نفس سياسة TTL 30 ثانية؛ product card API يتضمن <code>ops_paused: bool</code> لإخفاء badge الإتاحة</td>
+        <td class="plan-cell">إضافة <code>ops_paused</code> boolean لـ product card response schema</td>
+      </tr>
+
+      <!-- G: SSE إشعار -->
+      <tr>
+        <td class="num">26</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-G) 20%,transparent);color:var(--cat-G)"><span class="cat-dot" style="background:var(--cat-G)"></span>G</span></td>
+        <td>OPS يوقف منتجاً — SSE يُرسَل للمزوّد — app يعرض علامة الإيقاف</td>
+        <td>Happy path: provider app يُظهر pause badge فوراً</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">SSE payload: <code>{event: "catalog.item.ops_paused", item_id, paused_at, visible_reason: "ops_review"}</code></td>
+        <td class="plan-cell">توثيق SSE event schema في OpenAPI؛ اختبار في E2E</td>
+      </tr>
+      <tr>
+        <td class="num">27</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-G) 20%,transparent);color:var(--cat-G)"><span class="cat-dot" style="background:var(--cat-G)"></span>G</span></td>
+        <td>اتصال SSE للمزوّد منقطع لحظة الإيقاف</td>
+        <td>إشعار الإيقاف يضيع؛ المزوّد لا يعلم لماذا اختفى المنتج</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">SSE reconnect يُرسل <code>Last-Event-ID</code>؛ backend يُعيد إرسال الأحداث الفائتة خلال 5 دقائق؛ provider dashboard يفحص حالة الإيقاف عند كل تحميل</td>
+        <td class="plan-cell">SSE implementation يدعم replay بـ Last-Event-ID؛ provider dashboard يستعلم item status عند reconnect</td>
+      </tr>
+      <tr>
+        <td class="num">28</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-G) 20%,transparent);color:var(--cat-G)"><span class="cat-dot" style="background:var(--cat-G)"></span>G</span></td>
+        <td>المزوّد لديه تبويبات متعددة مفتوحة — OPS يوقف — بعض التبويبات لا تتحدث</td>
+        <td>تبويب 1 يُظهر badge الإيقاف؛ تبويب 2 يبقى على الحالة القديمة</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">كل تبويب له اتصال SSE مستقل؛ استخدام <code>BroadcastChannel</code> لمزامنة حالة الإيقاف بين التبويبات</td>
+        <td class="plan-cell">provider frontend يستخدم BroadcastChannel API لنشر pause events عبر التبويبات</td>
+      </tr>
+      <tr>
+        <td class="num">29</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-G) 20%,transparent);color:var(--cat-G)"><span class="cat-dot" style="background:var(--cat-G)"></span>G</span></td>
+        <td>OPS يوقف عبر node A — عملاء SSE متصلون بـ node B</td>
+        <td>في بيئة multi-node بدون pub-sub مشترك: node B لا يُوصّل الإشعار</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell"><code>POST /pause</code> ينشر <code>catalog.item.paused</code> على Redis pub-sub؛ جميع nodes تشترك وتُوصّل لعملائها</td>
+        <td class="plan-cell">التحقق من أن SSE implementation يمر عبر Redis pub-sub؛ إلزامي في multi-node deployment</td>
+      </tr>
+
+      <!-- H: سجل تدقيق -->
+      <tr>
+        <td class="num">30</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-H) 20%,transparent);color:var(--cat-H)"><span class="cat-dot" style="background:var(--cat-H)"></span>H</span></td>
+        <td>OPS يوقف بسبب معين — يجب أن يُسجَّل في audit log</td>
+        <td>سجل كامل: ops_paused_by، item_id، paused_at، reason</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">POST /pause يكتب في <code>catalog_audit_log</code>: <code>{item_id, action, by_user_id, at, reason}</code></td>
+        <td class="plan-cell">تعريف schema لـ catalog_audit_log في migration ab14؛ index على <code>(item_id, at DESC)</code></td>
+      </tr>
+      <tr>
+        <td class="num">31</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-H) 20%,transparent);color:var(--cat-H)"><span class="cat-dot" style="background:var(--cat-H)"></span>H</span></td>
+        <td>OPS يستعيد — يجب أن تُسجَّل الاستعادة أيضاً</td>
+        <td>سجل ثانٍ: action=unpause، by_user_id=المستعيد (قد يختلف عن الموقِف)</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">DELETE /pause يكتب audit entry مستقلاً يتضمن <code>ops_restored_by</code> و إشارة للـ pause_event_id الأصلي</td>
+        <td class="plan-cell">كلا الـ endpoints يكتبان في audit_log؛ سجل الاستعادة يتضمن reference للإيقاف الأصلي</td>
+      </tr>
+      <tr>
+        <td class="num">32</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-H) 20%,transparent);color:var(--cat-H)"><span class="cat-dot" style="background:var(--cat-H)"></span>H</span></td>
+        <td>OPS يُرسل طلب إيقاف بدون حقل reason</td>
+        <td>إن كان <code>ops_pause_reason</code> nullable: audit trail غير قابل للتطبيق؛ "لماذا أُوقف؟" لا يُجاب</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">reason مطلوب على مستوى API؛ 400 إن غاب؛ عمود DB: <code>NOT NULL</code>؛ حد أدنى 5 محارف</td>
+        <td class="plan-cell">POST /pause body: <code>{reason: required, min_length: 5}</code>؛ عمود DB <code>NOT NULL</code> في ab14</td>
+      </tr>
+      <tr>
+        <td class="num">33</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-H) 20%,transparent);color:var(--cat-H)"><span class="cat-dot" style="background:var(--cat-H)"></span>H</span></td>
+        <td>منتج يُوقَف ويُستعاد 7 مرات خلال 30 يوماً</td>
+        <td>audit_log يتراكم 14 سجلاً؛ نمو الجدول في الوقت</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">audit_log append-only؛ retention 90 يوماً؛ index على <code>(item_id, at DESC)</code> لاستعلامات التاريخ</td>
+        <td class="plan-cell">إضافة index في migration ab14؛ توثيق retention policy (90 يوم hot)</td>
+      </tr>
+
+      <!-- I: أجهزة متعددة -->
+      <tr>
+        <td class="num">34</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-I) 20%,transparent);color:var(--cat-I)"><span class="cat-dot" style="background:var(--cat-I)"></span>I</span></td>
+        <td>موظف OPS يوقف من موبايل — مشرف يستعيد من ديسكتوب</td>
+        <td>HTTP semantics عادية؛ DELETE يُعيد <code>ops_paused_at = NULL</code>؛ لا تعارض</td>
+        <td><span class="badge risk-low">منخفض</span></td>
+        <td class="sol-cell">HTTP semantics كافية؛ audit log يسجّل كلا المستخدمين بـ user_id مختلف</td>
+        <td class="plan-cell">اختبار E2E مع مستخدمَي OPS مختلفَين؛ لا تعديل في البنية</td>
+      </tr>
+      <tr>
+        <td class="num">35</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-I) 20%,transparent);color:var(--cat-I)"><span class="cat-dot" style="background:var(--cat-I)"></span>I</span></td>
+        <td>موظفا OPS يضغطان "إيقاف" على نفس المنتج في آنٍ واحد</td>
+        <td>طلبان متزامنان؛ الأخير يُكتب في ops_paused_by فيضيع هوية الأول</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell"><code>UPDATE SET ops_paused_at = NOW() WHERE ops_paused_at IS NULL</code> — ينجح مرة واحدة فقط؛ الطلب الثاني يُرجع 200 "already_paused"</td>
+        <td class="plan-cell">pause endpoint يستخدم conditional UPDATE؛ الطلب المتزامن الثاني يحصل على رد idempotent</td>
+      </tr>
+      <tr>
+        <td class="num">36</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-I) 20%,transparent);color:var(--cat-I)"><span class="cat-dot" style="background:var(--cat-I)"></span>I</span></td>
+        <td>موظف OPS يوقف — مشرف يستعيد فوراً من جهاز آخر — واجهة الموظف لا تتحدث</td>
+        <td>الموظف يرى المنتج "موقوفاً" رغم استعادته؛ قد يحاول إيقافه مجدداً</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">OPS dashboard يشترك في SSE لأحداث الكاتالوج؛ عند restore event يتحدث badge المنتج في الواجهة</td>
+        <td class="plan-cell">OPS frontend يستقبل <code>catalog.item.ops_pause_lifted</code> عبر SSE ويُحدّث UI في الوقت الفعلي</td>
+      </tr>
+      <tr>
+        <td class="num">37</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-I) 20%,transparent);color:var(--cat-I)"><span class="cat-dot" style="background:var(--cat-I)"></span>I</span></td>
+        <td>جلسة موظف OPS تنتهي أثناء تدفق الإيقاف — يُرسل الطلب فيحصل على 401</td>
+        <td>الإيقاف لا يُسجَّل؛ الموظف يظن أنه أوقف لكنه لم يفعل</td>
+        <td><span class="badge risk-mid">متوسط</span></td>
+        <td class="sol-cell">OPS frontend يعالج 401 على pause action: يُعيد توجيهاً لتسجيل الدخول مع <code>return_to</code>؛ الإجراء المعلَّق يُحفظ في sessionStorage</td>
+        <td class="plan-cell">إضافة 401 handler في pause form؛ pending action يُعاد تقديمه بعد إعادة المصادقة</td>
+      </tr>
+
+      <!-- J: صلاحيات -->
+      <tr>
+        <td class="num">38</td>
+        <td><span class="badge" style="background:color-mix(in srgb,var(--cat-J) 20%,transparent);color:var(--cat-J)"><span class="cat-dot" style="background:var(--cat-J)"></span>J</span></td>
+        <td>موظف OPS يوقف منتجاً — يُسحب منه الـ permission لاحقاً — الإيقاف يبقى بلا مالك</td>
+        <td>ops_paused_by يُشير لمستخدم فاقد الصلاحية؛ الإيقاف يستمر إلى ما لا نهاية دون مراجعة</td>
+        <td><span class="badge risk-high">عالٍ</span></td>
+        <td class="sol-cell">عند سحب صلاحية OPS: يُتحقق من <code>ops_paused_items WHERE ops_paused_by = user_id</code> → تنبيه للمشرف؛ أي موظف OPS يستطيع الاستعادة (ليس الموقِف الأصلي فقط)</td>
+        <td class="plan-cell">permission revocation endpoint يُنشئ supervisor alert عند وجود إيقافات نشطة للمستخدم؛ DELETE /pause مفتوح لأي OPS staff</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Discoveries -->
+<div class="discoveries">
+  <div class="disc-header">
+    <h2 class="disc-title">أهم 5 اكتشافات</h2>
+    <span class="disc-sub">ترتيب حسب الأثر المعماري</span>
+  </div>
+  <div class="disc-grid">
+
+    <div class="disc-card">
+      <p class="disc-num">اكتشاف 01 — معماري</p>
+      <h3 class="disc-card-title">إيقاف مزدوج بلا حاكمية واضحة</h3>
+      <p class="disc-card-body">
+        حين يوقف المزوّد منتجه ثم يضيف OPS إيقافه الخاص، تنشأ حالتان مستقلتان لا تتشاركان منطق الاستعادة. خطأ واحد في شرط
+        <code>visibility</code> — AND بدلاً من OR أو العكس — يُظهر المنتج بعد رفع إيقاف واحد فقط. هذه هي أعلى مخاطرة معمارية
+        في الميزة بأكملها لأنها صامتة: الاختبار العادي لا يكشفها، والكشف يتطلب اختبار الترتيبين الأربعة من حالتَي الإيقاف.
+      </p>
+      <p class="disc-scenarios">السيناريوهات: 13 · 14 · 15 · 16 · 17</p>
+    </div>
+
+    <div class="disc-card">
+      <p class="disc-num">اكتشاف 02 — أمان الزبون</p>
+      <h3 class="disc-card-title">السلة النشطة لا تُبطَل — البوابة الإلزامية هي <code>POST /orders</code></h3>
+      <p class="disc-card-body">
+        الزبون الذي يملك منتجاً في سلته وقت إيقافه يستطيع نظرياً الوصول لصفحة الدفع وإتمامه قبل انتهاء الكاش. الحماية الوحيدة
+        الموثوقة هي: <code>POST /orders</code> يفحص <code>ops_paused_at</code> على كل بند <em>قبل</em> معالجة أي دفع. أي دفاع
+        على مستوى frontend أو SSE هو defense-in-depth وليس بوابة حتمية.
+      </p>
+      <p class="disc-scenarios">السيناريوهات: 01 · 02 · 03 · 04 · 23</p>
+    </div>
+
+    <div class="disc-card">
+      <p class="disc-num">اكتشاف 03 — بنية تحتية</p>
+      <h3 class="disc-card-title">SSE في بيئة متعددة العقد يتطلب Redis pub-sub</h3>
+      <p class="disc-card-body">
+        إيقاف يُعالَج على node A لن يصل لعملاء SSE المتصلين بـ node B ما لم تكن الأحداث تمر عبر Redis pub-sub مشترك. هذا ليس
+        خياراً معمارياً مستقبلياً — هو شرط لصحة الميزة في أي deployment يتجاوز عقدة واحدة. يجب التحقق من هذا قبل أي نشر متعدد العقد.
+      </p>
+      <p class="disc-scenarios">السيناريوهات: 27 · 29</p>
+    </div>
+
+    <div class="disc-card">
+      <p class="disc-num">اكتشاف 04 — استمرارية العمل</p>
+      <h3 class="disc-card-title">إيقاف يتيم عند سحب صلاحية الموظف</h3>
+      <p class="disc-card-body">
+        موظف OPS يوقف منتجاً ثم تُسحب منه الصلاحية: الإيقاف يستمر في DB بلا مالك فعّال ولا مراجعة مجدولة. المنتج يختفي من
+        الكاتالوج بصمت. الحل في نقطتين: (أ) permission revocation يُنشئ supervisor alert، (ب) أي موظف OPS — وليس الموقِف الأصلي
+        فقط — يستطيع تشغيل <code>DELETE /pause</code>.
+      </p>
+      <p class="disc-scenarios">السيناريو: 38</p>
+    </div>
+
+    <div class="disc-card">
+      <p class="disc-num">اكتشاف 05 — سلامة المراجعة</p>
+      <h3 class="disc-card-title">تعديل المحتوى أثناء الإيقاف يتجاوز سبب الإيقاف</h3>
+      <p class="disc-card-body">
+        إن أوقف OPS منتجاً بسبب محتوى مخالف، وعدّل المزوّد المحتوى أثناء الإيقاف، ثم استعاد OPS المنتج تلقائياً — المحتوى
+        المعدَّل الجديد (غير المراجَع) يظهر فوراً. الاستعادة يجب أن تفحص <code>updated_at > ops_paused_at</code> وتُعيد
+        202 "requires re-review" في هذه الحالة بدلاً من 200 مباشر.
+      </p>
+      <p class="disc-scenarios">السيناريو: 19</p>
+    </div>
+
+  </div>
+</div>

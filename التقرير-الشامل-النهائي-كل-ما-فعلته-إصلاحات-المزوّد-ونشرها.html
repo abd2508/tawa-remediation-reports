@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>التقرير الشامل النهائي — إصلاحات المزوّد + الاستلام الذاتي + النشر</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1d2740; --border:#2a3550;
+    --text:#e7ecf5; --muted:#9aa7c2; --accent:#4d8bff;
+    --ok:#2ec26a; --okbg:#122a1c; --warn:#f5a623; --warnbg:#2b220f;
+    --bad:#ff5c6c; --badbg:#2a1319; --code:#0b0f1a; --codeline:#233;
+    --chip:#243352; --chipbad:#3a1f27; --new:#38bdf8; --newbg:#0b2637; --fix:#f472b6; --fixbg:#2c1522;
+    --dep:#34d399; --depbg:#06281d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.75;font-size:16px}
+  .wrap{max-width:1060px;margin:0 auto;padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#10233a,#0f1420);border:1px solid var(--border);border-radius:18px;padding:28px 30px;margin-bottom:24px}
+  header.top h1{margin:0 0 6px;font-size:1.7rem}
+  header.top .sub{color:var(--muted);font-size:.96rem}
+  .meta{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+  .tag{background:var(--panel2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:.78rem;color:var(--muted)}
+  .live{background:var(--depbg);color:var(--dep);border:1px solid #16613f;border-radius:999px;padding:4px 12px;font-size:.78rem;font-weight:700}
+  h2.section{font-size:1.34rem;margin:40px 0 12px;padding-right:12px;border-right:4px solid var(--accent);scroll-margin-top:18px}
+  h3{font-size:1.06rem;margin:22px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;margin:16px 0}
+  .goal{background:var(--panel2);border-radius:12px;padding:13px 16px;margin-bottom:15px;font-size:.97rem}
+  .goal b{color:var(--accent)}
+  pre{background:var(--code);border:1px solid var(--codeline);border-radius:10px;padding:12px 14px;overflow-x:auto;direction:ltr;text-align:left;font-size:.8rem;margin:6px 0}
+  code{font-family:"Fira Code",Consolas,monospace}
+  .inl{font-family:monospace;background:#0b1526;border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-size:.82rem}
+  .fileref{direction:ltr;text-align:left;color:var(--accent);font-family:monospace;font-size:.79rem;background:#0b1526;border:1px solid var(--border);border-radius:6px;padding:2px 8px;display:inline-block;margin-bottom:4px}
+  .add{color:var(--ok)} .del{color:var(--bad)} .hl{color:var(--warn)} .cmt{color:#5b6b8c}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.87rem}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted)}
+  .pill{border-radius:999px;padding:2px 10px;font-size:.74rem;font-weight:700;white-space:nowrap;display:inline-block}
+  .pill.ok{background:var(--okbg);color:var(--ok)} .pill.warn{background:var(--warnbg);color:var(--warn)}
+  .pill.bad{background:var(--badbg);color:var(--bad)} .pill.new{background:var(--newbg);color:#7dd3fc}
+  .pill.fix{background:var(--fixbg);color:#f9a8d4} .pill.dep{background:var(--depbg);color:var(--dep)}
+  .note{background:#0d1730;border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:.9rem;margin-top:12px}
+  .note.warn{border-left-color:var(--warn);background:var(--warnbg)}
+  .note.bad{border-left-color:var(--bad);background:var(--badbg)}
+  .note.new{border-left-color:var(--new);background:var(--newbg)}
+  .note.fix{border-left-color:var(--fix);background:var(--fixbg)}
+  .note.dep{border-left-color:var(--dep);background:var(--depbg)}
+  .mockrow{display:flex;gap:18px;flex-wrap:wrap;margin:18px 0}
+  .phone{flex:1;min-width:250px;background:#0b1020;border:2px solid var(--border);border-radius:22px;padding:14px;position:relative}
+  .phone .bar{height:6px;width:60px;background:#2a3550;border-radius:99px;margin:0 auto 12px}
+  .phone .title{font-weight:800;font-size:1rem;margin-bottom:12px;color:#fff}
+  .ui{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+  .ui.badcard{border-color:var(--bad)} .ui.okcard{border-color:var(--ok)}
+  .lbl{font-size:.78rem;color:var(--muted);margin-bottom:6px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{background:var(--chip);border:1px solid var(--border);border-radius:8px;padding:3px 9px;font-size:.72rem}
+  .chip.bad{background:var(--chipbad);border-color:var(--bad);color:#ffb0b8}
+  .chip.good{background:var(--okbg);border-color:#1c5b36;color:#8ff0b5}
+  .flag{position:absolute;top:10px;left:12px;font-size:.66rem;padding:2px 8px;border-radius:8px;font-weight:700}
+  .flag.bad{background:var(--badbg);color:var(--bad);border:1px solid #6b2530}
+  .flag.ok{background:var(--okbg);color:var(--ok);border:1px solid #1c5b36}
+  .arrow{display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--accent);min-width:32px}
+  .toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;margin-top:12px}
+  .toc a{display:block;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-decoration:none;color:var(--text);font-size:.9rem}
+  .toc a:hover{border-color:var(--accent)}
+  .foot{margin-top:44px;color:var(--muted);font-size:.82rem;text-align:center;border-top:1px solid var(--border);padding-top:18px}
+  ul.clean{margin:6px 0;padding-right:20px} ul.clean li{margin:5px 0}
+  .kbd{font-family:monospace;background:#0b1526;border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:.8rem}
+  .tl{position:relative;padding-right:22px}
+  .tl .ev{position:relative;padding:10px 0 10px 0;border-right:2px solid var(--border);padding-right:20px;margin-right:6px}
+  .tl .ev::before{content:"";position:absolute;right:-7px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+  .tl .ev b{color:#fff}
+  .scnrow td:first-child{white-space:nowrap;font-weight:700;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>التقرير الشامل النهائي — كل ما فعلته</h1>
+  <div class="sub">إصلاح ثلاثة أعطال في شاشة المزوّد وشاشة العميل (توا) — من التحقّق بالكود، مرورًا بثلاث مراجعات متعمّقة، إلى التنفيذ والتحقّق، وصولًا إلى النشر الحيّ على الأهداف الأربعة. لا استنتاجات — كل بند مسنود بملف/سطر أو دليل تنفيذ فعليّ.</div>
+  <div class="meta">
+    <span class="tag">المنصّة: Tawa — واجهة الويب (React · Vite · i18next)</span>
+    <span class="tag">التاريخ: 2026-07-07</span>
+    <span class="tag">Commit: 8b3c807</span>
+    <span class="tag">Bundle: main-0QIw1IwP.js</span>
+    <span class="live">● حيّ على tawanow.com</span>
+  </div>
+  <div class="toc">
+    <a href="#tl">⓪ الخطّ الزمني للرحلة</a>
+    <a href="#verify">① التحقّق من الأعطال (من الكود)</a>
+    <a href="#plans">② المراجعات الثلاث (v1 → عميقة → v2)</a>
+    <a href="#rbac">🔒 التحقّق من الصلاحيات</a>
+    <a href="#impl">③ التنفيذ (الملفات + قبل/بعد)</a>
+    <a href="#valid">④ التحقّق (typecheck/lint/tests/build)</a>
+    <a href="#deploy">⑤ النشر إلى الأهداف الأربعة</a>
+    <a href="#reports">⑥ التقارير المسجّلة</a>
+    <a href="#resid">⑦ المتبقّيات وضمانات السلامة</a>
+  </div>
+</header>
+
+<!-- TIMELINE -->
+<h2 class="section" id="tl">⓪ الخطّ الزمني للرحلة</h2>
+<div class="card">
+  <div class="tl">
+    <div class="ev"><b>1. التحقّق</b> — فحص الأعطال الأربعة التي ذكرتَها مقابل الكود الفعلي، وتقرير «هل كلامي صحيح؟» نقطة نقطة.</div>
+    <div class="ev"><b>2. خطة v1</b> — خطة تنفيذية أولى + 9 أعراض جانبية.</div>
+    <div class="ev"><b>3. مراجعة عميقة</b> — محاكاة سيناريوهات كشفت <b>7 فجوات جديدة</b> (G1–G7).</div>
+    <div class="ev"><b>4. مراجعة نهائية v2</b> — تحقّق ذرّي صحّح توصية زائدة كنتُ اقترحتُها (G3)، وأكّد G6/S8، وبرّأ e2e، وأضاف قسم الصلاحيات.</div>
+    <div class="ev"><b>5. التنفيذ</b> — 15 ملفًا (14 web + تقرير). اعتماد «القائمة المرجعية للأصناف».</div>
+    <div class="ev"><b>6. التحقّق</b> — typecheck 0 · lint 0 خطأ · متأثّرة 46/46 · الحزمة 1381 نجحت · build نجح.</div>
+    <div class="ev"><b>7. النشر</b> — الأهداف الأربعة عبر <span class="inl">docker cp</span> (دون إعادة إنشاء). <b>حيّ على tawanow.com</b>.</div>
+    <div class="ev"><b>8. التوثيق</b> — تقريران مرقّمان (448 تنفيذ · 449 نشر) + هذا التقرير الشامل.</div>
+  </div>
+</div>
+
+<!-- VERIFY -->
+<h2 class="section" id="verify">① التحقّق من الأعطال — من الكود مباشرةً</h2>
+<div class="card">
+  <table>
+    <tr><th style="width:34px">#</th><th>ما لاحظتَه</th><th>الدليل</th><th style="width:110px">الحكم</th></tr>
+    <tr><td>1</td><td>كود دعوة الموظفين يظهر في الشاشة الرئيسية بدل صفحة «الموظّفون والصلاحيات»</td><td><span class="inl">ProviderDashboard.tsx:321</span> يعرض <span class="inl">&lt;StaffInviteCard/&gt;</span> في الرئيسية؛ صفحة الموظفين خالية منه</td><td><span class="pill ok">✔ صحيح</span></td></tr>
+    <tr><td>2</td><td>استبدال «كتالوج» بـ«الأصناف»</td><td>العنوان صار «الأصناف»، لكن بطاقة الرئيسية (:647) وزر «اختر من الكتالوج» والنافذة والوصف بقيت «كتالوج»</td><td><span class="pill warn">◐ جزئي</span></td></tr>
+    <tr><td>3</td><td>في الاستلام الذاتي تظهر أزرار السائق («اطرق الباب»…)</td><td>العنوان/placeholder يتبدّلان، لكن <span class="inl">NOTE_CHIPS</span> تُعرَض بلا شرط في <span class="inl">CheckoutPage.tsx:1052</span></td><td><span class="pill ok">✔ صحيح</span></td></tr>
+    <tr><td>4</td><td>هل رسوم الاستلام الذاتي = صفر صحيحة؟</td><td><span class="inl">CheckoutPage.tsx:182-183</span> يضبطها صفرًا عمدًا ويتخطّى التسعير</td><td><span class="pill ok">✔ صحيحة</span></td></tr>
+  </table>
+  <div class="note">النتيجة: 3 أعطال حقيقية للإصلاح + نقطة واحدة صحيحة أصلًا (لا تغيير).</div>
+</div>
+
+<!-- PLANS -->
+<h2 class="section" id="plans">② المراجعات الثلاث — ما أضافته كل واحدة</h2>
+<div class="card">
+  <h3>خطة v1 → مراجعة عميقة: 7 فجوات جديدة (G1–G7)</h3>
+  <table>
+    <tr><th>الفجوة</th><th>ماذا كشفت المحاكاة</th></tr>
+    <tr><td><span class="pill new">G1/G7</span></td><td>تلميح التسجيل + نصّ الحالة الفارغة يوجّهان الموظف لـ«إعدادات المتجر» — خطأ الآن وبعد النقل. لزم توحيدهما على «صفحة الموظّفين».</td></tr>
+    <tr><td><span class="pill new">G2</span></td><td>خلط تسميات «كتالوج» للمزوّد مع تسميات لوحة العمليات OPS → فصلها (OPS خارج النطاق).</td></tr>
+    <tr><td><span class="pill new">G4</span></td><td>خطر «تسمية نصفية»: الزر «الأصناف» بينما النافذة «الكتالوج المرجعي» → ربطهما معًا في قرار S6.</td></tr>
+    <tr><td><span class="pill new">G5</span></td><td>الزر المقترح «سيستلمه شخص آخر» يكرّر ميزة موجودة «المستلم شخص آخر؟» → حُذف.</td></tr>
+    <tr><td><span class="pill new">G6</span></td><td>لم تُحدَّد نقطة إدراج البطاقة في صفحة الموظفين → بعد العنوان مباشرة.</td></tr>
+  </table>
+  <h3>المراجعة النهائية v2 — أهمّ تصحيح</h3>
+  <div class="note fix"><b>G3 (تصحيح توصية زائدة كنتُ اقترحتُها):</b> اقترحتُ سابقًا تحويل بطاقة الرئيسية إلى <span class="inl">t("provider.catalog")</span> لإصلاح i18n. لكن التحقّق أثبت أن الداشبورد <b>لا يستخدم <span class="inl">t()</span> إطلاقًا</b> (<span class="kbd">rg -c "t(" = 0</span>). فإدخال i18n لسطر واحد وسط ملفٍ كلّه نصوص مضمّنة = توسيع نطاق غير مبرَّر. الصحيح: تغيير النصّ المضمّن مباشرةً. <b>المراجعة الأعمق صحّحت خطأ خطّتي نفسها.</b></div>
+  <div class="note new"><b>تبرئة e2e:</b> فُحصت كل ملفات Playwright — لا كسر؛ بل تور <span class="inl">all_fixes_tour · P-504</span> يتوقّع «الأصناف» أصلًا فالتسمية متّسقة معه.</div>
+</div>
+
+<!-- RBAC -->
+<h2 class="section" id="rbac">🔒 التحقّق من الصلاحيات (الأدمن / المزوّد / الموظف)</h2>
+<div class="card">
+  <div class="goal"><b>المبدأ الذي طلبتَه:</b> الموظف لا يتجاوز صلاحياته ولا يصل لمنطقة حسّاسة إلا بإذن الأدمن. بطاقة كود الدعوة قدرة مالك حسّاسة — تحقّقتُ من حمايتها بثلاث طبقات، من الكود.</div>
+  <div class="mockrow" style="gap:8px;font-size:.82rem">
+    <div class="ui" style="flex:1;min-width:150px">🧑‍💼 <b>موظف يحاول الوصول</b></div>
+    <div class="arrow">←</div>
+    <div class="ui okcard" style="flex:1;min-width:150px"><b>طبقة 1 — تنقّل</b><br><span class="lbl">providerAccess = PROVIDER_ADMIN_ONLY → الرابط لا يظهر</span></div>
+    <div class="arrow">←</div>
+    <div class="ui okcard" style="flex:1;min-width:150px"><b>طبقة 2 — حارس المسار</b><br><span class="lbl">router.tsx:316-319 → يُمنَع</span></div>
+    <div class="arrow">←</div>
+    <div class="ui okcard" style="flex:1;min-width:150px"><b>طبقة 3 — Backend</b><br><span class="lbl">provider_router.py:2811/2852 → 403</span></div>
+  </div>
+  <div class="note dep"><b>النقل يقوّي الأمان:</b> كانت البطاقة على صفحة <b>مشتركة</b> (يصلها الموظف) مخفيّة بشرط عميل فقط <span class="inl">{isAdmin&&…}</span>. صارت داخل صفحة <b>لا يصلها الموظف إطلاقًا</b> (3 طبقات) → عزل أقوى، لا مجرّد إخفاء بصريّ. الإصلاحان 2 و3 لا يمسّان أي حارس؛ كتابة الأصناف تبقى للأدمن، والموظف يبدّل التوفّر فقط.</div>
+</div>
+
+<!-- IMPL -->
+<h2 class="section" id="impl">③ التنفيذ — الملفات وقبل/بعد</h2>
+
+<div class="card">
+  <h3>الإصلاح 1 — نقل بطاقة الدعوة + توحيد الإرشاد</h3>
+  <ul class="clean">
+    <li>نُقلت الدالة <span class="inl">StaffInviteCard</span> من <span class="fileref">ProviderDashboard.tsx</span> إلى <span class="fileref">ProviderStaff.tsx</span> (بعد <span class="inl">&lt;h2&gt;</span> سطر 84)، وحُذف استدعاؤها (:321) وتعريفها من الداشبورد.</li>
+    <li>وُحِّد الإرشاد: نصّ الحالة الفارغة + <span class="inl">register.invite_code_hint</span> (ar/en/fr) + defaultValue في <span class="fileref">RegistrationPage.tsx:1023</span> → «صفحة الموظّفون والصلاحيات».</li>
+    <li>معالِج MSW لنقطتي كود الدعوة في <span class="fileref">test/handlers/provider.ts</span>.</li>
+  </ul>
+  <div class="mockrow">
+    <div class="phone"><span class="flag bad">قبل</span><div class="bar"></div><div class="title">🏠 الرئيسية</div>
+      <div class="ui badcard"><div class="lbl">👥 كود دعوة الموظفين</div><div class="chips"><span class="chip bad">TWA-4821</span></div></div>
+      <div class="ui" style="font-size:.72rem">تسجيل: «في إعدادات المتجر» ✗</div></div>
+    <div class="arrow">⇦</div>
+    <div class="phone"><span class="flag ok">بعد (حيّ)</span><div class="bar"></div><div class="title">👥 الموظّفون والصلاحيات</div>
+      <div class="ui okcard"><div class="lbl">👥 كود دعوة الموظفين</div><div class="chips"><span class="chip good">TWA-4821</span><span class="chip">نسخ</span><span class="chip">تجديد</span></div></div>
+      <div class="ui" style="font-size:.72rem">تسجيل: «في صفحة الموظّفين» ✓</div></div>
+  </div>
+  <div class="note fix"><b>تصحيح أثناء التنفيذ (S1):</b> ظننتُ أن <span class="inl">providersApi</span> سيصبح غير مستخدَم في الداشبورد بعد الحذف، فأزلته من الاستيراد → كشف typecheck أنه مستخدَم في 5 مواضع بنمط سلسلة (الاستدعاء في السطر التالي، فلم يلتقطه بحثي الأول). أعدتُ الاستيراد فورًا. لا عَرَض lint.</div>
+</div>
+
+<div class="card">
+  <h3>الإصلاح 2 — «كتالوج» → «الأصناف» (نطاق المزوّد فقط)</h3>
+  <table>
+    <tr><th>الموضع</th><th>الملف:السطر</th><th>قبل → بعد</th></tr>
+    <tr><td>بطاقة الرئيسية</td><td>ProviderDashboard.tsx:647</td><td class="add">«الكتالوج» → «الأصناف»</td></tr>
+    <tr><td>زر الاختيار</td><td>ProviderCatalog.tsx:403 · ar.json:408</td><td class="add">«اختر من الكتالوج» → «اختر من الأصناف الجاهزة»</td></tr>
+    <tr><td>نافذة المنتقي (S6)</td><td>MasterCatalogPicker.tsx:71,81</td><td class="add">«الكتالوج المرجعي» → «القائمة المرجعية للأصناف»</td></tr>
+    <tr><td>وصف الصلاحية</td><td>providerStaff.ts:119</td><td class="add">«…في الكتالوج» → «…في القائمة»</td></tr>
+  </table>
+  <div class="note">لوحة العمليات OPS (<span class="inl">OpsMasterCatalog · opsNav · ar.json:620/637</span>) <b>استُثنيت عمدًا</b> — شخصية مستخدم مختلفة. تحديث اختباري S4/S5 (Dashboard/Layout).</div>
+</div>
+
+<div class="card">
+  <h3>الإصلاح 3 — أزرار الاستلام الذاتي</h3>
+  <pre><code>const PICKUP_CHIPS = [ "بدون بصل", "غلّفوه جيدًا", "سأصل خلال ١٥ دقيقة", "اتصلوا بي عند الجاهزية" ];
+const activeChips = fulfillmentType === "DELIVERY" ? NOTE_CHIPS : <span class="add">PICKUP_CHIPS</span>;
+- {<span class="del">NOTE_CHIPS</span>.map(...)}  →  + {<span class="add">activeChips</span>.map(...)}   <span class="cmt">// سطر 1052</span></code></pre>
+  <div class="mockrow">
+    <div class="phone"><span class="flag bad">قبل — استلام ذاتي</span><div class="bar"></div><div class="title">🧾 إتمام الطلب</div>
+      <div class="ui badcard"><div class="lbl">ملاحظات للمتجر</div><div class="chips"><span class="chip bad">+ اطرق الباب</span><span class="chip bad">+ اتصل عند الوصول</span><span class="chip bad">+ اتركها مع الحارس</span></div></div></div>
+    <div class="arrow">⇦</div>
+    <div class="phone"><span class="flag ok">بعد (حيّ) — استلام ذاتي</span><div class="bar"></div><div class="title">🧾 إتمام الطلب</div>
+      <div class="ui okcard"><div class="lbl">ملاحظات للمتجر</div><div class="chips"><span class="chip good">+ بدون بصل</span><span class="chip good">+ غلّفوه جيدًا</span><span class="chip good">+ سأصل خلال ١٥ دقيقة</span><span class="chip good">+ اتصلوا عند الجاهزية</span></div></div></div>
+  </div>
+  <div class="note">مفاتيح i18n جديدة (<span class="inl">checkout.pickup_chip_*</span>) في اللغات الثلاث. تكافؤ i18n محفوظ، وإضافات en/fr خالية من الأحرف العربية (يفحصها اختبار D10). لا اختبار يفحص الأزرار → لا كسر.</div>
+</div>
+
+<div class="card">
+  <h3>قائمة الملفات المعدّلة (15)</h3>
+  <pre><code>web/src/pages/customer/CheckoutPage.tsx           web/src/pages/provider/ProviderDashboard.tsx
+web/src/pages/customer/RegistrationPage.tsx       web/src/pages/provider/ProviderCatalog.tsx
+web/src/pages/provider/ProviderStaff.tsx          web/src/components/MasterCatalogPicker.tsx
+web/src/api/providerStaff.ts                      web/src/test/handlers/provider.ts
+web/src/i18n/ar.json  ·  en.json  ·  fr.json      web/src/pages/provider/ProviderDashboard.test.tsx
+web/src/components/Layout.test.tsx                app_report/REPORT_INDEX.md  +  448_*.md (تقرير)</code></pre>
+</div>
+
+<!-- VALID -->
+<h2 class="section" id="valid">④ التحقّق قبل النشر</h2>
+<div class="card">
+  <table>
+    <tr><th>الفحص</th><th>النتيجة</th></tr>
+    <tr><td>Typecheck (<span class="inl">tsc --noEmit</span>)</td><td><span class="pill ok">0 أخطاء</span></td></tr>
+    <tr><td>Lint (<span class="inl">eslint</span>)</td><td><span class="pill ok">0 أخطاء</span> · 5 تحذيرات سابقة (ملفات لم تُلمَس)</td></tr>
+    <tr><td>الاختبارات المتأثّرة</td><td><span class="pill ok">46/46</span> (Dashboard · Layout · Checkout بما فيه الاستلام الذاتي)</td></tr>
+    <tr><td>الحزمة الكاملة (Vitest)</td><td><span class="pill ok">1381 نجحت</span> · 1 فشل سابق غير متعلّق (<span class="inl">pwa-config</span>)</td></tr>
+    <tr><td>Build</td><td><span class="pill ok">exit 0</span> · <span class="inl">main-0QIw1IwP.js</span> · PWA 41 precache</td></tr>
+  </table>
+  <div class="note"><b>الفشل السابق:</b> <span class="inl">pwa-config.test.ts</span> يتوقّع <span class="inl">skipWaiting=false</span> بينما كوميت <span class="inl">f058e67</span> (قبل جلستي) جعله <span class="inl">true</span>. ليس من تعديلاتي — لم ألمس إعداد PWA.</div>
+</div>
+
+<!-- DEPLOY -->
+<h2 class="section" id="deploy">⑤ النشر إلى الأهداف الأربعة</h2>
+<div class="card">
+  <div class="goal"><b>الطريقة:</b> أمامية فقط عبر <span class="inl">docker cp web/dist/. &lt;web-container&gt;:/usr/share/nginx/html/</span> — <b>دون إعادة إنشاء أي حاوية</b> (تفاديًا لحادثة إزاحة المنفذ 8081↔8080 → 502).</div>
+  <table>
+    <tr><th>#</th><th>الهدف</th><th>الحاوية / الوصول</th><th>الدليل</th></tr>
+    <tr><td>4</td><td><b>GitHub</b></td><td><span class="inl">git push origin master</span></td><td><span class="pill dep">✔</span> <span class="inl">f25c0d7..8b3c807</span> (خطاف: gitleaks لا تسريب · eslint · prettier)</td></tr>
+    <tr><td>2</td><td><b>test1 (Kali محلي)</b></td><td><span class="inl">tawalocal-web-frontend-1</span></td><td><span class="pill dep">✔</span> يخدم <span class="inl">main-0QIw1IwP.js</span> (المنفذ 8090 يشغّله WordPress حاليًّا؛ يُوصَل عبر النفق)</td></tr>
+    <tr><td>3</td><td><b>test (.194 Ubuntu)</b></td><td><span class="inl">tawa-test-web-frontend-1</span> (:8091)</td><td><span class="pill dep">✔</span> يخدم <span class="inl">main-0QIw1IwP.js</span> · المكدّسات المحميّة (agentic-staging/WordPress) لم تُلمَس</td></tr>
+    <tr><td>1</td><td><b>Production (Hetzner)</b></td><td><span class="inl">tawa-web-frontend-1</span> (8080+8081)</td><td><span class="pill dep">✔</span> 8081 و8080 يخدمان النسخة الجديدة، 8080 بقي HTTP 200 · <b>الحيّ: <span class="inl">tawanow.com</span> → HTTP 200 · <span class="inl">main-0QIw1IwP.js</span></b></td></tr>
+  </table>
+  <div class="note dep"><b>الأربعة الآن على البصمة نفسها</b> <span class="inl">main-0QIw1IwP.js</span> — متزامنة. سُجِّل الأساس الجديد في الذاكرة الآلية <span class="inl">deploy-targets-sync</span>.</div>
+</div>
+
+<!-- REPORTS -->
+<h2 class="section" id="reports">⑥ التقارير المسجّلة</h2>
+<div class="card">
+  <table>
+    <tr><th>الرقم</th><th>النوع</th><th>الملف</th></tr>
+    <tr><td>448</td><td>تنفيذ الإصلاحات</td><td><span class="inl">app_report/448_PROVIDER_UX_INVITE_RELOCATION_CATALOG_RENAME_PICKUP_NOTES_*.md</span></td></tr>
+    <tr><td>449</td><td>تقرير النشر</td><td><span class="inl">app_report/449_PROVIDER_UX_FIXES_DEPLOY_ALL_FOUR_TARGETS_*.md</span></td></tr>
+    <tr><td>—</td><td>خطط + هذا التقرير</td><td><span class="inl">~/Desktop/New File 10/</span> (v1 · مراجعة عميقة · v2 · الشامل)</td></tr>
+  </table>
+  <div class="note">كلاهما مضاف إلى <span class="inl">REPORT_INDEX.md</span>. تقرير 448 دُفع إلى GitHub ضمن كوميت النشر؛ تقرير 449 وهذا التقرير محلّيان.</div>
+</div>
+
+<!-- RESID -->
+<h2 class="section" id="resid">⑦ المتبقّيات وضمانات السلامة</h2>
+<div class="card">
+  <h3>ضمانات طُبِّقت</h3>
+  <ul class="clean">
+    <li><b>الإنتاج بـ<span class="inl">docker cp</span> فقط — دون إعادة إنشاء</b> → لا إزاحة منفذ، لا 502؛ الربطان 8080/8081 بقيا HTTP 200.</li>
+    <li><b>نُشِرت تغييراتي الأمامية فقط</b> (15 ملفًا)؛ لا أسرار دُفعت (ملف الاعتمادات خارج المستودع).</li>
+    <li>لم يُلمَس أي مكدّس محميّ على .194، ولا أي علَم مالي.</li>
+  </ul>
+  <h3>يبقى لقرارك</h3>
+  <ul class="clean">
+    <li><b>S8 (backend محظور):</b> ملاحظات الاستلام الذاتي تُرسَل تحت الحقل <span class="inl">delivery_notes_for_driver</span> مع <span class="inl">fulfillment_type=SELF_PICKUP</span>. هل أفتح عمل backend مستقلًّا للتحقّق من رؤية المتجر لها؟</li>
+    <li><b>4 ملفات backend مجهولة المصدر</b> (<span class="inl">orders/accept_timeout_service · order_router · providers/provider_router · provider_service</span>) كانت معدّلة في شجرة العمل قبل جلستي — <b>تُركت دون commit/نشر</b> (منطقة محظورة، ليست من عملي). تحتاج مراجعتك لمصدرها.</li>
+    <li><b>فشل سابق غير متعلّق:</b> <span class="inl">pwa-config.test.ts</span> (skipWaiting).</li>
+  </ul>
+</div>
+
+<div class="foot">
+  تقرير شامل مبنيّ على أدلّة فعليّة: أرقام أسطر · هاش الكوميت <span class="inl">8b3c807</span> · اسم الحزمة <span class="inl">main-0QIw1IwP.js</span> · استجابة <span class="inl">tawanow.com</span> HTTP 200.<br>
+  التغييرات <b>حيّة الآن</b>: بطاقة الدعوة في صفحة الموظّفين · «الأصناف» بدل «كتالوج» · أزرار الاستلام الذاتي الصحيحة.
+</div>
+
+</div>
+</body>
+</html>

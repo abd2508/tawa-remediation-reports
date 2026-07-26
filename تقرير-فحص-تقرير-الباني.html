@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير فحص تقرير الباني — منصة توا</title>
+<style>
+  :root {
+    --green:  #16a34a; --green-bg:  #dcfce7; --green-bd:  #bbf7d0;
+    --red:    #dc2626; --red-bg:    #fee2e2; --red-bd:    #fca5a5;
+    --orange: #d97706; --orange-bg: #fef3c7; --orange-bd: #fde047;
+    --blue:   #2563eb; --blue-bg:   #dbeafe; --blue-bd:   #93c5fd;
+    --gray:   #6b7280; --gray-bg:   #f3f4f6; --gray-bd:   #d1d5db;
+    --bg: #f1f5f9; --card: #fff; --border: #e2e8f0; --text: #0f172a; --text2: #475569;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:Tahoma,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+  /* ─── HEADER ─── */
+  .header{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 60%,#1d4ed8 100%);color:#fff;padding:2.5rem 2rem;text-align:center;}
+  .header h1{font-size:1.9rem;font-weight:800;margin-bottom:.4rem;}
+  .header p{opacity:.8;font-size:.95rem;}
+  .header-badges{display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;margin-top:1rem;}
+  .hbadge{background:rgba(255,255,255,.15);padding:.3rem .9rem;border-radius:999px;font-size:.8rem;border:1px solid rgba(255,255,255,.2);}
+  /* ─── LAYOUT ─── */
+  .container{max-width:960px;margin:0 auto;padding:1.5rem 1rem 4rem;}
+  .section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;box-shadow:0 2px 8px rgba(15,23,42,.06);}
+  .section-title{font-size:1.15rem;font-weight:800;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+  .section-title::before{content:'';display:inline-block;width:4px;height:1.2em;border-radius:2px;background:var(--blue);}
+  /* ─── VERDICT CARDS ─── */
+  .verdict-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-bottom:1.5rem;}
+  .v-card{border-radius:14px;padding:1rem;text-align:center;border:2px solid;}
+  .v-card .big{font-size:2rem;font-weight:900;display:block;}
+  .v-card .lbl{font-size:.75rem;margin-top:.25rem;}
+  .v-wrong  {background:var(--red-bg);   border-color:var(--red);}
+  .v-right  {background:var(--green-bg); border-color:var(--green);}
+  .v-bug    {background:var(--orange-bg);border-color:var(--orange);}
+  /* ─── FINDING CARDS ─── */
+  .finding{border-radius:14px;border:1px solid var(--border);margin-bottom:1rem;overflow:hidden;}
+  .finding-head{display:flex;align-items:center;gap:.8rem;padding:1rem 1.2rem;font-weight:700;font-size:1rem;}
+  .finding-body{padding:1rem 1.2rem;border-top:1px solid var(--border);}
+  .f-wrong  .finding-head{background:var(--red-bg);}
+  .f-right  .finding-head{background:var(--green-bg);}
+  .f-bug    .finding-head{background:var(--orange-bg);}
+  .badge{display:inline-block;padding:.25rem .7rem;border-radius:999px;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0;}
+  .b-wrong {background:var(--red);}
+  .b-right {background:var(--green);}
+  .b-bug   {background:var(--orange);}
+  .b-info  {background:var(--blue);}
+  /* ─── SIMPLE EXPLAIN BOX ─── */
+  .simple-box{background:#fffbeb;border:2px solid #fde047;border-radius:12px;padding:.9rem 1rem;margin:.75rem 0;}
+  .simple-box .title{font-weight:800;font-size:.9rem;color:#92400e;margin-bottom:.35rem;}
+  /* ─── EVIDENCE ─── */
+  .evidence-box{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:.9rem 1rem;margin:.6rem 0;font-family:'Courier New',monospace;font-size:.82rem;direction:ltr;text-align:left;overflow-x:auto;}
+  .ev-file{color:#7dd3fc;font-size:.78rem;margin-bottom:.35rem;}
+  .ev-ok{color:#86efac;} .ev-bad{color:#fca5a5;} .ev-kw{color:#93c5fd;} .ev-cm{color:#64748b;}
+  /* ─── DIAGRAM WRAP ─── */
+  .diagram{background:var(--gray-bg);border:1px solid var(--border);border-radius:14px;padding:1rem;margin:.75rem 0;overflow-x:auto;}
+  /* ─── TABLE ─── */
+  table{width:100%;border-collapse:collapse;font-size:.88rem;}
+  th{background:#f1f5f9;padding:.65rem .75rem;font-weight:700;border-bottom:2px solid var(--border);text-align:right;}
+  td{padding:.6rem .75rem;border-bottom:1px solid var(--border);}
+  tr:last-child td{border-bottom:none;}
+  /* ─── DETAIL ROWS ─── */
+  .row{display:flex;gap:.5rem;align-items:flex-start;padding:.45rem 0;border-bottom:1px dashed var(--border);}
+  .row:last-child{border-bottom:none;}
+  .row-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:.1rem;}
+  .ri-ok  {background:var(--green-bg);color:var(--green);}
+  .ri-bad {background:var(--red-bg);color:var(--red);}
+  .ri-warn{background:var(--orange-bg);color:var(--orange);}
+  /* ─── FOOTER ─── */
+  footer{text-align:center;color:var(--text2);font-size:.8rem;padding:2rem;}
+  @media(max-width:600px){.verdict-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="font-size:2.5rem;margin-bottom:.5rem;">🔍</div>
+  <h1>تقرير فحص تقرير الباني</h1>
+  <p>هل ما قاله التقرير صحيح؟ — فحص كل نقطة مقابل الكود الحقيقي بالدليل</p>
+  <div class="header-badges">
+    <span class="hbadge">6 يوليو 2026</span>
+    <span class="hbadge">6 نقاط مفحوصة</span>
+    <span class="hbadge">3 خاطئة · 2 صحيحة · 2 عيوب حقيقية</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ═══ الخلاصة ═══ -->
+  <div class="section">
+    <div class="section-title">الخلاصة السريعة</div>
+    <div class="verdict-grid">
+      <div class="v-card v-wrong"><span class="big">F-01</span><span class="lbl">wallet_peer_transfer<br>❌ خاطئ</span></div>
+      <div class="v-card v-right"><span class="big">F-02</span><span class="lbl">Launch Gates<br>✓ صحيح</span></div>
+      <div class="v-card v-bug">  <span class="big">F-03</span><span class="lbl">self-claim metrics<br>⚠ عيب حقيقي</span></div>
+      <div class="v-card v-bug">  <span class="big">F-04</span><span class="lbl">my-stats guard<br>⚠ عيب حقيقي</span></div>
+      <div class="v-card v-right"><span class="big">F-05</span><span class="lbl">لا web CI<br>✓ صحيح</span></div>
+      <div class="v-card v-wrong"><span class="big">E-15</span><span class="lbl">Mobile غير مبني<br>❌ خاطئ</span></div>
+    </div>
+
+    <table>
+      <tr><th>النقطة</th><th>ما قاله التقرير</th><th>الواقع</th><th>الحكم</th></tr>
+      <tr><td>F-01 wallet_peer_transfer</td><td>تناقض FIN-COR خطير</td><td>فتحها المشغّل عن قصد، SHA يطابق، الأداة تتوقع true</td><td><span class="badge b-wrong">خاطئ</span></td></tr>
+      <tr><td>F-02 Launch Gates</td><td>7 بوابات تمنع الإطلاق</td><td>صحيح، لكن غير برمجي وموثّق في CLAUDE.md</td><td><span class="badge b-right">صحيح</span></td></tr>
+      <tr><td>F-03 self-claim metrics</td><td>active_orders لا يزيد</td><td>مثبت: record_assignment لا تُستدعى إطلاقاً للـ STAFF</td><td><span class="badge b-bug">عيب حقيقي</span></td></tr>
+      <tr><td>F-04 my-stats guard</td><td>موظف موقوف يقرأ الإحصائيات</td><td>مثبت: require_active_role لا تفحص is_suspended</td><td><span class="badge b-bug">عيب حقيقي</span></td></tr>
+      <tr><td>F-05 لا web CI</td><td>الواجهة لا تُختبر في CI</td><td>مثبت: ci.yml لا يحتوي أي job للـ web</td><td><span class="badge b-right">صحيح</span></td></tr>
+      <tr><td>E-15 Mobile</td><td>التطبيق غير مبني (placeholder)</td><td>120 ملف Dart حقيقي، main.dart 153 سطر، هيكل كامل</td><td><span class="badge b-wrong">خاطئ</span></td></tr>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════ F-01 ═══════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">F-01 — wallet_peer_transfer: ادعاء خاطئ</div>
+    <div class="finding f-wrong">
+      <div class="finding-head"><span class="badge b-wrong">خاطئ</span> التقرير قال: تناقض FIN-COR حرج — wallet_peer_transfer=true خطر!</div>
+      <div class="finding-body">
+
+        <div class="simple-box">
+          <div class="title">🧠 شرح مبسّط للجميع</div>
+          مثل قفل على خزنة — القفل يمكن فتحه بمفتاح المشغّل. التقرير رأى الخزنة مفتوحة وقال "خطر!" لكن نسي أن صاحب المشروع هو الذي فتحها عن قصد، وكتب سبب الفتح، وحدّث كل الحسابات والتحقق الأمني بناءً على ذلك. لا يوجد تناقض.
+        </div>
+
+        <div class="diagram">
+          <svg width="700" height="180" viewBox="0 0 700 180" style="max-width:100%">
+            <!-- Timeline -->
+            <line x1="50" y1="90" x2="650" y2="90" stroke="#cbd5e1" stroke-width="2"/>
+            <!-- Point 1 -->
+            <circle cx="120" cy="90" r="12" fill="#dc2626"/>
+            <text x="120" y="95" text-anchor="middle" font-size="11" fill="white" font-weight="bold">1</text>
+            <text x="120" y="120" text-anchor="middle" font-size="11" fill="#0f172a">wallet_peer_transfer</text>
+            <text x="120" y="136" text-anchor="middle" font-size="10" fill="#475569">= false (مغلوق)</text>
+            <text x="120" y="55" text-anchor="middle" font-size="10" fill="#475569">قبل</text>
+            <text x="120" y="68" text-anchor="middle" font-size="10" fill="#475569">2026-06-19</text>
+            <!-- Point 2 -->
+            <circle cx="350" cy="90" r="14" fill="#16a34a"/>
+            <text x="350" y="95" text-anchor="middle" font-size="11" fill="white" font-weight="bold">2</text>
+            <text x="350" y="120" text-anchor="middle" font-size="11" fill="#0f172a">قرار المشغّل</text>
+            <text x="350" y="136" text-anchor="middle" font-size="10" fill="#475569">فتح wallet_peer_transfer</text>
+            <text x="350" y="55" text-anchor="middle" font-size="10" fill="#475569">2026-06-19</text>
+            <text x="350" y="68" text-anchor="middle" font-size="10" fill="#16a34a">قرار صريح موثّق</text>
+            <!-- Point 3 -->
+            <circle cx="580" cy="90" r="12" fill="#2563eb"/>
+            <text x="580" y="95" text-anchor="middle" font-size="11" fill="white" font-weight="bold">3</text>
+            <text x="580" y="120" text-anchor="middle" font-size="11" fill="#0f172a">re-baseline FIN-COR</text>
+            <text x="580" y="136" text-anchor="middle" font-size="10" fill="#475569">SHA + أداة = محدّثة</text>
+            <text x="580" y="55" text-anchor="middle" font-size="10" fill="#475569">2026-07-02</text>
+            <text x="580" y="68" text-anchor="middle" font-size="10" fill="#2563eb">كل الأدوات تعرف</text>
+          </svg>
+        </div>
+
+        <p style="margin:.6rem 0 .4rem;font-weight:700;">الأدلة الثلاثة:</p>
+        <div class="evidence-box">
+          <div class="ev-file">contracts/feature_flags.yaml — السطر الفعلي:</div>
+<span class="ev-ok">wallet_peer_transfer: true</span>  <span class="ev-cm"># UNSEALED 2026-06-19 (owner operator-override)</span>
+<span class="ev-cm">                                    # rails built + AML/KYC-gated + tested</span>
+        </div>
+        <div class="evidence-box">
+          <div class="ev-file">_ai_tools/bin/contract_flag_hash_check.py — السطر 33:</div>
+<span class="ev-kw">"wallet_peer_transfer"</span>: <span class="ev-ok">True</span>,  <span class="ev-cm"># ← الأداة تتوقع True صراحةً</span>
+        </div>
+        <div class="evidence-box">
+          <div class="ev-file">sha256sum contracts/feature_flags.yaml:</div>
+<span class="ev-ok">25ddf010282a09abd2aab8e775b599c5cd3d64e613e6c5348562b5ebd1f91557</span>  <span class="ev-cm">✓ يطابق CLAUDE.md تماماً</span>
+        </div>
+        <p style="margin-top:.75rem;color:var(--red);font-weight:700;">خلاصة: التقرير قرأ ملفاً واحداً وتجاهل الأدوات والتعليقات والتاريخ. لا تناقض.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ F-02 ═══════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">F-02 — Launch Gates: صحيح لكن ليس جديداً</div>
+    <div class="finding f-right">
+      <div class="finding-head"><span class="badge b-right">صحيح</span> 7 بوابات blocking=true كلها status=open</div>
+      <div class="finding-body">
+        <div class="simple-box">
+          <div class="title">🧠 شرح مبسّط</div>
+          مثل افتتاح مطعم — الطعام جاهز والطباخين موجودون، لكن لم تصدر رخصة الصحة ولا رخصة البلدية بعد. المشروع اشترط على نفسه: "لا تفتح قبل إغلاق هذه البوابات." والبوابات ما زالت مفتوحة.
+        </div>
+        <div class="evidence-box">
+          <div class="ev-file">contracts/launch_gates.yaml — نماذج من البوابات المفتوحة:</div>
+GATE_LEGAL:           status: open  blocking: true  <span class="ev-cm"># رخصة قانونية</span>
+GATE_PAYMENT_SANDBOX: status: open  blocking: true  <span class="ev-cm"># sandbox الدفع</span>
+GATE_SECURITY_PENTEST:status: open  blocking: true  <span class="ev-cm"># اختبار أمني خارجي</span>
+GATE_DR_RUNBOOK:      status: open  blocking: true  <span class="ev-cm"># خطة التعافي</span>
+        </div>
+        <div class="row">
+          <div class="row-icon ri-warn">!</div>
+          <div>هذا موثّق في CLAUDE.md كبوابات غير برمجية معروفة. ليس عيباً في الكود — بل بنود تشغيلية وقانونية خارج صلاحية المطوّر.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ F-03 ═══════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">F-03 — self-claim metrics: عيب حقيقي مثبت ✓</div>
+    <div class="finding f-bug">
+      <div class="finding-head"><span class="badge b-bug">عيب حقيقي</span> الموظف يقبل الطلب لكن عدّاد حمله لا يزيد</div>
+      <div class="finding-body">
+        <div class="simple-box">
+          <div class="title">🧠 شرح مبسّط — تخيّل هذا المشهد:</div>
+          عندك 3 موظفين في المطبخ. الجرسون يوزّع الطلبات على الأقل انشغالاً. موظف A أخذ 4 طلبات بنفسه (self-claim)، لكن السجل يقول إنه لا يحمل إلا 0 طلب! فيظل الجرسون يرسل له طلبات جديدة لأنه "فاضي"، فيتراكم عنده الكل. الموظفان B وC جالسان بلا عمل.
+        </div>
+
+        <div class="diagram">
+          <svg width="720" height="260" viewBox="0 0 720 260" style="max-width:100%">
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#334155"/>
+              </marker>
+              <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#dc2626"/>
+              </marker>
+            </defs>
+            <!-- Staff accepts order -->
+            <rect x="20" y="30" width="140" height="55" rx="10" fill="#dbeafe" stroke="#2563eb"/>
+            <text x="90" y="54" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold">موظف STAFF</text>
+            <text x="90" y="72" text-anchor="middle" font-size="11" fill="#1e3a8a">يقبل الطلب</text>
+            <!-- Arrow 1 -->
+            <line x1="160" y1="57" x2="200" y2="57" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+            <!-- provider_service -->
+            <rect x="200" y="30" width="160" height="55" rx="10" fill="#fef3c7" stroke="#d97706"/>
+            <text x="280" y="50" text-anchor="middle" font-size="12" fill="#92400e" font-weight="bold">provider_service</text>
+            <text x="280" y="65" text-anchor="middle" font-size="10" fill="#92400e">assigned_staff_id ✓</text>
+            <text x="280" y="78" text-anchor="middle" font-size="10" fill="#92400e">assigned_at ✓</text>
+            <!-- Missing call -->
+            <line x1="360" y1="57" x2="400" y2="57" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,3"/>
+            <text x="380" y="47" text-anchor="middle" font-size="10" fill="#dc2626">لا يُستدعى!</text>
+            <!-- record_assignment MISSING -->
+            <rect x="400" y="30" width="155" height="55" rx="10" fill="#fee2e2" stroke="#dc2626"/>
+            <text x="477" y="54" text-anchor="middle" font-size="12" fill="#991b1b" font-weight="bold">record_assignment()</text>
+            <text x="477" y="72" text-anchor="middle" font-size="10" fill="#991b1b">active_orders +1 ← لا يحدث</text>
+            <!-- X mark -->
+            <circle cx="575" cy="57" r="18" fill="#dc2626" opacity=".15"/>
+            <text x="575" y="63" text-anchor="middle" font-size="22" fill="#dc2626">✗</text>
+
+            <!-- Result -->
+            <rect x="60" y="140" width="580" height="90" rx="12" fill="#fee2e2" stroke="#dc2626"/>
+            <text x="350" y="168" text-anchor="middle" font-size="14" fill="#7f1d1d" font-weight="bold">النتيجة الخاطئة</text>
+            <!-- Staff A -->
+            <rect x="90" y="178" width="120" height="38" rx="8" fill="#fca5a5" stroke="#dc2626"/>
+            <text x="150" y="197" text-anchor="middle" font-size="11" fill="#7f1d1d" font-weight="bold">موظف A</text>
+            <text x="150" y="210" text-anchor="middle" font-size="10" fill="#7f1d1d">يحمل 4 فعلياً · يُسجّل 0</text>
+            <!-- Staff B -->
+            <rect x="300" y="178" width="120" height="38" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+            <text x="360" y="197" text-anchor="middle" font-size="11" fill="#166534" font-weight="bold">موظف B</text>
+            <text x="360" y="210" text-anchor="middle" font-size="10" fill="#166534">يحمل 0 · يُسجّل 0</text>
+            <!-- Staff C -->
+            <rect x="500" y="178" width="120" height="38" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+            <text x="560" y="197" text-anchor="middle" font-size="11" fill="#166534" font-weight="bold">موظف C</text>
+            <text x="560" y="210" text-anchor="middle" font-size="10" fill="#166534">يحمل 0 · يُسجّل 0</text>
+            <!-- Engine picks A again -->
+            <text x="350" y="248" text-anchor="middle" font-size="12" fill="#dc2626">← الخوارزمية تختار A مجدداً لأنه "فاضي"!</text>
+          </svg>
+        </div>
+
+        <p style="font-weight:700;margin:.75rem 0 .4rem;">الدليل: تتبّع الكود خطوة بخطوة</p>
+
+        <div class="evidence-box">
+          <div class="ev-file">backend/app/modules/providers/provider_service.py — السطر 152-154 (self-claim):</div>
+<span class="ev-kw">if</span> actor_role == <span class="ev-ok">"PROVIDER_STAFF"</span> <span class="ev-kw">and</span> order.assigned_staff_id <span class="ev-kw">is None</span>:
+    order.assigned_staff_id = provider_user_id   <span class="ev-cm"># ← هذا يحدث ✓</span>
+    order.assigned_at      = datetime.now(...)   <span class="ev-cm"># ← هذا يحدث ✓</span>
+    <span class="ev-cm"># record_assignment() ← مفقودة تماماً ✗</span>
+        </div>
+
+        <div class="evidence-box">
+          <div class="ev-file">backend/app/modules/providers/provider_router.py — السطر 638-643 (ADMIN فقط):</div>
+<span class="ev-kw">if</span> (
+    user.role == PlatformRole.<span class="ev-ok">PROVIDER_ADMIN</span>   <span class="ev-cm"># ← STAFF مستبعد صراحةً</span>
+    <span class="ev-kw">and</span> order.assigned_staff_id <span class="ev-kw">is None</span>
+):
+    chosen = <span class="ev-kw">await</span> distribution_service.auto_assign_order(...)
+    <span class="ev-cm"># auto_assign_order هي الوحيدة التي تستدعي record_assignment()</span>
+        </div>
+
+        <div class="evidence-box">
+          <div class="ev-file">grep -rn "record_assignment" backend/app/ — نتيجة البحث الكاملة:</div>
+<span class="ev-bad">نتيجة واحدة فقط:</span>
+distribution_service.py:319 → inside auto_assign_order()  <span class="ev-cm"># لا مستدعٍ آخر في المشروع كله</span>
+        </div>
+
+        <p style="font-weight:700;margin:.75rem 0 .4rem;">الاختبار الموجود — ثغرة التغطية</p>
+        <div class="evidence-box">
+          <div class="ev-file">backend/tests/test_scn_distribution.py — السطر 376-380 (test_scn11):</div>
+<span class="ev-cm"># الاختبار يفحص assigned_staff_id فقط — ولا يفحص active_orders</span>
+assert o.assigned_staff_id == staff   <span class="ev-ok"># يمرّ ✓</span>
+<span class="ev-bad"># assert StaffLoadMetrics.active_orders == 1 ← غير موجود ✗</span>
+        </div>
+        <p style="margin-top:.6rem;color:var(--orange);font-weight:700;">➜ الاختبار يثبت أن self-claim يكتب assigned_staff_id لكنه لا يثبت أن active_orders يزيد — وهو لا يزيد فعلاً.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ F-04 ═══════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">F-04 — my-stats guard: عيب حقيقي مثبت ✓</div>
+    <div class="finding f-bug">
+      <div class="finding-head"><span class="badge b-bug">عيب حقيقي</span> موظف موقوف يستطيع قراءة إحصائياته</div>
+      <div class="finding-body">
+        <div class="simple-box">
+          <div class="title">🧠 شرح مبسّط</div>
+          عندك حارسان على الباب. الحارس البسيط يفحص فقط: هل لديك بطاقة موظف؟ الحارس القوي يفحص إضافةً: هل أنت موقوف؟ المسار /my-stats يستخدم الحارس البسيط. الموظف الموقوف لا تزال عنده بطاقة موظف، فيمرّ.
+        </div>
+
+        <div class="diagram">
+          <svg width="700" height="200" viewBox="0 0 700 200" style="max-width:100%">
+            <!-- Guard comparison -->
+            <rect x="20" y="20" width="300" height="150" rx="12" fill="#fee2e2" stroke="#dc2626"/>
+            <text x="170" y="45" text-anchor="middle" font-size="13" fill="#7f1d1d" font-weight="bold">require_active_role (الحارس المستخدم)</text>
+            <text x="170" y="68" text-anchor="middle" font-size="11" fill="#7f1d1d">✓ هل الدور PROVIDER_STAFF؟</text>
+            <text x="170" y="88" text-anchor="middle" font-size="11" fill="#7f1d1d">✓ هل role.status == ACTIVE؟</text>
+            <text x="170" y="108" text-anchor="middle" font-size="12" fill="#dc2626" font-weight="bold">✗ is_suspended؟ لا يفحص</text>
+            <rect x="30" y="125" width="280" height="32" rx="8" fill="#fca5a5"/>
+            <text x="170" y="146" text-anchor="middle" font-size="12" fill="#7f1d1d">موظف موقوف → يمرّ! 🚨</text>
+
+            <rect x="380" y="20" width="300" height="150" rx="12" fill="#dcfce7" stroke="#16a34a"/>
+            <text x="530" y="45" text-anchor="middle" font-size="13" fill="#166534" font-weight="bold">require_provider_permission (الحارس القوي)</text>
+            <text x="530" y="68" text-anchor="middle" font-size="11" fill="#166534">✓ هل الدور صحيح؟</text>
+            <text x="530" y="88" text-anchor="middle" font-size="11" fill="#166534">✓ هل role.status == ACTIVE؟</text>
+            <text x="530" y="108" text-anchor="middle" font-size="11" fill="#166534">✓ هل OperationalProfile موجود؟</text>
+            <text x="530" y="128" text-anchor="middle" font-size="11" fill="#166534">✓ هل is_suspended == false؟</text>
+            <rect x="390" y="142" width="280" height="22" rx="8" fill="#bbf7d0"/>
+            <text x="530" y="157" text-anchor="middle" font-size="11" fill="#166534">موظف موقوف → 403 ✓</text>
+          </svg>
+        </div>
+
+        <div class="evidence-box">
+          <div class="ev-file">backend/app/modules/providers/provider_router.py — السطر 3063-3066:</div>
+@router.get(<span class="ev-ok">"/me/staff/my-stats"</span>)
+<span class="ev-kw">async def</span> provider_staff_my_stats(
+    user: UserContext = Depends(
+        <span class="ev-bad">require_active_role</span>(PlatformRole.PROVIDER_ADMIN, PlatformRole.PROVIDER_STAFF)
+        <span class="ev-cm"># ↑ الحارس البسيط — لا يفحص is_suspended</span>
+    ),
+        </div>
+        <div class="evidence-box">
+          <div class="ev-file">backend/app/modules/identity/dependencies.py — السطر 326-331 (require_provider_permission فقط):</div>
+<span class="ev-kw">select</span>(OperationalProfile).<span class="ev-kw">where</span>(OperationalProfile.user_id == user.user_id)
+...
+_suspended = <span class="ev-ok">bool</span>(getattr(op, <span class="ev-ok">"is_suspended"</span>, False)) <span class="ev-kw">if</span> op <span class="ev-kw">is not None else</span> False
+<span class="ev-cm"># هذا الفحص موجود في require_provider_permission فقط — غير موجود في require_active_role</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ F-05 ═══════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">F-05 — لا web CI: صحيح</div>
+    <div class="finding f-right">
+      <div class="finding-head"><span class="badge b-right">صحيح</span> الواجهة الأمامية لا تُختبر تلقائياً قبل الدمج</div>
+      <div class="finding-body">
+        <div class="simple-box">
+          <div class="title">🧠 شرح مبسّط</div>
+          الـ CI مثل موظف فحص الجودة. الآن يفحص فقط المطبخ (Backend). لو كسّرت شيئاً في الواجهة، يمرّ الفحص ويصل للإنتاج.
+        </div>
+        <div class="evidence-box">
+          <div class="ev-file">.github/workflows/ci.yml — jobs الموجودة فعلاً:</div>
+<span class="ev-ok">contracts:</span>      FIN-COR gate ✓
+<span class="ev-ok">lint:</span>           Ruff backend ✓
+<span class="ev-ok">contracts-revision:</span> revision markers ✓
+<span class="ev-ok">backend-tests:</span>  pytest + PostgreSQL ✓
+
+<span class="ev-bad">web:</span>            <span class="ev-bad">غير موجود ✗</span>
+<span class="ev-cm">         # typecheck / vitest / lint / build — لا شيء</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ E-15 ═══════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">E-15 — Mobile "غير مبني": ادعاء خاطئ</div>
+    <div class="finding f-wrong">
+      <div class="finding-head"><span class="badge b-wrong">خاطئ</span> التقرير قال: mobile/FLUTTER_PLACEHOLDER.md — التطبيق غير مبني</div>
+      <div class="finding-body">
+        <div class="simple-box">
+          <div class="title">🧠 شرح مبسّط</div>
+          التقرير قال إن التطبيق مجرد ورقة فارغة عليها "سيتم البناء لاحقاً". الواقع: تطبيق Flutter حقيقي كامل بـ 120 ملف كود.
+        </div>
+        <div class="evidence-box">
+          <div class="ev-file">نتائج فحص mobile_app/ المباشر:</div>
+find mobile_app -name "*.dart" | wc -l  →  <span class="ev-ok">120 ملف Dart حقيقي</span>
+wc -l mobile_app/lib/main.dart          →  <span class="ev-ok">153 سطراً</span>
+ls mobile_app/lib/                      →  features/ router.dart services/ core/ data/ di/
+
+<span class="ev-bad">find mobile_app -name "FLUTTER_PLACEHOLDER*"  →  لا شيء (الملف غير موجود أصلاً!)</span>
+        </div>
+        <div class="row">
+          <div class="row-icon ri-bad">✗</div>
+          <div>يبدو أن التقرير بنى هذه النقطة على افتراض أو مصدر قديم، لا على فحص الملفات الفعلية.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ خلاصة ═══════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">الخلاصة النهائية — ماذا يعني هذا للمشروع؟</div>
+
+    <div class="diagram">
+      <svg width="680" height="300" viewBox="0 0 680 300" style="max-width:100%">
+        <text x="340" y="28" text-anchor="middle" font-size="16" fill="#0f172a" font-weight="bold">ما الذي يحتاج عملاً فعلياً؟</text>
+        <!-- F-03 Box -->
+        <rect x="20" y="50" width="300" height="110" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+        <text x="170" y="75" text-anchor="middle" font-size="13" fill="#92400e" font-weight="bold">⚠ F-03 — يحتاج إصلاحاً</text>
+        <text x="170" y="96" text-anchor="middle" font-size="11" fill="#78350f">في provider_service.py</text>
+        <text x="170" y="114" text-anchor="middle" font-size="11" fill="#78350f">بعد self-claim: أضف</text>
+        <text x="170" y="132" text-anchor="middle" font-size="10.5" fill="#92400e" font-weight="bold">await record_assignment(db, provider_id, user_id)</text>
+        <text x="170" y="150" text-anchor="middle" font-size="10" fill="#78350f">+ اختبار يفحص active_orders</text>
+        <!-- F-04 Box -->
+        <rect x="360" y="50" width="300" height="110" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+        <text x="510" y="75" text-anchor="middle" font-size="13" fill="#92400e" font-weight="bold">⚠ F-04 — يحتاج إصلاحاً</text>
+        <text x="510" y="96" text-anchor="middle" font-size="11" fill="#78350f">في provider_router.py السطر 3066</text>
+        <text x="510" y="114" text-anchor="middle" font-size="11" fill="#78350f">استبدل require_active_role بـ</text>
+        <text x="510" y="132" text-anchor="middle" font-size="10.5" fill="#92400e" font-weight="bold">require_provider_permission(...)</text>
+        <text x="510" y="150" text-anchor="middle" font-size="10" fill="#78350f">أو أضف فحص is_suspended</text>
+        <!-- F-05 Box -->
+        <rect x="190" y="180" width="300" height="80" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="340" y="205" text-anchor="middle" font-size="13" fill="#1e3a8a" font-weight="bold">ℹ F-05 — تحسين موصى به</text>
+        <text x="340" y="225" text-anchor="middle" font-size="11" fill="#1e3a8a">أضف web job لـ CI</text>
+        <text x="340" y="242" text-anchor="middle" font-size="10.5" fill="#1e3a8a">typecheck + vitest + build</text>
+        <!-- No action needed boxes -->
+        <rect x="20" y="270" width="190" height="26" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+        <text x="115" y="287" text-anchor="middle" font-size="11" fill="#166534">F-01: لا عمل مطلوب ✓</text>
+        <rect x="230" y="270" width="190" height="26" rx="8" fill="#f3f4f6" stroke="#d1d5db"/>
+        <text x="325" y="287" text-anchor="middle" font-size="11" fill="#374151">F-02: بوابات تشغيلية خارجية</text>
+        <rect x="440" y="270" width="220" height="26" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+        <text x="550" y="287" text-anchor="middle" font-size="11" fill="#166534">E-15: Mobile مبني فعلاً ✓</text>
+      </svg>
+    </div>
+
+    <table style="margin-top:1rem;">
+      <tr><th>النقطة</th><th>الحكم</th><th>الإجراء المطلوب</th></tr>
+      <tr>
+        <td>F-01 wallet_peer_transfer</td>
+        <td><span class="badge b-wrong">التقرير خاطئ</span></td>
+        <td>لا شيء — FIN-COR سليم، القرار متعمّد وموثّق</td>
+      </tr>
+      <tr>
+        <td>F-02 Launch Gates</td>
+        <td><span class="badge b-right">التقرير صحيح</span></td>
+        <td>بنود تشغيلية وقانونية خارج صلاحية المطوّر</td>
+      </tr>
+      <tr>
+        <td>F-03 self-claim active_orders</td>
+        <td><span class="badge b-bug">عيب حقيقي</span></td>
+        <td>أضف <code>record_assignment()</code> بعد self-claim + اختبار</td>
+      </tr>
+      <tr>
+        <td>F-04 my-stats guard</td>
+        <td><span class="badge b-bug">عيب حقيقي</span></td>
+        <td>غيّر الحارس أو أضف فحص <code>is_suspended</code></td>
+      </tr>
+      <tr>
+        <td>F-05 لا web CI</td>
+        <td><span class="badge b-right">التقرير صحيح</span></td>
+        <td>أضف web job في ci.yml (typecheck + vitest + build)</td>
+      </tr>
+      <tr>
+        <td>E-15 Mobile غير مبني</td>
+        <td><span class="badge b-wrong">التقرير خاطئ</span></td>
+        <td>لا شيء — 120 ملف Dart حقيقي</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+<footer>منصة توا — فحص تقرير الباني · 2026-07-06 · الدليل من الكود مباشرةً</footer>
+</body>
+</html>

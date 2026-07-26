@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الخطة المنقّحة (مراجعة عميقة) — إصلاحات المزوّد + الاستلام الذاتي</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1d2740; --border:#2a3550;
+    --text:#e7ecf5; --muted:#9aa7c2; --accent:#4d8bff; --accent2:#8b5cf6;
+    --ok:#2ec26a; --okbg:#122a1c; --warn:#f5a623; --warnbg:#2b220f;
+    --bad:#ff5c6c; --badbg:#2a1319; --code:#0b0f1a; --codeline:#233;
+    --chip:#243352; --chipbad:#3a1f27; --new:#8b5cf6; --newbg:#1e1636;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.75;font-size:16px}
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#241a44,#0f1420);border:1px solid var(--border);border-radius:18px;padding:26px 28px;margin-bottom:24px}
+  header.top h1{margin:0 0 6px;font-size:1.6rem}
+  header.top .sub{color:var(--muted);font-size:.95rem}
+  .meta{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+  .tag{background:var(--panel2);border:1px solid var(--border);border-radius:999px;padding:4px 12px;font-size:.78rem;color:var(--muted)}
+  h2.section{font-size:1.32rem;margin:38px 0 12px;padding-right:12px;border-right:4px solid var(--accent);scroll-margin-top:18px}
+  h3{font-size:1.05rem;margin:22px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;margin:16px 0}
+  .goal{background:var(--panel2);border-radius:12px;padding:14px 16px;margin-bottom:16px;font-size:.98rem}
+  .goal b{color:var(--accent)}
+  pre{background:var(--code);border:1px solid var(--codeline);border-radius:10px;padding:12px 14px;overflow-x:auto;direction:ltr;text-align:left;font-size:.8rem;margin:6px 0}
+  code{font-family:"Fira Code",Consolas,monospace}
+  .inl{font-family:monospace;background:#0b1526;border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-size:.82rem}
+  .fileref{direction:ltr;text-align:left;color:var(--accent);font-family:monospace;font-size:.8rem;background:#0b1526;border:1px solid var(--border);border-radius:6px;padding:2px 8px;display:inline-block;margin-bottom:4px}
+  .add{color:var(--ok)} .del{color:var(--bad)} .hl{color:var(--warn)} .cmt{color:#5b6b8c}
+  .step{display:flex;gap:14px;margin:14px 0;align-items:flex-start}
+  .num{flex-shrink:0;width:30px;height:30px;background:var(--accent);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem}
+  .num.warn{background:var(--warn);color:#221800} .num.ok{background:var(--ok);color:#04210f} .num.new{background:var(--new);color:#fff}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.87rem}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:var(--panel2);color:var(--muted)}
+  .pill{border-radius:999px;padding:2px 10px;font-size:.75rem;font-weight:700;white-space:nowrap;display:inline-block}
+  .pill.ok{background:var(--okbg);color:var(--ok)} .pill.warn{background:var(--warnbg);color:var(--warn)}
+  .pill.bad{background:var(--badbg);color:var(--bad)} .pill.new{background:var(--newbg);color:#c4b5fd}
+  .note{background:#0d1730;border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:.9rem;margin-top:12px}
+  .note.warn{border-left-color:var(--warn);background:var(--warnbg)}
+  .note.bad{border-left-color:var(--bad);background:var(--badbg)}
+  .note.new{border-left-color:var(--new);background:var(--newbg)}
+  .mockrow{display:flex;gap:18px;flex-wrap:wrap;margin:18px 0}
+  .phone{flex:1;min-width:255px;background:#0b1020;border:2px solid var(--border);border-radius:22px;padding:14px;position:relative}
+  .phone .bar{height:6px;width:60px;background:#2a3550;border-radius:99px;margin:0 auto 12px}
+  .phone .title{font-weight:800;font-size:1rem;margin-bottom:12px;color:#fff}
+  .ui{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+  .ui.badcard{border-color:var(--bad)} .ui.okcard{border-color:var(--ok)}
+  .lbl{font-size:.78rem;color:var(--muted);margin-bottom:6px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{background:var(--chip);border:1px solid var(--border);border-radius:8px;padding:3px 9px;font-size:.72rem}
+  .chip.bad{background:var(--chipbad);border-color:var(--bad);color:#ffb0b8}
+  .chip.good{background:var(--okbg);border-color:#1c5b36;color:#8ff0b5}
+  .flag{position:absolute;top:10px;left:12px;font-size:.66rem;padding:2px 8px;border-radius:8px;font-weight:700}
+  .flag.bad{background:var(--badbg);color:var(--bad);border:1px solid #6b2530}
+  .flag.ok{background:var(--okbg);color:var(--ok);border:1px solid #1c5b36}
+  .arrow{display:flex;align-items:center;justify-content:center;font-size:1.6rem;color:var(--accent);min-width:32px}
+  .toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px}
+  .toc a{display:block;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-decoration:none;color:var(--text);font-size:.9rem}
+  .toc a:hover{border-color:var(--accent)}
+  .foot{margin-top:44px;color:var(--muted);font-size:.82rem;text-align:center;border-top:1px solid var(--border);padding-top:18px}
+  .flow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;font-size:.82rem}
+  .flow .b{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:6px 10px}
+  .flow .s{color:var(--accent);font-weight:800}
+  ul.clean{margin:6px 0;padding-right:20px} ul.clean li{margin:5px 0}
+  .kbd{font-family:monospace;background:#0b1526;border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:1px 7px;font-size:.8rem}
+  .newbadge{background:var(--new);color:#fff;font-size:.68rem;font-weight:800;border-radius:6px;padding:2px 7px;margin-inline-start:6px}
+  .scnrow td:first-child{white-space:nowrap;font-weight:700;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>الخطة التنفيذية المنقّحة — بعد مراجعة عميقة ومحاكاة سيناريوهات</h1>
+  <div class="sub">مراجعة ذرّية للخطة السابقة: أُعيد فحص كل ملف، وحوكيت عشرات السيناريوهات لكل نقطة، فظهرت <b>7 فجوات جديدة</b> لم تُرصد سابقًا — أُدمجت كلها هنا. لا استنتاج؛ كل بند مسنود بالملف والسطر.</div>
+  <div class="meta">
+    <span class="tag">المنصّة: Tawa — واجهة الويب (React · Vite · i18next 3 لغات)</span>
+    <span class="tag">التاريخ: 2026-07-07</span>
+    <span class="tag">الحالة: خطة للاعتماد — لم يُنفَّذ كود</span>
+  </div>
+  <div class="toc">
+    <a href="#delta">⓪ ماذا تغيّر عن الخطة السابقة (7 فجوات جديدة)</a>
+    <a href="#f1">① نقل بطاقة كود الدعوة + توحيد الإرشادات</a>
+    <a href="#f2">② «كتالوج» → «الأصناف» (بحدود نطاق)</a>
+    <a href="#f3">③ أزرار الاستلام الذاتي (بلا تعارض)</a>
+    <a href="#f4">④ رسوم الاستلام الذاتي (تثبيت)</a>
+    <a href="#reg">⑤ سجل الأعراض الجانبية S1–S10</a>
+    <a href="#scn">⑥ محاكاة السيناريوهات</a>
+    <a href="#order">⑦ ترتيب التنفيذ + التحقّق</a>
+  </div>
+</header>
+
+<!-- ===== DELTA ===== -->
+<h2 class="section" id="delta">⓪ خلاصة المراجعة العميقة — ما الذي أضافته على الخطة السابقة</h2>
+<div class="card">
+  <p style="margin-top:0">الخطة السابقة كانت صحيحة في جوهرها لكنها <b>ناقصة</b>. المحاكاة الذهنية كشفت الفجوات التالية، وكلها مُعالَجة في هذه النسخة:</p>
+  <table>
+    <tr><th style="width:44px">الفجوة</th><th>الوصف</th><th>لماذا خطيرة</th><th>المعالجة</th></tr>
+    <tr><td><span class="pill new">G1</span></td><td>نصّ تلميح التسجيل يقول للموظف الجديد إنّ الكود «في إعدادات المتجر» (ar/en/fr).</td><td>خطأ الآن (الكود في الرئيسية) و<b>سيبقى خطأً</b> بعد النقل (سيصير في صفحة الموظفين) — إرشاد يقود المستخدم لمكان فارغ.</td><td>تحديث <span class="inl">register.invite_code_hint</span> في اللغات الثلاث ليشير لصفحة الموظّفين.</td></tr>
+    <tr><td><span class="pill new">G2</span></td><td>الخطة السابقة خلطت تسميات «كتالوج» الخاصة بالمزوّد مع تسميات لوحة العمليات (OPS).</td><td>تغيير تسميات OPS = توسيع نطاق غير مطلوب يمسّ شخصية مستخدم أخرى ويكسر اتساقها.</td><td>فصل صريح: مواضع المزوّد (تُصلَح) مقابل مواضع OPS (تُستثنى وتُوثَّق).</td></tr>
+    <tr><td><span class="pill new">G3</span></td><td>بطاقة «الكتالوج» في الرئيسية نصّ <b>مضمّن</b> بلا i18n → المزوّد بالإنجليزية/الفرنسية يراها عربية.</td><td>تغيير النصّ لعربي آخر يُبقي العيب. الأفضل ربطها بمفتاح i18n الموجود.</td><td>تحويل البطاقة لاستخدام <span class="inl">t("provider.catalog")</span> = «الأصناف/Menu» — يصلح التسمية والـi18n معًا.</td></tr>
+    <tr><td><span class="pill new">G4</span></td><td>خطر «إعادة تسمية نصفية»: الزر يصير «الأصناف» بينما النافذة التي يفتحها تبقى «الكتالوج المرجعي».</td><td>تناقض بصريّ يربك المستخدم (زر يقول أصناف، نافذة تقول كتالوج).</td><td>ربط قرار التسمية S6 بالزر والنافذة معًا في نفس الدفعة.</td></tr>
+    <tr><td><span class="pill new">G5</span></td><td>زر الاستلام المقترح «سيستلمه شخص آخر» يكرّر ميزة موجودة «المستلم شخص آخر؟» (باسم + هاتف).</td><td>تكرار وتضارب: زرّ يكتب نصًّا حرًّا، وميزة مبنيّة تجمع بيانات المستلم.</td><td>حذف ذلك الزر، واعتماد أزرار استلام لا تتقاطع مع أي ميزة قائمة.</td></tr>
+    <tr><td><span class="pill new">G6</span></td><td>لم تُحدَّد نقطة إدراج البطاقة في صفحة الموظفين.</td><td>لو أُدرجت داخل بوّابة التحميل لظهرت متأخرة/مختفية أثناء تحميل القائمة.</td><td>إدراجها بعد شريط الخطأ وقبل بطاقة «توزيع الطلبات» — مستقلّة عن التحميل.</td></tr>
+    <tr><td><span class="pill new">G7</span></td><td>موضعان ينصّان على «الإعدادات» (صفحة الموظفين + تلميح التسجيل) والكود ليس في الإعدادات أصلًا.</td><td>مصدرا إرشاد خاطئان معًا.</td><td>توحيدهما على مصدر حقيقة واحد: «صفحة الموظّفين والصلاحيات».</td></tr>
+  </table>
+  <div class="note new">النتيجة: عدد الأعراض الجانبية ارتفع من 9 إلى <b>10</b> (أُضيف S10)، وتوسّع نطاق الإصلاح 1 ليشمل توحيد 3 مصادر إرشاد بدل نصّ واحد، وتقلّص نطاق الإصلاح 2 ليستثني OPS.</div>
+</div>
+
+<!-- ===== FIX 1 ===== -->
+<h2 class="section" id="f1">① الإصلاح 1 — نقل بطاقة «كود دعوة الموظفين» + توحيد كل الإرشادات</h2>
+<div class="card">
+  <div class="goal"><b>الهدف:</b> الكود يظهر في مكان واحد صحيح = صفحة «الموظّفون والصلاحيات»، وكل النصوص التي تشير إليه توجّه للمكان نفسه.</div>
+
+  <h3>أ) تحقّقات مسبقة (من الكود)</h3>
+  <ul class="clean">
+    <li>مسار <span class="inl">/provider-portal/staff</span> محميّ بـ <span class="inl">PROVIDER_ADMIN</span> فقط (<span class="fileref">router.tsx:316-319</span>) = نفس شرط <span class="inl">isAdmin</span> الحالي → لا تغيير أمني.</li>
+    <li><span class="inl">isAdmin</span> مستخدَم في 6 مواضع (243/248/253/321/346/671) → يبقى مستخدَمًا بعد حذف البطاقة، لا متغيّر معلَّق.</li>
+    <li>النوعان <span class="inl">ProviderComplaint</span> (سطر 64) و<span class="inl">SalesAnalytics</span> (سطر 69) مستخدَمان → نُبقي استيراد الأنواع، ونحذف <b>القيمة</b> <span class="inl">providersApi</span> فقط.</li>
+    <li>لا نسخة أخرى للبطاقة في «الإعدادات» أو غيرها (تأكيد بالبحث الشامل) → لا تكرار فعليّ، فقط إرشادات نصّية خاطئة.</li>
+  </ul>
+
+  <h3>ب) الخطوات</h3>
+  <div class="step"><div class="num">1</div><div><b>نقل الدالة</b> <span class="inl">StaffInviteCard</span> من <span class="fileref">ProviderDashboard.tsx</span> إلى <span class="fileref">ProviderStaff.tsx</span> كمكوّن مرافق (co-located) — أبسط من ملف مشترك جديد لأن المستهلك واحد فقط، وأقلّ سطحًا عامًّا.
+    <pre><code><span class="cmt">// داخل ProviderStaff.tsx: أضف الاستيراد الذي كانت البطاقة تحتاجه</span>
+import { providersApi } from "../../api/providers";
+<span class="cmt">// وألصق تعريف الدالة StaffInviteCard كما هو دون تغيير منطق</span></code></pre></div></div>
+
+  <div class="step"><div class="num warn">2</div><div><b>حذف من الرئيسية + معالجة S1 (lint):</b>
+    <pre><code><span class="cmt">// ProviderDashboard.tsx</span>
+- {isAdmin &amp;&amp; &lt;StaffInviteCard /&gt;}                 <span class="cmt">// سطر 321</span>
+- function StaffInviteCard() { ... }               <span class="cmt">// التعريف كامل</span>
+<span class="cmt">// سطر 12: أبقِ الأنواع فقط</span>
+- import { providersApi, type ProviderComplaint, type SalesAnalytics } from "../../api/providers";
++ import { type ProviderComplaint, type SalesAnalytics } from "../../api/providers";</code></pre></div></div>
+
+  <div class="step"><div class="num new">3</div><div><b>الإدراج الصحيح (G6):</b> في <span class="fileref">ProviderStaff.tsx</span> ضع <span class="inl">&lt;StaffInviteCard /&gt;</span> بعد شريط الخطأ <span class="inl">{err}</span> (≈سطر 108) وقبل بطاقة «توزيع الطلبات» (≈سطر 110) — فتظهر مستقلّة عن بوّابة تحميل القائمة.</div></div>
+
+  <div class="step"><div class="num new">4</div><div><b>توحيد الإرشادات (G1 + G7):</b> تصحيح <b>موضعين</b> نصّيين:
+    <pre><code><span class="cmt">// 1) ProviderStaff.tsx:143 (الحالة الفارغة)</span>
+- "…شارك رمز الدعوة <span class="del">من إعدادات المتجر</span>."
++ "…شارك رمز الدعوة <span class="add">من البطاقة أعلاه</span>."
+
+<span class="cmt">// 2) تلميح التسجيل — register.invite_code_hint في اللغات الثلاث (سطر 984)</span>
+<span class="cmt">//    + الـ defaultValue في RegistrationPage.tsx:1023</span>
+- "…يَجده في <span class="del">إعدادات متجره</span>"
++ "…يَجده في <span class="add">صفحة «الموظّفون والصلاحيات»</span>"</code></pre>
+    <div class="note new">هذه هي الفجوة الأخطر التي أضافتها المراجعة: بدونها يبقى الموظف الجديد يُرسَل إلى «الإعدادات» فلا يجد شيئًا. لا اختبار يفحص هذا النصّ → لا كسر.</div></div></div>
+
+  <div class="step"><div class="num warn">5</div><div><b>معالجة S2 (معالِج MSW):</b> إضافة معالِجَي <span class="inl">GET/POST /providers/me/staff-invite-code[/rotate]</span> (مؤكَّدة من <span class="fileref">api/providers.ts:64-70</span>) في <span class="inl">test/handlers/provider.ts</span> لتفادي أخطاء 404 في أي اختبار مستقبلي لصفحة الموظفين.</div></div>
+
+  <div class="mockrow">
+    <div class="phone"><span class="flag bad">قبل</span><div class="bar"></div><div class="title">🏠 الرئيسية</div>
+      <div class="ui badcard"><div class="lbl">👥 كود دعوة الموظفين</div><div class="chips"><span class="chip bad">TWA-4821</span></div></div>
+      <div class="ui">👥 الموظّفون والصلاحيات →</div>
+      <div class="ui" style="font-size:.72rem">تسجيل موظف: «الكود في إعدادات المتجر» ⟵ خطأ</div>
+    </div>
+    <div class="arrow">⇦</div>
+    <div class="phone"><span class="flag ok">بعد</span><div class="bar"></div><div class="title">👥 الموظّفون والصلاحيات</div>
+      <div class="ui okcard"><div class="lbl">👥 كود دعوة الموظفين</div><div class="chips"><span class="chip good">TWA-4821</span><span class="chip">نسخ</span><span class="chip">تجديد</span></div></div>
+      <div class="ui" style="font-size:.72rem">تسجيل موظف: «الكود في صفحة الموظّفين» ✓</div>
+      <div class="ui" style="opacity:.5">🏠 الرئيسية: بلا بطاقة</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FIX 2 ===== -->
+<h2 class="section" id="f2">② الإصلاح 2 — «كتالوج» → «الأصناف» مع حدود نطاق واضحة</h2>
+<div class="card">
+  <div class="goal"><b>الهدف:</b> إزالة «كتالوج» من كل نصّ يراه <b>المزوّد</b> — دون المساس بلوحة العمليات (OPS) التي يستخدمها فريق داخلي مختلف.</div>
+
+  <h3>أ) داخل النطاق (المزوّد يراها) — تُصلَح</h3>
+  <table>
+    <tr><th>الموضع</th><th>الملف:السطر</th><th>الإجراء</th></tr>
+    <tr><td>بطاقة الرئيسية</td><td>ProviderDashboard.tsx:647</td><td class="add">ربطها بـ <span class="inl">t("provider.catalog")</span> = «الأصناف» (يصلح G3 + التسمية)</td></tr>
+    <tr><td>زر «اختر من الكتالوج»</td><td>ProviderCatalog.tsx:403 + ar.json:408</td><td class="add">→ «اختر من الأصناف الجاهزة»</td></tr>
+    <tr><td>نافذة المنتقي <span class="newbadge">جديد</span></td><td>MasterCatalogPicker.tsx:71,81</td><td class="hl">قرار S6 (مقترن بالزر أعلاه — G4)</td></tr>
+    <tr><td>وصف صلاحية <span class="newbadge">جديد</span></td><td>api/providerStaff.ts:119</td><td class="add">«…يخفي الأصناف في <span class="del">الكتالوج</span>» → «…في القائمة»</td></tr>
+  </table>
+
+  <h3>ب) خارج النطاق (OPS — لا تُلمَس، تُوثَّق فقط) <span class="pill new">G2</span></h3>
+  <div class="note">مواضع «الكتالوج» التالية تخصّ <b>لوحة العمليات الداخلية</b> لا المزوّد، وتغييرها توسيع نطاق غير مطلوب: <span class="fileref">OpsMasterCatalog.tsx:88,98 · OpsCatalogItemPause.tsx:88 · opsNav.ts:69,88 · ar.json:620 (الكتالوج والأماكن) · ar.json:637 (master_catalog)</span>. تُترك كما هي عمدًا لحفظ اتساق OPS.</div>
+
+  <div class="note bad"><b>العَرَض S4 (اختبار سيكسر):</b> <span class="fileref">ProviderDashboard.test.tsx:117</span> يتحقّق من «الكتالوج». بعد ربط البطاقة بـ i18n سيصير النصّ «الأصناف» → يجب تحديث الاختبار إلى <span class="inl">/الأصناف/</span> في نفس الالتزام.</div>
+  <div class="note warn"><b>العَرَض S5:</b> <span class="fileref">Layout.test.tsx:130</span> (تحقّق سلبيّ من غياب رابط «الكتالوج») لن يفشل لكنه يفقد معناه → يُحدَّث إلى «الأصناف».</div>
+  <div class="note warn"><b>قرار مطلوب S6:</b> «الكتالوج المرجعي» مفهوم مختلف (مكتبة أصناف مرجعية للمنصّة). التوصية: «<b>القائمة المرجعية للأصناف</b>». <b>يلزم موافقتك</b> قبل لمس الزر + النافذة معًا (G4).</div>
+  <div class="note">اللغات: البطاقة بعد الربط تعرض «الأصناف/Menu/Menu» تلقائيًّا. قيمة <span class="inl">pick_from_catalog</span> نغيّر العربية؛ الإنجليزية/الفرنسية اختيارية (نطاق طلبك عربيّ).</div>
+</div>
+
+<!-- ===== FIX 3 ===== -->
+<h2 class="section" id="f3">③ الإصلاح 3 — أزرار استلام ذاتي بلا تعارض مع الميزات القائمة</h2>
+<div class="card">
+  <div class="goal"><b>الهدف:</b> في «الاستلام الذاتي» تظهر أزرار مناسبة للمتجر/الاستلام، ولا تكرّر ميزة «المستلم شخص آخر؟» الموجودة.</div>
+
+  <div class="note new"><b>تصحيح من المراجعة (G5):</b> الأزرار المقترحة سابقًا تضمّنت «سيستلمه شخص آخر» — وهي تكرّر ميزة مبنيّة أصلًا في نفس الشاشة: مربّع «المستلم شخص آخر؟» + حقلا الاسم والهاتف (<span class="fileref">CheckoutPage.tsx:1094-1126</span>). لذا حُذف هذا الزر، والأزرار الجديدة مخصّصة لتعليمات المتجر والتوقيت فقط.</div>
+
+  <div class="step"><div class="num">1</div><div>قائمة أزرار الاستلام (بمفاتيح i18n جديدة، لا تتقاطع مع أي ميزة):
+    <pre><code>const PICKUP_CHIPS = [
+  t("checkout.pickup_chip_noonion", { defaultValue: "<span class="add">بدون بصل</span>" }),
+  t("checkout.pickup_chip_wrap",    { defaultValue: "<span class="add">غلّفوه جيدًا</span>" }),
+  t("checkout.pickup_chip_eta15",   { defaultValue: "<span class="add">سأصل خلال ١٥ دقيقة</span>" }),
+  t("checkout.pickup_chip_ready",   { defaultValue: "<span class="add">اتصلوا بي عند الجاهزية</span>" }),
+];</code></pre>
+    <div class="note">تنسجم مع الـplaceholder الحالي للاستلام «مثال: بدون بصل، أو غلّفها كهديّة» → كلها ملاحظات فعلية للمتجر.</div></div></div>
+
+  <div class="step"><div class="num">2</div><div>اختيار القائمة بشرط بسيط، وعرضها بدل <span class="inl">NOTE_CHIPS</span> الثابتة (سطر 1052):
+    <pre><code>const activeChips = fulfillmentType === "DELIVERY" ? NOTE_CHIPS : <span class="add">PICKUP_CHIPS</span>;
+- {<span class="del">NOTE_CHIPS</span>.map(...)}
++ {<span class="add">activeChips</span>.map(...)}</code></pre></div></div>
+
+  <div class="step"><div class="num">3</div><div>إضافة المفاتيح الأربعة إلى <span class="inl">ar.json · en.json · fr.json</span> (بجوار <span class="inl">chip_*</span> ~1071) لحفظ تكافؤ اللغات.</div></div>
+
+  <div class="note warn"><b>S7 (مقبول):</b> نصّ الملاحظة يبقى محفوظًا عند تبديل النوع — لا نمسحه تلقائيًّا تفاديًا لضياع نصّ يدويّ؛ العنوان يقرأ «للمتجر» فلا لبس.</div>
+  <div class="note bad"><b>S8 (يُرفع للمالك — backend محظور):</b> الملاحظات تُرسَل تحت الحقل <span class="inl">delivery_notes_for_driver</span> (<span class="fileref">CheckoutPage.tsx:628</span>) حتى بلا سائق. لا نغيّر الـbackend في هذه الخطة؛ نطلب تحقّقًا: هل يرى المتجر هذه الملاحظات في طلب الاستلام الذاتي؟ إن لزم، يُفتح عمل backend مستقل بإذنك.</div>
+
+  <div class="mockrow">
+    <div class="phone"><span class="flag bad">قبل — 🏪 استلام ذاتي</span><div class="bar"></div><div class="title">🧾 إتمام الطلب</div>
+      <div class="ui badcard"><div class="lbl">ملاحظات للمتجر</div><div class="chips"><span class="chip bad">+ اطرق الباب</span><span class="chip bad">+ اتصل عند الوصول</span><span class="chip bad">+ اتركها مع الحارس</span></div></div>
+      <div class="ui" style="font-size:.72rem">☑ المستلم شخص آخر؟ (ميزة موجودة)</div>
+    </div>
+    <div class="arrow">⇦</div>
+    <div class="phone"><span class="flag ok">بعد — 🏪 استلام ذاتي</span><div class="bar"></div><div class="title">🧾 إتمام الطلب</div>
+      <div class="ui okcard"><div class="lbl">ملاحظات للمتجر</div><div class="chips"><span class="chip good">+ بدون بصل</span><span class="chip good">+ غلّفوه جيدًا</span><span class="chip good">+ سأصل خلال ١٥ دقيقة</span><span class="chip good">+ اتصلوا عند الجاهزية</span></div></div>
+      <div class="ui" style="font-size:.72rem">☑ المستلم شخص آخر؟ (بلا تكرار من الأزرار) ✓</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FIX 4 ===== -->
+<h2 class="section" id="f4">④ الإصلاح 4 — رسوم الاستلام الذاتي = صفر (تثبيت فقط)</h2>
+<div class="card">
+  <div class="goal"><b>القرار:</b> صحيح ومقصود — لا تعديل كود.</div>
+  <p style="margin-top:0"><span class="fileref">CheckoutPage.tsx:181-186</span> يضبط الرسم صفرًا ويتخطّى التسعير. الإجراء الوحيد: اختبار تثبيت صغير (S9) يضمن بقاء الرسم = 0 في الاستلام الذاتي.</p>
+</div>
+
+<!-- ===== REGISTER ===== -->
+<h2 class="section" id="reg">⑤ سجل الأعراض الجانبية الكامل (S1–S10)</h2>
+<div class="card">
+  <table>
+    <tr><th style="width:44px">#</th><th>الوصف</th><th>الملف</th><th style="width:120px">الحالة</th></tr>
+    <tr><td>S1</td><td>استيراد <span class="inl">providersApi</span> يصبح غير مستخدم</td><td>ProviderDashboard.tsx:12</td><td><span class="pill warn">يُعالَج</span></td></tr>
+    <tr><td>S2</td><td>نداء API للبطاقة يحتاج معالِج MSW</td><td>test/handlers/provider.ts</td><td><span class="pill warn">يُعالَج</span></td></tr>
+    <tr><td>S3</td><td>لا اختبار لصفحة الموظفين</td><td>—</td><td><span class="pill info" style="background:#0d2036;color:#7fb4ff">اختبار دخان اختياري</span></td></tr>
+    <tr><td>S4</td><td>اختبار «الكتالوج» سيكسر</td><td>ProviderDashboard.test.tsx:117</td><td><span class="pill bad">إلزامي</span></td></tr>
+    <tr><td>S5</td><td>اختبار سلبيّ يصبح قديمًا</td><td>Layout.test.tsx:130</td><td><span class="pill warn">يُحدَّث</span></td></tr>
+    <tr><td>S6</td><td>تسمية «الكتالوج المرجعي»</td><td>MasterCatalogPicker.tsx</td><td><span class="pill warn">قرارك</span></td></tr>
+    <tr><td>S7</td><td>بقاء نصّ الملاحظة عند التبديل</td><td>CheckoutPage.tsx</td><td><span class="pill ok">مقبول</span></td></tr>
+    <tr><td>S8</td><td>الملاحظة تُرسَل تحت حقل السائق</td><td>CheckoutPage.tsx:628 (backend)</td><td><span class="pill bad">يُرفع للمالك</span></td></tr>
+    <tr><td>S9</td><td>تثبيت رسوم الاستلام = 0</td><td>اختبار جديد</td><td><span class="pill ok">حماية انحدار</span></td></tr>
+    <tr><td><span class="pill new">S10</span></td><td>تلميح التسجيل يوجّه لمكان خاطئ (ar/en/fr)</td><td>i18n:984 + RegistrationPage.tsx:1023</td><td><span class="pill new">جديد — يُعالَج</span></td></tr>
+  </table>
+</div>
+
+<!-- ===== SCENARIOS ===== -->
+<h2 class="section" id="scn">⑥ محاكاة السيناريوهات (خلاصة العشرات)</h2>
+<div class="card">
+  <h3>الإصلاح 1 — نقل البطاقة</h3>
+  <table>
+    <tr><th>السيناريو</th><th>السلوك المتوقَّع</th></tr>
+    <tr class="scnrow"><td>مالك يفتح الرئيسية</td><td>لا بطاقة كود ✓</td></tr>
+    <tr class="scnrow"><td>مالك يفتح صفحة الموظفين</td><td>بطاقة الكود أعلى الصفحة، تُحمّل مستقلّة عن القائمة ✓</td></tr>
+    <tr class="scnrow"><td>موظف (غير مدير)</td><td>لا يصل للصفحة أصلًا (حارس المسار) → لا يرى الكود، كما قبل ✓</td></tr>
+    <tr class="scnrow"><td>فشل تحميل الكود</td><td>«تعذّر تحميل كود الدعوة» داخل البطاقة فقط، لا يعطّل الصفحة ✓</td></tr>
+    <tr class="scnrow"><td>زر تجديد الكود</td><td>POST rotate → كود جديد ✓ (معالِج MSW متوفّر)</td></tr>
+    <tr class="scnrow"><td>موظف جديد يسجّل</td><td>التلميح يوجّهه لصفحة الموظّفين (بعد G1) ✓</td></tr>
+    <tr class="scnrow"><td>رابط مباشر /staff</td><td>حارس PROVIDER_ADMIN + بطاقة ✓</td></tr>
+    <tr class="scnrow"><td>شاشة جوّال ضيّقة</td><td>البطاقة تلتفّ (flexWrap) ✓</td></tr>
+  </table>
+  <h3>الإصلاح 2 — التسمية</h3>
+  <table>
+    <tr><th>السيناريو</th><th>السلوك المتوقَّع</th></tr>
+    <tr class="scnrow"><td>مزوّد عربي</td><td>بطاقة «الأصناف» + عنوان «الأصناف» + زر «اختر من الأصناف الجاهزة» → اتساق كامل ✓</td></tr>
+    <tr class="scnrow"><td>مزوّد إنجليزي/فرنسي</td><td>البطاقة «Menu» عبر i18n (بعد G3) بدل عربيّ مضمّن ✓</td></tr>
+    <tr class="scnrow"><td>فتح نافذة المنتقي</td><td>يتطلّب قرار S6 لتفادي «زر أصناف / نافذة كتالوج» (G4)</td></tr>
+    <tr class="scnrow"><td>مستخدم OPS</td><td>تسميات OPS كما هي — لا تأثّر (G2) ✓</td></tr>
+    <tr class="scnrow"><td>تشغيل الاختبارات</td><td>Dashboard/Layout محدّثان → أخضر (S4/S5) ✓</td></tr>
+  </table>
+  <h3>الإصلاح 3 — الأزرار</h3>
+  <table>
+    <tr><th>السيناريو</th><th>السلوك المتوقَّع</th></tr>
+    <tr class="scnrow"><td>وضع التوصيل</td><td>أزرار السائق كما هي (بلا مساس) ✓</td></tr>
+    <tr class="scnrow"><td>وضع الاستلام</td><td>أزرار المتجر/التوقيت الجديدة ✓</td></tr>
+    <tr class="scnrow"><td>تبديل توصيل→استلام بعد كتابة</td><td>النصّ يبقى (S7 مقبول) — العنوان «للمتجر» ✓</td></tr>
+    <tr class="scnrow"><td>«المستلم شخص آخر؟»</td><td>تعمل مستقلّة بلا تكرار من الأزرار (G5) ✓</td></tr>
+    <tr class="scnrow"><td>عربي/إنجليزي/فرنسي</td><td>أزرار مترجمة في اللغات الثلاث ✓</td></tr>
+    <tr class="scnrow"><td>إرسال طلب استلام بملاحظة</td><td>تصل لسجلّ الطلب (تحت حقل driver — S8 يُتحقَّق منه) ✓</td></tr>
+  </table>
+</div>
+
+<!-- ===== ORDER ===== -->
+<h2 class="section" id="order">⑦ ترتيب التنفيذ + خطة التحقّق + الرجوع</h2>
+<div class="card">
+  <div class="flow">
+    <span class="b">1) إصلاح 3 (أزرار — معزول)</span><span class="s">→</span>
+    <span class="b">2) إصلاح 2 (تسمية + S4/S5) — بعد قرار S6</span><span class="s">→</span>
+    <span class="b">3) إصلاح 1 (نقل + توحيد الإرشادات + MSW)</span><span class="s">→</span>
+    <span class="b">4) اختبارات تثبيت (S9 + دخان الموظفين)</span><span class="s">→</span>
+    <span class="b">5) تحقّق كامل</span>
+  </div>
+  <table>
+    <tr><th>الفحص</th><th>الأمر</th><th>المتوقَّع</th></tr>
+    <tr><td>Lint</td><td><span class="kbd">cd web &amp;&amp; npm run lint</span></td><td>0 (يثبت S1)</td></tr>
+    <tr><td>Types</td><td><span class="kbd">npm run typecheck</span></td><td>0</td></tr>
+    <tr><td>الوحدة</td><td><span class="kbd">npm test</span></td><td>أخضر مع Dashboard/Layout المحدّثين</td></tr>
+    <tr><td>البناء</td><td><span class="kbd">npm run build</span></td><td>exit 0</td></tr>
+  </table>
+  <h3>تحقّق يدويّ</h3>
+  <ul class="clean">
+    <li>الرئيسية: لا بطاقة كود · بطاقة «الأصناف».</li>
+    <li>صفحة الموظّفين: البطاقة تعمل (نسخ/تجديد) · نصّ الحالة الفارغة يوجّه للبطاقة أعلاه.</li>
+    <li>تسجيل موظف جديد: التلميح يقول «صفحة الموظّفين».</li>
+    <li>إتمام الطلب: التبديل يغيّر الأزرار والعنوان · لا كلمة «اطرق الباب» في الاستلام · الرسم صفر.</li>
+    <li>لا كلمة «كتالوج» في أي شاشة مزوّد (مع بقاء OPS كما هي).</li>
+  </ul>
+  <div class="note"><b>الرجوع:</b> كل إصلاح في التزام منفصل → أي خلل يُرجَع بإلغاء التزام واحد دون التأثير على البقية.</div>
+  <div class="note warn"><b>قرار وحيد مطلوب قبل البدء:</b> صياغة S6 («القائمة المرجعية للأصناف» أم صياغتك). بقيّة البنود جاهزة.</div>
+</div>
+
+<div class="foot">
+  خطة منقّحة بعد مراجعة ذرّية — الفجوات السبع (G1–G7) والأعراض العشرة (S1–S10) مرصودة من الكود لا مفترَضة.<br>
+  المراجع: <code style="direction:ltr">ProviderDashboard.tsx · ProviderStaff.tsx · ProviderCatalog.tsx · MasterCatalogPicker.tsx · CheckoutPage.tsx · RegistrationPage.tsx · router.tsx · api/providers.ts · api/providerStaff.ts · i18n/{ar,en,fr}.json · الاختبارات</code><br>
+  <b>لم يُنفَّذ أي كود.</b> بانتظار اعتمادك + قرار S6.
+</div>
+
+</div>
+</body>
+</html>

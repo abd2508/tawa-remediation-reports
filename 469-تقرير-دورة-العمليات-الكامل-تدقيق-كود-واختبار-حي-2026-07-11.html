@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير دورة العمليّات (OPS) الكامل — تدقيق كود + اختبار حيّ شامل (61 عيبًا، 6 مؤكَّدة حيًّا)</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.8; margin:0; font-size:16px;}
+  .wrap{max-width:1260px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:960px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.med .num{color:var(--med)}
+  .stat .lbl{color:var(--muted); font-size:.82rem; margin-top:4px}
+  section{margin:44px 0}
+  h2.sec-title{font-size:1.5rem; border-inline-start:5px solid var(--accent); padding-inline-start:14px; margin-bottom:18px; color:#fff}
+  h2.sec-title.blocker{border-color:var(--blocker)}
+  h2.sec-title.cluster{border-color:var(--accent2); font-size:1.3rem}
+  p.lead{color:var(--muted); max-width:960px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 24px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+  .card-title{font-size:1.1rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.live{background:rgba(255,45,85,.12); color:#ff6b8f; border:1px solid rgba(255,45,85,.35)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .orig{background:var(--panel2); border-radius:10px; padding:10px 16px; margin:10px 0; font-size:.9rem; color:var(--muted)}
+  .orig b{color:var(--text)}
+  .problem{background:rgba(255,45,85,.06); border:1px solid rgba(255,45,85,.25); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem}
+  .problem.high{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.25)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.78rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem}
+  th,td{border:1px solid var(--border); padding:9px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .fine-list{background:rgba(55,201,135,.05); border:1px dashed rgba(55,201,135,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+  .shallow-list{background:rgba(111,211,255,.05); border:1px dashed rgba(111,211,255,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>🛡️ تقرير دورة العمليّات (OPS) الكامل — تدقيق الكود من الجذور + اختبار حيّ فعليّ على كل مسار</h1>
+  <div class="sub">تنفيذًا للتوجيه الصريح ("ابدأ دورة العمليّات، بنفس المنهجيّة"): رابع وأخير دورات الأدوار (عميل→مزوّد→سائق→<b>العمليّات</b>) بنفس المنهجيّة الثلاثيّة (تدقيق كود ثنائيّ الاتّجاه + اختبار حيّ فعليّ + سجلّ عيوب متراكم). سطح العمليّات أكبر بكثير من أيّ دور سابق (~90 صفحة تغطّي التوزيع، الأموال، الكتالوج، الدعم، التحكّم المدمِّر، والصلاحيّات الهرميّة) — استُخدم 9 وكلاء تدقيق متوازين بدل 6، موزَّعين حسب نطاق الأثر لا بالتساوي: 7 وكلاء عميقين على الأنظمة الحسّاسة + 2 فحص خفيف سريع على اللوحات الأقلّ خطورة. النطاق يبقى محصورًا بالباك إند + الفرونت إند (ويب) فقط.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-11</div>
+    <div class="badge">🧪 <b>البيئة:</b> tawalocal (Docker محلّي، 127.0.0.1:8080)</div>
+    <div class="badge">👥 <b>الوكلاء:</b> 9 وكلاء تدقيق كود متوازية (7 عميقة + 2 فحص خفيف) + اختبار حيّ متسلسل (API مباشر + استعلامات DB مباشرة)</div>
+    <div class="badge">🎯 <b>الحالة:</b> دورة العمليّات مكتملة — الدورات الأربع (عميل+مزوّد+سائق+عمليّات) اكتملت</div>
+  </div>
+</header>
+
+<div class="stats-grid">
+  <div class="stat"><div class="num">61</div><div class="lbl">عيبًا مسجَّلًا</div></div>
+  <div class="stat high"><div class="num">22</div><div class="lbl">خطورة عالية (HIGH)</div></div>
+  <div class="stat med"><div class="num">26</div><div class="lbl">خطورة متوسّطة (MED)</div></div>
+  <div class="stat"><div class="num">13</div><div class="lbl">خطورة منخفضة (LOW)</div></div>
+  <div class="stat ok"><div class="num">6</div><div class="lbl">مؤكَّدة حيًّا بدليل DB/API مباشر</div></div>
+  <div class="stat ok"><div class="num">5</div><div class="lbl">حسابات اختبار جديدة أُنشئت لهذه الدورة</div></div>
+</div>
+
+<div class="toc">
+  <strong>محتويات التقرير</strong>
+  <ul>
+    <li><a href="#exec">١. الخلاصة التنفيذية</a></li>
+    <li><a href="#method">٢. المنهجية — كيف جرى الفحص</a></li>
+    <li><a href="#cast">٣. طاقم الاختبار المحلّي + التسلسل الهرميّ للأدوار</a></li>
+    <li><a href="#headline">٤. الأخطر: منح/سحب الصلاحيّات وهميّ بالكامل على مسار مال حقيقيّ</a></li>
+    <li><a href="#suspend">٥. التعليق مكسور بثلاث طرق مختلفة</a></li>
+    <li><a href="#financial">٦. عائلة الازدواج الماليّ (امتداد E1 من تقرير السائق 468)</a></li>
+    <li><a href="#dispatch">٧. التوزيع والأسطول وحوكمة السائقين</a></li>
+    <li><a href="#destructive">٨. التحكّم المدمِّر ومنصّة الإيقاف</a></li>
+    <li><a href="#catalog">٩. الكتالوج وحوكمة المزوّدين</a></li>
+    <li><a href="#accounting">١٠. العمولات والضرائب والمحاسبة</a></li>
+    <li><a href="#support">١١. الدعم والشكاوى والاحتيال والقانونيّ</a></li>
+    <li><a href="#dashboards">١٢. اللوحات ومؤشّرات الأداء (وفئة "الفلتر الميّت")</a></li>
+    <li><a href="#systemctl">١٣. التعافي من الكوارث، التدقيق، والإطلاق التدريجيّ</a></li>
+    <li><a href="#live-verified">١٤. ملخّص الأدلّة الحيّة (LIVE-VERIFIED)</a></li>
+    <li><a href="#confirmed-fine">١٥. ما تمّ تأكيد سلامته + التغطية الجزئيّة المُعلَنة</a></li>
+    <li><a href="#next">١٦. الخطوة التالية</a></li>
+  </ul>
+</div>
+
+<section id="exec">
+<h2 class="sec-title">١. الخلاصة التنفيذية</h2>
+<p class="lead">جرى تدقيق دورة العمليّات (OPS) الكاملة بنفس منهجيّة الدورات الثلاث السابقة، لكن بحجم مكيَّف مع سطح أكبر بكثير: هذا الدور يملك نحو 90 صفحة فرونت إند تغطّي التوزيع، الأموال، الكتالوج، الدعم، التحكّم المدمِّر عبر المنصّة، وتسلسلًا هرميًّا كاملًا من الأدوار المميَّزة (MONITOR إلى SUPER_ADMIN). استُخدم 9 وكلاء تدقيق كود متوازية موزَّعة حسب نطاق الأثر لا بالتساوي — 7 عميقة على الأنظمة الحسّاسة (الصلاحيّات، الأموال، التحكّم المدمِّر، التوزيع، الكتالوج، الدعم، المحاسبة) + وكيلان لفحص خفيف سريع على اللوحات الأقلّ خطورة (مؤشّرات الأداء، أدوات النظام) — ثمّ اختبار حيّ فعليّ حوَّل أخطر الفرضيّات إلى حقائق مثبَتة بدليل API/DB مباشر. النتيجة: <b>61 عيبًا مسجَّلًا</b> (22 عالية / 26 متوسّطة / 13 منخفضة)، منها <b>6 مؤكَّدة حيًّا</b>.</p>
+<p class="lead">أخطر نتيجة مؤكَّدة حيًّا: نظام منح/سحب الصلاحيّات الفرديّة لموظّفي العمليّات — المعادل على مستوى العمليّات لنفس عيب "صلاحيّات الموظّفين المكسورة بالاتّجاهين" الذي وُجد سابقًا لدى المزوّد — <b>وهميّ بالكامل</b> على مسار "إضافة رصيد يدويّ للمحفظة" الحقيقيّ: مُنِحت الصلاحيّة لحساب MONITOR (أدنى رتبة، لا يملكها أصلًا) فبقيت محظورة (403) رغم ظهورها الكامل في صفحة "صلاحيّاتي" الخاصّة به؛ وسُحبت من حساب OPERATIONS_AGENT حقيقيّ فاختفت من صفحة صلاحيّاته الخاصّة — لكنّ الاستدعاء الفعليّ لإضافة رصيد نجح رغم السحب (200 حقيقيّ). صفحة "صلاحيّاتي" تعرض حالة السحب/المنح بدقّة — لكنّها لا تعني شيئًا على الإطلاق لنقطة النهاية الفعليّة.</p>
+<p class="lead">ثاني أخطر نتيجة مؤكَّدة حيًّا: تعليق حساب عميل من لوحة العمليّات (<code>ControlPanelCustomers</code>/<code>ControlPanelUsers</code>) لا يُبطِل جلسته الحيّة إطلاقًا — عميل جرى تعليقه فعليًّا في قاعدة البيانات واصل تصفّح حسابه <b>ووضع طلب حقيقيّ جديد</b> بنفس التوكن القديم دون أيّ انقطاع.</p>
+<div class="insight">
+<h4>✅ نفس معيار الدقّة عبر الدورات الأربع: كل ادّعاء إمّا "مؤكَّد حيًّا" أو "من تدقيق الكود فقط"</h4>
+<p class="lead" style="margin:0">كما في التقارير الثلاثة السابقة، كل عيب هنا موسوم <span class="tag live">LIVE-VERIFIED</span> أو <span class="tag audit">CODE-AUDIT-ONLY</span>. بتوجيه استشاريّ صريح، بقيت عائلة كاملة من النتائج (التحكّم المدمِّر عبر المنصّة، ازدواج التسوية المالية، حدّ العمولة) مصنَّفة CODE-AUDIT-ONLY عمدًا — تفعيلها حيًّا كان يخاطر بتعطيل البيئة المحليّة بالكامل (إيقاف طارئ/وضع صيانة) أو تحريك أموال حقيقيّة (تسوية/عمولة) لإثبات ما تثبته قراءة الكود المزدوجة أصلًا بيقين تامّ. معايير الخطورة أُبقيت متّسقة مع التقارير الثلاثة السابقة: غياب واجهة كاملة لقدرة خلفيّة (مثل عدم وجود شاشة لموافقات العروض التمويليّة) يبقى MED عمدًا لا HIGH، محفوظًا لِـ: كسر أمنيّ فعليّ، بيانات خاطئة تُعرَض كأنّها صحيحة، أو وعد وظيفيّ فارغ.</p>
+</div>
+</section>
+
+<section id="method">
+<h2 class="sec-title cluster">٢. المنهجية — كيف جرى الفحص</h2>
+<p class="lead">نفس البنية الثلاثيّة، مُكيَّفة مع الحجم: (أ) 9 وكلاء تدقيق كود متوازية موزَّعة حسب نطاق الأثر — الصلاحيّات الهرميّة عبر MONITOR/FINANCE_AGENT/COMPLIANCE_AGENT/ADMIN/SUPERVISOR/SUPER_ADMIN (الأخطر) · حركة الأموال وعدم قابليّة التراجع · التحكّم المدمِّر عبر المنصّة (إيقاف طارئ/صيانة/إجراءات جماعيّة) · التوزيع والأسطول وحوكمة السائقين · الكتالوج وحوكمة المزوّدين · الدعم والشكاوى والاحتيال والقانونيّ · المحاسبة والعمولات والضرائب · ثمّ وكيلان لفحص خفيف سريع (اللوحات ومؤشّرات الأداء · أدوات النظام والتدقيق)، مع تعليمات صريحة لكل وكيل بالإفصاح عن أيّ تغطية سطحيّة بدل التظاهر بالشمول. (ب) قبل الاختبار الحيّ، استشارة توجيهيّة حدَّدت فخّين محدَّدين للسلبيّ الكاذب: اختبار "التعليق" عبر مسار الاحتيال الجماعيّ كان سيُخفي العيب (ذلك المسار يستدعي إبطال الجلسة بشكل صحيح فعليًّا)؛ واختبار منح/سحب الصلاحيّة يجب أن يتمّ على الفاعل الذي يغيب عنه الفحص فعليًّا (MONITOR للمنح، OPERATIONS_AGENT حقيقيّ للسحب) لا فاعل يمرّ من الفحص أصلًا. أُنشئت حسابات اختبار جديدة عبر <code>POST /admin/ops-accounts</code> الحقيقيّة: FINANCE_AGENT، MONITOR، COMPLIANCE_AGENT — إضافة لإعادة تفعيل حساب SUPER_ADMIN الدائم (<code>admin</code>/<code>admin</code>) عبر سكربت الإقلاع الفعليّ. (ج) كل إجراء حاسم جرى التحقّق منه مباشرةً من قاعدة البيانات أو استجابة API الفعليّة.</p>
+</section>
+
+<section id="cast">
+<h2 class="sec-title cluster">٣. طاقم الاختبار المحلّي + التسلسل الهرميّ للأدوار</h2>
+<table>
+<tr><th>الدور</th><th>الهاتف/المعرِّف</th><th>ملاحظة</th></tr>
+<tr><td>SUPER_ADMIN</td><td class="en">admin / admin</td><td>حساب دائم مُعاد تفعيله عبر <code>seed_super_admin.py</code> الفعليّ لهذه الدورة</td></tr>
+<tr><td>OPERATIONS_AGENT (من الدورات السابقة)</td><td class="en">+218911000009</td><td>استُخدم لاختبار السحب-الجزء-الأخطر ولإسناد التوزيع اليدويّ</td></tr>
+<tr><td>FINANCE_AGENT (جديد)</td><td class="en">+218911000091</td><td>أُنشئ عبر <code>POST /admin/ops-accounts</code> الحقيقيّ</td></tr>
+<tr><td>MONITOR (جديد، أدنى رتبة)</td><td class="en">+218911000092</td><td>استُخدم لاختبار المنح-الجزء</td></tr>
+<tr><td>COMPLIANCE_AGENT (جديد)</td><td class="en">+218911000093</td><td>استُخدم لاختبار عدم وصول الدور لسجلّ التدقيق الخاصّ به</td></tr>
+<tr><td>عميل/مزوّد/سائق (من الدورات السابقة)</td><td class="en">+218911000001/002/003</td><td>استُخدمت لاختبارَي التعليق وازدواج التعيين</td></tr>
+</table>
+<p class="lead">التسلسل الهرميّ الفعليّ (<code>backend/app/core/roles.py</code>، <code>ROLE_RANK</code>): <code>SUPER_ADMIN</code>=100 &gt; <code>ADMIN</code>=80 &gt; <code>SUPERVISOR</code>=60 &gt; <code>{OPERATIONS_AGENT, FINANCE_AGENT, COMPLIANCE_AGENT}</code>=40 &gt; <code>MONITOR</code>=20 (الأدنى، للقراءة فقط بالتصميم — مؤكَّد بالكود أنّه لا يظهر أبدًا في أيّ قائمة سماح لنقطة نهاية مُغيِّرة). إنشاء الحسابات عبر <code>POST /admin/ops-accounts</code>، محكوم بـ<code>require_permission("ops_account:create")</code> + فحص تراتبيّ صارم (لا يمكن إنشاء رتبة مساوية أو أعلى).</p>
+</section>
+
+<section id="headline">
+<h2 class="sec-title blocker">٤. الأخطر: منح/سحب الصلاحيّات وهميّ بالكامل على مسار مال حقيقيّ</h2>
+<div class="card blocker">
+<div class="card-head"><div class="card-title">Auth-F1) نظام منح/سحب صلاحيّة "إضافة رصيد محفظة يدويّ" لا يُقرأ أبدًا من قِبل نقطة النهاية الفعليّة — في الاتّجاهين معًا</div><span class="tag high">HIGH</span><span class="tag live">LIVE-VERIFIED</span></div>
+<p class="lead"><b>الثغرة الخلفيّة:</b> <code>POST /operations/users/{id}/wallet-credit</code> و<code>approve/reject</code> (operations_router.py:2045,2172,2223) تتحقّق فقط من <code>role_satisfies(role,(OPERATIONS_AGENT,SUPER_ADMIN))</code> — بينما <code>wallet:manual_credit_with_reason</code> مُدرَجة في كتالوج الصلاحيّات القابلة للمنح/السحب صراحةً (فئة "finance")، ومعروضة في <code>OpsAccountManagement.tsx</code> مع مربّع تأكيد يقول حرفيًّا إنّ المنح/السحب "يُغيِّر ما يستطيع هذا الحساب فعله." فحص شامل للكود أكَّد: هذه الصلاحيّة <b>لا تُقرأ أبدًا</b> من أيّ <code>require_permission</code>/<code>has_effective_permission</code> في كامل الباك إند.</p>
+<p class="lead"><b>الإثبات الحيّ — اتّجاه المنح (على MONITOR، أدنى رتبة، لا يملك هذه الصلاحيّة بالأساس، بتوجيه استشاريّ لتفادي اختبار فاعل يمرّ الفحص أصلًا):</b></p>
+<ol class="lead">
+<li>SUPER_ADMIN منح <code>wallet:manual_credit_with_reason</code> لحساب MONITOR: <code>POST /admin/accounts/{monitor_id}/permissions {"effect":"GRANT"}</code> → نجاح.</li>
+<li><code>GET /me/permissions</code> بتوكن MONITOR نفسه → **يعرض الصلاحيّة كاملة**: <code>"granted_by_name":"Super Admin"</code>، وصف "إضافة رصيد يدويّ بسبب موثّق" — كل شيء يوحي بأنّها تعمل الآن.</li>
+<li><code>POST /operations/users/{customer_id}/wallet-credit</code> بتوكن MONITOR → <b><code>403 FORBIDDEN</code></b> رغم المنح، تمامًا كما توقّع تدقيق الكود.</li>
+</ol>
+<p class="lead"><b>الإثبات الحيّ — اتّجاه السحب (الأخطر، على OPERATIONS_AGENT حقيقيّ يمرّ فحص الدور أصلًا):</b></p>
+<ol class="lead">
+<li>SUPER_ADMIN سحب نفس الصلاحيّة من حساب OPERATIONS_AGENT حقيقيّ: <code>POST /admin/accounts/{ops_id}/permissions {"effect":"REVOKE"}</code> → نجاح.</li>
+<li><code>GET /me/permissions</code> بتوكن ذلك الوكيل → الصلاحيّة **اختفت تمامًا** من القائمة — صفحته الخاصّة تخبره أنّها سُحبت للتوّ.</li>
+<li><code>POST /operations/users/{customer_id}/wallet-credit</code> بنفس توكن الوكيل → <b><code>200 OK</code></b>، صفّ <code>ManualWalletCredit</code> حقيقيّ أُنشئ (<code>{"state":"PENDING_APPROVAL",...}</code>) — <b>غير متأثّر إطلاقًا بالسحب</b>.</li>
+</ol>
+<p class="lead">الخلاصة: نظام المنح/السحب زخرفيّ بنسبة 100% لهذه الصلاحيّة — يُغيِّر فقط ما تعرضه صفحة "صلاحيّاتي" ولا شيء آخر. وكيل عمليّات سُحبت صلاحيّته للتوّ ما زال قادرًا على تسجيل طلبات رصيد حقيقيّة؛ حساب MONITOR مُنِح الصلاحيّة للتوّ ما زال عاجزًا عنها. (بيانات الاختبار: صفّ الرصيد المُنشأ يبقى PENDING_APPROVAL دون تقدّم لأنّ نظام maker-checker يتطلّب موافقًا مختلفًا — بلا أثر ماليّ فعليّ، أُبقي كدليل. جرى تنظيف كلا التفويضَين بعد التوثيق.)</p>
+</div>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Auth-F2) 7 من أصل 12 كودًا في كتالوج صلاحيّات العمليّات لا تُفحَص من أيّ نقطة نهاية إطلاقًا <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>order:read_all</code>, <code>driver:read_all</code>, <code>cash:audit</code>, <code>ledger:read_all</code>, <code>settlement:read_all</code>, <code>audit_log:read_all</code>, <code>complaint:manage_all</code> — صفر استدعاء لأيٍّ منها خارج <code>roles.py</code>/<code>account_permission_service.py</code> نفسيهما (تأكَّد بفحص شامل). النقاط المفترَض أن تتحقّق منها (طلبات العمليّات، السائقون غير النشطين، سجلّ التدقيق، إسناد/حلّ/تصعيد الشكاوى) كلّها فحوصات دور ثابتة. بالمقابل: <code>internal_chat:oversee/broadcast/participate</code> + <code>ops_account:create</code> مربوطة بشكل صحيح فعليًّا — فالآليّة تعمل، فقط غير مُستخدَمة لـ7 من أصل 12 صفًّا. <code>OpsAccountManagement.tsx</code> يعرض هذه الأكواد السبعة نفسها في منتقي المنح/السحب بنفس مربّع التأكيد المُضلِّل.</p>
+</div>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Auth-F3) مجموعة صلاحيّات COMPLIANCE_AGENT الأساسيّة بالكامل غير قابلة للوصول عمليًّا <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag live">LIVE-VERIFIED</span></div>
+<p class="lead"><code>ROLE_PERMISSIONS[COMPLIANCE_AGENT]</code> = <code>{audit_log:read_all, complaint:read_all, user:read_sensitive_with_reason}</code> — سبب وجود هذا الدور بالكامل. لكنّ <code>ROLE_INHERITS</code> لا يمنح COMPLIANCE_AGENT أيّ وراثة من OPERATIONS_AGENT (بعكس ADMIN/SUPERVISOR)، وكل نقاط <code>control_panel_router.py</code> الـ21 (بما فيها سجلّ التدقيق الفعليّ) محكومة <code>require_role(OPERATIONS_AGENT,SUPER_ADMIN)</code> فقط. <b>مؤكَّد حيًّا:</b> أُنشئ حساب COMPLIANCE_AGENT حقيقيّ، ثمّ <code>GET /control-panel/audit-log</code> بتوكنه → <b><code>403 FORBIDDEN</code></b>. الدور المفترَض أن يُدقِّق المنصّة لا يملك أيّ مسار لسجلّ التدقيق نفسه — ليست فجوة واجهة/خلفيّة، بل فجوة حقيقيّة متّسقة على الطرفين (الفرونت إند يستثني الدور بشكل صحيح من هذا المسار أيضًا).</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Auth-F4) صلاحيّة ops_account:create التي يملكها ADMIN/SUPERVISOR قابلة للاستخدام جزئيًّا فقط</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>POST/PATCH /admin/ops-accounts</code> محكومة بشكل صحيح فعليًّا (صلاحيّة + فحص تراتبيّ). لكنّ <code>GET /admin/ops-accounts</code> (القائمة) وكل نقاط <code>account_permissions_router.py</code> الأربع (الكتالوج/الجلب/الضبط/المسح) محكومة <code>require_role(SUPER_ADMIN)</code> ثابتًا فقط — لا صلاحيّة. ADMIN/SUPERVISOR يستطيعان إنشاء/إعادة تسمية حساب تابع لكن أبدًا لا سرد الحسابات أو إدارة تجاوزات صلاحيّاتها عبر API. الفرونت إند يزيد الطين بلّة: كامل صفحة إدارة الحسابات مخفيّة عن ADMIN/SUPERVISOR بصرف النظر — الصلاحيّة التي يملكانها غير قابلة للوصول عبر التطبيق. يفشل مغلَقًا (الاتّجاه الآمن) — MED لا HIGH.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Auth-F5) وعد فارغ: صفحة "إيقافات الطوارئ" قابلة للوصول من التنقّل لأدوار يرفضها الباك إند</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">مجموعة تنقّل الفرونت إند لهذه الصفحة تشمل FINANCE_AGENT/COMPLIANCE_AGENT/MONITOR — لكنّ نقاط النهاية الفعليّة (القراءة، الموافقة، الرفض) كلّها <code>require_role(OPERATIONS_AGENT,SUPER_ADMIN)</code> فقط، ولا مسار وراثة لهذه الأدوار الثلاثة. الصفحة بلا أيّ حارس داخليّ أو معالجة 403 لطيفة — يمكن لهذه الأدوار الثلاثة التنقّل إليها من القائمة الجانبيّة والاصطدام بخطأ عامّ عند التحميل. سطح للقراءة فقط لا أموال — MED لا HIGH.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Auth-F6) ربط مزدوج على مستوى الوحدة لقائمة أدوار العمليّات — قنبلة انحراف كامنة</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">تعريفان لنفس المتغيّر <code>_OPS_ROLES</code> في مواضع مختلفة من نفس الملفّ — الثاني يُبطِل الأوّل بصمت لبقيّة الملفّ (بحث بايثون بالاسم وقت الاستدعاء لا وقت التعريف). القيمتان متطابقتان حاليًّا، بلا عيب حيّ اليوم، لكنّ أيّ تعديل مستقبليّ على أحدهما فقط سينتشر بصمت جزئيًّا فقط.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Auth-F7) ميزة SUPER_ADMIN يتيمة بلا أيّ نقطة دخول واجهة</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">نقطة "رعاية مزوّد" محكومة بشكل صحيح ولها غلاف عميل عامل، لكن لا صفحة/مكوّن يستدعيها إطلاقًا. لا وعد مكسور (لا شيء يدّعي أنّها تعمل) — فجوة اكتمال فقط.</p>
+</div>
+</section>
+
+<section id="suspend">
+<h2 class="sec-title blocker">٥. التعليق مكسور بثلاث طرق مختلفة</h2>
+<p class="lead">الجذر المشترَك لكل الثلاثة هو <code>OperationsControlsService.suspend_user()</code> — لكنّها ثلاثة عيوب مختلفة فعليًّا بنطاق أثر مختلف تمامًا (أمنيّ · تشغيليّ · واجهة/اتّساق)، لا عيب واحد ولا ثلاثة عيوب منفصلة بلا رابط. تُعرَض هنا معًا لكن بثلاث بطاقات مستقلّة.</p>
+<div class="card blocker">
+<div class="card-head"><div class="card-title">Support-F3) تعليق عميل/مستخدم من لوحة العمليّات لا يُبطِل جلسته الحيّة إطلاقًا</div><span class="tag high">HIGH</span><span class="tag live">LIVE-VERIFIED</span></div>
+<p class="lead">اختُبِر عبر المسار الدقيق الذي تستدعيه <code>ControlPanelCustomers.tsx</code>/<code>ControlPanelUsers.tsx</code> فعليًّا (<code>POST /operations/users/{id}/suspend</code>) — وليس مسار الاحتيال الجماعيّ (الذي يستدعي بشكل صحيح <code>block_user_sessions</code>، بتحذير استشاريّ مسبق كان سيُنتِج سلبيًّا كاذبًا لو اختُبِر هناك). عميل حقيقيّ بتوكن نشِط، سجّله OPS معلَّقًا: <code>{"is_suspended":true}</code> (200) — <b>وقاعدة البيانات تؤكِّد الانتقال فعليًّا</b> (<code>operational_profiles.is_suspended=t</code>). بنفس التوكن القديم غير المُجدَّد: <code>GET /users/me/addresses</code> → 200 عاديّ؛ <code>POST /orders</code> → <b><code>201 Created</code></b>، طلب حقيقيّ (150 د.ل) وصل لمزوّد حقيقيّ. عميل عُلِّق للتوّ يواصل التصفّح والطلب بلا أيّ انقطاع — لأنّ <code>suspend_user</code> يُغيِّر <code>OperationalProfile.is_suspended</code> فقط، بينما وضع الطلب يستخدم <code>require_role(CUSTOMER)</code> العاديّ لا <code>require_active_role</code> الأكثر صرامة (المحجوز لحرّاس الأموال/التشغيل فقط). التنظيف: أُلغي الطلب التجريبيّ ورُفع التعليق.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dispatch-F4) تعليق سائق لا يمسّ طلبه الجاري، ولا يُنذِر، ولا يُعيد إسناده</div><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>suspend_user</code> يضبط <code>is_suspended=True</code> فقط — لا فحص لعرض مقبول نشِط، لا فرض <code>available=False</code>، لا تنبيه. بالمقارنة: حين يذهب السائق نفسه دون اتّصال أثناء التسليم، يُطلَق تنبيه <code>driver_offline_mid_delivery</code> صراحةً (DRV-A4) — لا معادل لذلك عندما تكون العمليّات هي من علّقت السائق. ثغرة أعمى أسوأ من المسار الموثَّق أصلًا لتخلّي السائق نفسه.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Catalog-F5) زرّ التعليق في لوحة المزوّدين يتتبّع الحقل الخاطئ، ولا يمتدّ لموظّفي المزوّد</div><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">الدرج يحسم أيّ زرّ يعرض من <code>detail.status</code> (<code>User.status</code>) — لكنّ <code>suspendUser</code>/<code>liftSuspension</code> يُغيِّران <code>OperationalProfile.is_suspended</code> فقط، أبدًا لا <code>User.status</code>. بعد نقر "تعليق الحساب" لا يتحوّل الزرّ أبدًا لـ"رفع التعليق" — صفر تأكيد مرئيّ أنّ الإجراء نجح، وقد ينقر OPS مرارًا بلا أيّ استجابة مختلفة. الأسوأ: تعليق موظّفي المزوّد آليّة مستقلّة تمامًا (<code>/providers/me/staff/{id}/suspend</code>) لا تلمسها هذه الصفحة إطلاقًا — تعليق مالك المزوّد لا يؤثِّر على موظّفيه، الذين يواصلون تسجيل الدخول ومعالجة الطلبات.</p>
+</div>
+</section>
+
+<section id="financial">
+<h2 class="sec-title blocker">٦. عائلة الازدواج الماليّ (امتداد E1 من تقرير السائق 468)</h2>
+<p class="lead">تقرير دورة السائق (468) أثبت مسبقًا E1 (ازدواج احتساب النقد/الأرباح بين تسوية العمليّات اليوميّة ومسار السائق المباشر SET-12) بقراءة كود مباشرة لكلا الطرفين — <b>لا يُعاد عدّه هنا كنتيجة جديدة</b> تفاديًا للازدواج بين التقريرَين، لكنّ وكيل هذه الدورة أُرشِد صراحةً بحمله كمرساة والبحث عن أخوات لنفس فئة العيب. وُجدت أختان جديدتان، أخطر من الأصل.</p>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Money-F2) تسوية العمليّات اليوميّة (المسار نفسه الذي يحمل E1) لا تتحقّق أبدًا من نزاع/تفاوت معلَّق قبل الدفع <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY (أخت-E1)</span></div>
+<p class="lead"><code>driver_settlement_router.py</code>'s <code>confirm_settlement</code> بلا أيّ حاجز نزاع/تفاوت — بعكس <code>finance/settlement_service.py:pay_settlement</code> الذي يحجب الدفع صراحةً عند وجود <code>FinancialDispute</code> مفتوح أو <code>CashHandover</code> بحالة تفاوت. هذه آليّة تسوية سائق <b>ثالثة</b> مستقلّة (إضافة لـ<code>settlement/service.py</code> و<code>finance/settlement_service.py</code>) تتجاوز صمتًا الحواجز التي تفرضها الأخريان. سائق لديه تفاوت نقديّ مفتوح أو نزاع عميل نشِط على طلب من ذلك اليوم يمكن أن يُدفَع له عبر هذا المسار رغم ذلك.</p>
+</div>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Money-F3) عدّاد عائم وكيل التسوية غير مقفل — تعديل قراءة/كتابة بلا قفل صفّيّ <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY (أخت-E1، تزامن)</span></div>
+<p class="lead"><code>SettlementAgent.current_float_minor</code> يُحدَّث عبر قراءة-تعديل-كتابة **بلا قفل** في موضعَين (<code>settlement/service.py</code> و<code>settlement/ops_router.py</code>) — بينما فحص <code>OVER_FLOAT_CAP</code> يقرأ نفس العدّاد غير المقفل. المنصّة أصلحت هذه الفئة بالذات لعدّاد <code>Driver.cash_outstanding_minor</code> (تعليقات FIN-1/FIN-2/FIN-3/D-3 كلّها تضيف <code>with_for_update()</code> لهذا السبب تحديدًا) لكن عدّاد وكيل التسوية لم يتلقَّ الإصلاح المماثل. تسليمتا نقد متزامنتان لنفس الوكيل، أو تسليمة تتسابق مع تسوية عائم، يمكن أن تفقد تحديثًا وتُفسِد حدّ العائم ولوحة تعرّض العائم للعمليّات معًا.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Money-F4) دفتر اليوميّة اليدويّة بلا مفتاح تكرار فعليّ ولا حالة انتظار في الواجهة</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>OpsManualJournal.tsx</code> لا يُعطِّل زرّ "ترحيل القيد" أثناء الإرسال؛ وسيط الحقن التلقائيّ لمفتاح Idempotency-Key يُرسَل لكن المسار الخلفيّ غير مُدرَج في قائمة المسارات المحمِيّة بذلك الوسيط — نقرة مزدوجة تُرحِّل نفس القيد المتوازن مرّتين بلا منع خلفيّ. نقطة عكس موجودة (idempotent فعليًّا) لكن غير معروضة في واجهة العمليّات — لا علاج متاح من نفس الشاشة، ويزيده سوءًا نصّ مربّع التأكيد نفسه الذي يقول إنّ الترحيل "لا يمكن التراجع عنه."</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Money-F5) "إضافة رصيد المحفظة" تعرض رسالة نجاح مضلِّلة قبل أن تتحرّك أيّ أموال فعليًّا</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">النظام فعليًّا maker-checker حقيقيّ بقراءة الكود (الإنشاء يُنشئ صفًّا PENDING_APPROVAL فقط، الموافقة تتطلّب موافقًا مختلفًا تحت أقفال صفّيّة) — لكنّ بحثًا شاملًا في الفرونت إند لم يجد أيّ صفحة تستدعي قائمة/موافقة/رفض طلبات الرصيد إطلاقًا. رغم ذلك تعرض <code>OpsWalletCredit.tsx</code> "تمّ إضافة الرصيد بنجاح" فور مجرّد وضع الطلب في الطابور — لا أموال تحرّكت، ولا مسار واجهة لأيّ شخص ثانٍ ليوافق عليه أبدًا.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Money-F6) سقف استرداد النقد التراكميّ يستثني المستردّات "قيد المعالجة"</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY (ثقة أقلّ)</span></div>
+<p class="lead">سقف الموافقة التراكميّ يجمع فقط <code>Refund.state=="COMPLETED"</code>؛ مستردّات البطاقة تُضبَط "قيد المعالجة" <b>بعد</b> أن يُرحَّل قيد الدفتر فعلًا — فتُستثنى من فحص السقف. طلبا استرداد منفصلان على نفس الطلب قد يجتازا الفحص كلاهما ويُرحَّلا للدفتر، فيتجاوز الإجماليّ المُرحَّل المبلغ القابل للاسترداد فعليًّا. الأموال حاليًّا خاملة (<code>production_payment_enabled=false</code>) لكنّ الدفتر مُتضخِّم بالفعل؛ لم يُتحقَّق من أنّ منفِّذ الدفع المؤجَّل يُعيد التحقّق قبل الصرف الفعليّ — ثقة أقلّ.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Money-F7) حسم نزاع "لصالح العميل" لا يُذكِّر بخطوة الاسترداد اليدويّة المنفصلة اللازمة</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">حسم النزاع لصالح العميل مقصود بالتصميم بأن لا يُحرِّك أموالًا (يُلغي التجميد فقط) — سليم كتصميم. لكن لا تذكير في الواجهة أنّ القرار يتطلّب رحلة منفصلة يدويّة لمركز الاسترداد — خطر حقيقيّ أن "يربح" العميل على الورق ولا يُدفَع له أبدًا فعليًّا. كذلك: حاجز تعليق النزاع في <code>finance/settlement_service.py</code> يغطّي فقط صفوف Settlement التي تحمل <code>order_id</code> — لا يصل لدفعة تسوية السائق اليوميّة من Money-F2 (التي لا تحمل <code>order_id</code> إطلاقًا).</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Money-F8) مفتاح Idempotency-Key يُحقَن تلقائيًّا لكن يُسقَط بصمت</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">كل من <code>OpsManualJournal.tsx</code> و<code>OpsWalletCredit.tsx</code> يحصلان على رأس Idempotency-Key محقون تلقائيًّا من وسيط axios، لكن بما أنّ أيًّا من المسارَين الخلفيَّين ليس ضمن قائمة المسارات المحمِيّة، الرأس يُسقَط بصمت — إحساس زائف بالأمان لمن يقرأ الفرونت إند فقط.</p>
+</div>
+<div class="fine-list">✅ مؤكَّد سليم: <code>reconcile_driver_cash</code> (بالطابع التحصيليّ، <code>settlement_id IS NULL</code>) مُستخدَمة بشكل صحيح في كل نقاط استدعائها الثلاث — لا ازدواج ائتمان على جانب "الصرف" · <code>refund_router.py</code> يفرض Idempotency-Key عند الإنشاء، يُقفِل الصفّ عند الموافقة، سقف لكل طلب+تراكميّ (المكتمل)، maker-checker مزدوج فوق 500 د.ل · <code>manual_journal_router.py</code> يفرض توازن DR==CR خلفيًّا، تحقّق شجرة الحسابات، قفل الفترة، رفض أكواد حسابات غير معروفة · تسوية القسم الماليّ (<code>finance/settlement_service.py</code>) تستخدم أقفالًا صفّيّة وفحوصات نزاع/تفاوت حقيقيّة قبل أيّ دفع · <code>OpsCashRiskCenter.tsx</code> يقرأ نفس حقل <code>cash_outstanding_minor</code> السليم من تدقيق دورة السائق · <code>OpsSplitPayments.tsx</code>/<code>OpsChartOfAccounts.tsx</code> للقراءة فقط فعليًّا، لا خطر إفساد.</div>
+</section>
+
+<section id="dispatch">
+<h2 class="sec-title cluster">٧. التوزيع والأسطول وحوكمة السائقين</h2>
+<div class="card blocker">
+<div class="card-head"><div class="card-title">Dispatch-F1/F3) لوحة العمليّات نفسها تُظهِر سائقًا مشغولًا كأنّه متاح — تُعرِّض عيب ازدواج التعيين للمشغِّل مباشرةً</div><span class="tag high">HIGH</span><span class="tag live">LIVE-VERIFIED</span></div>
+<p class="lead">ملاحظة مرجعيّة: آليّة ازدواج التعيين نفسها (غياب فحص "الانشغال" من مسار التوزيع اليدويّ) هي A1، العنوان الرئيسيّ المؤكَّد حيًّا لتقرير دورة السائق (468) — هذه ليست إعادة اكتشاف، بل إثبات أنّ شاشات لوحة العمليّات نفسها <b>تُعرِّض</b> هذه الفجوة للمشغِّل بصمت تامّ بدل مجرّد الفشل في منعها.</p>
+<p class="lead"><b>مؤكَّد حيًّا:</b> طلب حقيقيّ دُفِع حتى <code>DRIVER_ASSIGNED</code> على سائق الاختبار (مشغول فعليًّا، يسلِّم طلبًا حقيقيًّا). <code>GET /operations/dispatch/available-drivers</code> كـOPS → **السائق المشغول يظهر في قائمة مرشّحي التوزيع اليدويّ** جنبًا لجنب مع سائق حرّ فعليًّا، بحقل <code>cash_outstanding_minor</code> فقط، بلا أيّ مؤشّر انشغال. <code>GET /dispatch/fleet/locations</code> لنفس السائق → **نفس الصفّ يُعيد <code>"available":true</code> و<code>"order_id":"...","order_state":"DRIVER_ASSIGNED"</code> معًا في آنٍ واحد** — تناقض مباشر داخل استجابة واحدة. بما أنّ <code>OpsFleetMap.tsx</code> يُصنِّف/يُلوِّن بناءً على <code>available</code> حصرًا، فسيظهر هذا السائق أخضر "متاح" ولن يظهر أبدًا تحت فلتر "في التسليم."</p>
+</div>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Dispatch-F5) لوحة "الطلبات العالقة" تُغفِل حالة النفاد الجزئيّ نفسها — العيب الأخطر في دورتَي المزوّد/السائق غير مرئيّ هنا إطلاقًا <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>GET /operations/orders/stuck</code> يشمل فقط <code>RETURN_INITIATED/DISPUTED/PROOF_REVIEW_REQUIRED/NO_DRIVER_ESCALATION</code> — أبدًا لا <code>PARTIALLY_UNAVAILABLE_SUBSTITUTION_OFFERED</code>/<code>SUBSTITUTION_APPROVED_READY</code>، رغم أنّ كود التوزيع نفسه يُسمِّيهما صراحةً "حالات ما قبل التوزيع" قابلة للعلوق. الطلب العالق الحقيقيّ من دورة المزوّد (<code>553d608a</code>، مُبقًى عمدًا عالقًا كدليل) سيكون <b>غير مرئيّ تمامًا</b> على لوحة "الطلبات العالقة" هذه بالذات.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dispatch-F2) إعادة الإسناد اليدويّة من العمليّات تحمل نفس فجوة الانشغال</div><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>reassign_driver</code> يتحقّق من الحالة/التواجد/حدّ النقد للسائق الجديد لكن أبدًا لا من كونه مشغولًا بطلب آخر نشِط — يمتدّ أبعد من الوصف السابق ("إعادة الإسناد تُعيد التحقّق من بوّابات الأهليّة بشكل صحيح")؛ تتحقّق من البوّابات الخاطئة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dispatch-F6) لا بديل لدى العمليّات لقفل رمز التسليم بعد استنفاد المحاولات</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">بعد 3 محاولات فاشلة، <code>verify-handoff</code> يُقفَل نهائيًّا (429) — لا نقطة نهاية للعمليّات تُعيد ضبط عدّاد المحاولات أو تتحقّق يدويًّا. إعادة الإسناد تُجدِّد رمز التسليم لكن لا تُصفِّر العدّاد — سائق جديد يرث عدّادًا مستنفَدًا أصلًا، يُقفَل من أوّل محاولة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dispatch-F7) لا قفل صفّيّ عند حسم الطوارئ/SOS — وكيلا عمليّات يمكن أن يتسابقا</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY (نافذة ضيّقة)</span></div>
+<p class="lead"><code>resolve_emergency</code>/<code>resolve_sos</code> كلاهما بلا <code>with_for_update()</code>/فحص إصدار (بعكس قفل عرض التوزيع الصريح لنفس السبب). وكيلان يتسابقان على نفس الحادثة المفتوحة قد يجتاز كلاهما الفحص قبل الالتزام؛ الثاني يستبدل صامتًا سبب/ملاحظة/حاسم الأوّل.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dispatch-F8) تبويب "طلبات المشاوير" في تحكّم المشاوير لا يعرض أيّ معلومات سائق مُسنَد</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>GET /operations/errand/orders</code> يعيد حقول مستوى-الطلب فقط — لا <code>driver_id</code>/اسم. بعكس أسطح الطلب-التوصيل الأخرى، لا يستطيع مشغِّل العمليّات معرفة أيّ سائق يُنفِّذ مشوارًا نشِطًا دون مغادرة الصفحة للبحث يدويًّا.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dispatch-F9) نفس بيانات جدول عروض التوزيع بتردّد تحديث مختلف على صفحتَين</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>ControlPanelDispatchOffers</code> و<code>OpsDispatchOffer</code> يستدعيان نفس نقطة النهاية بتردّد مختلف (استقصاء 20 ثانية مقابل تحميل واحد) — ليس ازدواجًا حقيقيًّا لكن بلا رابط تبادليّ أو مؤشّر تقادم رغم شارة "قراءة فقط" التي تُوحي بأنّها المرجع القاطع.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dispatch-F10) ازدواج جزئيّ بين OpsDriverControls ولوحة تحكّم السائقين</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY (ثقة أقلّ)</span></div>
+<p class="lead">نفس نقاط نهاية حدّ النقد/التعليق/الرفع على صفحتَين منفصلتَين؛ لوحة التحكّم تملك إضافةً إعادة التفعيل/التعديل/موافقة المستندات التي تفتقدها الأولى. قلق اكتشاف/اتّساق فقط، نفس الخلفيّة الحيّة، لا خطر انحراف بيانات.</p>
+</div>
+<div class="fine-list">✅ مؤكَّد سليم: إعادة الإسناد تُبطِل العرض القديم بشكل صحيح، تُجدِّد رمز التسليم، تمسح رمز الاستلام، وتحلّ تلقائيًّا أيّ طلب إعادة-إسناد طارئ مفتوح · إعادة الإسناد تحجب بشكل صحيح إذا كان نقد COD قد جُمِع بعد الاستلام فعلًا · إعادة تفعيل التخلّي idempotent فعليًّا (يحسب الغرامة الصافية المتبقّية، إعادة التشغيل تعكس صفرًا) · <code>OpsDriverAbandonment.tsx</code> يعرض بدقّة لـOPS بالضبط حالة سلّم التخلّي (نقاط الموثوقيّة، الحظر، الغرامة) التي وجدها تقرير السائق غير مرئيّة للسائق نفسه · حظر <code>errand_allowed</code> يُنفَّذ خلفيًّا عند نقطة التوزيع الفعليّة لا في واجهة العمليّات فقط · فتح الطوارئ مقيَّد بشكل صحيح بالسائق المالك للعرض المقبول فعليًّا · تصميم SOS "الصفّ الدائم أوّلًا" يعني أنّ العمليّات ترى الحادثة دائمًا عبر القائمة المُستقصاة حتى لو فشل بثّ SSE اللحظيّ بصمت.</div>
+</section>
+
+<section id="destructive">
+<h2 class="sec-title cluster">٨. التحكّم المدمِّر ومنصّة الإيقاف</h2>
+<p class="lead" style="font-size:.85rem">كل نتائج هذا القسم CODE-AUDIT-ONLY عمدًا بتوجيه استشاريّ صريح — تفعيلها حيًّا (إيقاف طارئ/وضع صيانة/رفض جماعيّ) كان سيُعطِّل البيئة المحليّة بالكامل ويقطع بقيّة الاختبارات الحيّة الجارية، بلا أيّ إضافة يقينيّة على ما تثبته قراءة الكود المباشرة أصلًا.</p>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Destructive-F1) إجراءات التسجيل الجماعيّة تكتب الحالة دون أيّ تحقّق من الحالة الراهنة <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>_bulk_set_status</code> (المستخدَمة في الموافقة/الرفض الجماعيّ للتسجيل) تضبط <code>status=new_status</code> بلا شرط — بعكس الدوالّ الشقيقة في نفس الملفّ (إنهاء المناطق، حلّ الشكاوى) التي تتحقّق من الحالة الحاليّة أوّلًا. سيناريو واقعيّ: مشغِّل يلصق قائمة معرِّفات خاطئة (من صفحة "المزوّدين النشطين" بدل "بانتظار المراجعة" — حسب تعليمات الصفحة نفسها) ويختار "رفض" — حتى 100 مزوّد/سائق نشِط فعليًّا يتحوّلون فورًا لـREJECTED، يُسحبون من الكتالوج/التوزيع عبر المنصّة بنقرة تأكيد واحدة عامّة بلا معاينة لكل معرِّف. قابل للعكس عبر موافقة جماعيّة ثانية، لكن لا شيء يكتشف/يُحذِّر أنّ الإجراء أصاب حسابات حيّة لا معلَّقة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Destructive-F2) "الإيقاف الطارئ" و"وضع الصيانة" نفس الإجراء الخلفيّ بالضبط</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">كلا الصفحتين تستدعيان <code>POST /operations/maintenance/enable|disable</code> نفسه — لا نطاق مزوّد/منطقة واحد منفصل، لا تجربة جافّة، فقط تسمية أكثر إثارة وخانة تأكيد إضافيّة في الواجهة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Destructive-F3) لا سبب/تبرير مطلوب خلفيًّا لتفعيل الإيقاف الشامل — التأكيد واجهة فقط</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">كل حقول جسم الطلب اختياريّة بقيم افتراضيّة؛ استدعاء خامّ بجسم فارغ ينجح فورًا برسالة افتراضيّة، بلا سبب غير فارغ، بلا رمز تأكيد، بلا حدّ تكرار. خانة "أؤكّد أنّني مخوَّل" في الواجهة مفروضة من جانب العميل فقط — بعكس تبديل ميزة الحماية التي تفرض ملاحظة تدقيق غير فارغة خلفيًّا فعليًّا.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Destructive-F4) قائمة استثناء وسيط الصيانة لا تطابق توثيقها الخاصّ بخصوص إلغاء الطلب</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">التوثيق يذكر أنّ الاستثناء يشمل "إثبات التسليم، إلغاء الطلب" — القائمة الفعليّة لا تشمل مسار إلغاء الطلب إطلاقًا. أثناء نافذة صيانة (حتى 24 ساعة)، لا يستطيع العميل إلغاء طلبه ذاتيًّا — فقط طاقم العمليّات (المستثنى من البوّابة) يستطيع ذلك نيابةً عنه. يناقض القصد المُعلَن، فجوة وظيفيّة حقيقيّة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Destructive-F5) الموافقة على إيقاف الطوارئ بلا أيّ تأكيد بينما الرفض يتطلّب تبريرًا مكتوبًا</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">زرّ الموافقة يُنفَّذ مباشرةً بلا حوار/ملاحظة؛ الرفض يتطلّب نصًّا ≥5 أحرف + تأكيدًا ثانيًا. رفع تعليق أطلقه المزوّد نفسه لسبب طارئ (احتمال سلامة) — وهو الأثقل من الاثنين حجّةً — يحمل أقلّ احتكاك. نطاق مزوّد واحد لا شامل، وعمدًا لا يُعيد فتح المتجر — يحدّ الأثر.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Destructive-F6) إغلاق/تنازل/إعادة فتح بوّابات الإطلاق بلا أيّ خطوة تأكيد، لا واجهة ولا خلفيّة</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">لا حوار تأكيد إطلاقًا في الواجهة (بعكس نافذة التأكيد الحقيقيّة للإجراءات الجماعيّة). الخلفيّة تتطلّب فقط فحص الدور + حقل نصّيّ غير فارغ. إغلاق بوّابة حاجزة مقيَّد بشكل صحيح لـSUPER_ADMIN عبر فحص صريح داخل الراوتر (تحقّق دفاعيّ إضافيّ على مستوى الخدمة أيضًا) — لكن البوّابات غير الحاجزة قابلة للإغلاق من OPERATIONS_AGENT/ADMIN/SUPERVISOR بنقرة واحدة غير مؤكَّدة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Destructive-F7) تعليق في الكود يبالغ في تقدير قيد "التهيئة" على بوّابات الإطلاق</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY (توثيقيّ)</span></div>
+<p class="lead">التعليق يقول "حصريّ لـSUPER" لكنّ الفحص الفعليّ أوسع (<code>OPERATIONS_AGENT,SUPER_ADMIN</code>). ليست ثغرة أمنيّة (الواجهة أكثر تقييدًا ممّا تتطلّبه الخلفيّة) — فقط تعليق غير دقيق.</p>
+</div>
+<div class="fine-list">✅ مؤكَّد سليم: ختم FIN-COR حماية حقيقيّة على مستوى الكود (ثابت Python صريح <code>SEALED_FLAGS</code> يُفحَص في 3 مواضع مستقلّة، يسبق أيّ كتابة قاعدة بيانات، ينطبق حتى على SUPER_ADMIN) — لا مسار في هذا الراوتر يمكنه قلب علَم مختوم حتى لو كانت الواجهة تسمح بالمحاولة · حالة "غير مختوم" لـ<code>wallet_peer_transfer</code> تطابق التفويض الموثَّق من المالك 2026-06-19 · تبديل الميزة يفرض ملاحظة تدقيق غير فارغة خلفيًّا فعليًّا + سجلّ كامل · حدّ 100 معرِّف للإجراءات الجماعيّة مفروض على الطرفين · إنهاء المناطق وحلّ الشكاوى جماعيًّا يتحقّقان بشكل صحيح من عدم إعادة معالجة صفوف منتهية بالفعل (فقط الموافقة/الرفض الجماعيّان يفتقدان هذا، Destructive-F1) · حلّ الرسائل الميّتة idempotent فعليًّا، لا إعادة تشغيل موجودة أصلًا · إيقاف الطوارئ للمزوّد مقيَّد بشكل صحيح بمزوّد واحد، عمدًا لا يُعيد فتح المتجر تلقائيًّا.</div>
+</section>
+
+<section id="catalog">
+<h2 class="sec-title cluster">٩. الكتالوج وحوكمة المزوّدين</h2>
+<div class="card blocker">
+<div class="card-head"><div class="card-title">Catalog-F2) صفحة "الأصناف الموقوفة" لدى العمليّات تستدعي مسارًا خلفيًّا غير موجود إطلاقًا</div><span class="tag high">HIGH</span><span class="tag live">LIVE-VERIFIED</span></div>
+<p class="lead"><b>مؤكَّد حيًّا:</b> <code>GET /operations/catalog/items/paused</code> كـOPS → <b><code>404 Not Found</code></b>. تأكيد تامّ لتدقيق الكود: الفرونت إند يستدعي <code>DELETE .../pause</code> و<code>GET .../paused</code> لكنّ الخلفيّة تُنفِّذ فقط <code>POST .../pause</code> و<code>POST .../resume</code> (تأكَّد ببحث شامل، صفر تطابق). قائمة الأصناف الموقوفة تفشل عند كل تحميل صفحة؛ زرّ "▶️ استعادة" يفشل أيضًا (فعل/مسار خاطئ) — العمليّات لا تستطيع رؤية أو رفع أيّ إيقاف منصّة عبر هذه الشاشة إطلاقًا؛ فقط نصف "إيقاف صنف جديد" يعمل.</p>
+</div>
+<div class="card blocker">
+<div class="card-head"><div class="card-title">Catalog-F3) صفحة تكامل POS يمكن الوصول لها من التنقّل، لكن كل إجراء عليها يُرفَض 403</div><span class="tag high">HIGH</span><span class="tag live">LIVE-VERIFIED</span></div>
+<p class="lead"><b>مؤكَّد حيًّا:</b> OPERATIONS_AGENT حقيقيّ (ضمن مجموعة <code>OPS_ADMIN</code> التي تُظهِر له الصفحة في التنقّل) → <code>POST /operations/pos/{provider_id}/rotate-secret</code> → <b><code>403 FORBIDDEN</code></b> (الحارس الفعليّ SUPER_ADMIN حصرًا؛ ADMIN/SUPERVISOR لا يرثان SUPER_ADMIN حسب التسلسل الهرميّ). أيّ OPERATIONS_AGENT/ADMIN/SUPERVISOR يفتح "تكامل أنظمة POS" يُرفَض على كل زرّ.</p>
+</div>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Catalog-F1) طابور المراجعة لا رؤية له إطلاقًا لأصناف مُحيَاة من الأرشيف أو سبق رفضها <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">تحديث المزوّد لحالة الصنف إلى "منشور" يرسله لـPENDING_APPROVAL بصرف النظر عن كون الحالة السابقة DRAFT أو ARCHIVED (محذوف ناعمًا) أو REJECTED سابقًا — بلا أيّ علَم تمييز، وخانة السبب/المراجعة الوحيدة تُمسَح صراحةً عند إعادة التقديم. موافقة العمليّات على ما يبدو تقديمًا جديدًا قد تكون فعليًّا إحياء لصنف محذوف أو التقديم رقم-ن لشيء رُفض من قبل، بلا أيّ وسيلة للمعرفة.</p>
+</div>
+<p class="lead" style="font-size:.85rem">Catalog-F5 (زرّ التعليق في لوحة المزوّدين يتتبّع الحقل الخاطئ ولا يمتدّ للموظّفين) مُغطًّى بالكامل في القسم ٥ أعلاه ضمن كتلة "التعليق مكسور بثلاث طرق" — غير مُكرَّر هنا.</p>
+<div class="card">
+<div class="card-head"><div class="card-title">Catalog-F4) موافقة العمليّات على العروض التمويليّة من المزوّد كاملة خلفيًّا، بلا أيّ واجهة إطلاقًا</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">مزوّد يطلب خصمًا مموَّلًا من المنصّة أعلى من 5% (حتى سقف 40%) يذهب لحالة PENDING ولا يُطبَّق على أيّ طلب أو يُعرَض لعميل حتى توافق العمليّات — لكن لا شاشة عمليّات تُظهِر وجود هذا الطابور أصلًا، رغم أنّ نقاط النهاية الخلفيّة (قائمة/موافقة/رفض) كاملة وسليمة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Catalog-F6) لا سقف ولا موافق ثانٍ على عروض المنصّة التي ينشئها OPS مباشرةً</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">إنشاء عرض منصّة مُوافَق عليه تلقائيًّا بلا شرط، فقط حدّ نسبة عامّ 1-100%، بلا فرض تاريخ انتهاء. بالمقابل "إضافة رصيد المحفظة" تفرض maker-checker صراحةً — وكيل عمليّات واحد يستطيع منفردًا إطلاق خصم منصّة غير محدود بلا انتهاء.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Catalog-F7) "تعطيل" فئة طعام بلا أيّ فحص استخدام أو تحذير، بعكس "الحذف"</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">تعطيل الفئة لا يتحقّق من أصناف/فئات فرعيّة مرتبطة؛ الحذف وحده يفعل ذلك ويرفض بـ409 إن كانت مستخدَمة. زرّ التعطيل بلا أيّ حوار تأكيد بينما الحذف يملكه. تصفّح العميل يُصفّي على الفئات النشطة فقط — تعطيل فئة مستخدَمة فعليًّا يُسقِط كل صنف تحتها من التصفّح عبر المنصّة بصمت تامّ.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Catalog-F9) الموافقة الجماعيّة على التسجيل تتخطّى إنشاء عقد التأهيل</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">الموافقة الجماعيّة تُفعِّل الدور/الحالة تمامًا كالموافقة الفرديّة لكن لا تستدعي أبدًا إنشاء عقد التأهيل الذي تستدعيه الفرديّة. مُغطًّى حاليًّا بفشل-مفتوح موثَّق (لا عقد = يُعامَل كموقَّع) لكنّ الحسابات المُوافَق عليها جماعيًّا لا تملك صفّ عقد إطلاقًا حتى تشغيل تعبئة لاحقة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Catalog-F8) تسمية سبب ميّتة لكود لا يمكن للخلفيّة إصداره أبدًا</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">كود ميّت غير ضارّ، يُشير لانحراف غير مراجَع.</p>
+</div>
+<div class="fine-list">✅ مؤكَّد سليم: ربط الكتالوج الرئيسيّ↔كتالوج المزوّد نسخ-بالقيمة فقط وقت الإنشاء (لا مرجع دائم) — حذف/إخفاء صنف رئيسيّ لا يُتيم أصناف المزوّدين المُنشأة سلفًا · إيقاف/استئناف صنف عمليّات سليم (قفل صفّيّ، الحالة السابقة محفوظة، مُدقَّق، idempotent، مقفل على ARCHIVED، المزوّد لا يستطيع رفع قفل العمليّات حتى مع منح صريح) · حذف فئة الطعام (بعكس التعطيل) محميّ بشكل صحيح ضدّ التيتيم بـ409 · موافقة العمليّات على صنف الكتالوج تتحقّق من وجود متغيّر واحد غير مؤرشَف مُسعَّر قبل النشر (يُغلِق فجوة "متغيّر مؤرشَف فقط" السابقة) · محرِّك العروض بلا تكديس (الأفضل فقط يفوز)، يستثني PENDING/REJECTED من التطبيق التلقائيّ بشكل صحيح، يفرض الانتهاء/حدّ الاستخدام عند الاستبدال · موافقة تسجيل المزوّد الفرديّة تُنشئ عقد PENDING_SIGNATURE بشكل صحيح، وقبول الطلب مقيَّد بتوقيع العقد فعليًّا (رهنًا بتحفّظ F9 الجماعيّ) · تكامل POS مستهلِك webhook حقيقيّ عامل فعليًّا (توقيع HMAC مُتحقَّق، idempotent، مُدقَّق، يُحرِّك انتقالات حالة طلب حقيقيّة) — ليس شكليًّا.</div>
+</section>
+
+<section id="accounting">
+<h2 class="sec-title cluster">١٠. العمولات والضرائب والمحاسبة</h2>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Accounting-F1) سقف نسبة العمولة 1000% لا 100% — رقم صفريّ زائد على الأرجح، يُقارَن بضبط الضريبة المجاورة المضبوط بشكل صحيح <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">لا حدّ أعلى منطقيّ على نسبة العمولة في أيّ طبقة (الواجهة، تحقّق API، أو قيد قاعدة البيانات). <code>commission_bps: Field(ge=0, le=100000)</code> — 100000 نقطة أساس = <b>1000%</b>، وليس 100%. بالمقارنة: وحدة الضريبة الشقيقة (نفس اصطلاح نقطة الأساس بالضبط) تضبطه بشكل صحيح <code>le=10_000</code> (سقف 100% صلب) — رقم <code>le=100000</code> للعمولة يبدو نسخة خاطئة أضافت صفرًا واحدًا زيادة عن نمط وحدة الضريبة. <code>_clamp_fee</code> يحدّ الرسم المحسوب بـ<code>min(fee, order_total_minor)</code> فلا يصبح سالبًا — لكن قيمة مكتوبة خطأً ("150" بدل "15" مثلًا → 15000 نقطة أساس) تُقبَل بصمت؛ عند التسوية، صافي المزوّد يُقصّ لصفر على كل طلب ضمن ذلك الضبط (مصادرة كاملة، وإن لم تكن سالبة). لا حوار تأكيد على حفظ العمولة إطلاقًا، بعكس عكس-العمولة ودفع-الرواتب اللذين يفرضان <code>window.confirm</code> كلاهما.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Accounting-F2) ضبط الضريبة سقالة خاملة بالكامل — لا مسار تسوية آليّ يستشير المعدّلات المضبوطة إطلاقًا</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>compute_order_tax()</code> — الدالّة الوحيدة التي تقرأ صفوف الضريبة النشطة — <b>صفر مستدعٍ</b> في كامل الباك إند (تأكَّد ببحث شامل). كل مسار توليد تسوية يُثبِّت <code>tax_minor=0</code> يدويًّا. رقم "إجمالي الضرائب المُحصَّلة" سيقرأ صفرًا دائمًا بصرف النظر عمّا يضيفه/يُفعِّله OPS من معدّلات — الواجهة لا تُلمِّح أنّ هذا لا أثر له؛ مشغِّل قد يُفعِّل معدّل ضريبة معقولًا ويُصدِّق خطأً أنّه يُطبَّق الآن.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Accounting-F4) لا "لماذا" حقيقيّ لحدّ نقد سائق لدى العمليّات — محرِّك التفسير موجود لكن غير مربوط بأيّ صفحة</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>CashLimitService.explain()</code> يُعيد تحليلًا كاملًا (فئة المخاطر، نقاط الموثوقيّة، أعلام الامتثال، التفاوتات الأخيرة → الحدّ الموصى به) — لكنّه مكشوف فقط عبر نقطة معاينة تأخذ مدخلات كباراميترات لا بحث عن سائق، ولا تظهر في أيّ واجهة (فقط في أنواع OpenAPI المولَّدة). <code>OpsDriverCashLimit.tsx</code> يعرض فقط الرقم الخام + حقل سبب حرّ — تعديل الحدّ مُدقَّق بشكل صحيح، لكنّ منطق الرقم الأصليّ صندوق أسود بالنسبة للعمليّات كما هو للسائق نفسه.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Accounting-F3) تفصيلة واجهة صغيرة في ضبط الضريبة الخامل</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY (معلوماتيّ)</span></div>
+<p class="lead">اختيار المعدَّل النشِط الوحيد يأخذ الأحدث إنشاءً فقط — لو فُعِّل معدَّلان لنفس القاعدة، تظهر القائمة كلاهما "نشِط" لكن واحدًا فقط سيُستخدَم لو فُعِّل هذا المسار يومًا. لا أثر حاليًّا بسبب Accounting-F2.</p>
+</div>
+<div class="fine-list">✅ مؤكَّد سليم: قيمة عمولة سالبة مرفوضة من الجذر للنهاية · <code>_clamp_fee</code> يضمن ألّا يتجاوز الرسم إجماليّ الطلب أو يصبح سالبًا مهما كانت النسبة المضبوطة متطرِّفة · فئات عائد الكيلومتر للسائق مضبوطة بحدّ صحيح (≤100 د.ل/كم) وقابلة للتفسير الكامل عبر معاينة الدفع المربوطة فعليًّا في واجهة العمليّات · مصدر قائمة السائقين موحَّد لصفحتَي فئات العائد وحدّ النقد (عيب العقد المزدوج التاريخيّ على هذا الراوتر مُصلَح ومُوثَّق سلفًا) · تسلسل حسم العمولة (شخصيّ مزوّد→عامّ→احتياطيّ بيئة) يطابق توثيقه تمامًا · توليد التسوية idempotent ضدّ الإنشاء المزدوج · عكس العمولة يتعامل بشكل صحيح مع PENDING/APPROVED (قيد عكس حيّ) مقابل PAID (يُعلَّم للمعالجة اليدويّة) مع فحص idempotency · دفع الرواتب موظّفون داخليّون فقط، مجال منفصل تمامًا عن فئات عائد السائق — لا ازدواج مصدر حقيقة · العمولة تُحسَم عند التسليم/التسوية لا عند إنشاء الطلب — لا عيب سعر قديم متجمِّد (تغيير سعر منتصف الطريق يُطبَّق رجعيًّا بلا إشعار — تصميم لا عيب) · لوحة/تقارير المحاسبة تُعيد الحساب حيًّا من الدفتر الخام في كل مرّة، لا خطر كاش/تقادم.</div>
+</section>
+
+<section id="support">
+<h2 class="sec-title cluster">١١. الدعم والشكاوى والاحتيال والقانونيّ</h2>
+<p class="lead" style="font-size:.85rem">فئة عيب متكرِّرة عبر الدورات الأربع جميعها: "السبب المحدَّد لا يصل للمستخدم" — مؤكَّدة هنا مرّتين بشكلَين مختلفَين (Support-F2 مستندات KYC السائق، Support-F6 رفض تغيير الاسم)، إضافةً لسبب/نتيجة حسم الشكوى (Support-F1). جديرة بالذكر كنمط منهجيّ لا حوادث منفصلة.</p>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Support-F1) حسم الشكوى لا يُخطِر أبدًا العميل الذي قدّمها <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>resolve_complaint</code> يلتزم التغيير ويعود — صفر استدعاء إشعار، رغم وجود تعيين حدث "complaint.resolved" وقالب بريد كامل له في مكان آخر — سقالة ميّتة، صفر نقطة استدعاء لهذا الحدث في كامل الباك إند. نفس الفجوة في مسار حلّ الشكاوى الجماعيّ (الذي يتخطّى أيضًا آليّة الانتقال المفصَّلة، يُسقِط النتائج الدقيقة "لصالح-كذا"). عميل شكواه حُسِمت لصالحه (استرداد صدر من مكان آخر) لا يتلقّى أيّ إشارة push/بريد/داخل التطبيق — لا يعرف النتيجة إلّا بإعادة استقصاء شكواه يدويًّا بنفسه.</p>
+</div>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Support-F2) سبب رفض مستند KYC السائق يُلتقَط من العمليّات لكن يُهمَل بصمت — لا يصل للسائق أبدًا <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">كتلة حفظ السبب في <code>reject_document</code> مُقيَّدة صراحةً بـ<code>entity_type=="provider"</code> — تكتب فقط لحقول مستند المزوّد. مستند السائق يملك حقلَي سبب مماثلَين تمامًا في نموذج قاعدة بياناته، لكنّ نقطة الرفض لا تكتبهما أبدًا للسائق. واجهة السائق تنتظر هذه البيانات فعليًّا (تعليق في الكود: "أظهِر السبب الحقيقيّ للمراجِع، كان ملاحظة ثابتة") — بما أنّ الحقل لا يُملَأ أبدًا للسائقين، كل رفض مستند سائق يسقط للرسالة الاحتياطيّة العامّة، بصرف النظر عمّا كتبه OPS فعليًّا في نموذج الرفض. مسار المزوّد صحيح؛ مسار السائق تحديدًا هو المؤكَّد معطَّلًا.</p>
+</div>
+<p class="lead" style="font-size:.85rem">Support-F3 (تعليق عميل لا يُبطِل الجلسة، مؤكَّد حيًّا) مُغطًّى بالكامل في القسم ٥ أعلاه ضمن كتلة "التعليق مكسور بثلاث طرق" — غير مُكرَّر هنا.</p>
+<div class="card">
+<div class="card-head"><div class="card-title">Support-F4) أعلام الاحتيال في شاشة المراجعة المحدَّدة بلا أيّ زرّ إجراء — الإنفاذ يعيش في صفحة منفصلة غير مرتبطة</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>OpsFraudReview.tsx</code>/<code>OpsFraudRules.tsx</code> تعرضان نتائج الفحص/تدير عتبات القواعد فقط — لا زرّ إجراء على أيّ فاعل مُعلَّم من أيّ من الصفحتين. الإجراء الوحيد الفعليّ (تعليق/إعلام/تعليم جماعيّ، الذي يستدعي بشكل صحيح إبطال الجلسة) مربوط فقط في صفحة أخرى خارج هذا النطاق. الفحص نفسه "اقتراح فقط" صراحةً، مُخزَّن مؤقّتًا 24 ساعة، بلا صفّ علَم دائم. علَم عالي الخطورة من هاتين الصفحتين مرئيّ لنافذة فحص واحدة ثمّ يختفي عمليًّا ما لم يعرف OPS الذهاب لشاشة أخرى.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Support-F5) فلاتر "مغلقة"/"الكل" في مركز الدعم لا تُظهِر أبدًا الجلسات المغلقة</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">الاستدعاء لا يرسل باراميترات؛ الخلفيّة تفترض <code>state="OPEN"</code> افتراضيًّا والفرونت إند لا يتجاوزه أبدًا بـ<code>?state=CLOSED/ALL</code>. أزرار الفلترة تُصفّي فقط القائمة المُجلَبة أصلًا (المفتوحة حصرًا) — نقر "مغلق" يعرض دائمًا قائمة فارغة حتى لو وُجدت جلسات مغلقة فعليًّا؛ "الكل" يعرض بصمت المفتوحة فقط رغم التسمية.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Support-F6) إشعار رفض تغيير الاسم يُسقِط سبب OPS الحرّ، يرسل كودًا ثابتًا فقط</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">متغيّرات القالب تتضمّن فقط <code>reject_reason_code</code> أبدًا لا <code>reject_reason_text</code>. الفرونت إند يُثبِّت الكود بقيمة ثابتة واحدة لكل رفض — فالشيء الوحيد الذي يصل لخط الإشعار هو ذلك الثابت الحرفيّ، أبدًا لا النصّ المحدَّد الذي كتبه OPS في حوار الرفض. مالكو المزوّدين ما زالوا يرون السبب الحقيقيّ عبر مسار استقصاء GET منفصل يعمل بشكل صحيح — الإشعار نفسه هو العامّ لكل الأدوار.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Support-F7) طلب تغيير اسم السائق إرسال فقط — لا مسار قراءة على أيّ عميل</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY (ثقة أقلّ)</span></div>
+<p class="lead">نقطة POST موجودة خلفيًّا لكن لا معادل GET (بعكس المزوّد)، ولا مستدعٍ لهذه النقطة موجود في أيّ عميل ويب/Flutter مشحون. عرض العمليّات نفسه سليم (يشمل كلا الدورَين بشكل صحيح) — لكنّ جانب السائق من الدورة الكاملة يبدو غير قابل للوصول من أيّ عميل حاليًّا.</p>
+</div>
+<div class="fine-list">✅ مؤكَّد سليم: <code>ControlPanelComplaints.tsx</code> للقراءة فقط صراحةً، لا خطر انحراف لأنّها لا تكتب أبدًا · <code>OpsComplaints.tsx</code> يقيِّد الإسناد/التصعيد/الحسم بشكل صحيح مطابقًا للخلفيّة · idempotency الشكوى يُعيد بشكل صحيح الشكوى النشطة الموجودة عند فتح مكرَّر · القفل الصفّيّ عند الإسناد/الحسم يمنع سباقات التعديل المتزامن مع 409 صحيح عند الحالة النهائيّة · التصنيف التلقائيّ للشكاوى استشاريّ فعليًّا (لا يكتب فوق اختيار العميل أبدًا، أيّ عدم تطابق يُعرَض بوضوح لـOPS) · <code>OpsConversations.tsx</code> للقراءة فقط فعليًّا لمحادثة عميل↔سائق منفصلة تمامًا، مقيَّدة بشكل صحيح · دردشة OPS الداخليّة الحقيقيّة تملك نموذج مشارك/بثّ/إشراف سليمًا مع أثر إشراف مُدقَّق · قواعد/فحص الاحتيال موسومة بأمانة "اقتراح فقط"، لا إنفاذ آليّ أبدًا · طابور تغيير الاسم يسرد بشكل صحيح ويسمح للعمليّات بالتصرّف على طلبات PROVIDER وDRIVER معًا · إنفاذ إصدار الوثيقة القانونيّة يحجب بشكل صحيح عند عدم تطابق الإصدار، ونشر إصدار جديد يفرض فعليًّا إعادة قبول · لوحتا المستخدمين/العملاء تعرضان فقط تعليق/رفع (لا حذف/انتحال)، كلاهما مُدقَّق بفاعل/هدف/سبب، وحماية تراتبيّة صحيحة تمنع وكيلًا أدنى رتبة من تعليق موظّف بنفس رتبته أو أعلى.</div>
+</section>
+
+<section id="dashboards">
+<h2 class="sec-title cluster">١٢. اللوحات ومؤشّرات الأداء (وفئة "الفلتر الميّت")</h2>
+<p class="lead" style="font-size:.85rem">فحص خفيف سريع بتوجيه صريح (سطح مُعتقَد أقلّ خطورة) — عمق التغطية أقلّ من بقيّة الأقسام، مع إفصاح صريح عن الصفحات المُغطّاة سطحيًّا فقط في قسم ١٥.</p>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Dashboards-F1) رقم "الطلبات النشطة" في اللوحة الرئيسيّة مضخَّم وينحرف عن لوحة مؤشّرات الأداء لنفس اللحظة <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead"><code>OpsDashboard.tsx</code> يستثني فقط <code>{"DELIVERED","CANCELLED","REFUNDED"}</code> — لكن الحالات النهائيّة الفعليّة تشمل <code>CANCELLED_BY_CUSTOMER/EXPIRED/DELIVERY_FAILED/RETURNED/CLOSED_INSUFFICIENT_EVIDENCE</code>، لا شيء منها يطابق نصّيًّا مجموعة الاستثناء. الاستعلام الخلفيّ نفسه يجمع بلا أيّ فلتر — الفرونت إند هو الفلتر الوحيد، وهو مكسور. كل طلب مُلغى/منتهي/مُرجَع/مُغلَق-بنزاع مُنذ إنشاء المنصّة (غير محدود، يتراكم للأبد) يُحتسَب "حيًّا." يؤكَّد ذلك بتطبيق ثانٍ صحيح لنفس المقياس على بُعد نقرتَين (لوحة مؤشّرات الأداء تستخدم قائمة سماح صريحة صحيحة) — صفحتان في تنقّل العمليّات تعرضان رقمَين مختلفَين لنفس اللحظة، ورقم اللوحة الرئيسيّة لا يتناقص أبدًا.</p>
+</div>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">Dashboards-F2) 3 من أصل 9 خيارات فلتر حالة الطلب في لوحة التحكّم تُعيد صفر نتائج دائمًا <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY (كسر جزئيّ)</span></div>
+<p class="lead">القائمة المنسدلة الثابتة تتضمّن <code>ACCEPTED</code>, <code>PREPARING</code>, <code>CANCELLED</code> — التعداد الفعليّ يستخدم <code>ACCEPTED_BY_PROVIDER</code>, <code>IN_PREPARATION</code>, ولا يملك <code>CANCELLED</code> خامًا إطلاقًا. الخلفيّة تطابق تطابقًا حرفيًّا تامًّا — اختيار أيّ من الثلاثة يُعيد بصمت <code>{total:0}</code>، لا فرق عن "لا طلبات بهذه الحالة فعليًّا." الخيارات الستّة الأخرى سليمة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dashboards-F3) تبويبا "الأرصدة"/"الإحالات" في تحكّم الولاء يُقفَلان بصمت عند 50 صفًّا</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">الخلفيّة تدعم ترقيم الصفحات فعليًّا (<code>offset</code>/<code>limit</code>/<code>has_more</code>)، لكنّ الواجهة لا تُرسِل أوفست أبدًا ولا تقرأ <code>has_more</code> — لا زرّ "تحميل المزيد" في أيّ مكان. أيّ حساب ولاء/إحالة بعد أوّل 50 غير مرئيّ نهائيًّا بلا أيّ إشارة لوجود المزيد.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dashboards-F4) التزام الإحالة المُبلَّغ يستخدم معدَّل الإعداد الحاليّ لا القيم الفعليّة التاريخيّة</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">استشاريّ/مكتبيّ فقط، لا أموال تتحرّك (الاسترداد مختوم) — لو تغيَّر المعدَّل يومًا، يختلف رقم التقرير عن مجموع الالتزامات الفعليّة الحقيقيّة.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">Dashboards-F5) صفحة الأرشيف تدّعي دوامًا لا تملكه</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">نصّ الصفحة يقول "محفوظة دائمًا ولا تُحذف" — كلا المخزنَين فعليًّا <code>localStorage</code> متصفِّح بحدّ 500 مدخل، الأقدم يُحذَف بصمت عند التجاوز. مسح بيانات المتصفّح/تبديل الجهاز يناقضان الادّعاء أيضًا.</p>
+</div>
+<div class="fine-list">✅ مؤكَّد سليم: <code>OpsOrders.tsx</code> ترقيم صفحات صحيح تمامًا · مناطق/مضلَّعات الجغرافيا تُقرأ حيّة من القاعدة عند كل فحص توزيع، لا كاش/تأخّر · <code>OpsBonusEngine.tsx</code> ميزة حقيقيّة فعليًّا (تُرحِّل قيود دفتر حقيقيّة متوازنة، ليست سقالة) · التنبّؤ بالطلب/السقالة الذكيّة موثَّقان بوضوح كاستشاريّين/قائمين على قواعد لا تعلّم آليّ حقيقيّ، مُفصَح عنهما دائمًا · متتبِّع تدفّق الطلبات يُصنِّف بشفافيّة أيّ خطوة تُركِّبها احتياطيًّا (غير مخفيّة) · غرفة التحكّم متّسقة ومُفصَح عنها.</div>
+<div class="shallow-list">🔍 مُغطًّى سطحيًّا فقط (فحص سريع، غير مُتحقَّق بعمق): <code>OpsPlaces.tsx</code> (CRUD بسيط ظاهريًّا) · <code>OpsGeographicRegions.tsx</code> (CRUD بسيط، لكن لافت: ألوان ثابتة بوضع فاتح بدل متغيّرات النظام — نفس فئة عيب وضوح الوضع الداكن من دورات سابقة، يستحقّ فحصًا لاحقًا مخصَّصًا للواجهة) · <code>OpsZonePolygon.tsx</code> (محرِّر إحداثيّات بسيط) · <code>OpsAuditExplorer.tsx</code> (بطاقات ملخَّص للقراءة فقط) · <code>OpsAccountManagement.tsx</code> (يبدو متّسقًا، إنفاذ التسلسل الهرميّ الخلفيّ تحقَّق منه وكيل الصلاحيّات المنفصل) · <code>operations_router.py</code> نفسه (7037 سطرًا) لم يُقرَأ من الجذر للنهاية، فقط بُحِث عن نقاط نهاية محدَّدة.</div>
+</section>
+
+<section id="systemctl">
+<h2 class="sec-title cluster">١٣. التعافي من الكوارث، التدقيق، والإطلاق التدريجيّ</h2>
+<p class="lead" style="font-size:.85rem">فحص خفيف سريع بتوجيه صريح — نفس انضباط الإفصاح عن العمق الجزئيّ.</p>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">SystemCtl-F5) سقوف الإطلاق التدريجيّ/التجريبيّ مُخزَّنة لكن غير مُنفَّذة في أيّ مكان — تسميات الواجهة تُوحي بضبط حيّ لا وجود له <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">حقول "الحدّ الأقصى للطلبات/ساعة"، "الحدّ الأقصى للطلبات/يوم"، "الحدّ الأقصى للسائقين"، "المناطق المسموحة" جميعها تُخزَّن على صفوف ضبط — لكنّ بحثًا شاملًا في كامل الباك إند (الطلبات/التوزيع/التسجيل) لا يجد أيّ مستهلك آخر لهذه القيم خارج وحدتها الخاصّة. لا كود إنشاء طلب يفرض الحدّ الساعيّ؛ لا كود تسجيل/توزيع يتحقّق من المناطق المسموحة أو سقوف السائقين/المزوّدين/العملاء. دالّة البوّابة الحقيقيّة الوحيدة الموجودة فعلًا صفر مستدعٍ لها في كل الكود (ميّتة). الشيء الحقيقيّ الوحيد: تفعيل التجربة يتحقّق فعليًّا من جاهزيّة بوّابة الإطلاق قبل السماح بالتفعيل — لكن بمجرّد التفعيل، لا شيء من السقوف المضبوطة يفعل شيئًا. قارئ التقرير سيُصدِّق بشكل معقول لكن خاطئ أنّ هذه السقوف الرقميّة تُنفَّذ حيًّا.</p>
+</div>
+<div class="card blocker">
+<div class="card-title" style="margin-bottom:8px">SystemCtl-F2) لا سطح تدقيق يلتقط عدّة إجراءات حسّاسة للعمليّات إطلاقًا — فجوة تسجيل حقيقيّة لا مجرّد انقسام واجهة <span class="tag high" style="margin-inline-start:10px">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">انقسام تبويبَي التدقيق (سجلّ التدقيق مقابل أحداث النظام، جدولان مختلفان فعليًّا) مقصود وموثَّق — ليس عيبًا. الفجوة الحقيقيّة: ملفّات عناصر المتابعة، التعافي من الكوارث، ونشر إصدارات التطبيق (بما فيها قلب فرض التحديث) — صفر استدعاء لآليّة التدقيق أو أحداث النظام في أيٍّ من ملفّاتها الثلاثة (تأكَّد بحثًا). إنشاء/إغلاق عنصر متابعة، تسجيل/إكمال تدريب استعادة أو نسخة احتياطيّة، نشر إصدار تطبيق جديد — كلّها بلا أثر في أيّ من تبويبَي التدقيق. مشغِّل عمليّات يراجع مركز التدقيق بعد حادثة سيرى لا شيء لأيٍّ من هذه الإجراءات، وقد يستنتج خطأً أنّها لم تحدث.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">SystemCtl-F1) التعافي من الكوارث سجلّ ذاتيّ التبليغ بالكامل — لا إجراء نسخ/استعادة فعليّ من جانب الخادم في هذا المستودع</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY (صياغة حذرة، ليس "معطَّل")</span></div>
+<p class="lead">نقطتا تسجيل النسخة الاحتياطيّة/تدريب الاستعادة تحفظان فقط ما يدّعيه المستدعي — لا شيء في الباك إند يُشغِّل فعليًّا نسخًا احتياطيًّا حقيقيًّا أو استعادة. تعليق الكرون الخاصّ بالتذكير يقول صراحةً إنّ الاستعادة الفعليّة "لا يمكن أتمتتها بعد... الكرون فقط يُذكِّر العمليّات." (تحفّظ: نسخ pg_dump/WAL حقيقيّة قد تعمل على مستوى البنية التحتيّة خارج هذا المستودع — هذا السطح لا يستطيع التحقّق منها أو تشغيلها). الواجهة نفسها أمينة، مُعلَّمة صراحةً "قراءة فقط" في كلا الصفحتَين — الخطر في كيفيّة <b>وصف</b> التقرير لهذه القدرة، لا في ادّعاء الواجهة نفسها. لذا MED بصياغة حذرة لا HIGH.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">SystemCtl-F3) قائمة فلتر شدّة الخطأ ميّتة لكل خيار — لا خطأ خلفيّ حقيقيّ يصل هذه الصفحة أصلًا</div><span class="tag med">MED</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">الخيارات <code>CRITICAL/ERROR/WARN</code> تطابق حرفيًّا؛ الكاتب الوحيد لهذا الجدول تسجيل تيليمتري متصفِّح جانب-عميل يُثبِّت <code>severity="WARNING"</code> (لا "WARN") بصرف النظر عن نوع الخطأ الفعليّ. كل خيار فلترة بما فيها "WARN" الحرفيّة يُعيد صفر صفوف؛ لا خطأ خادم من أيّ شدّة يصل هذا الجدول إطلاقًا. مشغِّل يُصفّي لـCRITICAL أثناء حادثة يرى "لا أخطاء حرجة" — صحيح فقط لأنّ لا شيء يمكن وسمه CRITICAL هنا، لا لأنّ لا شيء حدث.</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">SystemCtl-F4) نفس نمط الفلتر الميّت على قوائم النسخ الاحتياطيّة/تدريبات الاستعادة</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY</span></div>
+<p class="lead">النسخ الاحتياطيّة تعرض PENDING/RUNNING/COMPLETED/FAILED لكن الخلفيّة تُصدِر فقط PENDING/COMPLETED. تدريبات الاستعادة تعرض PENDING/RUNNING/SUCCESS/FAILED لكن الحالة الفعليّة الناجحة تُهجَّى PASSED لا SUCCESS. ضرر وظيفيّ منخفض (قائمة قصيرة، رسالة الحالة الفارغة أمينة).</p>
+</div>
+<div class="card">
+<div class="card-head"><div class="card-title">SystemCtl-F6) تسمية "الذكاء الاصطناعيّ" قائمة بالكامل على قواعد — لا نموذج تعلّم آليّ حقيقيّ في هذا السطح</div><span class="tag low">LOW</span><span class="tag audit">CODE-AUDIT-ONLY (موثَّق ذاتيًّا، غير مضلِّل لقارئ الكود)</span></div>
+<p class="lead">مساعد العمليّات وسقالة المخاطر كلاهما موثَّقان ذاتيًّا في تعليقاتهما كقائمَين على استعلامات SQL/قواعد حتميّة، لا استدعاء API خارجيّ أو استدلال نموذج في أيّ منهما. أمين لقارئ الكود، لكنّ عنوان "مركز التحكّم الذكيّ" بالواجهة قد يُوحي زائفًا بمكوّن تعلّم آليّ حقيقيّ لقارئ تقرير لا يقرأ الكود. الجزء الحقيقيّ الوحيد الفعليّ ضمن هذه الصفحة: مفتاح تفعيل الذكاء الاصطناعيّ يُقرَأ فعليًّا من مكانَين حقيقيَّين (تجميد مشاركة الجهاز، خدمة الاحتفاظ) — ذلك الجزء يعمل كما هو مُعلَن.</p>
+</div>
+<div class="fine-list">✅ مؤكَّد سليم: منطق مقارنة إصدار التطبيق صحيح تمامًا ومقروء بالكامل، فرض التحديث محسوب بدقّة — لكن الإنفاذ طوعيّ جانب-العميل بالكامل، لا وسيط خلفيّ يرفض استدعاءات عميل دون الحدّ الأدنى · صفحة عناصر المتابعة معروضة بأمانة كـ"يدويّة تمامًا"، تطابق نصّها الخاصّ · تصميم توحيد مركز التدقيق (واجهة لا دمج بيانات) دقيق ومُوثَّق.</div>
+<div class="shallow-list">🔍 مُغطًّى سطحيًّا فقط: <code>OpsAIControls.tsx</code> (بُحِث نحو 500 من 1379 سطرًا للربط فقط، قد يحوي مسائل أخرى في الباقي غير المُغطّى مثل مسار الإجراء الجماعيّ للحسابات عالية الخطورة) · <code>OpsPilot.tsx</code> (بُحِث عن استدعاءات API/تسميات فقط) · <code>retention_router.py</code>/<code>retention_service.py</code> (فحص سريع فقط، يبدو وظيفيًّا لكن غير مُدقَّق بعمق).</div>
+</section>
+
+<section id="live-verified">
+<h2 class="sec-title cluster">١٤. ملخّص الأدلّة الحيّة (LIVE-VERIFIED)</h2>
+<p class="lead">6 نتائج من أصل 61 أُعيد إنتاجها فعليًّا — طلبات API حقيقيّة + استعلامات قاعدة بيانات مباشرة قبل/بعد، على حسابات اختبار حقيقيّة أُنشئت عبر واجهة برمجة التسجيل الفعليّة (لا محاكاة):</p>
+<table>
+<tr><th>#</th><th>العيب</th><th>دليل الإثبات الحيّ</th></tr>
+<tr><td>Auth-F1</td><td>منح/سحب صلاحيّة إضافة رصيد وهميّ بالاتّجاهين</td><td>MONITOR بمنح حقيقيّ→403 رغم المنح؛ OPERATIONS_AGENT بسحب حقيقيّ→200 رغم السحب</td></tr>
+<tr><td>Auth-F3</td><td>COMPLIANCE_AGENT لا يصل لسجلّ التدقيق</td><td>حساب حقيقيّ جديد→403 على GET /control-panel/audit-log</td></tr>
+<tr><td>Dispatch-F1/F3</td><td>سائق مشغول يظهر متاحًا في التوزيع اليدويّ</td><td>طلب حقيقيّ حتى DRIVER_ASSIGNED؛ استجابتا available-drivers وfleet/locations تُظهِرانه متاحًا</td></tr>
+<tr><td>Catalog-F2</td><td>مسار "الأصناف الموقوفة" غير موجود</td><td>GET حقيقيّ→404</td></tr>
+<tr><td>Catalog-F3</td><td>تكامل POS: 403 رغم الوصول من التنقّل</td><td>OPERATIONS_AGENT حقيقيّ→403 على rotate-secret</td></tr>
+<tr><td>Support-F3</td><td>تعليق عميل لا يُبطِل الجلسة</td><td>عميل حقيقيّ مُعلَّق فعليًّا في DB، بنفس التوكن وضع طلب 201 حقيقيّ</td></tr>
+</table>
+</section>
+
+<section id="confirmed-fine">
+<h2 class="sec-title cluster">١٥. ما تمّ تأكيد سلامته + التغطية الجزئيّة المُعلَنة</h2>
+<div class="fine-list">
+ختم FIN-COR حماية حقيقيّة على مستوى الكود لا مجرّد فحص هاش ملفّ، لا مسار يمكنه قلب علَم مختوم حتى لـSUPER_ADMIN · بنية إنفاذ الصلاحيّات الأساسيّة (التسلسل الهرميّ، الرتب، منع إنشاء رتبة مساوية/أعلى) سليمة التصميم أينما استُخدمت فعليًّا — المشكلة أنّها غير مُستخدَمة في مواضع محدَّدة (Auth-F2)، لا في تصميمها · MONITOR للقراءة فقط فعليًّا مؤكَّد ببحث شامل، لا يظهر في أيّ قائمة سماح مُغيِّرة · تسوية القسم الماليّ (finance/settlement_service.py) تستخدم أقفالًا صفّيّة وفحوص نزاع/تفاوت حقيقيّة، بعكس دفعة تسوية السائق اليوميّة (Money-F2) · دورة الكتالوج الأساسيّة والعروض الأساسيّة سليمتان حقلًا بحقل · تكامل POS ميزة حقيقيّة كاملة التنفيذ، ليست سقالة · آليّة إنشاء حسابات العمليّات (POST /admin/ops-accounts) محكومة تراتبيًّا بدقّة، لا يمكن لمنشئ تفويض صلاحيّة لا يملكها هو نفسه.
+</div>
+<div class="shallow-list">
+🔍 <b>تغطية جزئيّة مُعلَنة صراحةً (وكيلا الفحص الخفيف):</b> OpsPlaces.tsx · OpsGeographicRegions.tsx (+ ملاحظة ألوان وضع فاتح ثابتة) · OpsZonePolygon.tsx · OpsAuditExplorer.tsx · OpsAccountManagement.tsx · operations_router.py (7037 سطرًا، بُحِث لا قُرئ من الجذر للنهاية) · OpsAIControls.tsx (~900 سطر غير مُغطًّى) · OpsPilot.tsx · retention_router.py/retention_service.py — هذه الصفحات فُحصت سطحيًّا لا بعمق الأقسام الأخرى، تُذكَر هنا صراحةً بدل الادّعاء بتغطية شاملة لم تحدث.
+</div>
+</section>
+
+<section id="next">
+<h2 class="sec-title cluster">١٦. الخطوة التالية</h2>
+<p class="lead">بإتمام الدورات الأربع (العميل، المزوّد، السائق، العمليّات) بنفس المنهجيّة الدقيقة عبر كامل سطح الويب (باك إند + فرونت إند)، النطاق المقرَّر أصلًا منذ البداية هو الانتقال لتطبيق فلاتر (Flutter) وتطبيق React Native، المؤجَّلَين عمدًا حتى اكتمال كل دورات الويب. أيّ استمرار آخر (مثل تجميع/عبور نتائج الأربع تقارير في تحليل موحَّد واحد) يتطلّب طلبًا صريحًا من المالك أوّلًا.</p>
+</section>
+
+<footer>
+تقرير تدقيق داخليّ لأغراض الجودة — تووا (Toowa) — بيئة اختبار محلّيّة (tawalocal) — 2026-07-11
+</footer>
+
+</div>
+<a class="back-top" href="#exec">↑ أعلى الصفحة</a>
+</body>
+</html>

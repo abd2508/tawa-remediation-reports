@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تصميم — وحدة الصلاحيّات الهرميّة + الاتصال الداخليّ (الكنترول روم) — تووا — 2026-06-10</title>
+<style>
+  :root{--green:#166534;--green-bg:#dcfce7;--red:#991b1b;--red-bg:#fee2e2;--amber:#92400e;--amber-bg:#fef3c7;--blue:#1e40af;--blue-bg:#dbeafe;--purple:#5b21b6;--purple-bg:#ede9fe;--teal:#0f766e;--teal-bg:#ccfbf1;--border:#e5e7eb;}
+  *{box-sizing:border-box;}
+  body{font-family:"Segoe UI",Tahoma,"Noto Naskh Arabic",Arial,sans-serif;margin:0;background:#f8fafc;color:#1f2937;line-height:1.85;}
+  .container{max-width:1180px;margin:0 auto;padding:1.5rem;}
+  header{background:linear-gradient(135deg,#312e81 0%,#4338ca 55%,#6366f1 100%);color:#fff;padding:2.3rem 1.5rem;text-align:center;}
+  header h1{margin:0 0 .4rem;font-size:1.6rem;}
+  header .sub{opacity:.94;font-size:.98rem;}
+  header .meta{margin-top:.8rem;font-size:.83rem;opacity:.9;}
+  .warn-banner{background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:8px;padding:.7rem 1rem;margin:1rem 0;font-weight:600;text-align:center;}
+  h2{color:#312e81;border-right:6px solid #6366f1;padding-right:.7rem;margin-top:2.6rem;font-size:1.32rem;}
+  h3{color:#0f766e;margin-top:1.6rem;font-size:1.08rem;}
+  h4{color:#374151;margin:1.1rem 0 .4rem;font-size:.96rem;}
+  table{width:100%;border-collapse:collapse;margin:1rem 0;background:#fff;font-size:.85rem;}
+  th{background:#312e81;color:#fff;padding:.5rem .7rem;text-align:right;font-weight:600;}
+  td{padding:.5rem .7rem;border-bottom:1px solid var(--border);vertical-align:top;}
+  tr:nth-child(even) td{background:#fafafa;}
+  code,.mono{font-family:Consolas,monospace;font-size:.82em;background:#eef2f7;padding:.1em .35em;border-radius:4px;direction:ltr;unicode-bidi:embed;}
+  pre{background:#0f172a;color:#e2e8f0;padding:.9rem 1.1rem;border-radius:8px;overflow-x:auto;direction:ltr;text-align:left;font-size:.78rem;line-height:1.6;}
+  pre .cm{color:#94a3b8;} pre .k{color:#93c5fd;} pre .s{color:#86efac;}
+  .badge{display:inline-block;padding:.08rem .55rem;border-radius:999px;font-size:.74rem;font-weight:700;white-space:nowrap;}
+  .b-pass{background:var(--green-bg);color:var(--green);} .b-fail{background:var(--red-bg);color:var(--red);}
+  .b-warn{background:var(--amber-bg);color:var(--amber);} .b-info{background:var(--blue-bg);color:var(--blue);} .b-dec{background:var(--purple-bg);color:var(--purple);} .b-new{background:var(--teal-bg);color:var(--teal);}
+  .card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1rem 1.3rem;margin:1rem 0;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+  .card.green{border-right:5px solid #16a34a;} .card.red{border-right:5px solid #dc2626;} .card.amber{border-right:5px solid #d97706;} .card.blue{border-right:5px solid #2563eb;} .card.purple{border-right:5px solid #7c3aed;} .card.teal{border-right:5px solid #0f766e;}
+  .toc{background:#fff;border:1px solid var(--border);border-radius:10px;padding:1rem 1.6rem;}
+  .toc a{color:#4338ca;text-decoration:none;} .toc a:hover{text-decoration:underline;}
+  ul.tight li{margin:.3rem 0;} ol.steps li{margin:.5rem 0;}
+  .note{font-size:.83rem;color:#6b7280;}
+  .hier{display:flex;flex-direction:column;gap:.35rem;margin:1rem 0;}
+  .hier .lvl{background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:.5rem .9rem;font-size:.85rem;}
+  .hier .l0{margin-inline-start:0;background:#312e81;color:#fff;font-weight:700;}
+  .hier .l1{margin-inline-start:1.5rem;background:#4338ca;color:#fff;}
+  .hier .l2{margin-inline-start:3rem;background:#6366f1;color:#fff;}
+  .hier .l3{margin-inline-start:4.5rem;}
+  .hier .l4{margin-inline-start:6rem;background:#f1f5f9;}
+  footer{text-align:center;color:#6b7280;font-size:.8rem;padding:2rem 0 3rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧩 تقرير تصميم وحدة جديدة — الصلاحيّات الهرميّة + الاتصال الداخليّ للكنترول روم</h1>
+  <div class="sub">كيف ستُبنى هذه الوحدة بالضبط: البيانات، الترحيلات، نقاط النهاية، محرّك الصلاحيّات، الواجهات، الأمان، تسلسل البناء — مبنيّ على فحص الكود القائم</div>
+  <div class="meta">منصّة تووا · 2026-06-10 · وثيقة تصميم/تخطيط فقط</div>
+</header>
+
+<div class="container">
+
+<div class="warn-banner">⛔ هذه وثيقة تصميم فقط — لم يُبنَ أيّ شيء. لا تنفيذ قبل مراجعتك وإذنك الصريح. الأرقام والمسارات أدناه مبنيّة على فحص الكود الفعليّ.</div>
+
+<div class="toc">
+  <strong>المحتويات</strong>
+  <ol>
+    <li><a href="#req">ما طلبتَه (مُفكَّك إلى متطلّبات)</a></li>
+    <li><a href="#exist">ما يوجد فعلاً في الكود اليوم (الأساس)</a></li>
+    <li><a href="#gap">الفجوة بين المطلوب والقائم</a></li>
+    <li><a href="#decision">القرار المعماريّ الجوهريّ (نموذج الصلاحيّات)</a></li>
+    <li><a href="#partA">الجزء أ — نظام الأدوار والصلاحيّات الهرميّ</a></li>
+    <li><a href="#partB">الجزء ب — الاتصال الداخليّ (شات الكنترول روم)</a></li>
+    <li><a href="#security">الأمان والخصوصيّة والحوكمة</a></li>
+    <li><a href="#sequence">تسلسل البناء المقترح (مراحل)</a></li>
+    <li><a href="#risks">مخاطر تصميميّة تحتاج محاكاة قبل التنفيذ</a></li>
+    <li><a href="#decisions">القرارات المطلوبة منك قبل أن أبدأ</a></li>
+  </ol>
+</div>
+
+<!-- REQ -->
+<h2 id="req">1) ما طلبتَه — مُفكَّكًا إلى متطلّبات</h2>
+<table>
+  <tr><th>#</th><th>المتطلّب (بكلماتك)</th><th>التفسير التقنيّ</th></tr>
+  <tr><td>R1</td><td>السوبر-أدمن ينشئ حساب أدمن أو سوبرفايزر «جاهزًا بصلاحيّاته»</td><td>أدوار مُعرَّفة مسبقًا بحُزَم صلاحيّات افتراضيّة تُطبَّق فور الإنشاء</td></tr>
+  <tr><td>R2</td><td>السوبرفايزر له صلاحيّات، والأدمن أعلى منه</td><td>تدرّج هرميّ: SUPER_ADMIN &gt; ADMIN &gt; SUPERVISOR &gt; موظّف متخصّص &gt; مراقبة</td></tr>
+  <tr><td>R3</td><td>موظّفون متخصّصون (مالية، مراقبة، …) كلٌّ حسب تخصّصه</td><td>أدوار وظيفيّة (موجود بعضها: FINANCE_AGENT, COMPLIANCE_AGENT) + توسعة</td></tr>
+  <tr><td>R4</td><td>حساب «مخصّص»: السوبر-أدمن يعطيه اسمًا وصلاحيّات يراها هو</td><td><strong>صلاحيّات لكل-حساب (per-account grants)</strong> + اسم عرض مخصّص — غير موجود اليوم</td></tr>
+  <tr><td>R5</td><td>حساب «مراقبة فقط»: لا يغيّر شيئًا، صلاحيّات بسيطة جدًّا، للاتصال الداخليّ</td><td>دور MONITOR للقراءة فقط + وصول لشات الكنترول روم فقط</td></tr>
+  <tr><td>R6</td><td>صفحة/لوحة اتصال داخليّ بين الموظفين (شات)</td><td>وحدة مراسلة داخليّة جديدة + صفحة <code>/ops/control-room</code></td></tr>
+  <tr><td>R7</td><td>الإرسال لكل الموظفين أو لموظفين معيّنين حسب اختيار المرسِل</td><td>قنوات: بثّ عامّ · مجموعة مختارة · فرديّ</td></tr>
+  <tr><td>R8</td><td>السوبرفايزر والأدمن والسوبر-أدمن تصلهم نسخة من كلّ المحادثات حتى الفرديّة</td><td><strong>إشراف الكنترول روم:</strong> رؤية فوقيّة لكلّ الرسائل (شفافيّة موثَّقة)</td></tr>
+</table>
+
+<!-- EXIST -->
+<h2 id="exist">2) ما يوجد فعلاً في الكود اليوم (الأساس الذي سأبني عليه)</h2>
+<table>
+  <tr><th>المكوّن</th><th>الملفّ</th><th>الحالة</th></tr>
+  <tr><td>تعداد الأدوار <code>PlatformRole</code></td><td><code>backend/app/core/roles.py</code></td><td>9 أدوار: CUSTOMER/DRIVER/PROVIDER_ADMIN/PROVIDER_STAFF/<strong>OPERATIONS_AGENT/FINANCE_AGENT/COMPLIANCE_AGENT</strong>/SYSTEM_SERVICE/<strong>SUPER_ADMIN</strong></td></tr>
+  <tr><td>خريطة الصلاحيّات <code>ROLE_PERMISSIONS</code></td><td><code>core/roles.py:23</code></td><td>صلاحيّات نصّيّة (مثل <code>order:read_all</code>) <strong>مثبتة لكل دور</strong> — لا تخصيص لكل حساب · <code>has_permission()</code> + <code>require_permission()</code> في <code>dependencies.py:152</code></td></tr>
+  <tr><td>إنشاء حساب OPS</td><td><code>operations_router.py:2589</code> <code>POST /admin/ops-accounts</code></td><td>SUPER_ADMIN فقط · الأدوار القابلة للإنشاء = {OPERATIONS_AGENT, FINANCE_AGENT, COMPLIANCE_AGENT} · ينشئ User+Role(ACTIVE) · <strong>اسم/صلاحيّات مخصّصة غير مدعومة</strong></td></tr>
+  <tr><td>جدول الأدوار <code>roles</code></td><td><code>models/user.py:76</code></td><td>صفّ (user_id, role, status) — دور واحد فعّال يُختار عند الدخول (أوّل ACTIVE بالأقدميّة، <code>auth_router.py:456</code>)</td></tr>
+  <tr><td>حوكمة وصول الواجهة</td><td><code>web/src/auth/opsAccess.ts</code></td><td>مجموعات أدوار (ALL_OPS/OPS_FIN/OPS_ADMIN/SUPER) + خريطة مسار→أدوار · يطابق الخلفيّة</td></tr>
+  <tr><td>صفحة إدارة حسابات OPS</td><td><code>pages/operations/OpsAccountManagement.tsx</code></td><td>موجودة — ستُوسَّع</td></tr>
+  <tr><td>نمط الشات (للاقتباس)</td><td><code>models/order_message.py</code> · <code>models/operations.py:207</code> (SupportChat)</td><td>قالب ناضج: <code>sender_id/sender_role/body/created_at/read_at</code> + فهرس · <strong>قابل لإعادة الاستخدام مباشرة</strong></td></tr>
+  <tr><td>الفوريّة (SSE)</td><td><code>modules/sse/publish.py</code> + بثّ Redis</td><td>بنية بثّ ناضجة (طلب/مزوّد/أسطول) — قناة شات جديدة تُضاف بنفس النمط</td></tr>
+  <tr><td>سجلّ التدقيق + الأحداث</td><td><code>control_panel_router</code> audit-log/system-events</td><td>موجود — تغييرات الصلاحيّات والإشراف ستُسجَّل فيه</td></tr>
+</table>
+<div class="card teal">
+  <strong>خلاصة الأساس:</strong> المنصّة تملك بنية أدوار وصلاحيّات نصّيّة <u>لكنها ثابتة لكل دور</u>، وإنشاء حسابات OPS محدودًا بثلاثة أدوار بلا تخصيص، ونمط شات + بثّ SSE جاهزًا للاقتباس. فالوحدة الجديدة = <strong>توسعة محرّك الصلاحيّات ليصبح هرميًّا + قابلًا للتخصيص لكل حساب</strong> + <strong>وحدة مراسلة داخليّة جديدة مبنيّة على النمط القائم</strong>.
+</div>
+
+<!-- GAP -->
+<h2 id="gap">3) الفجوة بين المطلوب والقائم</h2>
+<table>
+  <tr><th>المطلوب</th><th>قائم؟</th><th>ما ينقص</th></tr>
+  <tr><td>أدوار ADMIN / SUPERVISOR / MONITOR متدرّجة</td><td><span class="badge b-warn">جزئيّ</span></td><td>3 أدوار وظيفيّة موجودة؛ تنقص طبقات ADMIN/SUPERVISOR/MONITOR والتدرّج الهرميّ بينها</td></tr>
+  <tr><td>صلاحيّات مخصّصة لكل حساب + اسم عرض</td><td><span class="badge b-fail">لا</span></td><td>جدول منح صلاحيّات لكل-حساب + حقل اسم عرض + محرّك «الصلاحيّات الفعّالة»</td></tr>
+  <tr><td>«من ينشئ ماذا» محكوم بالهرميّة</td><td><span class="badge b-fail">لا</span></td><td>اليوم SUPER_ADMIN فقط ينشئ؛ المطلوب: الأدمن ينشئ ما دونه، لا فوقه</td></tr>
+  <tr><td>اتصال داخليّ (شات موظفين)</td><td><span class="badge b-fail">لا</span></td><td>وحدة كاملة جديدة (نموذج + نقاط نهاية + صفحة + فوريّة)</td></tr>
+  <tr><td>إشراف الكنترول روم (نسخة لكل المحادثات)</td><td><span class="badge b-fail">لا</span></td><td>منطق رؤية فوقيّة + خصوصيّة موثَّقة</td></tr>
+</table>
+
+<!-- DECISION -->
+<h2 id="decision">4) القرار المعماريّ الجوهريّ — نموذج الصلاحيّات</h2>
+<div class="card purple">
+  <strong>المبدأ المقترح: «دور أساس + منح/سحب لكل-حساب» (Role baseline + per-account overrides).</strong><br>
+  الصلاحيّة الفعّالة لأيّ حساب = <code>صلاحيّات دوره الافتراضيّة</code> ⊕ <code>منحٌ إضافيّة لهذا الحساب</code> ⊖ <code>سحبٌ لهذا الحساب</code>. هذا يحقّق R1 (الدور جاهز بصلاحيّاته) <u>و</u> R4 (التخصيص الدقيق) معًا، ويبقى متوافقًا مع <code>has_permission()</code> القائم بأقلّ تغيير.
+</div>
+<p><strong>لماذا لا «أدوار جامدة فقط»؟</strong> لأنها لا تحقّق R4 (حساب مخصّص بصلاحيّات يختارها السوبر-أدمن). <strong>ولماذا لا «صلاحيّات حرّة بلا أدوار»؟</strong> لأنها تُفقِد R1/R2 (الجاهزيّة والتدرّج) وتُثقِل الإدارة. الحلّ الهجين هو الأنسب.</p>
+
+<!-- PART A -->
+<h2 id="partA">5) الجزء أ — نظام الأدوار والصلاحيّات الهرميّ</h2>
+
+<h3>5.1 — الهرميّة المقترحة</h3>
+<div class="hier">
+  <div class="lvl l0">SUPER_ADMIN — كل الصلاحيّات · ينشئ ويعدّل الكلّ · الوحيد الذي يمنح صلاحيّات «خطرة» (مالية/أعلام/إغلاق بوابات)</div>
+  <div class="lvl l1">ADMIN (جديد) — صلاحيّات تشغيليّة واسعة · ينشئ SUPERVISOR وما دونه · لا يلمس القلب الماليّ المختوم ولا ينشئ ADMIN/SUPER</div>
+  <div class="lvl l2">SUPERVISOR (جديد) — إشراف ميدانيّ · ينشئ موظفين متخصّصين/مراقبة · صلاحيّات أدنى من ADMIN</div>
+  <div class="lvl l3">موظّفون متخصّصون — FINANCE_AGENT (مالية) · COMPLIANCE_AGENT (مراقبة/امتثال) · OPERATIONS_AGENT (عمليّات) · (+أدوار وظيفيّة تُضاف عند الحاجة: دعم، توزيع…)</div>
+  <div class="lvl l4">MONITOR (جديد) — قراءة فقط، أبسط الصلاحيّات · لا يُغيّر شيئًا · وصوله الأساس = شات الكنترول روم</div>
+</div>
+<p class="note">«الحساب المخصّص» ليس طبقة بل <u>أيّ حساب</u> (غالبًا بدور أساس محايد) يمنحه السوبر-أدمن اسمًا وصلاحيّات منتقاة عبر الـoverrides.</p>
+
+<h3>5.2 — نموذج البيانات (migrations جديدة — مُتحقَّقة على PostgreSQL قبل الدمج)</h3>
+<table>
+  <tr><th>الجدول/الحقل</th><th>الغرض</th></tr>
+  <tr><td><code>permissions_catalog</code> (مرجعيّ، مبذور)</td><td>قائمة الصلاحيّات المعرّفة (key, name_ar, name_en, category, is_dangerous) — مصدر الحقيقة لواجهة الاختيار والتحقّق</td></tr>
+  <tr><td><code>roles.display_name</code> (عمود جديد على <code>roles</code>)</td><td>اسم العرض المخصّص للحساب (R4) — اختياريّ</td></tr>
+  <tr><td><code>account_permission_grants</code> (جديد)</td><td>(user_id, permission_key, effect=GRANT/REVOKE, granted_by, reason, created_at) — منح/سحب لكل-حساب</td></tr>
+  <tr><td>(لا migration للأدوار الجديدة)</td><td>ADMIN/SUPERVISOR/MONITOR تُضاف لتعداد <code>PlatformRole</code> + <code>ROLE_PERMISSIONS</code> (كود، لا قاعدة)</td></tr>
+</table>
+
+<h3>5.3 — محرّك الصلاحيّات الفعّالة</h3>
+<pre>
+<span class="cm"># core/roles.py (توسعة) — مع دالّة قاعدة-واعية</span>
+<span class="k">def</span> effective_permissions(role, account_grants) -> set[str]:
+    base = <span class="s">ROLE_PERMISSIONS</span>[role]              <span class="cm"># R1: جاهز بصلاحيّات الدور</span>
+    grants = {g.key <span class="k">for</span> g <span class="k">in</span> account_grants <span class="k">if</span> g.effect==<span class="s">"GRANT"</span>}
+    revokes= {g.key <span class="k">for</span> g <span class="k">in</span> account_grants <span class="k">if</span> g.effect==<span class="s">"REVOKE"</span>}
+    <span class="k">return</span> (base | grants) - revokes      <span class="cm"># R4: تخصيص دقيق</span>
+</pre>
+<ul class="tight">
+  <li><code>require_permission(perm)</code> القائم يُعدَّل ليقرأ الصلاحيّات الفعّالة (دور + منح الحساب) بدل خريطة الدور وحدها — تغيير مركزيّ واحد، كلّ الحرّاس القائمين يستفيدون تلقائيًّا.</li>
+  <li>أداء: منح الحساب تُحمَّل مرّة (cache قصير TTL بالـRedis القائم) لتفادي استعلام لكل طلب.</li>
+  <li><strong>حارس الخطورة:</strong> الصلاحيّات الموسومة <code>is_dangerous</code> (مالية/أعلام/إغلاق بوابات) لا يمنحها إلّا SUPER_ADMIN — ولا تُمنح أبدًا لـMONITOR.</li>
+</ul>
+
+<h3>5.4 — نقاط النهاية (توسعة على المسار القائم)</h3>
+<table>
+  <tr><th>المسار</th><th>من</th><th>الوظيفة</th></tr>
+  <tr><td><code>GET /admin/permissions-catalog</code> (جديد)</td><td>ADMIN+</td><td>قائمة الصلاحيّات القابلة للمنح (مفلترة حسب رتبة المنشئ)</td></tr>
+  <tr><td><code>POST /admin/ops-accounts</code> (توسعة)</td><td>هرميّ</td><td>+ <code>display_name</code> + <code>grants[]</code> + التحقّق الهرميّ (لا تنشئ فوق رتبتك، لا تمنح ما لا تملكه)</td></tr>
+  <tr><td><code>PATCH /admin/ops-accounts/{id}</code> (جديد)</td><td>هرميّ</td><td>تعديل الاسم/الدور/المنح (بنفس حرّاس الهرميّة)</td></tr>
+  <tr><td><code>GET /admin/ops-accounts/{id}/effective</code> (جديد)</td><td>ADMIN+</td><td>عرض الصلاحيّات الفعّالة لحساب (شفافيّة)</td></tr>
+</table>
+<p><strong>حرّاس الهرميّة (جوهريّة):</strong> منشئ برتبة R لا يستطيع: (1) إنشاء/تعديل حساب برتبة ≥ R، (2) منح صلاحيّة لا يملكها هو، (3) منح صلاحيّة خطرة (SUPER فقط). كلّ تغيير يُكتب في سجلّ التدقيق (من، لمن، ماذا، السبب).</p>
+
+<h3>5.5 — الواجهة</h3>
+<ul class="tight">
+  <li><strong>توسعة</strong> <code>OpsAccountManagement.tsx</code>: منشئ حساب متعدّد الخطوات (اسم العرض → الدور الأساس → منتقي صلاحيّات مجمَّع حسب الفئة مع تمييز الخطرة → مراجعة).</li>
+  <li><strong>محرّر حساب</strong>: عرض الصلاحيّات الفعّالة + منح/سحب.</li>
+  <li><code>opsAccess.ts</code>: إضافة ADMIN/SUPERVISOR/MONITOR للمجموعات وخرائط المسارات؛ MONITOR يُقصَر على <code>/ops/control-room</code> (وربّما لوحات قراءة محدّدة).</li>
+  <li>i18n ثلاثيّ اللغة لكل النصوص الجديدة (حسب سياسة المرحلة 4: OPS عربيّ-أوّلًا، لكن المفاتيح البنيويّة تُضاف).</li>
+</ul>
+
+<!-- PART B -->
+<h2 id="partB">6) الجزء ب — الاتصال الداخليّ (شات الكنترول روم)</h2>
+
+<h3>6.1 — نموذج البيانات (مبنيّ على نمط OrderMessage/SupportChat)</h3>
+<table>
+  <tr><th>الجدول</th><th>الحقول الرئيسيّة</th></tr>
+  <tr><td><code>internal_threads</code> (جديد)</td><td>id · kind (BROADCAST / GROUP / DIRECT) · title · created_by · created_at</td></tr>
+  <tr><td><code>internal_thread_participants</code> (جديد)</td><td>thread_id · user_id · role_at_join · last_read_at — يحدّد «لمن يظهر»</td></tr>
+  <tr><td><code>internal_messages</code> (جديد)</td><td>id · thread_id · sender_id · sender_role · sender_display_name · body · created_at · (مرفق لاحقًا)</td></tr>
+</table>
+<p><strong>أنواع المحادثة (R7):</strong> <code>BROADCAST</code> = يظهر لكل الموظفين · <code>GROUP</code> = للمشاركين المختارين فقط · <code>DIRECT</code> = شخصان. المرسِل يختار النوع والمستلمين عند الإنشاء.</p>
+
+<h3>6.2 — إشراف الكنترول روم (R8) — التصميم الحسّاس</h3>
+<div class="card amber">
+  المطلوب: <strong>الأدمن/المشرف/السوبر-أدمن تصلهم نسخة من كلّ المحادثات حتى الفرديّة.</strong> التصميم المقترح — <u>«رؤية إشرافيّة» لا «مشاركة خفيّة»</u>:
+  <ul class="tight">
+    <li>المشرفون لا يُحقنون كمشاركين خفيّين في كل خيط (يُربك المحادثة)؛ بل يملكون صلاحيّة <code>internal_chat:oversee</code> تتيح <strong>قراءة كلّ الخيوط</strong> عبر لوحة إشراف (<code>GET /internal/threads?oversight=true</code>).</li>
+    <li><strong>الشفافيّة الأخلاقيّة:</strong> يُعرض للموظفين بوضوح أن «محادثات الكنترول روم خاضعة لإشراف الإدارة» (شعار دائم) — لتجنّب توقّع خصوصيّة زائف. هذا قرار سياسة يحتاج تأكيدك.</li>
+    <li>كلّ وصول إشرافيّ يُسجَّل في سجلّ التدقيق (من اطّلع على أيّ خيط ومتى).</li>
+  </ul>
+</div>
+
+<h3>6.3 — حساب المراقبة (R5) داخل الشات</h3>
+<ul class="tight">
+  <li>MONITOR: قراءة فقط في كل أنحاء المنصّة (لا أزرار كتابة/تعديل في أيّ لوحة)، <strong>لكن</strong> له صلاحيّة <code>internal_chat:participate</code> — يكتب ويستقبل في الكنترول روم فقط (هذا غرضه الأساس كما ذكرت).</li>
+</ul>
+
+<h3>6.4 — الواجهة والفوريّة</h3>
+<ul class="tight">
+  <li>صفحة جديدة <code>/ops/control-room</code>: قائمة الخيوط (بثّ/مجموعات/مباشر) + لوحة رسائل + منشئ خيط (اختيار النوع والمستلمين) + (للمشرفين) تبويب «إشراف: كل المحادثات».</li>
+  <li>الفوريّة: قناة SSE جديدة <code>GET /sse/internal/threads/{id}</code> + بثّ Redis بنمط القنوات القائمة (إعادة استخدام <code>sse/publish.py</code>) + استطلاع احتياطيّ.</li>
+  <li>إيصالات القراءة (<code>last_read_at</code>) + شارات غير المقروء.</li>
+</ul>
+
+<!-- SECURITY -->
+<h2 id="security">7) الأمان والخصوصيّة والحوكمة</h2>
+<table>
+  <tr><th>المحور</th><th>الضمان</th></tr>
+  <tr><td>القلب الماليّ (FIN-COR)</td><td><span class="badge b-pass">غير متأثّر</span> — لا مساس بـledger/wallet/settlement؛ الصلاحيّات الماليّة الخطرة تبقى SUPER-only</td></tr>
+  <tr><td>منع تصعيد الامتيازات</td><td>حرّاس الهرميّة الثلاثة (§5.4) + لا يمنح أحد ما لا يملك + الخطرة SUPER-only</td></tr>
+  <tr><td>التدقيق الكامل</td><td>كل إنشاء/تعديل صلاحيّة + كل وصول إشرافيّ للشات → <code>audit_log</code></td></tr>
+  <tr><td>ABAC على الشات</td><td>الكتابة/القراءة محصورة بالمشاركين (إلّا الإشراف الموثَّق)؛ MONITOR لا يصل خارج الكنترول روم</td></tr>
+  <tr><td>الخصوصيّة</td><td>شعار «خاضع للإشراف» دائم + سياسة مكتوبة (قرار سياسة #D4)</td></tr>
+  <tr><td>الأعلام المختومة</td><td>غير متأثّرة — لا تغيير على <code>feature_flags.yaml</code></td></tr>
+</table>
+
+<!-- SEQUENCE -->
+<h2 id="sequence">8) تسلسل البناء المقترح (مراحل صغيرة قابلة للتحقّق)</h2>
+<table>
+  <tr><th>المرحلة</th><th>المحتوى</th><th>migration؟</th></tr>
+  <tr><td>B-1 محرّك الصلاحيّات</td><td>تعداد ADMIN/SUPERVISOR/MONITOR + ROLE_PERMISSIONS + permissions_catalog + account_permission_grants + effective_permissions + توصيل require_permission</td><td>نعم (catalog+grants+display_name)</td></tr>
+  <tr><td>B-2 إنشاء/تعديل الحسابات الهرميّ</td><td>توسعة POST + PATCH + الحرّاس الهرميّة + التدقيق</td><td>لا</td></tr>
+  <tr><td>B-3 واجهة الحسابات</td><td>منشئ/محرّر الحساب + منتقي الصلاحيّات + opsAccess</td><td>لا</td></tr>
+  <tr><td>B-4 وحدة الشات (نموذج+API)</td><td>الجداول الثلاثة + إنشاء خيط/رسالة + قراءة + ABAC</td><td>نعم (3 جداول)</td></tr>
+  <tr><td>B-5 إشراف + فوريّة</td><td>رؤية الإشراف + قناة SSE + إيصالات القراءة + التدقيق</td><td>لا</td></tr>
+  <tr><td>B-6 واجهة الكنترول روم</td><td>صفحة /ops/control-room + تبويب الإشراف + i18n</td><td>لا</td></tr>
+</table>
+<p class="note">كل مرحلة: اختبارات خلفيّة + tsc/vitest + FIN-COR PASS + (للترحيلات) تحقّق upgrade/downgrade على PostgreSQL حقيقيّ، قبل الانتقال للتالية. بلا commit/نشر إلّا بإذنك.</p>
+
+<!-- RISKS -->
+<h2 id="risks">9) مخاطر تصميميّة تحتاج محاكاة ذهنيّة قبل التنفيذ</h2>
+<table>
+  <tr><th>#</th><th>الخطر</th><th>التخفيف المبدئيّ</th></tr>
+  <tr><td>RK-1</td><td>تغيير <code>require_permission</code> مركزيًّا قد يكسر حرّاسًا قائمين تعتمد على خريطة الدور الثابتة</td><td>الإبقاء على التوافق الخلفيّ: الدور الأساس يظلّ يعطي صلاحيّاته؛ الـoverrides إضافة فقط؛ اختبارات انحدار على كل الحرّاس القائمة</td></tr>
+  <tr><td>RK-2</td><td>الدور الواحد عند الدخول (أوّل ACTIVE) قد لا يكفي لحساب متعدّد القبّعات</td><td>نموذج «دور أساس + منح» يغني عن تعدّد الأدوار؛ يُبقى منطق الدخول كما هو</td></tr>
+  <tr><td>RK-3</td><td>تصعيد امتياز عبر منح حساب صلاحيّة ثم ترقيته</td><td>إعادة تقييم الحرّاس عند كلّ تعديل + الخطرة SUPER-only + تدقيق</td></tr>
+  <tr><td>RK-4</td><td>إشراف الشات قد يُفهَم كخصوصيّة فيُساء استخدامه</td><td>شعار شفافيّة دائم + سياسة مكتوبة + تدقيق الوصول الإشرافيّ (قرار #D4)</td></tr>
+  <tr><td>RK-5</td><td>البثّ العامّ لكل الموظفين قد يُغرق الجدد/الكثيرين</td><td>BROADCAST صلاحيّة محصورة (ADMIN+) لا للجميع؛ MONITOR لا يبثّ عامًّا</td></tr>
+  <tr><td>RK-6</td><td>أداء الصلاحيّات الفعّالة لكل طلب</td><td>cache Redis قصير + تحميل المنح مرّة لكل طلب</td></tr>
+</table>
+<p class="note">عند إذنك بالبناء، سأُجري محاكاة ذهنيّة كاملة (كما في المراحل السابقة) تستخرج عيوب التنفيذ قبل وقوعها، وأقدّم خطّة منقّحة قبل كتابة أيّ كود.</p>
+
+<!-- DECISIONS -->
+<h2 id="decisions">10) القرارات المطلوبة منك قبل أن أبدأ</h2>
+<div class="card blue">
+  <ol class="steps">
+    <li><strong>D1 — النموذج:</strong> أوافق على «دور أساس + منح/سحب لكل-حساب» (§4)؟ أم تفضّل أدوارًا جامدة فقط (أبسط لكن بلا تخصيص R4)؟</li>
+    <li><strong>D2 — الأدوار الجديدة:</strong> ADMIN + SUPERVISOR + MONITOR — بهذه الأسماء؟ وهل تريد أدوارًا وظيفيّة إضافيّة الآن (دعم، توزيع، تسويق…)؟</li>
+    <li><strong>D3 — من ينشئ مَن:</strong> هل ADMIN ينشئ SUPERVISOR وما دون فقط (لا ADMIN آخر)؟ وهل SUPERVISOR ينشئ موظفين/مراقبة فقط؟</li>
+    <li><strong>D4 — سياسة إشراف الشات:</strong> أوافق على «رؤية إشرافيّة شفّافة» مع شعار «خاضع للإشراف» دائم (بدل المشاركة الخفيّة)؟ ومن يُشرف بالضبط: ADMIN+SUPERVISOR+SUPER فقط؟</li>
+    <li><strong>D5 — حدود البثّ:</strong> من يحقّ له «بثّ لكل الموظفين»؟ (مقترح: ADMIN+ فقط، لتفادي الإغراق).</li>
+    <li><strong>D6 — النطاق الأوّل:</strong> أبدأ بالجزء أ (الصلاحيّات) أوّلًا، أم ب (الشات) أوّلًا، أم الاثنان بالتسلسل؟</li>
+  </ol>
+</div>
+
+<div class="card green">
+  <strong>الخلاصة:</strong> الوحدة قابلة للبناء بنظافة فوق الأساس القائم: محرّك صلاحيّات هرميّ قابل للتخصيص (يحقّق R1–R5) + وحدة مراسلة داخليّة بإشراف شفّاف (يحقّق R6–R8)، عبر 6 مراحل صغيرة، migrations مُتحقَّقة على PostgreSQL، بلا مساس بالقلب الماليّ. <strong>لن أكتب سطر كود واحد قبل قراراتك الستّة أعلاه وإذنك الصريح بالبناء.</strong>
+</div>
+
+</div>
+
+<footer>
+  تقرير تصميم — وحدة الصلاحيّات الهرميّة + الاتصال الداخليّ · منصّة تووا · 2026-06-10 · وثيقة تخطيط فقط، لا بناء · مبنيّة على فحص الكود الفعليّ
+</footer>
+
+</body>
+</html>

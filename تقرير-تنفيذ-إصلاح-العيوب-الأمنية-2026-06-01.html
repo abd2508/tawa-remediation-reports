@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>تقرير تنفيذ إصلاح العيوب الأمنية — F-1..F-6 — 2026-06-01</title>
+<style>
+  :root{--bg:#fafafa;--fg:#1a1a1a;--muted:#5b5b5b;--card:#fff;--border:#e3e3e3;
+        --green:#146e44;--green-soft:#e8f3ec;--red:#b3261e;--red-soft:#fde7e5;
+        --amber:#aa5500;--amber-soft:#fff6e2;--blue:#0f5b9e;--blue-soft:#e8f2fb}
+  body{font-family:-apple-system,"Segoe UI","Tajawal","Noto Naskh Arabic",sans-serif;background:var(--bg);color:var(--fg);margin:0;line-height:1.75;font-size:15px}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 22px 80px}
+  header{padding:22px 26px;background:linear-gradient(135deg,#13322a 0%,#0c1f1a 100%);color:#fff;border-radius:12px;margin-bottom:24px}
+  header h1{margin:0 0 6px;font-size:22px}
+  h2{font-size:19px;margin:30px 0 10px;border-bottom:2px solid var(--border);padding-bottom:6px}
+  h3{font-size:16px;margin:18px 0 6px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:12px 0}
+  .ok{border-inline-start:5px solid var(--green);background:var(--green-soft)}
+  .warn{border-inline-start:5px solid var(--amber);background:var(--amber-soft)}
+  .crit{border-inline-start:5px solid var(--red);background:var(--red-soft)}
+  code{background:#f0f0f0;padding:1px 6px;border-radius:4px;font-size:12.6px;font-family:"JetBrains Mono",monospace;direction:ltr;display:inline-block}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  th,td{padding:8px 10px;border:1px solid var(--border);text-align:right;font-size:13.3px;vertical-align:top}
+  th{background:#f0f0f0}
+  ul,ol{padding-inline-start:22px}li{margin:4px 0}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .filepath{background:#ececec;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:12px;direction:ltr}
+  .big{font-size:15px;font-weight:700;padding:10px 16px;border-radius:8px;margin:10px 0}
+  .big.green{background:var(--green-soft);border:1px solid var(--green);color:var(--green)}
+  .big.amber{background:var(--amber-soft);border:1px solid var(--amber);color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>✅ تقرير تنفيذ إصلاح العيوب الأمنية — F-1..F-6</h1>
+  <div>tawanow.com · 2026-06-01 · تنفيذ بالتسلسل لكل بنود الخطة المنقّحة (بعد مراجعة 8 وكلاء) · بإذن المالك «ابدأ الآن التنفيذ بكل دقة»</div>
+</header>
+
+<div class="big green">النتيجة: نُفِّذت F-1 · F-2 · F-3 · F-4 · F-5 · F-6 بالكامل ومُختبَرة. مجالي الأمني (auth/jwt/rate-limit/sse) أخضر 100% (161/161). صفر تراجع جديد في الحزمة الكاملة.</div>
+<div class="big amber">⚠ يلزم انتباهك: FIN-COR يبلّغ عن تغيّر SHA في <code>feature_flags.yaml</code> — لكنّه <strong>سابق لهذه الجلسة</strong> (عُدِّل 2026-05-31 17:48) ولم تمسّه إصلاحاتي. الأعلام المختومة الثلاثة سليمة. + النشر لم يبدأ (ينتظر إذنك).</div>
+
+<h2>1) ما نُفِّذ — بنداً بنداً</h2>
+<table>
+<thead><tr><th>الإصلاح</th><th>ما تمّ فعلاً</th><th>الملفّات</th><th>اختبار</th></tr></thead>
+<tbody>
+<tr><td><strong>F-1</strong> rate-limit auth</td><td>دلو <code>auth</code> جديد (12/60ث/IP) بـ<code>startswith</code> على <code>/auth/login</code>+<code>/auth/register</code> (+بادئة /api). <strong>بلا قراءة جسم</strong> (تجنّب كسر POST). ترويسات <code>X-RateLimit-*</code> على كل ردّ بحراسة <code>count=None</code> (تحافظ على fail-open). لم تُضَف otp endpoints (محميّة في otp_service).</td><td class="filepath">core/rate_limiter.py</td><td>+8 (28/28)</td></tr>
+<tr><td><strong>F-2</strong> login lockout</td><td>قفل Redis لكل <code>(user_id+ip)</code> (يمنع DoS بقفل الضحية من أي شبكة)، عتبة 5/30د. <strong>fail-open</strong> صريح (Redis مقطوع→لا يمنع الدخول). <strong>ذرّي</strong> (pipeline incr+expire). المسح <strong>بعد verify_password مباشرة</strong> (قبل فرع TOTP → لا يبقى مستخدم TOTP مقفولاً). مسح كل الأقفال عند reset ناجح. استثناء هواتف SEED. <code>ACCOUNT_LOCKED</code> أُضيف لـErrorCodes + تُرجم (ar/en/fr).</td><td class="filepath">registration_router.py · error_envelope.py · config.py · messages/*.json</td><td>+6 (6/6)</td></tr>
+<tr><td><strong>F-3</strong> HSTS تدريجي</td><td>HSTS Stage 1 (<code>max-age=300</code>) في <strong>host vhost</strong> (نقطة إنهاء TLS الفعليّة) + مرآة في nginx الحاوية. بلا preload/includeSubDomains. تعليقات الترقّي 300→سنتان موثّقة.</td><td class="filepath">deploy/setup_prod_domain.sh · web/nginx.conf</td><td>+1 (4/4)</td></tr>
+<tr><td><strong>F-4</strong> register موحّد</td><td>الردود الثلاثة (phone/email/username) → <strong>409 موحّد واحد بلا تلميح حقل</strong>. كل الفحوص تُشغَّل (إزالة قناة توقيت short-circuit) + تأخير عشوائي على مساري <strong>التعارض والنجاح</strong> (إزالة أوراكل التوقيت). موثّق كتخفيف لا إغلاق.</td><td class="filepath">registration_router.py</td><td>اختباران مُحدَّثان</td></tr>
+<tr><td><strong>F-5</strong> صمت الاسترداد</td><td><code>password-reset/confirm</code> (هاتف مجهول) + <code>email/verify-request</code> + <code>email/verify</code> (بريد مجهول) → <strong>200 عامّ بدل 404</strong>. توحيد «بريد مجهول» مع «رمز خاطئ» على 422 واحد. (<code>/email/verify-otp</code> مُصادَق→ليس ناقل enumeration، تُرك.)</td><td class="filepath">registration_router.py</td><td>اختباران مُحدَّثان</td></tr>
+<tr><td><strong>F-6</strong> تدوير السرّ</td><td><strong>دالة فكّ مركزيّة</strong> <code>decode_with_rotation</code> (نشط ثم legacy). وُجِّهت إليها <strong>كل المواقع العشرة</strong>: jwt_service ×2 · SSE/WS ×5 (order_tracking/provider_stream/sse_router/fleet_stream/ws_gateway) · maintenance · main · auth_router ×2. <code>secret_key_legacy</code> في config بتوثيق نافذة ≥ عمر refresh (30 يوماً).</td><td class="filepath">jwt_service.py + 9 ملفّات + config.py</td><td>+4 (23/23)</td></tr>
+<tr><td><strong>F-7</strong> RS256</td><td>مؤجّل (P3) — يعيد استخدام الدالة المركزيّة الآن جاهزة.</td><td>—</td><td>—</td></tr>
+</tbody>
+</table>
+
+<h2>2) التحقّق — الأرقام الفعليّة</h2>
+<div class="card ok">
+<ul>
+<li><strong>مجالي الأمني كامل (12 ملفّ اختبار): <span class="pass">161 ناجح / 0 فاشل</span></strong> — rate_limiter, F-2 lockout, F-6 rotation, registration, phase146, phase192a, i18n_sweep, jwt_revocation, ws_gateway, ux02, security_hardening, otp_log.</li>
+<li><strong>الحزمة الخلفيّة الكاملة:</strong> <span class="pass">1937 ناجح</span> / 29 فاشل / 2 skip. <strong>قبل عملي: 30 فاشل → بعده: 29</strong> (الفرق −1 = اختبار i18n الذي أدخلتُه ثم أصلحتُه بترجمة <code>ACCOUNT_LOCKED</code>).</li>
+<li><strong>الـ29 الباقية كلّها سابقة، صفر منها في مجالي:</strong> phase12_soft_launch (9)، phase399_variant_crud (6)، phase175_catalog (5)، master_pick (2)، wallet_topup (2)، phase372 (2)، phase457/phase422/phase13 (1 لكلّ). كلّها <code>201==200</code> على إنشاء صنف الكتالوج + لُقَط SQLite (FK shortcuts) — لا تستورد أيّ ملفّ من ملفّاتي وتفشل بنفس الشكل منفردةً.</li>
+<li><strong>الواجهة:</strong> nginx-security-headers (4/4) + RegistrationPage (12/12) + ForgotPasswordPage (6/6) = 22/22.</li>
+<li><strong>التحويل البرمجي:</strong> كل الملفّات الـ13 المعدّلة تُترجَم نظيفاً · الكتالوجات الثلاثة JSON صحيحة.</li>
+</ul>
+</div>
+
+<h2>3) العيوب الحرجة من المراجعة — كيف عولجت في الكود</h2>
+<table>
+<thead><tr><th>العيب (من مراجعة الوكلاء)</th><th>المعالجة في التنفيذ</th></tr></thead>
+<tbody>
+<tr><td>CRIT: قراءة الجسم في الـmiddleware تكسر POST</td><td>لم يُقرأ الجسم إطلاقاً — مفتاح IP فقط</td></tr>
+<tr><td>CRIT/HIGH: ترويسة Remaining بلا حراسة → 500 عند Redis مقطوع</td><td><code>count=None</code> قبل try + <code>if count is not None</code></td></tr>
+<tr><td>HIGH: مستخدم TOTP يبقى مقفولاً</td><td>المسح بعد verify_password مباشرة، قبل فرع TOTP</td></tr>
+<tr><td>HIGH: F-6 يُغفل 10 مواقع decode</td><td>دالة مركزيّة وُجِّهت إليها العشرة</td></tr>
+<tr><td>HIGH: نافذة legacy 60د &lt; عمر refresh 30 يوماً</td><td>موثّق في config: النافذة ≥ عمر refresh</td></tr>
+<tr><td>HIGH: 4 اختبارات تنكسر صامتةً</td><td>حُدِّثت الأربعة في نفس التنفيذ + i18n الخامس</td></tr>
+<tr><td>HIGH: F-5 يجب أن يشمل /email/verify</td><td>عولجت النقاط الثلاث</td></tr>
+<tr><td>HIGH: DoS بقفل الضحية بمفتاح user_id</td><td>المفتاح <code>(user_id+ip)</code></td></tr>
+<tr><td>MED: fail-open + ذرّيّة القفل + استثناء SEED</td><td>كلّها مطبّقة</td></tr>
+</tbody>
+</table>
+
+<h2>4) ما يحتاج قراراً/انتباهك</h2>
+<div class="card crit">
+<ol>
+<li><strong>FIN-COR — <code>feature_flags.yaml</code> hash mismatch (سابق لجلستي):</strong> الملفّ عُدِّل 2026-05-31 17:48 قبل بدء عملي؛ لم ألمس <code>contracts/</code>. الأعلام المختومة الثلاثة (<code>wallet_cash_out/wallet_peer_transfer/production_payment_enabled = false</code>) كلّها سليمة (الفاحص نفسه يؤكّد «OK»). <code>launch_gates.yaml</code> = MATCH. <strong>القرار:</strong> إمّا تحديث الأساس في CLAUDE.md (إن كان التعديل السابق مقصوداً) أو فحص ما تغيّر فيه.</li>
+<li><strong>النشر لم يبدأ</strong> — الترتيب الجاهز: تحديثات الاختبار+الكود في commit واحد → <code>deploy_be.sh</code> → <code>verify_security_fixes.sh</code> (أنشأتُه) → F-3 عبر <code>deploy_web.sh</code>+<code>setup_prod_domain.sh</code> ثم <code>curl -I</code> → مراقبة 48س → تصعيد HSTS. ينتظر إذنك.</li>
+<li><strong>متابعات مؤجّلة (بحسب الخطة):</strong> معالجة 429/ACCOUNT_LOCKED في الواجهة/الجوّال (تحسين UX، ليس أمنيّاً) · F-7 RS256 · تفعيل التدوير الفعلي (ضبط SECRET_KEY_LEGACY) عند جاهزيّة OPS · قرار F-4 الجذري (200+OTP) إن أردتَ إغلاق enumeration كاملاً بدل التخفيف.</li>
+</ol>
+</div>
+
+<p style="margin-top:30px;text-align:center;color:var(--muted);font-size:12.5px">
+لا commits (سياسة المشروع) · لا migration · 13 ملفّ كود + 3 كتالوجات + 5 ملفّات اختبار (3 جديدة، اثنان+i18n محدّثة) + سكربت تحقّق جديد. مجالي الأمني 161/161 · الحزمة 1937 ناجح · صفر تراجع جديد.
+</p>
+</div>
+</body>
+</html>

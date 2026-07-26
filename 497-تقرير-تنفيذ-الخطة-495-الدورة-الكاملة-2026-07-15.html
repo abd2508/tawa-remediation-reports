@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>497 — تقرير التنفيذ الكامل لخطة 495: ستّ خطوات، من رابط مكسور إلى بناء أندرويد حقيقي</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+      --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+      --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+      --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+      --code-bg:#0f1018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+    --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+    --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+    --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+    --code-bg:#0f1018;
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI","Tahoma","Geeza Pro","Noto Naskh Arabic",sans-serif;
+    line-height:1.75; margin:0; padding:0; font-size:16px;
+  }
+  .wrap{max-width:1200px; margin:0 auto; padding:28px 20px 90px;}
+  header.hero{
+    background:linear-gradient(135deg,var(--green),#0a7a4d);
+    color:#fff; border-radius:18px; padding:36px 28px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+  }
+  header.hero h1{margin:0 0 10px; font-size:1.6rem; line-height:1.55; text-wrap:balance;}
+  header.hero p{margin:0; opacity:.95; font-size:1.02rem;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+  .meta-chip{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:6px 14px; border-radius:999px; font-size:.85rem;}
+
+  h2{font-size:1.32rem; margin:50px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px;}
+  h3{font-size:1.1rem; margin:28px 0 10px; color:var(--accent);}
+  h4{font-size:1rem; margin:16px 0 8px;}
+  .lead{color:var(--sub); font-size:1rem; margin-bottom:16px;}
+
+  .tbl-wrap{overflow-x:auto; border-radius:12px; border:1px solid var(--border); margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:.87rem;}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{background:var(--code-bg); font-size:.8rem; color:var(--sub);}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--code-bg); padding:2px 6px; border-radius:6px; font-size:.85em; direction:ltr; display:inline-block; unicode-bidi:embed;}
+
+  .badge{display:inline-block; padding:3px 10px; border-radius:999px; font-size:.72rem; font-weight:700; white-space:nowrap;}
+  .badge.done{background:var(--green-bg); color:var(--green);}
+  .badge.new{background:var(--red-bg); color:var(--red);}
+  .badge.info{background:var(--blue-bg); color:var(--blue);}
+  .badge.warn{background:var(--amber-bg); color:var(--amber);}
+  .badge.skip{background:var(--gray-bg); color:var(--gray);}
+  .badge.purple{background:var(--purple-bg); color:var(--purple);}
+
+  .simple{background:var(--blue-bg); border-inline-start:4px solid var(--blue); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.96rem;}
+  .simple b{color:var(--blue);}
+  .risk{background:var(--red-bg); border-inline-start:4px solid var(--red); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .risk b{color:var(--red);}
+  .safe{background:var(--green-bg); border-inline-start:4px solid var(--green); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .safe b{color:var(--green);}
+  .fix{background:var(--amber-bg); border-inline-start:4px solid var(--amber); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .fix b{color:var(--amber);}
+  .found{background:var(--purple-bg); border-inline-start:4px solid var(--purple); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .found b{color:var(--purple);}
+
+  .item{border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:20px; background:var(--card);}
+  .item.hot{border:2px solid var(--red);}
+  .item-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+  .item-head h3{margin:0; font-size:1.1rem; color:var(--text);}
+  .src{color:var(--sub); font-size:.76rem; margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);}
+  .src b{color:var(--text);}
+  .quote{background:var(--code-bg); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:.85rem; border-inline-start:3px solid var(--accent);}
+  .verify{background:var(--code-bg); border-radius:8px; padding:8px 12px; margin:6px 0; font-size:.82rem; border-inline-start:3px solid var(--green);}
+  .verify.bad{border-inline-start-color:var(--red);}
+  .verify b{color:var(--green);}
+  .verify.bad b{color:var(--red);}
+
+  .verdict-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:18px 0;}
+  .stat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center;}
+  .stat .num{font-size:1.7rem; font-weight:800;}
+  .stat .lbl{color:var(--sub); font-size:.78rem; margin-top:4px;}
+  .stat.green .num{color:var(--green);}
+  .stat.red .num{color:var(--red);}
+  .stat.blue .num{color:var(--blue);}
+  .stat.amber .num{color:var(--amber);}
+  .stat.purple .num{color:var(--purple);}
+
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:10px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.88rem;}
+  .toc ol{margin:6px 0; padding-inline-start:22px; columns:2; column-gap:24px;}
+  @media (max-width:640px){ .toc ol{columns:1;} }
+
+  .timeline{position:relative; margin:24px 0; padding-inline-start:26px;}
+  .timeline::before{content:""; position:absolute; inset-inline-start:8px; top:6px; bottom:6px; width:2px; background:var(--border);}
+  .tl-item{position:relative; margin-bottom:18px; padding-inline-start:14px;}
+  .tl-item::before{content:""; position:absolute; inset-inline-start:-26px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--card); box-shadow:0 0 0 2px var(--accent);}
+  .tl-item.hot::before{background:var(--red); box-shadow:0 0 0 2px var(--red);}
+  .tl-item.ok::before{background:var(--green); box-shadow:0 0 0 2px var(--green);}
+  .tl-item .tl-date{font-size:.76rem; color:var(--sub); font-weight:700;}
+  .tl-item .tl-title{font-weight:700; margin:2px 0 4px;}
+  .tl-item .tl-body{font-size:.86rem; color:var(--sub);}
+
+  .flow{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:16px 0; font-size:.82rem;}
+  .flow .step{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 12px; text-align:center; flex:1; min-width:130px;}
+  .flow .arrow{color:var(--sub); font-size:1.1rem; flex-shrink:0;}
+  .flow .step.ok{border-color:var(--green); background:var(--green-bg);}
+  .flow .step.stop{border-color:var(--red); background:var(--red-bg);}
+  .flow .step.warn{border-color:var(--amber); background:var(--amber-bg);}
+  @media (max-width:760px){ .flow{flex-direction:column;} .flow .arrow{transform:rotate(90deg);} }
+
+  .before-after{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;}
+  @media (max-width:700px){ .before-after{grid-template-columns:1fr;} }
+  .ba-box{border-radius:12px; padding:14px 16px; font-size:.88rem;}
+  .ba-box.before{background:var(--red-bg); border:1px solid var(--red);}
+  .ba-box.after{background:var(--green-bg); border:1px solid var(--green);}
+  .ba-box .ba-label{font-weight:800; font-size:.78rem; margin-bottom:6px;}
+  .ba-box.before .ba-label{color:var(--red);}
+  .ba-box.after .ba-label{color:var(--green);}
+
+  .status-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; margin:16px 0;}
+  .status-card{border:1px solid var(--border); border-radius:12px; padding:14px 16px; background:var(--card); border-top:4px solid var(--gray);}
+  .status-card.pending{border-top-color:var(--amber);}
+  .status-card.resolved{border-top-color:var(--green);}
+  .status-card.hot{border-top-color:var(--red);}
+  .status-card .sc-title{font-weight:700; font-size:.92rem; margin-bottom:4px;}
+  .status-card .sc-note{font-size:.8rem; color:var(--sub);}
+
+  ul.clean{margin:8px 0; padding-inline-start:22px;}
+  ul.clean li{margin-bottom:6px;}
+  footer{color:var(--sub); font-size:.82rem; text-align:center; margin-top:50px; padding-top:20px; border-top:1px solid var(--border);}
+
+  .deploy-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:16px 0;}
+  .deploy-card{border:2px solid var(--green); background:var(--green-bg); border-radius:14px; padding:16px; text-align:center;}
+  .deploy-card .dc-name{font-weight:800; font-size:.95rem; margin-bottom:6px;}
+  .deploy-card .dc-status{font-size:1.3rem; font-weight:800; color:var(--green);}
+  .deploy-card .dc-detail{font-size:.76rem; color:var(--sub); margin-top:6px; word-break:break-all;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>497 — تقرير التنفيذ الكامل لخطة 495: ستّ خطوات متسلسلة، من رابط طلب مكسور حتى بناء أندرويد حقيقي</h1>
+  <p>تنفيذ كامل الخطة 495 بالتسلسل الآمن الموصى به فيها، دون توقّف بين الخطوات، مع تحقّق شامل في النهاية (باك-إند + ويب + جوّال + بناء أندرويد حقيقي)، وتنسيق صريح مع جلسة عمل أخرى كانت تعدّل نفس المستودع في نفس الوقت.</p>
+  <div class="meta-row">
+    <span class="meta-chip">📅 2026-07-15</span>
+    <span class="meta-chip">✅ باك-إند 3511/3515 (0 فشل)</span>
+    <span class="meta-chip">✅ ويب 1613/1614 (فشل معروف مسبقاً، غير متعلّق)</span>
+    <span class="meta-chip">✅ جوّال 41/41 + Typecheck/Lint نظيفان</span>
+    <span class="meta-chip">📱 بناء أندرويد حقيقي ناجح</span>
+  </div>
+</header>
+
+<div class="toc">
+  <b>فهرس التقرير</b>
+  <ol>
+    <li><a href="#summary">الخلاصة بالأرقام</a></li>
+    <li><a href="#step1">الخطوة 1 — روابط طلبات المزوّد وتحويل المحفظة</a></li>
+    <li><a href="#step2">الخطوة 2 — قيود قاعدة البيانات لمنع تسويتين متزامنتين</a></li>
+    <li><a href="#step3">الخطوة 3 — واجهة التسوية على الويب: تصادم بين جلستين وكيف حُلّ</a></li>
+    <li><a href="#step4">الخطوة 4 — توحيد رقم "إيرادات اليوم" + عطل SQLite مكتشَف بالصدفة</a></li>
+    <li><a href="#step5">الخطوة 5 — خمسة إصلاحات في تطبيق الجوّال</a></li>
+    <li><a href="#step6">الخطوة 6 — التحقّق الكامل والبناء الحقيقي</a></li>
+    <li><a href="#coord">التنسيق بين الجلستين (Claude 1 و Claude 3)</a></li>
+    <li><a href="#next">المتبقي وما ينتظر قرارك</a></li>
+  </ol>
+</div>
+
+<h2 id="summary">1) الخلاصة بالأرقام</h2>
+<div class="verdict-grid">
+  <div class="stat green"><div class="num">6/6</div><div class="lbl">خطوات من خطة 495 منجزة كاملة</div></div>
+  <div class="stat green"><div class="num">3511</div><div class="lbl">اختبار باك-إند ناجح، صفر فشل</div></div>
+  <div class="stat green"><div class="num">1613</div><div class="lbl">اختبار ويب ناجح (فشل واحد معروف مسبقاً)</div></div>
+  <div class="stat green"><div class="num">41/41</div><div class="lbl">اختبار جوّال ناجح</div></div>
+  <div class="stat purple"><div class="num">2</div><div class="lbl">تصادمات عمل مع جلسة أخرى، اكتُشفت وعولجت بشفافية</div></div>
+</div>
+<div class="simple">
+  <b>بلغة بسيطة:</b> التقرير 495 وضع خطّة من ست خطوات، مرتّبة من الأكثر أماناً للأقل، بحيث لا تُبنى خطوة على أساس غير مستقر. نُفِّذت الخطوات الست جميعها، دون توقّف، كما طُلب صراحة. كل خطوة انتهت باختبارات حقيقية جديدة تثبت أنها تعمل، لا بمجرد "يبدو صحيحاً". وفي أثناء العمل، ظهرت مرّتان حالتان حقيقيتان لجلسة ذكاء اصطناعي أخرى (Claude 3) تعمل على نفس الملفات في نفس اللحظة — عولجتا بالتوقّف، والتحقّق، وتفضيل العمل المُختبَر فعلياً على الإنتاج بدل تكرار العمل أو المخاطرة بتعارض.
+</div>
+
+<h2 id="step1">2) الخطوة 1 — روابط طلبات المزوّد وتحويل المحفظة</h2>
+<p class="lead">الملفات: <code>apps/mobile/src/services/api/index.ts</code>، <code>apps/mobile/src/app/wallet-transfer.tsx</code></p>
+
+<div class="item">
+  <div class="item-head"><h3>روابط طلبات المزوّد كانت جميعها خاطئة (404 دائماً)</h3><span class="badge done">أُصلح</span></div>
+  <p>أربعة أزرار في شاشة المزوّد — قبول، رفض، بدء التحضير، جاهز للتسليم — كانت تستدعي <code>/orders/{id}/...</code> بينما المسار الحقيقي في الخادم هو <code>/providers/orders/{id}/...</code> (بحسب <code>provider_router.py</code>). أي ضغطة على أيّ من هذه الأزرار كانت تفشل دائماً.</p>
+  <div class="flow">
+    <div class="step stop">المزوّد يضغط "قبول الطلب"</div>
+    <div class="arrow">→</div>
+    <div class="step stop">الطلب يذهب لمسار غير موجود</div>
+    <div class="arrow">→</div>
+    <div class="step stop">404 — فشل صامت</div>
+  </div>
+  <div class="safe"><b>الحل:</b> تصحيح المسار الأربعة إلى البادئة الصحيحة <code>/providers/orders/...</code>.</div>
+</div>
+
+<div class="item">
+  <div class="item-head"><h3>تحويل المحفظة: بلا مفتاح تكرار، وبلا خطوة تحقّق إضافية للمبالغ الكبيرة</h3><span class="badge done">أُصلح</span></div>
+  <p>الميزة كانت مفعَّلة فعلياً في الخادم (<code>wallet_peer_transfer: true</code> في <code>contracts/feature_flags.yaml</code>) رغم تعليق قديم في الكود يزعم أنها "مُغلَقة بعد". لكن التطبيق لم يكن يرسل رأس <code>Idempotency-Key</code> إطلاقاً — أي انقطاع شبكة أثناء التحويل قد يعني تكراره دون أن يعرف المستخدم — ولم يكن يستخدم رمز التحقّق (<code>wallet_session_token</code>) الذي يُصدره الخادم بعد التحقّق من رمز PIN للتحويلات الكبيرة.</p>
+  <div class="before-after">
+    <div class="ba-box before"><div class="ba-label">قبل</div>عند طلب مبلغ كبير، الخادم يرفض بخطأ عام غير مفهوم؛ لا واجهة لإدخال PIN؛ لا حماية من التكرار عند إعادة المحاولة.</div>
+    <div class="ba-box after"><div class="ba-label">بعد</div>مفتاح تكرار ثابت لكل محاولة تحويل؛ عند طلب PIN من الخادم، تظهر شاشة إدخال داخلية، وتُعاد المحاولة تلقائياً بعد التحقّق — بنفس مفتاح التكرار.</div>
+  </div>
+</div>
+
+<h2 id="step2">3) الخطوة 2 — قيود قاعدة البيانات لمنع تسويتين متزامنتين</h2>
+<p class="lead">الملفات: <code>backend/app/models/settlement.py</code>، <code>settlement/service.py</code>، <code>settlement/party_router.py</code>، هجرة جديدة <code>ab32</code></p>
+<div class="risk">
+  <b>لماذا هذه الخطوة قبل واجهة الويب؟</b> بناء واجهة استرداد ذكية للتسوية (الخطوة 3) بلا ضمان من قاعدة البيانات نفسها أن السائق لا يملك سوى تسوية نشطة واحدة، يعني أن الواجهة قد "تنجح" بينما الخادم يسمح بسباق يُنتج تسويتين متزامنتين لنفس السائق — بالضبط ما حذّرت منه مراجعة الخطة 495 المستقلة.
+</div>
+<div class="flow">
+  <div class="step">سائقان (أو تبويبان) يبدآن تسوية في نفس اللحظة</div>
+  <div class="arrow">→</div>
+  <div class="step ok">فهرس فريد جزئي في قاعدة البيانات يمنع الثانية</div>
+  <div class="arrow">→</div>
+  <div class="step ok">الخادم يرد 409 نظيفاً، لا خطأ 500 غامضاً</div>
+</div>
+<ul class="clean">
+  <li><b>فهرسان فريدان جزئيان جديدان</b> على <code>SettlementTransaction</code> (يعملان على Postgres و SQLite): معاملة نشطة واحدة كحد أقصى لكل سائق، ورمز قصير (short_code) فريد واحد كحد أقصى بين المعاملات النشطة — بنفس نمط الفهرس الموجود مسبقاً في الكود <code>uq_settlement_agents_live_per_user</code>.</li>
+  <li><b>فحص على مستوى الخادم + حماية على مستوى القاعدة:</b> إنشاء معاملة جديدة يتحقق أولاً من عدم وجود معاملة نشطة (رد 409 نظيف)، ثم — كطبقة حماية ثانية حقيقية — أي محاولة تتجاوز هذا الفحص وتصطدم بالفهرس نفسه تُعالَج وتُحوَّل لنفس الرد النظيف بدل عطل غير معالَج.</li>
+  <li><b><code>SELECT ... FOR UPDATE</code></b> عند إصدار رمز التسوية، لمنع استدعاءين متزامنين على نفس المعاملة من إصدار رمزين مختلفين.</li>
+</ul>
+<div class="verify"><b>تحقّق حقيقي:</b> 5 اختبارات جديدة (<code>test_r495_settlement_concurrency.py</code>) — بعضها يتجاوز طبقة الخادم عمداً ليثبت أن القيد الحقيقي في قاعدة البيانات نفسها يرفض التكرار، لا فقط الفحص في كود بايثون.</div>
+<div class="found">
+  <b>عطل تسمية اكتُشف أثناء العمل:</b> الهجرة الجديدة سُمّيت أولاً <code>ab29</code>، فاصطدمت برقم هجرة آخر <code>ab29_r478_136_percentage_caps.py</code> كان موجوداً مسبقاً من عمل آخر في نفس المستودع المشترك. عولج بإعادة التحقّق من <code>alembic heads</code> وإيجاد رقم حرّ فعلياً (<code>ab32</code>) بدل افتراض الرقم التالي تسلسلياً.
+</div>
+
+<h2 id="step3">4) الخطوة 3 — واجهة التسوية على الويب: تصادم بين جلستين، وكيف حُلّ</h2>
+<p class="lead">الملفات: <code>web/src/pages/driver/DriverSettlementPage.tsx</code> و <code>.test.tsx</code>، <code>web/src/api/client.ts</code></p>
+<div class="risk">
+  <b>ما حدث فعلياً:</b> كنتُ قد بنيتُ واختبرتُ نسختي الخاصة من هذا الإصلاح بالكامل — قبل أن أعلم، بفضل تنبيه صريح منك بمراعاة جلسة عمل أخرى (Claude 3) تعمل على نفس المشروع في نفس اللحظة، أن تلك الجلسة سبق أن صمَّمت واختبرت ودمجت ونشرت إصلاحاً مطابقاً تقريباً — كـ Pull Request رقم 17 (commit <code>79a540f</code>) — على المنصّات الأربع جميعها.
+</div>
+<div class="timeline">
+  <div class="tl-item hot"><div class="tl-date">اللحظة 1</div><div class="tl-title">اكتشاف التعارض المحتمل</div><div class="tl-body">تنبيه صريح منك: "لا أريد تعارض بينكما، بل أريد تعاون" — فتح قناة تنسيق حقيقية مع الجلسة الأخرى عبر ملفات الذاكرة المشتركة</div></div>
+  <div class="tl-item ok"><div class="tl-date">اللحظة 2</div><div class="tl-title">التحقّق بدل الافتراض</div><div class="tl-body">قراءة النسخة الفعلية المدموجة فعلاً على <code>origin/master</code> — تبيّن أنها شبه مطابقة لما بنيتُه، ومُختبَرة على الإنتاج فعلياً، لا مجرد كود محلي</div></div>
+  <div class="tl-item ok"><div class="tl-date">اللحظة 3</div><div class="tl-title">القرار: تبنّي الأصل، لا الدمج اليدوي</div><div class="tl-body">تبنّي محتوى <code>origin/master</code> كما هو حرفياً بدل محاولة دمج نسختين مختلفتين — تفادياً لأي تعارض لاحق</div></div>
+  <div class="tl-item ok"><div class="tl-date">اللحظة 4</div><div class="tl-title">إضافة الفارق الحقيقي فقط</div><div class="tl-body">أُضيفت فقط الحالة الجديدة التي يتيحها قيد قاعدة البيانات من الخطوة 2 (استرداد تلقائي عند 409) — وهي شيء لم يكن بإمكان الجلسة الأخرى بناءه أصلاً، لأن قيد قاعدة البيانات لم يكن موجوداً بعد وقت عملها</div></div>
+</div>
+<div class="safe">
+  <b>لماذا هذا القرار كان الصحيح:</b> تفضيل عمل مُختبَر ومنشور فعلياً على الإنتاج، على عمل محلي غير مُختبَر في الواقع — حتى لو كان الاثنان متشابهين تصميمياً — يطابق مبدأ "الجودة والموثوقية أولاً" ويمنع تماماً أي احتمال تعارض دمج لاحق بين الجلستين.
+</div>
+<div class="tbl-wrap"><table>
+<thead><tr><th>الفحص</th><th>النتيجة</th></tr></thead>
+<tbody>
+<tr><td>مجموعة اختبارات الصفحة (بعد الدمج)</td><td><span class="badge done">6/6 ناجحة</span> — 5 من الجلسة الأخرى + اختبار جديد لحالة 409</td></tr>
+<tr><td>إصلاح إضافي غير متعارض في <code>client.ts</code></td><td><span class="badge done">أُبقي</span> — يفكّ تغليف شكل خطأ FastAPI المتداخل (<code>detail.code</code>) الذي لم يكن يُعالَج سابقاً</td></tr>
+</tbody></table></div>
+
+<h2 id="step4">5) الخطوة 4 — توحيد رقم "إيرادات اليوم" + عطل SQLite مكتشَف بالصدفة</h2>
+<p class="lead">الملف: <code>backend/app/modules/operations/operations_router.py</code></p>
+<div class="before-after">
+  <div class="ba-box before"><div class="ba-label">قبل</div>نقطتا نهاية مختلفتان (<code>/operations/kpi</code> و <code>/operations/live-kpis</code>) تحسبان "إيرادات اليوم" بتعريفين مختلفين تماماً (واحد يحسب قيمة البضاعة فقط بتوقيت UTC، والآخر يحسب البضاعة + رسم التوصيل بتوقيت يوم العمل الليبي) — رقمان مختلفان يبدوان وكأنهما نفس المفهوم.</div>
+  <div class="ba-box after"><div class="ba-label">بعد</div>دالة واحدة مشتركة <code>_compute_today_revenue_minor</code> يستدعيها الطرفان معاً — استحالة أن يتباعدا مرة أخرى. أُبقي التعريف الأقدم (بضاعة فقط، UTC) لأنه المعروض فعلياً للمستخدمين على الويب حالياً — تغيير رقم مالي معروض هو قرار منتج يحتاج موافقة صريحة، لا أثراً جانبياً لإصلاح توحيد.</div>
+</div>
+<div class="found">
+  <b>اكتشاف جانبي حقيقي أثناء كتابة الاختبار:</b> الاستعلام القديم كان يستخدم <code>CAST(created_at AS DATE)</code>. تبيّن أن SQLite (قاعدة بيانات كل الاختبارات في هذا المشروع) لا تملك نوع DATE حقيقياً، فتقتصّ السلسلة النصية على أرقامها الأولى فقط بدل تحويلها فعلياً — النتيجة: هذه المقارنة لم تكن تُطابق أبداً تحت SQLite، فكان الرقم دائماً صفراً في كل اختبار/تطوير محلي، دون أن يكتشف أي اختبار سابق ذلك (PostgreSQL في الإنتاج غير متأثرة، لأنها تملك نوع DATE حقيقي). نفس العطل بالضبط تكرّر في 3 أماكن أخرى من نفس الملف — أُصلحت الأربعة معاً بمقارنة نطاق زمني نصف مفتوح، تعمل بشكل صحيح على القاعدتين.
+</div>
+<div class="flow">
+  <div class="step stop"><code>CAST(created_at AS DATE)</code></div>
+  <div class="arrow">→</div>
+  <div class="step warn">تحت SQLite: يقتصّ إلى "2026" فقط</div>
+  <div class="arrow">→</div>
+  <div class="step stop">لا تطابق أبداً مع تاريخ اليوم الحقيقي</div>
+  <div class="arrow">→</div>
+  <div class="step ok">استُبدل بنطاق زمني نصف مفتوح — يعمل على القاعدتين</div>
+</div>
+<div class="risk">
+  <b>ملاحظة مهمة لأي عمل لاحق على هذا الملف تحديداً:</b> <code>operations_router.py</code> ملفٌ مشترك حالياً — الفرق الكامل بين نسخته الحالية وآخر نسخة مُثبَّتة (git) أكبر بكثير (نحو 620 سطراً مُضافاً) من التغيير الفعلي لهذه الخطوة (نحو 60 سطراً: دالة جديدة + 3 مواضع استدعاء). الباقي عملٌ غير مُثبَّت من جلسة أخرى تعدّل نفس الملف في نفس الوقت. <b>هذا الملف يحتاج مطابقة سطراً بسطر — تماماً كما حدث مع صفحة التسوية في الخطوة 3 — قبل أي التزام (commit) مستقبلي.</b> لم يُنفَّذ أي التزام في هذه المرحلة (بحسب قاعدة المشروع بعدم الالتزام)، وهذا التنبيه موثَّق حتى لا يقع أي عمل لاحق في فخ <code>git add -A</code> عشوائي على هذا الملف تحديداً.
+</div>
+
+<h2 id="step5">6) الخطوة 5 — خمسة إصلاحات في تطبيق الجوّال</h2>
+
+<div class="item">
+  <div class="item-head"><h3>أ) إنشاء صنف الكتالوج وسعره في خطوة واحدة</h3><span class="badge done">أُصلح</span></div>
+  <p>التطبيق كان ينشئ الصنف، ثم يرسل طلباً ثانياً منفصلاً لإضافة السعر — إن فشل الطلب الثاني، يبقى صنف بلا سعر غير قابل للبيع. أُضيف حقل اختياري <code>initial_variant</code> لنفس طلب الإنشاء في الخادم، بحيث يُنشأ الصنف وسعره الأول معاً داخل معاملة واحدة (commit واحد).</p>
+</div>
+
+<div class="item">
+  <div class="item-head"><h3>ب) أدوار ناقصة في التطبيق تُسقِط حسابات عمليات كاملة على شاشة العميل</h3><span class="badge done">أُصلح</span></div>
+  <p>الخادم يملك أدواراً (<code>ADMIN</code>, <code>SUPERVISOR</code>, <code>MONITOR</code>) لم يكن تطبيق الجوّال يعرفها إطلاقاً — أي حساب بأحد هذه الأدوار كان "يسقط" إلى الشاشة الرئيسية للعميل بدل شاشة العمليات. كما أن لوحة عمليات الجوّال كانت تستخدم <code>Promise.all</code>، فرفض واحد فقط (403) من أربعة استدعاءات يُفرغ اللوحة بأكملها.</p>
+  <div class="before-after">
+    <div class="ba-box before"><div class="ba-label">قبل</div>حساب FINANCE_AGENT يفتح لوحة العمليات فتظهر فارغة تماماً، لأن استدعاءً واحداً غير مسموح له يُسقط الأربعة معاً.</div>
+    <div class="ba-box after"><div class="ba-label">بعد</div>كل بطاقة KPI تُحمَّل بشكل مستقل؛ البطاقة التي لا يملك الحساب صلاحية الوصول إليها تعرض "—" بدل إسقاط الشاشة كاملة.</div>
+  </div>
+</div>
+
+<div class="item">
+  <div class="item-head"><h3>ج) الدفع بنقاط الولاء عند إتمام الطلب — كان غائباً كليّاً عن الجوّال</h3><span class="badge done">أُصلح</span></div>
+  <p>تعليق قديم في كود الجوّال كان يزعم أن هذه الميزة "مُغلَقة بعد" — تبيّن أنها مفعَّلة فعلياً بشكل افتراضي في الخادم (<code>loyalty_redemption_enabled = True</code>)، ومطبَّقة أصلاً على الويب. أُضيف حقل مبلغ من النقاط داخل بطاقة الدفع المجزّأ الموجودة أصلاً، بنفس قاعدة الويب تماماً: النقاط تغطّي قيمة البضاعة فقط، لا رسم التوصيل ولا الإكرامية.</p>
+</div>
+
+<div class="item">
+  <div class="item-head"><h3>د) زر شحن المحفظة يظهر حتى عندما تكون البوابة مغلقة</h3><span class="badge done">أُصلح</span></div>
+  <p>نقطة نهاية <code>/payments/public-status</code> في الخادم موجودة أصلاً وتوثيقها الداخلي يقول صراحة إنها لهذا الغرض بالضبط — لكن الجوّال لم يكن يقرأ الحقل الخاص بحالة الشحن إطلاقاً (كان يقرأ فقط الحقل الشقيق الخاص بالتحويل بين المحافظ). أصبح الزرّ يختفي مع رسالة توضيحية عندما تكون بوابة الدفع مغلقة، تماماً كما يفعل الويب.</p>
+</div>
+
+<div class="item">
+  <div class="item-head"><h3>ه) شاشة كتالوج المزوّد بلا أي قيود صلاحيات</h3><span class="badge done">أُصلح</span></div>
+  <p>كل الأزرار (إضافة، تعديل، حذف، نشر/إيقاف) كانت تظهر لأي حساب مزوّد، رغم أن الخادم يقصر الإنشاء/التعديل/الحذف على مدير المنشأة فقط (لا صلاحية قابلة للمنح للموظفين)، بينما تبديل التوفّر مرتبط بصلاحية قابلة للمنح تحديداً. طُبِّق نفس التقسيم الموجود في نسخة الويب بالضبط.</p>
+</div>
+
+<h2 id="step6">7) الخطوة 6 — التحقّق الكامل والبناء الحقيقي</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>الفحص</th><th>النتيجة</th></tr></thead>
+<tbody>
+<tr><td>مجموعة اختبارات الباك-إند الكاملة</td><td><span class="badge done">3511 ناجح، 4 مُتخطّى، 0 فشل</span> (506.96 ثانية)</td></tr>
+<tr><td>اختبارات خطة 495 المخصَّصة (باك-إند)</td><td><span class="badge done">6/6</span> — تزامن التسوية ×5 + توحيد الإيرادات ×1</td></tr>
+<tr><td>Typecheck الويب</td><td><span class="badge done">0 خطأ</span></td></tr>
+<tr><td>Lint الويب</td><td><span class="badge done">0 خطأ</span>، 7 تحذيرات قديمة في ملفات لم تُلمَس هذه المرحلة</td></tr>
+<tr><td>مجموعة اختبارات الويب الكاملة</td><td><span class="badge warn">1613 ناجح، فشل واحد</span> — <code>OpsTopNav.test.tsx</code> انتهت مهلته تحت ضغط تنفيذ متزامن؛ أُعيد تشغيله منفرداً فنجح خلال 978 مللي ثانية (أقل بكثير من حدّ 5000) — نمط عطل معروف مسبقاً وموثَّق في قواعد المشروع، وليس ملفاً لمسته هذه المرحلة</td></tr>
+<tr><td>مجموعة اختبارات صفحة التسوية (مخصَّصة)</td><td><span class="badge done">6/6</span></td></tr>
+<tr><td>Typecheck الجوّال</td><td><span class="badge done">0 خطأ</span></td></tr>
+<tr><td>Lint الجوّال</td><td><span class="badge done">0 خطأ</span></td></tr>
+<tr><td>اختبارات Jest الجوّال</td><td><span class="badge done">41/41</span></td></tr>
+<tr><td>بناء أندرويد الحقيقي (Gradle)</td><td><span class="badge done">BUILD SUCCESSFUL</span> — أنتج <code>app-debug.apk</code></td></tr>
+<tr><td>التحقّق الحقيقي من حزمة JavaScript</td><td><span class="badge done">نجح، 2089 وحدة، 0 خطأ</span> — هذا هو الفحص الذي يُشغِّل فعلياً كل ملف عُدِّل هذه المرحلة عبر مُجمِّع Metro/Hermes الكامل</td></tr>
+<tr><td>تثبيت التطبيق على جهاز حقيقي متّصل</td><td><span class="badge skip">فشل — قيد جهاز، لا عيب برمجي</span> — الجهاز المتّصل يعمل بنظام أندرويد 6.0.1 بينما الحد الأدنى المطلوب للتطبيق هو أندرويد 7 (انظر التقرير 485 السابق حول هذا القيد)</td></tr>
+</tbody></table></div>
+
+<div class="found">
+  <b>لماذا "تصدير حزمة JS" منفصل عن نجاح Gradle؟</b> بناء Gradle لنسخة Debug من تطبيقات Expo/React Native لا يُضمِّن حزمة JavaScript فعلياً — يعتمد على خادم Metro وقت التشغيل. لذلك نجاح <code>assembleDebug</code> وحده (وكانت معظم مهامه "UP-TO-DATE" أصلاً لأن لا شيء في الكود الأصلي بلغة Kotlin/Java تغيَّر) لا يُثبت أن التعديلات في هذه المرحلة (كلها ملفات TypeScript/TSX) تُترجَم بلا أخطاء. لهذا نُفِّذ فحص إضافي حقيقي: <code>expo export --platform android</code>، الذي يُشغِّل نفس مُجمِّع Metro/Hermes الذي يستخدمه التطبيق فعلياً، على كل الشيفرة الحيّة — 2089 وحدة بلا أي خطأ.
+</div>
+
+<h2 id="coord">8) التنسيق بين الجلستين (Claude 1 و Claude 3)</h2>
+<p class="lead">طلبٌ صريح منك في منتصف هذه المرحلة: فتح قناة تعاون حقيقية بدل مجرد الانتباه السلبي لوجود جلسة أخرى.</p>
+<div class="status-grid">
+  <div class="status-card resolved"><div class="sc-title">صفحة التسوية على الويب (الخطوة 3)</div><div class="sc-note">تصادم كامل — عولج بتبنّي العمل المُختبَر والمنشور فعلاً من الجلسة الأخرى، بدل تكراره</div></div>
+  <div class="status-card resolved"><div class="sc-title">ملف الهجرات (<code>alembic</code>)</div><div class="sc-note">تصادم في رقم الهجرة <code>ab29</code> — عولج بإعادة التحقّق وإيجاد رقم حرّ فعلياً (<code>ab32</code>)</div></div>
+  <div class="status-card pending"><div class="sc-title"><code>operations_router.py</code> (الخطوة 4)</div><div class="sc-note">تصادم لم يُحلّ بعد — الملف يحتوي عملاً غير مُثبَّت من الجلسة الأخرى مختلطاً مع إضافتي؛ يحتاج مطابقة يدوية قبل أي التزام مستقبلي</div></div>
+  <div class="status-card resolved"><div class="sc-title">التوثيق في الذاكرة المشتركة</div><div class="sc-note">تحديث صريح ومفصَّل (لا قراءة سلبية فقط) في <code>PROJECTS.md</code> وملف نسخة fam-tawa: قائمة كاملة بالملفات، رقم الهجرة الدقيق، وإقرار صريح بقواعد التعاون الخمس التي اقترحتها الجلسة الأخرى</div></div>
+</div>
+
+<h2 id="next">9) المتبقي وما ينتظر قرارك</h2>
+<div class="status-grid">
+  <div class="status-card pending"><div class="sc-title">مطابقة <code>operations_router.py</code></div><div class="sc-note">قبل أي التزام مستقبلي على هذا الملف — نفس أسلوب المطابقة المُستخدم في الخطوة 3</div></div>
+  <div class="status-card pending"><div class="sc-title">نسخة الويب من إنشاء الصنف+السعر معاً</div><div class="sc-note">لم تُلمَس هذه المرحلة — خارج نطاق خطة 495 صراحة (الجوّال فقط)</div></div>
+  <div class="status-card pending"><div class="sc-title">لا التزام (commit) نُفِّذ هذه المرحلة</div><div class="sc-note">بحسب قاعدة المشروع الثابتة بعدم الالتزام دون طلب صريح</div></div>
+</div>
+
+<footer>
+  تقرير 497 — تنفيذ كامل للخطوات الست من الخطة 495، 2026-07-15 · كل رقم في هذا التقرير مأخوذ من تشغيل اختبارات وبناء فعليَّين، لا افتراض بلا دليل.
+</footer>
+
+</div>
+</body>
+</html>

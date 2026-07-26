@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تشخيص: أخطاء واجهة العميل + التسجيل + MFA — tawanow 2026-06-23</title>
+<style>
+  :root{
+    --green:#1b7f4f;--green-d:#0f5c38;--amber:#9a6b00;--red:#b3261e;--blue:#1558b0;--purple:#6b3fa0;
+    --bg:#f5f7f6;--card:#fff;--ink:#17241e;--muted:#5b6b63;--line:#dde6e1;
+    --ok:#e8f5ee;--okl:#9fd6b7;--warn:#fdf4e3;--warnl:#e9cd8f;--bad:#fdecea;--badl:#f0b3ad;--blbg:#e7eefb;--bll:#b9cdf0;--pur:#f1eafa;--purl:#cdb6ea;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;line-height:1.82}
+  .wrap{max-width:1200px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f5c38,#1b7f4f);color:#fff;border-radius:18px;padding:34px;box-shadow:0 10px 30px rgba(15,92,56,.25)}
+  header.hero h1{margin:0 0 8px;font-size:22px;line-height:1.5}
+  header.hero p{margin:4px 0;opacity:.95;font-size:13px}
+  .meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+  .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:12px}
+  h2{margin:34px 0 13px;font-size:20px;color:var(--green-d);border-right:6px solid var(--green);padding:9px 14px 9px 0;background:linear-gradient(90deg,#eef6f1,transparent)}
+  h3{margin:18px 0 8px;font-size:15.5px;color:var(--green-d)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:13px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.4px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#eef6f1;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fbfdfc}
+  .ok{background:var(--ok)!important}.warn{background:var(--warn)!important}.bad{background:var(--bad)!important}.bl{background:var(--blbg)!important}
+  code{background:#eef2ef;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-family:"Cascadia Code",Consolas,monospace;font-size:11.1px;direction:ltr;display:inline-block}
+  pre{background:#10241b;color:#d7ffe9;border-radius:12px;padding:13px;overflow:auto;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.1px;line-height:1.55}
+  pre .r{color:#ff9a8c}pre .g{color:#7fffb0}pre .y{color:#ffd479}pre .c{color:#7fb89a}
+  .diag{background:#0e1f18;border-radius:12px;padding:16px;color:#d7ffe9;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.2px;line-height:1.65;overflow:auto;white-space:pre}
+  .diag .y{color:#ffd479}.diag .r{color:#ff9a8c}.diag .g{color:#7fffb0}.diag .b{color:#8cc6ff}.diag .m{color:#d9a8ff}.diag .c{color:#7fb89a}.diag .w{color:#fff}
+  .simple{background:#eef6ff;border:1px solid var(--bll);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.9px}
+  .simple b{color:var(--blue)}
+  .danger{background:var(--bad);border:1px solid var(--badl);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.7px}
+  .danger b{color:var(--red)}
+  .good{background:#f3fbf6;border:1px solid var(--okl);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.7px}
+  .good b{color:var(--green-d)}
+  .note{font-size:11.8px;color:var(--muted)}
+  .dash{display:flex;flex-wrap:wrap;gap:9px;margin:8px 0}
+  .kpi{flex:1 1 150px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .kpi.r{background:var(--bad);border-color:var(--badl)}.kpi.a{background:var(--warn);border-color:var(--warnl)}.kpi.g{background:var(--ok);border-color:var(--okl)}
+  .kpi .n{font-size:15px;font-weight:800;color:var(--green-d)}.kpi.r .n{color:var(--red)}.kpi.a .n{color:var(--amber)}
+  .kpi .l{font-size:10.5px;color:var(--muted)}
+  .toc{columns:2;font-size:13px;gap:24px}@media(max-width:760px){.toc{columns:1}}
+  .toc a{color:var(--blue);text-decoration:none;display:block;padding:2px 0}
+  .sev{font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;white-space:nowrap}
+  .s-hi{background:var(--bad);color:var(--red)}.s-med{background:var(--warn);color:var(--amber)}.s-low{background:var(--blbg);color:var(--blue)}
+  .footer{margin:30px 0 8px;text-align:center;color:var(--muted);font-size:11.8px}
+  ul{margin:5px 0;padding-right:20px}li{margin:4px 0;font-size:12.6px}
+  .step{display:inline-block;background:var(--green);color:#fff;border-radius:50%;width:20px;height:20px;text-align:center;font-size:11px;line-height:20px;font-weight:800;margin-left:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير تشخيص: أخطاء واجهة العميل + شاشة التسجيل + خيار إيقاف MFA</h1>
+  <p>منظومة تووا / Tawa · دراسة الجذور وتتبّع المسارات (لا تنفيذ — بانتظار قرارك) · 2026-06-23</p>
+  <p>كل جذر مُتحقَّق منه بقراءة الكود مباشرةً (file:line) + شرح بسيط + رسم + اتجاه إصلاح مقترح</p>
+  <div class="meta">
+    <span>🔎 5 نقاط طلبتها + أخطاء مجاورة</span>
+    <span>✅ كل الجذور مؤكَّدة بـfile:line</span>
+    <span>🛠️ دراسة فقط — لم أُغيّر أيّ كود</span>
+    <span>🔒 لا مساس بـFIN-COR/المناطق المحظورة</span>
+  </div>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:0">📑 الفهرس</h3>
+  <div class="toc">
+    <a href="#dash">٠ · لوحة الخطورة (ملخّص)</a>
+    <a href="#mfa">١ · إيقاف MFA للأدمين مؤقّتاً / خلف علم</a>
+    <a href="#addr">٢ · عنوان التوصيل في الدفع (قديم + بلا خيارات)</a>
+    <a href="#banner">٣ · شريط «تابع طلبك» المعلّق</a>
+    <a href="#phone">٤ · رقم هاتف العميل (آخر 4 أرقام)</a>
+    <a href="#map">٥ · خريطة تسجيل السائق/المزوّد تُغلق الشاشة</a>
+    <a href="#other">٦ · أخطاء أخرى وُجِدت أثناء الفحص</a>
+    <a href="#plan">٧ · الأولويّات + اتجاهات الإصلاح المقترحة</a>
+  </div>
+  <p class="note">المنهج: 4 وكلاء تشخيص متوازية قرأت الكود + تحقّق شخصيّ من كل سطر حاسم. الرمز <code>file:line</code> = الموضع الدقيق في الكود.</p>
+</div>
+
+<!-- 0 -->
+<h2 id="dash">٠) لوحة الخطورة</h2>
+<div class="dash">
+  <div class="kpi r"><div class="n">🔴 2 عالية</div><div class="l">خريطة التسجيل · عنوان الدفع</div></div>
+  <div class="kpi a"><div class="n">🟠 2 متوسّطة</div><div class="l">شريط الطلب · رقم الهاتف</div></div>
+  <div class="kpi g"><div class="n">🔵 1 إعداد</div><div class="l">إيقاف MFA (خيار تشغيليّ)</div></div>
+  <div class="kpi a"><div class="n">+8</div><div class="l">أخطاء مجاورة</div></div>
+</div>
+<table>
+  <tr><th>#</th><th>المشكلة</th><th>الجذر (مختصر)</th><th>الموضع</th><th>الخطورة</th><th>الإصلاح</th></tr>
+  <tr class="bad"><td>٥</td><td>خريطة التسجيل تُغلق الشاشة وترجع للرئيسيّة</td><td>أزرار بلا <code>type="button"</code> → تُرسِل النموذج</td><td><code>LocationPicker.tsx:405,208</code></td><td><span class="sev s-hi">عالية</span></td><td>سطران (+ تسمية أيقونات)</td></tr>
+  <tr class="bad"><td>٢</td><td>عنوان التوصيل قديم + «اختر عنواناً» بلا خيارات</td><td><code>&lt;select&gt;</code> فقط · زر الإضافة يظهر حين 0 عناوين فقط · الافتراضيّ = الأحدث إنشاءً</td><td><code>ErrandPage:143</code> · <code>CheckoutPage:768</code></td><td><span class="sev s-hi">عالية</span></td><td>زر «خريطة/جديد» دائم + افتراضيّ ذكيّ</td></tr>
+  <tr class="warn"><td>٣</td><td>شريط «تابع طلبك» يعلّق بطلبات قديمة بلا أزرار</td><td>حالات عالقة (OPS) بلا كنس تلقائيّ + شريط بزرّ تنقّل واحد</td><td><code>HomePage.tsx:141-232</code></td><td><span class="sev s-med">متوسّطة</span></td><td>حدّ عمر + أزرار إلغاء/شكوى</td></tr>
+  <tr class="warn"><td>٤</td><td>رقم الهاتف يظهر آخر 4 أرقام فقط</td><td>قناع واجهة <code>.slice(-4)</code> على رقمك أنت</td><td><code>HomePage.tsx:251</code></td><td><span class="sev s-med">متوسّطة</span></td><td>سطر واحد</td></tr>
+  <tr class="bl"><td>١</td><td>إيقاف MFA للأدمين مؤقّتاً</td><td>MFA أصلاً خلف علم · admin مُسجَّل TOTP</td><td>config + DB</td><td><span class="sev s-low">إعداد</span></td><td>تعطيل TOTP + إفراغ العلَم</td></tr>
+</table>
+
+<!-- 1 -->
+<h2 id="mfa">١) إيقاف المصادقة الثنائية للأدمين مؤقّتاً (أو خلف علم)</h2>
+<div class="card">
+  <div class="simple">🟦 <b>بلغة بسيطة:</b> النظام <b>أصلاً</b> مبنيّ على «علَم» يُشعِل/يُطفئ إلزام MFA متى شئت. سبب طلب الأدمين للكود الآن أمران منفصلان: (أ) أنت <b>سجّلتَ</b> TOTP للأدمين (مُخزَّن في قاعدة البيانات)، (ب) ضبطتَ العلَم على «إلزاميّ». لإيقافه للتطوير: أطفئ الاثنين معاً. لإعادته لاحقاً: أعِد التسجيل + أشعِل العلَم.</div>
+  <h3>الحالة الحاليّة (مؤكَّدة)</h3>
+  <table>
+    <tr><th>العنصر</th><th>القيمة الآن</th><th>الأثر</th></tr>
+    <tr><td>قاعدة البيانات: <code>admin.totp_enabled</code></td><td><code>TRUE</code> (مُسجَّل + له سرّ)</td><td>بوّابة <code>totp_enabled</code> تطلب الكود <b>حتى لو أُفرِغ العلَم</b></td></tr>
+    <tr><td>العلَم: <code>MFA_REQUIRED_ROLES</code></td><td><code>SUPER_ADMIN,OPERATIONS_AGENT,…</code></td><td>يفرض MFA على غير-المُسجَّلين أيضاً</td></tr>
+    <tr><td>العلَم: <code>MFA_REPORT_ONLY</code></td><td><code>false</code> (صارم)</td><td>الفرض فعّال</td></tr>
+  </table>
+  <div class="diag"><span class="b">نقطتان منفصلتان (مهمّ):</span>
+  <span class="y">بوّابة totp_enabled</span>  registration_router.py:906  →  إن TRUE: اطلب الكود (مستقلّة عن العلَم!)
+  <span class="y">العلَم MFA_REQUIRED_ROLES</span> registration_router.py:930  →  يفرض على من ليس مُسجَّلاً
+  ────────────────────────────────────────
+  لذلك: إفراغ العلَم وحده <span class="r">لا يكفي</span> — admin مُسجَّل فيبقى يطلب الكود.</div>
+  <h3>الخيارات (دراسة)</h3>
+  <table>
+    <tr><th>الخيار</th><th>الخطوات</th><th>التقييم</th></tr>
+    <tr class="ok"><td><b>أ · إيقاف كامل للتطوير (موصى به)</b></td><td>(1) تعطيل TOTP للأدمين: <code>POST /control-panel/users/{id}/disable-totp</code> (SUPER) أو DB <code>UPDATE users SET totp_enabled=false WHERE username='admin'</code> · (2) إفراغ العلَم: <code>MFA_REQUIRED_ROLES=""</code> + إعادة إنشاء backend</td><td>admin/admin يعود يعمل فوراً · العلَم يبقى جاهزاً لإعادة التفعيل</td></tr>
+    <tr class="bl"><td>ب · «خلف علم» (هو الوضع أصلاً)</td><td>الآليّة <b>مبنيّة خلف علم فعلاً</b> (<code>MFA_REPORT_ONLY=true</code> = مراقبة بلا حجب، أو <code>MFA_REQUIRED_ROLES=""</code> = مُطفأ). فقط يلزم أيضاً تعطيل TOTP الأدمين الحاليّ.</td><td>لا كود جديد — إعداد فقط</td></tr>
+  </table>
+  <div class="good"><b>إعادة التفعيل لاحقاً (عند جاهزيّة النشر):</b> اضبط <code>MFA_REQUIRED_ROLES</code> + <code>MFA_REPORT_ONLY=true</code> (مراقبة أوّلاً) → سجّل TOTP → <code>MFA_REPORT_ONLY=false</code> (صارم). كل هذا موثَّق في تقرير TOTP السابق.</div>
+  <p class="note">⏳ بانتظار قرارك: هل أُنفّذ الخيار (أ) الآن (إيقاف مؤقّت)؟ — لم أُغيّر شيئاً بعد.</p>
+</div>
+
+<!-- 2 -->
+<h2 id="addr">٢) عنوان التوصيل في الدفع: يظهر عنوان قديم + «اختر عنواناً» بلا خيارات خريطة/كتابة <span class="sev s-hi">عالية</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>بلغة بسيطة:</b> صفحة الدفع تعرض قائمة منسدلة بسيطة (<code>&lt;select&gt;</code>) فيها <b>عناوينك المحفوظة فقط</b>. زر «أضِف عنواناً / من الخريطة» مبرمَج ليظهر <b>فقط حين لا تملك أيّ عنوان</b>. فبمجرّد أن يكون لديك عنوان واحد، <b>يختفي الزرّ تماماً</b> ولا يبقى إلّا التبديل بين العناوين القديمة — لا خريطة، لا كتابة يدويّة. والعنوان الافتراضيّ المختار هو «الأحدث إنشاءً» لا «الأكثر استخداماً»، فيبدو قديماً/عشوائيّاً.</div>
+  <p class="note">المسار «اطلب أيّ شيء» = <code>ErrandPage.tsx</code> (يطابق «التوصيل إلى» + «اختر عنواناً»). ونفس الخلل في <code>CheckoutPage.tsx</code> (سلّة الطعام، «عنوان التوصيل»).</p>
+  <h3>الجذر (أ): لا مُنتقي خريطة/كتابة — الزرّ مشروط بـ«صفر عناوين»</h3>
+  <pre><span class="c">// ErrandPage.tsx:143-164  (ونفسه CheckoutPage.tsx:768-808)</span>
+{addresses.length === 0 ? (
+  <span class="g">&lt;Link to="/address-book"&gt;أضِف عنواناً&lt;/Link&gt;</span>   <span class="r">// ← يظهر فقط حين 0 عناوين!</span>
+) : (
+  &lt;select onChange=...&gt;                          <span class="r">// ← غير ذلك: قائمة منسدلة فقط</span>
+    &lt;option value=""&gt;اختر عنواناً&lt;/option&gt;        <span class="c">// نصّ "اختر عنواناً" — بلا أيّ خيار خريطة</span>
+    {addresses.map(a =&gt; &lt;option&gt;{a.label}&lt;/option&gt;)}
+  &lt;/select&gt;
+)}</pre>
+  <div class="diag"><span class="b">لماذا لا تظهر الخريطة؟ (تتبّع المسار)</span>
+  تضغط "اختر عنواناً"  →  هو &lt;select&gt; أصليّ  →  يعرض العناوين المحفوظة فقط
+        →  <span class="r">لا modal · لا توجيه · لا LocationPicker</span>  →  لا شيء «يُفتَح»
+
+  <span class="g">المُنتقي الكامل موجود فعلاً</span> (خريطة + GPS + إحداثيات + كتابة + بحث):
+    components/LocationPicker.tsx  —  لكنّه مُستخدَم في AddressBook فقط، <span class="r">لم يُستدعَ في صفحة الدفع</span></div>
+  <h3>الجذر (ب): العنوان الافتراضيّ «الأحدث إنشاءً» لا «الأكثر استخداماً»</h3>
+  <div class="diag">الواجهة: <span class="y">setSelectedAddressId(cur || items[0]?.id)</span>  (CheckoutPage:100 / ErrandPage:40) → يختار أوّل عنصر
+  الخلفيّة: <span class="y">ORDER BY Address.created_at DESC</span>  (address_router.py:90) → الأحدث إنشاءً أوّلاً
+  الحقل <span class="r">last_used_at</span> موجود (addresses.ts:13) لكنّه <span class="r">لا يُكتَب أبداً للعناوين</span> → دائماً null
+  ────────────────────────────────────────
+  ∴ الافتراضيّ = آخر عنوان <span class="r">أنشأتَه</span> (وقد يكون قديماً) لا آخر عنوان <span class="g">استخدمتَه</span></div>
+  <div class="good"><b>اتجاه الإصلاح المقترح (لاحقاً):</b> (1) زر دائم «➕ عنوان جديد / 🗺️ من الخريطة» بجانب القائمة يفتح <code>LocationPicker</code> أو ينتقل لـ<code>/address-book</code> (التحديث-عند-العودة يعمل أصلاً). (2) حفظ آخر عنوان مُستخدَم (localStorage) + كتابة <code>last_used_at</code> عند الطلب وترتيب <code>last_used_at DESC NULLS LAST</code>. (3) استخراج <code>&lt;AddressSelector&gt;</code> مشترك (يُصلح Checkout+Errand معاً).</div>
+</div>
+
+<!-- 3 -->
+<h2 id="banner">٣) شريط «تابع طلبك الحالي» يعلّق بطلبات قديمة بلا أزرار <span class="sev s-med">متوسّطة</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>بلغة بسيطة:</b> الشريط يُظهر «طلبك النشِط». المشكلة: بعض الطلبات تعلق في حالات وسطى لا تنتهي تلقائيّاً (تنتظر تدخّل غرفة العمليّات الذي قد لا يأتي)، فتبقى «نشطة» للأبد ويعود الشريط كلّ مرّة تفتح فيها الحساب. كما أنّ الشريط زرّ تنقّل واحد فقط — بلا إلغاء أو شكوى.</div>
+  <div class="good"><b>تصحيح فرضيّة شائعة:</b> قائمة «المنتهية» في الواجهة (<code>CUSTOMER_TERMINAL</code>، 7 حالات) <b>مطابقة تماماً</b> للحالات النهائيّة الحقيقيّة في الخلفيّة (7 حالات بلا مخرج). فالمشكلة <b>ليست</b> قائمةً ناقصة — بل حالات وسطى «عالقة».</div>
+  <h3>الجذر: حالات «عالقة» بلا كنس تلقائيّ → تبقى نشطة للأبد</h3>
+  <table>
+    <tr><th>حالة عالقة</th><th>كنس تلقائيّ؟</th><th>تنتظر</th></tr>
+    <tr class="ok"><td>AWAITING_PROVIDER_ACCEPTANCE</td><td>✅ نعم → رفض بعد 5د</td><td>—</td></tr>
+    <tr class="ok"><td>AWAITING_DRIVER / DRIVER_ASSIGNED</td><td>✅ نعم → تصعيد لا-سائق</td><td>—</td></tr>
+    <tr class="bad"><td><b>DRIVER_AT_PROVIDER</b></td><td>❌ <b>لا</b> (المزوّد مرجعيّ؛ OPS فقط يُلغي)</td><td>غرفة العمليّات</td></tr>
+    <tr class="bad"><td><b>NO_DRIVER_ESCALATION</b></td><td>❌ لا</td><td>OPS يُعيد/يُلغي</td></tr>
+    <tr class="bad"><td><b>DELIVERY_FAILED / RETURN_INITIATED / DISPUTED</b></td><td>❌ لا</td><td>OPS يحلّ</td></tr>
+    <tr class="bad"><td><b>PROOF_REVIEW_REQUIRED / OFFER_EXPIRED_REASSIGN</b></td><td>❌ لا</td><td>OPS يراجع</td></tr>
+  </table>
+  <div class="diag"><span class="b">لماذا يعلّق للأبد؟</span>
+  طلب قديم علق في DRIVER_AT_PROVIDER (مثلاً)
+     → ليس في قائمة "المنتهية" (لأنّه ليس حالة نهائيّة حقيقيّة)
+     → الفلتر activeOrdersList يعتبره "نشطاً"  (HomePage.tsx:156)
+     → الشريط يظهر كلّ تسجيل دخول  ←  <span class="r">بلا نهاية + بلا حدّ عمر</span>
+  (تسجيل الخروج/الدخول غير مؤثّر: الاستعلام يُعيد الجلب ويعيد اشتقاق نفس "النشِط")</div>
+  <h3>ماذا يقدّم الشريط الآن مقابل المطلوب</h3>
+  <div class="diag">الآن:    HomePage.tsx:205  →  &lt;button onClick={navigate(`/order/${id}`)}&gt;  <span class="r">// تنقّل فقط</span>
+  المطلوب: <span class="g">تابع</span> (موجود) + <span class="g">إلغاء</span> (متى سُمِح) + <span class="g">شكوى</span>
+
+  <span class="b">البنية التحتيّة جاهزة بالكامل:</span>
+    • allowed_actions في OrderSummary (types.ts:50)  →  ["CANCEL_OWN"] متى يُسمح بالإلغاء
+    • ordersApi.cancel(id, reason)  →  POST /orders/{id}/cancel (موجود)
+    • تدفّق الشكوى موجود (OrderTrackingPage)</div>
+  <div class="good"><b>اتجاه الإصلاح المقترح:</b> (1) حدّ عمر (تجاهل >24-48 ساعة) أو إخفاء الحالات العالقة-OPS من مفهوم «تابع». (2) استبدال الزرّ الواحد بشريط فيه: تابع · إلغاء (يظهر فقط إن <code>allowed_actions.includes("CANCEL_OWN")</code>) · شكوى. (3) إضافة مفاتيح i18n لـar/en/fr. <b>لا حاجة لتغيير الخلفيّة</b> — كل شيء موجود.</div>
+</div>
+
+<!-- 4 -->
+<h2 id="phone">٤) رقم هاتف العميل يظهر آخر 4 أرقام فقط <span class="sev s-med">متوسّطة</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>بلغة بسيطة:</b> الخلفيّة تُرسِل رقمك <b>كاملاً</b>. لكنّ الصفحة الرئيسيّة تقتطع آخر 4 أرقام فقط للعرض. وهذا قناع <b>في الواجهة فقط</b>، وعلى <b>رقمك أنت</b> — وهو خطأ (إخفاء رقمك عنك بلا داعٍ).</div>
+  <h3>الجذر: قطع في الواجهة — سطر واحد</h3>
+  <pre><span class="c">// HomePage.tsx:251</span>
+📞 …{customerPhone.current<span class="r">.slice(-4)</span>}      <span class="r">// ← يأخذ آخر 4 من رقمك أنت</span>
+
+<span class="c">// لكنّ الرقم الكامل متاح أصلاً:</span>
+<span class="c">// HomePage.tsx:76</span>  customerPhone.current = data.phone   <span class="g">// كامل من /customer/me</span>
+<span class="c">// backend customer_router.py:44</span>  "phone": ... u.phone   <span class="g">// كامل (لا قناع)</span>
+<span class="c">// CustomerSettings.tsx:205</span>  {me?.phone}            <span class="g">// الإعدادات تعرضه كاملاً ✓</span></pre>
+  <div class="diag"><span class="b">التمييز المهمّ (لئلّا نكسر الخصوصيّة):</span>
+  رقمك <span class="g">أنت</span>           →  يجب أن يظهر <span class="g">كاملاً</span>   (هنا الخطأ: HomePage يقنّعه)
+  رقم الطرف <span class="r">الآخر</span>     →  يُقنّع عمداً (السائق↔العميل، تلميح OTP) ← <span class="g">صحيح، لا يُمَسّ</span>
+  (الأقنعة الأخرى كلّها على أرقام الغير أو تحدّي OTP — متعمّدة وسليمة)</div>
+  <div class="good"><b>اتجاه الإصلاح المقترح:</b> في <code>HomePage.tsx:251</code> استبدل <code>.slice(-4)</code> بالرقم الكامل: <code>📞 {customerPhone.current}</code>. إصلاح سطر واحد، واجهة فقط، بلا تغيير خلفيّة.</div>
+</div>
+
+<!-- 5 -->
+<h2 id="map">٥) خريطة تسجيل السائق/المزوّد تُغلق الشاشة وترجع للرئيسيّة <span class="sev s-hi">عالية</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>بلغة بسيطة:</b> في HTML، أيّ زرّ داخل «نموذج» (form) <b>بلا تحديد نوعه</b> يُعتبر تلقائيّاً «زرّ إرسال». مُنتقي الموقع في شاشة التسجيل فيه أزرار (تبويبات الخريطة/الكتابة + زرّ «موقعي») <b>نُسِيَ تحديد نوعها</b>، فكلّ ضغطة عليها <b>تُرسِل نموذج التسجيل</b>. وللوصول للخريطة لا بدّ أن تضغط تبويب «🗺️ خريطة» أوّلاً — وهذه الضغطة نفسها تُرسِل النموذج → إن كانت حقولك مكتملة، يُسجَّل الحساب ويُنقَل بك بعيداً → «الشاشة تُغلق وترجع للرئيسيّة».</div>
+  <h3>الجذر: أزرار بلا <code>type="button"</code> داخل <code>&lt;form&gt;</code></h3>
+  <pre><span class="c">// RegistrationPage.tsx:471 — النموذج يلتقط أيّ إرسال</span>
+&lt;form onSubmit={handleSubmit}&gt; ... &lt;LocationPicker/&gt; ... &lt;/form&gt;
+
+<span class="c">// LocationPicker.tsx:405 — زرّ التبويب (4 تبويبات) — بلا type!</span>
+&lt;button onClick={onClick}&gt;{label}&lt;/button&gt;          <span class="r">// type غائب ⇒ submit</span>
+
+<span class="c">// LocationPicker.tsx:208 — زرّ "موقعي" GPS — بلا type!</span>
+&lt;button data-testid="lp-use-my-location" onClick={useMyLocation}&gt; <span class="r">// submit</span>
+
+<span class="c">// LocationPicker.tsx:316 — زرّ البحث (الوحيد الصحيح) — دليل أنّ البقيّة سهو</span>
+&lt;button <span class="g">type="button"</span> onClick={runSearch}&gt;</pre>
+  <div class="diag"><span class="b">تتبّع المسار (لماذا ترجع للرئيسيّة):</span>
+  تضغط تبويب "🗺️ خريطة"  →  زرّ بلا type ⇒ <span class="r">submit</span>  →  handleSubmit يعمل (RegistrationPage.tsx:232)
+     ├─ الحقول مكتملة (مزوّد) →  authApi.register()  →  <span class="r">navigate(target,{replace:true})</span> (سطر 362)
+     │                                                  →  /provider/pending أو /  ←  "ترجع للرئيسيّة"
+     └─ غير مكتملة            →  خطأ تحقّق + قفزة الصفحة  →  يبدو أنّ النموذج "ضاع"
+  (نقرة الخريطة نفسها لا تُرسِل — لكن لا تصلها إلّا بعد ضغط تبويب يُرسِل)</div>
+  <h3>المشكلة الثانية: الأيقونات بلا تسمية</h3>
+  <pre><span class="c">// LocationPicker.tsx:395-421 — TabBtn يعرض الإيموجي فقط</span>
+&lt;button onClick={onClick}&gt;{label}&lt;/button&gt;
+<span class="c">// label = "📍 موقعي" / "🗺️ خريطة" / "🔢 إحداثيات" / "✍ كتابة"</span>
+<span class="r">// بلا aria-label · بلا title · بلا role="tab"/aria-selected</span>  → غلاف بلا نصّ واضح/تلميح</pre>
+  <div class="good"><b>اتجاه الإصلاح المقترح:</b> (1) أضِف <code>type="button"</code> إلى <code>LocationPicker.tsx:405</code> (يُصلح التبويبات الأربعة دفعةً) + <code>:208</code> (زرّ موقعي) → الخريطة تُفتَح وتُنقَر دون إغلاق النموذج. (2) أضِف <code>type="button"</code> لأزرار <code>PlacePicker.tsx</code> (52,56,59,81) دفاعيّاً. (3) أضِف <code>aria-label/title</code> + <code>role="tab"</code> للتبويبات. (4) فعّل قاعدة lint <code>react/button-has-type</code> لمنع التكرار.</div>
+</div>
+
+<!-- 6 -->
+<h2 id="other">٦) أخطاء أخرى وُجِدت أثناء الفحص</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>الخطأ</th><th>الموضع</th><th>الخطورة</th></tr>
+    <tr><td>A</td><td><code>PlacePicker</code> أزراره أيضاً بلا <code>type="button"</code> (خارج النموذج حاليّاً → آمن، لكن نفس فئة العيب)</td><td><code>PlacePicker.tsx:52,56,59,81</code></td><td><span class="sev s-low">منخفضة</span></td></tr>
+    <tr><td>B</td><td>لا قاعدة lint <code>react/button-has-type</code> → 1 من ~8 أزرار فقط صحيح</td><td>إعداد ESLint</td><td><span class="sev s-low">منخفضة</span></td></tr>
+    <tr><td>C</td><td>خيار عنوان قد يظهر <b>فارغاً</b> (عنوان بإحداثيات بلا تسمية)</td><td><code>CheckoutPage.tsx:800</code></td><td><span class="sev s-low">منخفضة</span></td></tr>
+    <tr><td>D</td><td>توصيل لعنوان <b>بلا إحداثيات</b> ممكن → لا وجهة للسائق + يكسر تسعيرة الرسم بصمت</td><td><code>CheckoutPage.tsx:121-154,1063</code></td><td><span class="sev s-med">متوسّطة</span></td></tr>
+    <tr><td>E</td><td>كود مُنتقي العنوان <b>مكرَّر</b> بين Checkout/Errand (يجب إصلاح الاثنين أو استخراج مشترك)</td><td>كلا الملفّين</td><td><span class="sev s-low">منخفضة</span></td></tr>
+    <tr><td>F</td><td>شريط «تابع طلبك» <b>بلا حدّ عمر</b> + يُظهر الأحدث فقط (لا فعل على البقيّة)</td><td><code>HomePage.tsx:157</code></td><td><span class="sev s-med">متوسّطة</span></td></tr>
+    <tr><td>G</td><td>فجوة i18n: <code>home.resume_order</code> غير موجود في ar/en/fr.json (إنجليزيّ/فرنسيّ يرى عربيّاً)</td><td>ملفّات locale</td><td><span class="sev s-low">منخفضة</span></td></tr>
+    <tr><td>H</td><td>تعليق مُضلِّل: <code>HomePage.tsx:138-140</code> يدّعي أنّ DELIVERY_FAILED/DISPUTED «تُعرَض عمداً» — هذا بالضبط ما يجعلها تعلّق</td><td><code>HomePage.tsx:138</code></td><td><span class="sev s-low">منخفضة</span></td></tr>
+    <tr><td>I</td><td>reverse-geocode في الخريطة يبتلع الأخطاء بصمت (<code>.catch(()=&gt;{})</code>)</td><td><code>LocationPicker.tsx:128-138</code></td><td><span class="sev s-low">منخفضة</span></td></tr>
+  </table>
+</div>
+
+<!-- 7 -->
+<h2 id="plan">٧) الأولويّات + اتجاهات الإصلاح المقترحة (بانتظار قرارك)</h2>
+<div class="card">
+  <div class="diag"><span class="y">دفعة 1 — سريعة وعالية الأثر (سطور قليلة):</span>
+  • خريطة التسجيل: +type="button" (LocationPicker 405,208)            ← يُصلح "الشاشة تُغلق"
+  • رقم الهاتف: إزالة .slice(-4) (HomePage 251)                       ← سطر واحد
+<span class="y">دفعة 2 — متوسّطة (مكوّن/منطق):</span>
+  • عنوان الدفع: زر "خريطة/جديد" دائم + افتراضيّ ذكيّ (Errand+Checkout)
+  • شريط الطلب: حدّ عمر + أزرار إلغاء/شكوى (allowed_actions جاهزة)
+<span class="y">دفعة 3 — تجميل/تصلّب:</span>
+  • تسمية أيقونات الخريطة (aria/title) · قاعدة lint · توحيد كود العنوان · i18n
+<span class="b">إعداد منفصل:</span> إيقاف MFA المؤقّت (تعطيل TOTP الأدمين + إفراغ العلَم)</div>
+  <div class="danger"><b>ملاحظة مهمّة:</b> هذا <b>تشخيص فقط</b> — لم أُغيّر أيّ كود. كل الإصلاحات أعلاه <b>مقترحات</b> بانتظار إذنك. الملفّات المعنيّة <b>تحت سطح العميل</b> (ليست منطقة محظورة) عدا الجزء الخلفيّ لـ<code>last_used_at</code> (اختياريّ). أخبرني بأيّ دفعة تريد تنفيذها.</div>
+</div>
+
+<div class="footer">
+  تشخيص 5 نقاط طلبتها + 9 أخطاء مجاورة · كل جذر مؤكَّد بقراءة الكود (file:line) · المنهج: 4 وكلاء تشخيص + تحقّق شخصيّ · لم يُغيَّر أيّ كود (دراسة فقط) · لا مساس بـFIN-COR/المناطق المحظورة · بانتظار قرارك بأيّ دفعة تنفيذ · 2026-06-23
+</div>
+
+</div>
+</body>
+</html>

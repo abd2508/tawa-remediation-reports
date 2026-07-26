@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تقرير التنفيذ المفصّل — بعد خطة v2 · منصة تووا / Tawa</title>
+<style>
+  :root{
+    --bg:#0d1117;--panel:#161b22;--panel2:#1c2230;--ink:#e6edf3;--muted:#9aa6b2;--line:#2a3340;
+    --accent:#2ea043;--accent2:#58a6ff;--crit:#f85149;--high:#ff9800;--med:#e3b341;--ok:#3fb950;
+    --purple:#c678dd;--cyan:#56d4dd;--disp:#d29922;--chip:#21262d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;line-height:1.9;font-size:16px}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px}
+  h1{font-size:2rem;margin:.2em 0}
+  h2{font-size:1.5rem;margin:1.7em 0 .5em;padding-bottom:.3em;border-bottom:2px solid var(--line)}
+  h3{font-size:1.2rem;color:var(--accent2);margin:1.3em 0 .4em}
+  h4{font-size:1.02rem;margin:.7em 0 .3em;color:#c9d4e0}
+  a{color:var(--accent2)}
+  code,.mono{font-family:"Cascadia Code",Consolas,monospace;background:#0b0f14;border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:.83em;direction:ltr;display:inline-block}
+  .hero{background:linear-gradient(135deg,#10331f,#0d1117 65%);border:1px solid var(--line);border-radius:16px;padding:28px;margin-bottom:20px}
+  .hero p{color:#cfe6d6;margin:.3em 0}
+  .pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .pill{background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:.9rem}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+  @media(max-width:860px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .card.ok{border-left:5px solid var(--ok)}.card.crit{border-left:5px solid var(--crit)}
+  .card.fin{border-left:5px solid var(--purple)}.card.staff{border-left:5px solid var(--cyan)}.card.disp{border-left:5px solid var(--disp)}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .stat .n{font-size:1.9rem;font-weight:800;display:block}.stat .l{color:var(--muted);font-size:.82rem}
+  .tag{display:inline-block;border-radius:6px;padding:1px 9px;font-size:.76rem;font-weight:700;margin-inline-start:6px}
+  .t-ok{background:rgba(63,185,80,.14);color:#56d364;border:1px solid #2ea043}
+  .t-crit{background:rgba(248,81,73,.16);color:#ff7b72;border:1px solid #f85149}
+  .t-high{background:rgba(255,152,0,.14);color:#ffb454;border:1px solid #ff9800}
+  .t-med{background:rgba(227,179,65,.14);color:#e3b341;border:1px solid #b58900}
+  .t-disp{background:rgba(210,153,34,.16);color:#e3b341;border:1px solid #d29922}
+  .t-new{background:rgba(198,120,221,.14);color:#d2a8ff;border:1px solid #c678dd}
+  table{width:100%;border-collapse:collapse;margin:.6em 0;font-size:.88rem}
+  th,td{border:1px solid var(--line);padding:7px 10px;text-align:right;vertical-align:top}
+  th{background:var(--panel2);font-weight:700}
+  tr:nth-child(even) td{background:#12171f}
+  .diagram{background:#0b0f14;border:1px solid var(--line);border-radius:10px;padding:16px;margin:.8em 0;overflow-x:auto}
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;font-size:.85rem}
+  .node{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-align:center;min-width:84px}
+  .node.good{border-color:var(--ok);color:#7ee787}.node.bad{border-color:var(--crit);color:#ff7b72}.node.warn{border-color:var(--med);color:#e3b341}
+  .arrow{color:var(--muted);font-size:1.2rem}
+  .ba{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:.6em 0}
+  @media(max-width:680px){.ba{grid-template-columns:1fr}}
+  .before,.after{border-radius:10px;padding:12px 14px;font-size:.9rem}
+  .before{background:rgba(248,81,73,.07);border:1px solid #50221f}
+  .after{background:rgba(63,185,80,.07);border:1px solid #1f4023}
+  .ba .mid{display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:1.5rem}
+  .lbl{font-weight:700;color:#c9d4e0}
+  .block{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin:.5em 0}
+  .b-easy{border-right:4px solid #c678dd}.b-fix{border-right:4px solid #3fb950}.b-test{border-right:4px solid #58a6ff}
+  .note{background:rgba(88,166,255,.07);border:1px solid #1f3350;border-radius:10px;padding:12px 14px;margin:.6em 0}
+  .okbox{background:rgba(63,185,80,.07);border:1px solid #1f4023;border-radius:10px;padding:12px 14px;margin:.6em 0}
+  .dispbox{background:rgba(210,153,34,.08);border:1px solid #5a4a1f;border-radius:10px;padding:12px 14px;margin:.6em 0}
+  ul{margin:.4em 0 .6em;padding-inline-start:1.2em}li{margin:.25em 0}
+  .small{font-size:.85rem;color:var(--muted)}
+  hr{border:none;border-top:1px solid var(--line);margin:1.4em 0}
+  .num{display:inline-block;width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;background:var(--accent);color:#04210f;font-weight:800;margin-inline-end:8px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+  .barwrap{background:#1c2230;border-radius:7px;height:26px;overflow:hidden;display:flex;font-size:.78rem}
+  .barwrap i{display:flex;align-items:center;justify-content:center;height:100%;color:#04210f;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="small">تقرير تنفيذ · يغطّي ما جرى <b>بعد</b> «الخطة المنقّحة v2» مباشرةً · 2026-06-29</div>
+  <h1>🛠️ تقرير التنفيذ المفصّل — تنفيذ الموجات 0 → 4</h1>
+  <p>بعد أن سلّمتُك خطة v2، انتقلنا من <b>التخطيط</b> إلى <b>التنفيذ الفعلي</b>: مراجعة جنائية مالية، ثم تنفيذ/إكمال/تحقّق الموجات الأربع الأولى — مع شرح مبسّط ورسوم لكل خطوة.</p>
+  <div class="pills">
+    <span class="pill">✅ 4 موجات نُفِّذت/أُكمِلت</span>
+    <span class="pill">✍️ 17 ملف كود لمستُه</span>
+    <span class="pill">🧪 6 اختبارات جديدة</span>
+    <span class="pill">🔬 1 مراجعة جنائية (البقشيش)</span>
+    <span class="pill">⚖️ 3 قرارات اتّخذتَها أنت</span>
+    <span class="pill">⛔ صفر commits</span>
+  </div>
+</div>
+
+<div class="note">
+  <b>كيف تقرأ هذا التقرير؟</b> لكل إصلاح ثلاث طبقات بسيطة:
+  <span class="tag" style="background:rgba(198,120,221,.12);color:#d2a8ff;border:1px solid #c678dd">🟣 المشكلة ببساطة</span>
+  <span class="tag t-ok">🟢 ماذا فعلتُ</span>
+  <span class="tag t-med">🔵 كيف تأكّدتُ</span>.
+  والرسوم تُظهر «قبل ← بعد» بصرياً.
+</div>
+
+<!-- BIG PICTURE -->
+<h2 id="picture">١) الصورة الكبيرة — من الخطة إلى التنفيذ</h2>
+<div class="diagram">
+  <div class="flow">
+    <div class="node">📋 خطة v2<br>(التقرير السابق)</div><span class="arrow">→</span>
+    <div class="node warn">🔬 مراجعة<br>البقشيش</div><span class="arrow">→</span>
+    <div class="node good">الموجة 0<br>6 حرجة</div><span class="arrow">→</span>
+    <div class="node good">الموجة 1<br>SPLIT</div><span class="arrow">→</span>
+    <div class="node good">الموجة 2<br>المالية</div><span class="arrow">→</span>
+    <div class="node good">الموجة 3<br>الموظف</div><span class="arrow">→</span>
+    <div class="node good">الموجة 4<br>العالية ×5 دفعات</div>
+  </div>
+  <div class="small" style="text-align:center;margin-top:8px">هذا التقرير يغطّي كل ما بعد «خطة v2».</div>
+</div>
+
+<div class="okbox">
+  <b>🔑 مفاجأة مهمة اكتشفتُها (اشرحها ببساطة):</b> أثناء التنفيذ وجدتُ أن <b>«فريقاً موازياً» (حساب آخر اسمه claude3)</b> كان قد بدأ تنفيذ خطتي على «خادم الاختبار» بنموذج «بلا حفظ نهائي (No-Commit)».
+  لذلك تغيّر دوري من «أكتب كل شيء من الصفر» إلى <b>«أتحقّق بدقّة ممّا فُعِل + أُكمِل الفجوات الحقيقية + لا أُكرّر/أُفسد عمل الغير»</b>.
+  هذا أوفر وأأمن، ويعني أن كثيراً من البنود كانت <b>جاهزة</b> فتحقّقتُ منها، وبعضها كانت <b>ناقصة</b> فأكملتُها بنفسي.
+</div>
+
+<!-- STATS -->
+<h2 id="stats">٢) أرقام سريعة عمّا فعلته</h2>
+<div class="grid g5" style="margin:12px 0">
+  <div class="stat"><span class="n" style="color:var(--ok)">12+</span><span class="l">إصلاح أكملتُه بنفسي</span></div>
+  <div class="stat"><span class="n" style="color:var(--accent2)">30+</span><span class="l">بند تحقّقتُ أنه مُنجَز</span></div>
+  <div class="stat"><span class="n" style="color:var(--purple)">6</span><span class="l">اختبار جديد كتبتُه</span></div>
+  <div class="stat"><span class="n" style="color:var(--med)">3</span><span class="l">بنود أجّلتها بوعي</span></div>
+  <div class="stat"><span class="n" style="color:var(--crit)">0</span><span class="l">commits (النموذج محفوظ)</span></div>
+</div>
+<div class="card">
+  <h4>عدد الاختبارات التي شغّلتُها ونجحت (عيّنات عبر الجلسة)</h4>
+  <div class="barwrap" title="إجمالي تقريبي">
+    <i style="width:100%;background:linear-gradient(90deg,#2ea043,#3fb950)">~250 اختبار ناجح عبر كل المناطق التي لمستُها (Wave0 12 · لا-حضور 7 · قانوني 38 · STAFF 34 · كتالوج 35 · تحويلات/SSE/إشعارات…)</i>
+  </div>
+  <div class="small" style="margin-top:6px">+ أبلغتُك بصدق عن 4 إخفاقات <b>سابقة</b> في اختبارات التحويل (ليست من تعديلي — أثبتُّ ذلك).</div>
+</div>
+
+<!-- F9 FORENSIC -->
+<h2 id="f9">٣) 🔬 المراجعة الجنائية للبقشيش (أول ما طلبتَه)</h2>
+<div class="card disp">
+  <div class="block b-easy"><b>🟣 ببساطة:</b> التقرير قال «النظام يطلب من السائق تسليم نقود أكثر مما عليه لأنه يَحسب البقشيش ضمن المستحق» — وهذا لو صحّ ظلمٌ للسائق. مهمّتي: أفحص بدقّة هل هو خطأ فعلاً أم تصميم سليم؟</div>
+  <div class="diagram">
+    <div class="flow">
+      <div class="node">السائق يُحصّل<br>بضاعة + بقشيش</div><span class="arrow">←</span>
+      <div class="node good">العُهدة تزيد بـ<br>(المبلغ − البقشيش)</div><span class="arrow">=</span>
+      <div class="node good">التسوية اليومية<br>(المبلغ − البقشيش)</div>
+    </div>
+    <div class="small" style="text-align:center;margin-top:8px">الطرفان يستبعدان البقشيش معاً → متطابقان → السائق لا يُطالَب بإكراميّته.</div>
+  </div>
+  <div class="block b-fix"><b>🟢 الحكم:</b> <b>سليم — لا خطأ.</b> تتبّعتُ المال في الكود: العُهدة (<span class="mono">cash_outstanding += amount − tip</span>) والتسوية (<span class="mono">SUM(amount − tip)</span>) كلاهما يستبعد البقشيش. كان قلق التقرير صحيحاً مبدئياً، لكن الكود يستبعد البقشيش بشكل صحيح على الجانبين فعلاً. <b>لم أُغيّر شيئاً</b> (تغيير تصميم سليم = خلق عُطل).</div>
+  <div class="block b-test"><b>🔵 درس:</b> هذا بالضبط سبب قاعدتي «لا تُصلح المال قبل مراجعة جنائية» — لو طبّقتُ التقرير حرفياً لكسرتُ توازن الدفتر.</div>
+</div>
+
+<!-- WAVE 0 -->
+<h2 id="wave0">٤) الموجة 0 — الست الحرجة 🔴</h2>
+<p>هذه تمسّ المال أو تمنع إكمال الطلب أو تَحبس مستخدماً. <b>خمسة منها كانت مُنجَزة (تحقّقتُ)، وواحدة أكملتُها بنفسي (C2).</b></p>
+<table>
+  <tr><th>الرمز</th><th>المشكلة ببساطة</th><th>الحالة</th><th>مَن</th></tr>
+  <tr><td><b>C1</b></td><td>طلب مجدول «بعد 10 دقائق» كان يُرسَل فوراً</td><td><span class="tag t-ok">مُنجَز + تحقّقتُ</span></td><td>claude3</td></tr>
+  <tr><td><b>C2</b></td><td>موظف المتجر يعلق للأبد في شاشة توقيع العقد</td><td><span class="tag t-ok">أكملتُها أنا</span></td><td>أنا</td></tr>
+  <tr><td><b>C3</b></td><td>الدفع المختلط (نقد+محفظة) كان تحصيله مستحيلاً (كود ميت)</td><td><span class="tag t-ok">مُنجَز + تحقّقتُ</span></td><td>claude3</td></tr>
+  <tr><td><b>C4</b></td><td>بعد الإبلاغ عن استثناء نقدي يُقفَل «إرسال الإثبات» بلا مخرج</td><td><span class="tag t-ok">مُنجَز + تحقّقتُ</span></td><td>claude3</td></tr>
+  <tr><td><b>C5</b></td><td>أي سائق يرفع استثناءً نقدياً على أي طلب (ثغرة تفويض)</td><td><span class="tag t-ok">مُنجَز + تحقّقتُ</span></td><td>claude3</td></tr>
+  <tr><td><b>C6</b></td><td>سائق يُفعَّل بلا رخصة/هوية (خطر قانوني)</td><td><span class="tag t-ok">مُنجَز + تحقّقتُ</span></td><td>claude3</td></tr>
+</table>
+
+<h3>🔧 ما أكملتُه: C2 — تحرير الموظف من شاشة العقد</h3>
+<div class="card crit">
+  <div class="block b-easy"><b>🟣 ببساطة:</b> النظام كان يُري الموظف باباً اسمه «وقّع العقد»، يدخله، يلتقط صورته، يضغط «توقيع» — فيصطدم بقفل لا يفتح (رفع الصورة ممنوع عليه). طريق مسدود.</div>
+  <div class="ba">
+    <div class="before"><b>قبل ❌</b><br>الموظف يصل لشاشة التوقيع → يرفع الصورة → <b>403 رفض</b> → عالق للأبد</div>
+    <div class="mid">→</div>
+    <div class="after"><b>بعد ✅</b><br>قرارك: «الموظف لا يوقّع عقداً» → النظام <b>لا يُنشئ له عقداً</b> + المسار مخفيٌّ عنه → يدخل لوحته مباشرة</div>
+  </div>
+  <div class="block b-fix"><b>🟢 ماذا فعلتُ (الخيار أ الذي اخترتَه):</b>
+    <ul>
+      <li>الخلفية (<span class="mono">legal_router.py</span>): حارس يمنع إنشاء عقد لأي دور غير المالك/السائق.</li>
+      <li>الواجهة (<span class="mono">router.tsx</span>): أخفيتُ مسار التوقيع عن الموظف.</li>
+    </ul>
+    <b>اكتشاف وقائي مهم:</b> فرضية الخطة الأصلية («الموظف لا يُنشأ له عقد») كانت <b>ناقصة</b> — الكود كان يُنشئ له عقداً فعلاً. لو أخفيتُ المسار فقط دون حارس الخلفية، لـ<b>حبستُ موظفاً لديه عقد</b>. الحارس يغلق الجذر.</div>
+  <div class="block b-test"><b>🔵 التحقّق:</b> اختبار جديد + 12/12 (Wave 0) + 38/38 (قانوني) + 8/8 (واجهة العقد).</div>
+</div>
+
+<!-- WAVE 1 SPLIT -->
+<h2 id="wave1">٥) الموجة 1 — عنقود الدفع المختلط (SPLIT)</h2>
+<div class="card ok">
+  <div class="block b-easy"><b>🟣 ببساطة:</b> «الدفع المختلط» = العميل يدفع نصفه من المحفظة ونصفه نقداً. كان منشوراً بنصف اكتمال (يكسر سلسلة التحصيل والعمولة).</div>
+  <p><b>كل بنوده مُنجَزة (تحقّقتُ منها):</b> تحصيل السائق · حقل النقد في شاشة السائق · بوابة «النقد أولاً» · خانة الكاش الصحيحة لطلبات المحفظة.</p>
+  <div class="diagram">
+    <div class="flow">
+      <div class="node bad">عمولة الاستلام الذاتي<br>+ SPLIT؟</div><span class="arrow">→</span>
+      <div class="node good">الحلّ الذكي:<br>مَنْع الجمع أصلاً</div><span class="arrow">→</span>
+      <div class="node good">SPLIT للتوصيل فقط<br>(422 واضح)</div>
+    </div>
+  </div>
+  <div class="block b-fix"><b>🟢 نقطة دقيقة (F2):</b> «عمولة الاستلام الذاتي بدفع مختلط» كان يبدو فجوة. لكن الكود <b>يمنع</b> الجمع بين «استلام ذاتي» و«دفع مختلط» برسالة 422 واضحة — وهذا <b>الحلّ الصحيح المتحفّظ</b>، لأنه يتجنّب اختلال الدفتر الذي كان سيسبّبه «إصلاح» ساذج. تحقّقتُ ووثّقتُ أن الحالة سليمة.</div>
+  <div class="block b-test"><b>🔵 التحقّق:</b> 21/21 اختبار (SPLIT + الاستلام الذاتي).</div>
+</div>
+
+<!-- WAVE 2 -->
+<h2 id="wave2">٦) الموجة 2 — التعارضات المالية 💰</h2>
+<div class="grid g2">
+  <div class="card fin">
+    <h4>F5 — إشعار العميل عند عدم الحضور <span class="tag t-ok">نفّذتُه أنا</span></h4>
+    <div class="block b-easy"><b>🟣 ببساطة:</b> حين لا يحضر العميل لاستلام طلبه، يُنشأ عليه دَين يحجب طلباته القادمة — لكن <b>بلا أي إشعار</b>. يكتشف الحجب لاحقاً عند محاولة طلب جديد فيتفاجأ.</div>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>دَين صامت → العميل لا يدري → يُحجَب فجأةً</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>إشعار فوري بالمبلغ والسبب</div>
+    </div>
+    <div class="block b-fix"><b>🟢 فعلتُ:</b> أضفتُ حدثاً <span class="mono">order.no_show</span> + استدعاء إشعار «آمن-عند-الفشل» (الإشعار لا يُعطّل التسوية) عند عدم الحضور.</div>
+    <div class="block b-test"><b>🔵 التحقّق:</b> اختبار جديد + 7/7 (عدم الحضور).</div>
+  </div>
+  <div class="card fin">
+    <h4>F1 — دَين الجزء النقدي في SPLIT <span class="tag t-ok">قرارك + توثيق</span></h4>
+    <div class="block b-easy"><b>🟣 ببساطة:</b> لو لم يحضر عميل دفع مختلط، هل نحمّله دَيناً عن الجزء النقدي غير المدفوع؟</div>
+    <div class="block b-fix"><b>🟢 قرارك:</b> «أبقِ الامتصاص (بلا دَين) ووثّقه». ثبّتُّ التعليق كـ«قرار مشغّل نهائي 2026-06-29».</div>
+  </div>
+  <div class="card ok">
+    <h4>F10 — تسرّب التقييم الأعمى <span class="tag t-ok">تحقّقتُ مُنجَز</span></h4>
+    <div class="block b-easy"><b>🟣 ببساطة:</b> ملف السائق كان يكشف متوسط تقييمه قبل أوانه (يخترق «التقييم الأعمى» المضادّ للانتقام). claude3 أصلحه.</div>
+  </div>
+  <div class="card ok">
+    <h4>F4 — «جهّز نقداً» الناقص <span class="tag t-ok">تحقّقتُ سليم</span></h4>
+    <div class="block b-easy"><b>🟣 ببساطة:</b> المبلغ المعروض يُؤخذ من <b>الخادم</b> بعد إنشاء الطلب (سلطوي وصحيح)، والزرّ يعرض «…» عند جهل الرسم — لا تعرّض لمبلغ ناقص.</div>
+  </div>
+</div>
+<div class="dispbox">
+  <b>⏸️ F3 (بوابة OTP تقيس البضاعة فقط) — أجّلتُها بوعي.</b> الإصلاح الصحيح يتطلّب <b>نقل البوابة في قلب «إنشاء الطلب»</b> بعد حساب الخصم/الرسم — إعادة ترتيب دقيقة لكودٍ حسّاس، مقابل <b>فائدة مجهرية</b> (العتبة معطّلة افتراضياً + الفرق ضئيل). قرّرتُ ألا أُخاطر باستقرار إنشاء الطلب لمكسب هامشي، وأوصيتُ بإعادة هيكلة مخصّصة لاحقاً.
+</div>
+
+<!-- WAVE 3 -->
+<h2 id="wave3">٧) الموجة 3 — صلاحيات موظف المتجر 🏪</h2>
+<p>ستة مواضع كان الموظف يُمنَع فيها أو يُربَك. <b>خمسة مُنجَزة (تحقّقتُ)، وواحدة أكملتُها بقرارك (STAFF-4).</b></p>
+<table>
+  <tr><th>الإجراء</th><th>قبل</th><th>بعد</th><th>مَن</th></tr>
+  <tr><td>رفع صورة العقد</td><td>عالق</td><td>محلول عبر C2</td><td>أنا</td></tr>
+  <tr><td>تحرير استلام السائق (مسح QR)</td><td>ممنوع</td><td>مسموح + يسجّل من حرّر</td><td>claude3</td></tr>
+  <tr><td>عرض الإضافات</td><td>404</td><td>يعمل</td><td>claude3</td></tr>
+  <tr><td>زر القبول الظاهر له خطأً</td><td>403</td><td>مخفيّ عنه</td><td>سابق</td></tr>
+  <tr><td>متابعة الطلب لحظياً (SSE)</td><td>محظور</td><td>مسموح (بلا موقع السائق)</td><td>claude3</td></tr>
+  <tr><td><b>فتح/إغلاق المتجر</b></td><td><b>403</b></td><td><b>مسموح — أكملتُه</b></td><td><b>أنا</b></td></tr>
+</table>
+<div class="card staff">
+  <h4>🔧 ما أكملتُه: STAFF-4 — فتح/إغلاق المتجر للموظف</h4>
+  <div class="block b-easy"><b>🟣 ببساطة:</b> موظف الوردية الصباحية كان يرى زرّ «افتح المتجر» لكن الخادم يرفضه بـ403 → المتجر يبقى مغلقاً حتى يحضر المدير → <b>خسارة مبيعات</b>.</div>
+  <div class="block b-fix"><b>🟢 قرارك «نعم اسمح للموظف» → فعلتُ:</b> الزرّ الرئيسي كان يعمل سلفاً؛ أكملتُ الاتساق بجعل النقطتين القديمتين (<span class="mono">/me/status</span> و<span class="mono">/me/accept-toggle</span>) تقبلان الموظف وتستخدمان البحث الواعي به. القبول/الرفض يبقى للمدير.</div>
+  <div class="block b-test"><b>🔵 التحقّق:</b> اختبار جديد + 34/34 (الموظف + المزوّد).</div>
+</div>
+
+<!-- WAVE 4 -->
+<h2 id="wave4">٨) الموجة 4 — أنماط العالية (5 دفعات) 🟠</h2>
+<p>الموجة الأكبر (40 بنداً). أنجزتُها في <b>دفعات متحقَّقة</b> بدل دفعة واحدة متعجّلة. هذه ملخّصات بصرية لكل إصلاح أكملتُه:</p>
+
+<div class="grid g2">
+  <div class="card ok">
+    <h4>الدفعة 1-أ · تجميع اتصالات Redis <span class="tag t-high">أداء</span></h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>اتصال Redis <b>جديد</b> لكل نشر (عشرات/ثانية تحت الحمل)</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>إعادة استخدام الـ<b>pool</b> المشترك</div>
+    </div>
+    <div class="small">🟣 كأنك تفتح خطّ هاتف جديد لكل رسالة بدل استخدام خطّ مفتوح. <span class="mono">publish.py</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 1-ب · رمز التحقّق لا يضيع <span class="tag t-high">محفظة</span></h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>يُحذف الرمز <b>قبل</b> التحويل → أي فشل = إعادة تحقّق من الصفر</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>يُحذف <b>بعد</b> نجاح التحويل فقط</div>
+    </div>
+    <div class="small">🟣 لا نُمزّق التذكرة قبل أن تركب. <span class="mono">transfer_router.py</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 1-ج · التقييم لا يبتلع الفشل <span class="tag t-high">تقييم</span></h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>تُغلق نافذة التقييم «بنجاح» حتى لو فشل الإرسال → تقييمات تُفقَد صامتةً</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>رسالة خطأ + النافذة تبقى مفتوحة لإعادة المحاولة</div>
+    </div>
+    <div class="small">🟣 لا نقول «تمّ» ونحن لا ندري. <span class="mono">ThreeLayerRating.tsx</span> + اختبار جديد</div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 2-أ · سرعة صفحة تحويلات OPS <span class="tag t-high">أداء</span></h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>~800 استعلام لصفحة واحدة (4 لكل صف × 200)</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>استعلامان فقط (جلب جماعي)</div>
+    </div>
+    <div class="small">🟣 نجلب كل الأسماء دفعة واحدة بدل واحداً-واحداً. <span class="mono">transfer_router.py</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 2-ب · رسالة «المتجر مغلق» الواضحة</h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>«خطأ في التحقق من البيانات» (غامض)</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>«المتجر مغلق خارج ساعات الدوام — حاول في وقت العمل»</div>
+    </div>
+    <div class="small">🟣 رسالة يفهمها الزبون. <span class="mono">order_router.py</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 2-ج · عنصر «مغلق» لا يُنقَر</h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>يضغط متجراً مغلقاً → يملأ السلة → يُرفض في الدفع</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>العنصر المغلق غير قابل للنقر (مع شارة «مغلق الآن»)</div>
+    </div>
+    <div class="small">🟣 نمنع الطريق المسدود من البداية. <span class="mono">SearchResultsPage.tsx</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 3-أ · سبب رفض وثيقة السائق</h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>«راجع تعليق الفريق» (ثابت، بلا معلومة)</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>السبب الفعلي من المراجِع (صورة ضبابية؟ منتهية؟)</div>
+    </div>
+    <div class="small">🟣 السائق يعرف ما يصلحه. <span class="mono">DriverPending.tsx</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 3-ب · حالات الشكوى بالعربية</h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br><span class="mono">RESOLVED_IN_FAVOR_OF_CUSTOMER</span> (إنجليزي خام)</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>«تم الحل لصالحك» + شارة بلون صحيح</div>
+    </div>
+    <div class="small">🟣 العميل والمزوّد يفهمان النتيجة. <span class="mono">OrderTrackingPage + ProviderDashboard</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 4-أ · منع الضغط المزدوج <span class="tag t-high">مزوّد</span></h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>ضغطتان سريعتان على «قبول» → خطأ 422 محيّر</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>الزرّ يُعطَّل أثناء التنفيذ</div>
+    </div>
+    <div class="small">🟣 لا نقبل ضغطتين على نفس الطلب. <span class="mono">ProviderOrderQueue.tsx</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 4-ب · أرباح «مدفوع» مقابل «معلّق»</h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>رقم واحد كبير → المزوّد يظنه مقبوضاً</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>«✅ مدفوع: X · ⏳ قيد الانتظار: Y»</div>
+    </div>
+    <div class="small">🟣 شفافية مالية. <span class="mono">ProviderEarnings.tsx</span></div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 4-ج · منع تكرار طلب الصرف</h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>ضغطات متكرّرة → طلبات مكرّرة تُربك المالية</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>طلب ثانٍ خلال ساعة → 429 (تهدئة)</div>
+    </div>
+    <div class="small">🟣 طلب واحد يكفي. <span class="mono">provider_settlement_router.py</span> + اختبار</div>
+  </div>
+  <div class="card ok">
+    <h4>الدفعة 5 · فرز «الأرخص» الصحيح <span class="tag t-high">عميل</span></h4>
+    <div class="ba">
+      <div class="before"><b>قبل ❌</b><br>يجلب 50 عشوائياً ثم يفرز → «الأرخص» يفوّت الأرخص الحقيقي</div>
+      <div class="mid">→</div>
+      <div class="after"><b>بعد ✅</b><br>الفرز في قاعدة البيانات <b>قبل</b> القصّ → أرخص الفئة كلها</div>
+    </div>
+    <div class="small">🟣 «الأرخص» يعني فعلاً الأرخص. <span class="mono">food_categories_router.py</span> + اختبار</div>
+  </div>
+</div>
+
+<div class="diagram" style="margin-top:14px">
+  <h4 style="margin-top:0">📈 رسم: لماذا كان «الأرخص» خاطئاً؟ (مثال مبسّط)</h4>
+  <div class="flow">
+    <div class="node bad">200 صنف بالفئة</div><span class="arrow">→</span>
+    <div class="node bad">خُذ 50 بأي ترتيب</div><span class="arrow">→</span>
+    <div class="node bad">رتّبها بالسعر</div><span class="arrow">→</span>
+    <div class="node bad">الأرخص الحقيقي<br>(رقم 70) لا يظهر أبداً!</div>
+  </div>
+  <div style="text-align:center;color:var(--muted);margin:6px 0">↓ بعد الإصلاح ↓</div>
+  <div class="flow">
+    <div class="node good">200 صنف بالفئة</div><span class="arrow">→</span>
+    <div class="node good">رتّبها بالسعر أولاً<br>(في قاعدة البيانات)</div><span class="arrow">→</span>
+    <div class="node good">خُذ أرخص 50</div><span class="arrow">→</span>
+    <div class="node good">الأرخص الحقيقي<br>يظهر دائماً ✅</div>
+  </div>
+</div>
+
+<!-- DECISIONS -->
+<h2 id="decisions">٩) القرارات الثلاثة التي اتّخذتَها أنت ⚖️</h2>
+<table>
+  <tr><th>القرار</th><th>اخترتَ</th><th>أثره</th></tr>
+  <tr><td><b>C2:</b> هل يوقّع الموظف عقداً؟</td><td>لا → الخيار أ</td><td>حارس خلفي يمنع العقد + إخفاء المسار</td></tr>
+  <tr><td><b>F1:</b> دَين الجزء النقدي في SPLIT عند عدم الحضور؟</td><td>أبقِ الامتصاص ووثّقه</td><td>لا دَين + توثيق نهائي</td></tr>
+  <tr><td><b>STAFF-4:</b> هل يفتح/يغلق الموظف المتجر؟</td><td>نعم اسمح له</td><td>الموظف يدير الوردية كاملة</td></tr>
+</table>
+<div class="note">في كل مرة كان البند <b>قراراً تجارياً/سياسياً</b> (لا خطأ تقنياً واضحاً)، توقّفتُ وسألتُك بدل أن أخمّن — لأن إجابتك تُغيّر الكود.</div>
+
+<!-- DEFERRED -->
+<h2 id="deferred">١٠) ما أجّلتُه بوعي (وأسبابه) ⏸️</h2>
+<div class="grid g3">
+  <div class="card disp"><h4>F3 — بوابة OTP بالبضاعة فقط</h4><p class="small">يحتاج نقل البوابة في قلب إنشاء الطلب (كود حسّاس) لمكسب مجهري (العتبة معطّلة افتراضياً). أوصيتُ بإعادة هيكلة مخصّصة.</p></div>
+  <div class="card disp"><h4>H4 — <span class="mono">has_more</span> قبل الفلتر</h4><p class="small">فلتر ساعات العمل يُقيَّم في Python لا SQL، فلا يمكن إصلاحه بنظافة دون إعادة هيكلة كبيرة. أي تعديل سطحي سيكون خاطئاً.</p></div>
+  <div class="card disp"><h4>بنود خلفية أكبر</h4><p class="small">endpoint سبب رفض الانضمام · شاشة OPS لطلبات الصرف · قصور حدّ الـ50 في الأرباح — تحتاج عملاً خلفياً أوسع، للدفعات القادمة.</p></div>
+</div>
+
+<!-- PRINCIPLES -->
+<h2 id="principles">١١) المبادئ التي التزمتُ بها</h2>
+<div class="grid g2">
+  <div class="card">
+    <ul>
+      <li><b>تحقّق قبل التعديل:</b> الكود الحيّ هو الحقيقة، لا الخطة. كثيرٌ كان مُنجَزاً فتحقّقتُ بدل إعادة الكتابة.</li>
+      <li><b>لا أُفسد عمل الفريق الموازي:</b> أضفتُ فوق عمل claude3 بحذر، ونسّقتُ عبر الذاكرة المشتركة بعد كل خطوة.</li>
+      <li><b>حذر مالي:</b> أي بند مالي مُتنازَع (البقشيش) مرّ بمراجعة جنائية قبل أي سطر.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <ul>
+      <li><b>صدق تام:</b> أبلغتُك أن 4 إخفاقات اختبار <b>سابقة</b> وليست من تعديلي — وأثبتُّ ذلك بتجربة مستقلّة.</li>
+      <li><b>اختبار لكل إصلاح:</b> 6 اختبارات جديدة + تشغيل الانحدار في كل منطقة لمستُها.</li>
+      <li><b>صفر commits:</b> النموذج المرحلي محفوظ بالكامل (لا حفظ نهائي بلا إذنك).</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SCOREBOARD -->
+<h2 id="score">١٢) لوحة الإنجاز النهائية</h2>
+<div class="diagram">
+  <table>
+    <tr><th>الموجة</th><th>الحالة</th><th>دوري</th></tr>
+    <tr><td><span class="num">0</span>الست الحرجة</td><td><span class="tag t-ok">مكتملة</span></td><td>أكملتُ C2 · تحقّقتُ من 5</td></tr>
+    <tr><td><span class="num">1</span>الدفع المختلط</td><td><span class="tag t-ok">مكتملة</span></td><td>تحقّقتُ (F2 محلولة بتحفّظ صحيح)</td></tr>
+    <tr><td><span class="num">2</span>المالية</td><td><span class="tag t-ok">مكتملة عملياً</span></td><td>F5 نفّذتُه · F1 وثّقتُه · F3 أجّلتُه</td></tr>
+    <tr><td><span class="num">3</span>الموظف</td><td><span class="tag t-ok">مكتملة</span></td><td>أكملتُ STAFF-4 · تحقّقتُ من 5</td></tr>
+    <tr><td><span class="num">4</span>العالية</td><td><span class="tag t-med">5 دفعات منجَزة · فجوات للقادم</span></td><td>12 إصلاحاً عبر 5 دفعات</td></tr>
+  </table>
+</div>
+<div class="okbox"><b>الخلاصة:</b> الموجات 0–3 <b>مكتملة</b> (تنفيذاً وتحقّقاً)، والموجة 4 تتقدّم بثبات عبر دفعات متحقَّقة. كل ذلك <b>بلا أي commit</b> وبتنسيق كامل مع الفريق الموازي، وبصدق تام عن المُنجَز/المؤجَّل/الموروث.</div>
+
+<hr>
+<p class="small" style="text-align:center;color:var(--muted)">
+  تقرير تنفيذ · يغطّي ما بعد «خطة v2» مباشرةً · 17 ملف كود · 6 اختبارات جديدة · ~250 اختبار ناجح في المناطق الملموسة · مراجعة جنائية واحدة · 3 قرارات مُشغّل · ⛔ صفر commits<br>
+  منصة تووا / Tawa · 2026-06-29
+</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير مفصّل: قفل IP · البروكسي المزدوج · الخيارات الثلاثة — tawanow 2026-06-23</title>
+<style>
+  :root{
+    --green:#1b7f4f;--green-d:#0f5c38;--amber:#9a6b00;--red:#b3261e;--blue:#1558b0;--purple:#6b3fa0;
+    --bg:#f5f7f6;--card:#fff;--ink:#17241e;--muted:#5b6b63;--line:#dde6e1;
+    --ok:#e8f5ee;--okl:#9fd6b7;--warn:#fdf4e3;--warnl:#e9cd8f;--bad:#fdecea;--badl:#f0b3ad;--blbg:#e7eefb;--bll:#b9cdf0;--pur:#f1eafa;--purl:#cdb6ea;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;line-height:1.8}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f5c38,#1b7f4f);color:#fff;border-radius:18px;padding:34px;box-shadow:0 10px 30px rgba(15,92,56,.25)}
+  header.hero h1{margin:0 0 8px;font-size:22px;line-height:1.5}
+  header.hero p{margin:4px 0;opacity:.95;font-size:13px}
+  .meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+  .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:12px}
+  h2{margin:34px 0 13px;font-size:20px;color:var(--green-d);border-right:6px solid var(--green);padding:8px 14px 8px 0;background:linear-gradient(90deg,#eef6f1,transparent)}
+  h3{margin:18px 0 8px;font-size:15.5px;color:var(--green-d)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:13px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.4px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#eef6f1;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fbfdfc}
+  .ok{background:var(--ok)!important}.warn{background:var(--warn)!important}.bad{background:var(--bad)!important}.bl{background:var(--blbg)!important}.pur{background:var(--pur)!important}
+  .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:10px;font-weight:700;white-space:nowrap}
+  .pill.g{background:var(--ok);color:var(--green-d);border:1px solid var(--okl)}
+  .pill.a{background:var(--warn);color:var(--amber);border:1px solid var(--warnl)}
+  .pill.r{background:var(--bad);color:var(--red);border:1px solid var(--badl)}
+  .pill.b{background:var(--blbg);color:var(--blue);border:1px solid var(--bll)}
+  code{background:#eef2ef;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-family:"Cascadia Code",Consolas,monospace;font-size:11.2px;direction:ltr;display:inline-block}
+  .diag{background:#0e1f18;border-radius:12px;padding:16px;color:#d7ffe9;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.3px;line-height:1.65;overflow:auto;white-space:pre}
+  .diag .y{color:#ffd479}.diag .r{color:#ff9a8c}.diag .g{color:#7fffb0}.diag .b{color:#8cc6ff}.diag .m{color:#d9a8ff}.diag .c{color:#7fb89a}.diag .w{color:#fff}
+  .simple{background:#eef6ff;border:1px solid var(--bll);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.8px}
+  .simple b{color:var(--blue)}
+  .danger{background:var(--bad);border:1px solid var(--badl);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.7px}
+  .danger b{color:var(--red)}
+  .good{background:#f3fbf6;border:1px solid var(--okl);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:12.7px}
+  .good b{color:var(--green-d)}
+  .note{font-size:11.8px;color:var(--muted)}
+  .dash{display:flex;flex-wrap:wrap;gap:9px;margin:8px 0}
+  .kpi{flex:1 1 150px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .kpi.g{background:var(--ok);border-color:var(--okl)}.kpi.r{background:var(--bad);border-color:var(--badl)}.kpi.a{background:var(--warn);border-color:var(--warnl)}
+  .kpi .n{font-size:14px;font-weight:800;color:var(--green-d)}.kpi.r .n{color:var(--red)}.kpi.a .n{color:var(--amber)}
+  .kpi .l{font-size:10.5px;color:var(--muted)}
+  .toc{columns:2;font-size:13px;gap:24px}@media(max-width:760px){.toc{columns:1}}
+  .toc a{color:var(--blue);text-decoration:none;display:block;padding:2px 0}
+  .opt{border-radius:14px;padding:18px;margin:13px 0;border:2px solid}
+  .opt.o1{background:#f3fbf6;border-color:var(--okl)}
+  .opt.o2{background:#e7eefb;border-color:var(--bll)}
+  .opt.o3{background:#fdf4e3;border-color:var(--warnl)}
+  .opt h3{margin-top:0}
+  .badge{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;margin-right:6px}
+  .b-rec{background:var(--ok);color:var(--green-d)}.b-mid{background:var(--blbg);color:var(--blue)}.b-risk{background:var(--bad);color:var(--red)}
+  .footer{margin:30px 0 8px;text-align:center;color:var(--muted);font-size:11.8px}
+  ul{margin:5px 0;padding-right:20px}li{margin:4px 0;font-size:12.6px}
+  .pro{color:var(--green-d)}.con{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير مفصّل: قفل IP — لماذا لم يعمل، البروكسي المزدوج، والخيارات الثلاثة</h1>
+  <p>منظومة تووا / Tawa · <b>https://tawanow.com</b> · محاولة تفعيل قفل IP على عنوان المشغّل · 2026-06-23</p>
+  <p>الحالة الآمنة الحاليّة: <b>قفل IP فارغ = مفتوح · وصولك مُستعاد · MFA الصارم فعّال</b> — لم تُقفَل</p>
+  <div class="meta">
+    <span>🔎 اكتشاف: الخادم يرى الجميع كـ172.25.0.1 (بوّابة Docker)</span>
+    <span>🧩 السبب: بروكسي مزدوج يكتب فوق X-Real-IP</span>
+    <span>📉 عائق ثانٍ: عنوانك ديناميكيّ</span>
+    <span>⚖️ 3 خيارات للقرار</span>
+  </div>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:0">📑 الفهرس</h3>
+  <div class="toc">
+    <a href="#what">١ · ماذا حدث بالضبط (التسلسل الحيّ)</a>
+    <a href="#root">٢ · السبب الجذريّ: البروكسي المزدوج (رسم)</a>
+    <a href="#why">٣ · لماذا قفل IP لا يعمل كما هو</a>
+    <a href="#dyn">٤ · العائق الثاني: عنوانك ديناميكيّ</a>
+    <a href="#collateral">٥ · اكتشاف جانبيّ: rate-limit + قفل الدخول</a>
+    <a href="#options">٦ · الخيارات الثلاثة (تفصيل عميق)</a>
+    <a href="#matrix">٧ · مصفوفة المقارنة</a>
+    <a href="#rec">٨ · التوصية + break-glass</a>
+  </div>
+</div>
+
+<!-- 1 -->
+<h2 id="what">١) ماذا حدث بالضبط — التسلسل الحيّ</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>الإجراء</th><th>النتيجة الحيّة</th></tr>
+    <tr><td>1</td><td>اكتشاف عنوانك العامّ</td><td>IPv4 <code>217.228.240.34</code> · IPv6 <code>2003:c4:7f09:…</code> (يختلف عن السابق <code>…7f40…</code> → <b>متغيّر</b>)</td></tr>
+    <tr><td>2</td><td>ضبط <code>ADMIN_IP_ALLOWLIST=217.228.240.34</code> + إعادة إنشاء backend</td><td>backend صحّيّ · المتغيّر داخل الحاوية ✓</td></tr>
+    <tr class="bad"><td>3</td><td>اختبار <code>/control-panel</code> من جهازك</td><td><b>403 IP_NOT_ALLOWED</b> — محجوب!</td></tr>
+    <tr class="bad"><td>4</td><td>قراءة سجلّ الخادم</td><td><code>Admin IP blocked: <b>172.25.0.1</b> path=/control-panel</code> — الخادم رأى <b>بوّابة Docker</b>، لا عنوانك!</td></tr>
+    <tr class="ok"><td>5</td><td><b>إرجاع فوريّ</b>: <code>ADMIN_IP_ALLOWLIST=""</code> (فارغ=مفتوح) + إعادة إنشاء</td><td><code>/control-panel</code> = <b>401 UNAUTHORIZED</b> (مفتوح، لا IP_NOT_ALLOWED) → <b>وصولك مُستعاد</b> ✓</td></tr>
+    <tr><td>6</td><td>فحص الطوبولوجيا</td><td>أُكِّد: <b>nginx على المضيف (:443 TLS) → nginx الحاوية (127.0.0.1:8080) → backend</b></td></tr>
+  </table>
+  <div class="good"><b>المهمّ:</b> لم تُقفَل. الحالة الآن = قفل IP <b>مُطفأ (مفتوح)</b> تماماً كما كان، و<b>MFA الصارم فعّال</b> يحمي لوحة التحكّم (كلمة مرور + كود TOTP).</div>
+</div>
+
+<!-- 2 -->
+<h2 id="root">٢) السبب الجذريّ: البروكسي المزدوج</h2>
+<div class="card">
+  <div class="simple">🟦 <b>بلغة بسيطة:</b> طلبك يمرّ عبر <b>بوّابتين</b> (حارسين) قبل الخادم. الحارس الثاني (داخل Docker) يكتب على «بطاقة هويّة الزائر» <b>عنوانه هو</b> بدل عنوانك الحقيقيّ. فحين يصل الطلب للخادم، يرى عنوان الحارس الثاني (<code>172.25.0.1</code>) لا عنوانك.</div>
+  <div class="diag"><span class="b">رحلة الطلب الفعليّة (مُثبَتة حيّاً):</span>
+
+  <span class="w">[ متصفّحك ]</span>  عنوانك الحقيقيّ = <span class="g">217.228.240.34</span>
+       │  HTTPS
+       ▼
+  <span class="y">[ nginx على المضيف ]</span>  :443 (إنهاء TLS)
+       │  remote_addr = <span class="g">217.228.240.34</span>  ← يرى عنوانك الصحيح
+       │  يضبط X-Real-IP = <span class="g">217.228.240.34</span> ✓ (صحيح هنا)
+       │  proxy_pass → 127.0.0.1:8080
+       ▼
+  <span class="r">[ nginx داخل الحاوية ]</span>  :80 (المنفذ 127.0.0.1:8080)
+       │  remote_addr = <span class="r">172.25.0.1</span> (بوّابة Docker — لا عنوانك!)
+       │  <span class="r">proxy_set_header X-Real-IP $remote_addr</span>  ← يكتب فوق X-Real-IP
+       │  X-Real-IP الآن = <span class="r">172.25.0.1</span>  ✗ (دُمِّر عنوانك)
+       ▼
+  <span class="w">[ backend ]</span>  _get_client_ip() يقرأ X-Real-IP = <span class="r">172.25.0.1</span>
+       → قفل IP يقارن <span class="r">172.25.0.1</span> ≠ <span class="g">217.228.240.34</span> → <span class="r">403 حجب</span></div>
+  <p class="note"><b>الدليل المؤكَّد:</b> سجلّ <code>app.core.ip_allowlist</code>: <code>"Admin IP blocked: 172.25.0.1"</code> · فحص المنافذ: nginx مضيف على <code>0.0.0.0:443</code> + تعيين الحاوية <code>80/tcp → 127.0.0.1:8080</code>.</p>
+  <h3>لماذا «يكتب فوق»؟ تفصيل تقنيّ</h3>
+  <p class="note">nginx الحاوية فيه السطر <code>proxy_set_header X-Real-IP $remote_addr;</code>. الـ<code>$remote_addr</code> عنده = من يتّصل به مباشرةً = nginx المضيف عبر شبكة Docker = البوّابة <code>172.25.0.1</code>. فبدل تمرير الـX-Real-IP الصحيح القادم من المضيف، يستبدله بعنوان البوّابة. (الـ<code>X-Forwarded-For</code> يُلحَق لا يُستبدَل، فعنوانك الحقيقيّ ما يزال داخله بترتيب <code>217.228.240.34, 172.25.0.1</code> — لكن <code>_get_client_ip</code> يقرأ X-Real-IP أولاً فلا يصل لـXFF.)</p>
+</div>
+
+<!-- 3 -->
+<h2 id="why">٣) لماذا قفل IP لا يعمل كما هو — وضعان فاشلان</h2>
+<div class="card">
+  <div class="diag"><span class="r">الوضع (أ): أضع عنوانك الحقيقيّ</span>  ADMIN_IP_ALLOWLIST = 217.228.240.34
+     الخادم يرى الجميع كـ172.25.0.1 ≠ 217.228.240.34
+     → <span class="r">يُحجَب الجميع (وأنت) — 403</span>  ✗ (هذا ما حدث فعلاً)
+
+  <span class="r">الوضع (ب): أضع عنوان البوّابة</span>  ADMIN_IP_ALLOWLIST = 172.25.0.1
+     الخادم يرى الجميع كـ172.25.0.1 = 172.25.0.1
+     → <span class="r">يُسمح للجميع — بلا أيّ قيمة أمنيّة</span>  ✗ (قفل وهميّ)</div>
+  <p>أيّ قيمة أضعها تقع في أحد هذين الفخّين. <b>لا يمكن التمييز بين زائر وآخر</b> ما دام الخادم يرى عنواناً واحداً للجميع. الحلّ الوحيد = إصلاح سلسلة البروكسي ليصل العنوان الحقيقيّ.</p>
+</div>
+
+<!-- 4 -->
+<h2 id="dyn">٤) العائق الثاني (مستقلّ): عنوانك ديناميكيّ</h2>
+<div class="card warn" style="border-color:var(--warnl)">
+  <div class="simple">🟦 <b>بلغة بسيطة:</b> حتى لو أصلحنا البروكسي ورأى الخادم عنوانك الحقيقيّ، فعنوانك السكنيّ <b>يتغيّر</b> (مزوّدو الإنترنت في ألمانيا غالباً يُدوّرون العنوان كلّ ~24 ساعة أو عند إعادة تشغيل الراوتر). فالقفل المضبوط على عنوان اليوم <b>سيرفضك غداً</b>.</div>
+  <ul>
+    <li><b>IPv4</b> <code>217.228.240.34</code> — سكنيّ ألمانيّ، شبه مؤكَّد أنّه ديناميكيّ.</li>
+    <li><b>IPv6</b> <code>2003:c4:7f09:ee00:…</code> — تغيّر فعلاً عن قراءة سابقة (<code>2003:c4:7f40:a300:…</code>) → <b>دليل حيّ على التغيّر</b>.</li>
+    <li>القفل يطابق العنوان <b>بالضبط</b> (لا نطاقات CIDR) → أيّ تغيّر = حجب فوريّ → تحتاج break-glass.</li>
+  </ul>
+  <p class="note"><b>الخلاصة:</b> قفل IP مصمَّم لعنوان <b>ثابت</b> (مكتب/خادم/VPN بعنوان خروج ثابت). عنوان سكنيّ ديناميكيّ خيار هشّ بطبيعته — مهما أصلحنا البروكسي.</p>
+</div>
+
+<!-- 5 -->
+<h2 id="collateral">٥) اكتشاف جانبيّ مهمّ: rate-limit + قفل الدخول يُصابان بنفس العلّة</h2>
+<div class="card">
+  <p>الدالّة <code>_get_client_ip</code> نفسها يستخدمها أيضاً <b>مُحدّد المعدّل (rate limiter)</b> و<b>قفل محاولات الدخول</b>. وبما أنّها ترى الجميع كـ<code>172.25.0.1</code>:</p>
+  <table>
+    <tr><th>الميزة</th><th>المقصود</th><th>الواقع الآن (بسبب العلّة)</th></tr>
+    <tr class="warn"><td>Rate limit (60/دقيقة لكل IP)</td><td>لكلّ زائر دلوه</td><td>الجميع في <b>دلو واحد</b> (172.25.0.1) → الحدّ شبه عالميّ</td></tr>
+    <tr class="warn"><td>قفل الدخول per-(user, ip)</td><td>عزل المهاجم عن الضحيّة</td><td>الـIP ثابت للجميع → التمييز per-IP ضائع</td></tr>
+  </table>
+  <div class="good"><b>الجانب المضيء:</b> إصلاح <code>_get_client_ip</code> (الخيار ٢ و٣) <b>يُصلح هذه الثلاثة معاً</b> (قفل IP + rate-limit + قفل الدخول) — تحسين أمنيّ حقيقيّ بصرف النظر عن قفل IP.</div>
+</div>
+
+<!-- 6 -->
+<h2 id="options">٦) الخيارات الثلاثة — تفصيل عميق</h2>
+
+<div class="opt o1">
+  <h3><span class="badge b-rec">موصى به</span> الخيار ١: لا تُفعّل قفل IP (MFA يكفي)</h3>
+  <p><b>ماذا يحدث:</b> نترك قفل IP مُطفأً (فارغ=مفتوح) كما هو الآن. لا تغيير في الكود ولا البنية. الحماية تعتمد على <b>MFA الصارم</b> الفعّال (كلمة مرور + كود TOTP).</p>
+  <table>
+    <tr><th>الجانب</th><th>التفصيل</th></tr>
+    <tr><td class="pro">✅ المخاطر</td><td>صفر — لا تغيير، لا خطر قفل، لا لمس بنية</td></tr>
+    <tr><td class="pro">✅ الجهد</td><td>صفر (الحالة الحاليّة)</td></tr>
+    <tr><td class="pro">✅ الحماية</td><td>MFA الصارم قويّ: كلمة المرور المسروقة عديمة الجدوى بلا هاتفك. هذا هو الضابط الأهمّ أصلاً.</td></tr>
+    <tr><td class="con">⚠️ ما يفوتك</td><td>طبقة دفاع شبكيّة إضافيّة (defense-in-depth) — لكنّها هشّة لعنوان ديناميكيّ على أيّة حال · يبقى rate-limit/قفل-الدخول يريان بوّابة واحدة</td></tr>
+  </table>
+  <p class="note"><b>لمن يناسب:</b> إن كان MFA كافياً لراحتك (وهو معيار صناعيّ قويّ للأدمين)، وعنوانك ديناميكيّ.</p>
+</div>
+
+<div class="opt o2">
+  <h3><span class="badge b-mid">توازن</span> الخيار ٢: أصلِح سلسلة البروكسي فقط (بلا قفل IP)</h3>
+  <p><b>ماذا يحدث:</b> أُعدّل <code>_get_client_ip</code> ليقرأ العنوان الحقيقيّ في هذه الطوبولوجيا المزدوجة (يُفضّل <code>X-Forwarded-For</code> بعدد قفزات صحيح، أو يتجاهل X-Real-IP المكتوب فوقه). <b>أترك قفل IP مُطفأً</b> حتى يكون لديك عنوان ثابت/VPN.</p>
+  <table>
+    <tr><th>الجانب</th><th>التفصيل</th></tr>
+    <tr><td class="pro">✅ يُصلح 3 معاً</td><td>قفل IP (يصبح جاهزاً) + <b>rate-limit per-IP حقيقيّ</b> + <b>قفل الدخول per-IP حقيقيّ</b> — تحسين أمنيّ ملموس فوريّ</td></tr>
+    <tr><td class="pro">✅ بلا خطر قفل</td><td>قفل IP يبقى مُطفأً → لا أحد يُقفَل</td></tr>
+    <tr><td class="con">⚠️ يلمس كوداً</td><td><code>backend/app/core/rate_limiter.py</code> (نطاق التقوية — مأذون) + ربّما config قفزات · يحتاج اختبار حذِر (يؤثّر على rate-limit/lockout)</td></tr>
+    <tr><td class="con">⚠️ لا قفل IP بعد</td><td>طبقة الشبكة لا تُفعَّل الآن (تنتظر عنوانك الثابت)</td></tr>
+    <tr><td>الجهد</td><td>متوسّط: تعديل + اختبار على الاستاجينج المعزول أولاً ثم نشر مُتحقَّق</td></tr>
+    <tr><td>الإرجاع</td><td>سهل (تعديل دالّة واحدة قابل للعكس)</td></tr>
+  </table>
+  <p class="note"><b>لمن يناسب:</b> تريد تحسين rate-limit/قفل-الدخول الحقيقيّ الآن، وتؤجّل قفل IP حتى تجهّز عنواناً ثابتاً/VPN.</p>
+</div>
+
+<div class="opt o3">
+  <h3><span class="badge b-risk">هشّ</span> الخيار ٣: أصلِح السلسلة + فعّل القفل الآن على عنوانك الحاليّ</h3>
+  <p><b>ماذا يحدث:</b> كالخيار ٢ ثم أُفعّل القفل على <code>217.228.240.34</code>. يعمل <b>الآن</b> — لكن يكسر عند تغيّر عنوانك السكنيّ.</p>
+  <table>
+    <tr><th>الجانب</th><th>التفصيل</th></tr>
+    <tr><td class="pro">✅ دفاع شبكيّ كامل</td><td>قفل IP فعّال + الإصلاحات الثلاثة</td></tr>
+    <tr><td class="con">🔴 خطر قفل عالٍ</td><td>عنوانك <b>ديناميكيّ</b> → عند تغيّره (ربّما خلال ساعات/أيّام) <b>تُقفَل خارج لوحة التحكّم</b> وتحتاج break-glass عبر SSH</td></tr>
+    <tr><td class="con">⚠️ صيانة مستمرّة</td><td>كلّ تغيّر عنوان = تحديث القائمة + إعادة إنشاء backend</td></tr>
+    <tr><td>الجهد</td><td>متوسّط (كالخيار ٢) + متابعة دائمة</td></tr>
+    <tr><td>الإرجاع</td><td>break-glass: <code>ADMIN_IP_ALLOWLIST=""</code> عبر SSH (يتطلّب وصول الخادم)</td></tr>
+  </table>
+  <div class="danger"><b>تحذير:</b> هذا الخيار يضع عبئاً تشغيليّاً ومخاطرة قفل متكرّرة بسبب طبيعة عنوانك السكنيّ. لا يُنصَح به إلّا إن كان لديك يقين بثبات العنوان أو وصول SSH دائم سريع.</div>
+</div>
+
+<!-- 7 -->
+<h2 id="matrix">٧) مصفوفة المقارنة</h2>
+<div class="card">
+  <table>
+    <tr><th>المعيار</th><th>① لا تُفعّل</th><th>② أصلِح السلسلة فقط</th><th>③ أصلِح + فعّل الآن</th></tr>
+    <tr><td>خطر قفلك خارج اللوحة</td><td class="ok">لا شيء</td><td class="ok">لا شيء</td><td class="bad">عالٍ (عنوان ديناميكيّ)</td></tr>
+    <tr><td>قفل IP فعّال</td><td class="bad">لا</td><td class="warn">جاهز، مُطفأ</td><td class="ok">نعم (لكن هشّ)</td></tr>
+    <tr><td>تحسين rate-limit per-IP</td><td class="bad">لا</td><td class="ok">نعم</td><td class="ok">نعم</td></tr>
+    <tr><td>تحسين قفل الدخول per-IP</td><td class="bad">لا</td><td class="ok">نعم</td><td class="ok">نعم</td></tr>
+    <tr><td>لمس كود/بنية</td><td class="ok">لا</td><td class="warn">دالّة واحدة (backend)</td><td class="warn">دالّة واحدة + قائمة IP</td></tr>
+    <tr><td>عبء صيانة</td><td class="ok">لا شيء</td><td class="ok">لا شيء</td><td class="bad">مستمرّ (كلّ تغيّر عنوان)</td></tr>
+    <tr><td>الحماية الأساسيّة (MFA)</td><td class="ok">فعّالة</td><td class="ok">فعّالة</td><td class="ok">فعّالة</td></tr>
+  </table>
+</div>
+
+<!-- 8 -->
+<h2 id="rec">٨) التوصية + الحالة الآمنة + break-glass</h2>
+<div class="card">
+  <div class="good"><b>توصيتي:</b> <b>الخيار ② (أصلِح السلسلة فقط)</b> كأفضل توازن — يمنحك تحسيناً أمنيّاً حقيقيّاً فوريّاً (rate-limit + قفل الدخول per-IP) بلا أيّ خطر قفل، ويجعل قفل IP <b>جاهزاً للحظة</b> تحصل فيها على عنوان ثابت/VPN. وإن كان MFA كافياً لراحتك، فالخيار ① سليم تماماً. الخيار ③ لا أنصح به لعنوان ديناميكيّ.</div>
+  <h3>الحالة الآمنة الحاليّة (مؤكَّدة)</h3>
+  <table>
+    <tr><th>العنصر</th><th>الحالة</th></tr>
+    <tr class="ok"><td>قفل IP</td><td><code>ADMIN_IP_ALLOWLIST=""</code> (فارغ=مفتوح) → <b>لا أحد محجوب</b> · <code>/control-panel</code>=401 (مفتوح)</td></tr>
+    <tr class="ok"><td>MFA الصارم</td><td>🔴 فعّال (admin: كلمة مرور + كود TOTP)</td></tr>
+    <tr class="ok"><td>الحاويات · FIN-COR · nginx</td><td>صحّيّة · ثابتة · لم تُمَسّ</td></tr>
+    <tr class="ok"><td>نسخ احتياطيّة للإعداد</td><td><code>/tmp/staging.yml.bak.iplock.*</code> + <code>/tmp/staging.yml.bak.*</code></td></tr>
+  </table>
+  <h3>🆘 break-glass (إن فُعِّل القفل لاحقاً وقُفِلت)</h3>
+  <div class="diag">ssh deploy@178.105.87.192
+cd /home/deploy/platform
+python3 /tmp/set_ip_allowlist.py ""        <span class="c"># يفرغ القائمة = مفتوح</span>
+docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d backend-core</div>
+</div>
+
+<div class="footer">
+  محاولة تفعيل قفل IP كشفت بروكسي مزدوج يُخفي العنوان الحقيقيّ (الخادم يرى 172.25.0.1) + عنوان مشغّل ديناميكيّ · أُرجِع القفل فارغاً (مفتوح) فوراً → الوصول مُستعاد · MFA الصارم فعّال · 3 خيارات معروضة (التوصية: ② إصلاح السلسلة فقط) · FIN-COR/nginx لم تُمَسّ · 2026-06-23 — بانتظار قرارك
+</div>
+
+</div>
+</body>
+</html>

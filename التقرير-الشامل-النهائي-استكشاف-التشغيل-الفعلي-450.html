@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>التقرير الشامل — استكشاف التشغيل الفعلي لمنصة توا (450)</title>
+<style>
+  :root {
+    --bg: #f5f6f4;
+    --bg-raised: #ffffff;
+    --ink: #1a1d22;
+    --ink-soft: #4b5159;
+    --ink-faint: #7c828b;
+    --border: #dde0dc;
+    --accent: #1f6f62;
+    --accent-soft: #e4efec;
+    --accent-ink: #12463d;
+    --code-bg: #eef1ee;
+    --p0: #b3261e; --p0-bg: #fbe9e7;
+    --p1: #b25a06; --p1-bg: #fbeee0;
+    --p2: #8a6d00; --p2-bg: #f8f0d8;
+    --p3: #35618a; --p3-bg: #e6eef6;
+    --ok: #276a45; --ok-bg: #e3f0e7;
+    --shadow: 0 1px 2px rgba(20,24,22,.06), 0 4px 14px rgba(20,24,22,.05);
+    --serif: "Traditional Arabic", "Segoe UI", Tahoma, Georgia, serif;
+    --sans: "Segoe UI", Tahoma, Arial, sans-serif;
+    --mono: "Consolas", "Courier New", monospace;
+  }
+  :root[data-theme="dark"] {
+    --bg:#14171a; --bg-raised:#1b1f23; --ink:#e7e8e6; --ink-soft:#b2b6ba; --ink-faint:#7d8288;
+    --border:#2c3136; --accent:#52ab9c; --accent-soft:#1c2f2c; --accent-ink:#a6d9cd; --code-bg:#20252a;
+    --p0:#e2685f; --p0-bg:#2e1c1b; --p1:#dd9757; --p1-bg:#2f2419; --p2:#d3b84a; --p2-bg:#2c2917;
+    --p3:#7fa9d1; --p3-bg:#1b2530; --ok:#71c090; --ok-bg:#1a2b21;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#14171a; --bg-raised:#1b1f23; --ink:#e7e8e6; --ink-soft:#b2b6ba; --ink-faint:#7d8288;
+      --border:#2c3136; --accent:#52ab9c; --accent-soft:#1c2f2c; --accent-ink:#a6d9cd; --code-bg:#20252a;
+      --p0:#e2685f; --p0-bg:#2e1c1b; --p1:#dd9757; --p1-bg:#2f2419; --p2:#d3b84a; --p2-bg:#2c2917;
+      --p3:#7fa9d1; --p3-bg:#1b2530; --ok:#71c090; --ok-bg:#1a2b21;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16.5px; line-height:1.85; -webkit-font-smoothing:antialiased; }
+  a { color: var(--accent-ink); }
+  a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+  .shell { display:grid; grid-template-columns: minmax(0,1fr) 280px; max-width:1280px; margin:0 auto; }
+  @media (max-width:900px){ .shell{ grid-template-columns:1fr; } nav.toc{ display:none; } }
+
+  nav.toc { position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto; padding:2rem 1.5rem 2rem 1.25rem; border-left:1px solid var(--border); }
+  nav.toc .brand { font-family:var(--serif); font-size:1.05rem; font-weight:700; margin-bottom:.15rem; }
+  nav.toc .brand-sub { font-size:.74rem; color:var(--ink-faint); margin-bottom:1.5rem; }
+  nav.toc ol { list-style:none; margin:0; padding:0; }
+  nav.toc a { display:block; padding:.3rem .5rem; border-radius:6px; font-size:.85rem; color:var(--ink-soft); text-decoration:none; }
+  nav.toc a:hover { background:var(--accent-soft); color:var(--accent-ink); }
+  nav.toc .g { font-size:.7rem; color:var(--ink-faint); margin:1.1rem 0 .3rem .5rem; }
+
+  main { padding:3rem clamp(1.25rem,4vw,4rem) 6rem; min-width:0; }
+
+  header.cover { margin-bottom:2rem; }
+  .eyebrow { font-size:.78rem; color:var(--accent-ink); font-weight:700; margin-bottom:.6rem; }
+  h1.title { font-family:var(--serif); font-weight:700; font-size:clamp(1.9rem,4vw,2.6rem); line-height:1.3; margin:0 0 .8rem; text-wrap:balance; }
+  .subtitle { color:var(--ink-soft); font-size:1.08rem; max-width:68ch; margin:0 0 1.2rem; }
+  .meta-row { display:flex; flex-wrap:wrap; gap:.4rem .8rem; font-size:.82rem; color:var(--ink-faint); font-family:var(--mono); direction:ltr; justify-content:flex-end; }
+  .meta-row code { background:var(--code-bg); padding:.12rem .4rem; border-radius:4px; color:var(--ink-soft); }
+
+  .verdict-band { margin-top:1.4rem; padding:1.1rem 1.4rem; border-radius:10px; background:var(--p1-bg); border:1px solid var(--p1); display:flex; align-items:baseline; gap:.9rem; flex-wrap:wrap; }
+  .verdict-band .label { font-size:.78rem; color:var(--p1); font-weight:700; }
+  .verdict-band .value { font-family:var(--mono); direction:ltr; font-weight:700; font-size:1rem; color:var(--p1); }
+
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.7rem; margin:1.6rem 0 2.4rem; }
+  .stat-tile { background:var(--bg-raised); border:1px solid var(--border); border-radius:10px; padding:.9rem 1rem; box-shadow:var(--shadow); }
+  .stat-tile .num { font-family:var(--mono); direction:ltr; font-size:1.5rem; font-weight:700; line-height:1.1; }
+  .stat-tile .num.small { font-size:1.05rem; }
+  .stat-tile .lbl { font-size:.78rem; color:var(--ink-faint); margin-top:.3rem; }
+  .stat-tile.p0 .num{color:var(--p0)} .stat-tile.p1 .num{color:var(--p1)} .stat-tile.p2 .num{color:var(--p2)} .stat-tile.ok .num{color:var(--ok)}
+
+  section.rs { margin:2.6rem 0; scroll-margin-top:1.5rem; }
+  section.rs h2 { font-family:var(--serif); font-size:1.4rem; font-weight:700; display:flex; align-items:baseline; gap:.6rem; margin:0 0 .9rem; padding-bottom:.6rem; border-bottom:1px solid var(--border); text-wrap:balance; }
+  section.rs h2 .sec-no { font-family:var(--mono); font-size:.78rem; color:var(--accent-ink); background:var(--accent-soft); border-radius:5px; padding:.15rem .45rem; font-weight:700; direction:ltr; }
+  section.rs h3 { font-size:1.08rem; font-weight:700; margin:1.4rem 0 .6rem; color:var(--ink); }
+  section.rs p { margin:0 0 1rem; max-width:76ch; }
+  section.rs p.lede { color:var(--ink-soft); font-size:1.02rem; }
+  section.rs ul, section.rs ol { max-width:76ch; padding-inline-start:1.4rem; }
+  section.rs li { margin-bottom:.5rem; }
+  section.rs code { font-family:var(--mono); direction:ltr; display:inline-block; background:var(--code-bg); padding:.1rem .4rem; border-radius:4px; font-size:.86em; }
+  section.rs strong { color:var(--ink); }
+  .box { background:var(--accent-soft); border-radius:10px; padding:1rem 1.3rem; margin:1rem 0; color:var(--ink-soft); font-size:.96rem; }
+  .box.warn { background:var(--p1-bg); color:var(--ink); border:1px solid var(--p1); }
+  .box.info { background:var(--p3-bg); border:1px solid var(--p3); }
+
+  .verdict-final { font-family:var(--serif); font-size:clamp(1.3rem,3vw,1.7rem); font-weight:700; color:var(--p1); background:var(--p1-bg); border:1px solid var(--p1); border-radius:10px; padding:1rem 1.3rem; display:inline-block; margin:.4rem 0 1rem; direction:ltr; }
+
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:10px; margin:.7rem 0 1.3rem; }
+  table { width:100%; border-collapse:collapse; font-size:.9rem; margin:0; }
+  th, td { text-align:right; padding:.6rem .9rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { background:var(--bg-raised); font-size:.75rem; color:var(--ink-faint); font-weight:700; }
+  tr:last-child td { border-bottom:none; }
+  td.num, th.num { font-family:var(--mono); direction:ltr; text-align:left; }
+
+  .pill { display:inline-block; font-family:var(--mono); direction:ltr; font-size:.72rem; font-weight:700; padding:.16rem .55rem; border-radius:999px; white-space:nowrap; }
+  .pill.p0{background:var(--p0-bg);color:var(--p0)} .pill.p1{background:var(--p1-bg);color:var(--p1)}
+  .pill.p2{background:var(--p2-bg);color:var(--p2)} .pill.p3{background:var(--p3-bg);color:var(--p3)} .pill.ok{background:var(--ok-bg);color:var(--ok)}
+
+  .defect-card { background:var(--bg-raised); border:1px solid var(--border); border-inline-start:4px solid var(--p2); border-radius:10px; padding:1.1rem 1.3rem; margin-bottom:1.1rem; box-shadow:var(--shadow); }
+  .defect-card.p1 { border-inline-start-color:var(--p1); }
+  .defect-card.p2 { border-inline-start-color:var(--p2); }
+  .defect-card.p3 { border-inline-start-color:var(--p3); }
+  .dc-head { display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; margin-bottom:.5rem; }
+  .dc-id { font-family:var(--mono); direction:ltr; font-weight:700; }
+  .dc-title { font-weight:700; }
+  .dc-plain { background:var(--accent-soft); border-radius:8px; padding:.6rem .8rem; margin-top:.6rem; font-size:.92rem; color:var(--accent-ink); }
+  .dc-plain b { display:block; font-size:.72rem; margin-bottom:.25rem; }
+
+  .chart-card { background:var(--bg-raised); border:1px solid var(--border); border-radius:12px; padding:1.3rem 1.5rem; margin:1.2rem 0; box-shadow:var(--shadow); }
+  .chart-card h4 { margin:0 0 1rem; font-size:.95rem; color:var(--ink-soft); font-weight:700; }
+  .bar-row { display:flex; align-items:center; gap:.8rem; margin-bottom:.65rem; }
+  .bar-label { width:150px; flex-shrink:0; font-size:.85rem; color:var(--ink-soft); }
+  .bar-track { flex:1; background:var(--code-bg); border-radius:5px; height:22px; overflow:hidden; position:relative; }
+  .bar-fill { height:100%; border-radius:5px; display:flex; align-items:center; justify-content:flex-start; padding-inline-start:.5rem; }
+  .bar-fill span { font-family:var(--mono); direction:ltr; font-size:.72rem; color:#fff; font-weight:700; }
+  .bar-fill.low span { color: var(--ink); padding-inline-start: 0; margin-inline-start: .5rem; }
+
+  .role-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:.6rem; margin:1rem 0; }
+  .role-chip { background:var(--ok-bg); border:1px solid var(--ok); color:var(--ok); border-radius:8px; padding:.55rem .7rem; font-size:.82rem; display:flex; align-items:center; gap:.4rem; }
+  .role-chip .dot { width:8px; height:8px; border-radius:50%; background:var(--ok); flex-shrink:0; }
+
+  .flow-diagram { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin:1.3rem 0; direction:ltr; }
+  .flow-step { background:var(--bg-raised); border:1px solid var(--border); border-radius:10px; padding:.8rem 1rem; font-size:.85rem; text-align:center; min-width:130px; box-shadow:var(--shadow); }
+  .flow-step .fs-num { font-family:var(--mono); font-size:.7rem; color:var(--accent-ink); font-weight:700; display:block; margin-bottom:.3rem; }
+  .flow-arrow { color:var(--ink-faint); font-size:1.3rem; }
+
+  .glossary dt { font-weight:700; color:var(--accent-ink); margin-top:.8rem; }
+  .glossary dd { margin:.2rem 0 0; color:var(--ink-soft); }
+
+  footer.report-footer { margin-top:3.5rem; padding-top:1.5rem; border-top:1px solid var(--border); color:var(--ink-faint); font-size:.82rem; }
+  ::selection { background:var(--accent-soft); color:var(--accent-ink); }
+</style>
+</head>
+<body>
+<div class="shell">
+  <main>
+    <header class="cover">
+      <div class="eyebrow">استكشاف تشغيل فعلي مدفوع بوكلاء آليين — عبر متصفح حقيقي</div>
+      <h1 class="title">التقرير الشامل النهائي — اختبار التشغيل الفعلي لمنصة توا</h1>
+      <p class="subtitle">تقرير مفصّل بلغة بسيطة يشرح ماذا فعلنا فعلاً على نسخة حقيقية من منصة توا تعمل على هذا الجهاز: تسجيل دخول حقيقي، متصفح حقيقي، قاعدة بيانات حقيقية، وحسابات مالية حقيقية — بدون أي محاكاة أو بيانات وهمية.</p>
+      <div class="meta-row">
+        <span>Commit <code>ecb11de3ac8</code></span>
+        <span>الفرع <code>master</code></span>
+        <span>التقرير <code>450</code></span>
+        <span>التاريخ 2026-07-07/08</span>
+      </div>
+      <div class="verdict-band">
+        <span class="label">الحكم النهائي</span>
+        <span class="value">AGENT_REAL_OPERATION_PARTIAL_WITH_BLOCKERS</span>
+      </div>
+    </header>
+
+    <div class="box info">
+      <strong>ملاحظة عن مكان هذا التقرير:</strong> هذا هو النسخة العربية المبسّطة والمفصّلة، محفوظة في مجلد <code style="direction:ltr; display:inline-block;">/home/a/Desktop/New File 10/</code> باسم الملف
+      <code style="direction:ltr; display:inline-block;">التقرير-الشامل-النهائي-استكشاف-التشغيل-الفعلي-450.html</code>.
+      يوجد أيضاً نسخة إنجليزية تقنية أكثر تفصيلاً في مجلد المشروع نفسه ضمن <code style="direction:ltr; display:inline-block;">platform/app_report/450_*</code> لمن يريد التفاصيل التقنية الخام (السجلات، الصور، ملفات JSON).
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="num">187</div><div class="lbl">سيناريو حقيقي تم تنفيذه</div></div>
+      <div class="stat-tile"><div class="num">79</div><div class="lbl">سيناريو عبر متصفح حقيقي</div></div>
+      <div class="stat-tile"><div class="num">108</div><div class="lbl">سيناريو عبر API مباشر</div></div>
+      <div class="stat-tile"><div class="num small">42.2%</div><div class="lbl">نسبة اختبار الواجهة</div></div>
+      <div class="stat-tile ok"><div class="num">11/11</div><div class="lbl">كل الأدوار تم اختبارها</div></div>
+      <div class="stat-tile ok"><div class="num">10/10</div><div class="lbl">فحوصات قاعدة البيانات</div></div>
+      <div class="stat-tile p0"><div class="num">0</div><div class="lbl">عيوب حرجة (P0)</div></div>
+      <div class="stat-tile p1"><div class="num">2</div><div class="lbl">عيوب كبيرة (P1)</div></div>
+      <div class="stat-tile p2"><div class="num">3</div><div class="lbl">عيوب متوسطة (P2)</div></div>
+      <div class="stat-tile"><div class="num small">9 مفتوحة</div><div class="lbl">بوابات الإطلاق</div></div>
+    </div>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s0">
+      <h2><span class="sec-no">00</span>ما هذا التقرير أصلاً؟ (شرح مبسّط لأي شخص)</h2>
+      <p class="lede">هذا التقرير هو نتيجة تجربة حقيقية على منصة توا. بدل أن نقرأ الكود فقط ونخمّن هل يعمل أم لا، قمنا بتشغيل نسخة كاملة من المنصة على هذا الجهاز — تماماً كما لو كانت تعمل على خادم حقيقي — ثم "دخلنا" إليها فعلياً بحسابات تجريبية حقيقية بكل الأدوار الممكنة (عميل، مطعم، سائق، موظف عمليات، مدير...) وضغطنا على الأزرار الحقيقية في متصفح حقيقي (كروم)، وأرسلنا طلبات حقيقية إلى الخادم، وتحققنا من الأرقام الحقيقية في قاعدة البيانات.</p>
+      <p>الفكرة الأساسية: <strong>لا تخمين، لا محاكاة، لا "افتراض أنه يعمل"</strong> — كل نتيجة في هذا التقرير مبنية على دليل حقيقي: صورة شاشة فعلية، أو رد فعلي من الخادم، أو رقم فعلي من قاعدة البيانات.</p>
+
+      <h3>مخطط مبسّط لما حدث فعلياً</h3>
+      <div class="flow-diagram">
+        <div class="flow-step"><span class="fs-num">1</span>تشغيل المنصة محلياً<br>(قاعدة بيانات + خادم + واجهة)</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-step"><span class="fs-num">2</span>إنشاء بيانات تجريبية واقعية<br>(عملاء، سائقين، مطاعم...)</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-step"><span class="fs-num">3</span>تسجيل دخول حقيقي بكل الأدوار<br>عبر متصفح حقيقي</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-step"><span class="fs-num">4</span>اختبار الشاشات والأزرار<br>والصلاحيات فعلياً</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-step"><span class="fs-num">5</span>فحص الحسابات المالية<br>والقيود المحاسبية</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-step"><span class="fs-num">6</span>تسجيل كل عيب حقيقي<br>وجدناه بالدليل</div>
+      </div>
+
+      <div class="box">
+        <strong>لماذا الحكم النهائي "جزئي" (PARTIAL)؟</strong><br>
+        العقد الأصلي طلب تشغيل ما بين 2,000 و20,000 سيناريو اختبار. نحن نفّذنا 187 فقط. السبب: هذا الجهاز مشترك مع عدة جلسات عمل أخرى تعمل عليه بالتوازي، والذاكرة المتاحة كانت شحيحة جداً معظم الوقت (أحياناً أقل من نصف جيجابايت فقط متاح)، بالإضافة إلى توقف مؤقت فرضه النظام في منتصف العمل. اخترنا أن نُبقي العمل آمناً وألا نُرهق الجهاز المشترك، بدل المخاطرة بتعطيل الجلسات الأخرى. هذا قرار واعٍ ومُعلن، وليس تقصيراً مخفياً.
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s1">
+      <h2><span class="sec-no">01</span>الملخص التنفيذي بلغة بسيطة</h2>
+      <p>شغّلنا منصة توا فعلياً على هذا الجهاز: قاعدة بيانات حقيقية (PostgreSQL)، ذاكرة تخزين مؤقت حقيقية (Redis)، خادم خلفي حقيقي (الذي يستقبل الطلبات ويعالجها)، وواجهة أمامية حقيقية مبنية من الكود الفعلي الحالي للمشروع.</p>
+      <p>سجّلنا الدخول فعلياً بكل الأدوار الـ11 الموجودة في المنصة (عميل، سائق، صاحب مطعم، موظف مطعم، وسبعة أنواع من موظفي العمليات والإدارة)، وكل واحد منهم وصل فعلياً إلى الصفحة الصحيحة الخاصة به. اختبرنا حدود الصلاحيات (هل يستطيع موظف عادي الوصول لصفحة يجب أن تكون للمدير فقط؟ — والجواب: لا، بشكل صحيح، في كل الحالات التي اختبرناها). فحصنا حسابات 57 طلب حقيقي موجود في قاعدة البيانات للتأكد أن الأرقام المالية متوازنة وصحيحة.</p>
+      <p><strong>وجدنا مشكلتين حقيقيتين مهمتين</strong> يستحقان الإصلاح (اشرحهما بالتفصيل في القسم 8 أدناه)، بالإضافة إلى بضع ملاحظات أصغر. <strong>لم نجد أي مشكلة أمنية خطيرة</strong>، ولم نجد أي طريقة للوصول إلى ميزات "مقفلة عمداً" مثل سحب الأموال من المحفظة أو الدفع الحقيقي بالبطاقة — كلاهما مقفل تماماً كما يجب.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s2">
+      <h2><span class="sec-no">02</span>ما الذي تم اختباره فعلياً، وما الذي لم يُختبر</h2>
+      <h3>✅ ما تم فعلاً بشكل حقيقي</h3>
+      <ul>
+        <li>تشغيل حقيقي كامل للمنصة (قاعدة البيانات + الخادم + الواجهة) من الكود الحالي فعلياً، وليس من نسخة قديمة محفوظة.</li>
+        <li>بناء عالم بيانات تجريبي واقعي (عملاء، سائقين، مطاعم، موظفين، حسابات إدارة) — بحجم أصغر من المطلوب أصلياً لكن حقيقي بالكامل.</li>
+        <li>تسجيل دخول حقيقي واختبار واجهات حقيقية عبر متصفح كروم فعلي لكل الأدوار الرئيسية.</li>
+        <li>اختبار حدود الصلاحيات وقواعد الحوكمة (الميزات المقفلة) على أرض الواقع.</li>
+        <li>فحص مالي حقيقي لـ57 طلب موجود فعلاً في قاعدة البيانات.</li>
+        <li>فحص قاعدة البيانات للتأكد من عدم وجود تناقضات (10 من 10 فحوصات نجحت).</li>
+        <li>تحليل كل عيب تم اكتشافه وتوثيقه بدليل واضح.</li>
+      </ul>
+      <h3>❌ ما لم يتم اختباره في هذه الجلسة</h3>
+      <ul>
+        <li>الحجم الكامل المطلوب أصلاً في العقد (2,000 إلى 20,000 سيناريو) — نُفّذ منه 187 فقط، لأسباب تتعلق بموارد الجهاز (اشرحناها أعلاه).</li>
+        <li>اختبارات "الحمل الزائد" المخصصة (مثل محاكاة ساعة الذروة، أو نقص السائقين، أو موجة شكاوى كبيرة) — لم تُنفَّذ كدفعات مستقلة.</li>
+        <li>الضغط على كل زر موجود في لوحة التحكم (تم اختبار عيّنة تمثيلية فقط، وليس كل شيء).</li>
+        <li>التأكد الكامل من أن كل صفحة مخفية عن دور معين هي أيضاً محمية فعلياً في الخادم (تم التأكد من مسارين فقط، ونجحا).</li>
+        <li>جاهزية تطبيق الجوال (خارج نطاق هذه الجلسة تماماً).</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s3">
+      <h2><span class="sec-no">03</span>بيئة الاختبار والنسخة المستخدمة</h2>
+      <div class="table-wrap"><table>
+        <tr><th>البند</th><th>القيمة</th></tr>
+        <tr><td>النسخة (Commit) المُختبرة</td><td class="num" style="text-align:right;direction:ltr">ecb11de3ac87cc0fa7ae40ee11c04c9728002d25</td></tr>
+        <tr><td>الفرع</td><td class="num" style="direction:ltr">master</td></tr>
+        <tr><td>الجهاز</td><td>جهاز مشترك، كانت تعمل عليه 5-6 جلسات عمل أخرى بالتوازي أثناء هذا الاختبار</td></tr>
+        <tr><td>الذاكرة المتاحة أثناء العمل</td><td>تراوحت بين نصف جيجابايت وحوالي 3 جيجابايت فقط (شحيحة جداً معظم الوقت)</td></tr>
+      </table></div>
+      <p>نظراً لضيق الموارد، اخترنا بناء صور حاويات (Docker) جديدة من الكود الحالي مباشرة بدل استخدام صور قديمة محفوظة من قبل، حتى تعكس النتائج الوضع الفعلي للكود اليوم بدقة.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s4">
+      <h2><span class="sec-no">04</span>دليل التشغيل الفعلي (Boot)</h2>
+      <p>عند بدء العمل، حاولنا تشغيل المنصة بالطريقة القياسية الموثّقة في المشروع، ووجدنا مشكلتين حقيقيتين فوراً أثناء عملية التشغيل نفسها (مذكورتان بالتفصيل في القسم 8 كـ DEF-001 وDEF-002). بعد تجاوزهما بحل مؤقت غير دائم (لم نُعدّل أي كود، فقط تعاملنا مع قاعدة البيانات التجريبية المحلية)، نجح التشغيل بالكامل:</p>
+      <ul>
+        <li>قاعدة البيانات: تعمل وصحية ✅</li>
+        <li>ذاكرة التخزين المؤقت (Redis): تعمل وصحية ✅</li>
+        <li>الخادم الخلفي: تعمل وصحي، ووصل إلى آخر تحديث في قاعدة البيانات (<code style="direction:ltr">ab21</code>) ✅</li>
+        <li>الواجهة الأمامية: تعمل، وأخذنا صورة شاشة حقيقية للصفحة الرئيسية أظهرت أنها تعمل بدون أي خطأ في المتصفح (0 أخطاء) ✅</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s5">
+      <h2><span class="sec-no">05</span>إثبات عدم استخدام أي محاكاة أو بيانات وهمية</h2>
+      <p>كتبنا فاحصاً آلياً (سكريبت) يفتش تلقائياً في كل ملفات الاختبار عن أي علامة على استخدام "بيانات مزيفة" (مثل اعتراض الطلبات وتزييف الرد، أو حقن رمز دخول وهمي مباشرة في المتصفح). <strong>نتيجة الفحص: لا يوجد أي أثر لذلك في أي ملف.</strong> كل تسجيل دخول تم فعلياً عبر صفحة الدخول الحقيقية، وكل رمز دخول (Token) تم الحصول عليه من رد حقيقي من الخادم.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s6">
+      <h2><span class="sec-no">06</span>ملخص عالم البيانات التجريبي (Seed)</h2>
+      <p>أنشأنا بيانات تجريبية واقعية ومتنوعة، لكن بحجم أصغر من الحجم الأصلي المطلوب في العقد (بسبب ضيق الموارد كما شرحنا). الجدول التالي يوضح الفرق:</p>
+      <div class="table-wrap"><table>
+        <tr><th>النوع</th><th class="num">المطلوب أصلاً</th><th class="num">ما تم فعلياً</th></tr>
+        <tr><td>عملاء</td><td class="num">1,000</td><td class="num">250</td></tr>
+        <tr><td>سائقون</td><td class="num">300</td><td class="num">80</td></tr>
+        <tr><td>مطاعم/متاجر</td><td class="num">150</td><td class="num">108</td></tr>
+        <tr><td>موظفو مطاعم</td><td class="num">600</td><td class="num">~250</td></tr>
+        <tr><td>موظفو إدارة وعمليات</td><td class="num">75</td><td class="num">20</td></tr>
+      </table></div>
+      <p>تحققنا أن سكريبت إنشاء البيانات "آمن للتكرار" — يعني لو شغّلناه مرة ثانية، لن يُنشئ بيانات مكررة، بل يتعرّف على الموجود فعلاً. اختبرنا هذا فعلياً بتشغيله مرتين متتاليتين، والمرة الثانية لم تُنشئ أي شيء جديد.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s7">
+      <h2><span class="sec-no">07</span>ملخص عدد السيناريوهات</h2>
+      <div class="chart-card">
+        <h4>توزيع السيناريوهات المنفَّذة (187 سيناريو حقيقي)</h4>
+        <div class="bar-row"><div class="bar-label">عبر متصفح حقيقي (UI)</div><div class="bar-track"><div class="bar-fill" style="width:73%; background:var(--accent);"><span>79</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">عبر API مباشر</div><div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--p3);"><span>108</span></div></div></div>
+      </div>
+      <p>نسبة اختبارات المتصفح الحقيقي كانت 42.2% من الإجمالي — وهي أقل من النسبة المستهدفة أصلاً (70%)، ونذكر هذا بصراحة بدل تجميل الرقم.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s8">
+      <h2><span class="sec-no">08</span>نتائج سيناريوهات الواجهة (Browser UI)</h2>
+      <p>اختبرنا فعلياً، عبر متصفح كروم حقيقي، كل واحد من الأدوار الـ11 التالية، وكلٌّ منها سُجّل دخوله ووصل فعلياً للصفحة الصحيحة الخاصة به:</p>
+      <div class="role-grid">
+        <div class="role-chip"><span class="dot"></span>عميل (Customer)</div>
+        <div class="role-chip"><span class="dot"></span>سائق (Driver)</div>
+        <div class="role-chip"><span class="dot"></span>صاحب مطعم/متجر</div>
+        <div class="role-chip"><span class="dot"></span>موظف مطعم/متجر</div>
+        <div class="role-chip"><span class="dot"></span>موظف عمليات</div>
+        <div class="role-chip"><span class="dot"></span>موظف مالية</div>
+        <div class="role-chip"><span class="dot"></span>موظف امتثال</div>
+        <div class="role-chip"><span class="dot"></span>مدير</div>
+        <div class="role-chip"><span class="dot"></span>مشرف</div>
+        <div class="role-chip"><span class="dot"></span>مراقب</div>
+        <div class="role-chip"><span class="dot"></span>مدير عام (Super Admin)</div>
+      </div>
+      <p>بالإضافة إلى ذلك، اختبرنا فعلياً: صفحة العميل الرئيسية، تفاصيل مطعم، إضافة عنصر للسلة، الوصول لصفحة الدفع، سجل الطلبات، صفحة المحفظة، لوحة صاحب المطعم، قائمة الأصناف، صفحة السائق، عروض التوصيل، لوحة العمليات، وصفحات المالية.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s9">
+      <h2><span class="sec-no">09</span>نتائج سيناريوهات API والتزامن</h2>
+      <p>نفّذنا 108 سيناريو عبر الاتصال المباشر بالخادم (API)، كل واحد منها تضمّن تسجيل دخول حقيقي والحصول على رمز دخول (JWT) حقيقي، ثم استدعاء نقطة اتصال حقيقية بالخادم وتسجيل الرد الفعلي (بما فيه زمن الاستجابة الفعلي بالميلي ثانية).</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s10">
+      <h2><span class="sec-no">10</span>نتائج الحمل الزائد (Overload)</h2>
+      <p>لم ننفّذ دفعات اختبار مخصصة لمحاكاة "الحمل الزائد" (مثل ساعة الذروة أو موجة شكاوى). لكن، وبشكل غير مقصود، اكتشفنا شيئاً مفيداً: عندما حاولنا تشغيل عدد كبير من السيناريوهات بسرعة، <strong>نظام حماية تسجيل الدخول في الخادم تدخّل تلقائياً</strong> ومنع محاولات الدخول المتكررة السريعة جداً (رد "429 - طلبات كثيرة جداً"). هذا في الواقع دليل جيد أن الخادم يملك حماية حقيقية ضد محاولات الاختراق بالتخمين السريع — وليس عيباً، بل ميزة أمان تعمل كما يجب.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s11">
+      <h2><span class="sec-no">11</span>تغطية فئات المزوّدين (المطاعم/المتاجر)</h2>
+      <p>العقد الأصلي افترض وجود 18 فئة مختلفة من المزوّدين (مطعم، صيدلية، سوبر ماركت...). لكن عند الفحص الفعلي، اتضح أن المنصة الحقيقية اليوم تدعم فعلياً <strong>8 فئات فقط</strong> بشكل مُعرّف في النظام. الفئات العشر المتبقية غير موجودة كخيار منفصل حالياً في الكود — تم توثيق هذا بصراحة بدل اختراع فئات غير موجودة.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s12">
+      <h2><span class="sec-no">12</span>نتائج العملاء</h2>
+      <p>الصفحة الرئيسية، تفاصيل المطعم، إضافة عنصر للسلة، الوصول لصفحة الدفع، سجل الطلبات، وصفحة المحفظة — كل هذه اختُبرت فعلياً لحساب عميل حقيقي وظهرت بمحتوى صحيح وبدون أي خطأ في المتصفح. <strong>لم نجد أي زر أو رابط لسحب أموال من المحفظة</strong> — وهذا صحيح ومطلوب، لأن هذه الميزة مقفلة عمداً حالياً.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s13">
+      <h2><span class="sec-no">13</span>نتائج المزوّدين (المطاعم/المتاجر)</h2>
+      <p>لوحة صاحب المطعم، قائمة الأصناف، الإعدادات، وقائمة الطلبات — جميعها ظهرت بشكل صحيح لحساب صاحب مطعم حقيقي.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s14">
+      <h2><span class="sec-no">14</span>نتائج موظفي المزوّدين</h2>
+      <p>تسجيل دخول موظف المطعم يعمل بشكل صحيح، والشاشات المخصصة للموظف تظهر بشكل صحيح. تأكّدنا أن الموظف <strong>لا يستطيع</strong> الوصول لصفحات مخصصة لصاحب المطعم فقط (مثل الأرباح أو إدارة الموظفين) — وهذا صحيح.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s15">
+      <h2><span class="sec-no">15</span>نتائج السائقين</h2>
+      <p>تسجيل دخول السائق يوصله بشكل صحيح لصفحته الرئيسية، وصفحة عروض التوصيل والملف الشخصي تعملان بشكل صحيح.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s16">
+      <h2><span class="sec-no">16</span>نتائج العمليات والإدارة (Ops/Admin)</h2>
+      <p>كل الأدوار السبعة المتعلقة بالإدارة والعمليات وصلت بشكل صحيح للوحة التحكم الخاصة بها. اختبرنا فعلياً حدود الصلاحيات (انظر القسم 20 أدناه) ونجحت في كل حالة.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s17">
+      <h2><span class="sec-no">17</span>نتائج لوحة التحكم</h2>
+      <p>اختبرنا فعلياً 24 سيناريو مخصص للوحة التحكم (أقل بكثير من الهدف الأصلي 2,500 — ومُعلن بصراحة). من أصل 8 أقسام رئيسية في قائمة التنقل، اختبرنا 6 مباشرة بنجاح، واثنان أُعيد اختبارهما بشكل منفصل بعد أن واجها عطلاً مؤقتاً بسبب ضغط الذاكرة على الجهاز (وليس عطلاً في المنصة نفسها) ونجحا في المحاولة الثانية.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s18">
+      <h2><span class="sec-no">18</span>نتائج ظهور الأحداث في غرفة التحكم</h2>
+      <p>هل كل حدث مهم يحدث في المنصة (طلب جديد، وثيقة معلّقة، استثناء نقدي...) يظهر فعلياً لموظفي العمليات ليتابعوه؟ النتيجة:</p>
+      <div class="table-wrap"><table>
+        <tr><th>الحدث</th><th>هل يظهر لموظفي العمليات؟</th></tr>
+        <tr><td>تفاصيل الطلب</td><td><span class="pill ok">نعم</span></td></tr>
+        <tr><td>استثناء نقدي (Cash Exception)</td><td><span class="pill ok">نعم</span></td></tr>
+        <tr><td>وثيقة معلّقة (بعد إصلاح خطأ وجدناه في أداة الفحص نفسها)</td><td><span class="pill ok">نعم</span></td></tr>
+        <tr><td><strong>تسوية أرباح السائقين</strong></td><td><span class="pill p2">لا — فجوة حقيقية</span></td></tr>
+        <tr><td>تغيير حالة مزوّد/سائق (إيقاف مؤقت...)</td><td><span class="pill p3">لم يُختبر</span></td></tr>
+      </table></div>
+      <div class="box warn">
+        <strong>الفجوة الوحيدة المؤكدة:</strong> بيانات تسوية أرباح السائقين موجودة فعلياً وصحيحة في قاعدة البيانات (والمبالغ متوازنة تماماً)، لكن لا توجد صفحة أو رابط في لوحة التحكم يعرضها لموظفي العمليات لمراجعتها. المال ليس "ضائعاً" — فقط لا توجد نافذة لمراجعته من الإدارة.
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s19">
+      <h2><span class="sec-no">19</span>نتائج بوابات المستندات الإلزامية</h2>
+      <p>اختبرنا صفحة "مراجعة المستندات" في لوحة التحكم، ووجدنا مستنداً حقيقياً معلّق المراجعة (شهادة صحية لأحد المطاعم) يظهر بشكل صحيح فيها — لكن فقط بعد أن اكتشفنا وأصلحنا خطأ برمجياً في أداة الفحص الخاصة بنا نفسها (ليس في المنصة) كان يُخفي هذه المستندات خطأً.</p>
+      <p>ملاحظة تقنية مهمة: مستندات السائقين (رخصة القيادة مثلاً) لا تملك في قاعدة البيانات حقل "تاريخ انتهاء صلاحية"، بعكس مستندات المطاعم التي تملكه. هذا يعني أن النظام حالياً <strong>لا يستطيع</strong> تحديد أن رخصة سائق قد "انتهت صلاحيتها" تلقائياً.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s20">
+      <h2><span class="sec-no">20</span>نتائج الميزات المغلقة بالحوكمة (Governance)</h2>
+      <p>المنصة تحتوي على مفاتيح تشغيل/إيقاف (Feature Flags) للميزات الحساسة. تحققنا فعلياً من أهمّها:</p>
+      <ul>
+        <li><strong>سحب الأموال من المحفظة (Cash Out):</strong> مقفل في ملف الإعدادات، <strong>وتحققنا فعلياً</strong> أنه لا يوجد أي زر أو رابط له في واجهة العميل الحقيقية. ✅</li>
+        <li><strong>الدفع الحقيقي بالبطاقة (Production Payment):</strong> مقفل في ملف الإعدادات. ✅ (لم نُعد فحص الواجهة بشكل مباشر لهذا البند تحديداً هذه المرة، فقط ملف الإعدادات).</li>
+        <li><strong>تحويل الأموال بين المستخدمين (Peer Transfer):</strong> هذا مفتوح فعلياً — لكن هذا <strong>مقصود ومُوثّق رسمياً</strong> من قِبل صاحب المشروع منذ 19 يونيو 2026، وليس خطأ أو ثغرة.</li>
+        <li>حوالي 20 ميزة أخرى مقفلة تم التأكد من إغلاقها في ملف الإعدادات فقط، دون اختبار الواجهة الفعلية لكل واحدة (خارج نطاق هذه الجلسة المحدودة الوقت).</li>
+      </ul>
+      <h3>بوابات الإطلاق (Launch Gates)</h3>
+      <p>هناك 9 "بوابات" يجب أن تُغلق جميعها قبل أن تكون المنصة جاهزة للإطلاق الرسمي (مثل: الجانب القانوني، اختبار الدفع الحقيقي، اختبار الأمان من طرف خارجي، خطة الطوارئ...). <strong>تحققنا فعلياً عبر لوحة التحكم الحقيقية أن جميع البوابات التسع لا تزال مفتوحة (غير مكتملة)</strong> — وهذا يعني أن المنصة ليست جاهزة للإطلاق الرسمي حتى تُغلق هذه البوابات، بغض النظر عن أي شيء آخر في هذا التقرير.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s21">
+      <h2><span class="sec-no">21</span>نتائج الحسابات المالية الدقيقة</h2>
+      <p>فحصنا 57 طلباً حقيقياً موجوداً في قاعدة البيانات بأربعة فحوصات مالية مختلفة:</p>
+      <div class="chart-card">
+        <h4>نتائج الفحص المالي لـ57 طلب حقيقي (نجاح/فشل)</h4>
+        <div class="bar-row"><div class="bar-label">توازن دفتر الحسابات</div><div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--ok);"><span>57/57 ✓</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">عدم تكرار القيود المالية</div><div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--ok);"><span>57/57 ✓</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">صحة المجموع الفرعي</div><div class="bar-track"><div class="bar-fill" style="width:84%; background:var(--ok);"><span>48/57</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">صحة المجموع النهائي</div><div class="bar-track"><div class="bar-fill" style="width:79%; background:var(--p1);"><span>45/57</span></div></div></div>
+      </div>
+      <p>القيدان الأول والثاني (توازن الدفتر وعدم التكرار) <strong>نجحا بنسبة 100%</strong> — هذا مهم جداً لأنه يعني أن الأموال ذاتها لا تُفقد ولا تُضاعَف في السجلات المحاسبية.</p>
+      <p>لكن وُجدت مشكلتان حقيقيتان في حساب المجاميع لبعض الطلبات (اشرحهما بالتفصيل في القسم التالي كعيوب DEF-003 وDEF-004) — أثّرتا على 12 طلباً من أصل 57 (حوالي 21%)، وكلاهما يرجعان لسببين محدَّدين فقط، وليس اثني عشر مشكلة مختلفة.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s22">
+      <h2><span class="sec-no">22</span>نتائج التحكم المالي والمحفظة والتسوية</h2>
+      <p>لم نجد أي رصيد سالب في أي محفظة عميل في قاعدة البيانات بأكملها (فحص شامل، 0 حالة). الاستثناءات النقدية (Cash Exceptions) تظهر بشكل صحيح لموظفي العمليات. أما تسوية أرباح السائقين فهي الفجوة الوحيدة المذكورة في القسم 18.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s23">
+      <h2><span class="sec-no">23</span>نتائج الصلاحيات والوصول غير المصرّح (IDOR)</h2>
+      <p>اختبرنا فعلياً: هل يستطيع موظف من فئة "مراقب" (لديه صلاحيات محدودة) الوصول إلى صفحة "إدارة الحسابات" المخصصة فقط للمدير العام (Super Admin)؟ حاولنا فعلياً الدخول المباشر لهذا الرابط بحساب "مراقب" حقيقي، والنتيجة: <strong>مُنع بشكل صحيح تماماً</strong>، وظهرت له رسالة "غير مصرّح بالدخول" الحقيقية، ولم يتسرّب أي محتوى حساس. نفس الشيء تم اختباره لموظف عمليات عادي على صفحة "تفعيل الميزات" — نُتيجة مماثلة: محظور بشكل صحيح.</p>
+      <p>هذا اختبار جزئي (مسارين فقط من ضمن عشرات المسارات الممكنة)، لكن النتيجة في الحالتين اللتين اختُبرتا كانت إيجابية تماماً.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s24">
+      <h2><span class="sec-no">24</span>نتائج تعارضات الواجهة مع الخادم (API)</h2>
+      <p>لم نجد أي تعارض بين ما تعرضه الواجهة وما يسمح به الخادم فعلياً، ضمن ما تم اختباره. لم نقم بفحص شامل لكل صفحة مقابل كل نقطة اتصال في الخادم (يحتاج وقتاً أطول بكثير) — نذكر هذا كنقطة غير مؤكدة، لا كنتيجة نهائية.</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s25">
+      <h2><span class="sec-no">25</span>نتائج ثوابت قاعدة البيانات (DB Invariants)</h2>
+      <p>شغّلنا 10 فحوصات آلية مباشرة على قاعدة البيانات الحقيقية (قراءة فقط، بدون أي تعديل)، وكلها نجحت 10 من 10:</p>
+      <ul>
+        <li>لا توجد محفظة برصيد سالب</li>
+        <li>لا يوجد طلب بدون مبلغ إجمالي</li>
+        <li>لا يوجد تكرار في سجل تحديثات قاعدة البيانات</li>
+        <li>لا يوجد طلب مرتبط بمطعم أو عميل غير موجود فعلياً</li>
+        <li>لا توجد مستندات "يتيمة" (مرتبطة بمطعم أو سائق غير موجود)</li>
+        <li>كل أرقام الهواتف بصيغة دولية صحيحة</li>
+        <li><strong>لا يوجد أي عمود مالي في قاعدة البيانات يستخدم نوع بيانات "عشري تقريبي" (Float)</strong> — وهذا مهم جداً لأن الأرقام المالية بنوع Float يمكن أن تفقد الدقة، والمنصة تستخدم بشكل صحيح أرقاماً صحيحة دقيقة (بوحدة المليم) في كل مكان.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s26">
+      <h2><span class="sec-no">26</span>التدفقات التي ثبت أنها تعمل بشكل صحيح</h2>
+      <ul>
+        <li>تسجيل الدخول والتوجيه الصحيح لكل الأدوار الـ11</li>
+        <li>حدود الصلاحيات (3 من 3 اختبارات نجحت)</li>
+        <li>توازن الدفتر المحاسبي (10 من 10 فحوصات، و57 من 57 طلب متوازن محاسبياً)</li>
+        <li>قفل ميزتي سحب المحفظة والدفع الحقيقي كما هو مطلوب</li>
+        <li>ظهور المستندات المعلّقة والاستثناءات النقدية لموظفي العمليات</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s27">
+      <h2><span class="sec-no">27</span>العيوب المؤكدة — بالتفصيل وبلغة بسيطة</h2>
+      <p class="lede">فيما يلي كل عيب حقيقي وجدناه، مشروحاً بلغة بسيطة أولاً ثم بالتفاصيل التقنية لمن يريدها. لا يوجد أي عيب "حرج جداً" (P0) — أعلى درجة وجدناها هي "كبيرة" (P1)، وعددها اثنان فقط.</p>
+
+      <div class="chart-card">
+        <h4>توزيع العيوب حسب الخطورة</h4>
+        <div class="bar-row"><div class="bar-label">حرج جداً (P0)</div><div class="bar-track"><div class="bar-fill low" style="width:2%;"><span>0</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">كبير (P1)</div><div class="bar-track"><div class="bar-fill" style="width:50%; background:var(--p1);"><span>2</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">متوسط (P2)</div><div class="bar-track"><div class="bar-fill" style="width:75%; background:var(--p2);"><span>3</span></div></div></div>
+        <div class="bar-row"><div class="bar-label">بسيط/معلومة (P3)</div><div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--p3);"><span>4</span></div></div></div>
+      </div>
+
+      <div class="defect-card p1">
+        <div class="dc-head"><span class="pill p1">P1 — كبير</span><span class="dc-id">DEF-001</span><span class="dc-title">سلسلة تحديثات قاعدة البيانات تتعطّل عند التشغيل من الصفر</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> عندما تحاول تشغيل المنصة على قاعدة بيانات جديدة تماماً (فارغة أو قديمة)، تتوقف عملية التحديث في منتصف الطريق بسبب أن أحد أسماء التحديثات طويل جداً بالنسبة لعمود مخصص لتخزينه في قاعدة البيانات (32 حرفاً كحد أقصى، لكن الاسم المستخدم فعلياً 37 حرفاً). النتيجة: أي شخص يحاول تجهيز المنصة من الصفر (مثل بيئة اختبار جديدة، أو استرجاع بعد كارثة) سيفشل ولن يستطيع الاستمرار بدون تدخل يدوي.</div>
+        <dl style="display:grid;grid-template-columns:max-content 1fr;gap:.25rem .8rem;font-size:.86rem;margin-top:.6rem;">
+          <dt style="color:var(--ink-faint)">التأثير</dt><dd style="margin:0;color:var(--ink-soft)">يمنع تجهيز أي بيئة جديدة من الصفر بدون تدخل يدوي متخصص</dd>
+          <dt style="color:var(--ink-faint)">الحل المقترح</dt><dd style="margin:0;color:var(--ink-soft)">تقصير اسم ذلك التحديث المحدد، أو توسيع العمود المخصص لتخزين الأسماء</dd>
+        </dl>
+      </div>
+
+      <div class="defect-card p2">
+        <div class="dc-head"><span class="pill p2">P2 — متوسط</span><span class="dc-id">DEF-002</span><span class="dc-title">خطوة "تحديث قاعدة البيانات" في التشغيل الآلي لا تتوقف أبداً</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> عند تشغيل المنصة بالأمر القياسي الموثّق (خطوة واحدة تلقائية)، يوجد جزء مخصص فقط لتحديث قاعدة البيانات ثم يجب أن يتوقف — لكنه فعلياً لا يتوقف أبداً، بل يستمر بالعمل كخادم كامل، وهذا يمنع باقي أجزاء المنصة من البدء تلقائياً بعده. النتيجة: أي شخص يشغّل المنصة بالأمر الموحّد الموثّق سيجدها "معلّقة" ولن تكتمل بمفردها.</div>
+      </div>
+
+      <div class="defect-card p1">
+        <div class="dc-head"><span class="pill p1">P1 — كبير</span><span class="dc-id">DEF-003</span><span class="dc-title">خصم لا يُطرح من المبلغ الإجمالي في 3 طلبات حقيقية</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> وجدنا 3 طلبات حقيقية في قاعدة البيانات مسجَّل عليها "خصم" (تخفيض في السعر)، لكن المبلغ الإجمالي المطلوب من العميل <strong>لم يُخفَّض فعلياً</strong> بمقدار ذلك الخصم. الفروقات: حوالي 4.7 دينار، 4.1 دينار، و3.4 دينار على التوالي. <strong>لم نتأكد بعد</strong> هل هذه مشكلة تحدث الآن مع الطلبات الجديدة، أم أنها بيانات قديمة من فترة سابقة قبل تصحيح منطق الخصم — وهذا يحتاج فحصاً إضافياً من فريق التطوير.</div>
+      </div>
+
+      <div class="defect-card p2">
+        <div class="dc-head"><span class="pill p2">P2 — متوسط</span><span class="dc-id">DEF-004</span><span class="dc-title">تفاصيل حساب السعر مفقودة في 9 طلبات حقيقية</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> 9 طلبات حقيقية (كلها من نفس الدفعة بتاريخ 23 مايو 2026) لا تحتوي على تفاصيل كيفية حساب المبلغ الإجمالي، رغم أن المبلغ نفسه موجود وليس صفراً. هذا لا يعني بالضرورة أن الحساب خاطئ، لكن لا يمكننا التأكد منه لأن التفاصيل غير محفوظة — وهذا يجعل مراجعتها من قِبل المحاسبة صعبة أو مستحيلة.</div>
+      </div>
+
+      <div class="defect-card p3">
+        <div class="dc-head"><span class="pill p3">معلومة</span><span class="dc-id">DEF-005</span><span class="dc-title">خطآن في أداة الفحص نفسها (وليس في المنصة) — تم اكتشافهما وإصلاحهما فوراً</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> اكتشفنا أن أداتين من أدوات الفحص التي بنيناها نحن كانتا تُعطيان نتيجة خاطئة ("غير مرئي") لأنهما كانتا تبحثان عن معلومات بأسماء غير صحيحة في رد الخادم. صحّحنا هذا فوراً أثناء العمل، وأعدنا التأكد أن كل شيء يعمل بشكل صحيح بعد التصحيح. نذكر هذا بصراحة حتى يعرف القارئ أن أي نتيجة سابقة اعتمدت على هاتين الأداتين تم التحقق منها مجدداً.</div>
+      </div>
+
+      <div class="defect-card p3">
+        <div class="dc-head"><span class="pill p3">معلومة</span><span class="dc-id">DEF-006</span><span class="dc-title">نظام حماية تسجيل الدخول منع اختباراتنا السريعة جداً</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> هذه ليست مشكلة في المنصة — بل دليل أنها تعمل بشكل صحيح. عندما حاولنا تسجيل دخول حسابات كثيرة بسرعة كبيرة جداً (كجزء من الاختبار الآلي)، منعنا الخادم تلقائياً بعد عدد معيّن من المحاولات في وقت قصير — وهذا بالضبط ما يجب أن تفعله أي منصة جيدة لمنع محاولات الاختراق بالتخمين السريع. أصلحنا أداة الاختبار الخاصة بنا لتحترم هذا النظام بدل أن "تقاومه".</div>
+      </div>
+
+      <div class="defect-card p3">
+        <div class="dc-head"><span class="pill p3">معلومة</span><span class="dc-id">DEF-007</span><span class="dc-title">رسائل خطأ غير ضارة تظهر في سجل المتصفح لصفحة محظورة أصلاً</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> عندما يحاول حساب "مراقب" الدخول لصفحة يُمنع منها، تظهر في سجل الأخطاء التقني للمتصفح (غير المرئي للمستخدم العادي) 5 رسائل "ممنوع" بسبب أن بعض أجزاء الصفحة تحاول تحميل بيانات قبل أن يكتمل فحص الصلاحية. النتيجة النهائية صحيحة (المستخدم محظور فعلياً)، لكن هذا "ضجيج" تقني بسيط يستحق تنظيفاً لاحقاً.</div>
+      </div>
+
+      <div class="defect-card p2">
+        <div class="dc-head"><span class="pill p2">P2 — متوسط</span><span class="dc-id">DEF-008</span><span class="dc-title">لا توجد صفحة لمراجعة تسوية أرباح السائقين</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> (مشروح بالتفصيل في القسم 18 أعلاه) — البيانات موجودة وصحيحة، لكن لا توجد نافذة في لوحة التحكم لمراجعتها.</div>
+      </div>
+
+      <div class="defect-card p3">
+        <div class="dc-head"><span class="pill p3">معلومة</span><span class="dc-id">DEF-009</span><span class="dc-title">تعطّل عابر للمتصفح مرتين، بسبب ضغط ذاكرة الجهاز</span></div>
+        <div class="dc-plain"><b>بلغة بسيطة:</b> مرتين أثناء الاختبار، أغلق المتصفح نفسه فجأة أثناء اختبار صفحة معيّنة، وتزامن ذلك مع لحظات كانت فيها ذاكرة الجهاز شحيحة جداً (أقل من جيجابايت). أعدنا اختبار نفس الصفحتين لاحقاً في وقت أهدأ ونجحتا تماماً. هذا يخص الجهاز المشترك الذي نعمل عليه، وليس خللاً في المنصة نفسها.</div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s28">
+      <h2><span class="sec-no">28</span>التعارضات والفجوات</h2>
+      <p>لم نجد أي تعارض مؤكد بين ما تعرضه الواجهة وما يسمح به فعلياً الخادم أو ملفات الإعدادات. لكن هناك مناطق لم يتم فحصها بعمق كافٍ لنستطيع الجزم بعدم وجود تعارض فيها (انظر القسم التالي).</p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s29">
+      <h2><span class="sec-no">29</span>المناطق غير المثبتة أو غير المختبرة</h2>
+      <ul>
+        <li>الضغط على كل زر موجود فعلياً في لوحة التحكم (اختُبرت عيّنة فقط)</li>
+        <li>مقارنة شاملة بين كل صفحة مخفية عن دور معين وبين هل هي محمية فعلياً في الخادم (تم اختبار مثالين فقط، ونجحا)</li>
+        <li>ظهور أحداث تغيير حالة المزوّد/السائق (إيقاف مؤقت مثلاً) في لوحة التحكم</li>
+        <li>جاهزية تطبيق الجوال</li>
+        <li>اختبار الواجهة الفعلية لحوالي 20 ميزة مقفلة أخرى (تم التأكد من إعداداتها فقط، وليس واجهتها)</li>
+        <li>هل رفض مستند إلزامي يمنع فعلياً المزوّد أو السائق من العمل؟</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s30">
+      <h2><span class="sec-no">30</span>خطة الإصلاح ذات الأولوية العالية</h2>
+      <ol>
+        <li><strong>إصلاح DEF-001</strong> (تعطّل تحديثات قاعدة البيانات من الصفر) — الأولوية الأعلى، لأنه يمنع تجهيز أي بيئة جديدة بالكامل.</li>
+        <li><strong>تحديد سبب DEF-003</strong> (الخصم غير المطروح) — هل هي مشكلة حيّة أم بيانات قديمة؟ ثم إصلاحها أو توثيقها.</li>
+        <li><strong>إصلاح DEF-002</strong> (تعليق خطوة التحديث) — لتحسين تجربة التشغيل بأمر واحد.</li>
+        <li><strong>إضافة صفحة</strong> لمراجعة تسوية أرباح السائقين (DEF-008).</li>
+        <li><strong>فحص DEF-004</strong> (تفاصيل السعر المفقودة) وتحديد إن كانت مشكلة مستمرة.</li>
+        <li>تنظيف رسائل الخطأ غير الضارة (DEF-007).</li>
+        <li>عند توفر جهاز أقوى أو غير مشترك: تنفيذ دفعة اختبار أكبر (2000+ سيناريو) للوصول للحد الأدنى المطلوب في العقد الأصلي.</li>
+        <li>مقارنة شاملة بين كل الصفحات المحمية وحمايتها الفعلية في الخادم.</li>
+        <li>التأكد من أن رفض مستند إلزامي يمنع فعلياً العمل (وليس فقط شكلياً).</li>
+        <li>تقييم منفصل لجاهزية تطبيق الجوال (قرار معلّق أصلاً بانتظار الموافقة).</li>
+      </ol>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s31">
+      <h2><span class="sec-no">31</span>الحكم النهائي — بلغة بسيطة</h2>
+      <div class="verdict-final">AGENT_REAL_OPERATION_PARTIAL_WITH_BLOCKERS</div>
+      <p>بالعربية البسيطة، هذا الحكم يعني: <strong>"تم اختبار جزء حقيقي وموثوق من المنصة، لكن الحجم المُنفَّذ أصغر بكثير من المطلوب أصلاً، بسبب قيود حقيقية في موارد الجهاز، وليس بسبب تقصير في الجودة أو إخفاء نتائج."</strong></p>
+      <p>بمعزل عن حجم الاختبار: لا توجد أي مشكلة "حرجة جداً" (P0). توجد مشكلتان "كبيرتان" (P1) تستحقان اهتماماً فعلياً وسريعاً. جميع بوابات الإطلاق التسع لا تزال مفتوحة، وهذا وحده يمنع اعتبار المنصة جاهزة للإطلاق الرسمي، بصرف النظر عن أي نتيجة أخرى في هذا التقرير. <strong>هذا التقرير لا يدّعي أبداً أن المنصة جاهزة لاستقبال عملاء حقيقيين أو معاملات مالية حقيقية.</strong></p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s32">
+      <h2><span class="sec-no">32</span>الخطوة التالية المقترحة للمسؤول</h2>
+      <ol>
+        <li>مراجعة العيبين الكبيرين (DEF-001, DEF-003) أولاً — انظر خطة الإصلاح في القسم 30.</li>
+        <li>عند الرغبة في اختبار أوسع، يمكن تشغيل الأمر التالي على جهاز مخصص وغير مُحمَّل بأعمال أخرى:</li>
+      </ol>
+      <div class="table-wrap"><table><tr><td style="font-family:monospace; font-size:.8rem; direction:ltr; text-align:left; white-space:pre-wrap;">python3 tools/agent_scenarios/run_agent_batch.py --total-scenarios 2000 --batch-size 100 --seed 20260707 --ui-ratio 0.5 --load-profile mixed --resume --stop-on-p0 --output-dir test-results/agent-real-operation</td></tr></table></div>
+      <ol start="3">
+        <li>إغلاق فجوة رؤية تسوية أرباح السائقين قبل الادعاء بأن غرفة التحكم تغطي كل شيء.</li>
+        <li>إغلاق بوابات الإطلاق التسع قبل التفكير في أي إطلاق تجريبي حقيقي.</li>
+      </ol>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s33">
+      <h2><span class="sec-no">33</span>مسارات التقارير التقنية الكاملة (للمهتم بالتفاصيل الخام)</h2>
+      <p>كل الأدلة الخام (صور الشاشة، سجلات الخادم، ملفات JSON، نتائج الاستعلامات) محفوظة داخل مجلد المشروع نفسه، وليس هنا. المسار الكامل:</p>
+      <div class="table-wrap"><table>
+        <tr><td>التقرير التقني الشامل (إنجليزي، HTML)</td><td class="num" style="direction:ltr">platform/app_report/450_AGENT_REAL_OPERATION_EXPLORATION_REPORT.html</td></tr>
+        <tr><td>فهرس كل الأدلة الخام</td><td class="num" style="direction:ltr">platform/app_report/450_AGENT_EVIDENCE_INDEX.json</td></tr>
+        <tr><td>قائمة كل العيوب (JSON قابل للقراءة الآلية)</td><td class="num" style="direction:ltr">platform/app_report/450_AGENT_REAL_OPERATION_DEFECTS.json</td></tr>
+        <tr><td>الأرقام النهائية الملخّصة (JSON)</td><td class="num" style="direction:ltr">platform/app_report/450_AGENT_REAL_OPERATION_SUMMARY.json</td></tr>
+        <tr><td>مجلد صور الشاشة الحقيقية لكل سيناريو</td><td class="num" style="direction:ltr">platform/web/test-results/agent-real-operation/</td></tr>
+      </table></div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section class="rs" id="s34">
+      <h2><span class="sec-no">34</span>قاموس مصطلحات مبسّط</h2>
+      <dl class="glossary">
+        <dt>سيناريو (Scenario)</dt><dd>خطوة اختبار واحدة محدَّدة، مثل "دخول عميل وفتح صفحة المحفظة".</dd>
+        <dt>API</dt><dd>الطريقة التي يتحدّث بها البرنامج مع الخادم مباشرة دون المرور بالواجهة المرئية — مثل لغة اتصال داخلية بين الأنظمة.</dd>
+        <dt>P0 / P1 / P2 / P3</dt><dd>مستويات خطورة العيب: P0 حرج جداً يجب إصلاحه فوراً، P1 كبير ومهم، P2 متوسط، P3/معلومة بسيط أو لا يحتاج إصلاحاً فورياً.</dd>
+        <dt>DEF-XXX</dt><dd>رقم تعريف كل عيب موثّق في هذا التقرير، لسهولة الرجوع إليه.</dd>
+        <dt>بوابة إطلاق (Launch Gate)</dt><dd>شرط رسمي يجب استيفاؤه قبل السماح بالإطلاق الحقيقي للمنصة (مثل موافقة قانونية أو اختبار أمان خارجي).</dd>
+        <dt>ميزة مقفلة (Sealed Feature)</dt><dd>وظيفة موجودة في الكود لكنها مُعطّلة عمداً حتى إشعار آخر، مثل سحب الأموال من المحفظة.</dd>
+      </dl>
+    </section>
+
+    <footer class="report-footer">
+      منصة توا — تقرير المرحلة 450: استكشاف التشغيل الفعلي المدفوع بوكلاء آليين. مُنشأ اعتماداً على تنفيذ حقيقي وموثّق بالدليل بالكامل — لا نتائج وهمية ولا افتراضات غير مختبرة.
+    </footer>
+  </main>
+
+  <nav class="toc" aria-label="فهرس المحتويات">
+    <div class="brand">التقرير 450</div>
+    <div class="brand-sub">استكشاف التشغيل الفعلي — منصة توا</div>
+    <ol>
+      <div class="g">البداية</div>
+      <li><a href="#s0">ما هذا التقرير؟</a></li>
+      <li><a href="#s1">الملخص التنفيذي</a></li>
+      <li><a href="#s2">ما تم وما لم يتم</a></li>
+      <li><a href="#s3">بيئة الاختبار</a></li>
+      <li><a href="#s4">دليل التشغيل</a></li>
+      <li><a href="#s5">إثبات عدم المحاكاة</a></li>
+      <div class="g">البيانات والحجم</div>
+      <li><a href="#s6">عالم البيانات التجريبي</a></li>
+      <li><a href="#s7">عدد السيناريوهات</a></li>
+      <li><a href="#s8">نتائج الواجهة</a></li>
+      <li><a href="#s9">نتائج API</a></li>
+      <li><a href="#s10">الحمل الزائد</a></li>
+      <li><a href="#s11">فئات المزوّدين</a></li>
+      <div class="g">النتائج حسب الدور</div>
+      <li><a href="#s12">العملاء</a></li>
+      <li><a href="#s13">المزوّدون</a></li>
+      <li><a href="#s14">موظفو المزوّدين</a></li>
+      <li><a href="#s15">السائقون</a></li>
+      <li><a href="#s16">العمليات والإدارة</a></li>
+      <li><a href="#s17">لوحة التحكم</a></li>
+      <li><a href="#s18">غرفة التحكم</a></li>
+      <li><a href="#s19">بوابات المستندات</a></li>
+      <li><a href="#s20">الميزات المغلقة</a></li>
+      <li><a href="#s21">الحسابات المالية</a></li>
+      <li><a href="#s22">المحفظة والتسوية</a></li>
+      <li><a href="#s23">الصلاحيات</a></li>
+      <li><a href="#s24">تعارضات الواجهة</a></li>
+      <li><a href="#s25">ثوابت قاعدة البيانات</a></li>
+      <div class="g">الخلاصة</div>
+      <li><a href="#s26">ما يعمل بنجاح</a></li>
+      <li><a href="#s27">العيوب المؤكدة</a></li>
+      <li><a href="#s28">التعارضات والفجوات</a></li>
+      <li><a href="#s29">غير مختبَر</a></li>
+      <li><a href="#s30">خطة الإصلاح</a></li>
+      <li><a href="#s31">الحكم النهائي</a></li>
+      <li><a href="#s32">الخطوة التالية</a></li>
+      <li><a href="#s33">مسارات التقارير الخام</a></li>
+      <li><a href="#s34">قاموس مصطلحات</a></li>
+    </ol>
+  </nav>
+</div>
+</body>
+</html>

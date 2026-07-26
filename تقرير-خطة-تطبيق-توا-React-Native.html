@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>توا — خطة بناء تطبيق موبايل احترافي (React Native + Expo)</title>
+<style>
+  :root{
+    --green:#0F8056; --green-d:#0b5f40; --green-l:#e6f4ee;
+    --amber:#d98a00; --amber-l:#fff6e5;
+    --red:#c0392b; --red-l:#fdecea;
+    --blue:#1f6feb; --blue-l:#e8f0fe;
+    --purple:#6d4aff; --purple-l:#efeaff;
+    --ink:#1c2430; --muted:#5b6776; --line:#e2e8ee; --bg:#f6f8fa;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.9;font-size:16px}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border-radius:22px;padding:38px 32px;margin-bottom:26px;box-shadow:0 12px 34px rgba(15,128,86,.28)}
+  header.hero h1{margin:0 0 8px;font-size:32px}
+  header.hero p{margin:4px 0;opacity:.96}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:5px 13px;border-radius:999px;font-size:13px;margin:7px 7px 0 0}
+  h2{font-size:24px;margin:38px 0 12px;padding-right:14px;border-right:6px solid var(--green);color:var(--green-d)}
+  h3{font-size:19px;color:var(--green-d);margin:22px 0 8px}
+  h4{font-size:16px;color:var(--ink);margin:14px 0 6px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin:14px 0;box-shadow:0 2px 12px rgba(20,30,50,.04)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff;border-radius:12px;overflow:hidden;font-size:14.5px}
+  th,td{padding:11px 13px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  tr:last-child td{border-bottom:none}
+  .ok{color:var(--green-d);font-weight:700}.warn{color:var(--amber);font-weight:700}.bad{color:var(--red);font-weight:700}
+  .tag{display:inline-block;padding:2px 9px;border-radius:7px;font-size:12px;font-weight:700}
+  .tag.g{background:var(--green-l);color:var(--green-d)}.tag.a{background:var(--amber-l);color:var(--amber)}.tag.r{background:var(--red-l);color:var(--red)}.tag.b{background:var(--blue-l);color:var(--blue)}
+  code{background:#0f172a;color:#d7e3f4;padding:2px 7px;border-radius:6px;font-size:13px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+  pre{background:#0f172a;color:#d7e3f4;padding:14px 16px;border-radius:12px;overflow:auto;direction:ltr;text-align:left;font-size:12.5px;line-height:1.6;font-family:Consolas,monospace}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  @media(max-width:820px){.grid2,.grid3{grid-template-columns:1fr}}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+  .kpi .n{font-size:24px;font-weight:800;color:var(--green-d)}.kpi .l{font-size:12.5px;color:var(--muted)}
+  .note{border-right:5px solid var(--blue);background:var(--blue-l);padding:12px 16px;border-radius:10px;margin:12px 0}
+  .note.amber{border-color:var(--amber);background:var(--amber-l)}.note.green{border-color:var(--green);background:var(--green-l)}.note.red{border-color:var(--red);background:var(--red-l)}
+  .step{display:flex;gap:14px;align-items:flex-start;margin:10px 0}
+  .step .num{flex:0 0 34px;height:34px;width:34px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .svgbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0;overflow:auto;text-align:center}
+  .small{font-size:13px;color:var(--muted)} .center{text-align:center}
+  ul,ol{margin:8px 0} li{margin:4px 0}
+  .toc a{color:var(--green-d);text-decoration:none} .toc li{margin:6px 0}
+  .legend span{margin-left:16px;font-size:13px}
+  .swatch{display:inline-block;width:16px;height:16px;border-radius:4px;vertical-align:middle;margin-left:6px;border:1px solid #0002}
+  .phasebar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .phasebar .ph{flex:1;min-width:150px;border-radius:12px;padding:12px;color:#fff;text-align:center;font-weight:700;font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🚀 توا / Towa — خطة بناء تطبيق موبايل احترافي بمستوى إنتاجي</h1>
+  <p>التقنية: React Native + Expo + TypeScript — تقرير دراسة وتخطيط قبل كتابة أي كود.</p>
+  <p class="small" style="opacity:.9">التاريخ: 2026-06-30 · أُعِدّ لمراجعتك واعتمادك · لا يوجد كود في هذه المرحلة</p>
+  <div>
+    <span class="pill">دراسة + خطة + قرارات معمارية (ADR)</span>
+    <span class="pill">مبني على فحص المنصة الفعلية</span>
+    <span class="pill">جاهز للسوق الليبي</span>
+    <span class="pill">RTL + عربي</span>
+  </div>
+</header>
+
+<div class="card toc">
+  <h3 style="margin-top:0">محتويات التقرير</h3>
+  <ol>
+    <li><a href="#s0">القرار الأهم قبل أي شيء: لدينا تطبيق Flutter عامل بالفعل</a></li>
+    <li><a href="#s1">ماذا فحصت في المنصة (الوضع الحقيقي)</a></li>
+    <li><a href="#s2">أين سيوضع تطبيق الموبايل الجديد</a></li>
+    <li><a href="#s3">سجل القرارات المعمارية (ADR) — التقنيات ولماذا</a></li>
+    <li><a href="#s4">بنية المشروع المقترحة (شجرة الملفات)</a></li>
+    <li><a href="#s5">المعمارية بالرسم: كيف تتدفّق البيانات</a></li>
+    <li><a href="#s6">الشاشات في النسخة الأولى</a></li>
+    <li><a href="#s7">نظام التصميم (Design System)</a></li>
+    <li><a href="#s8">الأمان · الأداء · العمل دون إنترنت · الاختبارات</a></li>
+    <li><a href="#s9">طبقة الـ API و«المحاكاة» (Mock) والتبديل للإنتاج</a></li>
+    <li><a href="#s10">خطة التنفيذ بالمراحل + بوابات الجودة</a></li>
+    <li><a href="#s11">المخاطر التقنية وكيف نعالجها</a></li>
+    <li><a href="#s12">ما أحتاج قراره منك قبل البدء</a></li>
+  </ol>
+</div>
+
+<!-- ====================== 0 ====================== -->
+<h2 id="s0">0) القرار الأهم — اقرأه أولاً</h2>
+<div class="note red">
+  <b>تنبيه صريح:</b> يوجد <b>تطبيق موبايل عامل بالفعل</b> لمنصة توا، مكتوب بتقنية <b>Flutter</b> (اسمه <code>libya_delivery</code>)، وقد بنيناه ووقّعناه وثبّتناه على جهاز السامسونج في الجلسة السابقة، وهو يعمل (86 ملف، يغطّي العميل/السائق/المزوّد/العمليات). هذا الطلب الجديد يطلب بناء تطبيق <b>من جديد بتقنية مختلفة تماماً (React Native + Expo)</b>.
+</div>
+<div class="card">
+  <p>قبل أن نكتب سطراً واحداً، يجب أن تقرّر بوعي ماذا نفعل بالتطبيقين، لأن لكل خيار تكلفة:</p>
+  <table>
+    <tr><th>الخيار</th><th>ماذا يعني</th><th>الميزة</th><th>العيب</th></tr>
+    <tr>
+      <td><b>أ) استبدال Flutter بـ React Native</b><br><span class="tag g">موصى به إن اخترت RN</span></td>
+      <td>نتوقّف عن تطوير تطبيق Flutter، ويصبح RN هو تطبيق الموبايل الرسمي الوحيد.</td>
+      <td>فريق/كود واحد، لا ازدواجية، توحيد التقنية مع الويب (React).</td>
+      <td>نتخلّى عن عمل Flutter المُنجز (لكنه يبقى مرجعاً للميزات).</td>
+    </tr>
+    <tr>
+      <td><b>ب) تطبيقان معاً</b></td>
+      <td>نطوّر Flutter و RN في نفس الوقت.</td>
+      <td>—</td>
+      <td class="bad">تكلفة مضاعفة، صيانة مزدوجة، تشتّت. غير مُوصى به.</td>
+    </tr>
+    <tr>
+      <td><b>ج) إكمال Flutter بدل RN</b></td>
+      <td>نوقف فكرة RN ونكمل تطوير تطبيق Flutter الموجود (الذي يعمل اليوم).</td>
+      <td>أسرع وأرخص — العمل موجود ويعمل فعلاً.</td>
+      <td>لا يطابق رغبتك في React Native.</td>
+    </tr>
+  </table>
+  <div class="note amber">
+    <b>توصيتي بصراحة مهنية:</b> إن كان سبب الانتقال إلى React Native هو <b>توحيد التقنية مع موقع الويب (React)</b> ومشاركة المعرفة/المنطق — فهذا سبب وجيه، وأوصي بالخيار <b>(أ): استبدال Flutter بـ RN</b>، مع الاستفادة من تطبيق Flutter والويب كـ«مرجع ميزات» جاهز (وفّرا علينا تحديد كل الشاشات والمنطق). أمّا إن كان الهدف فقط «تطبيق يعمل بسرعة»، فالخيار <b>(ج)</b> أوفر. <b>الخيار (ب) مرفوض</b> لأنه يضاعف الكلفة بلا فائدة. هذا التقرير مكتوب على أساس أنك ستختار <b>(أ)</b>، لكن القرار قرارك.
+  </div>
+</div>
+
+<!-- ====================== 1 ====================== -->
+<h2 id="s1">1) ماذا فحصت في المنصة (الوضع الحقيقي)</h2>
+<div class="card">
+  <p>المنصّة الحالية في المجلد <code>/home/a/Desktop/APP/platform</code> وهي «أحادية المستودع» (monorepo) تضم ثلاثة أجزاء رئيسية:</p>
+  <div class="svgbox">
+  <svg width="900" height="250" viewBox="0 0 900 250" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans Arabic,Tahoma" font-size="13.5">
+    <rect x="330" y="14" width="240" height="50" rx="12" fill="#e8f0fe" stroke="#1f6feb" stroke-width="2"/>
+    <text x="450" y="36" text-anchor="middle" font-weight="bold" fill="#1f4fb0">الخادم (Backend)</text>
+    <text x="450" y="54" text-anchor="middle" font-size="12" fill="#1f4fb0">FastAPI · Python · PostgreSQL · Redis</text>
+    <line x1="450" y1="66" x2="160" y2="110" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="450" y1="66" x2="450" y2="110" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="450" y1="66" x2="745" y2="110" stroke="#0F8056" stroke-width="2.5" stroke-dasharray="5 3"/>
+    <rect x="40" y="112" width="240" height="64" rx="12" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+    <text x="160" y="136" text-anchor="middle" font-weight="bold">موقع الويب (web/)</text>
+    <text x="160" y="156" text-anchor="middle" font-size="12" fill="#5b6776">React + Vite + TS (مرجع الميزات)</text>
+    <rect x="330" y="112" width="240" height="64" rx="12" fill="#fff" stroke="#94a3b8" stroke-width="2"/>
+    <text x="450" y="136" text-anchor="middle" font-weight="bold">موبايل Flutter (mobile_app/)</text>
+    <text x="450" y="156" text-anchor="middle" font-size="12" fill="#5b6776">موجود ويعمل (مرجع)</text>
+    <rect x="620" y="112" width="240" height="64" rx="12" fill="#e6f4ee" stroke="#0F8056" stroke-width="2.5"/>
+    <text x="740" y="136" text-anchor="middle" font-weight="bold" fill="#0b5f40">موبايل RN الجديد</text>
+    <text x="740" y="156" text-anchor="middle" font-size="12" fill="#0b5f40">سننشئه هنا (apps/mobile)</text>
+    <text x="450" y="210" text-anchor="middle" font-size="12.5" fill="#5b6776">الكل يتكلّم مع نفس الخادم عبر HTTPS: https://tawanow.com/api</text>
+  </svg>
+  </div>
+  <h3>أهم ما اكتشفته (حقائق مؤكّدة)</h3>
+  <table>
+    <tr><th>المجال</th><th>الواقع</th></tr>
+    <tr><td>الخادم</td><td>FastAPI حيّ على <code>https://tawanow.com/api</code> (يعمل: health 200). وحداته غنية: orders, dispatch, wallets, finance, providers, catalog, complaints, loyalty, promotions, bonus, kyc, legal, notifications, geo, support, settlement, payments, identity…</td></tr>
+    <tr><td>تسجيل الدخول</td><td>بكلمة مرور (<code>login_identifier</code> = هاتف أو بريد) أو OTP (<code>device_id</code> + <code>purpose</code>)، مع <b>refresh token</b> و TOTP اختياري. ✅ اختبرته فعلياً وأنشأت حساب عميل ونجح الدخول + قراءة الطلبات + تصفّح 12 مزوّداً.</td></tr>
+    <tr><td>العملة</td><td>الوحدة «درهم» (mills)، 1 د.ل = 1000، تُعرض «د.ل» بثلاث خانات.</td></tr>
+    <tr><td>اللغة</td><td>عربي RTL أساسي + بنية إنجليزي/فرنسي موجودة في الويب.</td></tr>
+    <tr><td>الدفع</td><td>نقداً عند الاستلام (COD) أولاً؛ الدفع الإلكتروني مُقفل حالياً (<code>production_payment_enabled=false</code>).</td></tr>
+    <tr><td>الشهادة/الشبكة</td><td>الخادم خلف Cloudflare بشهادة Let's Encrypt (جذر ISRG Root X1). <b>درس اليوم:</b> الأجهزة القديمة جداً قد لا تثق بهذه السلسلة — سنعالجها في تطبيق RN بحزم الجذور.</td></tr>
+  </table>
+  <div class="note green"><b>الخبر الجيد:</b> لن نخمّن الميزات. <b>موقع الويب</b> يحتوي شاشات العميل كاملة (الصفحة الرئيسية، التصنيفات، تفاصيل المزوّد، السلة، الدفع، تتبّع الطلب، السجل، العناوين، المحفظة، الولاء، الدعم…) و<b>طبقة API</b> منظّمة (auth, orders, providers, catalog, addresses, wallets, loyalty, support…). سنستخدمها كعقد جاهز لبناء RN بدقّة.</div>
+</div>
+
+<!-- ====================== 2 ====================== -->
+<h2 id="s2">2) أين سيوضع تطبيق الموبايل الجديد</h2>
+<div class="card">
+  <p>لأن المشروع monorepo، الأنظف وضع تطبيق RN في مجلد مستقل أعلى المستودع باسم <code>apps/mobile</code> (أو <code>platform/mobile_rn</code>)، منفصلاً عن <code>web/</code> و <code>mobile_app/</code> (Flutter)، مع إمكانية مشاركة الأنواع/الثوابت لاحقاً عبر مجلد <code>packages/shared</code>.</p>
+  <pre>APP/
+└── platform/
+    ├── backend/         (الخادم — موجود)
+    ├── web/             (الويب React — موجود، مرجع)
+    ├── mobile_app/      (Flutter — موجود، مرجع)
+    └── apps/
+        └── mobile/      ← تطبيق React Native الجديد (هنا)</pre>
+  <p class="small">السبب: عزل واضح، لا تعارض في الأدوات (Vite للويب، Expo للموبايل)، وسهولة مشاركة الأنواع لاحقاً دون خلط.</p>
+</div>
+
+<!-- ====================== 3 ADR ====================== -->
+<h2 id="s3">3) سجل القرارات المعمارية (ADR) — ماذا نستخدم ولماذا</h2>
+<div class="card">
+  <p>لكل تقنية: <b>القرار</b> + <b>السبب</b> + <b>البديل</b> + <b>الخطر</b>. كل مكتبة هنا لها مبرّر — لا مكتبات عشوائية.</p>
+  <table>
+    <tr><th>الطبقة</th><th>القرار</th><th>السبب باختصار</th><th>البديل</th><th>الخطر/ملاحظة</th></tr>
+    <tr><td>الإطار</td><td><b>React Native + Expo (SDK حديث)</b></td><td>توحيد مع الويب React؛ Expo يبسّط البناء والتحديث والصلاحيات.</td><td>RN خام (CLI)</td><td>بعض المكتبات تحتاج «Dev Client» بدل Expo Go.</td></tr>
+    <tr><td>اللغة</td><td><b>TypeScript (strict)</b></td><td>أمان أنواع، أخطاء أقل، صيانة أسهل.</td><td>JS</td><td>—</td></tr>
+    <tr><td>التنقّل</td><td><b>Expo Router</b></td><td>تنقّل بالملفات (file-based)، روابط عميقة جاهزة، يناسب Expo.</td><td>React Navigation يدوي</td><td>—</td></tr>
+    <tr><td>المحرك</td><td><b>Hermes + New Architecture</b></td><td>أداء أسرع وذاكرة أقل (مهم للأجهزة الضعيفة)، وهما الافتراضي الحديث.</td><td>JSC/القديمة</td><td>تأكيد توافق كل مكتبة مع New Arch.</td></tr>
+    <tr><td>حالة الواجهة</td><td class="ok"><b>Zustand</b></td><td>خفيف، بسيط، أقل «boilerplate»؛ مناسب لحجم متوسط (سلة، جلسة، لغة، مدينة).</td><td>Redux Toolkit</td><td>RTK أقوى للفرق الكبيرة لكنه زائد عن الحاجة هنا.</td></tr>
+    <tr><td>حالة الخادم</td><td><b>TanStack Query</b></td><td>caching، إعادة المحاولة، تحديثات تفاؤلية، فصل بيانات الخادم عن الواجهة.</td><td>جلب يدوي</td><td>—</td></tr>
+    <tr><td>النماذج</td><td><b>React Hook Form + Zod</b></td><td>أداء جيد + تحقّق قوي مشترك مع الأنواع.</td><td>Formik/Yup</td><td>—</td></tr>
+    <tr><td>تخزين الأسرار</td><td><b>expo-secure-store</b> (للرموز)</td><td>تشفير عبر Keychain/Keystore — ممنوع AsyncStorage للرموز.</td><td>—</td><td>—</td></tr>
+    <tr><td>تخزين سريع</td><td><b>MMKV</b> (كاش غير حسّاس: سلة، إعدادات)</td><td>سريع جداً، أفضل من AsyncStorage.</td><td>AsyncStorage</td><td>يحتاج Dev Client (ليس Expo Go).</td></tr>
+    <tr><td>تخزين مركّب</td><td><b>expo-sqlite</b> عند الحاجة</td><td>قوائم/طلبات مخزّنة محلياً للعمل دون إنترنت.</td><td>—</td><td>نضيفه فقط عند الحاجة الفعلية.</td></tr>
+    <tr><td>اللغة/الترجمة</td><td><b>i18next + expo-localization</b></td><td>عربي/إنجليزي + RTL عبر I18nManager.</td><td>—</td><td>RTL يحتاج اختباراً دقيقاً.</td></tr>
+    <tr><td>البناء/النشر</td><td><b>EAS Build + EAS Update</b></td><td>بناء سحابي للأندرويد/iOS + <b>تحديث ذاتي (OTA)</b> يقلّل إزعاج «حدّث».</td><td>بناء محلي</td><td>iOS يحتاج حساب Apple Developer.</td></tr>
+    <tr><td>الجودة</td><td><b>ESLint + Prettier + TS strict + Jest/RNTL</b></td><td>منع الأخطاء، تنسيق موحّد، اختبارات للمنطق الحرج.</td><td>—</td><td>—</td></tr>
+  </table>
+  <div class="note"><b>قاعدة المكتبات:</b> أي مكتبة إضافية مستقبلاً ستُوثّق بسبب واضح. لا نضيف شيئاً «لأنه شائع».</div>
+</div>
+
+<!-- ====================== 4 ====================== -->
+<h2 id="s4">4) بنية المشروع المقترحة</h2>
+<div class="card">
+  <p>بنية واضحة قابلة للتوسّع، تفصل الواجهة عن المنطق عن الـ API (لا منطق أعمال داخل الشاشات):</p>
+  <pre>apps/mobile/
+├── app/                      # Expo Router (الشاشات = ملفات)
+│   ├── _layout.tsx           # الجذر: مزوّدو الحالة + RTL + الثيم
+│   ├── index.tsx             # نقطة الدخول/التحويل
+│   ├── (onboarding)/         # ترحيب · لغة · مدينة · صلاحية الموقع
+│   ├── (auth)/               # هاتف · OTP · تسجيل
+│   ├── (tabs)/               # الرئيسية · الطلبات · المحفظة · الحساب
+│   ├── restaurant/[id].tsx   # تفاصيل المطعم/المتجر
+│   ├── cart/                 # السلة
+│   ├── checkout/             # إتمام الطلب
+│   └── orders/[id].tsx       # تتبّع الطلب
+├── src/
+│   ├── components/
+│   │   ├── ui/               # أزرار، حقول، بطاقات، Badge، BottomSheet، Toast
+│   │   ├── layout/           # رؤوس، حاويات، حالات فارغة/تحميل/خطأ
+│   │   └── business/         # بطاقة مطعم، عنصر قائمة، عنصر سلة…
+│   ├── features/             # منطق كل ميزة (auth, restaurants, cart, orders, location…)
+│   ├── services/
+│   │   ├── api/              # apiClient مركزي + services لكل ميزة
+│   │   ├── storage/          # secure (رموز) + mmkv (كاش)
+│   │   └── location/
+│   ├── hooks/                # hooks فوق TanStack Query
+│   ├── lib/                  # أدوات (المال، التواريخ، الأخطاء…)
+│   ├── theme/                # design tokens
+│   ├── i18n/                 # ar / en
+│   ├── store/                # Zustand (جلسة، سلة، إعدادات)
+│   ├── types/                # أنواع request/response
+│   └── mocks/                # طبقة محاكاة API بنفس شكل الإنتاج
+├── tests/
+├── app.config.ts            # إعداد Expo + متغيّرات البيئة
+├── eas.json                 # ملفّات بناء EAS
+└── README.md</pre>
+</div>
+
+<!-- ====================== 5 ====================== -->
+<h2 id="s5">5) المعمارية بالرسم — كيف تتدفّق البيانات</h2>
+<div class="card">
+  <p>القاعدة الذهبية: <b>الشاشة لا تتكلّم مع الـ API مباشرة</b>. الشاشة → hook → service → apiClient → الخادم. وهذا يسمح بتبديل «المحاكاة» بالإنتاج بسطر إعداد واحد.</p>
+  <div class="svgbox">
+  <svg width="960" height="230" viewBox="0 0 960 230" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans Arabic,Tahoma" font-size="13">
+    <rect x="20" y="80" width="150" height="60" rx="12" fill="#e6f4ee" stroke="#0F8056" stroke-width="2"/><text x="95" y="106" text-anchor="middle" font-weight="bold" fill="#0b5f40">الشاشة (UI)</text><text x="95" y="125" text-anchor="middle" font-size="11.5">عرض فقط</text>
+    <rect x="200" y="80" width="150" height="60" rx="12" fill="#fff" stroke="#1f6feb" stroke-width="2"/><text x="275" y="106" text-anchor="middle" font-weight="bold" fill="#1f4fb0">Hook</text><text x="275" y="125" text-anchor="middle" font-size="11.5">TanStack Query</text>
+    <rect x="380" y="80" width="150" height="60" rx="12" fill="#fff" stroke="#1f6feb" stroke-width="2"/><text x="455" y="106" text-anchor="middle" font-weight="bold" fill="#1f4fb0">Service</text><text x="455" y="125" text-anchor="middle" font-size="11.5">منطق الميزة</text>
+    <rect x="560" y="80" width="150" height="60" rx="12" fill="#fff6e5" stroke="#d98a00" stroke-width="2"/><text x="635" y="100" text-anchor="middle" font-weight="bold" fill="#b06f00">apiClient</text><text x="635" y="118" text-anchor="middle" font-size="11">رموز · مهلة · إعادة محاولة</text><text x="635" y="133" text-anchor="middle" font-size="11">401/403/500</text>
+    <rect x="740" y="40" width="180" height="48" rx="12" fill="#e8f0fe" stroke="#1f6feb" stroke-width="2"/><text x="830" y="68" text-anchor="middle" font-weight="bold" fill="#1f4fb0">الخادم الحقيقي</text>
+    <rect x="740" y="132" width="180" height="48" rx="12" fill="#efeaff" stroke="#6d4aff" stroke-width="2"/><text x="830" y="160" text-anchor="middle" font-weight="bold" fill="#5a36cc">Mock (محاكاة)</text>
+    <line x1="170" y1="110" x2="198" y2="110" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="350" y1="110" x2="378" y2="110" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="530" y1="110" x2="558" y2="110" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="710" y1="100" x2="738" y2="72" stroke="#1f6feb" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="710" y1="120" x2="738" y2="150" stroke="#6d4aff" stroke-width="2" stroke-dasharray="4 3" marker-end="url(#ar)"/>
+    <text x="830" y="205" text-anchor="middle" font-size="12" fill="#5b6776">التبديل بين الحقيقي والمحاكاة = تغيير إعداد واحد</text>
+    <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#64748b"/></marker></defs>
+  </svg>
+  </div>
+  <div class="grid2">
+    <div><h4>حالة الواجهة (Zustand)</h4><p class="small">سلة، جلسة الدخول، اللغة، المدينة المختارة — أشياء «محلية» تخصّ التطبيق.</p></div>
+    <div><h4>حالة الخادم (TanStack Query)</h4><p class="small">المطاعم، الأصناف، الطلبات — تُجلب من الخادم وتُخزّن مؤقتاً تلقائياً.</p></div>
+  </div>
+</div>
+
+<!-- ====================== 6 ====================== -->
+<h2 id="s6">6) الشاشات في النسخة الأولى (مبنية على ميزات المنصّة الفعلية)</h2>
+<div class="card">
+  <p>هذه ليست افتراضات — هي مستخلصة من شاشات الويب الموجودة فعلاً للعميل. (الأمثلة في طلبك صحيحة، وأضفنا ما هو موجود فعلاً في المنصّة.)</p>
+  <div class="grid3">
+    <div class="kpi"><div class="n">Onboarding</div><div class="l">ترحيب · لغة · مدينة · صلاحية الموقع (بأدب)</div></div>
+    <div class="kpi"><div class="n">المصادقة</div><div class="l">هاتف/بريد · OTP · تسجيل · إدارة الجلسة · أخطاء/تحميل</div></div>
+    <div class="kpi"><div class="n">الرئيسية</div><div class="l">بحث · أقسام · بانرات · مطاعم قريبة · الأكثر طلباً · حالة التوصيل بالمدينة</div></div>
+    <div class="kpi"><div class="n">قائمة المتاجر</div><div class="l">فلترة (تصنيف/مفتوح/توصيل) · ترتيب (الأقرب/الأسرع/الأعلى تقييماً)</div></div>
+    <div class="kpi"><div class="n">تفاصيل المتجر</div><div class="l">حالة الفتح · وقت التوصيل · أقسام · أصناف · إضافات · ملاحظات</div></div>
+    <div class="kpi"><div class="n">السلة</div><div class="l">كمية · مجموع فرعي · توصيل · خصم · إجمالي · حفظ محلي · منع طلب خاطئ</div></div>
+    <div class="kpi"><div class="n">إتمام الطلب</div><div class="l">العنوان · طريقة الدفع (نقدي/محفظة) · ملاحظات · مراجعة · تأكيد</div></div>
+    <div class="kpi"><div class="n">الطلبات</div><div class="l">قائمة · تفاصيل · حالات (pending→delivered) · Timeline واضح</div></div>
+    <div class="kpi"><div class="n">الحساب</div><div class="l">بيانات · العناوين · اللغة · المساعدة · تسجيل الخروج</div></div>
+  </div>
+  <div class="note green">ميزات إضافية موجودة في المنصّة وسنضيفها في مراحل لاحقة: <b>المحفظة</b>، <b>الولاء (نقاط)</b>، <b>الدعم/المحادثة</b>، <b>تتبّع السائق الحيّ على الخريطة (SSE)</b>، «اطلب أي شيء»، التسوّق بميزانية. (هذه أمثلة من الموجود فعلاً، وليست كل شيء.)</div>
+</div>
+
+<!-- ====================== 7 ====================== -->
+<h2 id="s7">7) نظام التصميم (Design System)</h2>
+<div class="card">
+  <p>ألوان وقياسات موحّدة (Design Tokens) — لا ألوان عشوائية ولا أنماط مبعثرة. مبنية على هوية توا الخضراء.</p>
+  <h4>الألوان الأساسية</h4>
+  <table>
+    <tr><th>الاسم</th><th>اللون</th><th>الاستخدام</th></tr>
+    <tr><td>Primary (أخضر توا)</td><td><span class="swatch" style="background:#0F8056"></span> #0F8056</td><td>الأزرار الرئيسية، الهوية</td></tr>
+    <tr><td>Primary Dark</td><td><span class="swatch" style="background:#0b5f40"></span> #0b5f40</td><td>الضغط/التظليل</td></tr>
+    <tr><td>Success / Warning / Error</td><td><span class="swatch" style="background:#0F8056"></span> <span class="swatch" style="background:#d98a00"></span> <span class="swatch" style="background:#c0392b"></span></td><td>حالات الرسائل</td></tr>
+    <tr><td>Ink / Muted / Line</td><td><span class="swatch" style="background:#1c2430"></span> <span class="swatch" style="background:#5b6776"></span> <span class="swatch" style="background:#e2e8ee"></span></td><td>النصوص والحدود</td></tr>
+  </table>
+  <h4>بقية الـ Tokens والمكوّنات الموحّدة</h4>
+  <div class="grid2">
+    <div><ul><li><b>spacing</b>: 4 · 8 · 12 · 16 · 24 · 32</li><li><b>radius</b>: 8 · 12 · 16 · دائري</li><li><b>typography</b>: عناوين/نص/صغير (خط عربي واضح)</li><li><b>shadows</b>: خفيف/متوسط</li></ul></div>
+    <div><ul><li>أزرار · حقول إدخال · بطاقات · Badge</li><li>Bottom Sheets · Modals · Toasts</li><li>حالات: Skeleton تحميل · Empty محترمة · Error واضحة</li><li><b>Offline banner</b> عند ضعف الإنترنت</li></ul></div>
+  </div>
+  <p class="small">الهدف: واجهة بمستوى Talabat/Careem لكن مناسبة للسوق الليبي وبتجربة عربية طبيعية (لا ترجمة حرفية)، وأزرار كبيرة مناسبة للموبايل، وعدم ازدحام.</p>
+</div>
+
+<!-- ====================== 8 ====================== -->
+<h2 id="s8">8) الأمان · الأداء · العمل دون إنترنت · الاختبارات</h2>
+<div class="grid2">
+  <div class="card">
+    <h3>🔒 الأمان</h3>
+    <ul>
+      <li>الرموز في <b>SecureStore</b> فقط (لا AsyncStorage).</li>
+      <li><b>apiClient موحّد</b>: مهلة (timeout) + إعادة محاولة معقولة + معالجة 401/403/500 بوضوح دون كشف تفاصيل تقنية.</li>
+      <li><b>refresh token</b> (الخادم يدعمه) لتجديد الجلسة بأمان.</li>
+      <li><code>base URL</code> من إعداد البيئة — لا أسرار داخل الكود.</li>
+      <li>تحقّق <b>Zod</b> لكل مدخلات المستخدم.</li>
+      <li><b>حزم جذور الشهادات داخل التطبيق</b> (درس اليوم) ليثق بالخادم حتى على الأجهزة القديمة، دون إضعاف الأمان.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>⚡ الأداء</h3>
+    <ul>
+      <li>تحميل كسول (lazy) للشاشات الثقيلة.</li>
+      <li><b>Pagination</b> للقوائم + caching عبر TanStack Query.</li>
+      <li>تحسين الصور + منع إعادة الرسم غير الضرورية.</li>
+      <li>memoization عند الحاجة فقط (لا مبالغة).</li>
+      <li>تحديثات تفاؤلية فقط حيث تناسب (مثل تعديل السلة).</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>📴 الإنترنت الضعيف (مهم لليبيا)</h3>
+    <ul>
+      <li>كاش للقوائم الأساسية + حفظ السلة محلياً.</li>
+      <li>مؤشّر «غير متصل» + إعادة محاولة عند الفشل.</li>
+      <li><b>عدم فقدان الطلب</b> قبل التأكيد، ورسائل خطأ مفهومة.</li>
+      <li>التطبيق لا ينهار عند انقطاع الشبكة (fail-safe).</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3>🧪 الاختبارات</h3>
+    <ul>
+      <li>حسابات السلة (مجموع/خصم/توصيل).</li>
+      <li>تحويل حالات الطلب (status mapping).</li>
+      <li>تطبيع أخطاء API (error normalization).</li>
+      <li>تحقّق النماذج + حالة المصادقة.</li>
+      <li>مكوّنات حرجة.</li>
+    </ul>
+    <p class="small">أوامر جاهزة: <code>lint</code> · <code>typecheck</code> · <code>test</code> · <code>format</code> · <code>start</code> · إعداد <code>eas build</code>.</p>
+  </div>
+</div>
+
+<!-- ====================== 9 ====================== -->
+<h2 id="s9">9) طبقة الـ API والمحاكاة (Mock) والتبديل للإنتاج</h2>
+<div class="card">
+  <p>الخادم حيّ وجاهز، لكن لنطوّر بسرعة وبأمان نبني <b>طبقة محاكاة بنفس شكل الإنتاج تماماً</b> (نفس الأنواع)، ونبدّل بينها وبين الحقيقي بإعداد واحد.</p>
+  <table>
+    <tr><th>المكوّن</th><th>الدور</th></tr>
+    <tr><td><code>types/</code></td><td>أنواع دقيقة لكل request/response (مأخوذة من عقد الخادم/الويب).</td></tr>
+    <tr><td><code>services/api/apiClient</code></td><td>عميل مركزي: رؤوس، رموز، مهلة، إعادة محاولة/تراجع، تطبيع الأخطاء.</td></tr>
+    <tr><td><code>services/api/*.ts</code></td><td>service لكل ميزة (auth, providers, catalog, orders, addresses, wallet…) — مطابقة لوحدات الخادم.</td></tr>
+    <tr><td><code>hooks/</code></td><td>hooks فوق TanStack Query (تحميل/خطأ/كاش/إعادة محاولة).</td></tr>
+    <tr><td><code>mocks/</code></td><td>ردود محاكاة بنفس الشكل — للتطوير والاختبار دون انتظار الخادم.</td></tr>
+  </table>
+  <p class="small">التبديل: <code>API_MODE=mock</code> أو <code>API_MODE=real</code> في إعداد البيئة (app.config) — بلا أي تغيير في الشاشات.</p>
+  <div class="note">واجهات حقيقية جاهزة سنبني عليها (أمثلة مؤكّدة): <code>POST /auth/login</code> · <code>POST /auth/otp/request|verify</code> · <code>POST /auth/register</code> · <code>GET /providers/search</code> · <code>GET /orders</code> · catalog · addresses · wallets · loyalty · support · <code>GET /version/check</code>.</div>
+</div>
+
+<!-- ====================== 10 ====================== -->
+<h2 id="s10">10) خطة التنفيذ بالمراحل + بوابات الجودة</h2>
+<div class="card">
+  <div class="phasebar">
+    <div class="ph" style="background:#0F8056">المرحلة 0<br>الأساسات</div>
+    <div class="ph" style="background:#1f6feb">المرحلة 1<br>الشاشات الأساسية</div>
+    <div class="ph" style="background:#6d4aff">المرحلة 2<br>ربط الإنتاج + الخريطة</div>
+    <div class="ph" style="background:#d98a00">المرحلة 3<br>إشعارات + offline + أداء</div>
+    <div class="ph" style="background:#c0392b">المرحلة 4<br>النشر على المتاجر</div>
+  </div>
+
+  <h3>المرحلة 0 — الأساسات (قبل أي شاشة)</h3>
+  <ul>
+    <li>مشروع Expo + TS strict + ESLint/Prettier + Expo Router.</li>
+    <li>نظام الثيم (tokens) + i18n + RTL + إعداد البيئة.</li>
+    <li>apiClient قابل للمحاكاة + SecureStore للرموز + هيكل Zustand + TanStack Query + تطبيع الأخطاء.</li>
+    <li>أوامر الجودة (lint/typecheck/test/format) + CI أساسي.</li>
+  </ul>
+
+  <h3>المرحلة 1 — مخرجات النسخة الأولى (ما ستراجعه)</h3>
+  <ul>
+    <li>تنقّل كامل + Onboarding + تدفّق مصادقة مبدئي (هاتف/OTP).</li>
+    <li>الرئيسية + قائمة المتاجر + تفاصيل المتجر + السلة.</li>
+    <li>إتمام الطلب (هيكل وظيفي) + الطلبات (هيكل وظيفي) + الحساب.</li>
+    <li>اختبارات للمنطق الأساسي + README واضح.</li>
+  </ul>
+  <div class="note amber"><b>بوابة العبور للمرحلة التالية (إلزامية):</b> لا ننتقل إلا بعد: ✅ typecheck ينجح · ✅ lint ينجح · ✅ الاختبارات تنجح · ✅ التطبيق يقلع فعلياً · ✅ لا بنية وهمية · ✅ لا استيرادات مكسورة.</div>
+
+  <h3>المرحلة 2 — ربط الإنتاج + الموقع</h3>
+  <ul><li>تبديل المحاكاة بالـ API الحقيقي · العناوين والموقع/الخرائط · تتبّع الطلب الحيّ (SSE) · المحفظة/الولاء/الدعم.</li></ul>
+  <h3>المرحلة 3 — إشعارات + offline + أداء</h3>
+  <ul><li>إشعارات الدفع · متانة العمل دون إنترنت · جولة تحسين أداء · تحديث ذاتي OTA (EAS Update).</li></ul>
+  <h3>المرحلة 4 — النشر</h3>
+  <ul><li>EAS Build/Submit · Google Play · Apple App Store (يتطلب حساب Apple Developer).</li></ul>
+</div>
+
+<!-- ====================== 11 ====================== -->
+<h2 id="s11">11) المخاطر التقنية وكيف نعالجها</h2>
+<div class="card">
+  <table>
+    <tr><th>الخطر</th><th>الأثر</th><th>المعالجة</th></tr>
+    <tr><td>ازدواجية تطبيقين (Flutter + RN)</td><td class="bad">عالٍ</td><td>حسم القرار في القسم 0 (يفضّل استبدال Flutter).</td></tr>
+    <tr><td>بعض المكتبات (MMKV/New Arch) تحتاج «Dev Client»</td><td class="warn">متوسط</td><td>استخدام EAS Dev Client من البداية بدل Expo Go.</td></tr>
+    <tr><td>الأجهزة القديمة لا تثق بشهادة الخادم (درس اليوم)</td><td class="warn">متوسط</td><td>حزم جذور الشهادات داخل التطبيق + تحديد أدنى نظام مدعوم.</td></tr>
+    <tr><td>Cloudflare قد يحجب عملاء غير المتصفّح</td><td class="warn">متوسط</td><td>التأكد من سماح قواعد Cloudflare لطلبات التطبيق + رؤوس مناسبة.</td></tr>
+    <tr><td>عقد API غير موثّق رسمياً للموبايل</td><td class="warn">متوسط</td><td>اشتقاق الأنواع من الويب + طبقة Mock أولاً + تثبيت العقد تدريجياً.</td></tr>
+    <tr><td>الدفع الإلكتروني مُقفل حالياً</td><td class="ok">منخفض</td><td>نبدأ بالدفع نقداً (COD) كما المنصّة، ونجهّز بنية الدفع لاحقاً.</td></tr>
+    <tr><td>iOS يحتاج حساب Apple Developer ($99/سنة)</td><td class="ok">منخفض</td><td>نبدأ بأندرويد، وiOS عند توفّر الحساب (EAS يتولّى أغلب العمل).</td></tr>
+  </table>
+</div>
+
+<!-- ====================== 12 ====================== -->
+<h2 id="s12">12) ما أحتاج قراره منك قبل أن أبدأ</h2>
+<div class="card">
+  <ol>
+    <li><b>القرار الكبير (القسم 0):</b> هل نستبدل Flutter بـ React Native (أ)؟ أم نكمل Flutter (ج)؟</li>
+    <li><b>مكان التطبيق:</b> هل توافق على <code>platform/apps/mobile</code>؟</li>
+    <li><b>حالة الحالة:</b> Zustand (توصيتي) أم Redux Toolkit؟</li>
+    <li><b>أول منصّة للنشر:</b> أندرويد أولاً (أوصي به)، أم أندرويد + iOS معاً؟</li>
+    <li><b>المحاكاة:</b> هل نبدأ بطبقة Mock ثم نربط الحقيقي (أوصي به)، أم نربط الخادم الحقيقي مباشرة؟</li>
+    <li><b>الهوية:</b> هل ألتزم بالأخضر <code>#0F8056</code> وشعار توا الحالي؟</li>
+  </ol>
+  <div class="note green"><b>الخطوة التالية:</b> راجع هذا التقرير وأعطني رأيك وقراراتك على النقاط الستّ أعلاه. بعد موافقتك أبدأ <b>المرحلة 0 + 1 فقط</b> بشكل كامل، ولا أنتقل لما بعدها إلا بعد اجتياز بوابة الجودة (typecheck/lint/test/إقلاع التطبيق)، ثم أسلّمك تقريراً نهائياً بنتائج الأوامر الفعلية (install/typecheck/lint/test/start).</div>
+</div>
+
+<p class="center small" style="margin:30px 0 10px">— نهاية تقرير الدراسة والتخطيط · توا / Towa · 2026-06-30 · (لا كود بعد — بانتظار قرارك) —</p>
+
+</div>
+</body>
+</html>

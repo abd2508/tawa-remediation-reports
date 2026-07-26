@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير الموجة 5 — منصة توا</title>
+<style>
+  :root {
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --blue: #2563eb;
+    --blue-light: #dbeafe;
+    --orange: #d97706;
+    --orange-light: #fef3c7;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --gray: #6b7280;
+    --bg: #f9fafb;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --text-sec: #6b7280;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Geneva, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 15px; }
+
+  .header {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    text-align: center;
+  }
+  .header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .header p { opacity: 0.85; font-size: 1rem; }
+  .badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; margin-top: 0.75rem; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
+
+  .section-title {
+    font-size: 1.2rem; font-weight: 700; color: var(--blue);
+    border-right: 4px solid var(--blue); padding-right: 0.75rem;
+    margin: 2rem 0 1rem;
+  }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.25rem;
+    margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .status-row {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.6rem 0; border-bottom: 1px solid var(--border);
+  }
+  .status-row:last-child { border-bottom: none; }
+  .status-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+  .icon-ok { background: var(--green-light); color: var(--green); }
+  .icon-warn { background: var(--orange-light); color: var(--orange); }
+  .icon-info { background: var(--blue-light); color: var(--blue); }
+  .status-text { flex: 1; }
+  .status-label { font-weight: 600; font-size: 0.9rem; }
+  .status-detail { font-size: 0.8rem; color: var(--text-sec); margin-top: 0.15rem; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .tag { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+  .tag-ok { background: var(--green-light); color: var(--green); }
+  .tag-info { background: var(--blue-light); color: var(--blue); }
+  .tag-warn { background: var(--orange-light); color: var(--orange); }
+
+  /* SVG Diagrams */
+  .diagram-wrap { overflow-x: auto; margin: 1rem 0; }
+  svg text { font-family: 'Segoe UI', sans-serif; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th { background: #f1f5f9; padding: 0.6rem 0.75rem; text-align: right; font-weight: 700; border-bottom: 2px solid var(--border); }
+  td { padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f9fafb; }
+
+  .deploy-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+  @media (max-width: 600px) { .deploy-grid { grid-template-columns: repeat(2, 1fr); } }
+  .deploy-box { background: var(--green-light); border: 1px solid #bbf7d0; border-radius: 10px; padding: 0.75rem; text-align: center; }
+  .deploy-box .icon { font-size: 1.5rem; }
+  .deploy-box .name { font-weight: 700; font-size: 0.85rem; margin-top: 0.25rem; }
+  .deploy-box .url { font-size: 0.72rem; color: var(--text-sec); }
+  .deploy-box .status { font-size: 0.78rem; color: var(--green); font-weight: 600; margin-top: 0.2rem; }
+
+  .code { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.82rem; overflow-x: auto; direction: ltr; text-align: left; margin: 0.5rem 0; }
+  .kw { color: #93c5fd; }
+  .str { color: #86efac; }
+  .cm { color: #64748b; }
+
+  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px dashed var(--border); }
+  .summary-row:last-child { border-bottom: none; }
+  .num-big { font-size: 2rem; font-weight: 800; color: var(--green); }
+
+  footer { text-align: center; color: var(--text-sec); font-size: 0.8rem; padding: 2rem; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="font-size:2.5rem;margin-bottom:0.5rem;">🚀</div>
+  <h1>تقرير الموجة 5 — منصة توا</h1>
+  <p>تنفيذ النقاط المتبقية من خطة الفحص الشامل</p>
+  <div class="badge">6 يوليو 2026 · 4 أهداف نشر · 4/4 اختبارات E2E ✓</div>
+</div>
+
+<div class="container">
+
+  <!-- Overview numbers -->
+  <div class="grid-2">
+    <div class="card" style="text-align:center;">
+      <div class="num-big">6</div>
+      <div style="font-size:0.9rem;color:var(--text-sec);">ملفات مُعدَّلة</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="num-big">4/4</div>
+      <div style="font-size:0.9rem;color:var(--text-sec);">اختبارات E2E ناجحة</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-title">📋 ما تم تنفيذه في هذه الموجة</div>
+
+  <!-- 1. OpsDriverControls -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+      <span style="font-size:1.5rem;">🛡️</span>
+      <div>
+        <div style="font-weight:700;font-size:1rem;">ربط صفحة ضوابط السائقين (OpsDriverControls)</div>
+        <span class="tag tag-ok">مكتمل</span>
+      </div>
+    </div>
+    <p style="font-size:0.88rem;color:var(--text-sec);margin-bottom:0.75rem;">
+      الصفحة كانت <strong>موجودة كاملة</strong> (بحث + تعليق + حد نقدي + انحرافات GPS + ملف مخاطر)
+      لكنها لم تكن مربوطة بالـ Router ولا بالـ Nav — أي <em>لا أحد كان يستطيع الوصول إليها</em>.
+    </p>
+    <table>
+      <tr><th>الملف</th><th>التغيير</th></tr>
+      <tr><td><code>opsRouter.tsx</code></td><td>lazy import + مسار <code>/ops/driver-controls</code></td></tr>
+      <tr><td><code>opsNav.ts</code></td><td>إدخال في قسم الكيانات 🛡️ ضوابط السائقين</td></tr>
+      <tr><td><code>opsAccess.ts</code></td><td>إضافة <code>OPS_ADMIN</code> لمنع الظهور للعملاء</td></tr>
+    </table>
+    <!-- Diagram: OpsDriverControls connection -->
+    <div class="diagram-wrap">
+      <svg width="500" height="130" viewBox="0 0 500 130" style="max-width:100%;">
+        <!-- Before -->
+        <rect x="10" y="20" width="140" height="40" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
+        <text x="80" y="45" text-anchor="middle" font-size="11" fill="#991b1b" font-weight="bold">opsNav.ts</text>
+        <text x="80" y="57" text-anchor="middle" font-size="10" fill="#991b1b">❌ لا إدخال</text>
+        <rect x="170" y="20" width="140" height="40" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
+        <text x="240" y="45" text-anchor="middle" font-size="11" fill="#991b1b" font-weight="bold">opsRouter.tsx</text>
+        <text x="240" y="57" text-anchor="middle" font-size="10" fill="#991b1b">❌ لا مسار</text>
+        <rect x="330" y="20" width="140" height="40" rx="8" fill="#dcfce7" stroke="#86efac"/>
+        <text x="400" y="45" text-anchor="middle" font-size="11" fill="#166534" font-weight="bold">OpsDriverControls</text>
+        <text x="400" y="57" text-anchor="middle" font-size="10" fill="#166534">✓ الملف كامل</text>
+        <!-- After -->
+        <rect x="10" y="80" width="140" height="40" rx="8" fill="#dcfce7" stroke="#86efac"/>
+        <text x="80" y="105" text-anchor="middle" font-size="11" fill="#166534" font-weight="bold">opsNav.ts</text>
+        <text x="80" y="117" text-anchor="middle" font-size="10" fill="#166534">✓ إدخال مضاف</text>
+        <rect x="170" y="80" width="140" height="40" rx="8" fill="#dcfce7" stroke="#86efac"/>
+        <text x="240" y="105" text-anchor="middle" font-size="11" fill="#166534" font-weight="bold">opsRouter.tsx</text>
+        <text x="240" y="117" text-anchor="middle" font-size="10" fill="#166534">✓ مسار مضاف</text>
+        <line x1="150" y1="100" x2="170" y2="100" stroke="#16a34a" stroke-width="2" marker-end="url(#arr)"/>
+        <line x1="310" y1="100" x2="330" y2="100" stroke="#16a34a" stroke-width="2" marker-end="url(#arr)"/>
+        <rect x="330" y="80" width="140" height="40" rx="8" fill="#dcfce7" stroke="#86efac"/>
+        <text x="400" y="105" text-anchor="middle" font-size="11" fill="#166534" font-weight="bold">OpsDriverControls</text>
+        <text x="400" y="117" text-anchor="middle" font-size="10" fill="#166534">✓ متاحة الآن</text>
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#16a34a"/></marker></defs>
+        <!-- Labels -->
+        <text x="255" y="12" text-anchor="middle" font-size="10" fill="#6b7280">قبل</text>
+        <text x="255" y="74" text-anchor="middle" font-size="10" fill="#6b7280">بعد</text>
+      </svg>
+    </div>
+    <div style="background:#fef9c3;border:1px solid #fde047;padding:0.6rem 0.75rem;border-radius:8px;font-size:0.82rem;">
+      <strong>🐛 خطأ إضافي تم إصلاحه:</strong> لأن المسار لم يكن في <code>opsAccess.ts</code>، كان <em>ظهر للعملاء</em> (منطق fail-open).
+      تم إضافة <code>"/ops/driver-controls": OPS_ADMIN</code> لمنع ذلك — أصلح 4 اختبارات OpsTopNav كانت فاشلة.
+    </div>
+  </div>
+
+  <!-- 2. useDriverSSE -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+      <span style="font-size:1.5rem;">📡</span>
+      <div>
+        <div style="font-weight:700;font-size:1rem;">تفعيل SSE الكامل للسائق (useDriverSSE)</div>
+        <span class="tag tag-ok">مكتمل</span>
+        <span class="tag tag-info" style="margin-right:0.5rem;">مع fallback تلقائي</span>
+      </div>
+    </div>
+    <p style="font-size:0.88rem;color:var(--text-sec);margin-bottom:0.75rem;">
+      كان الـ hook مجرد stub فارغ. الآن يحتوي على:
+    </p>
+    <div class="diagram-wrap">
+      <svg width="480" height="150" viewBox="0 0 480 150" style="max-width:100%;">
+        <!-- Flow -->
+        <rect x="10" y="20" width="100" height="40" rx="8" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="60" y="43" text-anchor="middle" font-size="10" fill="#1d4ed8" font-weight="bold">صفحة السائق</text>
+        <text x="60" y="55" text-anchor="middle" font-size="9" fill="#1d4ed8">useDriverSSE()</text>
+        <line x1="110" y1="40" x2="140" y2="40" stroke="#2563eb" stroke-width="2" marker-end="url(#arr2)"/>
+        <rect x="140" y="20" width="100" height="40" rx="8" fill="#dcfce7" stroke="#86efac"/>
+        <text x="190" y="38" text-anchor="middle" font-size="10" fill="#166534" font-weight="bold">EventSource</text>
+        <text x="190" y="50" text-anchor="middle" font-size="9" fill="#166534">/api/sse/driver</text>
+        <text x="190" y="58" text-anchor="middle" font-size="8" fill="#166534">الخيار الأول</text>
+        <!-- Error path -->
+        <line x1="190" y1="60" x2="190" y2="80" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="200" y="75" font-size="8" fill="#dc2626">خطأ × 2</text>
+        <rect x="140" y="85" width="100" height="40" rx="8" fill="#fef3c7" stroke="#fde047"/>
+        <text x="190" y="103" text-anchor="middle" font-size="10" fill="#92400e" font-weight="bold">Polling</text>
+        <text x="190" y="115" text-anchor="middle" font-size="9" fill="#92400e">/api/driver/me/orders/active</text>
+        <text x="190" y="123" text-anchor="middle" font-size="8" fill="#92400e">كل 8 ثوان</text>
+        <!-- Reconnect -->
+        <line x1="140" y1="40" x2="110" y2="40" stroke="none"/>
+        <rect x="290" y="20" width="100" height="40" rx="8" fill="#dcfce7" stroke="#86efac"/>
+        <text x="340" y="38" text-anchor="middle" font-size="10" fill="#166534" font-weight="bold">إعادة اتصال</text>
+        <text x="340" y="50" text-anchor="middle" font-size="9" fill="#166534">1s → 2s → 4s → 30s max</text>
+        <line x1="240" y1="35" x2="290" y2="35" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4"/>
+        <text x="265" y="30" text-anchor="middle" font-size="8" fill="#16a34a">خطأ أول</text>
+        <rect x="390" y="20" width="80" height="40" rx="8" fill="#dcfce7" stroke="#86efac"/>
+        <text x="430" y="43" text-anchor="middle" font-size="9" fill="#166534" font-weight="bold">connected: true</text>
+        <line x1="390" y1="40" x2="375" y2="40" stroke="none"/>
+        <defs><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#2563eb"/></marker></defs>
+      </svg>
+    </div>
+    <div class="code">
+<span class="cm">// قبل: stub فارغ</span>
+<span class="kw">export function</span> useDriverSSE(_onDispatch) {
+  useEffect(() => { <span class="cm">/* TODO */</span> }, []);
+  <span class="kw">return</span> { connected: <span class="kw">false</span>, lastEventAt: <span class="kw">null</span> };
+}
+</div>
+    <div class="code">
+<span class="cm">// بعد: EventSource كامل + إعادة اتصال + polling</span>
+<span class="kw">const</span> source = <span class="kw">new</span> EventSource(<span class="str">"/api/sse/driver"</span>);
+source.onerror = () => {
+  <span class="cm">// بعد فشلين → تحويل تلقائي للـ polling</span>
+  <span class="kw">if</span> (backoffMs.current >= 4000) { startPolling(); <span class="kw">return</span>; }
+  <span class="cm">// إعادة اتصال تدريجية: 1s → 2s → 4s → 30s</span>
+  reconnectTimer.current = setTimeout(connect, delay);
+};
+</div>
+  </div>
+
+  <!-- 3. i18n -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+      <span style="font-size:1.5rem;">🌍</span>
+      <div>
+        <div style="font-weight:700;font-size:1rem;">مفاتيح الترجمة الجديدة للسلة</div>
+        <span class="tag tag-ok">مكتمل</span>
+      </div>
+    </div>
+    <p style="font-size:0.88rem;color:var(--text-sec);margin-bottom:0.75rem;">
+      الصفحة الجديدة للسلة (CartPage) تستخدم 7 مفاتيح جديدة لم تكن موجودة في ملفات الترجمة — كانت تعتمد على <code>defaultValue</code> فقط.
+    </p>
+    <table>
+      <tr><th>المفتاح</th><th>العربي</th><th>الإنجليزي</th><th>الفرنسي</th></tr>
+      <tr><td><code>cart.unit</code></td><td>للوحدة</td><td>each</td><td>l'unité</td></tr>
+      <tr><td><code>cart.increase</code></td><td>زيادة</td><td>Increase</td><td>Augmenter</td></tr>
+      <tr><td><code>cart.store_closed</code></td><td>هذا المتجر لا يستقبل طلبات الآن</td><td>Not accepting orders</td><td>N'accepte pas de commandes</td></tr>
+      <tr><td><code>cart.below_min</code></td><td>الحدّ الأدنى للطلب</td><td>Minimum order</td><td>Commande minimale</td></tr>
+      <tr><td><code>cart.checkout_all</code></td><td>ادفع الكل</td><td>Pay all</td><td>Tout payer</td></tr>
+      <tr><td><code>cart.stores</code></td><td>متاجر</td><td>stores</td><td>boutiques</td></tr>
+      <tr><td><code>cart.add_more</code></td><td>أضف المزيد من المتجر</td><td>Add more from store</td><td>Ajouter plus du magasin</td></tr>
+    </table>
+  </div>
+
+  <!-- 4. E2E Tests -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+      <span style="font-size:1.5rem;">🧪</span>
+      <div>
+        <div style="font-weight:700;font-size:1rem;">اختبارات E2E للسلة الموحدة</div>
+        <span class="tag tag-ok">4/4 ناجحة</span>
+      </div>
+    </div>
+    <p style="font-size:0.88rem;color:var(--text-sec);margin-bottom:0.75rem;">
+      كتابة 4 اختبارات E2E حقيقية بدون backend — تستخدم <strong>تقنية auth-refresh bootstrap</strong>
+      (حقن <code>device_id</code> في localStorage ثم تزوير استجابة <code>/api/auth/refresh</code>).
+    </p>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">السلة الفارغة تعرض رسالة التفريغ</div></div></div>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">سلة واحدة تعرض المنتجات وزر الدفع</div></div></div>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">زر "ادفع الكل" لا يظهر عندما group_order_enabled=false</div></div></div>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">/checkout-group يعيد التوجيه لـ /cart عندما العلَم مغلق</div></div></div>
+  </div>
+
+  <!-- 5. group_order_enabled -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <span style="font-size:1.5rem;">🔘</span>
+      <div>
+        <div style="font-weight:700;font-size:1rem;">تفعيل group_order_enabled من لوحة OPS</div>
+        <span class="tag tag-info">لا يحتاج تعديل</span>
+      </div>
+    </div>
+    <p style="font-size:0.88rem;color:var(--text-sec);margin-top:0.5rem;">
+      العلَم موجود في قاعدة البيانات ويمكن تشغيله من صفحة <strong>Feature Toggles</strong> الموجودة على
+      <code>/ops/feature-toggles</code> — لا يحتاج أي كود إضافي.
+    </p>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-title">🚀 حالة النشر على الأهداف الأربعة</div>
+  <div class="deploy-grid">
+    <div class="deploy-box">
+      <div class="icon">🏠</div>
+      <div class="name">Kali المحلي</div>
+      <div class="url">test1.tawanow.com</div>
+      <div class="status">✓ محدَّث</div>
+    </div>
+    <div class="deploy-box">
+      <div class="icon">🖥️</div>
+      <div class="name">Ubuntu .194</div>
+      <div class="url">test.tawanow.com</div>
+      <div class="status">✓ محدَّث</div>
+    </div>
+    <div class="deploy-box">
+      <div class="icon">🌐</div>
+      <div class="name">الإنتاج</div>
+      <div class="url">tawanow.com</div>
+      <div class="status">✓ محدَّث</div>
+    </div>
+    <div class="deploy-box">
+      <div class="icon">🐙</div>
+      <div class="name">GitHub</div>
+      <div class="url">commit 5707500</div>
+      <div class="status">✓ مدفوع</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-title">✅ نتائج التحقق النهائي</div>
+  <div class="card">
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">TypeScript typecheck</div><div class="status-detail">0 أخطاء</div></div></div>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">Vite Build</div><div class="status-detail">41 ملف precache · 1950 KiB</div></div></div>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">ESLint</div><div class="status-detail">0 أخطاء</div></div></div>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">E2E مخصصة (cart-unified)</div><div class="status-detail">4/4 ناجحة</div></div></div>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">OpsTopNav tests</div><div class="status-detail">342/342 — إصلاح خطأ fail-open للعملاء</div></div></div>
+    <div class="status-row"><div class="status-icon icon-ok">✓</div><div class="status-text"><div class="status-label">FIN-COR</div><div class="status-detail">SHA256 contracts محفوظة · لا تعديل مالي</div></div></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-title">📊 ملخص الموجات المكتملة (1–5)</div>
+  <div class="card">
+    <table>
+      <tr><th>الموجة</th><th>البند الرئيسي</th><th>الحالة</th></tr>
+      <tr><td>W1</td><td>إصلاح EN_ROUTE · OrderAcceptTimer · OfflineBanner · OPS nav · حذف أعلام وهمية</td><td><span class="tag tag-ok">✓</span></td></tr>
+      <tr><td>W2</td><td>PARKED_ADD/DECREMENT · CartPage موحدة · group_order guard · اختبارات سلة</td><td><span class="tag tag-ok">✓</span></td></tr>
+      <tr><td>W3</td><td>useDriverSSE stub</td><td><span class="tag tag-ok">✓ → مُحسَّن في W5</span></td></tr>
+      <tr><td>W4</td><td>ProviderEarnings: date filter + SVG chart</td><td><span class="tag tag-ok">✓</span></td></tr>
+      <tr><td>W5</td><td>OpsDriverControls routing · SSE كامل · i18n cart · E2E tests · opsAccess fix</td><td><span class="tag tag-ok">✓</span></td></tr>
+    </table>
+  </div>
+
+</div>
+<footer>Tawa Libya Platform · Wave 5 Report · 2026-07-06</footer>
+</body>
+</html>

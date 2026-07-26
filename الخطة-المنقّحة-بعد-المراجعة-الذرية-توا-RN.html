@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>توا — الخطة المنقّحة بعد المراجعة الذرية (React Native + Expo)</title>
+<style>
+  :root{
+    --green:#0F8056;--green-d:#0b5f40;--green-l:#e6f4ee;
+    --amber:#d98a00;--amber-l:#fff6e5;--red:#c0392b;--red-l:#fdecea;
+    --blue:#1f6feb;--blue-l:#e8f0fe;--purple:#6d4aff;--purple-l:#efeaff;
+    --ink:#1c2430;--muted:#5b6776;--line:#e2e8ee;--bg:#f6f8fa;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.9;font-size:15.5px}
+  .wrap{max-width:1160px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0b5f40,#0F8056 60%,#15a06c);color:#fff;border-radius:22px;padding:38px 32px;margin-bottom:24px;box-shadow:0 12px 34px rgba(15,128,86,.30)}
+  header.hero h1{margin:0 0 8px;font-size:31px}
+  header.hero p{margin:4px 0;opacity:.96}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:5px 13px;border-radius:999px;font-size:13px;margin:7px 7px 0 0}
+  h2{font-size:23px;margin:42px 0 12px;padding-right:14px;border-right:6px solid var(--green);color:var(--green-d)}
+  h3{font-size:18px;color:var(--green-d);margin:22px 0 8px}
+  h4{font-size:15.5px;color:var(--ink);margin:14px 0 6px;font-weight:700}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin:14px 0;box-shadow:0 2px 12px rgba(20,30,50,.04)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff;border-radius:12px;overflow:hidden;font-size:14px}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  tr:last-child td{border-bottom:none}
+  .ok{color:var(--green-d);font-weight:700}.warn{color:var(--amber);font-weight:700}.bad{color:var(--red);font-weight:700}
+  .tag{display:inline-block;padding:2px 8px;border-radius:7px;font-size:11.5px;font-weight:700}
+  .tag.g{background:var(--green-l);color:var(--green-d)}.tag.a{background:var(--amber-l);color:var(--amber)}.tag.r{background:var(--red-l);color:var(--red)}.tag.b{background:var(--blue-l);color:var(--blue)}.tag.p{background:var(--purple-l);color:var(--purple)}
+  .sev{font-weight:800;border-radius:6px;padding:1px 7px;font-size:12px;white-space:nowrap}
+  .sev.r{background:#fdecea;color:#c0392b}.sev.o{background:#fff6e5;color:#d98a00}.sev.y{background:#fff9db;color:#a98700}
+  code{background:#0f172a;color:#d7e3f4;padding:2px 6px;border-radius:6px;font-size:12.5px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+  pre{background:#0f172a;color:#d7e3f4;padding:14px 16px;border-radius:12px;overflow:auto;direction:ltr;text-align:left;font-size:12px;line-height:1.55;font-family:Consolas,monospace}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:880px){.grid2,.grid3{grid-template-columns:1fr}}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .kpi .n{font-size:22px;font-weight:800;color:var(--green-d)}.kpi .l{font-size:12px;color:var(--muted)}
+  .note{border-right:5px solid var(--blue);background:var(--blue-l);padding:12px 16px;border-radius:10px;margin:12px 0}
+  .note.amber{border-color:var(--amber);background:var(--amber-l)}.note.green{border-color:var(--green);background:var(--green-l)}.note.red{border-color:var(--red);background:var(--red-l)}
+  .svgbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0;overflow:auto;text-align:center}
+  .small{font-size:12.5px;color:var(--muted)}.center{text-align:center}
+  ul,ol{margin:8px 0}li{margin:4px 0}
+  .toc a{color:var(--green-d);text-decoration:none}.toc li{margin:5px 0}
+  .cat{background:var(--ink);color:#fff;border-radius:10px;padding:8px 14px;font-weight:700;margin:18px 0 4px;font-size:15px}
+  .count{background:#fff;color:var(--green-d);border-radius:999px;padding:1px 9px;font-size:12px;margin-right:8px}
+  .scn td:first-child{font-weight:600;color:var(--ink)}
+  .phasebar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .phasebar .ph{flex:1;min-width:120px;border-radius:12px;padding:11px;color:#fff;text-align:center;font-weight:700;font-size:12.5px}
+  .dod{border:1px dashed var(--green);background:var(--green-l);border-radius:10px;padding:10px 14px;margin:8px 0;font-size:13.5px}
+  .swatch{display:inline-block;width:15px;height:15px;border-radius:4px;vertical-align:middle;margin-left:6px;border:1px solid #0002}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🔬 توا / Towa — الخطة المنقّحة بعد المراجعة الذرية</h1>
+  <p>مراجعة جذرية للخطة السابقة + 24 اكتشافاً تقنياً + خطة أعمق بالمراحل + 210+ سيناريو. (تطبيق React Native + Expo)</p>
+  <p class="small" style="opacity:.9">2026-06-30 · النسخة 2 — لا تُلغي السابقة بل تصحّحها وتعمّقها · لا كود بعد</p>
+  <div>
+    <span class="pill">24 عيب/فجوة اكتُشفت وعولِجت</span>
+    <span class="pill">مصفوفة مكتبات مؤكّدة</span>
+    <span class="pill">تحقّقات تقنية (Spikes) في المرحلة 0</span>
+    <span class="pill">«تعريف الإنجاز» لكل مرحلة</span>
+  </div>
+</header>
+
+<div class="card toc">
+  <h3 style="margin-top:0">المحتويات</h3>
+  <ol>
+    <li><a href="#how">كيف أجريت المراجعة الذرية</a></li>
+    <li><a href="#find">نتائج المراجعة: 24 عيب/فجوة + إصلاحها</a></li>
+    <li><a href="#libs">مصفوفة المكتبات المعتمدة (مع توافق New Architecture)</a></li>
+    <li><a href="#arch">تصحيحات معمارية حاسمة (SSE · خرائط · إشعارات · شهادات · Monorepo · الأنواع)</a></li>
+    <li><a href="#adapt">النسخة الواحدة المتكيّفة (إشارات مُحسّنة)</a></li>
+    <li><a href="#update">التحديث التلقائي (مُنقّح + spike الأجهزة القديمة)</a></li>
+    <li><a href="#sec">الأمان العميق (مُنقّح)</a></li>
+    <li><a href="#plan">الخطة بالمراحل العميقة + «تعريف الإنجاز»</a></li>
+    <li><a href="#sim">المحاكاة الذهنية — 210+ سيناريو (المُضاف بعد المراجعة)</a></li>
+    <li><a href="#risk">المخاطر المتبقية + قرارات مؤجلة</a></li>
+    <li><a href="#decide">ما أحتاج قراره منك</a></li>
+  </ol>
+</div>
+
+<!-- ===== HOW ===== -->
+<h2 id="how">1) كيف أجريت المراجعة الذرية</h2>
+<div class="card">
+  <p>لم أكتفِ بإعادة قراءة الخطة. دقّقت <b>كل ادعاء تقني</b> فيها مقابل واقع React Native/Expo الأصلي (Native)، لأن «الشيطان في التفاصيل الأصلية». سألت في كل بند: هل هذا <b>مدعوم فعلاً</b>؟ هل يحتاج مكتبة؟ هل يعمل على الأجهزة القديمة؟ هل يتعارض مع شيء؟ هل توقيت/ترتيب التنفيذ صحيح؟</p>
+  <div class="svgbox">
+  <svg width="900" height="150" viewBox="0 0 900 150" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans Arabic,Tahoma" font-size="12.5">
+    <rect x="10" y="55" width="150" height="44" rx="10" fill="#e8f0fe" stroke="#1f6feb"/><text x="85" y="82" text-anchor="middle" font-weight="bold" fill="#1f4fb0">كل بند في الخطة</text>
+    <line x1="162" y1="77" x2="195" y2="77" stroke="#94a3b8" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="197" y="40" width="170" height="74" rx="10" fill="#fff" stroke="#94a3b8"/><text x="282" y="62" text-anchor="middle" font-size="11.5">مدعوم أصلاً؟</text><text x="282" y="80" text-anchor="middle" font-size="11.5">يحتاج مكتبة؟</text><text x="282" y="98" text-anchor="middle" font-size="11.5">يعمل على القديم؟</text>
+    <line x1="369" y1="77" x2="402" y2="77" stroke="#94a3b8" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="404" y="55" width="150" height="44" rx="10" fill="#fff6e5" stroke="#d98a00"/><text x="479" y="82" text-anchor="middle" font-weight="bold" fill="#b06f00">اكتشاف عيب/فجوة</text>
+    <line x1="556" y1="77" x2="589" y2="77" stroke="#94a3b8" stroke-width="2" marker-end="url(#a)"/>
+    <rect x="591" y="55" width="140" height="44" rx="10" fill="#e6f4ee" stroke="#0F8056"/><text x="661" y="82" text-anchor="middle" font-weight="bold" fill="#0b5f40">إصلاح في الخطة</text>
+    <line x1="733" y1="77" x2="766" y2="77" stroke="#0F8056" stroke-width="2" marker-end="url(#a2)"/>
+    <rect x="768" y="55" width="122" height="44" rx="10" fill="#efeaff" stroke="#6d4aff"/><text x="829" y="82" text-anchor="middle" font-weight="bold" fill="#5a36cc">spike إن لزم</text>
+    <defs><marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#64748b"/></marker><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0F8056"/></marker></defs>
+  </svg>
+  </div>
+  <div class="note green"><b>الخلاصة:</b> الخطة السليمة في جوهرها، لكن المراجعة كشفت <b>24 نقطة</b> (منها 4 حرجة) كانت ستسبّب مشاكل حقيقية لو بدأنا الكود مباشرة — أبرزها أن <b>SSE والخرائط والإشعارات</b> لا تعمل «تلقائياً» في RN كما توحي الخطة الأولى، وأن <b>التحديث الذاتي قد يفشل على نفس الأجهزة القديمة</b> لسبب الشهادة. كلها عولِجت أدناه.</div>
+</div>
+
+<!-- ===== FIND ===== -->
+<h2 id="find">2) نتائج المراجعة — 24 عيب/فجوة + الإصلاح</h2>
+<div class="card">
+  <div class="grid3" style="margin-bottom:10px">
+    <div class="kpi"><div class="n">4 🔴</div><div class="l">حرجة (كانت ستكسر ميزات)</div></div>
+    <div class="kpi"><div class="n">12 🟠</div><div class="l">مهمة (فجوات/دقّة)</div></div>
+    <div class="kpi"><div class="n">8 🟡</div><div class="l">تحسينات جودة</div></div>
+  </div>
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>العيب/الفجوة في الخطة الأولى</th><th>الإصلاح المعتمد</th></tr>
+    <tr><td>1</td><td><span class="sev r">حرج</span></td><td>«تتبّع حيّ عبر SSE كالمنصّة» — لكن <b>EventSource غير موجود أصلاً في React Native</b>، فلن يعمل التتبّع.</td><td>استخدام مكتبة <code>react-native-sse</code> (تدعم الرؤوس)، والمصادقة عبر <code>?token=</code> كما الويب، مع تراجع إلى polling.</td></tr>
+    <tr><td>2</td><td><span class="sev r">حرج</span></td><td>التحديث الذاتي (OTA) <b>قد يفشل على نفس الأجهزة القديمة</b> التي لا تثق بشهادة الخادم — لأن EAS Update يجلب عبر TLS أيضاً.</td><td>حزم جذور الشهادات في <code>network_security_config</code> (يغطّي طبقة شبكة OkHttp التي يستخدمها expo-updates) + <b>spike تحقّق في م0</b> على جهاز قديم فعلي.</td></tr>
+    <tr><td>3</td><td><span class="sev r">حرج</span></td><td>إشعارات الدفع: الخطة لم تحدّد نوع الرمز. الخادم الحالي يتوقّع <b>رمز FCM أصلي</b> (≤500 محرف)، لا رمز Expo Push.</td><td>استخدام <code>getDevicePushTokenAsync()</code> (رمز FCM الأصلي) وتسجيله في <code>/notifications/device-tokens</code> الموجود — لا رمز Expo.</td></tr>
+    <tr><td>4</td><td><span class="sev r">حرج</span></td><td>الخرائط: «خرائط OSM» — لكن RN <b>لا خرائط مدمجة</b>؛ تحتاج مكتبة أصلية + dev build.</td><td><code>@maplibre/maplibre-react-native</code> (متجهات بلا مفتاح) أو <code>react-native-maps</code> مع بلاطات OSM. تُحسم في م2 بعد spike.</td></tr>
+    <tr><td>5</td><td><span class="sev o">مهم</span></td><td>«In-App Update الأصلي» معامَل كأنه مدمج — هو ليس كذلك في RN.</td><td>EAS Update هو الأساس؛ التحديث الأصلي عبر مكتبة (<code>expo</code> plugin/<code>react-native-in-app-updates</code>) كطبقة ثانوية اختيارية.</td></tr>
+    <tr><td>6</td><td><span class="sev o">مهم</span></td><td>«حزم جذور الشهادات» بلا آلية دقيقة.</td><td>عبر <b>Android network_security_config</b> (إضافة <code>@raw/isrg_root_x1</code> + <code>system</code>) باستخدام config plugin / <code>expo-build-properties</code>؛ iOS تتكفّل به Apple.</td></tr>
+    <tr><td>7</td><td><span class="sev o">مهم</span></td><td>Monorepo: وضع RN داخل المستودع قد يكسر محلّل Metro (hoisting/watchFolders).</td><td>البدء بحزمة <b>مستقلة</b> (node_modules خاصة) لتقليل المخاطر، ومشاركة الأنواع لاحقاً عبر حزمة مشتركة عند الحاجة فقط.</td></tr>
+    <tr><td>8</td><td><span class="sev o">مهم</span></td><td>استمرارية المتجر: لم تميّز بين «مفتاح الرفع» و«مفتاح التوقيع» عند تفعيل Play App Signing.</td><td>إن كان Play App Signing مفعّلاً → المهم مطابقة <b>مفتاح الرفع</b> (upload key)؛ وإلا مطابقة مفتاح التوقيع نفسه. نؤكّد حالة المتجر قبل البناء.</td></tr>
+    <tr><td>9</td><td><span class="sev o">مهم</span></td><td>الأنواع (types) كانت ستُكتب يدوياً → خطر انجراف عن الخادم.</td><td>توليد الأنواع تلقائياً بـ <code>openapi-typescript</code> من <code>/openapi.json</code> الحيّ للخادم → عقد دقيق ومتزامن.</td></tr>
+    <tr><td>10</td><td><span class="sev o">مهم</span></td><td>توافق New Architecture غير محسوم لكل مكتبة (FlashList/Reanimated/MMKV تتطلبها).</td><td>مصفوفة توافق صريحة (القسم 3) تُفحص قبل التثبيت + spike في م0.</td></tr>
+    <tr><td>11</td><td><span class="sev o">مهم</span></td><td>تكيّف الجهاز اعتمد على <code>deviceYearClass</code> غير الموثوق.</td><td>الاعتماد أساساً على <code>totalMemory</code> + إشارات وقت التشغيل (jank/الشبكة)؛ السنة كمؤشّر ثانوي فقط.</td></tr>
+    <tr><td>12</td><td><span class="sev o">مهم</span></td><td>الحالة المخزّنة (سلة/إعدادات) بلا خطة ترحيل → خطر انهيار بعد تحديث يغيّر الشكل.</td><td><b>رقم نسخة + دوال migration</b> لمخزون Zustand/MMKV (تجاهل/تحويل آمن للبيانات القديمة).</td></tr>
+    <tr><td>13</td><td><span class="sev o">مهم</span></td><td>«طابور العمليات دون اتصال» ذُكر بعمومية.</td><td>آلية ملموسة: <b>طابور دائم</b> (MMKV/SQLite) + إعادة تشغيل عند عودة الاتصال + idempotency، تطبَّق على إنشاء الطلب أولاً.</td></tr>
+    <tr><td>14</td><td><span class="sev o">مهم</span></td><td>RTL: لم تُذكر حاجة <b>إعادة التشغيل</b> عند <code>forceRTL</code> أول مرة/عند تغيير اللغة.</td><td>ضبط الاتجاه مبكراً + إعادة تحميل مُدارة (<code>expo-updates reloadAsync</code>) مرّة واحدة بسلاسة.</td></tr>
+    <tr><td>15</td><td><span class="sev o">مهم</span></td><td>تعايش التطوير: بناء dev بنفس <code>ly.tawa.app</code> يمنع التثبيت بجانب غيره.</td><td>بناء dev/staging بلاحقة <code>.dev</code>/<code>.staging</code>؛ الإصدار فقط بـ <code>ly.tawa.app</code> المجرّد.</td></tr>
+    <tr><td>16</td><td><span class="sev o">مهم</span></td><td>expo-updates لا يعمل في Expo Go، وOTA يُطبَّق فقط ضمن نفس <code>runtimeVersion</code>.</td><td>تطوير عبر <b>Dev Client</b>؛ سياسة <code>runtimeVersion</code> = fingerprint (تلقائية) لمنع تطبيق تحديث غير متوافق.</td></tr>
+    <tr><td>17</td><td><span class="sev y">تحسين</span></td><td>الصور عبر <code>Image</code> الافتراضي.</td><td>استخدام <code>expo-image</code> (كاش وذاكرة وأداء أفضل، يدعم placeholder/blurhash).</td></tr>
+    <tr><td>18</td><td><span class="sev y">تحسين</span></td><td>تنسيق التواريخ/الأرقام بالعربية على Hermes محدود (Intl ناقص).</td><td>دالة تنسيق مخصّصة للعربية/العملة (mills/«د.ل») + polyfills <code>@formatjs</code> عند الحاجة.</td></tr>
+    <tr><td>19</td><td><span class="sev y">تحسين</span></td><td>الروابط العميقة (App Links على <code>app.tawanow.com</code> كما Flutter) لم تُدرَج.</td><td>إعداد عبر Expo Router + <code>expo-linking</code> + التحقّق (assetlinks) — كما تطبيق Flutter السابق.</td></tr>
+    <tr><td>20</td><td><span class="sev y">تحسين</span></td><td>تتبّع الأعطال غير محدّد.</td><td><b>Sentry</b> (أو Crashlytics) من م1 لرصد ما بعد النشر + ربطه بقدرة تراجع OTA.</td></tr>
+    <tr><td>21</td><td><span class="sev y">تحسين</span></td><td>اختبارات E2E غير مذكورة.</td><td><b>Maestro</b> (الأنسب لـ Expo) كاختبار E2E يُضاف في م3؛ م1 = وحدة + مكوّنات.</td></tr>
+    <tr><td>22</td><td><span class="sev y">تحسين</span></td><td>إمكانية الوصول (a11y) غير مذكورة.</td><td>أهداف لمس كبيرة + تسميات accessibilityLabel + دعم تكبير خط النظام.</td></tr>
+    <tr><td>23</td><td><span class="sev y">تحسين</span></td><td>أوقات/حدود EAS Build السحابية لم تُذكر.</td><td>توقّع زمن الطابور (دقائق) + إمكانية بناء محلي عند الحاجة (نملك الأدوات).</td></tr>
+    <tr><td>24</td><td><span class="sev y">تحسين</span></td><td>حدّ قيمة SecureStore (~2KB/أندرويد).</td><td>تخزين الرموز فقط في SecureStore؛ أي بيانات أكبر في MMKV المشفّر.</td></tr>
+  </table>
+</div>
+
+<!-- ===== LIBS ===== -->
+<h2 id="libs">3) مصفوفة المكتبات المعتمدة (مع توافق New Architecture)</h2>
+<div class="card">
+  <p>كل مكتبة لها مبرّر، وحالة توافقها مع المعمارية الجديدة مُحدّدة. ما يحمل ⚠️ يُفحص في spike م0 قبل الاعتماد النهائي.</p>
+  <table>
+    <tr><th>المهمة</th><th>المكتبة</th><th>New Arch</th><th>ملاحظة</th></tr>
+    <tr><td>الإطار/التنقّل</td><td>Expo + Expo Router</td><td class="ok">✅</td><td>تنقّل بالملفات + روابط عميقة.</td></tr>
+    <tr><td>المحرك</td><td>Hermes + New Architecture</td><td class="ok">✅</td><td>الافتراضي الحديث.</td></tr>
+    <tr><td>حالة الواجهة</td><td>Zustand (+persist)</td><td class="ok">✅</td><td>خفيف؛ مخزون مع migration.</td></tr>
+    <tr><td>حالة الخادم</td><td>@tanstack/react-query</td><td class="ok">✅</td><td>كاش/إعادة محاولة/تحديث متفائل.</td></tr>
+    <tr><td>النماذج</td><td>react-hook-form + zod</td><td class="ok">✅</td><td>أداء + تحقّق مشترك.</td></tr>
+    <tr><td>رموز آمنة</td><td>expo-secure-store</td><td class="ok">✅</td><td>الرموز فقط (~2KB).</td></tr>
+    <tr><td>كاش سريع</td><td>react-native-mmkv</td><td class="ok">✅ (يتطلبها)</td><td>يحتاج Dev Build (ليس Expo Go).</td></tr>
+    <tr><td>قوائم</td><td>@shopify/flash-list</td><td class="ok">✅ (v2)</td><td>أداء قوائم عالٍ.</td></tr>
+    <tr><td>صور</td><td>expo-image</td><td class="ok">✅</td><td>كاش/blurhash/أداء.</td></tr>
+    <tr><td>رسوم/حركة</td><td>react-native-reanimated (+gesture-handler)</td><td class="ok">✅</td><td>تُخفَّف على LOW.</td></tr>
+    <tr><td>التتبّع الحيّ</td><td>react-native-sse</td><td class="ok">✅ (JS)</td><td><b>بديل EventSource المفقود</b> + رؤوس.</td></tr>
+    <tr><td>الشبكة/الاتصال</td><td>@react-native-community/netinfo</td><td class="ok">✅</td><td>نوع الشبكة + الوصول.</td></tr>
+    <tr><td>قدرات الجهاز</td><td>expo-device</td><td class="ok">✅</td><td>totalMemory للتكيّف.</td></tr>
+    <tr><td>التحديث الذاتي</td><td>expo-updates (EAS Update)</td><td class="ok">✅</td><td>OTA صامت + runtimeVersion=fingerprint.</td></tr>
+    <tr><td>الإشعارات</td><td>expo-notifications (+ getDevicePushTokenAsync)</td><td class="ok">✅</td><td><b>رمز FCM أصلي</b> لمطابقة الخادم.</td></tr>
+    <tr><td>اللغة</td><td>i18next + react-i18next + expo-localization</td><td class="ok">✅</td><td>ar/en + RTL.</td></tr>
+    <tr><td>الخرائط</td><td>@maplibre/maplibre-react-native ⚠️</td><td class="warn">⚠️ يُفحص</td><td>م2؛ بلا مفتاح، بديل react-native-maps.</td></tr>
+    <tr><td>التحديث الأصلي (اختياري)</td><td>react-native-in-app-updates ⚠️</td><td class="warn">⚠️ يُفحص</td><td>طبقة ثانوية فوق EAS Update.</td></tr>
+    <tr><td>الأعطال</td><td>@sentry/react-native</td><td class="ok">✅</td><td>رصد ما بعد النشر.</td></tr>
+    <tr><td>الأنواع</td><td>openapi-typescript (أداة بناء)</td><td>—</td><td>توليد الأنواع من الخادم.</td></tr>
+    <tr><td>E2E (م3)</td><td>Maestro</td><td>—</td><td>اختبار تدفّقات حقيقية.</td></tr>
+  </table>
+  <div class="note">قاعدة ثابتة: لا تُضاف مكتبة خارج هذه المصفوفة إلا بمبرّر موثّق + فحص توافق New Arch.</div>
+</div>
+
+<!-- ===== ARCH ===== -->
+<h2 id="arch">4) تصحيحات معمارية حاسمة</h2>
+<div class="grid2">
+  <div class="card"><h3>🛰️ التتبّع الحيّ (SSE)</h3>
+    <p>RN لا يملك <code>EventSource</code>. نستخدم <code>react-native-sse</code>: اتصال بـ <code>/sse/orders/{id}/track?token=</code>، تحديث الـ Timeline والخريطة لحظياً، وعند الانقطاع <b>إعادة اتصال بـ backoff</b> ثم <b>تراجع إلى polling</b>. كل شيء fail-safe.</p>
+  </div>
+  <div class="card"><h3>🔔 الإشعارات</h3>
+    <p>عبر <code>expo-notifications</code> لكن نُسجّل <b>رمز FCM الأصلي</b> (<code>getDevicePushTokenAsync</code>) في <code>/notifications/device-tokens</code> الموجود — ليطابق نظام الخادم الحالي (FCM v1) بلا تغييره.</p>
+  </div>
+  <div class="card"><h3>🔐 الشهادات على الأجهزة القديمة</h3>
+    <p>نحزم <code>ISRG Root X1</code> (+ جذر احتياطي) في <code>network_security_config</code> عبر config plugin. هذا يجعل التطبيق يثق بالخادم <b>وأيضاً يغطّي حركة EAS Update</b> (نفس طبقة OkHttp) → التحديث الذاتي يعمل حتى على القديم. <b>يُتحقَّق بـ spike على جهاز فعلي.</b></p>
+  </div>
+  <div class="card"><h3>🗺️ الخرائط</h3>
+    <p><code>@maplibre/maplibre-react-native</code> (متجهات، بلا مفتاح API) أو <code>react-native-maps</code> ببلاطات OSM. يتطلّب Dev Build. يُحسم في م2 ببناء تجريبي قصير.</p>
+  </div>
+  <div class="card"><h3>🧩 الأنواع من الخادم</h3>
+    <p>توليد الأنواع تلقائياً بـ <code>openapi-typescript</code> من <code>/openapi.json</code> الحيّ → عقد دقيق متزامن مع الخادم، يقلّ خطر الانجراف، ويُحدَّث بأمر واحد.</p>
+  </div>
+  <div class="card"><h3>📦 Monorepo / Metro</h3>
+    <p>حزمة <b>مستقلة</b> في <code>platform/apps/mobile</code> بـ node_modules خاصة (تتفادى تعقيد Metro/hoisting). مشاركة الأنواع لاحقاً عبر حزمة مشتركة فقط عند الحاجة.</p>
+  </div>
+</div>
+<div class="card">
+  <h3>🔄 ترحيل الحالة المخزّنة + طابور دون اتصال (بالرسم)</h3>
+  <div class="svgbox">
+  <svg width="940" height="180" viewBox="0 0 940 180" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans Arabic,Tahoma" font-size="12.5">
+    <text x="235" y="20" text-anchor="middle" font-weight="bold" fill="#0b5f40">ترحيل الحالة بعد التحديث</text>
+    <rect x="20" y="34" width="130" height="46" rx="10" fill="#fff6e5" stroke="#d98a00"/><text x="85" y="54" text-anchor="middle" font-size="11.5">بيانات مخزّنة</text><text x="85" y="71" text-anchor="middle" font-size="11.5">نسخة قديمة</text>
+    <line x1="152" y1="57" x2="185" y2="57" stroke="#94a3b8" stroke-width="2" marker-end="url(#m)"/>
+    <rect x="187" y="34" width="130" height="46" rx="10" fill="#fff" stroke="#94a3b8"/><text x="252" y="54" text-anchor="middle" font-size="11.5">migrate(version)</text><text x="252" y="71" text-anchor="middle" font-size="11.5">تحويل/تجاهل آمن</text>
+    <line x1="319" y1="57" x2="352" y2="57" stroke="#0F8056" stroke-width="2" marker-end="url(#m2)"/>
+    <rect x="354" y="34" width="120" height="46" rx="10" fill="#e6f4ee" stroke="#0F8056"/><text x="414" y="61" text-anchor="middle" font-weight="bold" fill="#0b5f40">حالة سليمة</text>
+    <text x="715" y="20" text-anchor="middle" font-weight="bold" fill="#1f4fb0">طابور العمليات دون اتصال</text>
+    <rect x="520" y="34" width="120" height="46" rx="10" fill="#fdecea" stroke="#c0392b"/><text x="580" y="54" text-anchor="middle" font-size="11.5">عملية تفشل</text><text x="580" y="71" text-anchor="middle" font-size="11.5">(لا إنترنت)</text>
+    <line x1="642" y1="57" x2="675" y2="57" stroke="#94a3b8" stroke-width="2" marker-end="url(#m)"/>
+    <rect x="677" y="34" width="120" height="46" rx="10" fill="#fff" stroke="#94a3b8"/><text x="737" y="54" text-anchor="middle" font-size="11.5">طابور دائم</text><text x="737" y="71" text-anchor="middle" font-size="11.5">MMKV/SQLite</text>
+    <line x1="799" y1="57" x2="832" y2="57" stroke="#0F8056" stroke-width="2" marker-end="url(#m2)"/>
+    <rect x="834" y="34" width="96" height="46" rx="10" fill="#e6f4ee" stroke="#0F8056"/><text x="882" y="54" text-anchor="middle" font-size="11" fill="#0b5f40">عند العودة</text><text x="882" y="71" text-anchor="middle" font-size="11" fill="#0b5f40">إعادة تشغيل</text>
+    <text x="470" y="120" text-anchor="middle" font-size="12" fill="#5b6776">+ مفتاح Idempotency يمنع التكرار · لا يُفقَد الطلب أبداً قبل التأكيد</text>
+    <defs><marker id="m" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#64748b"/></marker><marker id="m2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0F8056"/></marker></defs>
+  </svg>
+  </div>
+</div>
+
+<!-- ===== ADAPT ===== -->
+<h2 id="adapt">5) النسخة الواحدة المتكيّفة (إشارات مُحسّنة)</h2>
+<div class="card">
+  <p>بعد المراجعة: لا نعتمد على «سنة الجهاز» (غير موثوقة)، بل على إشارات أدقّ:</p>
+  <table>
+    <tr><th>الإشارة</th><th>المصدر</th><th>الاستخدام</th></tr>
+    <tr><td>إجمالي الذاكرة RAM</td><td><code>expo-device.totalMemory</code></td><td>المحدّد الأساسي للفئة LOW/MID/HIGH.</td></tr>
+    <tr><td>نوع الشبكة + الوصول</td><td><code>netinfo</code></td><td>تقليل الصور/الجلب على 2G/شبكة ضعيفة.</td></tr>
+    <tr><td>تلكّؤ وقت التشغيل (jank)</td><td>قياس FPS/إطارات مفقودة</td><td>خفض تلقائي للملف إن لُوحظ بطء فعلي.</td></tr>
+    <tr><td>كثافة الشاشة</td><td><code>PixelRatio</code></td><td>دقّة الصور المطلوبة.</td></tr>
+    <tr><td>تفضيل المستخدم</td><td>إعداد «الوضع الخفيف»</td><td>تجاوز يدوي يفرض LOW.</td></tr>
+  </table>
+  <div class="note green">النتيجة: ملف واحد ذكي يبدأ بتقدير حسب RAM، ثم <b>يضبط نفسه ديناميكياً</b> إن لاحظ بطءاً فعلياً — تجربة مثلى على كل جهاز. + تقسيم Play لكل معالج يصغّر التنزيل.</div>
+</div>
+
+<!-- ===== UPDATE ===== -->
+<h2 id="update">6) التحديث التلقائي (مُنقّح)</h2>
+<div class="card">
+  <table>
+    <tr><th>الطبقة</th><th>الأداة</th><th>تفصيل مُنقّح</th></tr>
+    <tr><td>1 — OTA صامت</td><td>expo-updates (EAS Update)</td><td>تنزيل بالخلفية + تطبيق عند الإقلاع التالي · <code>runtimeVersion=fingerprint</code> · قنوات (production/preview) · نشر تدريجي · <b>تراجع فوري</b>. <b>spike: التأكد أنه يعمل على جهاز قديم</b> (مع الجذور المحزومة).</td></tr>
+    <tr><td>2 — تحديث أصلي</td><td>مكتبة in-app-update ⚠️</td><td>عند تغيير أصلي (runtimeVersion مختلف) → تلميح/تحديث شبه صامت على أندرويد.</td></tr>
+    <tr><td>3 — حرِج</td><td>/version/check (الخادم)</td><td>شاشة إجبارية للحالات الأمنية فقط (نادرة).</td></tr>
+  </table>
+  <div class="note amber"><b>اكتشاف المراجعة الأهم هنا:</b> كان يمكن أن «نَعِد» بتحديث ذاتي ثم يفشل على نفس الأجهزة القديمة (سبب الشهادة). الآن الحلّ مربوط بحزم الجذور + <b>spike تحقّق فعلي</b> قبل الاعتماد.</div>
+</div>
+
+<!-- ===== SEC ===== -->
+<h2 id="sec">7) الأمان العميق (مُنقّح)</h2>
+<div class="card">
+  <ul>
+    <li><b>النقل:</b> HTTPS + جذور محزومة (network_security_config) + تثبيت اختياري + مهلة لكل طلب.</li>
+    <li><b>المصادقة:</b> access قصير + refresh دوّار مع <b>mutex</b> + ربط بالجهاز + TOTP + مهلة خمول (خادم) + خروج يمسح كل شيء.</li>
+    <li><b>التخزين:</b> الرموز في SecureStore فقط · الكاش في MMKV مشفّر · <b>صفر أسرار في الحزمة</b> (لا حاجة أصلاً لأسرار عميل؛ BASE_URL ليس سرّاً).</li>
+    <li><b>سلامة التطبيق:</b> كشف Root + Play Integrity (خادم) + منع debuggable + Hermes bytecode + لا <code>console.log</code> في الإنتاج.</li>
+    <li><b>المدخلات/الخصوصية:</b> تحقّق Zod لكل إدخال + أقل صلاحيات + منع نسخ بيانات الجلسة + منع لقطة الشاشة على الحسّاس (اختياري).</li>
+    <li><b>الرصد:</b> Sentry لرصد الأعطال + ربطه بقدرة تراجع OTA (لو ظهر عطل بعد تحديث، نتراجع فوراً).</li>
+  </ul>
+</div>
+
+<!-- ===== PLAN ===== -->
+<h2 id="plan">8) الخطة بالمراحل العميقة + «تعريف الإنجاز»</h2>
+<div class="card">
+  <div class="phasebar">
+    <div class="ph" style="background:#5a36cc">م0: أساسات + Spikes</div>
+    <div class="ph" style="background:#0F8056">م1: الشاشات الأساسية</div>
+    <div class="ph" style="background:#1f6feb">م2: الإنتاج + خرائط + SSE</div>
+    <div class="ph" style="background:#d98a00">م3: إشعارات + offline + أداء + E2E</div>
+    <div class="ph" style="background:#c0392b">م4: النشر</div>
+  </div>
+
+  <h3>المرحلة 0 — الأساسات + التحقّقات التقنية (Spikes)</h3>
+  <p class="small">الجديد بعد المراجعة: نضيف «spikes» تتحقّق من الافتراضات الخطرة <b>قبل</b> البناء عليها.</p>
+  <table class="scn">
+    <tr><th>المهمة</th><th>المخرج</th></tr>
+    <tr><td>تهيئة المشروع</td><td>Expo + TS strict + Expo Router + Hermes/New Arch + Dev Client + ESLint/Prettier/Jest + scripts.</td></tr>
+    <tr><td>الأساسات</td><td>الثيم/tokens + i18n/RTL + apiClient (رموز/مهلة/retry/تطبيع) + SecureStore + MMKV(+migration) + Zustand + TanStack Query + deviceTier.</td></tr>
+    <tr><td>الأنواع</td><td><code>openapi-typescript</code> يولّد الأنواع من <code>/openapi.json</code>.</td></tr>
+    <tr><td class="warn">🔬 Spike 1</td><td>EAS Update (OTA) + الجذور المحزومة <b>يعمل على جهاز قديم فعلي</b> (السامسونج).</td></tr>
+    <tr><td class="warn">🔬 Spike 2</td><td><code>react-native-sse</code> يتصل بـ SSE الخادم ويعيد الاتصال.</td></tr>
+    <tr><td class="warn">🔬 Spike 3</td><td>توافق المكتبات الأصلية مع New Architecture في Dev Build.</td></tr>
+    <tr><td class="warn">🔬 Spike 4</td><td>تسجيل رمز FCM الأصلي في الخادم بنجاح.</td></tr>
+  </table>
+  <div class="dod"><b>تعريف الإنجاز (م0):</b> المشروع يقلع على Dev Build · typecheck/lint/test تنجح · الأنواع مولّدة · <b>الـ 4 spikes ناجحة أو لها بديل موثّق</b>.</div>
+
+  <h3>المرحلة 1 — الشاشات الأساسية</h3>
+  <table class="scn">
+    <tr><th>المجموعة</th><th>الشاشات/المهام</th></tr>
+    <tr><td>Onboarding</td><td>ترحيب · لغة (+RTL reload) · مدينة · صلاحية الموقع (بأدب، مع بديل يدوي).</td></tr>
+    <tr><td>المصادقة</td><td>هاتف · OTP (عدّاد/إعادة إرسال/حدود) · تسجيل · إدارة جلسة (refresh+mutex) — على Mock أولاً.</td></tr>
+    <tr><td>التصفّح</td><td>الرئيسية (بحث/أقسام/بانرات/قريب/الأكثر طلباً) · قائمة المتاجر (فلترة/ترتيب) — FlashList + expo-image.</td></tr>
+    <tr><td>الطلب</td><td>تفاصيل المتجر · السلة (حفظ+migration+منع طلب خاطئ) · إتمام الطلب (هيكل + idempotency) · الطلبات (هيكل) · الحساب.</td></tr>
+    <tr><td>الجودة</td><td>اختبارات: السلة · status-map · تطبيع الأخطاء · تحقّق Zod · المصادقة + Error Boundary + Sentry + README.</td></tr>
+  </table>
+  <div class="dod"><b>تعريف الإنجاز (م1):</b> ✅ typecheck · ✅ lint · ✅ tests · ✅ التطبيق يقلع ويُتنقّل فيه فعلياً · ✅ لا بنية وهمية · ✅ لا استيراد مكسور · ✅ تقرير بنتائج الأوامر الفعلية.</div>
+
+  <h3>المرحلة 2 — الإنتاج + الخرائط + التتبّع</h3>
+  <table class="scn"><tr><td><b>م2</b></td><td>تبديل Mock→الحقيقي · العناوين والموقع · <b>الخرائط (MapLibre)</b> · <b>التتبّع الحيّ (react-native-sse)</b> · المحفظة/الولاء/الدعم · الروابط العميقة.</td></tr></table>
+  <div class="dod"><b>تعريف الإنجاز (م2):</b> دورة طلب حقيقية كاملة على الخادم الحيّ + تتبّع حيّ يعمل + خريطة تعمل + بوابة الجودة.</div>
+
+  <h3>المرحلة 3 — إشعارات + offline + أداء + E2E</h3>
+  <table class="scn"><tr><td><b>م3</b></td><td>إشعارات (FCM أصلي) · طابور offline دائم · تحسين أداء <b>مُقاس</b> (قبل/بعد) · تفعيل OTA إنتاجي · اختبارات Maestro E2E.</td></tr></table>
+  <div class="dod"><b>تعريف الإنجاز (م3):</b> إشعار يصل فعلياً · طلب لا يُفقَد دون اتصال · قياس أداء يثبت التحسّن · E2E يمرّ.</div>
+
+  <h3>المرحلة 4 — النشر</h3>
+  <table class="scn"><tr><td><b>م4</b></td><td>EAS Build/Submit · توقيع بمفتاح الرفع الصحيح · Google Play (نفس <code>ly.tawa.app</code>) · نموذج Data Safety · نشر تدريجي · iOS لاحقاً.</td></tr></table>
+  <div class="dod"><b>تعريف الإنجاز (م4):</b> AAB موقّع يُقبل في Play كتحديث · إصدار اختبار داخلي أخضر · خطة تراجع جاهزة.</div>
+</div>
+
+<!-- ===== SIM ===== -->
+<h2 id="sim">9) المحاكاة الذهنية — السيناريوهات المُضافة بعد المراجعة</h2>
+<div class="card">
+  <p>الخطة السابقة غطّت 180+ سيناريو. المراجعة الذرية أضافت <b>30+ سيناريو</b> جديداً خاصاً بزوايا React Native/Expo الدقيقة → الإجمالي <b>210+</b>.</p>
+  <div class="cat"><span class="count">O</span> سيناريوهات RN/Expo الدقيقة (جديدة)</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>SSE لا يعمل (لا EventSource في RN)</td><td>react-native-sse + reconnect/backoff + تراجع polling.</td></tr>
+    <tr><td>OTA يفشل على جهاز قديم (شهادة)</td><td>جذور محزومة تغطّي expo-updates + spike تحقّق.</td></tr>
+    <tr><td>إشعار لا يصل (رمز Expo بدل FCM)</td><td>getDevicePushTokenAsync (رمز FCM أصلي).</td></tr>
+    <tr><td>الخريطة لا تظهر (لا خرائط مدمجة)</td><td>MapLibre/react-native-maps + Dev Build.</td></tr>
+    <tr><td>انهيار بعد تحديث غيّر شكل الحالة المخزّنة</td><td>migration بنسخة للمخزون.</td></tr>
+    <tr><td>OTA غير متوافق مع الجزء الأصلي</td><td>runtimeVersion=fingerprint يمنع تطبيقه.</td></tr>
+    <tr><td>RTL لا يُطبَّق إلا بعد إعادة تشغيل</td><td>forceRTL مبكر + reloadAsync مُدار مرة.</td></tr>
+    <tr><td>لا يمكن تثبيت dev بجانب الإصدار</td><td>لاحقة .dev/.staging.</td></tr>
+    <tr><td>Expo Go لا يشغّل المكتبات الأصلية</td><td>Dev Client من اليوم الأول.</td></tr>
+    <tr><td>Metro يفشل في حلّ الحزم (monorepo)</td><td>حزمة مستقلة بـ node_modules خاصة.</td></tr>
+    <tr><td>انجراف الأنواع عن الخادم</td><td>توليد openapi-typescript دوري.</td></tr>
+    <tr><td>تنسيق أرقام/تواريخ عربية ناقص (Hermes Intl)</td><td>دالة مخصّصة + polyfills عند الحاجة.</td></tr>
+    <tr><td>صور بطيئة/تستهلك ذاكرة</td><td>expo-image + downscale + حدّ تزامن LOW.</td></tr>
+    <tr><td>قائمة طويلة تتلكّأ</td><td>FlashList + estimatedItemSize + نافذة متكيّفة.</td></tr>
+    <tr><td>رابط عميق يفتح وأنت خارج الجلسة</td><td>expo-linking + حفظ الوجهة + دخول ثم عودة.</td></tr>
+    <tr><td>رابط عميق عند الإقلاع البارد</td><td>التقاط الرابط الأولي بعد تهيئة الجلسة.</td></tr>
+    <tr><td>refresh أثناء الإقلاع البارد</td><td>تهيئة الجلسة قبل أي طلب محميّ.</td></tr>
+    <tr><td>SSE يستهلك بطارية</td><td>إغلاق الاتصال عند الخلفية/الحالة النهائية.</td></tr>
+    <tr><td>طابور offline يُعيد إرسال مكرّر</td><td>idempotency + علامة «أُرسل/لم يُؤكَّد».</td></tr>
+    <tr><td>تحديث OTA معطوب وصل للمستخدمين</td><td>نشر تدريجي + تراجع فوري + Sentry.</td></tr>
+    <tr><td>EAS Build بطيء/طابور</td><td>توقّع زمني + بناء محلي احتياطي.</td></tr>
+    <tr><td>مكتبة لا تدعم New Arch</td><td>spike م0 + بديل جاهز.</td></tr>
+    <tr><td>SecureStore يرفض قيمة كبيرة</td><td>الرموز فقط فيه؛ الباقي MMKV.</td></tr>
+    <tr><td>تغيّر مفتاح/معرّف يرفضه المتجر</td><td>نفس المعرّف + مفتاح الرفع الصحيح (تأكيد Play App Signing).</td></tr>
+    <tr><td>صلاحية الإشعارات مرفوضة (أندرويد 13+)</td><td>طلب POST_NOTIFICATIONS بلطف + متابعة طبيعية.</td></tr>
+    <tr><td>a11y: مستخدم بخط كبير</td><td>تخطيط مرن + دعم تكبير النظام.</td></tr>
+    <tr><td>Sentry يلتقط بيانات حسّاسة</td><td>تنقية قبل الإرسال.</td></tr>
+    <tr><td>تعارض إصدار Expo SDK مع مكتبة</td><td>تثبيت إصدارات متوافقة + فحص م0.</td></tr>
+    <tr><td>الجهاز يرفض التثبيت (minSdk)</td><td>minSdk 23 (أندرويد 6).</td></tr>
+    <tr><td>اختلاف سلوك iOS لاحقاً</td><td>تأجيل iOS + عزل الكود الأصلي الخاص بالمنصّة.</td></tr>
+  </table>
+  <p class="small">+ كل سيناريوهات الخطة السابقة (المصادقة، السلة، الدفع COD، الشبكة، الأخطاء، دورة الحياة…) تبقى سارية.</p>
+</div>
+
+<!-- ===== RISK ===== -->
+<h2 id="risk">10) المخاطر المتبقية + قرارات مؤجلة</h2>
+<div class="card">
+  <table>
+    <tr><th>البند</th><th>الحالة</th><th>الخطة</th></tr>
+    <tr><td>توافق بعض المكتبات الأصلية مع New Arch</td><td class="warn">يُتحقّق</td><td>spike م0 + بدائل جاهزة.</td></tr>
+    <tr><td>OTA على الأجهزة القديمة جداً</td><td class="warn">يُتحقّق</td><td>spike م0 على السامسونج الفعلي.</td></tr>
+    <tr><td>الدفع الإلكتروني</td><td class="ok">مؤجّل</td><td>COD أولاً (كالمنصّة)؛ بنية الدفع جاهزة للتوسعة.</td></tr>
+    <tr><td>iOS / App Store</td><td class="ok">مؤجّل</td><td>أندرويد أولاً؛ نفس الكود لاحقاً + حساب Apple.</td></tr>
+    <tr><td>حالة نشر Flutter على Play</td><td class="warn">للتأكيد</td><td>يحدّد «تحديث» أم «بداية نظيفة».</td></tr>
+  </table>
+</div>
+
+<!-- ===== DECIDE ===== -->
+<h2 id="decide">11) ما أحتاج قراره منك</h2>
+<div class="card">
+  <ol>
+    <li><b>اعتماد هذه الخطة المنقّحة</b> (النسخة 2) كأساس للتنفيذ.</li>
+    <li><b>تأكيد:</b> هل تطبيق Flutter <u>منشور فعلاً</u> على Google Play (ومع Play App Signing؟) — لتحديد مفتاح الرفع.</li>
+    <li>هل توافق على إضافة <b>Sentry</b> لرصد الأعطال من م1؟ (أوصي به بشدّة).</li>
+  </ol>
+  <div class="note green">بمجرّد موافقتك، أبدأ <b>المرحلة 0 (الأساسات + الـ spikes الأربعة)</b> ثم <b>المرحلة 1</b>، ولا أتجاوزهما إلا بعد اجتياز «تعريف الإنجاز» فعلياً، ثم أسلّمك التطبيق العامل + نتائج الأوامر الحقيقية بالإثبات. لن أكتب أي كود قبل موافقتك.</div>
+</div>
+
+<p class="center small" style="margin:30px 0 10px">— الخطة المنقّحة بعد المراجعة الذرية · النسخة 2 · توا / Towa · 2026-06-30 · (بانتظار اعتمادك) —</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقرير النهائي — توّا v3 — نشر مكتمل — 2026-07-08</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:       #0D1B2A;
+  --navy-mid:   #1A2E42;
+  --navy-light: #243B55;
+  --gold:       #E8A020;
+  --gold-pale:  #FFF8E6;
+  --green:      #16A85A;
+  --green-pale: #D6F5E3;
+  --red:        #D63031;
+  --red-pale:   #FFE5E5;
+  --amber:      #E67E22;
+  --amber-pale: #FFF0DC;
+  --blue:       #2980B9;
+  --blue-pale:  #E3F2FD;
+  --border:     #CBD5E0;
+  --bg:         #F4F7FB;
+  --white:      #FFFFFF;
+  --text:       #1A202C;
+  --muted:      #718096;
+  --r:          8px;
+  --sh:         0 2px 8px rgba(13,27,42,.10);
+  --sh-lg:      0 8px 32px rgba(13,27,42,.16);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Arabic", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14.5px;
+  line-height: 1.7;
+  direction: rtl;
+}
+
+/* ── HEADER ── */
+.hdr {
+  background: var(--navy);
+  color: #fff;
+  padding: 36px 48px 30px;
+  position: relative;
+  overflow: hidden;
+}
+.hdr::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold) 0%, #f0c040 50%, var(--gold) 100%);
+}
+.hdr-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.logo { background: var(--gold); color: var(--navy); font-weight: 900; font-size: 17px; padding: 6px 14px; border-radius: 6px; letter-spacing: 1.5px; }
+.hdr h1 { font-size: 24px; font-weight: 700; line-height: 1.35; text-wrap: balance; }
+.hdr-meta { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 10px; }
+.hdr-meta span { font-size: 12.5px; color: #94A3B8; }
+.hdr-meta strong { color: #CBD5E0; }
+
+/* ── STATUS BAR ── */
+.sbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 48px;
+  display: flex; gap: 12px; flex-wrap: wrap;
+  box-shadow: 0 2px 6px rgba(13,27,42,.06);
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700; padding: 5px 13px;
+  border-radius: 20px;
+}
+.pill-green { background: var(--green-pale); color: #0D5B30; }
+.pill-gold  { background: var(--gold-pale);  color: #7A4A00; }
+.pill-blue  { background: var(--blue-pale);  color: #1A4F72; }
+.pill-navy  { background: #E8EEF5; color: var(--navy); }
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.dot-green { background: var(--green); }
+.dot-gold  { background: var(--gold);  }
+.dot-blue  { background: var(--blue);  }
+.dot-navy  { background: var(--navy);  }
+
+/* ── LAYOUT ── */
+.wrap { max-width: 1000px; margin: 0 auto; padding: 32px 48px 64px; }
+
+/* ── SECTION ── */
+.sec { margin-bottom: 44px; }
+.sec-hdr {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 17px; font-weight: 700; color: var(--navy);
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--gold);
+  margin-bottom: 20px;
+}
+.sec-icon {
+  width: 30px; height: 30px;
+  background: var(--navy); color: #fff;
+  border-radius: 7px; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+
+/* ── DEPLOY GRID ── */
+.deploy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+.deploy-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px;
+  box-shadow: var(--sh);
+  border-top: 3px solid var(--green);
+  text-align: center;
+}
+.deploy-card .dc-title { font-weight: 700; font-size: 13px; color: var(--navy); margin-bottom: 6px; }
+.deploy-card .dc-host  { font-size: 11px; color: var(--muted); font-family: monospace; }
+.deploy-card .dc-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--green-pale); color: #0D5B30;
+  font-size: 11px; font-weight: 700; padding: 3px 10px;
+  border-radius: 12px; margin-top: 8px;
+}
+.deploy-card .dc-alembic {
+  font-size: 11px; font-family: monospace; color: var(--muted);
+  margin-top: 6px;
+}
+
+/* ── TABLE ── */
+.tbl-wrap { overflow-x: auto; }
+table {
+  width: 100%; border-collapse: collapse;
+  background: var(--white); border-radius: var(--r);
+  overflow: hidden; box-shadow: var(--sh);
+  font-size: 13px;
+}
+th {
+  background: var(--navy); color: #fff;
+  padding: 10px 14px; text-align: right;
+  font-weight: 600; font-size: 11.5px; letter-spacing: .4px;
+}
+td {
+  padding: 10px 14px; border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #F7FAFC; }
+.badge {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+}
+.b-green { background: var(--green-pale); color: #0D5B30; }
+.b-gold  { background: var(--gold-pale);  color: #7A4A00; }
+.b-navy  { background: #E8EEF5; color: var(--navy); }
+.b-red   { background: var(--red-pale);   color: #7B1616; }
+.b-amber { background: var(--amber-pale); color: #7A3B00; }
+
+/* ── WAVE CARDS ── */
+.wave-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.wave-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px 18px; box-shadow: var(--sh);
+}
+.wave-card-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.wave-title { font-size: 13.5px; font-weight: 700; color: var(--navy); }
+.wave-items { list-style: none; }
+.wave-items li {
+  font-size: 12.5px; color: var(--muted);
+  padding: 3px 18px; position: relative;
+  border-bottom: 1px dashed #EEF2F7;
+}
+.wave-items li:last-child { border: none; }
+.wave-items li::before { content: "✓"; position: absolute; right: 0; color: var(--green); font-weight: 700; font-size: 11px; }
+
+/* ── TESTS ── */
+.test-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.test-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px 14px;
+  text-align: center; box-shadow: var(--sh);
+}
+.test-num {
+  font-size: 34px; font-weight: 800; line-height: 1;
+  font-variant-numeric: tabular-nums; margin-bottom: 4px;
+}
+.num-green { color: var(--green); }
+.num-amber { color: var(--amber); }
+.num-red   { color: var(--red); }
+.test-lbl  { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+/* ── FLOW DIAGRAM ── */
+.diag-box {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 20px;
+  overflow-x: auto; box-shadow: var(--sh);
+}
+.flow { display: flex; align-items: center; gap: 0; flex-wrap: nowrap; min-width: max-content; direction: ltr; }
+.fn {
+  background: var(--navy-light); color: #fff;
+  padding: 9px 14px; border-radius: 7px;
+  font-size: 11.5px; font-weight: 600; text-align: center;
+  min-width: 100px; line-height: 1.4;
+}
+.fn.g  { background: var(--green); }
+.fn.r  { background: var(--red); }
+.fn.a  { background: var(--amber); }
+.fn.au { background: var(--gold); color: var(--navy); }
+.fa { color: var(--muted); font-size: 18px; padding: 0 7px; flex-shrink: 0; }
+.fl { font-size: 10px; color: var(--muted); text-align: center; margin-top: 4px; }
+.fc { display: flex; flex-direction: column; align-items: center; }
+
+/* ── PROBLEMS ── */
+.ps-list { display: flex; flex-direction: column; gap: 12px; }
+.ps-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; box-shadow: var(--sh); }
+.ps-q { background: var(--red-pale); padding: 10px 16px; font-size: 13px; font-weight: 600; color: #7B1616; display: flex; gap: 8px; }
+.ps-a { padding: 10px 16px; font-size: 13px; color: var(--muted); display: flex; gap: 8px; border-top: 1px solid var(--border); }
+.ps-ico { flex-shrink: 0; margin-top: 1px; }
+
+/* ── CODE ── */
+.code {
+  background: #1E2D3D; color: #A8D8EA;
+  padding: 14px 16px; border-radius: var(--r);
+  font-family: "Cascadia Code", "Fira Code", monospace;
+  font-size: 11.5px; line-height: 1.65;
+  overflow-x: auto; direction: ltr; text-align: left;
+  margin: 10px 0;
+}
+.cc { color: #6A9AB0; }
+.ck { color: #79C1F5; }
+.cv { color: #90EE90; }
+.cr { color: #FF6B6B; }
+
+/* ── TIMELINE ── */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+.tl-item { display: flex; gap: 16px; }
+.tl-left { display: flex; flex-direction: column; align-items: center; width: 44px; flex-shrink: 0; }
+.tl-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 4px; }
+.tl-line { width: 2px; background: #D1DCE8; flex: 1; margin-top: 3px; }
+.tl-item:last-child .tl-line { display: none; }
+.tl-body { padding-bottom: 20px; flex: 1; }
+.tl-title { font-size: 13.5px; font-weight: 700; color: var(--navy); }
+.tl-desc  { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.tl-tag   { font-size: 11px; font-weight: 700; background: #E8EEF5; color: var(--navy); padding: 1px 7px; border-radius: 4px; margin-right: 4px; }
+
+/* ── FIN-COR ── */
+.fin-box {
+  background: var(--green-pale); border: 1px solid #A7D7B9;
+  border-radius: var(--r); padding: 16px 20px;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+.fin-ico { font-size: 28px; flex-shrink: 0; }
+.fin-body h3 { font-size: 13.5px; font-weight: 700; color: #0D5B30; margin-bottom: 6px; }
+.fin-body code {
+  display: block; font-family: monospace; font-size: 10.5px;
+  background: rgba(0,0,0,.06); padding: 2px 6px; border-radius: 3px;
+  margin-top: 4px; direction: ltr; text-align: left; color: #0D5B30;
+}
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: var(--r); padding: 13px 16px;
+  display: flex; align-items: flex-start; gap: 10px; margin: 12px 0;
+}
+.callout-warn { background: var(--amber-pale); border-right: 4px solid var(--amber); }
+.callout-info { background: var(--blue-pale);  border-right: 4px solid var(--blue); }
+.callout-ok   { background: var(--green-pale); border-right: 4px solid var(--green); }
+.callout-body { font-size: 13px; }
+.callout-body strong { color: var(--navy); }
+
+/* ── FOOTER ── */
+.ftr {
+  background: var(--navy); color: #94A3B8;
+  text-align: center; padding: 20px 48px; font-size: 12px;
+}
+.ftr strong { color: var(--gold); }
+
+p { margin-bottom: 10px; }
+p:last-child { margin-bottom: 0; }
+@media (max-width: 640px) {
+  .wrap, .hdr, .sbar { padding-left: 16px; padding-right: 16px; }
+  .wave-grid, .deploy-grid, .test-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <span class="logo">TAWA</span>
+    <span style="color:#94A3B8;font-size:12px;">منصة توّا — ليبيا للتوصيل</span>
+  </div>
+  <h1>التقرير النهائي — نشر v3 مكتمل على المواضع الأربعة</h1>
+  <div class="hdr-meta">
+    <span>📅 <strong>2026-07-08</strong></span>
+    <span>🔖 <strong>commit:</strong> 1390a5b</span>
+    <span>🗃️ <strong>Alembic:</strong> ab22 (head)</span>
+    <span>🧪 <strong>3109 passed / 0 failed</strong></span>
+    <span>🌐 <strong>4 / 4 مواضع</strong></span>
+  </div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="sbar">
+  <span class="pill pill-green"><span class="dot dot-green"></span>GitHub ✓</span>
+  <span class="pill pill-green"><span class="dot dot-green"></span>Test 1 Kali ✓</span>
+  <span class="pill pill-green"><span class="dot dot-green"></span>Test .194 ✓</span>
+  <span class="pill pill-green"><span class="dot dot-green"></span>Production ✓</span>
+  <span class="pill pill-gold"><span class="dot dot-gold"></span>ab22 على الكل</span>
+  <span class="pill pill-blue"><span class="dot dot-blue"></span>FIN-COR سليمة</span>
+  <span class="pill pill-navy"><span class="dot dot-navy"></span>0 إخفاقات</span>
+</div>
+
+<div class="wrap">
+
+<!-- ════════════════════════════════════════════════
+     1. النشر على المواضع الأربعة
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">١</span>النشر على المواضع الأربعة</h2>
+
+  <div class="deploy-grid">
+    <div class="deploy-card">
+      <div class="dc-title">GitHub</div>
+      <div class="dc-host">github.com/abd2508/tawa-platform</div>
+      <div class="dc-badge">✓ مدفوع</div>
+      <div class="dc-alembic">commit: 1390a5b</div>
+    </div>
+    <div class="deploy-card">
+      <div class="dc-title">Test 1 — Kali</div>
+      <div class="dc-host">192.168.178.102 | :8094</div>
+      <div class="dc-badge">✓ status: ok</div>
+      <div class="dc-alembic">ab22 (head) ✓</div>
+    </div>
+    <div class="deploy-card">
+      <div class="dc-title">Test — Ubuntu</div>
+      <div class="dc-host">192.168.178.194 | :8091</div>
+      <div class="dc-badge">✓ status: ok</div>
+      <div class="dc-alembic">ab22 (head) ✓</div>
+    </div>
+    <div class="deploy-card">
+      <div class="dc-title">Production</div>
+      <div class="dc-host">178.105.87.192 | staging.tawanow.com</div>
+      <div class="dc-badge">✓ status: ok</div>
+      <div class="dc-alembic">ab22 (head) ✓</div>
+    </div>
+  </div>
+
+  <div class="callout callout-ok" style="margin-top:16px;">
+    <span style="font-size:18px;">✅</span>
+    <div class="callout-body">
+      <strong>التحقق النهائي:</strong> الأمر التالي شغّل على الأربعة في وقت واحد وأعطى نفس النتيجة:
+      <code style="font-family:monospace;font-size:11px;background:rgba(0,0,0,.08);padding:2px 6px;border-radius:3px;direction:ltr;display:inline-block;margin-top:4px;">status: ok | ab22 (head)</code>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     2. ما الذي نشرناه — الموجات الأربع
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">٢</span>ما الذي نشرناه — الموجات الأربع</h2>
+
+  <div class="wave-grid">
+    <div class="wave-card">
+      <div class="wave-card-hdr">
+        <span class="badge b-green">✓ موجة A</span>
+        <span class="wave-title">السلة — 5 أخطاء</span>
+      </div>
+      <ul class="wave-items">
+        <li>حماية زر الدفع أثناء التحميل</li>
+        <li>توجيه صحيح للمتجر النشط</li>
+        <li>تحذير بصري عند تعذّر طلب مجموعة</li>
+        <li>مسح السلات المؤجلة بشكل صحيح</li>
+        <li>توجيه بدون هاتف قبل فتح OTP</li>
+      </ul>
+    </div>
+    <div class="wave-card">
+      <div class="wave-card-hdr">
+        <span class="badge b-green">✓ موجة 3</span>
+        <span class="wave-title">بيانات وأداء</span>
+      </div>
+      <ul class="wave-items">
+        <li>حل مشكلة N+1 لاسم السائق</li>
+        <li>إضافة lat/lng للمتجر العام</li>
+        <li>سقف 40% للعروض PLATFORM</li>
+        <li>موافقة تلقائية للعروض ≤5%</li>
+      </ul>
+    </div>
+    <div class="wave-card">
+      <div class="wave-card-hdr">
+        <span class="badge b-green">✓ موجة 4</span>
+        <span class="wave-title">السائق + ab22</span>
+      </div>
+      <ul class="wave-items">
+        <li>هجرة ab22: رمز رفض الوثيقة</li>
+        <li>حقل vehicle_plate + فترة سماح 30 يوم</li>
+        <li>حقل إدخال اللوحة في واجهة السائق</li>
+        <li>GET/PUT identity موسّعان</li>
+      </ul>
+    </div>
+    <div class="wave-card">
+      <div class="wave-card-hdr">
+        <span class="badge b-green">✓ موجة 5</span>
+        <span class="wave-title">نصوص ar + en</span>
+      </div>
+      <ul class="wave-items">
+        <li>13 مفتاح عربي جديد</li>
+        <li>13 مفتاح إنجليزي مقابل</li>
+        <li>cart.group_* · driver.vehicle_*</li>
+        <li>order.otp_no_phone</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     3. الأخطاء المصلحة — جدول تفصيلي
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">٣</span>الأخطاء المصلحة — كاملة</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>الملف</th>
+          <th>الخطأ</th>
+          <th>سبب الخطأ</th>
+          <th>الإصلاح</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>B1</strong></td>
+          <td><code>CartPage.tsx:91</code></td>
+          <td>زر الدفع يظهر فعّالاً قبل اكتمال تحميل بيانات المتاجر</td>
+          <td><code>canCheckout</code> لا يأخذ بعين الاعتبار حالة التحميل</td>
+          <td>أضفنا <code>loadingAny</code> يُعطّل الزر حتى اكتمال البيانات</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>B2</strong></td>
+          <td><code>CartPage.tsx:96</code></td>
+          <td>يُوجَّه لمتجر خاطئ عند وجود سلة مؤجلة</td>
+          <td>استخدام <code>allBaskets[0]</code> بدل السلة النشطة</td>
+          <td><code>activeProviderId ?? allBaskets[0].providerId</code></td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>B3</strong></td>
+          <td><code>CartPage.tsx:100</code></td>
+          <td>انتقال صامت عند تعطّل طلب المجموعة</td>
+          <td>لا يوجد تحقق من <code>group_order_enabled</code></td>
+          <td>modal تحذير يسأل المستخدم عن المتابعة بالمتجر النشط</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>B4</strong></td>
+          <td><code>CartPage.tsx:346</code></td>
+          <td>السلة المؤجلة تبقى بعد الضغط على "امسح"</td>
+          <td>يستدعي <code>clear()</code> بدل <code>clearAll()</code></td>
+          <td>يستدعي <code>clearAll()</code> عند غياب السلة النشطة</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>B5</strong></td>
+          <td><code>CheckoutPage.tsx:515</code></td>
+          <td>نافذة OTP تفتح فارغة بدون رقم هاتف</td>
+          <td>لا يتحقق من <code>me.phone</code> قبل <code>requestOtp</code></td>
+          <td>رسالة خطأ واضحة وإرجاع مبكر قبل الفتح</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>N+1</strong></td>
+          <td><code>order_router.py</code></td>
+          <td>اسم السائق يُجلَب بطلب منفصل لكل طلب</td>
+          <td>غياب <code>_driver_name_map</code> في <code>list_orders</code></td>
+          <td>استعلام واحد يجلب أسماء كل السائقين دفعةً</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>P1</strong></td>
+          <td><code>promotions_router.py</code></td>
+          <td>لا يوجد سقف للعروض PLATFORM</td>
+          <td>لا فحص على <code>value</code></td>
+          <td>رفض 422 إذا > 40% · AUTO_APPROVED إذا ≤ 5%</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>P2</strong></td>
+          <td><code>provider_router.py</code></td>
+          <td>lat/lng غائبة من صفحة المتجر العام</td>
+          <td>لم تُضَف لـ <code>_provider_public_dict</code></td>
+          <td>أضفنا <code>lat</code> و<code>lng</code> للاستجابة العامة</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td><strong>C1–C4</strong></td>
+          <td><code>test_catalog_*.py</code></td>
+          <td>4 اختبارات كتالوج تفشل مع <code>CATALOG_REQUIRE_APPROVAL=true</code></td>
+          <td>الاختبارات لا تتحكم في قيمة الـ flag</td>
+          <td><code>monkeypatch.setattr(settings, "catalog_require_approval", False)</code></td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     4. هجرة قاعدة البيانات ab22
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">٤</span>هجرة ab22 — تفاصيل</h2>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div>
+      <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">جدول <code>driver_documents</code> — عمودان جديدان</p>
+      <div class="code"><span class="cc"># سبب الرفض (رمز + نص)</span>
++ <span class="cv">reject_reason_code</span>  VARCHAR(40)  NULL
++ <span class="cv">reject_reason_text</span>  TEXT         NULL
+
+<span class="cc"># مثال: BLURRY_IMAGE / "الصورة ضبابية"</span></div>
+    </div>
+    <div>
+      <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">جدول <code>drivers</code> — عمودان جديدان</p>
+      <div class="code"><span class="cc"># لوحة المركبة + فترة السماح</span>
++ <span class="cv">vehicle_plate</span>     VARCHAR(25)   NULL
++ <span class="cv">docs_grace_until</span>  TIMESTAMPTZ   NULL
+
+<span class="cc"># السائقون النشطون يحصلون تلقائياً</span>
+<span class="cc"># على 30 يوم من تاريخ الترقية</span></div>
+    </div>
+  </div>
+
+  <div class="callout callout-ok" style="margin-top:12px;">
+    <span style="font-size:18px;">🛡️</span>
+    <div class="callout-body">
+      الهجرة <strong>آمنة بالكامل</strong>: كل الأعمدة nullable — لا حذف ولا تعديل.
+      طُبِّقت على الثلاثة DBs الحية تلقائياً عبر <code>entrypoint.sh alembic upgrade head</code>
+      بدون أي توقف في الخدمة.
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     5. رسوم توضيحية
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">٥</span>كيف تعمل الإصلاحات</h2>
+
+  <p style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:8px;">B1 — canCheckout قبل وبعد</p>
+  <div class="diag-box">
+    <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px;direction:rtl;">⬆ قبل: يسمح بالدفع أثناء التحميل · بعد: ينتظر اكتمال البيانات</div>
+    <div class="flow">
+      <div class="fc"><div class="fn">تحميل السلة</div><div class="fl">START</div></div>
+      <div class="fa">→</div>
+      <div class="fc"><div class="fn a">جلب المتاجر</div><div class="fl">loadingAny=true</div></div>
+      <div class="fa">→</div>
+      <div class="fc"><div class="fn r">❌ دفع مسموح</div><div class="fl">قبل الإصلاح</div></div>
+      <div class="fa" style="color:#E8A020;">VS</div>
+      <div class="fc"><div class="fn" style="background:#444;">⏳ دفع مُعطَّل</div><div class="fl">بعد الإصلاح</div></div>
+      <div class="fa">→</div>
+      <div class="fc"><div class="fn g">✓ دفع مسموح</div><div class="fl">بعد التحميل</div></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:8px;margin-top:16px;">P1 — منطق العروض الترويجية PLATFORM</p>
+  <div class="diag-box">
+    <div class="flow">
+      <div class="fc"><div class="fn au">عرض PLATFORM</div></div>
+      <div class="fa">→</div>
+      <div class="fc"><div class="fn r">value > 40%?</div></div>
+      <div class="fa">نعم→</div>
+      <div class="fc"><div class="fn r">رفض 422</div></div>
+    </div>
+    <div class="flow" style="margin-top:8px;">
+      <div style="width:100px;"></div>
+      <div class="fa" style="opacity:0;">→</div>
+      <div class="fc">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">لا↓</div>
+        <div class="fn au">value ≤ 5%?</div>
+      </div>
+      <div class="fa">نعم→</div>
+      <div class="fc"><div class="fn g">AUTO_APPROVED</div></div>
+      <div class="fa">لا→</div>
+      <div class="fc"><div class="fn a">PENDING (OPS)</div></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:8px;margin-top:16px;">N+1 fix — list_orders driver name</p>
+  <div class="diag-box">
+    <div class="flow">
+      <div class="fc"><div class="fn r">قبل: N استعلام</div><div class="fl">استعلام/طلب</div></div>
+      <div class="fa" style="color:#E8A020;">→</div>
+      <div class="fc">
+        <div class="fn g">بعد: استعلامان</div>
+        <div class="fl">driver_id_map</div>
+      </div>
+      <div class="fa">+</div>
+      <div class="fc">
+        <div class="fn g">driver_name_map</div>
+        <div class="fl">batch lookup</div>
+      </div>
+      <div class="fa">→</div>
+      <div class="fc">
+        <div class="fn g">serialize كل الطلبات</div>
+        <div class="fl">O(1) per order</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     6. الاختبارات
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">٦</span>نتائج الاختبارات — النهائية</h2>
+
+  <div class="test-row">
+    <div class="test-card">
+      <div class="test-num num-green">3109</div>
+      <div class="test-lbl">Backend اختبار ✓</div>
+    </div>
+    <div class="test-card">
+      <div class="test-num num-green">0</div>
+      <div class="test-lbl">إخفاقات جديدة</div>
+    </div>
+    <div class="test-card">
+      <div class="test-num num-green">1388</div>
+      <div class="test-lbl">Frontend Vitest ✓</div>
+    </div>
+    <div class="test-card">
+      <div class="test-num num-green">4</div>
+      <div class="test-lbl">اختبارات كتالوج مُصلحة</div>
+    </div>
+    <div class="test-card">
+      <div class="test-num num-green">3</div>
+      <div class="test-lbl">skip قديم موجود مسبقاً</div>
+    </div>
+    <div class="test-card">
+      <div class="test-num num-green">41</div>
+      <div class="test-lbl">PWA precache ✓</div>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <span style="font-size:16px;">ℹ️</span>
+    <div class="callout-body">
+      <strong>إصلاح الكتالوج:</strong> الاختبارات الأربعة
+      (<code>test_gate_off_publishes_directly</code>, <code>test_approve_non_pending_returns_422</code>,
+      <code>test_archived_item_hidden_from_public_catalog</code>, <code>test_variant_price_surfaces_as_item_base_price</code>)
+      كانت تفشل لأن <code>.env</code> يحتوي <code>CATALOG_REQUIRE_APPROVAL=true</code>
+      لكن الاختبارات تتوقع <code>false</code>. الحل: إضافة
+      <code>monkeypatch.setattr(settings, "catalog_require_approval", False)</code>
+      في بداية كل اختبار متأثر — الاختبار الآن يتحكم في البيئة بنفسه.
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     7. الملفات المعدّلة
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">٧</span>الملفات المُعدَّلة — commit 1390a5b</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>الملف</th>
+          <th>النوع</th>
+          <th>الموجة</th>
+          <th>ما الذي تغيّر</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>web/src/pages/customer/CartPage.tsx</code></td>
+          <td><span class="badge b-blue">Frontend</span></td>
+          <td>A</td>
+          <td>4 إصلاحات: loadingAny، handleCheckout، clearConfirm، modal</td>
+        </tr>
+        <tr>
+          <td><code>web/src/pages/customer/CheckoutPage.tsx</code></td>
+          <td><span class="badge b-blue">Frontend</span></td>
+          <td>A</td>
+          <td>startOtpFlow: فحص phone قبل requestOtp</td>
+        </tr>
+        <tr>
+          <td><code>web/src/pages/driver/DriverPending.tsx</code></td>
+          <td><span class="badge b-blue">Frontend</span></td>
+          <td>4</td>
+          <td>حقل vehicle_plate + prefill + save</td>
+        </tr>
+        <tr>
+          <td><code>web/src/api/operations.ts</code></td>
+          <td><span class="badge b-navy">API Types</span></td>
+          <td>4</td>
+          <td>vehicle_plate في getMyDriverIdentity / updateMyDriverIdentity</td>
+        </tr>
+        <tr>
+          <td><code>web/src/i18n/ar.json</code></td>
+          <td><span class="badge b-navy">i18n</span></td>
+          <td>5</td>
+          <td>13 مفتاح جديد عربي</td>
+        </tr>
+        <tr>
+          <td><code>web/src/i18n/en.json</code></td>
+          <td><span class="badge b-navy">i18n</span></td>
+          <td>5</td>
+          <td>13 مفتاح جديد إنجليزي</td>
+        </tr>
+        <tr>
+          <td><code>backend/app/models/dispatch.py</code></td>
+          <td><span class="badge b-amber">Model</span></td>
+          <td>4</td>
+          <td>Driver: vehicle_plate + docs_grace_until · DriverDoc: reject_reason_*</td>
+        </tr>
+        <tr>
+          <td><code>backend/app/modules/dispatch/dispatch_router.py</code></td>
+          <td><span class="badge b-gold">Backend</span></td>
+          <td>4</td>
+          <td>DriverIdentityBody + GET/PUT identity بـ vehicle_plate</td>
+        </tr>
+        <tr>
+          <td><code>backend/app/modules/orders/order_router.py</code></td>
+          <td><span class="badge b-gold">Backend</span></td>
+          <td>3.1</td>
+          <td>_driver_name_map: batch lookup بدل N+1</td>
+        </tr>
+        <tr>
+          <td><code>backend/app/modules/promotions/promotions_router.py</code></td>
+          <td><span class="badge b-gold">Backend</span></td>
+          <td>3.2</td>
+          <td>سقف 40% + AUTO_APPROVED ≤5% للعروض PLATFORM</td>
+        </tr>
+        <tr>
+          <td><code>backend/app/modules/providers/provider_router.py</code></td>
+          <td><span class="badge b-gold">Backend</span></td>
+          <td>3.3</td>
+          <td>lat + lng في _provider_public_dict</td>
+        </tr>
+        <tr>
+          <td><code>backend/alembic/versions/ab22_driver_docs_expansion.py</code></td>
+          <td><span class="badge b-red">Migration</span></td>
+          <td>4</td>
+          <td>جديد — reject_reason + vehicle_plate + docs_grace_until</td>
+        </tr>
+        <tr>
+          <td><code>backend/tests/test_catalog_approval.py</code></td>
+          <td><span class="badge b-navy">Tests</span></td>
+          <td>Fix</td>
+          <td>monkeypatch لـ 2 اختبارات</td>
+        </tr>
+        <tr>
+          <td><code>backend/tests/test_phase175_catalog_edit_delete.py</code></td>
+          <td><span class="badge b-navy">Tests</span></td>
+          <td>Fix</td>
+          <td>import settings + monkeypatch</td>
+        </tr>
+        <tr>
+          <td><code>backend/tests/test_phase399_variant_crud.py</code></td>
+          <td><span class="badge b-navy">Tests</span></td>
+          <td>Fix</td>
+          <td>import settings + monkeypatch</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     8. المشكلات والحلول
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">٨</span>المشكلات التي واجهناها والحلول</h2>
+
+  <div class="ps-list">
+
+    <div class="ps-item">
+      <div class="ps-q"><span class="ps-ico">🔴</span><div><strong>مشكلة:</strong> المصنّف التلقائي رفض <code>git commit</code> رغم "الصلاحيات التامة" — قاعدة No-Commit تشترط إذناً صريحاً.</div></div>
+      <div class="ps-a"><span class="ps-ico">🟢</span><div><strong>الحل:</strong> المستخدم قال "أكمل النشر" → commit نجح. الدرس: "الصلاحيات التامة" لا تكفي للعمليات الحساسة — الإذن الصريح هو المطلوب دائماً.</div></div>
+    </div>
+
+    <div class="ps-item">
+      <div class="ps-q"><span class="ps-ico">🔴</span><div><strong>مشكلة:</strong> نقل صور Docker إلى Ubuntu (.194) عبر <code>docker save | ssh docker load</code> تعلّق مراراً (عملية تُستهلك > 10 دقائق بدون تقدم).</div></div>
+      <div class="ps-a"><span class="ps-ico">🟢</span><div><strong>الحل:</strong> <code>docker save | gzip > /tmp/file.tar.gz</code> ثم <code>scp</code> الملف. البناء المباشر على Ubuntu للـ frontend عبر <code>--network=host</code> بعد rsync للمصدر — أكثر موثوقية من نقل الصورة بأكملها.</div></div>
+    </div>
+
+    <div class="ps-item">
+      <div class="ps-q"><span class="ps-ico">🔴</span><div><strong>مشكلة:</strong> <code>npm ci</code> داخل Docker على Ubuntu يفشل بـ ETIMEDOUT — حاوية Docker لا تستطيع الوصول لـ npm registry.</div></div>
+      <div class="ps-a"><span class="ps-ico">🟢</span><div><strong>الحل:</strong> <code>docker build --network=host</code> يجعل Docker يستخدم شبكة المضيف مباشرةً — npm يصل للـ registry بنجاح.</div></div>
+    </div>
+
+    <div class="ps-item">
+      <div class="ps-q"><span class="ps-ico">🔴</span><div><strong>مشكلة:</strong> SSH للإنتاج (178.105.87.192) يُرفض بـ "Connection refused" — المنافذ الشائعة مغلقة بعد nmap.</div></div>
+      <div class="ps-a"><span class="ps-ico">🟢</span><div><strong>الحل:</strong> <code>ssh-keyscan -p 22</code> أثبت أن المنفذ 22 مفتوح. المشكلة كانت في أمر SSH — استخدام <code>-o StrictHostKeyChecking=accept-new</code> حلّها.</div></div>
+    </div>
+
+    <div class="ps-item">
+      <div class="ps-q"><span class="ps-ico">🔴</span><div><strong>مشكلة:</strong> 4 اختبارات كتالوج تفشل مستمراً بسبب <code>CATALOG_REQUIRE_APPROVAL=true</code> في <code>.env</code>.</div></div>
+      <div class="ps-a"><span class="ps-ico">🟢</span><div><strong>الحل:</strong> <code>monkeypatch.setattr(settings, "catalog_require_approval", False)</code> في كل اختبار → الاختبار يتحكم في البيئة بنفسه بدلاً من الاعتماد على <code>.env</code>. النتيجة: <code>3109 passed / 0 failed</code>.</div></div>
+    </div>
+
+    <div class="ps-item">
+      <div class="ps-q"><span class="ps-ico">🔴</span><div><strong>مشكلة:</strong> <code>container frontend tawalocal</code> على Kali كان يتعارض مع <code>lab_wp</code> على منفذ 8090.</div></div>
+      <div class="ps-a"><span class="ps-ico">🟢</span><div><strong>الحل:</strong> قراءة <code>/home/a/.cloudflared/config.yml</code> أثبتت أن النفق يُوجَّه لـ :8094 — شغّلنا frontend على المنفذ الصحيح مباشرةً.</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     9. التسلسل الزمني للجلسة
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">٩</span>تسلسل الجلسة</h2>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">استئناف الجلسة + تحليل الحالة</div>
+        <div class="tl-desc">استعادة السياق من الجلسة السابقة — التنفيذ مكتمل، ينتظر commit</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">كتابة التقرير الأول</div>
+        <div class="tl-desc">تقرير HTML شامل في <code>New File 10</code> — 11 قسم، رسوم توضيحية، جداول</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">إصلاح 4 اختبارات الكتالوج</div>
+        <div class="tl-desc">monkeypatch في test_catalog_approval + test_phase175 + test_phase399 → 3109 passed</div>
+        <span class="tl-tag">قبل النشر</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">git commit + push GitHub</div>
+        <div class="tl-desc">commit 1390a5b — Husky + FIN-COR + prettier مرّوا جميعاً · push origin master</div>
+        <span class="tl-tag">✓ GitHub</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">نشر Test 1 (Kali)</div>
+        <div class="tl-desc">DOCKER_BUILDKIT=0 build backend+frontend · ab22 مطبَّق تلقائياً · frontend على :8094</div>
+        <span class="tl-tag">✓ Kali</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">نشر Test (.194)</div>
+        <div class="tl-desc">rsync المصدر → docker build --network=host (npm ETIMEDOUT بدونه) → recreate → ab22 ✓</div>
+        <span class="tl-tag">✓ Ubuntu</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">نشر Production (Hetzner)</div>
+        <div class="tl-desc">deploy_be.sh → rsync backend → build → recreate · deploy_web.sh → build → recreate · ab22 ✓</div>
+        <span class="tl-tag">✓ Production</span>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-left"><div class="tl-dot"></div><div class="tl-line"></div></div>
+      <div class="tl-body">
+        <div class="tl-title">التحقق النهائي</div>
+        <div class="tl-desc">الأربعة: <code>status: ok | ab22 (head)</code> ✓ — النشر مكتمل</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     10. FIN-COR
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">١٠</span>سلامة العقود — FIN-COR</h2>
+  <div class="fin-box">
+    <div class="fin-ico">🔒</div>
+    <div class="fin-body">
+      <h3>الهاشان مطابقان — لم تُمَسّ العقود</h3>
+      <code>feature_flags.yaml : 25ddf010282a09abd2aab8e775b599c5cd3d64e613e6c5348562b5ebd1f91557 ✓</code>
+      <code>launch_gates.yaml  : 6c78dc892b110c9252035f0a07f18e9538abcd9eb5fe4160c009c4bcfcd68414 ✓</code>
+      <div style="margin-top:8px;font-size:12px;color:#0D5B30;">
+        wallet_cash_out=false · wallet_peer_transfer=true · production_payment_enabled=false — كلها ثابتة
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════
+     11. الحالة الراهنة
+═════════════════════════════════════════════════ -->
+<div class="sec">
+  <h2 class="sec-hdr"><span class="sec-icon">١١</span>الحالة الراهنة</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>البند</th><th>القيمة</th><th>الحالة</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Alembic Head (الكل)</td>
+          <td><code>ab22</code></td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>آخر commit</td>
+          <td><code>1390a5b feat(v3): cart fixes + driver plate…</code></td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>Backend Tests</td>
+          <td>3109 passed / 0 failed / 3 skip</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>Frontend Tests</td>
+          <td>1388 passed / 1 pre-existing (pwa-config)</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>TypeCheck</td>
+          <td>0 errors</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>Build PWA</td>
+          <td>41 precache entries</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>FIN-COR</td>
+          <td>كلا الهاشَين مطابقان</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>Production (staging.tawanow.com)</td>
+          <td>status: ok · backend+frontend healthy</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>Test 1 Kali (:8094)</td>
+          <td>status: ok · ab22 (head)</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>Test Ubuntu (:8091)</td>
+          <td>status: ok · ab22 (head)</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+        <tr>
+          <td>GitHub master</td>
+          <td>commit 1390a5b مدفوع</td>
+          <td><span class="badge b-green">✓</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<div class="ftr">
+  تقرير نشر <strong>توّا v3</strong> النهائي · 2026-07-08 · 4/4 مواضع · ab22 (head) · FIN-COR PASS
+</div>
+
+</body>
+</html>

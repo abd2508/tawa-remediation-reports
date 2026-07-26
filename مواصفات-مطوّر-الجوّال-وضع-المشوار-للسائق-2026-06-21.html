@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مواصفات الجوّال — وضع المشوار للسائق — تووا — 2026-06-21</title>
+<style>
+:root{--bg:#0d1117;--panel:#161d23;--panel2:#1c252d;--bd:#2a343d;--ink:#e8eef2;--mut:#9fb1bd;--grn:#34b87a;--grn2:#52d295;--red:#e5534b;--amb:#e3a008;--blu:#539bf5;--pur:#b083f0;--cy:#3bd1c4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Arabic","Segoe UI",Tahoma,sans-serif;line-height:1.85}
+.wrap{max-width:1100px;margin:0 auto;padding:26px 18px 90px}
+header.hero{background:linear-gradient(135deg,#10302a,#0f2a40);border:1px solid var(--bd);border-radius:18px;padding:28px;margin-bottom:16px}
+header.hero h1{margin:0 0 6px;font-size:1.4rem} .sub{color:var(--mut);font-size:.92rem}
+.b{display:inline-block;font-size:.78rem;padding:4px 12px;border-radius:999px;border:1px solid var(--bd);background:#0e1519;margin:4px 4px 0 0}
+.b.ok{color:var(--grn2);border-color:#1f5a40} .b.live{color:var(--blu)}
+h2{font-size:1.18rem;margin:28px 0 10px;padding-bottom:8px;border-bottom:2px solid var(--bd)}
+h2 .n{display:inline-block;min-width:28px;height:28px;line-height:28px;text-align:center;border-radius:8px;font-weight:800;margin-left:8px;padding:0 6px;color:#06281b;background:var(--grn)}
+h3{font-size:1rem;margin:14px 0 7px;color:var(--grn2)}
+.panel{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:15px 19px;margin:11px 0}
+.simple{background:#0e1a24;border-right:4px solid var(--blu);padding:9px 13px;border-radius:8px;margin:9px 0;font-size:.9rem} .simple b{color:var(--blu)}
+.warn{background:#241a0c;border-right:4px solid var(--amb);padding:9px 13px;border-radius:8px;margin:9px 0;font-size:.86rem} .warn b{color:var(--amb)}
+.note{background:#11201a;border-right:4px solid var(--grn);padding:9px 13px;border-radius:8px;margin:9px 0;font-size:.86rem} .note b{color:var(--grn2)}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.82rem} th,td{border:1px solid var(--bd);padding:6px 9px;text-align:right;vertical-align:top}
+th{background:var(--panel2);color:var(--mut)} td.c,th.c{text-align:center}
+code{background:#0b1116;border:1px solid var(--bd);border-radius:5px;padding:1px 6px;font-size:.78em;color:#ffd9a0}
+ul,ol{margin:5px 0;padding-right:20px} li{margin:5px 0} .small{font-size:.81rem;color:var(--mut)}
+.term{background:#05080b;border:1px solid #1f2a33;border-radius:10px;padding:12px 14px;font-family:"Cascadia Code","Courier New",monospace;font-size:.78rem;direction:ltr;text-align:left;overflow-x:auto;white-space:pre;color:#a8c7da;margin:8px 0}
+.term .k{color:#c9a3f5} .term .s{color:#9ecbff} .term .c{color:#6b7d8a} .term .g{color:#52d295}
+img.shot{max-width:260px;border:1px solid var(--bd);border-radius:10px;margin:8px 0;display:block}
+svg{max-width:100%}
+</style></head><body><div class="wrap">
+
+<header class="hero">
+  <h1>📱 مواصفات الجوّال — «وضع المشوار» في تطبيق السائق (Flutter)</h1>
+  <div class="sub">وثيقة تنفيذ دقيقة لمطوّر تطبيق السائق الجوّال. الهدف: تمكين سائقي الجوّال من إكمال طلبات «اطلب أيّ شيء / مشوار» — تمامًا كما يعمل الآن في بوّابة السائق على الويب. <b>كلّ نقاط الـAPI الخلفيّة منشورة وحيّة بالفعل؛ المطلوب تغييرات تطبيق الجوّال فقط.</b> · 2026-06-21</div>
+  <div>
+    <span class="b live">🔌 API حيّ (لا تغيير backend)</span>
+    <span class="b ok">✅ المرجع: بوّابة السائق على الويب (مُنفَّذة)</span>
+    <span class="b">📦 Flutter · mobile_app/</span>
+  </div>
+</header>
+
+<div class="panel"><div class="simple"><b>الفكرة بإيجاز:</b> «المشوار» طلب بلا متجر — العميل يصف ما يريده ويحدّد ميزانيّة (مدفوعة مسبقًا من محفظته). لا يوجد مزوّد يُسلّم الطلب للسائق، فالسائق <b>هو المتسوّق</b>. لذلك شاشة الاستلام في الجوّال يجب أن تعرض — لطلبات المشوار فقط — <b>قائمة التسوّق</b> وزرًّا واحدًا «تمّ الشراء — في الطريق» بدل «قائمة الفحص + مسح المزوّد».</div></div>
+
+<!-- 1 API contract -->
+<h2 id="api"><span class="n">١</span> عقد الـAPI (حيّ ومنشور — لا تعديل)</h2>
+<div class="panel">
+<h3>أ) جلب تفاصيل الطلب للسائق — مُحدَّث بحقلين جديدين</h3>
+<div class="term"><span class="c">// GET /orders/{order_id}   (دور السائق — موجود مسبقًا)</span>
+<span class="c">// الاستجابة الآن تتضمّن حقلين إضافيّين:</span>
+{
+  "id": "…",
+  "order_state": "DRIVER_ASSIGNED",
+  "payment_method": "WALLET",
+  "total_minor": 25000,
+  "currency": "LYD",
+  <span class="g">"fulfillment_type": "ERRAND",</span>            <span class="c">// ← جديد: "DELIVERY" | "SELF_PICKUP" | "ERRAND"</span>
+  <span class="g">"errand_description": "عشرة أرغفة خبز + علبة حليب + ملح",</span>  <span class="c">// ← جديد: نصّ المشوار (null لغير المشوار)</span>
+  "dropoff_info": { "address_hint": "طرابلس - حي الأندلس" },
+  "delivery_notes": [ … ]
+}</div>
+<h3>ب) نقطة جديدة — تأكيد استلام المشوار (تحلّ محلّ مسح المزوّد)</h3>
+<div class="term"><span class="k">POST</span> <span class="s">/dispatch/orders/{order_id}/errand-picked-up</span>
+<span class="c">// Headers: Authorization: Bearer &lt;driver JWT&gt;  ·  Body: {} (فارغ)</span>
+<span class="c">// الدور: DRIVER (السائق المقبول لهذا الطلب فقط)</span>
+
+<span class="c">// 200 OK:</span>
+{ "order_id": "…", "order_state": <span class="g">"EN_ROUTE"</span> }
+
+<span class="c">// أخطاء محتملة:</span>
+<span class="c">// 403 — السائق غير مصرَّح له بهذا الطلب (ليس المقبول)</span>
+<span class="c">// 422 — ليس طلب مشوار / حالة غير صالحة للاستلام</span>
+<span class="c">// 404 — ملف السائق غير موجود</span></div>
+<div class="note"><b>ما تفعله النقطة:</b> تنقل الطلب <code>DRIVER_ASSIGNED → DRIVER_AT_PROVIDER → PICKED_UP → EN_ROUTE</code> دفعةً واحدة (النظام يؤكّد نيابةً عن السائق لأنّه لا مزوّد). بعدها يُكمِل السائق بتدفّق التسليم العاديّ (وصول → إثبات تسليم).</div>
+</div>
+
+<!-- 2 state flow -->
+<h2 id="flow"><span class="n">٢</span> تدفّق حالات المشوار (للسائق)</h2>
+<div class="panel">
+<svg viewBox="0 0 960 70" height="70" font-family="Noto Sans Arabic,sans-serif">
+<rect x="6" y="22" width="150" height="34" rx="8" fill="#14233a" stroke="#234b66"/><text x="81" y="38" fill="#7db8ff" font-size="9.5" text-anchor="middle">عرض على السائق</text><text x="81" y="50" fill="#9fb1bd" font-size="8" text-anchor="middle">DRIVER_ASSIGNED</text>
+<rect x="186" y="22" width="200" height="34" rx="8" fill="#11321f" stroke="#1f5a40"/><text x="286" y="38" fill="#52d295" font-size="9.5" text-anchor="middle">شاشة الاستلام: «وضع المشوار»</text><text x="286" y="50" fill="#9fb1bd" font-size="8" text-anchor="middle">قائمة التسوّق + زرّ «تمّ الشراء»</text>
+<rect x="416" y="22" width="180" height="34" rx="8" fill="#241a0c" stroke="#5a4a10"/><text x="506" y="38" fill="#e3a008" font-size="9.5" text-anchor="middle">POST errand-picked-up</text><text x="506" y="50" fill="#9fb1bd" font-size="8" text-anchor="middle">→ EN_ROUTE</text>
+<rect x="626" y="22" width="150" height="34" rx="8" fill="#0e1a24" stroke="#234b66"/><text x="701" y="38" fill="#7db8ff" font-size="9.5" text-anchor="middle">وصول (arrive)</text><text x="701" y="50" fill="#9fb1bd" font-size="8" text-anchor="middle">تدفّق موجود</text>
+<rect x="806" y="22" width="148" height="34" rx="8" fill="#0a1a18" stroke="#1f5a52"/><text x="880" y="38" fill="#3bd1c4" font-size="9.5" text-anchor="middle">إثبات التسليم</text><text x="880" y="50" fill="#9fb1bd" font-size="8" text-anchor="middle">DELIVERED</text>
+<line x1="156" y1="39" x2="184" y2="39" stroke="#52d295"/><line x1="386" y1="39" x2="414" y2="39" stroke="#52d295"/><line x1="596" y1="39" x2="624" y2="39" stroke="#52d295"/><line x1="776" y1="39" x2="804" y2="39" stroke="#52d295"/>
+</svg>
+<div class="warn"><b>مهمّ:</b> المشوار دائمًا <b>محفظة (WALLET)</b> — مدفوع مسبقًا. <b>لا تحصيل نقد</b> عند التسليم. الميزانيّة محجوزة وتُثبَّت عند DELIVERED تلقائيًّا (لا عمل من السائق).</div>
+</div>
+
+<!-- 3 mobile changes -->
+<h2 id="changes"><span class="n">٣</span> التغييرات المطلوبة في تطبيق الجوّال (ملفًّا ملفًّا)</h2>
+<div class="panel">
+<h3>① نموذج الطلب — <code>lib/shared/models/order.dart</code></h3>
+<div class="small">الحقل <code>fulfillmentType</code> موجود مسبقًا. أضِف حقل <code>errandDescription</code>:</div>
+<div class="term"><span class="c">// داخل class OrderSummary:</span>
+<span class="k">final</span> String? errandDescription;
+<span class="c">// في الباني (constructor): this.errandDescription,</span>
+<span class="c">// في fromJson:</span>
+errandDescription: json[<span class="s">'errand_description'</span>] <span class="k">as</span> String?,</div>
+
+<h3>② شاشة الاستلام — <code>lib/features/driver/pickup_screen.dart</code></h3>
+<div class="small">أضِف فرعًا: إذا <code>order.fulfillmentType == "ERRAND"</code> اعرض «وضع المشوار» بدل قائمة الفحص + مسح المزوّد.</div>
+<div class="term"><span class="k">final</span> isErrand = order.fulfillmentType == <span class="s">'ERRAND'</span>;
+
+<span class="c">// إذا isErrand → اعرض:</span>
+<span class="c">// 1) عنوان: «🛍️ مهمّة المشوار — اشترِ ما يلي»</span>
+<span class="c">// 2) صندوق نصّ يعرض order.errandDescription (قائمة التسوّق)</span>
+<span class="c">// 3) ملاحظة: «الميزانيّة مدفوعة مسبقًا من محفظة العميل…»</span>
+<span class="c">// 4) زرّ واحد «تمّ الشراء — في الطريق إلى العميل» → _errandPickedUp()</span>
+<span class="c">//    (أخفِ قائمة الفحص + أيّ عرض لرمز/مسح المزوّد للمشوار)</span>
+
+<span class="k">Future</span>&lt;<span class="k">void</span>&gt; _errandPickedUp() <span class="k">async</span> {
+  <span class="k">await</span> api.post(<span class="s">'/dispatch/orders/\${widget.orderId}/errand-picked-up'</span>, {});
+  <span class="c">// عند النجاح: انتقل لشاشة التسليم (delivery_screen) كما يفعل المسار العاديّ بعد EN_ROUTE</span>
+  <span class="c">// عند الخطأ: اعرض رسالة الخطأ (message_ar من الاستجابة)</span>
+}</div>
+
+<h3>③ الترجمة — <code>lib/l10n/app_ar.arb</code> · <code>app_en.arb</code> · <code>app_fr.arb</code></h3>
+<table>
+<tr><th>المفتاح</th><th>عربي</th><th>إنجليزي</th><th>فرنسي</th></tr>
+<tr><td><code>driverErrandTask</code></td><td>مهمّة المشوار — اشترِ ما يلي</td><td>Errand task — buy the following</td><td>Course — achetez ce qui suit</td></tr>
+<tr><td><code>driverErrandBudgetNote</code></td><td>الميزانيّة القصوى مدفوعة مسبقًا من محفظة العميل. اشترِ في حدودها ثمّ توجّه إليه.</td><td>The max budget is prepaid from the customer's wallet. Buy within it, then head to them.</td><td>Le budget max est prépayé… achetez dans cette limite.</td></tr>
+<tr><td><code>driverErrandBought</code></td><td>تمّ الشراء — في الطريق إلى العميل</td><td>Bought — en route to the customer</td><td>Acheté — en route vers le client</td></tr>
+</table>
+</div>
+
+<!-- 4 reference -->
+<h2 id="ref"><span class="n">٤</span> المرجع: التنفيذ على الويب (انسخ سلوكه حرفيًّا)</h2>
+<div class="panel">
+<img class="shot" src="موجة-إصلاحات-لقطات/p-driver-errand-mode.png" alt="وضع المشوار في بوّابة السائق على الويب">
+<div style="display:inline-block;max-width:60%;vertical-align:top">
+<div class="note"><b>الويب مُنفَّذ ومنشور — هو مصدر الحقيقة للسلوك والنصوص:</b>
+<ul class="small">
+<li><code>web/src/pages/driver/DriverPickup.tsx</code> — فرع <code>isErrand</code> (قائمة التسوّق + زرّ «تمّ الشراء»).</li>
+<li><code>web/src/api/dispatch.ts</code> — <code>errandPickedUp(orderId)</code>.</li>
+<li>اللقطة على اليسار هي الشكل النهائيّ المطلوب مطابقته في الجوّال.</li>
+</ul></div>
+</div>
+</div>
+
+<!-- 5 edge cases -->
+<h2 id="edge"><span class="n">٥</span> حالات الحافّة ومعالجة الأخطاء</h2>
+<div class="panel">
+<table>
+<tr><th>الحالة</th><th>السلوك المطلوب</th></tr>
+<tr><td>الطلب غير مشوار (<code>fulfillmentType != "ERRAND"</code>)</td><td>لا تغيير — الشاشة الحاليّة (قائمة الفحص + مسح المزوّد) كما هي.</td></tr>
+<tr><td><code>errand_description</code> فارغ/null</td><td>اعرض «—» (لا تتعطّل).</td></tr>
+<tr><td>الضغط على «تمّ الشراء» والحالة ليست DRIVER_ASSIGNED/AT_PROVIDER</td><td>الخادم يردّ 422 — اعرض <code>message_ar</code>.</td></tr>
+<tr><td>السائق ليس المقبول للطلب</td><td>الخادم يردّ 403 — اعرض الرسالة.</td></tr>
+<tr><td>نجاح (200، EN_ROUTE)</td><td>انتقل لشاشة التسليم (delivery) — السائق يُكمل: وصول → إثبات تسليم.</td></tr>
+<tr><td>الدفع</td><td>المشوار دائمًا محفظة — <b>لا تعرض أيّ واجهة تحصيل نقد</b> للمشوار.</td></tr>
+</table>
+</div>
+
+<!-- 6 acceptance -->
+<h2 id="accept"><span class="n">٦</span> معايير القبول (الاختبار)</h2>
+<div class="panel">
+<ul class="small">
+<li>☑ طلب مشوار (DRIVER_ASSIGNED) ⇒ شاشة الاستلام تعرض «قائمة التسوّق» + زرّ واحد (لا قائمة فحص، لا رمز مزوّد).</li>
+<li>☑ الضغط على «تمّ الشراء» ⇒ نداء <code>POST /dispatch/orders/{id}/errand-picked-up</code> ⇒ 200 + الحالة EN_ROUTE ⇒ الانتقال للتسليم.</li>
+<li>☑ طلب عاديّ (DELIVERY) ⇒ الشاشة بلا تغيير (قائمة الفحص + مسح المزوّد كما كانت).</li>
+<li>☑ لا واجهة تحصيل نقد تظهر في مسار المشوار.</li>
+<li>☑ أخطاء 403/422 تُعرَض رسالتها العربيّة للسائق.</li>
+<li>☑ اختبار widget للحالتين (مشوار / عاديّ) — كما في <code>web .../DriverPickup.test.tsx</code>.</li>
+</ul>
+</div>
+
+<div class="warn"><b>ملاحظة للمالك:</b> هذا تغيير <b>تطبيق الجوّال فقط</b> (منطقة لا أُعدّلها أنا). الخلفيّة جاهزة وحيّة. سائقو الويب يعملون الآن بهذا التدفّق؛ بعد تطبيق هذه المواصفات يعمل سائقو الجوّال أيضًا. لا يلزم أيّ تغيير في القلب الماليّ.</div>
+
+<div class="small" style="text-align:center;margin-top:26px;color:var(--mut)">تووا / Tawa — مواصفات وضع المشوار لتطبيق السائق الجوّال · API حيّ · المرجع: الويب المُنفَّذ · 2026-06-21</div>
+
+</div></body></html>

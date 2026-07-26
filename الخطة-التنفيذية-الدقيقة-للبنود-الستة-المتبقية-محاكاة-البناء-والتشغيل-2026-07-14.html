@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الخطة التنفيذية الدقيقة — محاكاة البناء والتشغيل للبنود الستة المتبقية</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+      --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+      --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+      --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+      --code-bg:#0f1018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+    --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+    --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+    --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+    --code-bg:#0f1018;
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI","Tahoma","Geeza Pro","Noto Naskh Arabic",sans-serif;
+    line-height:1.75; margin:0; padding:0; font-size:16px;
+  }
+  .wrap{max-width:1140px; margin:0 auto; padding:28px 20px 90px;}
+  header.hero{
+    background:linear-gradient(135deg,var(--accent),#2563eb);
+    color:#fff; border-radius:18px; padding:34px 28px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+  }
+  header.hero h1{margin:0 0 10px; font-size:1.6rem; line-height:1.55; text-wrap:balance;}
+  header.hero p{margin:0; opacity:.95; font-size:1.02rem;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+  .meta-chip{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:6px 14px; border-radius:999px; font-size:.85rem;}
+
+  h2{font-size:1.35rem; margin:50px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px;}
+  h3{font-size:1.05rem; margin:22px 0 10px;}
+  h4{font-size:.98rem; margin:16px 0 8px;}
+  .lead{color:var(--sub); font-size:1rem; margin-bottom:18px;}
+
+  .card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,.03);}
+
+  .tbl-wrap{overflow-x:auto; border-radius:12px; border:1px solid var(--border); margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:.9rem;}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{background:var(--code-bg); font-size:.82rem; color:var(--sub);}
+  tr:last-child td{border-bottom:none;}
+  td.num-cell, th.num-cell{font-variant-numeric:tabular-nums; text-align:center;}
+  code{background:var(--code-bg); padding:2px 6px; border-radius:6px; font-size:.85em; direction:ltr; display:inline-block; unicode-bidi:embed;}
+  pre{background:var(--code-bg); padding:14px; border-radius:10px; overflow-x:auto; direction:ltr; text-align:left; font-size:.8rem; border:1px solid var(--border); white-space:pre-wrap;}
+
+  .badge{display:inline-block; padding:4px 12px; border-radius:999px; font-size:.76rem; font-weight:700; white-space:nowrap;}
+  .badge.p0{background:var(--red-bg); color:var(--red);}
+  .badge.p1{background:var(--amber-bg); color:var(--amber);}
+  .badge.p2{background:var(--blue-bg); color:var(--blue);}
+  .badge.low{background:var(--green-bg); color:var(--green);}
+  .badge.med{background:var(--amber-bg); color:var(--amber);}
+  .badge.high{background:var(--red-bg); color:var(--red);}
+  .badge.decision{background:var(--purple-bg); color:var(--purple);}
+
+  .simple{background:var(--blue-bg); border-inline-start:4px solid var(--blue); border-radius:10px; padding:12px 16px; margin:14px 0; font-size:.94rem;}
+  .simple b{color:var(--blue);}
+  .found{background:var(--purple-bg); border-inline-start:4px solid var(--purple); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .found b{color:var(--purple);}
+  .risk{background:var(--red-bg); border-inline-start:4px solid var(--red); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .risk b{color:var(--red);}
+  .safe{background:var(--green-bg); border-inline-start:4px solid var(--green); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .safe b{color:var(--green);}
+  .fix{background:var(--amber-bg); border-inline-start:4px solid var(--amber); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .fix b{color:var(--amber);}
+
+  .item{border:1px solid var(--border); border-radius:18px; padding:26px 26px 22px; margin-bottom:30px; background:var(--card);}
+  .item-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:8px;}
+  .item-title-row{display:flex; align-items:center; gap:12px;}
+  .item-num{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; background:var(--accent); color:#fff; font-weight:800; font-size:1rem; flex-shrink:0;}
+  .item-head h3{margin:0; font-size:1.2rem;}
+  .badges-row{display:flex; gap:6px; flex-wrap:wrap;}
+
+  .original{background:var(--gray-bg); border-radius:10px; padding:12px 16px; margin:14px 0; font-size:.88rem; color:var(--sub); border:1px dashed var(--border);}
+  .original b{color:var(--text);}
+
+  /* three-phase timeline */
+  .timeline{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:20px 0;}
+  @media (max-width:760px){ .timeline{grid-template-columns:1fr;} }
+  .phase{border-radius:14px; padding:16px 16px; border:1px solid var(--border); background:var(--code-bg);}
+  .phase .ph-head{display:flex; align-items:center; gap:8px; margin-bottom:10px; font-weight:800; font-size:.88rem;}
+  .phase.build{border-top:4px solid var(--blue);}
+  .phase.build .ph-head{color:var(--blue);}
+  .phase.run{border-top:4px solid var(--amber);}
+  .phase.run .ph-head{color:var(--amber);}
+  .phase.after{border-top:4px solid var(--purple);}
+  .phase.after .ph-head{color:var(--purple);}
+  .phase ul{margin:0; padding-inline-start:18px; font-size:.83rem;}
+  .phase ul li{margin-bottom:7px;}
+  .timeline-arrow{display:flex; align-items:center; justify-content:center; color:var(--sub); font-size:1.3rem;}
+
+  .steps{counter-reset:stepnum; margin:14px 0; padding:0; list-style:none;}
+  .steps li{counter-increment:stepnum; position:relative; padding-inline-start:38px; margin-bottom:12px; font-size:.92rem;}
+  .steps li::before{content:counter(stepnum); position:absolute; right:0; top:0; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-size:.78rem; font-weight:800; display:flex; align-items:center; justify-content:center;}
+
+  .accept{background:var(--green-bg); border-radius:10px; padding:12px 16px; margin:12px 0; font-size:.9rem; border:1px solid var(--green);}
+  .accept b{color:var(--green);}
+
+  .flow{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:16px 0; font-size:.84rem;}
+  .flow .step{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:9px 13px; text-align:center; flex:1; min-width:130px;}
+  .flow .arrow{color:var(--sub); font-size:1.1rem; flex-shrink:0;}
+  .flow .step.ok{border-color:var(--green); background:var(--green-bg);}
+  .flow .step.stop{border-color:var(--red); background:var(--red-bg);}
+  .flow .step.warn{border-color:var(--amber); background:var(--amber-bg);}
+
+  .priority-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:20px 0;}
+  .pstat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; text-align:center;}
+  .pstat .num{font-size:2rem; font-weight:800;}
+  .pstat .lbl{color:var(--sub); font-size:.85rem; margin-top:4px;}
+  .pstat.p0 .num{color:var(--red);}
+  .pstat.p1 .num{color:var(--amber);}
+  .pstat.p2 .num{color:var(--blue);}
+
+  ul.clean{margin:8px 0; padding-inline-start:22px;}
+  ul.clean li{margin-bottom:6px;}
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:10px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.9rem;}
+  .toc ol{margin:6px 0; padding-inline-start:22px; columns:2; column-gap:24px;}
+  @media (max-width:640px){ .toc ol{columns:1;} }
+  footer{color:var(--sub); font-size:.82rem; text-align:center; margin-top:50px; padding-top:20px; border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>الخطة التنفيذية الدقيقة<br>محاكاة ذهنية كاملة للبناء والتشغيل — البنود الستة المتبقية من تقرير التحقق</h1>
+  <p>هذه الخطة تأخذ كل بند من البنود الستة الناقصة (تقرير التحقق السابق)، وتُجري عليه محاكاة من ثلاث مراحل: ماذا يحدث <b>أثناء الإصلاح/البناء</b>، ماذا يحدث <b>أثناء التشغيل الفعلي</b> بعده، وما هي <b>الأعراض الجانبية</b> التي تظهر لاحقاً — مع حل مُدرَج لكل عرَض جانبي حقيقي اكتُشف. كل نتيجة هنا مبنية على تحقق مباشر من الخادم والكود الآن، وليس افتراضاً.</p>
+  <div class="meta-row">
+    <span class="meta-chip">📅 2026-07-14</span>
+    <span class="meta-chip">🧪 محاكاة + تحقق حي من الخادم الفعلي</span>
+    <span class="meta-chip">📋 خطة فقط — لا تنفيذ بعد</span>
+  </div>
+</header>
+
+<div class="toc">
+  <b>محتويات الخطة</b>
+  <ol>
+    <li><a href="#priority">ترتيب الأولوية والمخاطر</a></li>
+    <li><a href="#item1">1) إصلاح pull_backups.sh</a></li>
+    <li><a href="#item2">2) تثبيت OSRM بالبصمة</a></li>
+    <li><a href="#item3">3) فحص دوري حقيقي على بيانات حية</a></li>
+    <li><a href="#item4">4) توحيد إعداد SSH</a></li>
+    <li><a href="#item5">5) بوابة CI لانجراف OpenAPI</a></li>
+    <li><a href="#item6">6) ربط check_invariants.py</a></li>
+    <li><a href="#sequence">التسلسل الآمن الموصى به</a></li>
+    <li><a href="#operator">ما يحتاج قراراً/فعلاً منك تحديداً</a></li>
+  </ol>
+</div>
+
+<h2 id="priority">1) ترتيب الأولوية والمخاطر — نظرة عامة</h2>
+<p class="lead">اكتشفت المحاكاة نتيجتين غير متوقَّعتين قبل حتى البدء بالتنفيذ — واحدة تجعل البند الأول أكثر إلحاحاً مما بدا، والأخرى تجعل البند الثاني أكثر إلحاحاً بكثير من "تحسين تثبيت" عادي. التفاصيل الكاملة في كل قسم.</p>
+
+<div class="priority-grid">
+  <div class="pstat p0"><div class="num">2</div><div class="lbl">أولوية عاجلة (P0) — عطل حقيقي قائم الآن</div></div>
+  <div class="pstat p1"><div class="num">2</div><div class="lbl">أولوية متوسطة (P1) — تحسين أمني/جودة حقيقي</div></div>
+  <div class="pstat p2"><div class="num">2</div><div class="lbl">أولوية مخطَّطة (P2) — يحتاج قرار بنية أولاً</div></div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>#</th><th>البند</th><th>الأولوية</th><th>حجم المخاطرة</th><th>اكتشاف جديد أثناء المحاكاة؟</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>إصلاح pull_backups.sh</td><td><span class="badge p0">P0</span></td><td><span class="badge low">منخفضة بعد التحقق</span></td><td><b>نعم</b> — نسخة حية منفصلة تعمل فعلياً كل ليلة بمعزل عن المستودع</td></tr>
+<tr><td>2</td><td>تثبيت OSRM بالبصمة</td><td><span class="badge p0">P0</span></td><td><span class="badge med">متوسطة</span></td><td><b>نعم</b> — الصورة المرجعية الأساسية غير قابلة للسحب إطلاقاً الآن، ليست فقط "غير مثبَّتة"</td></tr>
+<tr><td>3</td><td>فحص دوري حقيقي</td><td><span class="badge p2">P2</span></td><td><span class="badge high">تحتاج قرار بنية</span></td><td><b>نعم</b> — لا توجد قناة تنبيه فعلية مُفعَّلة حالياً حتى لو بُني الفحص</td></tr>
+<tr><td>4</td><td>توحيد SSH</td><td><span class="badge p1">P1</span></td><td><span class="badge med">متوسطة</span></td><td><b>نعم</b> — 131 سكربتاً (لا ~30)، لكنها جميعاً تستهدف هوية واحدة فقط</td></tr>
+<tr><td>5</td><td>بوابة CI لـOpenAPI</td><td><span class="badge p2">P2</span></td><td><span class="badge med">متوسطة</span></td><td><b>نعم</b> — أدوات الفحص جاهزة فعلاً، لكن بلا آلية نجاح/فشل قابلة للربط</td></tr>
+<tr><td>6</td><td>ربط check_invariants.py</td><td><span class="badge p1">P1</span></td><td><span class="badge low">منخفضة</span></td><td>لا — تكرار مباشر وآمن لنمط T21 المُثبَت مسبقاً</td></tr>
+</tbody>
+</table></div>
+
+<!-- ================= ITEM 1 ================= -->
+<div class="item" id="item1">
+  <div class="item-head">
+    <div class="item-title-row"><span class="item-num">1</span><h3>إصلاح pull_backups.sh</h3></div>
+    <div class="badges-row"><span class="badge p0">P0 — عاجل</span><span class="badge low">مخاطرة منخفضة بعد التحقق</span></div>
+  </div>
+
+  <div class="found">
+    <b>اكتشاف حرج أثناء المحاكاة:</b> الملف المُتتبَّع في المستودع (<code>deploy/backup/pull_backups.sh</code>) <b>ليس</b> الملف الذي يعمل فعلياً كل ليلة. فحصتُ الجدولة الحقيقية على هذا الجهاز الآن (<code>crontab -l</code>) ووجدت مهمة مجدوَلة تعمل يومياً الساعة <code>03:15</code> صباحاً بلا إشراف بشري، تُشغِّل نسخة <b>منفصلة تماماً</b> في <code>/home/a/Desktop/APP/backups_offsite/pull_backups.sh</code> — خارج المستودع بالكامل، بلا رابط رمزي (symlink) يربطها بالنسخة المُتتبَّعة في Git. النسختان متطابقتان المحتوى <b>حالياً</b> (تحقَّقت بـ<code>diff</code>، صفر اختلاف) — لكن هذا التطابق مجرد صدفة تاريخية، وليس مضموناً هيكلياً.
+  </div>
+
+  <div class="original"><b>معنى هذا عملياً:</b> لو أُصلحت النسخة المُتتبَّعة في Git فقط (كما كان سيحدث لو لم تُطلَب هذه المحاكاة الدقيقة)، فستبدو المهمة "منجزة" في سجل الـcommit — بينما المهمة الحقيقية التي تعمل كل ليلة ضد خادم الإنتاج (<code>deploy@178.105.87.192</code>) ستبقى تستخدم <code>StrictHostKeyChecking=no</code> الضعيف دون أن يلاحظ أحد.</div>
+
+  <div class="timeline">
+    <div class="phase build">
+      <div class="ph-head">🔧 أثناء الإصلاح</div>
+      <ul>
+        <li>يجب تعديل <b>كلا الملفين</b> بنفس الاستبدال (<code>no</code> → <code>accept-new</code>) في السطرين 18 و26، أو الأفضل: استبدال النسخة الحية بـ<b>رابط رمزي</b> يشير إلى نسخة المستودع — هذا يمنع أي انفراق مستقبلي بينهما نهائياً بدل تكرار نفس الخطأ لاحقاً.</li>
+        <li>فحص بنيوي بسيط (<code>bash -n</code>) كافٍ للتأكد من سلامة الصياغة — لا حاجة لتشغيل فعلي أثناء التعديل نفسه.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase run">
+      <div class="ph-head">⚙️ أثناء التشغيل الفعلي (03:15 يومياً)</div>
+      <ul>
+        <li>تحقَّقتُ من <code>known_hosts</code> على هذا الجهاز: يوجد إدخال واحد صحيح وغير متضارب لكل نوع مفتاح (ed25519 وrsa وecdsa) لعنوان <code>178.105.87.192</code> — لا تضارب، لا تكرار.</li>
+        <li>بما أن نفس هذا العنوان يُستخدَم يومياً بنجاح عبر 130+ سكربتاً آخر، فإن مفتاحه المُسجَّل شبه مؤكَّد أنه صحيح وحالي — الانتقال إلى <code>accept-new</code> سيكون <b>بلا أي تغيير سلوكي ملحوظ اليوم</b>: نفس النجاح المعتاد.</li>
+        <li>الفارق الحقيقي يظهر فقط في سيناريو مستقبلي: لو أُعيد بناء خادم Hetzner أو دُوِّر مفتاحه دون تحديث <code>known_hosts</code> هنا — عندها <code>accept-new</code> سيرفض الاتصال ويسجّل <code>FAIL: ssh list</code> بوضوح، بدل أن يقبل <code>no</code> أي مفتاح صامتاً (وهذا بالضبط الثغرة الأمنية التي يغلقها الإصلاح).</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase after">
+      <div class="ph-head">🔍 أعراض جانبية بعد الإصلاح</div>
+      <ul>
+        <li>لا عرَض جانبي سلوكي جديد نتيجة هذا الإصلاح تحديداً (مؤكَّد بالتحقق أعلاه).</li>
+        <li>عرَض جانبي <b>موجود مسبقاً وغير متعلق بهذا الإصلاح</b>، لكن يستحق التسجيل بصراحة: فشل السكربت (لأي سبب) لا يُنبِّه أحداً — يُسجَّل في <code>pull.log</code> فقط، ولا توجد مراقبة له. هذا لا يمنع المضي في الإصلاح الحالي، لكنه فرصة تحسين ملاصقة يمكن ضمّها لاحقاً (ربط بقناة التنبيه في البند 3 أدناه، لأنها نفس القناة بالضبط).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>خطوات التنفيذ</h4>
+  <ol class="steps">
+    <li>استبدال <code>StrictHostKeyChecking=no</code> بـ<code>accept-new</code> في السطرين 18 و26 من <code>deploy/backup/pull_backups.sh</code> (نفس النمط المُطبَّق سابقاً على 130 سكربتاً).</li>
+    <li>حذف <code>/home/a/Desktop/APP/backups_offsite/pull_backups.sh</code> واستبداله برابط رمزي: <code>ln -s /home/a/Desktop/APP/platform/deploy/backup/pull_backups.sh /home/a/Desktop/APP/backups_offsite/pull_backups.sh</code> — يضمن أن أي إصلاح مستقبلي في المستودع يسري تلقائياً على النسخة المجدوَلة فعلياً.</li>
+    <li>تشغيل السكربت يدوياً مرة واحدة للتأكد (آمن — قراءة فقط + نسخ ملفات نسخ احتياطي موجودة أصلاً، لا كتابة على الخادم البعيد).</li>
+  </ol>
+  <div class="accept"><b>معيار القبول:</b> تشغيل يدوي واحد يطبع <code>pull done: N new backup(s)</code> برمز خروج 0، و<code>crontab -l</code> يستمر بالإشارة لنفس المسار (الآن رابط رمزي) دون تعديل الجدولة نفسها.</div>
+</div>
+
+<!-- ================= ITEM 2 ================= -->
+<div class="item" id="item2">
+  <div class="item-head">
+    <div class="item-title-row"><span class="item-num">2</span><h3>تثبيت OSRM بالبصمة (digest)</h3></div>
+    <div class="badges-row"><span class="badge p0">P0 — عاجل</span><span class="badge med">مخاطرة متوسطة</span></div>
+  </div>
+
+  <div class="found">
+    <b>اكتشاف حرج يرفع الأولوية:</b> شغَّلتُ <code>docker manifest inspect osrm/osrm-backend:v5.27.1</code> الآن — النتيجة: <code>no such manifest</code>. الوسم (tag) المكتوب في <code>docker-compose.yml</code> الأساسي <b>غير قابل للسحب إطلاقاً منذ إزالته من Docker Hub</b> (نفس السبب المُوثَّق في تعليق داخل <code>docker-compose.staging.yml</code> نفسه). هذه ليست مسألة "تثبيت بصمة إضافي" فحسب — إنها مرجع صورة <b>معطوب فعلياً الآن</b> في الملف الأساسي.
+  </div>
+
+  <div class="original"><b>الأثر العملي:</b> أي تشغيل محلي/تطوير عادي لا يُحمِّل طبقة <code>-f docker-compose.staging.yml</code> فوق الأساسية سيفشل بالكامل عند <code>docker compose pull</code> أو <code>up --build</code> لخدمة <code>osrm</code> — بمعزل تام عن أي عمل من هذه الجلسة.</div>
+
+  <div class="timeline">
+    <div class="phase build">
+      <div class="ph-head">🔧 أثناء الإصلاح</div>
+      <ul>
+        <li>الإصلاح الصحيح <b>ليس</b> إضافة <code>@sha256:...</code> بعد <code>v5.27.1</code> (مستحيل — الوسم لا يُحلّ إطلاقاً). الإصلاح الصحيح: توجيه الملف الأساسي لنفس المرجع الذي تستخدمه staging بالفعل وتحقَّقنا أنه يعمل: <code>osrm/osrm-backend:latest@sha256:af5d...ee409</code>.</li>
+        <li><b>خطر حقيقي يستحق فحصاً قبل التبديل:</b> ملفات بيانات التوجيه المُعالَجة مسبقاً (<code>.osrm</code>) مرتبطة بإصدار المحرّك الذي بناها — لو كانت هناك بيانات <code>.osrm</code> محلية بُنيت فعلياً بإصدار مختلف عن <code>latest</code> الحالي، فقد يرفض الحاوية الإقلاع (فشل نظيف وواضح عادة، وليس نتائج توجيه خاطئة صامتة — لكنه يستحق فحصاً قبل الثقة به).</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase run">
+      <div class="ph-head">⚙️ أثناء التشغيل الفعلي</div>
+      <ul>
+        <li>staging تشغّل بالفعل هذا المرجع الدقيق بنجاح — دليل عملي أن الصورة سليمة وقابلة للسحب والتشغيل.</li>
+        <li>يجب التحقق أن حاوية <code>osrm</code> المحلية تُقلِع بنجاح بعد التبديل (فحص صحة/health check) قبل اعتبار الإصلاح مكتملاً — وليس الاكتفاء بنجاح السحب فقط.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase after">
+      <div class="ph-head">🔍 أعراض جانبية بعد الإصلاح</div>
+      <ul>
+        <li><b>احتمال انحراف حقيقي في أرقام العمل:</b> إصدارات OSRM المختلفة قد تُنتج حسابات مسافة/زمن وصول مختلفة قليلاً لنفس الرحلة (تحسينات خوارزمية بين الإصدارات). هذا الرقم يُغذّي <code>eta_minutes</code> في محرّك تسجيل التوزيع (<code>DispatchScoringEngine</code>) وتقديرات وقت الوصول المعروضة للعميل — تغيّر إصدار محرّك التوجيه ليس تجميلياً بحتاً.</li>
+        <li><b>الحل المُدرَج في الخطة:</b> بعد التبديل، تشغيل 3–5 طلبات توجيه فعلية على مسارات معروفة (نقاط بداية/نهاية حقيقية داخل طرابلس مثلاً) ومقارنة الأزمنة الناتجة قبل/بعد يدوياً — رصد أي انحراف جسيم (وليس افتراض التطابق التام).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>خطوات التنفيذ</h4>
+  <ol class="steps">
+    <li>تعديل سطر صورة <code>osrm</code> في <code>docker-compose.yml</code> الأساسي ليطابق حرفياً مرجع staging المُثبَّت بالبصمة.</li>
+    <li>سحب الصورة الجديدة والتأكد من نجاح الإقلاع (health check / سجلات الحاوية خالية من أخطاء تنسيق بيانات).</li>
+    <li>تشغيل 3–5 طلبات <code>/route/v1/driving/...</code> فعلية على مسارات معروفة، وتسجيل الأزمنة الناتجة كخط أساس جديد للمقارنة المستقبلية.</li>
+    <li>(اختياري، تبسيط لاحق) بما أن الملف الأساسي أصبح مطابقاً لملف staging override، يمكن التفكير لاحقاً في تبسيط الأخير بما أنه لم يعد يُغيّر شيئاً فعلياً — ليس عاجلاً.</li>
+  </ol>
+  <div class="accept"><b>معيار القبول:</b> <code>docker compose up osrm</code> من الملف الأساسي وحده (بدون طبقة staging) ينجح بالكامل، وطلب توجيه تجريبي واحد على الأقل يُعيد استجابة صحيحة (200 + مدة زمنية منطقية).</div>
+</div>
+
+<!-- ================= ITEM 3 ================= -->
+<div class="item" id="item3">
+  <div class="item-head">
+    <div class="item-title-row"><span class="item-num">3</span><h3>فحص دوري حقيقي على بيانات حية</h3></div>
+    <div class="badges-row"><span class="badge p2">P2 — يحتاج قرار بنية</span><span class="badge high">مخاطرة أعلى (توسيع بنية جديدة)</span></div>
+  </div>
+
+  <div class="found">
+    <b>اكتشافان حاسمان يجب حسمهما كقرار قبل أي بناء:</b>
+    <ul class="clean" style="margin-top:8px;">
+      <li><b>لا توجد بنية "دورية" في المشروع إطلاقاً حالياً</b> — بحثتُ في كل ملفات <code>.github/workflows/</code>: لا يوجد ملف واحد بمُشغِّل <code>schedule:</code>. البوابات المالية المُضافة (T21) تعمل عند push/PR فقط.</li>
+      <li><b>قناة التنبيه موجودة في الكود لكنها غير مُفعَّلة أبداً:</b> يوجد فعلياً وحدة تنبيه جاهزة (<code>backend/app/core/alert_webhook.py</code>) تدعم إرسال تنبيهات Slack/webhook عامة، مع منع التكرار عبر Redis. لكنها مبنية على متغيّر بيئة <code>ALERT_WEBHOOK_URL</code> — بحثت في كل ملفات <code>.env</code> و<code>.env.example</code> في المشروع: <b>غير مضبوط في أي منها إطلاقاً</b>. هذا يطابق تماماً ما تذكره <code>CLAUDE.md</code> نفسه: "مزوّد تنبيهات العمليات" مُدرَج كبوابة إطلاق غير برمجية لا تزال مفتوحة.</li>
+    </ul>
+  </div>
+
+  <div class="original"><b>الأثر:</b> حتى لو بُني الفحص الدوري بأعلى جودة، فإن قيمته الموعودة ("اكتشاف خلال دقائق") تعتمد على وجود من/ما يرى التنبيه. اليوم، أي فشل سيُسجَّل في ملف محلي فقط ولن يصل لأي إنسان تلقائياً.</div>
+
+  <h4>قرار بنية مطلوب أولاً (لا يمكن اختياره نيابة عنك بصمت)</h4>
+  <div class="tbl-wrap"><table>
+  <thead><tr><th>الخيار</th><th>الإيجابيات</th><th>السلبيات</th></tr></thead>
+  <tbody>
+  <tr><td><b>أ) Runner ذاتي الاستضافة لـGitHub Actions</b> على خادم test1/Hetzner</td><td>يظهر في واجهة GitHub مباشرة، يعيد استخدام نمط CI الحالي</td><td>حدود ثقة أوسع بكثير (تنفيذ كود حقيقي على البنية الحقيقية) — يتطلب تقييداً صارماً بألا يعمل إلا عبر <code>schedule:</code>/<code>workflow_dispatch</code> لا <code>pull_request</code>؛ لا توجد بنية runners ذاتية في المشروع إطلاقاً اليوم — بناء من الصفر</td></tr>
+  <tr><td><b>ب) مهمة cron على مستوى الخادم نفسه</b> (تكرار حرفي لنمط pull_backups.sh المُثبَت)</td><td>نفس الآلية المُثبَتة فعلياً (03:15 يومياً منذ فترة)، صفر حدود ثقة جديدة، دقائق إعداد</td><td>لا تظهر في واجهة GitHub — تعتمد على السجل المحلي/قناة التنبيه فقط</td></tr>
+  </tbody>
+  </table></div>
+  <div class="fix"><b>التوصية:</b> الخيار (ب) — نفس نمط <code>pull_backups.sh</code> المُثبَت والموثوق فعلاً، دون فتح حدود ثقة جديدة لا يحتاجها المشروع لهذا الغرض تحديداً.</div>
+
+  <div class="timeline">
+    <div class="phase build">
+      <div class="ph-head">🔧 أثناء البناء (على افتراض اختيار ب)</div>
+      <ul>
+        <li>سكربت غلاف بسيط يُشغِّل <code>finance_invariants.py</code> ثم <code>check_invariants.py</code> على التوالي، يلتقط رمز الخروج من كل منهما.</li>
+        <li>عند أي فشل: استدعاء <code>ALERT_WEBHOOK_URL</code> مباشرة (POST بسيط بدون الحاجة لاستيراد تطبيق FastAPI كاملاً) — مع تصميم "فشل مفتوح" مطابق لفلسفة <code>alert_webhook.py</code> نفسها: لو المتغيّر غير مضبوط، السكربت يُسجِّل محلياً فقط ولا ينهار.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase run">
+      <div class="ph-head">⚙️ أثناء التشغيل الفعلي</div>
+      <ul>
+        <li>الاستعلامات كلها للقراءة فقط (مفروضة برمجياً عبر <code>db_read._assert_read_only</code>) — تشغيلها كل ساعة على قاعدة بيانات حية آمن تماماً، بلا خطر كتابة أو قفل ثقيل (فحوصات مخطط/تجميع خفيفة).</li>
+        <li>سيناريو فشل حقيقي: كود جديد يُضيف عموداً مالياً بنوع <code>float</code> بالخطأ → الفحص يكتشفه خلال أول تشغيلة تالية (ساعة واحدة كحد أقصى لو كانت الجدولة ساعية) → إن كان <code>ALERT_WEBHOOK_URL</code> مضبوطاً، تنبيه فوري؛ إن لم يكن، يبقى الاكتشاف محلياً فقط.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase after">
+      <div class="ph-head">🔍 أعراض جانبية بعد البناء</div>
+      <ul>
+        <li>الفجوة الوحيدة المتبقية بعد البناء الكامل هي بالضبط <code>ALERT_WEBHOOK_URL</code> غير المضبوط — وهذا قرار/فعل يخصك أنت تحديداً (رابط Slack/webhook حقيقي)، وليس شيئاً يمكن إكماله من طرفي وحدي. سأُدرجه صراحة في قسم "ما يحتاج قراراً منك" أسفل هذه الخطة.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>خطوات التنفيذ (بعد اختيارك للخيار ب أو أ)</h4>
+  <ol class="steps">
+    <li>كتابة <code>scripts/run_live_invariant_checks.sh</code> يُشغِّل الأداتين ويُرسل تنبيهاً عند الفشل.</li>
+    <li>تسجيله في crontab الخادم المستهدف (نفس آلية <code>pull_backups.sh</code>).</li>
+    <li>تشغيل تجريبي يدوي أول مرة للتأكد من عمله دون أخطاء بيئة.</li>
+    <li>(بعد أن توفّر رابط Slack/webhook حقيقي) ضبط <code>ALERT_WEBHOOK_URL</code> في بيئة الخادم واختبار تنبيه حقيقي فعلي واحد.</li>
+  </ol>
+  <div class="accept"><b>معيار القبول:</b> تشغيلة يدوية واحدة تكتمل بنجاح وتطبع ملخص PASS/FAIL لكل الفحوصات؛ وبعد ضبط رابط التنبيه، فشل مُتعمَّد تجريبي واحد يصل فعلياً كرسالة حقيقية.</div>
+</div>
+
+<!-- ================= ITEM 4 ================= -->
+<div class="item" id="item4">
+  <div class="item-head">
+    <div class="item-title-row"><span class="item-num">4</span><h3>توحيد إعداد SSH</h3></div>
+    <div class="badges-row"><span class="badge p1">P1</span><span class="badge med">مخاطرة متوسطة (نطاق تنفيذ واسع)</span></div>
+  </div>
+
+  <div class="found">
+    <b>اكتشاف يُبسِّط الحل المتوقَّع:</b> العدد الفعلي 131 سكربتاً (وليس ~30 كما قُدِّر أولاً) — لكن فحصاً دقيقاً الآن لكل الأهداف يُظهر أن <b>كل السكربتات الـ131 تستهدف هوية اتصال واحدة فقط</b>: <code>deploy@178.105.87.192</code> بنفس المفتاح <code>~/.ssh/tawa_staging_ed25519</code>. هذا أبسط بكثير من افتراض عدة "ملفات شخصية" مختلفة — التوحيد هنا هو دمج نسخة واحدة مكررة 131 مرة، لا 3 أنماط مختلفة.
+  </div>
+
+  <div class="timeline">
+    <div class="phase build">
+      <div class="ph-head">🔧 أثناء البناء</div>
+      <ul>
+        <li><b>قرار مهم:</b> ملف <code>~/.ssh/config</code> يعيش خارج المستودع (محلي لكل جهاز) — لو استُخدِم، يجب توفيره أيضاً على أي جهاز آخر تُشغَّل منه هذه السكربتات (مثل خادم Ubuntu على الشبكة المحلية)، وإلا انكسرت هناك. البديل الأأمن: سكربت مشترك <b>مُتتبَّع في Git</b> (<code>deploy/lib/ssh_common.sh</code>) يُصدَّر منه متغيّر خيارات SSH — يسافر تلقائياً مع المستودع لأي جهاز.</li>
+        <li>تركيز المخاطرة: أي خطأ في الملف المشترك الواحد يكسر 131 سكربتاً دفعة واحدة بدل واحد فقط — يستوجب اختباراً فورياً بعد التطبيق مباشرة، لا الثقة العمياء.</li>
+        <li>تعديل ميكانيكي واسع النطاق (131 ملفاً) — يستدعي نفس انضباط "تحقق قبل/بعد بعدد دقيق" المُتبَع بنجاح سابقاً في هذه الجلسة (إصلاحات accept-new وQuery bounds)، وليس استبدالاً أعمى جماعياً.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase run">
+      <div class="ph-head">⚙️ أثناء التشغيل الفعلي</div>
+      <ul>
+        <li>لا تغيير سلوكي مقصود — نفس خيارات SSH بالضبط، فقط من مصدر واحد بدل 131 نسخة. نافذة الخطر الحقيقية هي لحظة التطبيق نفسها فقط، وليست تشغيلاً مستمراً لاحقاً.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase after">
+      <div class="ph-head">🔍 أعراض جانبية بعد البناء</div>
+      <ul>
+        <li><b>تآكل تدريجي للاتفاقية:</b> أي سكربت جديد يُكتَب مستقبلاً (بواسطة أي مطوّر أو جلسة Claude لاحقة) قد يعود لكتابة خيارات SSH يدوياً بدل استخدام الملف المشترك، لعدم معرفته بالاتفاقية — هذا ليس عيباً برمجياً بل توثيقياً. <b>الحل المُدرَج:</b> إضافة سطر واضح في <code>CLAUDE.md</code> أو <code>deploy/README.md</code> يوثّق الاتفاقية الجديدة صراحة، لا تركها ضمنية.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>خطوات التنفيذ</h4>
+  <ol class="steps">
+    <li>إنشاء <code>deploy/lib/ssh_common.sh</code> يُعرِّف <code>SSH_OPTS=(-i "$SSH_KEY" -p 22 -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20)</code>.</li>
+    <li>إعادة كتابة السكربتات الـ131 لتستدعي (<code>source</code>) هذا الملف وتستخدم <code>"${SSH_OPTS[@]}"</code> بدل التكرار.</li>
+    <li>اختبار عملي فوري لعيّنة تمثيلية من فئات مختلفة من السكربتات (فحص قراءة، نشر) قبل الوثوق بالتغيير على نطاقه الكامل.</li>
+    <li>توثيق الاتفاقية الجديدة في مكان مرئي (<code>deploy/README.md</code>).</li>
+    <li>تشغيل كامل بوابات الفحص (pre-commit + CI) للتأكد من عدم كسر شيء آخر.</li>
+  </ol>
+  <div class="accept"><b>معيار القبول:</b> <code>grep -c StrictHostKeyChecking deploy/</code> يُظهر استخدام الملف المشترك فقط دون تكرار مباشر، وعيّنة اختبار حقيقية من 3 سكربتات مختلفة تنجح بلا تغيير سلوكي.</div>
+</div>
+
+<!-- ================= ITEM 5 ================= -->
+<div class="item" id="item5">
+  <div class="item-head">
+    <div class="item-title-row"><span class="item-num">5</span><h3>بوابة CI لانجراف OpenAPI</h3></div>
+    <div class="badges-row"><span class="badge p2">P2</span><span class="badge med">مخاطرة متوسطة</span></div>
+  </div>
+
+  <div class="found">
+    <b>اكتشاف يُغيّر طبيعة العمل المطلوب:</b> أداتا الفحص (<code>_ai_tools/bin/backend_route_inventory.py</code> و<code>openapi_backend_gap_audit.py</code>) <b>موجودتان فعلاً</b> وتقارنان مسارات الـAPI الفعلية بالكود مقابل <code>openapi.yaml</code> — هذا بالضبط منطق المقارنة المطلوب في الاقتراح الأصلي. لكن فحصاً دقيقاً لدالة <code>main()</code> في <code>openapi_backend_gap_audit.py</code> يُظهر أنها <b>أداة تقرير بحتة</b>: لا <code>sys.exit()</code>، لا إشارة نجاح/فشل قابلة للربط بـCI على الإطلاق حالياً.
+  </div>
+
+  <div class="risk">
+    <b>الخطر الحقيقي لو نُفِّذ بلا محاكاة:</b> لو أُضيف رمز خروج فاشل بمجرد وجود أي مسار غير موثَّق، وربطناه فوراً كبوابة <b>حاجبة (blocking)</b>، فسيتحول CI بأكمله للأحمر على أول push/PR قادم — بسبب فجوة توثيق قديمة موجودة أصلاً (المذكورة سابقاً بحجم 110 مقابل 531 في تقرير التدقيق الأول)، وليس بسبب أي خطأ في ذلك الـPR نفسه. هذا بالضبط الفخ الذي وقع فيه المشروع سابقاً مرتين وحلّه بنفس الطريقة في نفس ملف CI: خطوة <b>"Ruff RATCHET"</b> تفحص فقط الملفات المتغيّرة في الـPR (لا الشجرة كاملة)، وخطوة <b>i18n lint</b> صُمِّمت <code>continue-on-error: true</code> صراحةً بسبب "التراكم التاريخي الموجود".
+  </div>
+
+  <div class="timeline">
+    <div class="phase build">
+      <div class="ph-head">🔧 أثناء البناء</div>
+      <ul>
+        <li>إضافة وضع <code>--check</code> لـ<code>openapi_backend_gap_audit.py</code> يُعيد رمز خروج 1 عند وجود مسارات غير موثَّقة — طبقة جديدة يجب بناؤها، الأداة الحالية لا تملكها.</li>
+        <li>بناء منطق "ratchet" حقيقي (مقارنة قائمة المسارات غير الموثَّقة بين فرع الأساس والفرع الحالي، وليس فحص القائمة كاملة) — نفس الآلية المستخدَمة فعلاً في خطوة Ruff RATCHET بنفس الملف، يمكن تقليدها مباشرة بدل اختراع نمط جديد.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase run">
+      <div class="ph-head">⚙️ أثناء التشغيل الفعلي</div>
+      <ul>
+        <li>بعد الربط الصحيح (بنمط ratchet): PR يضيف نقطة نهاية جديدة <b>بلا</b> توثيقها في <code>openapi.yaml</code> → فشل واضح <b>لهذا الـPR فقط</b>. PR لا يلمس الـAPI إطلاقاً → يمر بلا تأثر بالتراكم القديم.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase after">
+      <div class="ph-head">🔍 أعراض جانبية بعد البناء</div>
+      <ul>
+        <li>التراكم القديم (فجوة 110/531 أو ما يعادلها اليوم) <b>يبقى كما هو مجمَّداً</b>، ولا يتقلَّص تلقائياً بمجرد بناء البوابة — البوابة تمنع التفاقم فقط، لا تُصلِح الماضي. <b>يجب توثيح هذا صراحة</b> كمقايضة مقبولة (تماماً كحال ratchet ruff وi18n في نفس الملف اليوم) بدل تقديمها كأنها تحل الفجوة القديمة بالكامل.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>خطوات التنفيذ</h4>
+  <ol class="steps">
+    <li>إضافة وضع <code>--check</code> (رمز خروج) لأداة <code>openapi_backend_gap_audit.py</code>.</li>
+    <li>خطوة CI جديدة على نمط "Ruff RATCHET" الموجود بالضبط: تشغيل الأداة على <code>origin/${BASE_REF}</code> و<code>HEAD</code>، فشل فقط عند ظهور مسار جديد غير موثَّق في HEAD لم يكن في القاعدة.</li>
+    <li>تشغيل محلي على الشجرة الحالية أولاً للتأكد أن خط الأساس اليوم لا يُسقِط اختباراً زائفاً بنفسه.</li>
+    <li>توثيق صريح لحالة "التراكم القديم مُجمَّد لا مُصلَح" في تعليق داخل ملف CI (بنفس أسلوب التعليقات التفسيرية الموجودة فعلاً لخطوتَي ruff وi18n).</li>
+  </ol>
+  <div class="accept"><b>معيار القبول:</b> تشغيل محلي للوضع الجديد على الشجرة الحالية ينجح بلا فشل زائف؛ إضافة نقطة نهاية تجريبية بلا توثيق في فرع تجريبي تُسقِط الفحص فوراً؛ إزالتها تُعيده للنجاح.</div>
+</div>
+
+<!-- ================= ITEM 6 ================= -->
+<div class="item" id="item6">
+  <div class="item-head">
+    <div class="item-title-row"><span class="item-num">6</span><h3>ربط check_invariants.py</h3></div>
+    <div class="badges-row"><span class="badge p1">P1</span><span class="badge low">مخاطرة منخفضة</span></div>
+  </div>
+
+  <div class="safe">
+    <b>تحقَّقتُ الآن من كل التفاصيل التي تجعل هذا البند الأقل مخاطرة من الستة:</b> فحوصات <code>check_invariants.py</code> التسعة كلها استعلامات سلامة مخطط/تكامل مرجعي (FK integrity) — مثل "لا طلبات بلا عميل مرتبط"، "لا نسخة alembic مكرَّرة" — وكلها تنجح بصفر صفوف بشكل صحيح وطبيعي على قاعدة بيانات فارغة مُهاجَرة حديثاً فقط، تماماً كفحوصات <code>finance_invariants.py</code> الثلاثة التي رُبطت بنجاح في T21. كما تحقَّقتُ أن الملف ينتهي بـ<code>sys.exit(main())</code> ورمز خروج صحيح (0 عند النجاح، 1 عند أي فشل) — جاهز تماماً للربط دون أي تعديل بنيوي.
+  </div>
+
+  <div class="timeline">
+    <div class="phase build">
+      <div class="ph-head">🔧 أثناء البناء</div>
+      <ul>
+        <li>إضافة خطوة واحدة فقط لوظيفة <code>finance-invariants</code> الموجودة فعلاً في CI (بعد إعادة تسميتها لتعكس الأداتين معاً) — لا حاوية جديدة، لا ترحيل إضافي؛ نفس <code>tawalocal-postgres-1</code> المُقام مسبقاً في نفس الوظيفة يُعاد استخدامه مباشرة.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase run">
+      <div class="ph-head">⚙️ أثناء التشغيل الفعلي</div>
+      <ul>
+        <li>يعمل بنفس آلية <code>finance_invariants.py</code> تماماً — تحقَّق منه CI عند كل push/PR، على نفس القاعدة الفارغة المُهاجَرة.</li>
+      </ul>
+    </div>
+    <div class="timeline-arrow">←</div>
+    <div class="phase after">
+      <div class="ph-head">🔍 أعراض جانبية بعد البناء</div>
+      <ul>
+        <li>لم يظهر أي عرَض جانبي حقيقي في هذا البند بعد المحاكاة — أقرب البنود الستة لتكرار مباشر ومُثبَت لعمل سابق ناجح بالفعل (T21).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4>خطوات التنفيذ</h4>
+  <ol class="steps">
+    <li>إضافة خطوة <code>python3 tools/agent_scenarios/check_invariants.py</code> إلى وظيفة <code>finance-invariants</code> الموجودة، بعد خطوة <code>finance_invariants.py</code> مباشرة.</li>
+    <li>إعادة تسمية الوظيفة إلى ما يعكس الأداتين معاً (مثل <code>db-invariants</code>) للوضوح.</li>
+    <li>تشغيل محلي تجريبي (كما فُعل مع finance_invariants.py سابقاً، قراءة فقط ضد قاعدة test1 الحقيقية) للتأكد من نتيجة PASS كاملة قبل الاعتماد عليه في CI.</li>
+  </ol>
+  <div class="accept"><b>معيار القبول:</b> تشغيل محلي مباشر يطبع "9 run, 9 passed, 0 failed"، ثم نجاح الوظيفة كاملة في CI بعد الدفع.</div>
+</div>
+
+<h2 id="sequence">2) التسلسل الآمن الموصى به</h2>
+<p class="lead">البنود الستة مستقلة عن بعضها بنيوياً (لا يعتمد أحدها على إتمام الآخر تقنياً) — الترتيب أدناه مبني على الأولوية والمخاطرة فقط، وليس على تبعية إجبارية.</p>
+<div class="flow">
+  <div class="step ok">1) pull_backups.sh<br><span style="font-size:.75rem;color:var(--sub)">P0 · دقائق</span></div><div class="arrow">←</div>
+  <div class="step ok">2) OSRM بالبصمة<br><span style="font-size:.75rem;color:var(--sub)">P0 · ساعة تقريباً</span></div><div class="arrow">←</div>
+  <div class="step warn">6) check_invariants.py<br><span style="font-size:.75rem;color:var(--sub)">P1 · دقائق</span></div><div class="arrow">←</div>
+  <div class="step warn">4) توحيد SSH<br><span style="font-size:.75rem;color:var(--sub)">P1 · نصف يوم</span></div><div class="arrow">←</div>
+  <div class="step stop">5) بوابة OpenAPI<br><span style="font-size:.75rem;color:var(--sub)">P2 · يوم تقريباً</span></div><div class="arrow">←</div>
+  <div class="step stop">3) فحص دوري حي<br><span style="font-size:.75rem;color:var(--sub)">P2 · يحتاج قرارك أولاً</span></div>
+</div>
+
+<h2 id="operator">3) ما يحتاج قراراً أو فعلاً منك تحديداً (لا يمكن إكماله من طرفي وحدي)</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>القرار/الفعل المطلوب</th><th>لماذا لا أستطيع إكماله وحدي</th><th>مرتبط بالبند</th></tr></thead>
+<tbody>
+<tr><td>اختيار Runner ذاتي الاستضافة (أ) أو cron على الخادم (ب) للفحص الدوري</td><td>قرار بنية/ثقة أمنية حقيقي — يفتح حدوداً جديدة على بنيتك التحتية الفعلية</td><td>البند 3</td></tr>
+<tr><td>توفير رابط Slack/webhook حقيقي وضبطه كـ<code>ALERT_WEBHOOK_URL</code></td><td>يتطلب حساب/قناة تنبيه فعلية خارج ما يمكن للكود إنشاءه — نفس البوابة المذكورة أصلاً في CLAUDE.md كـ"بوابة إطلاق غير برمجية"</td><td>البند 3</td></tr>
+</tbody>
+</table></div>
+
+<footer>
+  خطة تنفيذية مبنية على محاكاة ذهنية + تحقق حي فعلي من الخادم والكود وقت الكتابة — 2026-07-14 · هذه خطة فقط، لم يُطبَّق أي تعديل بعد بانتظار موافقتك على الترتيب أو تعديله.
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>خطة تنفيذ — عيوب نظام الخبراء المحلّي (2026-05-31)</title>
+<style>
+  :root{--g:#0e7a4f;--a:#f59e0b;--r:#b3261e;--bg:#f6f8f7;--bd:#e3e9ee;--tx:#1f2a30;--mut:#5d6b75}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,"Segoe UI",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--tx);line-height:1.75}
+  .wrap{max-width:1100px;margin:0 auto;padding:1.5rem}
+  h1{color:var(--g);font-size:1.55rem;margin:.2rem 0}
+  h2{color:var(--g);border-bottom:2px solid var(--bd);padding-bottom:.3rem;margin-top:2rem}
+  h3{margin:1rem 0 .3rem;color:#0d3f29}
+  h4{margin:.9rem 0 .25rem;color:var(--mut);font-size:.93rem;text-transform:uppercase;letter-spacing:.04em}
+  .sub{color:var(--mut);font-size:.9rem}
+  .card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:1rem 1.2rem;margin:.8rem 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.5rem;margin:.5rem 0;font-size:.85rem}
+  .meta>div{background:#f1f5f3;padding:.4rem .6rem;border-radius:8px;border:1px solid var(--bd)}
+  table{width:100%;border-collapse:collapse;margin:.6rem 0;font-size:.88rem;background:#fff}
+  th,td{border:1px solid var(--bd);padding:.45rem .6rem;text-align:right;vertical-align:top}
+  th{background:#eef4f1;color:var(--g)}
+  code,pre{background:#0f172a;color:#e2e8f0;padding:.05rem .35rem;border-radius:5px;font-family:ui-monospace,Menlo,monospace;font-size:.84em;direction:ltr;display:inline-block}
+  pre{display:block;padding:.65rem .85rem;overflow-x:auto;text-align:left;font-size:.78rem;line-height:1.5;white-space:pre}
+  .sev{font-weight:800;padding:.12rem .55rem;border-radius:999px;font-size:.78rem;color:#fff;white-space:nowrap}
+  .s-hi{background:var(--r)}.s-md{background:var(--a);color:#3a2600}.s-lo{background:#64748b}
+  .file{color:#7dd3fc;direction:ltr;display:inline-block}
+  .quote{border-right:4px solid var(--g);background:#fafdfb;padding:.55rem .9rem;margin:.5rem 0;font-style:italic;color:#0d3f29}
+  ol.step{counter-reset:s;list-style:none;padding-right:0}
+  ol.step li{counter-increment:s;padding-right:1.8rem;position:relative;margin:.4rem 0}
+  ol.step li::before{content:counter(s);position:absolute;right:0;top:.05rem;background:var(--g);color:#fff;width:1.35rem;height:1.35rem;border-radius:50%;font-size:.75rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .approve{background:#fef3c7;border:1px solid #fbbf24;border-radius:10px;padding:.6rem .9rem;margin:1rem 0;font-weight:700;color:#92400e}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>خطة التنفيذ — عيوب نظام الخبراء المحلّي</h1>
+  <p class="sub">2026-05-31 · مبنيّة على اكتشافات تجربة الـExpert System الحيّة (راجع <code>تقرير-نظام-الخبراء-المحلّي-2026-05-30.html</code>) · مرجع كود حقيقي مع مسارات وأرقام أسطر · مُعَدَّة للمراجعة والموافقة قبل التنفيذ.</p>
+
+  <div class="approve">⚠ هذه خطة <b>للمراجعة فقط</b> — لن يُنفَّذ شيء قبل موافقتك الصريحة.</div>
+
+  <h2>0) ملخّص تنفيذي</h2>
+  <div class="card">
+    <table>
+      <tr><th>#</th><th>الخطورة</th><th>الإصلاح</th><th>الجهد</th><th>Migration؟</th><th>FIN-COR</th></tr>
+      <tr><td>C-1</td><td><span class="sev s-hi">عالٍ</span></td><td>كود <code>WALLET_INSUFFICIENT_FUNDS</code> + رسالة عربية + رابط شحن في الواجهة</td><td>~2 ساعة</td><td>لا</td><td>لا يُمَسّ</td></tr>
+      <tr><td>C-2</td><td><span class="sev s-md">متوسط</span></td><td>بانر OPS «مزوّدون غير نشطين» + توحيد فلتر البحث مع شروط إنشاء الطلب</td><td>~2 ساعة</td><td>لا</td><td>لا يُمَسّ</td></tr>
+      <tr><td>C-3</td><td><span class="sev s-md">متوسط</span></td><td>إثراء استجابة <code>/providers/search</code> بـ<code>min_price_minor</code> + <code>currently_open</code></td><td>~3 ساعات</td><td>لا</td><td>لا يُمَسّ</td></tr>
+      <tr><td>OPS-1</td><td><span class="sev s-md">متوسط</span></td><td>اختبار end-to-end لمسار إشعار المزوّد (SSE/FCM) + توثيق التفعيل</td><td>~2 ساعة</td><td>لا</td><td>لا يُمَسّ</td></tr>
+      <tr><td>OPS-2</td><td><span class="sev s-lo">منخفض</span></td><td>بطاقات KPI لايف على لوحة OPS</td><td>~2 ساعة</td><td>لا</td><td>لا يُمَسّ</td></tr>
+      <tr><td>C-4</td><td><span class="sev s-lo">منخفض</span></td><td><code>eta_minutes_estimate</code> في <code>/orders/delivery-quote</code></td><td>~1 ساعة</td><td>لا</td><td>لا يُمَسّ</td></tr>
+      <tr><td>C-5</td><td><span class="sev s-lo">منخفض</span></td><td>زرّ «إعادة طلب» من السجلّ (FE فقط — Backend جاهز)</td><td>~1 ساعة</td><td>لا</td><td>لا يُمَسّ</td></tr>
+    </table>
+    <p><b>المجموع المُقدَّر:</b> ~13 ساعة (~يوم ونصف). <b>بلا migration. FIN-COR محميّ.</b> دفعة نشر واحدة بعد اكتمال الكلّ.</p>
+  </div>
+
+  <!-- ──────────── C-1 ──────────── -->
+  <h2>١) <span class="sev s-hi">عالٍ</span> C-1 — رسالة WALLET واضحة + مسار شحن</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الخطورة:</b> عالية (أعلى أثر تجاري في التقرير)</div>
+      <div><b>الجهد:</b> ~2 ساعة</div>
+      <div><b>Migration؟</b> لا</div>
+      <div><b>FIN-COR:</b> لا يُمَسّ</div>
+    </div>
+
+    <h4>الدليل الحيّ من التجربة</h4>
+    <div class="quote">جولتا أم محمد 3 و6 (WALLET) ⇒ HTTP 422 برسالة <code>code=VALIDATION_ERROR / message_ar=«خطأ في التحقق من البيانات»</code> — بلا دلالة على «المحفظة فارغة» وبلا رابط شحن.</div>
+
+    <h4>السبب الجذري (مرجع كود)</h4>
+    <p>عند الدفع بـWALLET، <code>order_service.create_order</code> يستدعي مسار حجز المحفظة (<code>WalletService.reserve</code> أو ما يماثله). فشل الحجز يرفع استثناءً عامّاً ينتهي إلى <code>VALIDATION_ERROR</code> دون كود مُميِّز. المعالج (<code>order_router.py:349</code>) لا يميّز هذا السبب من غيره.</p>
+
+    <h4>التصميم</h4>
+    <ol class="step">
+      <li><b>Backend (raise مُميَّز):</b> في <code>order_service.create_order</code> عند فشل حجز المحفظة لرصيد غير كافٍ، إصدار:
+        <pre>raise ValidationError(
+    ["المحفظة لا تكفي لتغطية المبلغ"],
+    code="WALLET_INSUFFICIENT_FUNDS",
+    details={"required_minor": required, "available_minor": balance, "shortfall_minor": required - balance},
+)</pre>
+      </li>
+      <li><b>Backend (رسالة عربية):</b> في معالج <code>except ValidationError</code> في <span class="file">app/modules/orders/order_router.py</span> (يجاور نمط <code>ZONE_SUSPENDED</code>/<code>PROVIDER_OFFLINE</code>):
+        <pre>elif envelope_code == "WALLET_INSUFFICIENT_FUNDS":
+    message_ar = "رصيد المحفظة لا يكفي — اشحن المحفظة ثمّ أعد الطلب"</pre>
+      </li>
+      <li><b>FE (CheckoutPage):</b> عند الحصول على <code>code === "WALLET_INSUFFICIENT_FUNDS"</code>، عرض رسالة الخطأ + زرّ ثانوي <span style="background:#0e7a4f;color:white;padding:.1rem .5rem;border-radius:4px">اشحن المحفظة</span> يذهب إلى <code>/wallet</code> · يعرض المبلغ الناقص (<code>shortfall_minor</code>) إن وُجد.</li>
+      <li><b>FE (WalletPage):</b> إذا جاء المستخدم من checkout مع <code>?return=checkout&provider=…</code>، إظهار بانر «اشحن ثمّ ارجع لإكمال طلبك» وزرّ رجوع تلقائي بعد الشحن الناجح.</li>
+    </ol>
+
+    <h4>الملفّات</h4>
+    <table>
+      <tr><th>ملف</th><th>التغيير</th></tr>
+      <tr><td><span class="file">backend/app/modules/orders/order_service.py</span></td><td>التقاط فشل حجز WALLET ⇒ <code>ValidationError(code="WALLET_INSUFFICIENT_FUNDS", details={...})</code></td></tr>
+      <tr><td><span class="file">backend/app/modules/orders/order_router.py</span> :349</td><td>إضافة <code>elif envelope_code == "WALLET_INSUFFICIENT_FUNDS": message_ar = "..."</code></td></tr>
+      <tr><td><span class="file">web/src/pages/customer/CheckoutPage.tsx</span></td><td>اكتشاف الكود وعرض زرّ «اشحن المحفظة» + شريط «المبلغ الناقص: X»</td></tr>
+      <tr><td><span class="file">web/src/pages/customer/WalletPage.tsx</span></td><td>قراءة <code>?return=checkout</code> + بانر إرشادي</td></tr>
+    </table>
+
+    <h4>الاختبارات</h4>
+    <ul>
+      <li>Backend: <code>test_phase457_wallet_insufficient.py</code> — طلب WALLET بمحفظة فارغة ⇒ 422 بكود <code>WALLET_INSUFFICIENT_FUNDS</code> + <code>details.required_minor</code> + <code>details.available_minor</code>.</li>
+      <li>Backend: محفظة كافية ⇒ نجاح (regression).</li>
+      <li>FE: CheckoutPage.test.tsx — على <code>WALLET_INSUFFICIENT_FUNDS</code> يظهر زرّ «اشحن المحفظة».</li>
+    </ul>
+
+    <h4>التحقّق</h4>
+    <p>إعادة تشغيل خبير العميل ⇒ الجولات 3/6 (WALLET) يجب أن تُرجع الكود الجديد + رسالة عربية واضحة.</p>
+
+    <h4>التراجع</h4>
+    <p>إعادة الصورة السابقة. لا أثر بيانات.</p>
+  </div>
+
+  <!-- ──────────── C-2 ──────────── -->
+  <h2>٢) <span class="sev s-md">متوسط</span> C-2 — مزوّدون مخفيّون + توحيد فلاتر البحث/الطلب</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الخطورة:</b> متوسطة</div>
+      <div><b>الجهد:</b> ~2 ساعة</div>
+      <div><b>Migration؟</b> لا</div>
+    </div>
+
+    <h4>الدليل</h4>
+    <div class="quote">DB يحوي 4 مزوّدين لكنّ <code>/providers/search</code> الأنونيمي يُرجع 1 فقط (مطعم النجمة). الثلاثة الباقون: 2 بلا <code>active_now</code>، 1 بلا إحداثيات.</div>
+
+    <h4>السبب الجذري (مرجع كود)</h4>
+    <p><span class="file">backend/app/modules/providers/provider_router.py</span> سطر ≈95: <code>stmt = stmt.where(Provider.is_accepting_orders.is_(True))</code> — يفلتر <b>هذا العَلَم فقط</b>. لا يفلتر <code>active_now</code> أو وجود <code>lat/lng</code>. لكن <code>order_service.create_order</code> يفرض الثلاثة (<code>status='ACTIVE' AND active_now AND is_accepting_orders</code>)، فقد يَظهر مزوّد للزائر ثمّ ترفض المنصّة الطلب.</p>
+    <p>الواقع المُكتشف معاكس: مزوّدون <b>غير</b> ظاهرين لأنّ بذور التطوير قديمة. لكنّ التناقض المنطقيّ بين فلتر البحث وشروط الطلب <b>هو الجذر</b>.</p>
+
+    <h4>التصميم</h4>
+    <ol class="step">
+      <li><b>توحيد الفلاتر:</b> فلتر <code>/providers/search</code> يُضاف له <code>active_now=True</code> و<code>lat IS NOT NULL AND lng IS NOT NULL</code> ⇒ <b>الزائر لن يرى إلّا مزوّدين قابلين للطلب فعلاً.</b></li>
+      <li><b>نقطة OPS جديدة:</b> <code>GET /operations/providers/inactive</code> تُرجع المزوّدين المسجَّلين+معتمَدين لكنّ غير ظاهرين (سبب لكلّ واحد: <code>no_coords</code>/<code>not_active_now</code>/<code>not_accepting</code>/<code>not_status_active</code>).</li>
+      <li><b>FE OPS:</b> بطاقة على لوحة المعلومات: «N مزوّد غير نشط — راجعهم» تربط بصفحة <code>OpsInactiveProviders</code>.</li>
+    </ol>
+
+    <h4>الملفّات</h4>
+    <table>
+      <tr><th>ملف</th><th>التغيير</th></tr>
+      <tr><td><span class="file">backend/app/modules/providers/provider_router.py</span> :95</td><td>إضافة <code>Provider.active_now.is_(True), Provider.lat.is_not(None), Provider.lng.is_not(None)</code> إلى فلتر البحث</td></tr>
+      <tr><td><span class="file">backend/app/modules/operations/operations_router.py</span></td><td>نقطة <code>GET /operations/providers/inactive</code> مع التشخيص</td></tr>
+      <tr><td><span class="file">web/src/pages/operations/OpsInactiveProviders.tsx</span> (جديد) + opsRouter</td><td>صفحة قائمة + سبب لكلّ مزوّد + رابط لتفاصيله</td></tr>
+      <tr><td><span class="file">web/src/pages/operations/OpsDashboard.tsx</span></td><td>بطاقة KPI «مزوّدون غير نشطين»</td></tr>
+    </table>
+
+    <h4>الاختبارات</h4>
+    <ul>
+      <li>Backend: مزوّد <code>active_now=false</code> لا يظهر في البحث · مزوّد بلا coords لا يظهر · مزوّد كامل يظهر.</li>
+      <li>Backend: <code>/operations/providers/inactive</code> يُرجع التشخيص الصحيح لكلّ سبب.</li>
+      <li>FE: OpsDashboard يعرض البطاقة عند وجود ≥1 مزوّد غير نشط.</li>
+    </ul>
+  </div>
+
+  <!-- ──────────── C-3 ──────────── -->
+  <h2>٣) <span class="sev s-md">متوسط</span> C-3 — إثراء كرت المزوّد (سعر تقديري + ساعات عمل + مفتوح الآن)</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الخطورة:</b> متوسطة (تجربة الزائر)</div>
+      <div><b>الجهد:</b> ~3 ساعات</div>
+      <div><b>Migration؟</b> لا (حقول محسوبة)</div>
+    </div>
+
+    <h4>الدليل</h4>
+    <div class="quote">«أم محمد ترى مطعماً واحداً في القائمة. لا أعرف هل هو مفتوح الآن؟ ومن أيّ سعر تبدأ الوجبات؟ يجب أن أدخل لكلّ متجر لأعرف.»</div>
+
+    <h4>التصميم</h4>
+    <ol class="step">
+      <li><b>إثراء استجابة البحث:</b> <code>/providers/search</code> يُرجع لكلّ مزوّد:
+        <ul>
+          <li><code>min_price_minor</code>: أرخص <code>base_price</code> لـ<code>ItemVariant</code> نشطة لصنف <code>PUBLISHED</code>.</li>
+          <li><code>currently_open</code>: نتيجة <code>is_currently_open(opening_hours)</code> بوقت الخادم + <code>active_now</code>.</li>
+          <li><code>opening_hours_summary_ar</code>: مثل «9 ص – 11 م» (مشتقّة من <code>opening_hours</code>).</li>
+        </ul>
+      </li>
+      <li><b>تجنّب N+1:</b> استعلام تجميعيّ واحد بعد جلب المزوّدين:
+        <pre>SELECT ci.provider_id, MIN(iv.base_price) FROM item_variants iv
+JOIN catalog_items ci ON ci.id = iv.item_id
+WHERE iv.status='ACTIVE' AND ci.status='PUBLISHED' AND ci.provider_id IN (...)
+GROUP BY ci.provider_id;</pre>
+        ⇒ خريطة <code>provider_id → min_price</code> تُمرَّر إلى <code>_provider_public_dict</code> (نفس نمط <code>_provider_name_map</code>).
+      </li>
+      <li><b>FE (ProviderCard):</b> عرض «من ‎X.XXX د.ل» + شارة <span style="background:#0e7a4f;color:white;padding:.05rem .4rem;border-radius:4px;font-size:.75rem">مفتوح</span> أو <span style="background:#b3261e;color:white;padding:.05rem .4rem;border-radius:4px;font-size:.75rem">مغلق</span> + ساعات العمل المختصرة.</li>
+    </ol>
+
+    <h4>الملفّات</h4>
+    <table>
+      <tr><th>ملف</th><th>التغيير</th></tr>
+      <tr><td><span class="file">backend/app/modules/providers/provider_router.py</span></td><td>دالّة جديدة <code>_provider_min_price_map(db, provider_ids)</code> + توسيع <code>_provider_public_dict</code> بـ3 حقول جديدة + استدعاؤها في <code>search_providers</code></td></tr>
+      <tr><td><span class="file">backend/app/modules/providers/provider_hours.py</span></td><td>دالّة <code>opening_hours_summary_ar(hours)</code> إن لم توجد</td></tr>
+      <tr><td><span class="file">web/src/components/ProviderCard.tsx</span></td><td>عرض الحقول الجديدة</td></tr>
+      <tr><td><span class="file">web/src/api/types.ts</span></td><td>إضافة الحقول إلى <code>ProviderResult</code></td></tr>
+    </table>
+
+    <h4>اعتبارات الأداء</h4>
+    <ul>
+      <li>الاستعلام التجميعي يقلّل من N استعلام إلى 1 (للبحث بـ20 مزوّد، 20×3 = 60 query ⇒ 3 queries).</li>
+      <li><code>is_currently_open</code> دالّة Python خفيفة على JSON.</li>
+    </ul>
+
+    <h4>الاختبارات</h4>
+    <ul>
+      <li>مزوّد بـ3 variants أرخصها 12000 ⇒ <code>min_price_minor=12000</code>.</li>
+      <li>مزوّد بلا أصناف منشورة ⇒ <code>min_price_minor=null</code>.</li>
+      <li>مزوّد في ساعة عمل ⇒ <code>currently_open=true</code>؛ خارجها ⇒ <code>false</code>.</li>
+    </ul>
+  </div>
+
+  <!-- ──────────── OPS-1 ──────────── -->
+  <h2>٤) <span class="sev s-md">متوسط</span> OPS-1 — التحقّق من مسار إشعار المزوّد end-to-end</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الخطورة:</b> متوسطة (واقعيّاً قد يكون عاملاً في الإنتاج، لم نتحقّق محلّياً)</div>
+      <div><b>الجهد:</b> ~2 ساعة</div>
+      <div><b>Migration؟</b> لا</div>
+    </div>
+
+    <h4>الدليل</h4>
+    <p>محلّياً (dev-minimal بلا web-frontend): المزوّد لم يتلقَّ إشعاراً حيّاً بالطلب. كان عليه استدعاء <code>/providers/orders</code> يدوياً.</p>
+
+    <h4>التصميم (تحقّق أوّلاً، ثمّ إصلاح إن لزم)</h4>
+    <ol class="step">
+      <li><b>تتبّع المسار:</b>
+        <ul>
+          <li>SSE: <code>order_router.create_order</code> ⇒ <code>publish_provider_order_event(provider_id, "order.new", ...)</code> ⇒ <code>sse/provider_stream.py</code> ⇒ FE <code>useProviderOrderStream</code>.</li>
+          <li>FCM: device token مُسجَّل عبر <code>POST /notifications/device-tokens</code> ⇒ <code>NotificationService.send()</code> ⇒ مزوّد FCM.</li>
+        </ul>
+      </li>
+      <li><b>اختبار end-to-end على staging الحيّ:</b> نسجِّل مزوّداً، نفتح SSE في الخلفية، ننشئ طلباً، نتأكّد من وصول حدث <code>provider.order</code>.</li>
+      <li><b>إصلاحات محتمَلة (لو فشل):</b>
+        <ul>
+          <li>إن كان <code>publish_provider_order_event</code> يَفشل صامتاً (post-commit) ⇒ المعالَجة موجودة في الجلسة السابقة (W4-09 يسجّل التحذير الآن).</li>
+          <li>إن كان Redis pub/sub غير متّصل ⇒ تأكيد <code>REDIS_URL</code> في الإنتاج.</li>
+          <li>إن كان FCM غير مُهيّأ ⇒ <code>FCM_PROJECT_ID</code> + <code>FCM_SERVICE_ACCOUNT_FILE</code> + تثبيت <code>google-auth</code> (تفعيل وثائقي).</li>
+        </ul>
+      </li>
+      <li><b>توثيق تفعيل الإنتاج:</b> ملف <span class="file">deploy/notifications/PRODUCTION_ACTIVATION.md</span> يشرح المتغيّرات والملفّات السرّيّة المطلوبة.</li>
+    </ol>
+
+    <h4>الاختبارات</h4>
+    <ul>
+      <li>اختبار محلّي: نشر حدث SSE مزوّر ⇒ التحقّق من وصوله للمشترك (الخلفية موجودة، يحتاج اختبار smoke).</li>
+      <li>سكربت smoke جديد <span class="file">deploy/smoke_provider_notification.sh</span>: على الإنتاج يربط SSE ثمّ ينشئ طلباً ثمّ يتحقّق من الحدث.</li>
+    </ul>
+  </div>
+
+  <!-- ──────────── OPS-2 ──────────── -->
+  <h2>٥) <span class="sev s-lo">منخفض</span> OPS-2 — بطاقات KPI لايف على لوحة OPS</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الجهد:</b> ~2 ساعة</div>
+      <div><b>Migration؟</b> لا</div>
+    </div>
+
+    <h4>الدليل</h4>
+    <p>التجربة كشفت أنّ لوحة المعلومات تستجيب 200 لكنّها تفتقد قرارات لحظيّة سهلة الرؤية.</p>
+
+    <h4>التصميم</h4>
+    <p>تمديد <code>/operations/dashboard</code> الموجود ليُضيف:</p>
+    <pre>{
+  "live_kpis": {
+    "active_orders_now": int,        // orders في حالات IN_PREPARATION..EN_ROUTE
+    "drivers_online_now": int,        // drivers.available=true AND status=ACTIVE
+    "orders_without_driver_now": int, // READY_FOR_PICKUP بلا offer ACCEPTED
+    "providers_active_now": int,      // active_now=true AND is_accepting_orders=true
+  },
+  ...existing fields
+}</pre>
+    <p>FE: 4 بطاقات أعلى لوحة <code>OpsDashboard</code> بألوان مختلفة + تحديث تلقائي كلّ 30ث.</p>
+
+    <h4>الملفّات</h4>
+    <table>
+      <tr><th>ملف</th><th>التغيير</th></tr>
+      <tr><td><span class="file">backend/app/modules/operations/operations_router.py</span></td><td>إضافة 4 استعلامات COUNT(*) سريعة لـ<code>get_dashboard</code></td></tr>
+      <tr><td><span class="file">web/src/pages/operations/OpsDashboard.tsx</span></td><td>4 بطاقات + polling 30ث</td></tr>
+    </table>
+  </div>
+
+  <!-- ──────────── C-4 ──────────── -->
+  <h2>٦) <span class="sev s-lo">منخفض</span> C-4 — ETA قبل إرسال الطلب</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> ~1 ساعة</div></div>
+    <h4>التصميم</h4>
+    <p><code>GET /orders/delivery-quote</code> يُضيف <code>eta_minutes_estimate</code> (مساوية لـ<code>provider.default_prep_time_min</code> + ثابت توصيل افتراضي مثلاً 15د، أو حساب من المسافة).</p>
+    <p>FE: CheckoutPage يعرض «الوقت المتوقّع: حوالي N دقيقة» تحت الرسم.</p>
+    <h4>الملفّات</h4>
+    <table>
+      <tr><td><span class="file">backend/app/modules/orders/order_service.py</span> <code>quote_delivery_fee</code></td><td>إضافة <code>eta_minutes_estimate</code></td></tr>
+      <tr><td><span class="file">web/src/pages/customer/CheckoutPage.tsx</span></td><td>عرض السطر الجديد</td></tr>
+    </table>
+  </div>
+
+  <!-- ──────────── C-5 ──────────── -->
+  <h2>٧) <span class="sev s-lo">منخفض</span> C-5 — زرّ «إعادة طلب» من السجلّ</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> ~1 ساعة (FE فقط — Backend جاهز)</div></div>
+    <h4>التصميم</h4>
+    <p>كلّ طلب في <code>OrderHistoryPage</code> يحوي <code>price_snapshot</code> (Backend موجود). FE فقط: زرّ «إعادة طلب» ⇒ يُحَلّ snapshot ⇒ يُملأ السلّة ⇒ ينتقل إلى <code>/checkout</code>.</p>
+    <h4>الملفّات</h4>
+    <table>
+      <tr><td><span class="file">web/src/pages/customer/OrderHistoryPage.tsx</span></td><td>زرّ «إعادة طلب» (DELIVERED فقط) + معالج يُملأ <code>CartContext</code> من <code>price_snapshot.items</code></td></tr>
+    </table>
+    <h4>تحذير</h4>
+    <ul>
+      <li>تحقّق توفّر الأصناف (قد تكون <code>UNPUBLISHED</code> الآن) ⇒ التحقّق الفعلي يتمّ عند الإنشاء (Backend يرفض).</li>
+      <li>التسعير يُحسب وقت الإنشاء (لا نُلصق سعراً قديماً) — السلّة تستخدم catalog_item_id فقط، البقيّة من الخادم.</li>
+    </ul>
+  </div>
+
+  <!-- ──────────── DEPLOY PLAN ──────────── -->
+  <h2>٨) خطّة النشر</h2>
+  <div class="card">
+    <ol class="step">
+      <li>تنفيذ البنود محلّياً + اختبارات backend/web/typecheck/build/lint.</li>
+      <li>commit واحد منظَّم مع رسالة قياسية.</li>
+      <li><code>deploy/deploy_be.sh</code> ⇒ <code>deploy/deploy_web.sh</code>. <b>بلا migrations.</b></li>
+      <li>تحقّق على <code>https://tawanow.com</code>:
+        <ul>
+          <li>WALLET أمر بمحفظة فارغة ⇒ كود <code>WALLET_INSUFFICIENT_FUNDS</code> + الرسالة العربية.</li>
+          <li><code>/providers/search</code> يُرجع <code>min_price_minor</code> و<code>currently_open</code>.</li>
+          <li><code>/operations/dashboard</code> يحوي <code>live_kpis</code>.</li>
+          <li><code>/orders/delivery-quote</code> يحوي <code>eta_minutes_estimate</code>.</li>
+        </ul>
+      </li>
+      <li>التراجع: إعادة الصورة السابقة. لا أثر بيانات (كلّ التغييرات additive).</li>
+    </ol>
+  </div>
+
+  <h2>٩) معايير النجاح (Definition of Done)</h2>
+  <div class="card">
+    <table>
+      <tr><th>البند</th><th>معيار</th></tr>
+      <tr><td>C-1</td><td>محاولة WALLET بمحفظة فارغة ⇒ كود <code>WALLET_INSUFFICIENT_FUNDS</code> + رسالة عربية واضحة + زرّ «اشحن المحفظة» في الواجهة</td></tr>
+      <tr><td>C-2</td><td>البحث الأنونيمي لا يُرجع إلّا مزوّدين قابلين للطلب فعلاً + بطاقة OPS لغير النشطين</td></tr>
+      <tr><td>C-3</td><td>كرت المزوّد يحوي «من X د.ل» + شارة «مفتوح/مغلق» + ساعات مختصرة</td></tr>
+      <tr><td>OPS-1</td><td>اختبار smoke يثبت وصول SSE event للمزوّد بعد إنشاء طلب</td></tr>
+      <tr><td>OPS-2</td><td>4 بطاقات KPI لايف ظاهرة وتتحدّث كلّ 30ث</td></tr>
+      <tr><td>C-4</td><td><code>eta_minutes_estimate</code> يَظهر في معاينة الـcheckout</td></tr>
+      <tr><td>C-5</td><td>زرّ «إعادة طلب» على كلّ طلب DELIVERED يَملأ السلّة فوراً</td></tr>
+    </table>
+  </div>
+
+  <h2>١٠) ما هو خارج النطاق (شفافيّة)</h2>
+  <div class="card">
+    <ul>
+      <li>الـcontract bypass الذي حجب اختبار السائق المحلّي — <b>قيد منهجيّ</b> لا عيب منصّة، لا يُعالَج هنا.</li>
+      <li>اختبار «جهاز متعدّد» بصرياً — يتطلّب متصفّحاً ضمن البيئة (غير متاح حاليّاً). مؤجَّل لـPlaywright منفصل.</li>
+      <li>لقطات شاشة بصرية — نفس السبب.</li>
+      <li>اختبار شامل لتطبيق الجوّال (Flutter) — تكافؤ تمّ إثباته في جلسات سابقة؛ هذه الخطّة تركّز على ما اكتشفته التجربة الحيّة على الـAPI.</li>
+    </ul>
+  </div>
+
+  <div class="approve">⚠ <b>للمراجعة:</b> أعطني تأشيرة الموافقة (أو طلبات تعديل) قبل بدء التنفيذ. الترتيب الموصى به: C-1 → C-2 → C-3 → OPS-2 → OPS-1 → C-4 → C-5.</div>
+</div>
+</body>
+</html>

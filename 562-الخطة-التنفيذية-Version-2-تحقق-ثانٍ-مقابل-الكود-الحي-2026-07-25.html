@@ -1,0 +1,471 @@
+<title>560 — الخطة التنفيذية Version 2: تحقّق ثانٍ صارم مقابل الكود الحيّ</title>
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74;
+  --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  direction:rtl;line-height:1.7;max-width:1040px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:74ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.88em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.84em}
+a{color:var(--accent2)}
+
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.9em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:130px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.7em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.82em}
+
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+.callout.good{border-inline-start:5px solid var(--good)}
+
+section{margin:44px 0}
+section > h2{font-size:1.4em;padding-bottom:10px;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:10px}
+section > h2 .n{font-family:var(--mono);color:var(--sub);font-size:.7em}
+h3.sub{font-size:1.12em;margin-top:30px}
+
+.chip{display:inline-block;font-size:.72em;font-weight:700;padding:2px 9px;border-radius:999px;margin-inline-end:5px;white-space:nowrap}
+.chip.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.good{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.chip.info{background:color-mix(in srgb,var(--info) 16%,transparent);color:var(--info)}
+.chip.build{background:color-mix(in srgb,var(--build) 16%,transparent);color:var(--build)}
+.chip.corr{background:color-mix(in srgb,var(--corr) 16%,transparent);color:var(--corr)}
+
+.finding{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:16px 0}
+.finding h4{margin:0 0 6px;font-size:1.05em;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.finding h4 .id{font-family:var(--mono);color:var(--sub);font-size:.75em;font-weight:600}
+.finding .meta-row{color:var(--sub);font-size:.85em;margin-bottom:8px}
+.finding .files{font-family:var(--mono);font-size:.82em;color:var(--sub);direction:ltr;text-align:left}
+.finding .simple{background:color-mix(in srgb,var(--info) 6%,transparent);border-radius:8px;padding:8px 12px;margin-top:8px;font-size:.94em}
+
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.86em}
+th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;vertical-align:top}
+th{background:var(--line);font-weight:700}
+tr:nth-child(even) td{background:color-mix(in srgb,var(--line) 35%,transparent)}
+td.idcol{font-family:var(--mono);font-size:.85em;white-space:nowrap;color:var(--sub)}
+
+.stat-row{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}
+.stat-card{flex:1;min-width:140px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-align:center}
+.stat-card b{display:block;font-size:1.8em}
+.stat-card span{color:var(--sub);font-size:.82em}
+
+.bar-chart{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-row .lbl{width:140px;font-size:.85em;color:var(--sub);flex:none;text-align:left;direction:ltr}
+.bar-row .track{flex:1;background:var(--line);border-radius:6px;height:22px;position:relative;overflow:hidden}
+.bar-row .fill{position:absolute;inset:0;border-radius:6px}
+.bar-row .num{width:36px;text-align:center;font-weight:700;flex:none}
+
+.timeline{position:relative;padding:20px 0;margin:20px 0}
+.timeline .track{position:relative;height:6px;background:var(--line);border-radius:3px;margin:40px 30px}
+.timeline .pt{position:absolute;top:-9px;width:22px;height:22px;border-radius:50%;border:3px solid var(--bg);
+  transform:translateX(50%)}
+.timeline .lbl{position:absolute;top:14px;transform:translateX(50%);font-size:.78em;text-align:center;width:150px;
+  right:0;color:var(--sub)}
+.timeline .lbl b{display:block;color:var(--ink);font-size:1.05em}
+
+.correction-box{background:color-mix(in srgb,var(--corr) 7%,var(--panel));border:1px dashed var(--corr);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.correction-box b{color:var(--corr)}
+.decision-box{background:color-mix(in srgb,var(--warn) 8%,var(--panel));border:1px solid var(--warn);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.decision-box b{color:var(--warn)}
+
+details{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin:10px 0}
+details summary{cursor:pointer;font-weight:700}
+details[open] summary{margin-bottom:10px}
+
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+.top{position:fixed;bottom:18px;left:18px;background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:8px 16px;font-size:.82em;box-shadow:0 4px 14px rgba(0,0,0,.12)}
+</style>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 560 · الخطة التنفيذية — النسخة الثانية (Version 2) بعد تحقّق ثانٍ صارم</div>
+  <h1>هل تغيّر شيء تحت أقدامنا؟ تحقّق حرف بحرف من التقرير 559 مقابل الكود الحيّ الآن</h1>
+  <div class="meta">
+    بينما كنّا نكتب التقرير 559، تحرّك الكود الحيّ فعليًا: 14 commit جديدًا هبطت على الفرع (من <code>6bbeaad</code>
+    إلى <code>d9c5d38d</code>)، تمسّ بالضبط بعض أكثر الملفّات حساسية في خطتنا
+    (<code>order_service.py</code>, <code>carts/service.py</code>, <code>carts/router.py</code>,
+    <code>catalog_service.py</code>). هذا التقرير يعيد فحص كل واحدة من الـ112 مجموعة إصلاح، وكل فجوة في تقييم
+    السلة المجمّعة، حرفًا بحرف، مقابل هذا الواقع الجديد — عبر 11 عملية تحقّق مستقلّة قرأت الكود <b>الآن</b>، لا
+    اعتمدت على ما كتبناه قبل ساعات. · 2026-07-25
+  </div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>0 / 112</b><span>مجموعة إصلاح أصبحت منجزة صدفةً</span></div>
+  <div class="stat"><b>14</b><span>commit جديد فُحص كل واحد منها</span></div>
+  <div class="stat"><b>11</b><span>تصحيحًا دقيقًا طُبِّق على الخطة</span></div>
+  <div class="stat"><b>1</b><span>مجموعة إصلاح جديدة اكتُشفت (E15)</span></div>
+  <div class="stat"><b>3</b><span>تقنيات حديثة إضافية أُضيفت من كود هبط للتوّ</span></div>
+</div>
+
+<div class="callout good">
+  <b>الخلاصة بجملة واحدة:</b> الخطة صمدت. رغم أن 14 commit حقيقيًا هبط أثناء إعدادنا للتقرير 559 ولمس ملفّات
+  محورية في خطّتنا، فإن <b>لا واحدة من الـ112 مجموعة إصلاح أُنجزت صدفةً</b> — كل تصحيح لا يزال مطلوبًا بالضبط كما
+  صُمِّم. ما تغيّر فقط: أرقام أسطر انزاحت قليلًا، رقم ترحيل قاعدة بيانات (migration) اصطدم بترحيلات Trade جديدة حقيقية،
+  ونطاق تصحيح واحد (B10) تقلّص من 4 أعمدة إلى 3 لأن عمودًا واحدًا اتضح أنه محميّ فعلًا. اكتشفنا أيضًا فجوة حقيقية
+  جديدة تمامًا (E15) لم تكن في التقرير الأصلي، وثلاث تقنيات حديثة إضافية مستوحاة مباشرة من نمط برمجي جديد هبط
+  للتوّ في نفس هذه الـ14 commit.
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li>ماذا تغيّر تحت أقدامنا: الـ14 commit بالتفصيل</li>
+    <li>منهجية هذا التحقّق الثاني</li>
+    <li>الخلاصة: كل شيء ما زال معلَّقًا (0/112)</li>
+    <li>التصحيحات الإحدى عشر المُطبَّقة على الخطة</li>
+    <li>اكتشاف جديد: مجموعة E15 (حارس اتساق الدفتر/المحفظة)</li>
+    <li>تقنيات حديثة إضافية اكتُشفت من الكود الجديد نفسه</li>
+    <li>إعادة فحص السلة المجمّعة: هل تغيّر الحكم؟</li>
+    <li>الجداول الكاملة المُحدَّثة — كل مجموعة عبر كل مجال (A–J)</li>
+    <li>خريطة التسلسل — بلا تغيير، وما زالت سارية بالكامل</li>
+    <li>الخلاصة والتوصية النهائية لبدء التنفيذ</li>
+  </ol>
+</div>
+
+<section id="s1">
+  <h2><span class="n">§1</span> ماذا تغيّر تحت أقدامنا: الـ14 commit بالتفصيل</h2>
+  <p>بين كتابة التقرير 559 (عند commit <code>6bbeaad</code>) وبدء هذا التحقّق (عند commit <code>d9c5d38d</code>)،
+  هبطت 14 commit حقيقيّة على نفس الفرع — على الأرجح من جلسة عمل موازية تنفّذ بقية بنود "تقرير 557". هذه ليست
+  محاكاة افتراضية؛ هذا بالضبط السيناريو الذي حذّرت منه الخطة نفسها في §2/ت١ (لا تُنفَّذ إصلاحاتك على أرض ثابتة
+  افتراضًا — تحقّق دائمًا من الحالة الحيّة).</p>
+
+  <table>
+    <tr><th>Commit</th><th>ماذا يفعل</th><th>الملفّات الحسّاسة التي يمسّها</th></tr>
+    <tr><td class="idcol">a25dbaf7</td><td>إضافة مسند مشترك جديد "هل الصنف قابل للشراء" (F-14a)</td><td><code>backend/app/core/item_access.py</code> (ملف جديد)</td></tr>
+    <tr><td class="idcol">2f477e2d</td><td>ترحيل فحوصات التوفّر المكرّرة/الناقصة على المسند المشترك (F-14b)</td><td>catalog_service.py, order_service.py, carts/service.py</td></tr>
+    <tr><td class="idcol">a3b95103</td><td>إصلاح إضافة صنف للسلّة عند متغيّر ميت أو سعر مجاني (F-14c)</td><td>CustomizationModal.tsx, CartContext.tsx</td></tr>
+    <tr><td class="idcol">f0983cf0</td><td>حارس اتساق دفتر/محفظة لا ينذر خطأً بعد الآن عن استحقاق إحالة (NEW-5)</td><td><code>finance/reconciliation_service.py</code></td></tr>
+    <tr><td class="idcol">d3853320</td><td>إعادة الاتصال اليدوي لـSSE يصكّ تذكرة جديدة بدل إعادة تشغيل تذكرة قديمة</td><td>OpsFleetMap.tsx</td></tr>
+    <tr><td class="idcol">a46f82b3</td><td>تطابق معاينة/فعلي لحدّ استخدام الكوبون لكل عميل (R557 بند 5)</td><td>order_service.py (promo)، ملفّا اختبار جديدان</td></tr>
+    <tr><td class="idcol">bf4a964b</td><td>دمج استثناءات النقد المفتوحة في عرض الطلبات العالقة بـOPS</td><td>operations_router.py، OpsStuckOrders.tsx</td></tr>
+    <tr><td class="idcol">c282cc47</td><td>اختبار حوكمة: يمنع عمود حالة جديد من عدم التسجيل (Phase5)</td><td>ملف اختبار جديد فقط</td></tr>
+    <tr><td class="idcol">3470b061</td><td>إضافة eslint-plugin-i18next بوضع تحذير فقط</td><td>web/eslint.config.js</td></tr>
+    <tr><td class="idcol">d4366810</td><td>اختبار تغطية مفاتيح i18n المفقودة (RATCHET-5) — نمط جديد مهمّ</td><td>web/src/test/i18n/*</td></tr>
+    <tr><td class="idcol">8d17e240 / a1c62b1e</td><td>حلّ الأخطاء يحافظ على رسالة الخادم الأصلية بدل استبدالها بنصّ عامّ (F-03)</td><td>client.ts، apiErrors.ts، صفحات OPS</td></tr>
+    <tr><td class="idcol">1ac8f426</td><td>إعادة مزامنة لقطة انحراف قيم i18n</td><td>ar.json, en.json, fr.json</td></tr>
+    <tr><td class="idcol">d9c5d38d</td><td>التوقّف عن ربط عمود default_address_id الميت (F-24 خطوة 3أ)</td><td>customer_extra.py، customer_router.py</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <b>لماذا هذا مهمّ تحديدًا لخطّتنا:</b> أربعة من هذه الملفّات المُتأثّرة — <code>order_service.py</code>،
+    <code>carts/service.py</code>، <code>carts/router.py</code>، و<code>operations_router.py</code> — هي
+    بالضبط الملفّات الأكثر استشهادًا في مجموعة C (الطلبات) وفي فحص جاهزية السلة المجمّعة. لذلك أعطينا الأولوية
+    القصوى لإعادة فحص هذين القسمين تحديدًا (§8 وGroup-Order كليهما وُصفا بـ"HIGH PRIORITY" في تعليمات التحقّق).
+  </div>
+</section>
+
+<section id="s2">
+  <h2><span class="n">§2</span> منهجية هذا التحقّق الثاني</h2>
+  <p>لكل واحدة من مجموعات الإصلاح الـ112 (وفجوات السلة المجمّعة الأربع)، شغّلنا عملية تحقّق مستقلّة أُعطيت:</p>
+  <ol>
+    <li>ملف التصميم الأصلي الكامل (بما فيه كل استشهاد ملف/سطر).</li>
+    <li>قائمة الـ14 commit وملفّاتها المتأثّرة، مع تعليمة صريحة: <b>لا تفترض — اقرأ الملف الآن</b>.</li>
+    <li>مهمّة: لكل مجموعة، أعد قراءة الملف المُستشهَد به طازجًا عند الرأس الحالي، شغّل <code>git diff</code>/<code>git log</code>
+    على الملف بين الالتزامين، وصنِّف الحالة إلى: <b>ما زال معلَّقًا</b> | <b>عولج بالكامل</b> | <b>عولج جزئيًا</b> |
+    <b>الخطة تحتاج تصحيحًا</b>.</li>
+    <li>أبلغ عن أي تقنية حديثة جديدة تلاحظها في الكود الذي هبط للتوّ، قد تفيد تصميم الإصلاح.</li>
+  </ol>
+  <p>هذا يعني أن كل رقم في هذا التقرير مبنيّ على قراءة فعلية للكود <b>الآن</b>، لا على الثقة بالتقرير 559 نفسه —
+  بالضبط نفس الانضباط الذي طُبِّق عند التحقّق من التدقيقين الخارجيين في التقرير 558.</p>
+</section>
+
+<section id="s3">
+  <h2><span class="n">§3</span> الخلاصة: كل شيء ما زال معلَّقًا (0/112)</h2>
+  <div class="bar-chart">
+    <div class="bar-row"><div class="lbl">ما زال معلَّقًا</div><div class="track"><div class="fill" style="width:97%;background:var(--warn)"></div></div><div class="num">109</div></div>
+    <div class="bar-row"><div class="lbl">عولج جزئيًا</div><div class="track"><div class="fill" style="width:2.7%;background:var(--info)"></div></div><div class="num">3</div></div>
+    <div class="bar-row"><div class="lbl">عولج بالكامل</div><div class="track"><div class="fill" style="width:0%;background:var(--good)"></div></div><div class="num">0</div></div>
+  </div>
+  <p>المجموعات الثلاث "المُعالَجة جزئيًا" هي: <b>C3</b> (كود خصم غير صالح — حالة فرعية واحدة فقط عولجت، الهدف
+  الجوهري ما زال مفتوحًا)، <b>A4</b> (سؤال تحقّق داخل الخطة نفسها — هل rulesets متاحة؟ — أُجيب عليه الآن: لا، محظورة
+  أيضًا)، و<b>A5</b> (اكتُشف أن حارس CI موجود فعلًا يمنع نموّ المشكلة، لكن الهجرة الفعلية والفحص الصحّي للاعتماديات
+  ما زالا معلَّقين). لا شيء أُنجز بالكامل — وهذه في الواقع أخبار جيّدة: تعني أن كل ساعة عمل استثمرناها في تصميم
+  الخطة الأصلية لم تُهدَر بسبب تغيّر الأرض تحتنا.</p>
+</section>
+
+<section id="s4">
+  <h2><span class="n">§4</span> التصحيحات الإحدى عشر المُطبَّقة على الخطة</h2>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 1</span> A5 — حارس CI موجود فعلًا لأعلام الميزات <span class="chip corr">تصحيح</span></h4>
+    <p>اكتُشف أن <code>.github/workflows/ci.yml</code> يحتوي فعلًا خطوة <code>feature_flag_ratchet_check.py</code>
+    تمنع نموّ استخدام <code>is_enabled()</code> القديم — كانت موجودة حتى قبل الأساس الأصلي للخطة، ولم تُذكَر في
+    القسم الخامس من مجموعة A5. <b>التصحيح:</b> اعتبر "منع النموّ" منجزًا فعلًا؛ نطاق العمل المتبقّي هو الهجرة
+    الفعلية لنقاط الاستدعاء + سجلّ فحص صحّة الاعتماديات فقط، لا بناء حارس جديد.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 2</span> A8 — pos_router.py: 23 موقعًا لا 8 <span class="chip corr">تصحيح</span></h4>
+    <p>القراءة الأصلية توقّفت في منتصف الملف. العدّ الفعلي الكامل: <b>23</b> موقع <code>raise HTTPException</code>
+    خامًا يتجاوز الغلاف الموحَّد، وليس 8 كما ذُكر. هذا يعني نطاق الهجرة (وعدد اختبارات الوحدة المطلوبة) أكبر بثلاث
+    مرّات تقريبًا ممّا قُدِّر أصلًا — مهمّ لتقدير الجهد، لا لتصميم الإصلاح نفسه.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 3</span> B6 — العدد الصحيح 110/8 لا 111/9 <span class="chip corr">تصحيح طفيف</span></h4>
+    <p>عدّ إعادة القراءة عند التحقّق الأصلي كان 111/9 — العدّ الفعلي الآن (وأيضًا عند الأساس الأصلي، لم يتغيّر
+    الملف) هو 110 نداءً لـ<code>require_role()</code> مقابل 8 لـ<code>require_permission()</code> — يطابق رقم
+    التدقيق الأصلي في التقرير 558 تمامًا. فارق عدّ عابر، لا تغيير كود.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 4</span> B10 — نطاق قيد CHECK يتقلّص من 4 أعمدة إلى 3 <span class="chip corr">تصحيح مهمّ</span></h4>
+    <p>الخطة ادّعت أن <code>Address.status</code> بلا قيد CHECK مثل User/Role/Device — <b>هذا خاطئ</b>. القراءة
+    الطازجة أظهرت أن <code>Address</code> يملك فعلًا (<code>backend/app/models/user.py:226</code>):
+    <code>CheckConstraint("status IN ('ACTIVE', 'ARCHIVED')", name="ck_addresses_status")</code>. النطاق الصحيح:
+    <b>User.status وRole.status وDevice.status فقط</b> (3 أعمدة، لا 4)، مع إضافة <code>ck_addresses_status</code>
+    كسابقة إضافية جاهزة للاستنساخ (إلى جانب <code>ck_users_kyc_tier</code> المذكورة أصلًا).</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 5</span> E1/E3/E8/E12 — تصادم أرقام الترحيلات <span class="chip corr">تصحيح</span></h4>
+    <p>رأس alembic تحرّك فعليًا من <code>ab60</code> إلى <code>ab68</code> بسبب 8 ترحيلات Trade حقيقية جديدة —
+    أرقام الترحيل المقترحة في الخطة (<code>ab61</code>–<code>ab64</code>) أصبحت جميعها مأخوذة فعليًا (مثل
+    <code>ab61_trade_supplier_catalog.py</code>، <code>ab64_trade_purchase_orders.py</code>). <b>التصحيح:</b>
+    أعِد ترقيم كل الترحيلات المقترحة في هذه الأربع مجموعات إلى <code>ab69</code> فما فوق.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 6</span> G-G — مسار ads_service.py الصحيح <span class="chip corr">تصحيح مسار</span></h4>
+    <p>الخطة استشهدت بـ<code>app/modules/marketing/ads_service.py</code> — المسار الحقيقي هو
+    <code>backend/app/modules/ads/ads_service.py</code> (لا يوجد مجلّد <code>marketing</code> في المستودع). النتيجة
+    التقنية نفسها (فحص موافقة ذاتية منفصل بدل إعادة استخدام <code>require_not_self_approval</code>) لا تزال صحيحة.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 7</span> J5 — عدد أزواج الترقيم أكبر ممّا ذُكر <span class="chip corr">تصحيح</span></h4>
+    <p>الخطة ذكرت "6 أزواج مختلفة" لحدود limit/offset — العدّ الطازج الكامل وجد <b>9 أزواج مختلفة فأكثر</b>
+    (le=90, le=200 في خمسة مواضع، le=500، le=50، le=86400، le=365...). الاستيرادات الداخلية المدفونة أيضًا 331
+    لا 336. النتيجة (تشتّت كامل بلا ثابت مشترك) تتأكّد بقوّة أكبر، لا تتغيّر.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 8</span> J7 — خط أنابيب المقاييس موجود فعلًا في OTel <span class="chip corr">تصحيح</span></h4>
+    <p>الخطة افترضت أن مُجمِّع OTel قد يكون مخصّصًا للتتبّع (traces) فقط، وأن أي مقياس تطبيقي جديد قد لا يُستقبَل
+    أصلًا. القراءة الطازجة لـ<code>otel-collector-config.yaml</code> أظهرت أن خط أنابيب <code>metrics</code> موجود
+    فعلًا وسليم. <b>الفجوة الحقيقية أضيق ممّا افتُرِض:</b> المقاييس تُستقبَل وتُسجَّل، لكنها لا تُصدَّر إلى أي خلفية
+    حقيقية بعد (المُصدِّر الحالي لكل خطوط الأنابيب هو <code>debug</code> فقط) — فجوة "تصدير" لا فجوة "استقبال".</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 9</span> J8 — القائمة الفارغة مفتوحة صامتة تمامًا، لا مجرّد تحذير <span class="chip corr">تصحيح</span></h4>
+    <p>الخطة وصفت الحالة بـ"تحذير سجلّ فقط عند فراغ القائمة" — القراءة الطازجة لـ<code>ip_allowlist.py</code>
+    أظهرت أن حالة القائمة الفارغة <b>لا تُسجِّل أي تحذير إطلاقًا</b> — مفتوحة صامتة بالكامل. هذا يجعل حالة اليوم
+    أسوأ ممّا وُصِف، ويقوّي (لا يُضعِف) الحاجة لإصلاح الإيقاف الصلب المقترَح.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 10</span> H2 — إضافة وحدة آلة حالة مشتركة لـTrade <span class="chip corr">إضافة حقيقية</span></h4>
+    <p>اكتُشف أن Trade يملك فعلًا تطبيقين منفصلين لفرض انتقالات الحالة (لـReservation ولـShipment) بينما اثنان
+    آخران (Supplier وProduct) موثَّقان بالتعليق فقط بلا إنفاذ فعلي — أربعة أنماط مختلفة حيث يجب أن يكون نمطًا واحدًا
+    مشتركًا. <b>الإضافة الموصى بها:</b> وحدة واحدة <code>state_transitions.py</code> لـTrade، بنفس روح نمط
+    <code>item_access.py</code> الذي هبط للتوّ (انظر §6)، تُستخدَم من الأربعة نقاط معًا.</p>
+  </div>
+
+  <div class="finding">
+    <h4><span class="id">تصحيح 11</span> H1 — ملاحظة انزياح سطرين طفيفة <span class="chip corr">تصحيح تجميلي</span></h4>
+    <p>استشهاد توثيق حالة الحجز في trade.py انزاح من سطر 149 إلى 151 (فارق سطرين، بلا تغيير جوهري). كذلك رأس
+    وثيقة Trade نفسها ذكر "3012 سطرًا إجماليًا" للملفّات السبعة — العدد الفعلي الصحيح هو 2467، خطأ موجود منذ كتابة
+    الخطة الأصلية، لا ناتج عن الـ14 commit.</p>
+  </div>
+</section>
+
+<section id="s5">
+  <h2><span class="n">§5</span> اكتشاف جديد: مجموعة E15 (حارس اتساق الدفتر/المحفظة)</h2>
+  <div class="finding">
+    <h4><span class="id">E15 (جديدة)</span> حارس اتساق الدفتر ليس آمنًا بعد للتنبيه الحيّ <span class="chip warn">HIGH — جديدة بالكامل</span></h4>
+    <div class="files">backend/app/modules/finance/reconciliation_service.py — check_wallet_ledger_invariant()</div>
+    <p>commit <code>f0983cf0</code> (NEW-5) لا ينتمي لأي مجموعة من الـ14 الأصلية في مجال E — إنه يمسّ دالّة
+    تشخيصية (فحص هل مجموع أرصدة المحافظ يطابق مجموع قيود الدفتر المقابلة) لم تُذكَر إطلاقًا في الخطة الأصلية. أصلح
+    هذا الـcommit اتجاهًا واحدًا من انحراف معروف (قيود إحالة تُسجِّل طرفًا محاسبيًا دون لمس رصيد المحفظة الفعلي)،
+    لكن تعليق الكود المُحدَّث نفسه يقرّ صراحة بوجود <b>اتجاه انحراف ثانٍ معاكس لا يزال دون حلّ</b> (أرصدة أوّليّة/
+    تاريخية زُرِعت بلا قيد تمويل مرافق)، وأن هذا الحارس "ليس آمنًا للربط بأي تنبيه حيّ" حتى الآن.</p>
+    <p><b>العمل المطلوب:</b> (أ) معالجة مصدر الانحراف الثاني المعاكس الاتجاه، (ب) خطوة تحقّق ببيانات حقيقية (زرع
+    حجم إحالات معروف، تأكيد أن الانحراف المتبقّي يطابق خط الأساس المتوقَّع) قبل وصل هذا الحارس بأي تنبيه تشغيلي حيّ.
+    هذا نطاق عمل جديد بالكامل، لا يغطّيه أي بند من E1-E14 القائمة.</p>
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="n">§6</span> تقنيات حديثة إضافية اكتُشفت من الكود الجديد نفسه</h2>
+
+  <div class="finding">
+    <h4>نمط "لقطة مفاتيح i18n مُثبَّتة" (RATCHET-5) <span class="chip build">تقنية جديدة، أبسط من الموجود</span></h4>
+    <p>الـ14 commit أضافت اختبار تغطية مفاتيح i18n مفقودة (<code>web/src/test/i18n/i18n-missing-keys.test.ts</code>)
+    يعتمد على <b>لقطة JSON مُثبَّتة بالمستودع</b> ("لا يمكنها إلّا أن تتقلّص أو تبقى كما هي") — أبسط بكثير من نمط
+    git-worktree/مقارنة BASE-مقابل-HEAD المستخدَم في حارسَي <code>openapi-ratchet</code> و<code>api-contract-ratchet</code>
+    الموجودين مسبقًا (بلا تحقّق مزدوج، بلا دورة حياة worktree، يعمل محليًا وفي CI بنفس الطريقة). <b>أين يُطبَّق:</b>
+    (1) A7(د)/A10(أ) — تتبّع تراجعي لفجوة OpenAPI والإخفاقات المسموحة القديمة، (2) F5 — فحص اكتمال نصوص push
+    المحلّية بثلاث لغات بمجرّد بناء جدول النصوص، (3) I3 — الموبايل ليس لديه أي حارس مماثل لمشكلة النصوص العربية
+    المباشرة؛ يُوصى بإضافة نسخة مطابقة لملف الويب.</p>
+  </div>
+
+  <div class="finding">
+    <h4>نمط "وحدة مشتركة تُشحَن غير مُوصَّلة، ثم تُوصَّل لاحقًا" (item_access.py) <span class="chip build">تقنية جديدة مؤكَّدة عمليًا</span></h4>
+    <p>F-14a/F-14b أنشأتا وحدة <code>backend/app/core/item_access.py</code> (133 سطرًا) توحّد ثلاثة فحوصات "هل هذا
+    الصنف قابل للشراء" كانت منفصلة ومنحرفة عن بعضها، بمنطق واحد يُستخدَم عبر SQL وPython معًا — وذلك عبر
+    <b>commit-ين منفصلين</b>: الأوّل يضيف الوحدة غير موصولة، الثاني يهاجر نقاط الاستدعاء إليها. هذا بالضبط النمط
+    الذي أوصت به المجموعات C1/C2/C5/C15 لحزمة توقيع idempotency مشتركة بين الويب والموبايل — الآن لدينا مثال حيّ
+    شُحن بنجاح بنفس الأسلوب في نفس المستودع، يمكن الاستشهاد به كنموذج مباشر بدل اقتراح نظري.</p>
+  </div>
+</section>
+
+<section id="s7">
+  <h2><span class="n">§7</span> إعادة فحص السلة المجمّعة: هل تغيّر الحكم؟</h2>
+  <div class="callout good">
+    <b>لا. الحكم لم يتغيّر.</b> رغم أن <code>carts/router.py</code> (+11 سطرًا) و<code>carts/service.py</code>
+    (+55 سطرًا) تغيّرا فعليًا في هذه النافذة — كلا التغييرين <b>إضافي بحت</b> (صفر حذف، صفر لمس داخل أي دالّة
+    موجودة مسبقًا). الكود الجديد كلّه دالّة مساعدة جديدة <code>_unavailable_cart_items()</code> مربوطة بنقطة
+    <code>/carts/quote</code> — لا علاقة لها بمسار checkout-group أو بصمة idempotency الخاصة به.
+  </div>
+  <table>
+    <tr><th>الفجوة</th><th>الحالة بعد إعادة الفحص</th></tr>
+    <tr><td>الفجوة 1 — بصمة idempotency ناقصة (عنوان/جدولة/تحويلات/كود خصم)</td><td><span class="chip bad">قائمة بلا تغيير — <code>_hash_sub_orders</code> بلا أي حرف تغيير</span></td></tr>
+    <tr><td>الفجوة 2 — صفر اختبار لمسار تعارض إعادة التشغيل</td><td><span class="chip bad">قائمة — اختبارا الخصم الجديدان يغطّيان الطلب الفردي فقط، صفر ذكر لـOrderGroup</span></td></tr>
+    <tr><td>الفجوة 3 — صفر اختبار للتزامن الحقيقي</td><td><span class="chip bad">قائمة بلا تغيير</span></td></tr>
+    <tr><td>الفجوة 4 — كود خصم صامت الفشل (كامن، غير قابل للوصول)</td><td><span class="chip warn">قائمة كامنة — لكن نصف "توفّر الصنف" من نفس الفحص المسبق تحسّن فعليًا (انظر أدناه)</span></td></tr>
+  </table>
+  <p><b>اكتشاف جانبي إيجابي واحد:</b> الفحص المسبق لتوفّر الصنف في <code>checkout_group()</code> (عبر
+  <code>revalidate_cart_pricing</code>) أصبح الآن مبنيًا فعليًا على المسند المشترك الجديد <code>item_is_purchasable()</code>
+  بدل منطق "أوّل متغيّر نشط" القديم الأقل دقّة — تحسّن حقيقي في صحّة الفحص المسبق، لكنه لا يمسّ بصمة idempotency
+  ولا يغلق أيًا من الفجوات الأربع. <b>الحكم النهائي يبقى كما هو تمامًا:</b> <code>group_order_enabled</code> ما
+  زالت <span class="chip warn">NOT_READY_MAJOR_GAPS</span>، و<code>group_order_participant_split</code> ما زالت
+  <span class="chip bad">NOT_READY_ARCHITECTURAL_REDESIGN_NEEDED</span> (صفر لمس على ملفّاتها في هذه النافذة).</p>
+</section>
+
+<section id="s8">
+  <h2><span class="n">§8</span> الجداول الكاملة المُحدَّثة — كل مجموعة عبر كل مجال</h2>
+  <p>كل صفّ أدناه أُعيد فحصه فعليًا مقابل الرأس الحالي. حالة "معلَّق" هنا تعني: تحقّقنا بقراءة طازجة أن العلّة
+  الموصوفة لا تزال موجودة حرفيًا في الكود الآن، لا مجرّد نقل الحالة القديمة.</p>
+
+  <details open><summary>مجموعة A — النشر والـCI (10) — 8 معلَّق، 2 عولج جزئيًا</summary>
+  <table>
+    <tr><th>#</th><th>الحالة بعد التحقّق الثاني</th></tr>
+    <tr><td class="idcol">A1-A3, A6-A10</td><td><span class="chip warn">معلَّق — صفر تغيير</span></td></tr>
+    <tr><td class="idcol">A4</td><td><span class="chip info">سؤال التحقّق أُجيب: rulesets محظورة أيضًا (403) — يغلق سؤالًا مفتوحًا، لا يُنجز الإصلاح</span></td></tr>
+    <tr><td class="idcol">A5</td><td><span class="chip info">حارس منع نموّ موجود فعلًا (تصحيح 1) — الهجرة والفحص الصحّي معلَّقان</span></td></tr>
+  </table>
+  </details>
+
+  <details><summary>مجموعة B — الهوية والصلاحيات (15) — 15 معلَّق، 2 تصحيح</summary>
+  <table>
+    <tr><th>#</th><th>الحالة</th></tr>
+    <tr><td class="idcol">B1-B5, B7-B9, B11-B15</td><td><span class="chip warn">معلَّق — صفر تغيير، صفر لمس من الـ14 commit</span></td></tr>
+    <tr><td class="idcol">B6</td><td><span class="chip warn">معلَّق — تصحيح العدد فقط (110/8)</span></td></tr>
+    <tr><td class="idcol">B10</td><td><span class="chip warn">معلَّق — نطاق مُصحَّح لـ3 أعمدة لا 4 (تصحيح 4)</span></td></tr>
+  </table>
+  </details>
+
+  <details><summary>مجموعة C — الطلبات والكتالوج (16) — 15 معلَّق، 1 عولج جزئيًا (أعلى أولوية للتحقّق)</summary>
+  <table>
+    <tr><th>#</th><th>الحالة</th></tr>
+    <tr><td class="idcol">C1, C2, C4-C16</td><td><span class="chip warn">معلَّق — كل استشهادات الملفّات/الأسطر أُعيد التحقّق منها طازجة، تطابق تمامًا (مع انزياح أسطر طفيف متوقَّع)</span></td></tr>
+    <tr><td class="idcol">C3</td><td><span class="chip info">عولج جزئيًا فقط — إصلاح R557 بند 5 أغلق فقط تعارض معاينة/فعلي لحالة "بلغ الحدّ الشخصي"، الهدف الجوهري (كود غير موجود/منتهي يمرّ صامتًا) لا يزال مفتوحًا 100%</span></td></tr>
+  </table>
+  <p><b>تأكيد حاسم:</b> <code>item_access.py</code> الجديد <b>لا</b> يمسّ C10 (فصل مخزون المكوّنات) ولا C5 (قدرة
+  الاستلام الذاتي/سعر الموبايل) رغم تشابه الاسم — نطاقه محصور بحالة/سعر المتغيّر (ItemVariant) فقط.</p>
+  </details>
+
+  <details><summary>مجموعة D — التوصيل والسائقون (10) — 10 معلَّق بلا استثناء</summary>
+  <p>صفر لمس من الـ14 commit على أيٍّ من الملفّات الثمانية التي تستند إليها هذه المجموعة. التغيير الوحيد القريب
+  (<code>OpsFleetMap.tsx</code>، إصلاح تذكرة إعادة اتصال SSE) مجاور لكنه لا يمسّ فجوة تسجيل تدقيق الوصول لمواقع
+  الأسطول (D6) التي تبقى مفتوحة تمامًا.</p>
+  </details>
+
+  <details><summary>مجموعة E — المحفظة والدفتر المالي (14 + مجموعة جديدة E15) — 14 معلَّق، 4 تصحيح ترقيم، +1 جديدة</summary>
+  <p>لا شيء عولج. أربع مجموعات (E1، E3، E8، E12) تحتاج فقط إعادة ترقيم ترحيل قاعدة البيانات المقترَح (تصحيح 5).
+  اكتُشفت مجموعة جديدة كاملة (E15، انظر §5) من commit لم يكن مذكورًا في الخطة الأصلية إطلاقًا.</p>
+  </details>
+
+  <details><summary>مجموعة F — الإشعارات ونقطة البيع (9) — 9 معلَّق بلا استثناء</summary>
+  <p>صفر لمس من الـ14 commit على أيٍّ من الملفّات التسعة. تقنية حديثة واحدة أُضيفت (نمط لقطة i18n، انظر §6)
+  تنطبق على F5 تحديدًا.</p>
+  </details>
+
+  <details><summary>مجموعة G — الخصوصية وOPS (15) — 15 معلَّق، 1 تصحيح مسار</summary>
+  <p>تأكيد مهمّ: إصلاحات F-03 (رسائل خطأ الواجهة) <b>لا تتقاطع إطلاقًا</b> مع G-M (تسريب استثناءات خام في
+  الخادم) — الأولى واجهة أمامية بحتة تعرض نصًّا آمنًا مُعَدًّا سلفًا من الخادم، والثانية خادم يُسرِّب نصّ استثناء
+  خام لم يمرّ بأي تنقية. اتجاهان متعاكسان تمامًا، بلا تداخل.</p>
+  </details>
+
+  <details><summary>مجموعة H — Tawa Trade (6) — 6 معلَّق، +1 إضافة حقيقية (H2)</summary>
+  <p>صفر لمس على كل ملفّات Trade السبعة — تأكيد مباشر عبر مقارنة عدد أسطر كل ملف حرفيًا. الإضافة الوحيدة: H2
+  تحتاج وحدة آلة حالة مشتركة جديدة (تصحيح 10).</p>
+  </details>
+
+  <details><summary>مجموعة I — الموبايل (7) — 7 معلَّق بلا استثناء</summary>
+  <p>صفر commit من الـ14 مسّ <code>apps/mobile/</code> إطلاقًا. اكتشاف مؤكِّد: نفس فئة علّة رسائل الخطأ العربية
+  فقط أُصلحت على الويب <b>مرّتين</b> الآن (عند 6bbeaad وعند هذه النافذة) دون أن يصل الإصلاح المكافئ للموبايل بعد —
+  يقوّي أولوية I3.</p>
+  </details>
+
+  <details><summary>مجموعة J — الويب وقاعدة البيانات (10) — 8 معلَّق، 2 تصحيح</summary>
+  <p>J7 (المقاييس) وJ8 (قائمة IP) هما التصحيحان الوحيدان الجوهريّان (انظر §4، تصحيح 8 و9) — كلاهما يجعل الفجوة
+  الموصوفة إمّا أضيق (J7) أو أوسع (J8) ممّا افتُرِض أصلًا، لا ينهيها.</p>
+  </details>
+</section>
+
+<section id="s9">
+  <h2><span class="n">§9</span> خريطة التسلسل — بلا تغيير، وما زالت سارية بالكامل</h2>
+  <p>كل قيود التسلسل الثلاثين الموثَّقة في التقرير 559 (§2 هناك) تعتمد على بنية الكود لا على تفاصيل سطر بعينه —
+  ولأن لا شيء من الـ14 commit مسّ آلية Shadow Mode، أو ملفّات الأعلام، أو بنية الصلاحيات، أو حوكمة الـCI، فإن
+  <b>كل قيد من الثلاثين لا يزال ساري المفعول حرفيًا كما كُتب</b>. القيد الوحيد الذي يستحقّ إضافة: قيود ترقيم
+  الترحيلات (تصحيح 5) يجب أن تُقرأ الآن كـ"ابدأ من ab69 لا ab61" أينما ظهرت.</p>
+</section>
+
+<section id="s10">
+  <h2><span class="n">§10</span> الخلاصة والتوصية النهائية لبدء التنفيذ</h2>
+  <p>التقرير 559 لا يزال المرجع التنفيذي الصحيح والكامل. هذا التقرير (560) هو طبقة تحقّق وتصحيح فوقه، لا بديل عنه:</p>
+  <ol>
+    <li>استخدم كل محتوى التقرير 559 كما هو — البنية، المراحل، السيناريوهات، التسلسل — كل ذلك صحيح ومُتحقَّق منه
+    الآن مرّتين.</li>
+    <li>طبِّق التصحيحات الإحدى عشر في §4 حرفيًا عند التنفيذ الفعلي (خصوصًا: نطاق B10 المتقلِّص، وترقيم E1/E3/E8/E12
+    الجديد).</li>
+    <li>أضِف مجموعة E15 كبند جديد في مرحلة السلامة المالية (المرحلة الثالثة من 559).</li>
+    <li>ادمج التقنيتين الحديثتين الجديدتين (§6) في تصميم A7/A10/F5/I3/H2 عند التنفيذ.</li>
+    <li>لا تغيير على حكم السلة المجمّعة — لا تزال غير جاهزة للفتح، بنفس الفجوات الأربع بالضبط.</li>
+    <li><b>الدرس التشغيلي الأهمّ:</b> أي خطّة مستقبلية على هذا المستودع يجب أن تُعيد فحص حالة الكود الحيّة قبل
+    التنفيذ الفعلي مباشرة — ليس لأن الخطط السابقة كانت خاطئة، بل لأن فرقًا أخرى تعمل بالتوازي على نفس الفرع، وهذا
+    التقرير هو الدليل العملي على أن هذا الانضباط يُبقي الخطة دقيقة رغم ذلك.</li>
+  </ol>
+</section>
+
+<footer>
+  تقرير 560 · تحقّق ثانٍ صارم من التقرير 559 مقابل HEAD الجديد <code>d9c5d38d</code> (14 commit بعد
+  <code>6bbeaad</code>) · 11 عملية تحقّق مستقلّة · النتيجة: 0/112 عولج صدفةً، 11 تصحيحًا دقيقًا، 1 مجموعة جديدة،
+  2 تقنية حديثة إضافية · 2026-07-25
+</footer>
+
+<a class="top" href="#top">↑ الأعلى</a>

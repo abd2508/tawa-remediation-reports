@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تشخيص الفجوتين — test_f9 و pwa-config</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:     #1b2330;
+  --ink2:    #3b4f68;
+  --muted:   #6a7c94;
+  --paper:   #f2f5f8;
+  --surface: #ffffff;
+  --border:  #dce3ed;
+  --accent:  #0f766e;   /* teal — تحليل جنائي */
+  --accent2: #7c3aed;   /* purple — F9 */
+  --accent3: #0891b2;   /* cyan — PWA */
+  --success: #16a34a;
+  --warn:    #d97706;
+  --fail:    #dc2626;
+  --r:       6px;
+  --r-lg:    10px;
+  --mono:    'SF Mono','Cascadia Code',Consolas,'Courier New',monospace;
+  --sans:    -apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,Arial,sans-serif;
+}
+
+html { background: var(--paper); }
+body {
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.72;
+  color: var(--ink);
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--ink);
+  display: flex; align-items: stretch;
+  overflow-x: auto; scrollbar-width: none;
+  margin: 0 -20px; padding: 0 20px;
+}
+.nav::-webkit-scrollbar { display: none; }
+.nav a {
+  display: block; padding: 10px 15px;
+  font-size: 11.5px; font-weight: 600;
+  color: rgba(255,255,255,.5); text-decoration: none;
+  white-space: nowrap; border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.nav a:hover { color: #fff; border-color: var(--accent); }
+.nav .sep { width: 1px; background: rgba(255,255,255,.1); margin: 8px 4px; }
+
+/* ── HEADER ── */
+.page-header {
+  background: var(--ink);
+  margin: 0 -20px 28px; padding: 36px 32px 28px;
+  color: #fff;
+}
+.ph-eye {
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 10px;
+}
+.ph-title {
+  font-size: 22px; font-weight: 800;
+  line-height: 1.25; letter-spacing: -.01em;
+  margin-bottom: 10px; text-wrap: balance;
+}
+.ph-sub {
+  font-size: 12.5px; color: rgba(255,255,255,.5);
+  font-family: var(--mono); margin-bottom: 18px;
+}
+.ph-badges { display: flex; flex-wrap: wrap; gap: 7px; }
+.pb {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 4px;
+  font-size: 11px; font-weight: 700; border: 1px solid;
+}
+.pb.red    { color: #fca5a5; border-color: rgba(252,165,165,.4); background: rgba(252,165,165,.1); }
+.pb.teal   { color: #5eead4; border-color: rgba(94,234,212,.4); background: rgba(94,234,212,.1); }
+.pb.amber  { color: #fcd34d; border-color: rgba(252,211,77,.4); background: rgba(252,211,77,.1); }
+.pb.green  { color: #4ade80; border-color: rgba(74,222,128,.4); background: rgba(74,222,128,.1); }
+
+/* ── SECTION ── */
+.section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-lg); margin-bottom: 18px; overflow: hidden;
+}
+.sh {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 22px; border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none;
+}
+.sh:hover { background: var(--paper); }
+.sh .tag {
+  font-size: 10px; font-weight: 800; letter-spacing: .07em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 3px;
+  color: #fff; flex-shrink: 0;
+}
+.tg-f9   { background: var(--accent2); }
+.tg-pwa  { background: var(--accent3); }
+.tg-fix  { background: var(--success); }
+.tg-sum  { background: #475569; }
+.sh h2   { font-size: 15px; font-weight: 700; flex: 1; line-height: 1.3; }
+.sh .chev { color: var(--muted); font-size: 11px; transition: transform .2s; flex-shrink: 0; }
+.section.open .chev { transform: rotate(180deg); }
+.sb { padding: 22px; display: none; }
+.section.open .sb { display: block; }
+
+/* ── CONTENT ── */
+h3.sub {
+  font-size: 10px; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted);
+  margin: 22px 0 10px;
+}
+h3.sub:first-child { margin-top: 0; }
+p.body {
+  font-size: 13.5px; color: var(--ink2);
+  max-width: 660px; margin-bottom: 12px; line-height: 1.8;
+}
+p.body:last-child { margin-bottom: 0; }
+
+.callout {
+  padding: 13px 16px; border-radius: 5px;
+  font-size: 13px; line-height: 1.75;
+  color: var(--ink2); margin: 14px 0;
+}
+.callout.teal   { background: #f0fdfa; border-right: 3px solid var(--accent); }
+.callout.green  { background: #f0fdf4; border-right: 3px solid var(--success); }
+.callout.amber  { background: #fffbeb; border-right: 3px solid var(--warn); }
+.callout.red    { background: #fef2f2; border-right: 3px solid var(--fail); }
+.callout.purple { background: #faf5ff; border-right: 3px solid var(--accent2); }
+.callout.blue   { background: #ecfeff; border-right: 3px solid var(--accent3); }
+
+/* ── CODE BLOCKS ── */
+code {
+  font-family: var(--mono); font-size: 11.5px;
+  background: #edf1f8; padding: 1px 5px; border-radius: 3px; color: #2a3548;
+}
+.code-block {
+  background: #1b2330; border-radius: var(--r);
+  padding: 16px 18px; margin: 14px 0;
+  overflow-x: auto; font-family: var(--mono); font-size: 12px;
+  line-height: 1.7; color: #cdd5e0;
+}
+.code-block .ln  { color: #475569; user-select: none; display: inline-block; width: 24px; text-align: left; margin-left: 8px; }
+.code-block .kw  { color: #7dd3fc; }  /* keyword */
+.code-block .fn  { color: #a5f3fc; }  /* function */
+.code-block .str { color: #86efac; }  /* string */
+.code-block .cm  { color: #4b5563; }  /* comment */
+.code-block .bad { background: rgba(220,38,38,.25); border-right: 3px solid #dc2626; padding-right: 4px; }
+.code-block .fix { background: rgba(22,163,74,.2);  border-right: 3px solid #16a34a; padding-right: 4px; }
+.code-block .hi  { color: #fcd34d; }  /* highlight */
+
+/* ── TABLE ── */
+.tw { overflow-x: auto; margin: 14px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+th {
+  text-align: right; font-size: 10px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+  padding: 7px 12px; border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+.pass { color: var(--success); font-weight: 700; }
+.fail { color: var(--fail); font-weight: 700; }
+
+/* ── PILL ── */
+.pill {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 8px; border-radius: 3px;
+  font-size: 10.5px; font-weight: 700; white-space: nowrap;
+}
+.pill.pass   { background: #dcfce7; color: var(--success); }
+.pill.fail   { background: #fee2e2; color: var(--fail); }
+.pill.warn   { background: #fef3c7; color: var(--warn); }
+.pill.fixed  { background: #dcfce7; color: var(--success); }
+.pill.gap    { background: #faf5ff; color: var(--accent2); border: 1px solid #c4b5fd; }
+.pill.stale  { background: #ecfeff; color: #0e7490; border: 1px solid #a5f3fc; }
+
+/* ── DIAGRAM ── */
+.diagram {
+  overflow-x: auto; margin: 16px 0;
+  background: var(--paper); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px;
+}
+.diagram svg { max-width: 100%; display: block; margin: 0 auto; }
+.diagram-cap { text-align: center; font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+/* ── TIMELINE ── */
+.timeline { list-style: none; padding-right: 28px; position: relative; margin: 14px 0; }
+.timeline::before {
+  content: ''; position: absolute; right: 8px; top: 8px; bottom: 8px;
+  width: 2px; background: var(--border);
+}
+.timeline li { position: relative; padding: 0 26px 20px 0; }
+.timeline li:last-child { padding-bottom: 0; }
+.timeline li::before {
+  content: ''; position: absolute; right: -1px; top: 5px;
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2.5px solid var(--border); background: var(--surface);
+}
+.timeline li.done::before  { background: var(--success);  border-color: var(--success); }
+.timeline li.bad::before   { background: var(--fail);     border-color: var(--fail); }
+.timeline li.fixed::before { background: var(--accent);   border-color: var(--accent); }
+.timeline li.stale::before { background: var(--accent3);  border-color: var(--accent3); }
+.tl-step { font-size: 10.5px; font-weight: 700; color: var(--muted); margin-bottom: 3px; letter-spacing: .04em; text-transform: uppercase; }
+.tl-body { font-size: 13px; color: var(--ink2); line-height: 1.7; }
+
+/* ── SEP ── */
+.sep { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── FIX BOX ── */
+.fix-box {
+  background: #f0fdf4; border: 1.5px solid #86efac;
+  border-radius: var(--r); padding: 16px 18px; margin: 14px 0;
+}
+.fix-box .fix-label {
+  font-size: 10px; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--success); margin-bottom: 8px;
+}
+
+/* ── COMPARE GRID ── */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+@media (max-width: 620px) { .compare { grid-template-columns: 1fr; } }
+.compare-card {
+  border: 1px solid var(--border); border-radius: var(--r);
+  overflow: hidden;
+}
+.compare-card .cc-head {
+  padding: 8px 12px; font-size: 11px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+}
+.cc-head.old  { background: #fee2e2; color: var(--fail); border-bottom: 1px solid #fecaca; }
+.cc-head.new  { background: #dcfce7; color: var(--success); border-bottom: 1px solid #bbf7d0; }
+.compare-card .cc-body { padding: 12px; background: var(--paper); font-size: 12.5px; color: var(--ink2); line-height: 1.7; }
+
+/* ── FOOTER ── */
+.doc-footer {
+  text-align: center; font-size: 11px; color: var(--muted);
+  margin-top: 40px; padding-top: 20px;
+  border-top: 1px solid var(--border); line-height: 2;
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#overview">نظرة عامة</a>
+  <div class="sep"></div>
+  <a href="#f9-root">F9 · الجذر</a>
+  <a href="#f9-isolate">F9 · العزل</a>
+  <a href="#f9-fix">F9 · الإصلاح</a>
+  <div class="sep"></div>
+  <a href="#pwa-root">PWA · الجذر</a>
+  <a href="#pwa-triple">PWA · التناقض الثلاثي</a>
+  <a href="#pwa-fix">PWA · الإصلاح</a>
+  <div class="sep"></div>
+  <a href="#summary">الخلاصة</a>
+</nav>
+
+<div class="page-header">
+  <div class="ph-eye">منصة توا · تشخيص جنائي</div>
+  <h1 class="ph-title">تقرير الفجوتين — test_f9 و pwa-config</h1>
+  <p class="ph-sub">فحص دقيق لكل جذر · تتبع كامل · خطط إصلاح بالأساليب الحديثة</p>
+  <div class="ph-badges">
+    <span class="pb red">فجوة 1: test_f9 · إخفاق دوري + هشاشة هيكلية</span>
+    <span class="pb red">فجوة 2: pwa-config · skipWaiting ثلاثي التناقض</span>
+    <span class="pb teal">المجموعة الكاملة: 3104 نجاح حالياً</span>
+    <span class="pb amber">الـPWA gap لا تزال تفشل بثبات</span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     OVERVIEW
+══════════════════════════════════════════ -->
+<div class="section open" id="overview">
+  <div class="sh" onclick="this.closest('.section').classList.toggle('open')">
+    <span class="tag tg-sum">نظرة عامة</span>
+    <h2>ملخص الوضع — ما الفرق بين الفجوتين؟</h2>
+    <span class="chev">▾</span>
+  </div>
+  <div class="sb">
+
+    <div class="tw">
+      <table>
+        <tr>
+          <th>الفجوة</th>
+          <th>الملف</th>
+          <th>نوع المشكلة</th>
+          <th>الحالة الآن</th>
+          <th>الخطر</th>
+        </tr>
+        <tr>
+          <td><strong>F9 — الإيداع اليومي</strong></td>
+          <td><code>test_wave1_split_finance.py:97</code></td>
+          <td>هشاشة هيكلية + FK shortcut</td>
+          <td><span class="pill pass">يعمل في SQLite</span></td>
+          <td><span class="pill fail">يفشل في PostgreSQL</span></td>
+        </tr>
+        <tr>
+          <td><strong>PWA config</strong></td>
+          <td><code>src/test/pwa-config.test.ts:41</code></td>
+          <td>انجراف قرار التصميم</td>
+          <td><span class="pill fail">يفشل دائماً</span></td>
+          <td><span class="pill warn">سلوك SW مختلف عن الوثائق</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout teal">
+      <strong>مهم:</strong> الفجوتان مختلفتان تماماً في طبيعتهما.
+      F9 مشكلة <em>بنية اختبار</em> (يعمل في بيئة اختبار ويفشل في الإنتاج/CI الحقيقي).
+      PWA مشكلة <em>انجراف قرار</em> (الاختبار يقيس قراراً قديماً لم يُحدَّث عندما تغيّر الكود).
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 740 170" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Tahoma,Arial,sans-serif">
+
+        <!-- F9 branch -->
+        <rect x="10" y="20" width="350" height="135" rx="8" fill="#faf5ff" stroke="#c084fc" stroke-width="1.3"/>
+        <text x="185" y="42" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3aed">فجوة F9 — مشكلة بنية</text>
+
+        <rect x="30" y="55" width="140" height="28" rx="5" fill="#ede9fe" stroke="#a78bfa" stroke-width="1"/>
+        <text x="100" y="73" text-anchor="middle" font-size="10.5" fill="#5b21b6">SQLite (افتراضي)</text>
+
+        <rect x="200" y="55" width="140" height="28" rx="5" fill="#fecaca" stroke="#ef4444" stroke-width="1.2"/>
+        <text x="270" y="69" text-anchor="middle" font-size="10.5" fill="#7f1d1d">PostgreSQL (إنتاج/CI)</text>
+        <text x="270" y="79" font-size="0">.</text>
+
+        <line x1="100" y1="83" x2="100" y2="108" stroke="#7c3aed" stroke-width="1.5"/>
+        <polygon points="96,104 100,113 104,104" fill="#7c3aed"/>
+        <line x1="270" y1="83" x2="270" y2="108" stroke="#dc2626" stroke-width="1.5"/>
+        <polygon points="266,104 270,113 274,104" fill="#dc2626"/>
+
+        <rect x="30" y="112" width="140" height="28" rx="5" fill="#dcfce7" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="100" y="130" text-anchor="middle" font-size="10.5" fill="#166534">✓ يمر (FK غير مُطبَّق)</text>
+
+        <rect x="200" y="112" width="140" height="28" rx="5" fill="#fee2e2" stroke="#f87171" stroke-width="1.2"/>
+        <text x="270" y="130" text-anchor="middle" font-size="10.5" fill="#dc2626">✗ FK violation — يفشل</text>
+
+        <text x="185" y="158" text-anchor="middle" font-size="9.5" fill="#7c3aed">اختصار FK: order_id عشوائي لا طلب حقيقي</text>
+
+        <!-- PWA branch -->
+        <rect x="385" y="20" width="350" height="135" rx="8" fill="#ecfeff" stroke="#22d3ee" stroke-width="1.3"/>
+        <text x="560" y="42" text-anchor="middle" font-size="12" font-weight="700" fill="#0891b2">فجوة PWA — انجراف قرار</text>
+
+        <rect x="405" y="55" width="140" height="28" rx="5" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1"/>
+        <text x="475" y="69" text-anchor="middle" font-size="10" fill="#0369a1">القرار الأصلي (Phase 370)</text>
+        <text x="475" y="80" font-size="0">.</text>
+
+        <rect x="570" y="55" width="140" height="28" rx="5" fill="#fef3c7" stroke="#fbbf24" stroke-width="1.2"/>
+        <text x="640" y="73" text-anchor="middle" font-size="10.5" fill="#92400e">التطبيق الحالي (تغيّر)</text>
+
+        <line x1="475" y1="83" x2="475" y2="108" stroke="#0891b2" stroke-width="1.5"/>
+        <polygon points="471,104 475,113 479,104" fill="#0891b2"/>
+        <line x1="640" y1="83" x2="640" y2="108" stroke="#d97706" stroke-width="1.5"/>
+        <polygon points="636,104 640,113 644,104" fill="#d97706"/>
+
+        <rect x="405" y="112" width="140" height="28" rx="5" fill="#e0f2fe" stroke="#38bdf8" stroke-width="1"/>
+        <text x="475" y="130" text-anchor="middle" font-size="10.5" fill="#0369a1">skipWaiting: false (test)</text>
+
+        <rect x="570" y="112" width="140" height="28" rx="5" fill="#fef3c7" stroke="#fbbf24" stroke-width="1.2"/>
+        <text x="640" y="130" text-anchor="middle" font-size="10.5" fill="#92400e">skipWaiting: true (config)</text>
+
+        <text x="560" y="158" text-anchor="middle" font-size="9.5" fill="#0891b2">الاختبار يقيس قراراً قديماً غير محدَّث</text>
+      </svg>
+      <div class="diagram-cap">الفجوتان مختلفتان جوهرياً: الأولى خطر تقني في بيئة الإنتاج، الثانية توثيق قديم</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     F9 ROOT CAUSE
+══════════════════════════════════════════ -->
+<div class="section open" id="f9-root">
+  <div class="sh" onclick="this.closest('.section').classList.toggle('open')">
+    <span class="tag tg-f9">F9 · الجذر</span>
+    <h2>تحليل جذري كامل — لماذا test_f9 هشّ؟</h2>
+    <span class="chev">▾</span>
+  </div>
+  <div class="sb">
+
+    <h3 class="sub">ما يفعله الاختبار</h3>
+    <p class="body">
+      الاختبار يتحقق من أن حساب التسوية اليومية للسائق يستثني <strong>البقشيش</strong> من المبلغ المُسلَّم.
+      منطقياً صحيح: السائق يحتفظ بالبقشيش، فلا يجب أن يسلّمه للمشغّل.
+    </p>
+
+    <div class="callout purple">
+      <strong>مشكلة الاختصار (FK Shortcut):</strong>
+      الاختبار يُنشئ سجل <code>CashCollection</code> بـ<code>order_id = uuid.uuid4()</code> عشوائي —
+      لا طلب حقيقي في جدول <code>orders</code> يقابله.
+      هذا اختصار لتفادي بناء سجل طلب كامل، لكنه انتهاك لقيد FK الصريح في النموذج.
+    </div>
+
+    <div class="code-block">
+      <div><span class="ln">113</span><span class="bad">db_session.add(CashCollection(id=str(uuid.uuid4()),</span></div>
+      <div><span class="ln">114</span><span class="bad">    order_id=str(uuid.uuid4()),  <span class="cm"># ← طلب وهمي! لا وجود له في orders</span></span></div>
+      <div><span class="ln">115</span><span class="bad">    driver_id=str(d.id),</span></div>
+      <div><span class="ln">116</span><span class="bad">    amount_minor=10000, tip_minor=1000, ...))</span></div>
+      <div><span class="ln">117</span><span class="bad">await db_session.commit()  <span class="cm"># ← PostgreSQL: FK ERROR هنا</span></span></div>
+    </div>
+
+    <h3 class="sub">الـ FK في النموذج</h3>
+    <p class="body">
+      الحقل <code>order_id</code> في <code>CashCollection</code> مُعرَّف صراحةً بقيد مرجعي صارم:
+    </p>
+
+    <div class="code-block">
+      <div><span class="ln">270</span><span class="hi">order_id: Mapped[str] = mapped_column(</span></div>
+      <div><span class="ln">271</span><span class="hi">    String(36), <span class="kw">ForeignKey</span>(<span class="str">"orders.id"</span>), <span class="kw">nullable=False</span></span></div>
+      <div><span class="ln">272</span><span class="hi">)</span></div>
+      <div><span class="ln">   </span><span class="cm"># + Index unique على order_id (A6): مجموعة واحدة لكل طلب</span></div>
+      <div><span class="ln">289</span>Index(<span class="str">"uq_cash_collections_order_id"</span>, <span class="str">"order_id"</span>, <span class="kw">unique=True</span>)</div>
+    </div>
+
+    <h3 class="sub">لماذا يعمل في SQLite ولا يعمل في PostgreSQL؟</h3>
+
+    <div class="diagram">
+      <svg viewBox="0 0 740 195" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Tahoma,Arial,sans-serif">
+        <defs>
+          <marker id="arr-p" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" fill="#6b7c94"/>
+          </marker>
+          <marker id="arr-g" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" fill="#16a34a"/>
+          </marker>
+          <marker id="arr-r" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+            <path d="M0,0 L7,3.5 L0,7 Z" fill="#dc2626"/>
+          </marker>
+        </defs>
+
+        <!-- SQLite path -->
+        <rect x="8" y="8" width="340" height="178" rx="8" fill="#f5f3ff" stroke="#a78bfa" stroke-width="1.2"/>
+        <text x="178" y="28" text-anchor="middle" font-size="11.5" font-weight="700" fill="#7c3aed">مسار SQLite (افتراضي)</text>
+
+        <rect x="58" y="40" width="240" height="26" rx="5" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1"/>
+        <text x="178" y="57" text-anchor="middle" font-size="10" fill="#5b21b6">conftest → PRAGMA foreign_keys=OFF ثم ON</text>
+
+        <line x1="178" y1="66" x2="178" y2="86" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+        <rect x="58" y="87" width="240" height="26" rx="5" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1"/>
+        <text x="178" y="104" text-anchor="middle" font-size="10" fill="#5b21b6">db_session.add(CashCollection(order_id=fake))</text>
+
+        <line x1="178" y1="113" x2="178" y2="133" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arr-p)"/>
+
+        <rect x="58" y="134" width="240" height="28" rx="5" fill="#dcfce7" stroke="#4ade80" stroke-width="1.5"/>
+        <text x="178" y="149" text-anchor="middle" font-size="10" fill="#166534">await db_session.commit()</text>
+        <text x="178" y="162" text-anchor="middle" font-size="9.5" fill="#16a34a">✓ يمر — SQLite لا يُطبّق FK في هذه البيئة</text>
+
+        <text x="178" y="180" text-anchor="middle" font-size="9" fill="#7c3aed">StaticPool + aiosqlite: PRAGMA per-connection</text>
+
+        <!-- PostgreSQL path -->
+        <rect x="383" y="8" width="350" height="178" rx="8" fill="#fef2f2" stroke="#f87171" stroke-width="1.3"/>
+        <text x="558" y="28" text-anchor="middle" font-size="11.5" font-weight="700" fill="#dc2626">مسار PostgreSQL (إنتاج/CI حقيقي)</text>
+
+        <rect x="423" y="40" width="270" height="26" rx="5" fill="#fecaca" stroke="#ef4444" stroke-width="1"/>
+        <text x="558" y="57" text-anchor="middle" font-size="10" fill="#7f1d1d">FK constraints مُفعَّلة دائماً</text>
+
+        <line x1="558" y1="66" x2="558" y2="86" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+        <rect x="423" y="87" width="270" height="26" rx="5" fill="#fecaca" stroke="#ef4444" stroke-width="1"/>
+        <text x="558" y="104" text-anchor="middle" font-size="10" fill="#7f1d1d">db_session.add(CashCollection(order_id=fake))</text>
+
+        <line x1="558" y1="113" x2="558" y2="133" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+        <rect x="423" y="134" width="270" height="28" rx="5" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5"/>
+        <text x="558" y="149" text-anchor="middle" font-size="10" font-weight="700" fill="#dc2626">✗ FOREIGN KEY violation</text>
+        <text x="558" y="162" text-anchor="middle" font-size="9.5" fill="#991b1b">orders.id لا يحتوي على هذا UUID</text>
+
+        <text x="558" y="180" text-anchor="middle" font-size="9" fill="#dc2626">الاختبار يفشل → نتيجة مُضللة</text>
+      </svg>
+      <div class="diagram-cap">نفس الكود — سلوكان مختلفان حسب قاعدة البيانات</div>
+    </div>
+
+    <h3 class="sub">السبب العميق لـ SQLite السلوك</h3>
+    <p class="body">
+      في الـ conftest، يُطبَّق <code>PRAGMA foreign_keys=ON</code> داخل
+      <code>async with test_engine.begin() as conn</code> — وهو <strong>connection منفصل</strong>
+      عن الـ <code>db_session</code> fixture. مع <code>StaticPool</code>، تُعيد SQLAlchemy نفس
+      الـ connection تقنياً، لكن <code>aiosqlite</code> يُشغّل كل عملية عبر thread worker خاص،
+      وقد لا يحتفظ الـ PRAGMA بحالته عبر الـ event loop boundaries بنفس الطريقة.
+      النتيجة: FK قد تكون غير مُطبَّقة فعلياً في وقت الـ commit.
+    </p>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     F9 ISOLATION HISTORY
+══════════════════════════════════════════ -->
+<div class="section open" id="f9-isolate">
+  <div class="sh" onclick="this.closest('.section').classList.toggle('open')">
+    <span class="tag tg-f9">F9 · العزل</span>
+    <h2>تاريخ الإخفاق الدوري وكيف أُصلح جزئياً</h2>
+    <span class="chev">▾</span>
+  </div>
+  <div class="sb">
+
+    <h3 class="sub">السبب الأول للإخفاق الدوري (قبل Wave-T T1)</h3>
+    <div class="callout red">
+      <strong>المشكلة الجذرية القديمة:</strong>
+      قاعدة البيانات في الاختبارات هي SQLite in-memory واحدة مشتركة بين جميع الاختبارات (StaticPool).
+      أي اختبار يستدعي <code>.commit()</code> يترك بيانات في قاعدة البيانات تنتقل للاختبارات التالية.
+      هذا جعل النتائج تعتمد على ترتيب تشغيل الاختبارات.
+    </div>
+
+    <ul class="timeline">
+      <li class="bad">
+        <div class="tl-step">المشكلة المُكتشَفة</div>
+        <div class="tl-body">
+          اختبارات soft-launch تُحصي نسب أدوار/طلبات — إذا أبقى اختبار سابق بيانات في DB،
+          تتغير النسب وتفشل الاختبارات. <code>test_f9</code> كان ينجح منفرداً ويفشل في المجموعة
+          لأن اختباراً سابقاً أضاف بيانات تُغيّر نتيجة استعلام التسوية.
+        </div>
+      </li>
+      <li class="done">
+        <div class="tl-step">الإصلاح المطبَّق — Wave-T T1 (_isolate_db)</div>
+        <div class="tl-body">
+          أُضيف fixture جديد <code>_isolate_db</code> يعمل <strong>قبل كل اختبار</strong>:
+          يمسح جميع الجداول (بالترتيب العكسي لحل تبعيات FK)، ثم يُمكّن اختبار كل حالة من نقطة صفر نظيفة.
+        </div>
+      </li>
+      <li class="fixed">
+        <div class="tl-step">الحالة الآن</div>
+        <div class="tl-body">
+          المجموعة الكاملة تعمل: <strong>3104 نجاح</strong>. لكن الهشاشة الهيكلية لا تزال موجودة —
+          الاختبار يعتمد على SQLite وسيفشل عند تشغيله ضد PostgreSQL.
+        </div>
+      </li>
+    </ul>
+
+    <div class="code-block">
+      <div><span class="cm"># conftest.py — Wave-T T1: الحل المطبَّق</span></div>
+      <div>&nbsp;</div>
+      <div><span class="kw">@pytest_asyncio.fixture</span>(autouse=<span class="kw">True</span>)</div>
+      <div><span class="kw">async def</span> <span class="fn">_isolate_db</span>(create_tables):</div>
+      <div>    <span class="cm"># مسح كل الجداول قبل كل اختبار</span></div>
+      <div>    <span class="kw">async with</span> test_engine.begin() <span class="kw">as</span> conn:</div>
+      <div>        <span class="kw">if</span> IS_SQLITE:</div>
+      <div>            <span class="kw">await</span> conn.exec_driver_sql(<span class="str">"PRAGMA foreign_keys=OFF"</span>)</div>
+      <div>        <span class="kw">for</span> table <span class="kw">in</span> reversed(Base.metadata.sorted_tables):</div>
+      <div>            <span class="kw">await</span> conn.execute(table.delete())</div>
+      <div>        <span class="kw">if</span> IS_SQLITE:</div>
+      <div>            <span class="kw">await</span> conn.exec_driver_sql(<span class="str">"PRAGMA foreign_keys=ON"</span>)</div>
+      <div>    <span class="kw">yield</span>  <span class="cm"># ← الاختبار يعمل هنا</span></div>
+    </div>
+
+    <h3 class="sub">الهشاشة المتبقية</h3>
+    <div class="callout amber">
+      <strong>الاختبار ناجح في SQLite لكنه غير موثوق في PostgreSQL:</strong>
+      إذا أُعِيد تشغيل الاختبارات بـ<code>TEST_DATABASE_URL=postgresql+asyncpg://...</code>
+      (كما تُوصي الـ conftest للتحقق من pg_trgm وغيرها)، سيفشل <code>test_f9</code>
+      فوراً عند <code>await db_session.commit()</code> بسبب FK violation.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     F9 FIX
+══════════════════════════════════════════ -->
+<div class="section open" id="f9-fix">
+  <div class="sh" onclick="this.closest('.section').classList.toggle('open')">
+    <span class="tag tg-fix">F9 · الإصلاح</span>
+    <h2>الإصلاح الصحيح — ثلاثة خيارات بالأسلوب الحديث</h2>
+    <span class="chev">▾</span>
+  </div>
+  <div class="sb">
+
+    <div class="callout teal">
+      المبدأ الحديث: <strong>اختبار الوحدة يجب أن يصمد ضد قاعدة البيانات الحقيقية</strong>.
+      الاختصارات التي تعتمد على عدم تطبيق FK تُخفي أخطاء تصميم، وتكذب على مرحلة CI/CD.
+    </div>
+
+    <div class="tw">
+      <table>
+        <tr>
+          <th>الخيار</th>
+          <th>الأسلوب</th>
+          <th>الجهد</th>
+          <th>الموثوقية</th>
+          <th>الأفضل لـ</th>
+        </tr>
+        <tr>
+          <td><strong>✅ الأمثل — بناء طلب كامل</strong></td>
+          <td>استخدام <code>_seed()</code> الموجودة لبناء Order حقيقي</td>
+          <td>متوسط</td>
+          <td class="pass">عالية — يعمل في SQLite + PG</td>
+          <td>سلامة طويلة المدى</td>
+        </tr>
+        <tr>
+          <td>فصل المنطق عن البنية</td>
+          <td>Mock لـ DB layer، اختبار خدمة التسوية فقط</td>
+          <td>أقل</td>
+          <td><span class="pill warn">تغطية جزئية</span></td>
+          <td>اختبارات الوحدة البحتة</td>
+        </tr>
+        <tr>
+          <td>إعلان Skip في PostgreSQL</td>
+          <td><code>@pytest.mark.skipif(not IS_SQLITE, reason="FK shortcut")</code></td>
+          <td>أقل</td>
+          <td><span class="pill warn">يُخفي المشكلة</span></td>
+          <td>مؤقت فقط</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3 class="sub">الإصلاح الأمثل — الكود الكامل</h3>
+
+    <div class="fix-box">
+      <div class="fix-label">الإصلاح الموصى به: إنشاء طلب حقيقي</div>
+      <div class="code-block" style="background: #0f1a14; margin:0;">
+        <div><span class="kw">@pytest.mark.asyncio</span></div>
+        <div><span class="kw">async def</span> <span class="fn">test_f9_daily_settlement_excludes_tip</span>(</div>
+        <div>    client: AsyncClient, db_session: AsyncSession</div>
+        <div>):</div>
+        <div>    <span class="cm">"""F9: السائق يحتفظ بالبقشيش → يُستثنى من net_handover."""</span></div>
+        <div>    <span class="cm"># 1. بناء بيانات كاملة عبر _seed (تُنشئ Provider + CatalogItem + ...)</span></div>
+        <div>    cust, prov, addr, item, variant = <span class="kw">await</span> _seed(db_session)</div>
+        <div>&nbsp;</div>
+        <div>    <span class="cm"># 2. إنشاء طلب حقيقي عبر OrderService → يُوجَد في orders</span></div>
+        <div>    svc = OrderService(db_session)</div>
+        <div>    order = <span class="kw">await</span> svc.create_order(</div>
+        <div>        payment_method=<span class="str">"CASH"</span>,</div>
+        <div>        idempotency_key=str(uuid.uuid4()),</div>
+        <div>        correlation_id=str(uuid.uuid4()),</div>
+        <div>        customer_id=cust, provider_id=prov,</div>
+        <div>        address_id=addr, recipient_mode=<span class="str">"delivery_to_address"</span>,</div>
+        <div>        items=[{<span class="str">"catalog_item_id"</span>: item, <span class="str">"variant_id"</span>: variant, <span class="str">"qty"</span>: 1}],</div>
+        <div>        raw_notes=[],</div>
+        <div>    )</div>
+        <div>&nbsp;</div>
+        <div>    <span class="cm"># 3. بناء Driver حقيقي</span></div>
+        <div>    ops = str(uuid.uuid4())</div>
+        <div>    db_session.add(User(id=ops, phone=<span class="str">f"+218{uuid.uuid4().hex[:9]}"</span>, status=<span class="str">"ACTIVE"</span>))</div>
+        <div>    db_session.add(Role(user_id=ops, role=<span class="str">"OPERATIONS_AGENT"</span>, status=<span class="str">"ACTIVE"</span>))</div>
+        <div>    duid = str(uuid.uuid4())</div>
+        <div>    db_session.add(User(id=duid, phone=<span class="str">f"+218{uuid.uuid4().hex[:9]}"</span>, status=<span class="str">"ACTIVE"</span>))</div>
+        <div>    <span class="kw">await</span> db_session.flush()</div>
+        <div>    d = Driver(user_id=duid, status=<span class="str">"ACTIVE"</span>, city=<span class="str">"Tripoli"</span>, vehicle_type=<span class="str">"WALKING"</span>)</div>
+        <div>    db_session.add(d)</div>
+        <div>    <span class="kw">await</span> db_session.flush()</div>
+        <div>&nbsp;</div>
+        <div>    <span class="cm"># 4. ✅ استخدام order.id الحقيقي — لا FK violation</span></div>
+        <div>    libya = _tz(_td(hours=2))</div>
+        <div>    day = _dt.now(libya).strftime(<span class="str">"%Y-%m-%d"</span>)</div>
+        <div>    db_session.add(CashCollection(</div>
+        <div>        id=str(uuid.uuid4()),</div>
+        <div class="fix">        order_id=<span class="hi">order.id</span>,  <span class="cm"># ← طلب حقيقي، لا UUID عشوائي</span></div>
+        <div>        driver_id=str(d.id),</div>
+        <div>        amount_minor=10000, tip_minor=1000,</div>
+        <div>        currency=<span class="str">"LYD"</span>,</div>
+        <div>        collected_at=_dt.now(_tz.utc),</div>
+        <div>        state=<span class="str">"COLLECTED"</span>,</div>
+        <div>        local_operation_id=<span class="str">f"loc-{uuid.uuid4()}"</span>,</div>
+        <div>    ))</div>
+        <div>    <span class="kw">await</span> db_session.commit()</div>
+        <div>&nbsp;</div>
+        <div>    <span class="cm"># 5. التحقق من التسوية — كما كان</span></div>
+        <div>    r = <span class="kw">await</span> client.post(<span class="str">"/operations/driver-settlements/generate"</span>,</div>
+        <div>                         json={<span class="str">"business_day_id"</span>: day},</div>
+        <div>                         headers={<span class="str">"Authorization"</span>: <span class="str">f"Bearer {_jwt(ops, 'OPERATIONS_AGENT')}"</span>})</div>
+        <div>    <span class="kw">assert</span> r.status_code == 200, r.text</div>
+        <div>    <span class="cm"># ... بقية assertions كما هي</span></div>
+        <div>    <span class="kw">assert</span> s.cash_collected_minor == 9000</div>
+        <div>    <span class="kw">assert</span> s.net_handover_minor == 9000</div>
+      </div>
+    </div>
+
+    <div class="callout green" style="margin-top: 12px;">
+      <strong>ملاحظة:</strong> قد تحتاج إلى ضبط حالة الطلب إلى <code>DELIVERED</code> قبل إنشاء
+      <code>CashCollection</code> إذا كان هناك تحقق على مستوى خدمة التسوية.
+      الأفضل من ذلك: استخدام دالة <code>OrderService</code> لنقل حالة الطلب عبر المسار الصحيح.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PWA ROOT CAUSE
+══════════════════════════════════════════ -->
+<div class="section open" id="pwa-root">
+  <div class="sh" onclick="this.closest('.section').classList.toggle('open')">
+    <span class="tag tg-pwa">PWA · الجذر</span>
+    <h2>تحليل جذري — لماذا يفشل اختبار pwa-config؟</h2>
+    <span class="chev">▾</span>
+  </div>
+  <div class="sb">
+
+    <h3 class="sub">الفشل المباشر</h3>
+
+    <div class="code-block">
+      <div><span class="cm"># pwa-config.test.ts:39–42</span></div>
+      <div>it(<span class="str">"clientsClaim is true; skipWaiting is false (P-2: prompt mode waits for user accept)"</span>, () => {</div>
+      <div>    expect(config).toContain(<span class="str">"clientsClaim: true"</span>);  <span class="cm">// ✓ يمر</span></div>
+      <div class="bad">    expect(config).toContain(<span class="str">"skipWaiting: false"</span>);  <span class="cm">// ✗ يفشل — الملف يحتوي: true</span></div>
+      <div>});</div>
+    </div>
+
+    <div class="callout red">
+      <strong>المقارنة الحرفية:</strong><br>
+      <code>vite.config.ts</code> يحتوي على: <code>skipWaiting: true</code><br>
+      الاختبار يتوقع: <code>skipWaiting: false</code><br>
+      النتيجة: فشل ثابت في كل تشغيل.
+    </div>
+
+    <h3 class="sub">تاريخ القرار — كيف وصلنا هنا؟</h3>
+
+    <ul class="timeline">
+      <li class="done">
+        <div class="tl-step">المرحلة 370 (G-6) — القرار الأصلي P-2</div>
+        <div class="tl-body">
+          كُتب الاختبار ليُطبّق مبدأ P-2: <em>"المستخدم يتحكم في تحديث SW"</em>.
+          القرار: <code>skipWaiting: false</code> + <code>registerType: "prompt"</code> +
+          مكوّن <code>PwaReloadPrompt</code> يعرض للمستخدم زر "تحديث متاح".
+        </div>
+      </li>
+      <li class="stale">
+        <div class="tl-step">مرحلة لاحقة — تغيير التطبيق</div>
+        <div class="tl-body">
+          تغيّر <code>skipWaiting</code> إلى <code>true</code> في <code>vite.config.ts</code>.
+          أُعيدت كتابة <code>PwaReloadPrompt.tsx</code> كلياً — من "اعرض تحديثاً للمستخدم"
+          إلى "طبّق التحديث تلقائياً وأعد التحميل". <strong>لم يُحدَّث الاختبار.</strong>
+        </div>
+      </li>
+      <li class="bad">
+        <div class="tl-step">الوضع الراهن — تناقض موثّق</div>
+        <div class="tl-body">
+          الاختبار يُراقب قراراً منتهياً. كل push يُنتج فشلاً وهمياً لا يعكس خللاً حقيقياً —
+          بل يعكس اختباراً منتهي الصلاحية.
+        </div>
+      </li>
+    </ul>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PWA TRIPLE INCONSISTENCY
+══════════════════════════════════════════ -->
+<div class="section open" id="pwa-triple">
+  <div class="sh" onclick="this.closest('.section').classList.toggle('open')">
+    <span class="tag tg-pwa">PWA · التناقض</span>
+    <h2>التناقض الثلاثي — ثلاثة ملفات لا تتفق</h2>
+    <span class="chev">▾</span>
+  </div>
+  <div class="sb">
+
+    <div class="diagram">
+      <svg viewBox="0 0 740 225" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,Tahoma,Arial,sans-serif">
+
+        <!-- Three file boxes -->
+        <!-- vite.config.ts -->
+        <rect x="10" y="10" width="225" height="200" rx="8" fill="#fffbeb" stroke="#fbbf24" stroke-width="1.3"/>
+        <text x="122" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">vite.config.ts</text>
+        <text x="122" y="47" text-anchor="middle" font-size="9.5" fill="#78350f">الإعدادات</text>
+        <rect x="25" y="58" width="195" height="20" rx="3" fill="#fef3c7" stroke="#fde68a"/>
+        <text x="122" y="72" text-anchor="middle" font-size="10" fill="#92400e" font-family="Consolas,monospace">registerType: "prompt"</text>
+        <rect x="25" y="83" width="195" height="20" rx="3" fill="#fde68a" stroke="#fbbf24" stroke-width="1.5"/>
+        <text x="122" y="97" text-anchor="middle" font-size="10" font-weight="700" fill="#78350f" font-family="Consolas,monospace">skipWaiting: true ⚠</text>
+        <rect x="25" y="108" width="195" height="20" rx="3" fill="#fef3c7" stroke="#fde68a"/>
+        <text x="122" y="122" text-anchor="middle" font-size="10" fill="#92400e" font-family="Consolas,monospace">clientsClaim: true</text>
+        <text x="122" y="148" text-anchor="middle" font-size="9.5" fill="#d97706">registerType="prompt" مع skipWaiting=true</text>
+        <text x="122" y="162" text-anchor="middle" font-size="9" fill="#92400e">متوافقان: التطبيق يتحكم بالتسجيل</text>
+        <text x="122" y="174" text-anchor="middle" font-size="9" fill="#92400e">والـ SW ينشّط فوراً عند اكتشافه</text>
+
+        <!-- PwaReloadPrompt.tsx -->
+        <rect x="258" y="10" width="224" height="200" rx="8" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.3"/>
+        <text x="370" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">PwaReloadPrompt.tsx</text>
+        <text x="370" y="47" text-anchor="middle" font-size="9.5" fill="#15803d">السلوك الفعلي</text>
+        <rect x="273" y="58" width="194" height="36" rx="3" fill="#dcfce7" stroke="#4ade80" stroke-width="1.2"/>
+        <text x="370" y="71" text-anchor="middle" font-size="9.5" fill="#166534" font-family="Consolas,monospace">// Auto-update mode:</text>
+        <text x="370" y="83" text-anchor="middle" font-size="9.5" fill="#166534" font-family="Consolas,monospace">// no user prompt</text>
+        <rect x="273" y="100" width="194" height="36" rx="3" fill="#dcfce7" stroke="#4ade80"/>
+        <text x="370" y="113" text-anchor="middle" font-size="9.5" fill="#15803d" font-family="Consolas,monospace">if (needRefresh)</text>
+        <text x="370" y="125" text-anchor="middle" font-size="9.5" fill="#15803d" font-family="Consolas,monospace">  updateServiceWorker(true)</text>
+        <text x="370" y="157" text-anchor="middle" font-size="9" fill="#16a34a">✓ يتوافق مع skipWaiting:true</text>
+        <text x="370" y="169" text-anchor="middle" font-size="9" fill="#16a34a">يُطبّق التحديث فوراً تلقائياً</text>
+
+        <!-- pwa-config.test.ts -->
+        <rect x="506" y="10" width="226" height="200" rx="8" fill="#fef2f2" stroke="#f87171" stroke-width="1.5"/>
+        <text x="619" y="32" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">pwa-config.test.ts</text>
+        <text x="619" y="47" text-anchor="middle" font-size="9.5" fill="#dc2626">التوقعات القديمة</text>
+        <rect x="521" y="58" width="196" height="20" rx="3" fill="#fecaca" stroke="#f87171" stroke-width="1.2"/>
+        <text x="619" y="72" text-anchor="middle" font-size="9.5" fill="#7f1d1d" font-family="Consolas,monospace">// P-2: prompt mode</text>
+        <rect x="521" y="83" width="196" height="20" rx="3" fill="#fee2e2" stroke="#ef4444" stroke-width="1.5"/>
+        <text x="619" y="97" text-anchor="middle" font-size="10" font-weight="700" fill="#dc2626" font-family="Consolas,monospace">expect: "skipWaiting: false"</text>
+        <text x="619" y="118" text-anchor="middle" font-size="9.5" fill="#dc2626">← يفشل دائماً</text>
+        <text x="619" y="148" text-anchor="middle" font-size="9" fill="#b91c1c">يوثّق القرار الأصلي (P-2)</text>
+        <text x="619" y="160" text-anchor="middle" font-size="9" fill="#b91c1c">الذي لم يعد مطبَّقاً</text>
+        <text x="619" y="172" text-anchor="middle" font-size="9" fill="#b91c1c">الاختبار منتهي الصلاحية</text>
+
+        <!-- Arrows between -->
+        <line x1="235" y1="112" x2="256" y2="112" stroke="#16a34a" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="245" y="108" text-anchor="middle" font-size="8" fill="#16a34a">✓</text>
+        <line x1="482" y1="112" x2="503" y2="112" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="492" y="108" text-anchor="middle" font-size="8" fill="#dc2626">✗</text>
+      </svg>
+      <div class="diagram-cap">vite.config.ts + PwaReloadPrompt.tsx يتوافقان | الاختبار لا يزال يتوقع القرار القديم</div>
+    </div>
+
+    <h3 class="sub">ما هو سلوك كل إعداد؟</h3>
+    <div class="tw">
+      <table>
+        <tr><th>الإعداد</th><th>القيمة</th><th>المعنى</th></tr>
+        <tr>
+          <td><code>registerType: "prompt"</code></td>
+          <td><span class="pill stale">prompt</span></td>
+          <td>التطبيق يتحكم متى يُسجَّل الـ SW (لا تسجيل تلقائي) — الـ <code>PwaReloadPrompt</code> يتولى هذا</td>
+        </tr>
+        <tr>
+          <td><code>skipWaiting: true</code></td>
+          <td><span class="pill warn">true (حالي)</span></td>
+          <td>عند اكتشاف SW جديد: ينشّط فوراً دون انتظار إغلاق جميع التبويبات</td>
+        </tr>
+        <tr>
+          <td><code>skipWaiting: false</code></td>
+          <td><span class="pill gap">false (قديم)</span></td>
+          <td>SW جديد ينتظر في الـ "waiting" حتى تُغلق جميع التبويبات — يحتاج مستخدماً يغلق المتصفح</td>
+        </tr>
+        <tr>
+          <td><code>clientsClaim: true</code></td>
+          <td><span class="pill pass">true</span></td>
+          <td>SW الجديد يتولى جميع التبويبات المفتوحة فوراً بعد التنشيط</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout blue">
+      <strong>الفهم الكامل:</strong>
+      <code>registerType: "prompt"</code> + <code>skipWaiting: true</code> + <code>PwaReloadPrompt</code> (auto-update)
+      تُشكّل تصميماً متسقاً: التطبيق يكتشف SW جديداً ← يُنبَّه تلقائياً ← يُعيد التحميل فوراً.
+      لا حاجة لتدخل المستخدم. هذا النمط أحدث من P-2 وأكثر عملية للنشرات المتكررة.
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     PWA FIX
+══════════════════════════════════════════ -->
+<div class="section open" id="pwa-fix">
+  <div class="sh" onclick="this.closest('.section').classList.toggle('open')">
+    <span class="tag tg-fix">PWA · الإصلاح</span>
+    <h2>الإصلاح — تحديث الاختبار ليعكس التطبيق الحقيقي</h2>
+    <span class="chev">▾</span>
+  </div>
+  <div class="sb">
+
+    <div class="callout teal">
+      <strong>القاعدة الحديثة:</strong> اختبار التكوين يجب أن يوثّق القرار <em>المطبَّق حالياً</em>
+      مع شرح للسبب — لا القرار الذي كان صحيحاً في السابق.
+      تحديث الاختبار ليعكس السلوك المقصود هو الإصلاح الصحيح — ليس حذف الاختبار.
+    </div>
+
+    <div class="compare">
+      <div class="compare-card">
+        <div class="cc-head old">الكود القديم (يفشل)</div>
+        <div class="cc-body">
+<code>it("clientsClaim is true; skipWaiting is false
+    (P-2: prompt mode waits for user accept)", () => {
+    expect(config).toContain("clientsClaim: true");
+    expect(config).toContain("skipWaiting: false");
+    // ← يفشل: الملف يحتوي على true
+});</code>
+        </div>
+      </div>
+      <div class="compare-card">
+        <div class="cc-head new">الكود الجديد (يمر)</div>
+        <div class="cc-body">
+<code>it("skipWaiting:true + clientsClaim:true (auto-update:
+    SW activates immediately on detection)", () => {
+    expect(config).toContain("clientsClaim: true");
+    expect(config).toContain("skipWaiting: true");
+    // ← يمر: يعكس التطبيق الحقيقي
+});</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="fix-box">
+      <div class="fix-label">الإصلاح الكامل — pwa-config.test.ts</div>
+      <div class="code-block" style="background: #0f1a14; margin:0;">
+        <div><span class="cm">// السطر 39–42 — استبدال التوقع القديم</span></div>
+        <div>&nbsp;</div>
+        <div class="fix">  it(<span class="str">"skipWaiting:true + clientsClaim:true — auto-update mode (SW activates on detection)"</span>, () => {</div>
+        <div class="fix">    <span class="cm">// Design change from P-2 (prompt) to auto-update:</span></div>
+        <div class="fix">    <span class="cm">// PwaReloadPrompt.tsx auto-applies SW on needRefresh — no user button needed.</span></div>
+        <div class="fix">    <span class="cm">// skipWaiting:true → SW skips waiting, clientsClaim:true → takes over all tabs.</span></div>
+        <div class="fix">    expect(config).toContain(<span class="str">"clientsClaim: true"</span>);</div>
+        <div class="fix">    expect(config).toContain(<span class="str">"skipWaiting: true"</span>);  <span class="cm">// ← كان: false</span></div>
+        <div class="fix">  });</div>
+      </div>
+    </div>
+
+    <h3 class="sub">اختبار إضافي موصى به — تحقق من PwaReloadPrompt</h3>
+    <div class="callout blue">
+      الأسلوب الحديث في اختبار التكوين: ليس فقط التحقق من قيم الإعدادات،
+      بل التحقق من <strong>اتساق السلوك</strong> بين الإعدادات والمكوّنات.
+      أُضف هذا الاختبار لتوثيق أن الـ auto-update pattern مكتمل:
+    </div>
+
+    <div class="code-block">
+      <div><span class="cm">// اختبار جديد — التحقق من اتساق النمط</span></div>
+      <div>it(<span class="str">"auto-update pattern: registerType=prompt + skipWaiting=true + PwaReloadPrompt"</span>, () => {</div>
+      <div>    <span class="cm">// registerType=prompt: التطبيق يتحكم بالتسجيل (عبر PwaReloadPrompt)</span></div>
+      <div>    expect(config).toContain(<span class="str">'registerType: "prompt"'</span>);</div>
+      <div>    <span class="cm">// skipWaiting=true: SW ينشّط فوراً بعد الاكتشاف</span></div>
+      <div>    expect(config).toContain(<span class="str">"skipWaiting: true"</span>);</div>
+      <div>    <span class="cm">// PwaReloadPrompt موجود في المشروع ويتولى التحديث التلقائي</span></div>
+      <div>    <span class="kw">const</span> pwaPrompt = fs.readFileSync(</div>
+      <div>        <span class="str">"./src/components/PwaReloadPrompt.tsx"</span>, <span class="str">"utf-8"</span></div>
+      <div>    );</div>
+      <div>    expect(pwaPrompt).toContain(<span class="str">"updateServiceWorker(true)"</span>);</div>
+      <div>    expect(pwaPrompt).toContain(<span class="str">"needRefresh"</span>);</div>
+      <div>});</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SUMMARY
+══════════════════════════════════════════ -->
+<div class="section open" id="summary">
+  <div class="sh" onclick="this.closest('.section').classList.toggle('open')">
+    <span class="tag tg-sum">الخلاصة</span>
+    <h2>ماذا نفعل؟ — جدول القرار</h2>
+    <span class="chev">▾</span>
+  </div>
+  <div class="sb">
+
+    <div class="tw">
+      <table>
+        <tr>
+          <th>الفجوة</th>
+          <th>الجذر الحقيقي</th>
+          <th>الخطر الفعلي</th>
+          <th>الإصلاح</th>
+          <th>الجهد</th>
+          <th>الأولوية</th>
+        </tr>
+        <tr>
+          <td><strong>F9 — test_f9</strong></td>
+          <td>FK shortcut: order_id عشوائي في CashCollection</td>
+          <td>يفشل عند <code>TEST_DATABASE_URL=postgresql+asyncpg</code></td>
+          <td>استخدام <code>order.id</code> حقيقي من <code>_seed()</code></td>
+          <td>≈30 دقيقة</td>
+          <td><span class="pill warn">متوسطة</span></td>
+        </tr>
+        <tr>
+          <td><strong>PWA — pwa-config</strong></td>
+          <td>الاختبار يتوقع <code>skipWaiting: false</code> القديم، التطبيق يستخدم <code>true</code></td>
+          <td>فشل ثابت في كل push — ضوضاء CI مضلّلة</td>
+          <td>تحديث توقع الاختبار السطر 41 من <code>false</code> إلى <code>true</code> + تحديث الوصف</td>
+          <td>≈5 دقائق</td>
+          <td><span class="pill fail">عالية — فوري</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="sep"></div>
+
+    <h3 class="sub">المبادئ العامة المستخلصة</h3>
+
+    <div class="callout green">
+      <strong>مبدأ 1 — اختبارات التكامل يجب أن تصمد في PostgreSQL:</strong>
+      لا اختصارات FK. أي اختبار يُنشئ سجلاً بـ<code>ForeignKey</code> يجب أن يبني البيانات المرتبطة فعلياً.
+      SQLite يُخفي هذه المشاكل — PostgreSQL يكشفها.
+    </div>
+
+    <div class="callout green">
+      <strong>مبدأ 2 — اختبارات التكوين توثّق السلوك الحالي المقصود:</strong>
+      عندما يتغير قرار التصميم (P-2 → auto-update)، يجب تحديث الاختبار فوراً كجزء من نفس الـ commit.
+      اختبار يفشل لأن التطبيق تطور هو فشل في الانضباط، ليس فشلاً في الكود.
+    </div>
+
+    <div class="callout teal">
+      <strong>مبدأ 3 — الفشل الدوري خطير أكثر من الفشل الثابت:</strong>
+      الفشل الثابت واضح ويُصلَح. الفشل الدوري يبني ثقة زائفة ويُخفي أخطاء حقيقية.
+      <code>_isolate_db</code> حلّ الجزء الأكبر، لكن البنية الهشة تبقى وتنتظر بيئة CI حقيقية.
+    </div>
+
+  </div>
+</div>
+
+<div class="doc-footer">
+  منصة توا · تشخيص الفجوتين · test_f9 + pwa-config.test.ts<br>
+  <code>backend/tests/test_wave1_split_finance.py:97</code> ·
+  <code>web/src/test/pwa-config.test.ts:41</code>
+</div>
+
+</body>
+</html>

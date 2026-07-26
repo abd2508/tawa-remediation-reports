@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقرير المفصّل — E5 توسعة تغطية التحقّق إلى DRIVER + PROVIDER</title>
+<style>
+  :root{
+    --green:#1f7a4d; --green-d:#14532d; --amber:#b45309; --gray:#64748b;
+    --bg:#f5f8f6; --card:#fff; --border:#dbe5df; --ink:#16201c; --muted:#566860;
+    --ok:#15803d; --okbg:#e7f6ec; --warnbg:#fef4e4; --err:#b91c1c;
+    --code-bg:#0f1c17; --code-ink:#e6f3ec;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);
+       margin:0;padding:0;line-height:1.85;font-size:15px}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 80px}
+  header.hd{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:18px;
+       padding:30px 30px;box-shadow:0 10px 30px rgba(20,83,45,.20)}
+  header.hd h1{margin:0 0 8px;font-size:25px;line-height:1.45}
+  header.hd .sub{opacity:.93;font-size:15.5px}
+  .pill{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);
+       border-radius:999px;padding:4px 14px;font-size:12.5px;margin:9px 5px 0 0}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin:18px 0}
+  nav.toc strong{color:var(--green-d);display:block;margin-bottom:8px}
+  nav.toc ol{margin:0;padding-inline-start:22px;columns:2;font-size:14px}
+  nav.toc a{color:var(--green);text-decoration:none} nav.toc a:hover{text-decoration:underline}
+  section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin:18px 0;
+       box-shadow:0 2px 9px rgba(20,83,45,.05)}
+  h2{color:var(--green-d);font-size:20px;margin:2px 0 16px;padding-bottom:10px;border-bottom:2px solid #e9f2ec}
+  h3{color:var(--green);font-size:16.5px;margin:20px 0 9px}
+  p{margin:9px 0}
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13.8px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#edf5f0;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafcfb}
+  code,.mono{font-family:"SF Mono",Consolas,monospace;background:#eaf0ed;color:#0f2a1e;
+       padding:1.5px 6px;border-radius:5px;font-size:12.8px;direction:ltr;display:inline-block}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:15px 17px;overflow:auto;
+       font-family:"SF Mono",Consolas,monospace;font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;margin:11px 0}
+  pre .c{color:#7fa890} pre .k{color:#7fb0ff} pre .s{color:#9ee6a8} pre .n{color:#e6c07b}
+  .ok{color:var(--ok);font-weight:700} .err{color:var(--err);font-weight:700}
+  .badge-ok{background:var(--okbg);color:var(--ok);border:1px solid #bfe6cb;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  .badge-dormant{background:#eef2f0;color:var(--gray);border:1px solid #d6ddda;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  ul.clean{margin:8px 0;padding-inline-start:22px} ul.clean li{margin:6px 0}
+  .kv{display:grid;grid-template-columns:230px 1fr;gap:7px 16px;font-size:14px;margin:9px 0}
+  .kv .k{color:var(--muted)}
+  .note{background:var(--warnbg);border:1px solid #f4d9a8;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .seal{background:var(--okbg);border:1px solid #bfe6cb;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin:10px 0}
+  .flow span{background:#edf5f0;border:1px solid var(--border);border-radius:8px;padding:6px 11px}
+  .flow .arr{background:none;border:none;color:var(--green);font-weight:800}
+  .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:28px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <h1>التقرير المفصّل — E5: توسعة تغطية التحقّق الاستشاريّ<br>إلى وثائق DRIVER + PROVIDER</h1>
+  <div class="sub">إكمال الجزء الناقص: التحقّق كان موصولًا بـ AGENT فقط؛ النموذج يدعم الأنواع الثلاثة</div>
+  <div>
+    <span class="pill">النطاق: tawanow.com</span>
+    <span class="pill">نشر باكند + ويب</span>
+    <span class="pill">بلا migration (جدول aa29)</span>
+    <span class="pill">FIN-COR PASS · NEW=0</span>
+    <span class="pill">خامل افتراضيًّا</span>
+    <span class="pill">بلا commit · رأس المستودع aa29</span>
+    <span class="pill">2026-06-12</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>محتويات التقرير</strong>
+  <ol>
+    <li><a href="#s1">الخلاصة والدافع</a></li>
+    <li><a href="#s2">الفحص المسبق (نقاط الوصل)</a></li>
+    <li><a href="#s3">الدالّة المشتركة + إعادة التوظيف</a></li>
+    <li><a href="#s4">وصل المُطلِق (مزوّد + سائق)</a></li>
+    <li><a href="#s5">إرفاق التحقّق بنقاط قراءة OPS</a></li>
+    <li><a href="#s6">سطح الواجهة (شارة OpsOnboarding)</a></li>
+    <li><a href="#s7">الاختبارات والبوّابة</a></li>
+    <li><a href="#s8">النشر والتحقّق الحيّ</a></li>
+    <li><a href="#s9">السلامة والحالة النهائيّة</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2>① الخلاصة والدافع</h2>
+  <p>
+    المرحلة أ من E5 ربطت مُطلِق التحقّق الاستشاريّ بوثائق <strong>AGENT</strong> فقط، بينما جدول
+    <code>document_verifications</code> صُمِّم منذ البداية ليغطّي الأنواع الثلاثة عبر العمود <code>doc_kind</code>
+    (<code>AGENT | DRIVER | PROVIDER</code>). وثائق <strong>السائق والمزوّد</strong> هما سطحا KYC المركزيّان
+    (صفحة <code>/ops/onboarding</code>)، فكان وصلهما هو الجزء الناقص. هذه التوسعة تُكمله بنفس النمط بدقّة:
+    خامل/استشاريّ/غير حاجب، بلا migration، بلا مساس بالقلب الماليّ.
+  </p>
+  <div class="kv">
+    <div class="k">قبل</div><div>التحقّق موصول: AGENT فقط (المرحلة أ)</div>
+    <div class="k">بعد</div><div>التحقّق موصول: <strong>AGENT + DRIVER + PROVIDER</strong> (نفس المُطلِق الخامل)</div>
+    <div class="k">على الإنتاج</div><div><span class="badge-dormant">خامل — is_enabled=False</span> ⇒ كلّ وثيقة جديدة تُسجَّل SKIPPED، لا تحجب</div>
+    <div class="k">الترحيل / المالية</div><div>بلا migration (جدول aa29) · FIN-COR PASS</div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2>② الفحص المسبق — نقاط الوصل المؤكَّدة بالكود</h2>
+  <table>
+    <tr><th>الغرض</th><th>الموقع</th></tr>
+    <tr><td>إنشاء وثيقة مزوّد (وصل المُطلِق)</td><td><code>providers/provider_router.py:835</code> <code>upload_provider_document</code> (فيه <code>flush</code> مسبق)</td></tr>
+    <tr><td>إنشاء وثيقة سائق (وصل المُطلِق)</td><td><code>dispatch/dispatch_router.py:803</code> <code>upload_driver_document</code></td></tr>
+    <tr><td>قراءة OPS لوثائق المزوّد</td><td><code>GET /providers/{provider_id}/documents</code> (<code>_prov_doc_dict</code>)</td></tr>
+    <tr><td>قراءة OPS لوثائق السائق</td><td><code>GET /drivers/{driver_id}/documents</code> (<code>_doc_dict</code>)</td></tr>
+    <tr><td>سطح المراجعة في الواجهة</td><td><code>OpsOnboarding.tsx</code> — يستدعي <code>listDriverDocuments</code>/<code>listProviderDocuments</code></td></tr>
+    <tr><td>أنواع المُعرّفات</td><td>الثلاثة <code>String(36)</code> UUID — متّسقة مع <code>document_verifications.doc_id</code></td></tr>
+  </table>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2>③ الدالّة المشتركة + إعادة التوظيف (تقليل التكرار)</h2>
+  <p>بدل تكرار منطق «أرفِق آخر تحقّق» في ثلاثة مواضع، أضفتُ دالّة مشتركة واحدة، ثمّ أعدتُ توظيف مسار AGENT عليها:</p>
+  <pre><span class="c"># modules/kyc/doc_verification.py — دالّة جديدة مشتركة</span>
+<span class="k">async def</span> latest_verifications_for(db, doc_ids: list[str]) -> dict[str, dict]:
+    <span class="k">if not</span> doc_ids: <span class="k">return</span> {}
+    rows = (<span class="k">await</span> db.execute(
+        select(DocumentVerification)
+        .where(DocumentVerification.doc_id.in_([str(d) <span class="k">for</span> d <span class="k">in</span> doc_ids]))
+        .order_by(DocumentVerification.created_at.desc()))).scalars().all()
+    out = {}
+    <span class="k">for</span> v <span class="k">in</span> rows: out.setdefault(v.doc_id, {<span class="s">"status"</span>: v.status, <span class="s">"score"</span>: v.score, <span class="s">"flags"</span>: v.flags})
+    <span class="k">return</span> out  <span class="c"># desc ⇒ أوّل ظهور لكلّ doc_id = الأحدث</span></pre>
+  <pre><span class="c"># settlement/agent_admin_router.py — list_documents (AGENT) أُعيد توظيفه على الدالّة</span>
+vmap = <span class="k">await</span> latest_verifications_for(db, [d.id <span class="k">for</span> d <span class="k">in</span> rows])
+<span class="k">return</span> {<span class="s">"items"</span>: [{..., <span class="s">"verification"</span>: vmap.get(d.id)} <span class="k">for</span> d <span class="k">in</span> rows]}</pre>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2>④ وصل المُطلِق — مزوّد + سائق</h2>
+  <pre><span class="c"># provider_router.upload_provider_document — بعد flush، قبل commit</span>
+<span class="k">await</span> queue_document_verification(db, doc_id=doc.id, doc_kind=<span class="s">"PROVIDER"</span>,
+                                 doc_type=doc.doc_type, object_key=doc.object_key)
+<span class="k">await</span> db.commit()</pre>
+  <pre><span class="c"># dispatch_router.upload_driver_document — أُضيف flush ثمّ المُطلِق</span>
+db.add(doc); <span class="k">await</span> db.flush()
+<span class="k">await</span> queue_document_verification(db, doc_id=doc.id, doc_kind=<span class="s">"DRIVER"</span>,
+                                 doc_type=doc.doc_type, object_key=doc.object_key)
+<span class="k">await</span> db.commit()</pre>
+  <div class="flow">
+    <span>رفع وثيقة سائق/مزوّد</span><span class="arr">←</span>
+    <span>إنشاء الصفّ + flush</span><span class="arr">←</span>
+    <span>queue_document_verification</span><span class="arr">←</span>
+    <span>خامل ⇒ <strong>SKIPPED</strong></span><span class="arr">←</span>
+    <span>commit (لا يحجب الرفع)</span>
+  </div>
+  <div class="note">
+    <strong>fail-open محفوظ:</strong> <code>queue_document_verification</code> لا يرفع أبدًا داخل المُستدعي؛ الرفع يبقى <code>200 / PENDING</code>
+    كما كان (مؤكَّد باختبار «غير حاجب»).
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2>⑤ إرفاق التحقّق بنقاط قراءة OPS</h2>
+  <pre><span class="c"># GET /drivers/{driver_id}/documents  و  GET /providers/{provider_id}/documents</span>
+vmap = <span class="k">await</span> latest_verifications_for(db, [d.id <span class="k">for</span> d <span class="k">in</span> docs])
+<span class="k">return</span> {<span class="s">"items"</span>: [{**_doc_dict(d), <span class="s">"verification"</span>: vmap.get(d.id)} <span class="k">for</span> d <span class="k">in</span> docs], <span class="s">"total"</span>: len(docs)}</pre>
+  <p>المُسلسِلات الأصليّة (<code>_doc_dict</code> / <code>_prov_doc_dict</code>) <strong>لم تُلمَس</strong> — تُستعمَل في مسارات غير OPS (وثائق السائق/المزوّد لنفسه)؛ الإرفاق يقع فقط في نقطتَي قراءة OPS.</p>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2>⑥ سطح الواجهة — شارة في OpsOnboarding</h2>
+  <pre><span class="c">// operations.ts — KycDocument</span>
+verification?: { status: string; score?: number|null; flags?: string|null } | null;</pre>
+  <pre><span class="c">// OpsOnboarding.tsx — بعد شارة حالة الوثيقة (نفس خريطة شارة المرحلة أ)</span>
+SKIPPED → <span class="s">"🔍 لم يُفحَص"</span> · PENDING → <span class="s">"🔍 قيد الفحص"</span>
+DONE    → <span class="s">"🔍 درجة N"</span>  · ERROR  → <span class="s">"🔍 تعذّر الفحص"</span></pre>
+  <p>تظهر الشارة بجوار كلّ وثيقة سائق/مزوّد في درج المراجعة بصفحة <code>/ops/onboarding</code>.</p>
+</section>
+
+<!-- 7 -->
+<section id="s7">
+  <h2>⑦ الاختبارات والبوّابة</h2>
+  <table>
+    <tr><th>المجموعة</th><th>التغطية</th><th>النتيجة</th></tr>
+    <tr><td><code>test_e5_doc_verification_coverage.py</code> (جديد)</td><td>رفع وثيقة سائق ⇒ SKIPPED مُرفَق في قائمة OPS · رفع وثيقة مزوّد ⇒ SKIPPED مُرفَق · الرفع غير حاجب (200/PENDING)</td><td><span class="badge-ok">3/3</span></td></tr>
+    <tr><td>اختبارات KYC القائمة (140/449/174)</td><td>عدم تراجع في مسارات رفع/مراجعة الوثائق</td><td><span class="badge-ok">27/27</span></td></tr>
+    <tr><td>OpsOnboarding (واجهة)</td><td>سلامة الصفحة بعد إضافة الشارة</td><td><span class="badge-ok">11/11</span></td></tr>
+  </table>
+  <table>
+    <tr><th>بوّابة ما قبل النشر</th><th>النتيجة</th></tr>
+    <tr><td>FIN-COR</td><td><span class="badge-ok">PASS</span></td></tr>
+    <tr><td>الحزمة الخلفيّة</td><td>2194 ناجح (2191 + 3 جديدة) · أساس 29 / حاليّ 29 · <span class="ok">NEW=0</span></td></tr>
+    <tr><td>الواجهة</td><td>tsc 0 · eslint 0 · build PASS</td></tr>
+  </table>
+</section>
+
+<!-- 8 -->
+<section id="s8">
+  <h2>⑧ النشر والتحقّق الحيّ على tawanow.com</h2>
+  <table>
+    <tr><th>الخطوة</th><th>النتيجة</th></tr>
+    <tr><td><code>deploy_be_gated.sh</code></td><td>صورة الباكند أُعيد بناؤها — <span class="ok">backend-core صحّية</span> + الدالّة المشتركة حاضرة</td></tr>
+    <tr><td><code>deploy_web.sh</code></td><td>صورة الويب أُعيد بناؤها (شارة OpsOnboarding) — <span class="ok">web-frontend صحّية</span></td></tr>
+    <tr><td>الترحيل</td><td><strong>بلا migration</strong> — يعيد استخدام جدول aa29 (رأس الإنتاج aa29)</td></tr>
+  </table>
+  <h3>التحقّق الحيّ بالحاوية على الإنتاج (مع تأكيد الخمول) ثمّ تنظيف</h3>
+  <pre>  dormant on prod : is_enabled = <span class="s">False</span>
+  DRIVER   doc verification : {<span class="s">'status'</span>: <span class="s">'SKIPPED'</span>, <span class="s">'score'</span>: None, <span class="s">'flags'</span>: None}
+  PROVIDER doc verification : {<span class="s">'status'</span>: <span class="s">'SKIPPED'</span>, <span class="s">'score'</span>: None, <span class="s">'flags'</span>: None}
+  cleanup done. document_verifications total now: <span class="n">0</span></pre>
+  <p>أُنشئت كيانات سائق/مزوّد + وثيقتان عبر الكود المنشور؛ المُطلِق سجّل <strong>SKIPPED</strong> لكلٍّ، والدالّة المشتركة (المستعملة في نقاط قراءة OPS) أرفقتهما؛ ثمّ حُذفت كلّ صفوف الاختبار ⇒ الجدول 0.</p>
+</section>
+
+<!-- 9 -->
+<section id="s9">
+  <h2>⑨ السلامة والحالة النهائيّة</h2>
+  <ul class="clean">
+    <li><strong>القلب الماليّ:</strong> لا مساس — هويّة لا مال؛ <span class="ok">FIN-COR PASS</span>.</li>
+    <li><strong>خامل / استشاريّ / fail-open:</strong> لا تغيير سلوك حيّ؛ التحقّق لا يحجب الرفع أو الاعتماد إطلاقًا.</li>
+    <li><strong>إضافيّ:</strong> بلا migration (جدول aa29) · المُسلسِلات الأصليّة لم تُلمَس · بلا تراجع (27 اختبار KYC + 11 واجهة).</li>
+    <li><strong>تقليل التكرار:</strong> دالّة مشتركة واحدة تخدم الأنواع الثلاثة (AGENT أُعيد توظيفه عليها).</li>
+    <li>بلا commit · رأس المستودع <code>aa29</code>.</li>
+  </ul>
+  <div class="seal">
+    ✅ تغطية التحقّق الاستشاريّ الآن تشمل <strong>AGENT + DRIVER + PROVIDER</strong> — منشورة حيًّا وخاملة افتراضيًّا
+    ومُتحقَّقة على الإنتاج (DRIVER→SKIPPED · PROVIDER→SKIPPED) دون أثر على بيانات الإنتاج. أُكمِل الجزء الناقص من E5.
+    يبقى بإذنك فقط تفعيل المزوّد الخارجيّ (ML) بعد بوّابة الخصوصيّة.
+  </div>
+</section>
+
+<div class="foot">
+  تووا — منصّة التوصيل الليبيّة · تقرير E5 توسعة التغطية (DRIVER + PROVIDER) · 2026-06-12<br>
+  النطاق الحيّ tawanow.com · خامل افتراضيًّا · FIN-COR PASS · NEW=0 · بلا migration · بلا commit · رأس المستودع aa29
+</div>
+
+</div>
+</body>
+</html>

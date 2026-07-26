@@ -1,0 +1,503 @@
+<meta charset="utf-8">
+<title>فرص تقنية مستقبلية — حالة كل نقطة في المشروع</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 74ch; color: var(--ink); }
+  p.lead { font-size: 1.08rem; color: var(--ink-muted); max-width: 64ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.87em; }
+  b { color: var(--ink); }
+
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🔭"; position: absolute; left: -10px; top: -30px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1020px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 2.1rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 26ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 64ch; font-size: 1.1rem; }
+  .hero-stats { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.85rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.8rem; color: rgba(255,255,255,0.78); }
+
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.82rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+
+  section { margin: 54px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 1rem; color: var(--ink-muted); max-width: 72ch; margin-bottom: 24px; }
+
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.95rem; max-width: 62ch; }
+  .plain b { color: var(--accent-deep); }
+
+  .analogy { background: var(--accent-2-tint); border: 1px dashed var(--accent-2); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; }
+  .analogy .k { font-size: 0.76rem; font-weight: 800; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .analogy p { margin: 0; font-size: 0.92rem; color: var(--ink); max-width: 62ch; }
+
+  /* opportunity cards */
+  .opp { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); padding: 26px 26px 22px; margin-bottom: 22px; }
+  .opp .ohead { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; flex-wrap: wrap; }
+  .opp .onum { width: 40px; height: 40px; border-radius: 12px; background: var(--accent-tint); color: var(--accent-deep); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex: 0 0 auto; }
+  .opp h3 { font-size: 1.12rem; margin: 0; }
+  .opp .status-badge { margin-inline-start: auto; }
+  .opp .file-ref { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-faint); background: var(--surface-2); border: 1px solid var(--border); border-radius: 7px; padding: 3px 10px; display: inline-block; margin: 8px 0; }
+  .opp h4 { font-size: 0.82rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.03em; margin: 18px 0 6px; }
+  .opp h4:first-of-type { margin-top: 14px; }
+  .opp .code-block { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: var(--font-mono); font-size: 0.78rem; overflow-x: auto; white-space: pre; margin: 6px 0 10px; color: var(--ink); }
+
+  .status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 800; border-radius: 999px; padding: 5px 14px; border: 1.5px solid transparent; white-space: nowrap; }
+  .status-pill.done { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .status-pill.partial { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .status-pill.not-done { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+
+  .diagram { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 10px 4px 10px; }
+  .dg-stage { flex: 0 0 auto; min-width: 100px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 4px; }
+  .dg-node { width: 46px; height: 46px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; background: var(--surface); border: 2px solid var(--border); box-shadow: var(--shadow); margin-bottom: 6px; }
+  .dg-node.now { border-color: var(--ok-border); color: var(--ok-ink); }
+  .dg-node.future { border-color: var(--border); color: var(--ink-faint); background: var(--surface-2); }
+  .dg-stage .t { font-size: 0.74rem; font-weight: 700; color: var(--ink); }
+  .dg-stage .d { font-size: 0.66rem; color: var(--ink-faint); margin-top: 1px; }
+  .dg-arrow { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 22px; margin-top: -22px; }
+  .dg-arrow svg { width: 18px; height: 10px; }
+  .dg-arrow path { stroke: var(--border); stroke-width: 2.5; fill: none; }
+
+  ul.simple-list { margin: 10px 0; padding-inline-start: 22px; }
+  ul.simple-list li { margin-bottom: 8px; color: var(--ink-muted); font-size: 0.92rem; }
+  ul.simple-list li b { color: var(--ink); }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 560px; }
+  thead th { text-align: right; font-family: var(--font-display); font-weight: 700; background: var(--surface-2); color: var(--ink-muted); font-size: 0.72rem; letter-spacing: 0.03em; padding: 10px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.mono { font-family: var(--font-mono); font-size: 0.8rem; }
+
+  .final-verdict { background: linear-gradient(135deg, var(--accent-tint), var(--surface)); border: 2px solid var(--accent); border-radius: 20px; padding: 32px 30px; text-align: center; margin: 24px 0; }
+  .final-verdict .big { font-size: 3rem; margin-bottom: 10px; }
+  .final-verdict h3 { font-size: 1.3rem; color: var(--accent-deep); margin: 0 0 8px; }
+  .final-verdict p { margin: 0 auto; color: var(--ink-muted); font-size: 0.95rem; max-width: 58ch; }
+
+  hr.div { border: none; border-top: 1px dashed var(--border); margin: 46px 0; }
+  footer { margin-top: 72px; padding: 24px 0; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--ink-faint); text-align: center; }
+  a { color: var(--accent-deep); }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="inner">
+      <span class="kicker">🔭 بحث تقني — لا عيوب، بل فرص</span>
+      <h1>6 فرص تقنيّة مستقبليّة — حالة كل واحدة بدقّة في المشروع اليوم</h1>
+      <p class="lead">
+        هذه ليست قائمة عيوب تحتاج إصلاحًا — بل فرص استثمار تقنيّ مستقبليّ، اكتُشِفت عبر بحث مستقلّ في الممارسات
+        الحديثة (2026) ومقارنتها ببنية هذا المشروع تحديدًا. هذا التقرير يوضّح لكل نقطة: ما هي بالضبط، ما حالتها
+        <b>الفعليّة اليوم</b> في الكود (مُنفَّذة جزئيًّا أم غير مُنفَّذة إطلاقًا)، وكيف تعاملتُ معها.
+      </p>
+      <div class="hero-stats">
+        <div class="s"><div class="n">6</div><div class="l">فرص مبحوثة</div></div>
+        <div class="s"><div class="n">1</div><div class="l">جزء واحد نُفِّذ فعليًّا (OSRM)</div></div>
+        <div class="s"><div class="n">5</div><div class="l">موثَّقة، غير مُنفَّذة بعد</div></div>
+        <div class="s"><div class="n">0</div><div class="l">إعادة بناء من الصفر مطلوبة</div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#framing">كيف تعاملتُ مع هذا الملفّ</a>
+    <a href="#item1">1 — نموذج تعلّم آليّ لوقت التوصيل</a>
+    <a href="#item2">2 — تمهيد أُسّي لتوقّع الطلب</a>
+    <a href="#item3">3 — مفاتيح تكرار لمزامنة الجوّال</a>
+    <a href="#item4">4 — تصنيف كامل للإشعارات</a>
+    <a href="#item5">5 — ربط سرعة/جهاز للموافقة الماليّة</a>
+    <a href="#item6">6 — بوّابة CI لتغطية الترجمة</a>
+    <a href="#final">الخلاصة</a>
+  </nav>
+
+  <section id="framing">
+    <div class="section-eyebrow">🎯</div>
+    <h2>كيف تعاملتُ مع هذا الملفّ من البحث؟</h2>
+    <div class="plain">
+      <div class="ic">📌</div>
+      <p>
+        هذه الست نقاط وُثِّقت أصلًا في خطّة العمل رقم 506 كـ<b>"فرص تقنيّة" منفصلة تمامًا عن قائمة العيوب
+        التسعة عشر</b> الواجب إصلاحها. طبيعتها مختلفة جوهريًّا: العيوب لها سلوك خاطئ يجب تصحيحه الآن؛ الفرص هنا
+        لا تصحّح خطأً — بل ترقّي جزءًا يعمل بشكل صحيح اليوم إلى نسخة أكثر تطوّرًا لاحقًا. لذلك تعاملتُ معها هكذا:
+      </p>
+    </div>
+    <ul class="simple-list">
+      <li><b>لم أنفّذها كلّها في هذه الدورة</b> — لأنّها لم تكن ضمن نطاق البنود التسعة عشر المطلوب تنفيذها، ولأنّ كل واحدة منها استثمار تقنيّ حقيقيّ يستحقّ قرارًا مستقلًّا من صاحب المشروع، لا تنفيذًا تلقائيًّا.</li>
+      <li><b>نفّذتُ الجزء الوحيد الجاهز والمُقيَّم بأنّه "الحجم الصحيح الآن"</b> — ربط مسافة/مدّة OSRM الفعليّة في حساب وقت التوصيل (جزء من البند 1 أدناه)، لأنّه امتداد مباشر لبنية موجودة أصلًا، لا نموذج تعلّم آليّ جديد كامل.</li>
+      <li><b>تحقّقتُ الآن من حالة كل نقطة مباشرة في الكود</b> قبل كتابة هذا التقرير — لا اعتماد على وصف بحثيّ سابق وحده، بل قراءة الملفّات الفعليّة المذكورة في كل توصية.</li>
+    </ul>
+  </section>
+
+  <hr class="div">
+
+  <section id="item1">
+    <div class="section-eyebrow">1 / 6 — تعلّم وقت التوصيل</div>
+    <h2>من المتوسّط الإحصائيّ إلى نموذج تعلّم آليّ خفيف</h2>
+    <div class="opp">
+      <div class="ohead">
+        <div class="onum">1</div>
+        <h3>نموذج GBDT (أشجار قرار مُعزَّزة) فوق ميزات الرحلة</h3>
+        <span class="status-badge status-pill partial">◐ جزء نُفِّذ — الأساس لا يزال إحصائيًّا</span>
+      </div>
+      <div class="file-ref">backend/app/modules/orders/eta_learning.py</div>
+
+      <h4>ما هي هذه الفرصة، ببساطة؟</h4>
+      <div class="analogy">
+        <p>
+          تخيّل موظّفًا يقدّر وقت وصول كل طلب بحساب متوسّط بسيط لآخر عشرين طلبًا مشابهًا في نفس الساعة والمنطقة —
+          هذا ما يفعله النظام الحاليّ (بأسلوب أكثر دقّة قليلًا، يُسمّى "البطل/المتحدّي"). النموذج المقترَح أذكى:
+          يتعلّم من آلاف الأنماط في وقت واحد (الطقس، الازدحام، نوع الطلب، اليوم...) بدل الاكتفاء بمتوسّط خليّة واحدة.
+        </p>
+      </div>
+
+      <h4>الشرح التقنيّ</h4>
+      <p style="font-size:0.92rem;margin:0 0 10px">
+        الأنظمة الحديثة تستخدم طبقة أساسيّة من أشجار قرار مُعزَّزة (GBDT — مثل XGBoost أو LightGBM) مُدرَّبة على
+        ميزات الرحلة (المسافة، الساعة، اليوم، الطقس، الازدحام...)، مع طبقة تعديل لحظيّ خفيفة فوقها — وهذا يشبه
+        فعليًّا بنية "البطل/المتحدّي + EWMA" الموجودة حاليًّا في المشروع؛ التغيير المقترَح هو استبدال حساب الوسيط
+        لكل خليّة-ساعة بنموذج مُدرَّب، لا هدم البنية الحاليّة.
+      </p>
+
+      <h4>حالتها الفعليّة في الكود اليوم</h4>
+      <div class="diagram">
+        <div class="dg-stage"><div class="dg-node now">📊</div><div class="t">إحصاء البطل/المتحدّي</div><div class="d">موجود، يعمل</div></div>
+        <div class="dg-arrow"><svg viewBox="0 0 18 10"><path d="M2 5 H16 M12 2 L16 5 L12 8"/></svg></div>
+        <div class="dg-stage"><div class="dg-node now">🗺️</div><div class="t">مسافة OSRM حقيقيّة</div><div class="d">نُفِّذ هذه الجلسة</div></div>
+        <div class="dg-arrow"><svg viewBox="0 0 18 10"><path d="M2 5 H16 M12 2 L16 5 L12 8"/></svg></div>
+        <div class="dg-stage"><div class="dg-node future">🧠</div><div class="t">نموذج GBDT مُدرَّب</div><div class="d">غير مُنفَّذ — فرصة مستقبليّة</div></div>
+      </div>
+      <p style="font-size:0.88rem;color:var(--ink-muted)">
+        <b>ما نُفِّذ فعليًّا:</b> الجزء التمهيديّ الوحيد المرتبط بهذه الفرصة — ربط مسافة/مدّة الطريق الفعليّة عبر
+        OSRM بدل الاعتماد على خطّ مستقيم (haversine) فقط، بتزامن محدود (<code>asyncio.Semaphore</code>، حدّ 10).
+        هذا يُغلِق فجوة حقيقيّة بين "العامل المتعلَّم" والمسافة الفعليّة على الطريق — لكنّه <b>لا يزال حسابًا
+        إحصائيًّا (وسيط/EWMA)</b>، وليس نموذج تعلّم آليّ مُدرَّب. لا يوجد أي استيراد لمكتبة تعلّم آليّ
+        (XGBoost/LightGBM/scikit-learn) في هذا الملفّ اليوم.
+      </p>
+      <div class="tag-row" style="margin-top:10px"><span class="status-pill partial">◐ الأساس التحضيريّ منجَز</span><span class="status-pill not-done">○ نموذج التعلّم الآليّ نفسه — قرار مستقبليّ</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="item2">
+    <div class="section-eyebrow">2 / 6 — توقّع الطلب</div>
+    <h2>تمهيد أُسّي بدل المتوسّط البسيط</h2>
+    <div class="opp">
+      <div class="ohead">
+        <div class="onum">2</div>
+        <h3>تمهيد أُسّي (EWMA) + نمذجة احتماليّة (Poisson/NB)</h3>
+        <span class="status-badge status-pill partial">◐ نصف الفكرة موجود فعلًا</span>
+      </div>
+      <div class="file-ref">backend/app/modules/operations/demand_forecast.py</div>
+
+      <h4>ما هي هذه الفرصة، ببساطة؟</h4>
+      <div class="analogy">
+        <p>
+          بدل أن يعتمد توقّع عدد الطلبات القادمة على متوسّط بسيط لكل الأسابيع الماضية بوزن متساوٍ، التمهيد الأُسّي
+          يعطي وزنًا أكبر للأسابيع الأحدث — فيلتقط تغيّر السلوك بسرعة أكبر. النمذجة الاحتماليّة (بواسون) تذهب
+          أبعد: بدل رقم واحد ("35 طلبًا متوقَّعًا")، تُعطي توزيعًا احتماليًّا كاملًا ("35 الأرجح، لكن هناك احتمال
+          15٪ أن يتجاوز 45") — مفيد لقرارات التسعير وقت الذروة.
+        </p>
+      </div>
+
+      <h4>حالتها الفعليّة في الكود اليوم — تصحيح مهمّ عن البحث الأصليّ</h4>
+      <p style="font-size:0.92rem;margin:0 0 10px">
+        عند التحقّق المباشر من <code>demand_forecast.py</code>، تبيّن أنّ نصف الفكرة <b>موجود بالفعل</b>: دالّة
+        <code>_publish_forecast()</code> تمزج نتيجة كل دورة حساب مع "البطل" السابق بمعامل تمهيد أُسّيّ صريح
+        (<code>alpha</code> افتراضيًّا 0.5) — أي أنّ التمهيد الأُسّي بين الدورات المتتالية <b>مُنفَّذ فعلًا</b>، وهذا
+        تصحيح للوصف البحثيّ الأصليّ الذي افترض غياب أي تمهيد. الجزء غير المُنفَّذ هو أدقّ ممّا بدا: الإحصاء
+        الخامّ لكل دورة واحدة (عدد الطلبات ÷ عدد الأسابيع المُلاحَظة) لا يزال متوسّطًا بسيطًا داخل الدورة نفسها،
+        وناتج التوقّع النهائيّ رقم واحد فقط (ليس توزيعًا احتماليًّا بواسون/ثنائيّ التشتّت).
+      </p>
+      <div class="diagram">
+        <div class="dg-stage"><div class="dg-node now">📐</div><div class="t">متوسّط بسيط لكل دورة</div><div class="d">موجود</div></div>
+        <div class="dg-arrow"><svg viewBox="0 0 18 10"><path d="M2 5 H16 M12 2 L16 5 L12 8"/></svg></div>
+        <div class="dg-stage"><div class="dg-node now">📈</div><div class="t">تمهيد أُسّي بين الدورات</div><div class="d">موجود فعلًا</div></div>
+        <div class="dg-arrow"><svg viewBox="0 0 18 10"><path d="M2 5 H16 M12 2 L16 5 L12 8"/></svg></div>
+        <div class="dg-stage"><div class="dg-node future">🎲</div><div class="t">توزيع بواسون احتماليّ</div><div class="d">غير مُنفَّذ</div></div>
+      </div>
+      <div class="tag-row" style="margin-top:10px"><span class="status-pill partial">◐ التمهيد بين الدورات موجود</span><span class="status-pill not-done">○ النمذجة الاحتماليّة — لم تُنفَّذ</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="item3">
+    <div class="section-eyebrow">3 / 6 — مزامنة الجوّال بلا اتّصال</div>
+    <h2>مفاتيح تكرار (Idempotency Keys) بدل بنى معقّدة</h2>
+    <div class="opp">
+      <div class="ohead">
+        <div class="onum">3</div>
+        <h3>مفتاح تكرار لكل عنصر مخزَّن محليًّا</h3>
+        <span class="status-badge status-pill done">✓ موجود فعلًا لإنشاء الطلبات</span>
+      </div>
+      <div class="file-ref">apps/mobile/src/services/outbox.ts</div>
+
+      <h4>ما هي هذه الفرصة، ببساطة؟</h4>
+      <div class="analogy">
+        <p>
+          إذا كان جهاز السائق بلا إنترنت، فيرسل الطلب لاحقًا عند عودة الاتّصال، ثمّ يعيد المحاولة لأنّ الاستجابة
+          الأولى تأخّرت — كيف يعرف الخادم أنّ هذه نفس العمليّة لا عمليّة مكرَّرة جديدة؟ الحلّ: كل عمليّة مخزَّنة
+          محليًّا تحمل معها "بصمة" فريدة (UUID) يُنشَأ لحظة وضعها في الطابور، والخادم يتذكّر كل بصمة رآها من قبل
+          ويرفض تكرارها.
+        </p>
+      </div>
+
+      <h4>حالتها الفعليّة في الكود اليوم — تصحيح جوهريّ عن البحث الأصليّ</h4>
+      <p style="font-size:0.92rem;margin:0 0 10px">
+        عند التحقّق المباشر، تبيّن أنّ هذه الآليّة <b>موجودة ومُطبَّقة بالكامل بالفعل لإنشاء الطلبات</b> — وهذا
+        تصحيح جوهريّ للبحث الأصليّ الذي افترض غيابها كليًّا. جانب العميل: كل طلب مُخزَّن يحمل حقل
+        <code>idempotencyKey</code> يُستخدَم عند الإضافة للطابور، الحذف، وإعادة الإرسال. جانب الخادم: مسار إنشاء
+        الطلب يفرض ترويسة <code>Idempotency-Key</code> إلزاميّة (16–128 حرفًا)، ويتحقّق منها ويسجّلها بشكل دائم في
+        جدول مخصّص قبل قبول أي طلب مكرَّر. هذا مختلف تمامًا عن وسم الملكيّة (<code>userId</code>) الذي أُضيف هذه
+        الجلسة لإصلاح تسرّب الحسابات (البند 1.2 من تقرير 507) — الاثنان حقلان منفصلان لغرضين مختلفين تمامًا، لا
+        تداخل بينهما.
+      </p>
+      <p style="font-size:0.88rem;color:var(--ink-muted)">
+        <b>الفجوة الحقيقيّة المتبقّية، بعد التصحيح:</b> أضيق ممّا افترضه البحث الأصليّ — الآليّة اليوم خاصّة
+        بإنشاء الطلبات فقط. أي نوع عمليّة جديد يُخزَّن محليًّا مستقبلًا (غير الطلبات) سيحتاج مفتاح تكراره الخاصّ،
+        لأنّ طابور <code>outbox.ts</code> ليس عامًّا لكل أنواع العمليّات بعد.
+      </p>
+      <div class="tag-row" style="margin-top:10px"><span class="status-pill done">✓ مُنفَّذ بالكامل لإنشاء الطلبات</span><span class="status-pill not-done">○ غير معمَّم لكل أنواع العمليّات المستقبليّة</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="item4">
+    <div class="section-eyebrow">4 / 6 — موثوقيّة الإشعارات</div>
+    <h2>نظام تصنيف كامل (حرج/عادي/تسويقي)</h2>
+    <div class="opp">
+      <div class="ohead">
+        <div class="onum">4</div>
+        <h3>حقل <code>event_category</code> صريح بدل استثناء حدث واحد</h3>
+        <span class="status-badge status-pill not-done">○ غير مُنفَّذ — استثناء حدث واحد فقط اليوم</span>
+      </div>
+      <div class="file-ref">backend/app/modules/notifications/notification_service.py</div>
+
+      <h4>ما هي هذه الفرصة، ببساطة؟</h4>
+      <div class="analogy">
+        <p>
+          اليوم، عندما اكتشفنا أنّ إشعار "وصل عرض توزيع جديد" يجب أن يصل حتى لو عطَّل السائق الإشعارات، أضفنا
+          استثناءً خاصًّا بهذا الحدث وحده (البند 3.2 من تقرير 507). الفرصة هنا: بدل إضافة استثناء يدويّ جديد
+          كلّما ظهر حدث حرج آخر مستقبلًا، يُصنَّف كل حدث إشعار من البداية إلى فئة صريحة واحدة من ثلاث (حرج/عادي/تسويقي)،
+          فيرث كل حدث سلوكه من فئته تلقائيًّا.
+        </p>
+      </div>
+
+      <h4>حالتها الفعليّة في الكود اليوم</h4>
+      <p style="font-size:0.92rem;margin:0 0 10px">
+        عند التحقّق، الاستثناء الذي أضفتُه هذه الجلسة (البند 3.2) مبنيّ فعليًّا على قائمة ثابتة بحدث واحد
+        (<code>dispatch.offer_received</code>) لا حقل تصنيف عامّ — يخدم غرضَين معًا (اختيار قناة أندرويد عالية
+        الأولويّة + تجاوز <code>push_enabled</code>). لكن يوجد سابقة حقيقيّة تدعم فكرة التصنيف: الملفّ نفسه يحتوي
+        بالفعل <b>ثلاث</b> قوائم ثابتة منفصلة بنفس النمط بالضبط — واحدة لأحداث الرسائل النصّيّة، وواحدة للبريد
+        الإلكترونيّ، وواحدة لواتساب — كلّ واحدة قائمة سماح مُرتجَلة مستقلّة. هذه القوائم الثلاث بالضبط هي الشكل
+        الذي سيحلّ محلّه حقل <code>event_category</code> موحَّد لو نُفِّذت هذه الفرصة.
+      </p>
+      <div class="diagram">
+        <div class="dg-stage"><div class="dg-node now">📋</div><div class="t">3 قوائم ثابتة منفصلة</div><div class="d">sms/email/whatsapp</div></div>
+        <div class="dg-arrow"><svg viewBox="0 0 18 10"><path d="M2 5 H16 M12 2 L16 5 L12 8"/></svg></div>
+        <div class="dg-stage"><div class="dg-node now">1️⃣</div><div class="t">استثناء حدث واحد</div><div class="d">أُضيف هذه الجلسة</div></div>
+        <div class="dg-arrow"><svg viewBox="0 0 18 10"><path d="M2 5 H16 M12 2 L16 5 L12 8"/></svg></div>
+        <div class="dg-stage"><div class="dg-node future">🏷️</div><div class="t">event_category موحَّد</div><div class="d">غير مُنفَّذ</div></div>
+      </div>
+      <div class="tag-row" style="margin-top:10px"><span class="status-pill not-done">○ لا حقل تصنيف عامّ بعد</span><span class="status-pill partial">◐ السابقة (3 قوائم مماثلة) موجودة، تسهّل التعميم لاحقًا</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="item5">
+    <div class="section-eyebrow">5 / 6 — الموافقة المزدوجة الماليّة</div>
+    <h2>طبقة سرعة/جهاز عبر الحسابات</h2>
+    <div class="opp">
+      <div class="ohead">
+        <div class="onum">5</div>
+        <h3>ربط سرعة/جهاز/IP بين حسابات وكلاء مختلفة</h3>
+        <span class="status-badge status-pill not-done">○ غير مُنفَّذ — تحصين مستقبليّ فقط</span>
+      </div>
+      <div class="file-ref">backend/app/modules/operations/controls_service.py · backend/app/modules/payments/agent_topup_router.py</div>
+
+      <h4>ما هي هذه الفرصة، ببساطة؟</h4>
+      <div class="analogy">
+        <p>
+          نظام الموافقة المزدوجة الحاليّ يحمي كل حساب وكيل بمفرده بسقف يوميّ صارم (لا يستطيع الوكيل نفسه تجاوز
+          حدّه). لكن ماذا لو استخدم شخص واحد خمسة حسابات وكلاء مختلفة، كلّ واحد تحت سقفه الخاصّ، من نفس الجهاز أو
+          نفس عنوان الشبكة؟ كل حساب يبدو نظيفًا بمفرده، لكن مجموع النشاط من نفس المصدر مشبوه. طبقة ربط السرعة/الجهاز
+          تكتشف هذا النمط عبر الحسابات، لا داخل حساب واحد فقط.
+        </p>
+      </div>
+
+      <h4>حالتها الفعليّة في الكود اليوم</h4>
+      <p style="font-size:0.92rem;margin:0 0 10px">
+        عند التحقّق المباشر من كلا الملفَّين، لا يوجد أي ربط سرعة أو بصمة جهاز أو عنوان IP بينهما إطلاقًا اليوم.
+        الحماية الموجودة فعليًّا (وتعمل بشكل صحيح، بما فيها إصلاح سباق تزامن سابق موثَّق في الكود نفسه) هي سقف
+        يوميّ لكل وكيل بمفرده، وسقف يوميّ منفصل لكل مستفيد بمفرده — كلاهما محكوم بقفل صفّ آمن من التزامن، لكن
+        كلاهما أيضًا <b>محصور بحساب واحد في كل مرّة</b>، بلا أي ربط عبر حسابات متعدّدة.
+      </p>
+      <p style="font-size:0.88rem;color:var(--ink-muted)">
+        <b>لماذا هذا تحصين مستقبليّ لا أولويّة عاجلة:</b> تصميم المحفظة في هذا المشروع مغلَق أصلًا (بلا سحب نقديّ
+        فعليّ للخارج) — ما يحدّ من الضرر الأقصى الممكن حتى لو استُغِلّت هذه الفجوة اليوم. تبقى ترقية مستقبليّة
+        منطقيّة، لا ثغرة نشطة تحتاج إصلاحًا فوريًّا.
+      </p>
+      <div class="tag-row" style="margin-top:10px"><span class="status-pill done">✓ الحماية لكل حساب بمفرده تعمل وآمنة من التزامن</span><span class="status-pill not-done">○ لا ربط عبر الحسابات بعد</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="item6">
+    <div class="section-eyebrow">6 / 6 — تغطية الترجمة</div>
+    <h2>بوّابة CI تلقائيّة مانعة</h2>
+    <div class="opp">
+      <div class="ohead">
+        <div class="onum">6</div>
+        <h3>ترقية فحص تغطية i18n من استشاريّ إلى مانع</h3>
+        <span class="status-badge status-pill partial">◐ موجود لكنّه استشاريّ عمدًا</span>
+      </div>
+      <div class="file-ref">.github/workflows/ci.yml</div>
+
+      <h4>ما هي هذه الفرصة، ببساطة؟</h4>
+      <div class="analogy">
+        <p>
+          مشكلة الـ37 نصًّا الناقص ترجمتها التي أُصلحت في تقرير 507 (البند 4.3) كانت ستُكتَشَف تلقائيًّا قبل وصول
+          الكود لهذه المرحلة، لو كان فحص الترجمة في خطّ الإنتاج الآليّ (CI) يمنع دمج أي تغيير ناقص، لا يكتفي
+          بالتنبيه فقط.
+        </p>
+      </div>
+
+      <h4>حالتها الفعليّة في الكود اليوم — مع سبب مقصود موثَّق</h4>
+      <p style="font-size:0.92rem;margin:0 0 10px">
+        الفحص موجود بالضبط كما وصفه البحث: وظيفة باسم صريح
+        "<code>i18n coverage report (advisory, non-blocking)</code>" في <code>.github/workflows/ci.yml</code>،
+        خطواتها مُعلَّمة صراحة <code>continue-on-error: true</code> — أي لا تمنع أي طلب دمج (PR) من النجاح مهما
+        كانت نتيجتها. لكن التحقّق كشف تفصيلًا مهمًّا لم يذكره البحث الأصليّ: <b>يوجد بالفعل فحص منفصل مانع (يفشل
+        فعليًّا) في خطّ اختبارات الويب</b> — لكنّه محدود بذكاء إلى النصوص الجديدة فقط (لا يفشل بسبب الرصيد
+        التاريخيّ المتراكم من نصوص قديمة ناقصة الترجمة). سبب إبقاء التقرير الشامل استشاريًّا مذكور صراحةً كتعليق في
+        الملفّ نفسه: بوّابة مانعة صارمة على كامل الرصيد التاريخيّ ستُفشِل كل طلب دمج فورًا دون تمييز.
+      </p>
+      <div class="diagram">
+        <div class="dg-stage"><div class="dg-node now">🆕</div><div class="t">فحص مانع للنصوص الجديدة فقط</div><div class="d">موجود، يعمل</div></div>
+        <div class="dg-arrow"><svg viewBox="0 0 18 10"><path d="M2 5 H16 M12 2 L16 5 L12 8"/></svg></div>
+        <div class="dg-stage"><div class="dg-node now">📋</div><div class="t">تقرير تغطية شامل</div><div class="d">موجود، استشاريّ فقط</div></div>
+        <div class="dg-arrow"><svg viewBox="0 0 18 10"><path d="M2 5 H16 M12 2 L16 5 L12 8"/></svg></div>
+        <div class="dg-stage"><div class="dg-node future">🚫</div><div class="t">مانع لكامل الرصيد التاريخيّ</div><div class="d">قرار مقصود بعدم التفعيل الآن</div></div>
+      </div>
+      <div class="tag-row" style="margin-top:10px"><span class="status-pill done">✓ فحص مانع جزئيّ (نصوص جديدة) موجود فعلًا</span><span class="status-pill partial">◐ التقرير الشامل استشاريّ بقرار مقصود، لا إهمال</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="final">
+    <div class="section-eyebrow">🏁</div>
+    <h2>الخلاصة النهائيّة</h2>
+
+    <div class="final-verdict">
+      <div class="big">🔭</div>
+      <h3>6 فرص مبحوثة بدقّة، حالة كل واحدة موثَّقة بصدق — لا تفاؤل زائد ولا إخفاء تقدّم فعليّ</h3>
+      <p>التحقّق المباشر من الكود صحَّح افتراضَين من البحث الأصليّ (البند 2 والبند 3 أكثر تقدّمًا ممّا بدا)، وأكَّد البقيّة كما وُصِفت بدقّة.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>#</th><th>الفرصة</th><th>الحالة الحقيقيّة اليوم</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>نموذج تعلّم آليّ لوقت التوصيل</td><td><span class="status-pill partial">◐ الأساس التحضيريّ (OSRM) منجَز، النموذج نفسه لا</span></td></tr>
+          <tr><td>2</td><td>تمهيد أُسّي لتوقّع الطلب</td><td><span class="status-pill partial">◐ التمهيد بين الدورات موجود فعلًا، لا نمذجة احتماليّة</span></td></tr>
+          <tr><td>3</td><td>مفاتيح تكرار لمزامنة الجوّال</td><td><span class="status-pill done">✓ موجودة بالكامل لإنشاء الطلبات</span></td></tr>
+          <tr><td>4</td><td>تصنيف كامل للإشعارات</td><td><span class="status-pill not-done">○ غير مُنفَّذ، سابقة داعمة موجودة</span></td></tr>
+          <tr><td>5</td><td>ربط سرعة/جهاز للموافقة الماليّة</td><td><span class="status-pill not-done">○ غير مُنفَّذ، تحصين مستقبليّ فقط</span></td></tr>
+          <tr><td>6</td><td>بوّابة CI مانعة لتغطية الترجمة</td><td><span class="status-pill partial">◐ مانع جزئيّ موجود، الشامل استشاريّ بقرار مقصود</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ul class="simple-list">
+      <li><b>لا شيء نُفِّذ خارج النطاق المطلوب:</b> البنود التسعة عشر من تقرير 507 هي وحدها ما طُلب تنفيذه هذه الدورة؛ هذه الفرص وُثِّقت للقرار المستقبليّ، لا نُفِّذت تلقائيًّا.</li>
+      <li><b>الاستثناء الوحيد:</b> ربط مسافة/مدّة OSRM الحقيقيّة (جزء من البند 1) نُفِّذ لأنّه كان أصلًا بندًا تقنيًّا مُدرَجًا صراحة في خطّة 506 نفسها، لا امتدادًا تلقائيًّا لهذا البحث.</li>
+      <li><b>التحقّق كشف تقدّمًا حقيقيًّا لم يذكره البحث الأصليّ:</b> البندان 2 و3 كانا موصوفَين وكأنّهما غائبان تمامًا، بينما التحقّق المباشر من الكود أظهر أنّ نصفهما (على الأقلّ) موجود ويعمل بالفعل.</li>
+      <li><b>لا فرصة منها خطر أمنيّ أو ماليّ نشط:</b> كلّها ترقيات جودة/دقّة/متانة مستقبليّة، لا ثغرات تحتاج إصلاحًا عاجلًا.</li>
+    </ul>
+  </section>
+
+  <footer>
+    تووا (Tawa) — تقرير رقم 508 · 2026-07-17 · مبنيّ على تحقّق مباشر من الكود الفعليّ، لا وصف بحثيّ وحده
+  </footer>
+
+</div>

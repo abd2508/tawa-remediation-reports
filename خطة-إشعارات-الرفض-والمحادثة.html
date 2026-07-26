@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تووا — خطة مُراجَعة بعمق: إشعارات الرفض/لا سائق + محادثة الطلب</title>
+<style>
+  :root{ --g:#0e7a4f; --g2:#5fd0a0; --accent:#f59e0b; --red:#c0392b; --ink:#16242f; --muted:#6b7c8c; --line:#e3e9ee; --bg:#f5f7f9; }
+  *{box-sizing:border-box} body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.9}
+  .wrap{max-width:1020px;margin:0 auto;padding:24px 18px 80px}
+  header.hero{background:linear-gradient(135deg,var(--g),#0a5c3b);color:#fff;border-radius:20px;padding:30px 24px;text-align:center}
+  header.hero h1{margin:0 0 6px;font-size:1.7rem} header.hero p{margin:0;opacity:.92}
+  h2{color:var(--g);border-bottom:3px solid var(--g2);padding-bottom:8px;margin-top:40px;font-size:1.35rem}
+  h3{margin-top:22px;font-size:1.1rem}
+  .lead{background:#fff;border-right:5px solid var(--g);border-radius:10px;padding:12px 16px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);font-size:.94rem;vertical-align:top}
+  th{background:#eef6f2;color:var(--g);font-weight:800}
+  code{background:#eef2f6;border-radius:5px;padding:1px 6px;font-size:.82em;direction:ltr;display:inline-block}
+  .ok{background:#e9f8f0;border:1px solid #b6e6cf;border-radius:10px;padding:12px 16px;color:#0a5c3b}
+  .bug{background:#fdecea;border:1px solid #f4cfc9;border-radius:10px;padding:12px 16px;color:#7a1f15}
+  .warn{background:#fff7e6;border:1px solid #ffe2a8;border-radius:10px;padding:12px 16px;color:#7a5b13}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:12px 0;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+  .tag{display:inline-block;border-radius:999px;padding:1px 10px;font-size:.76rem;font-weight:800}
+  .tag.fix{background:var(--red);color:#fff} .tag.new{background:var(--accent);color:#3a2600} .tag.exists{background:#2563eb;color:#fff}
+  .mock{max-width:380px;margin:10px 0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+  .banner{background:#fdf3e0;border-bottom:1px solid #f0d9a8;padding:14px;text-align:center}
+  .banner .ic{font-size:1.8rem}.banner .t{font-weight:800;margin:.3rem 0}.banner .d{font-size:.85rem;color:var(--muted)}
+  .brow{display:flex;gap:8px;padding:10px}.b{flex:1;text-align:center;border-radius:10px;padding:.6rem;font-weight:800;font-size:.85rem;border:1.5px solid var(--g);background:#fff;color:var(--g)}.b.p{background:var(--g);color:#fff}
+  .sug{display:flex;gap:8px;align-items:center;padding:9px;border-top:1px solid var(--line)}.sug .px{font-weight:800;color:var(--g)}
+  .chat{padding:10px;background:#f7faf8}.msg{max-width:75%;padding:7px 11px;border-radius:12px;margin:5px 0;font-size:.86rem}.msg.me{background:var(--g);color:#fff;margin-inline-start:auto}.msg.them{background:#fff;border:1px solid var(--line)}
+  .sim{background:#f4f8fb;border:1px solid #d6e6f2;border-radius:10px;padding:10px 14px;margin:8px 0;font-size:.92rem}
+  .footnote{color:var(--muted);font-size:.85rem} ul,ol{margin:.4rem 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+  <h1>🔬 خطة مُراجَعة بعمق + محاكاة ذهنية</h1>
+  <p>إشعار رفض/عدم ردّ المزوّد · إشعار لا سائق · محادثة السائق↔العميل + لوحة OPS · مطابَقة سطراً بسطر · 2026-05-25</p>
+</header>
+
+<p class="lead"><b>نتيجة المراجعة العميقة:</b> الفكرة سليمة، والخلفية أقوى مما قدّرت — <b>لكن المطابقة كشفت عيبين حقيقيين</b> في مسار «عدم ردّ المزوّد» يجب إصلاحهما (وإلا الميزة لا تعمل أصلاً). صُحِّحت الخطة بناءً عليهما.</p>
+
+<h2>🔴 اكتشافات حرجة من مطابقة الكود (تُصحّح الخطة)</h2>
+<table>
+<tr><th>#</th><th>الاكتشاف (بالدليل)</th><th>الأثر</th></tr>
+<tr><td>أ</td><td><b>حلقة مهلة ردّ المزوّد غير مربوطة في <code>main.py</code></b> — الدالة <code>scheduled_accept_timeout_loop</code> موجودة لكنها لا تُستدعى عند الإقلاع.</td><td>🔴 «المزوّد لم يردّ» <b>لا يُفعَّل تلقائياً</b> — الطلب يعلق في <code>AWAITING_PROVIDER_ACCEPTANCE</code> للأبد. <b>يجب ربط الحلقة.</b></td></tr>
+<tr><td>ب</td><td><b>مسار المهلة لا يسترد ولا يُشعر</b> — <code>auto_reject_stale_orders:61</code> يضبط <code>order_state="REJECTED_BY_PROVIDER"</code> مباشرةً، بلا <code>release_reservation</code> وبلا إشعار وبلا آلة الحالة/SSE.</td><td>🔴 طلب المحفظة عند المهلة <b>يبقى المبلغ محجوزاً</b> + العميل لا يُشعَر + لا بثّ SSE. <b>يجب توحيد مساره مع الرفض الصريح.</b></td></tr>
+<tr><td>ج</td><td>تصعيد لا-سائق <code>escalate_stuck_awaiting_driver</code> يمرّ بآلة الحالة وحلقته <b>مربوطة</b> (<code>main.py:158</code>)، لكنه <b>لا يُشعر العميل</b>.</td><td>🟡 نضيف إشعار العميل + بانر + خيارات.</td></tr>
+</table>
+<div class="bug"><b>خلاصة:</b> «الرفض الصريح» سليم تماماً (يُطلق محفظة WALLET + يُشعر العميل — <code>provider_service.py:195–204</code>). المشكلة في «عدم الردّ (المهلة)» — عيبان (أ، ب). إصلاحهما جزء أساسي من الخطة الآن.</div>
+
+<h2>ملخّص حقائق الكود (مؤكَّدة بالدليل)</h2>
+<table>
+<tr><th>الموضوع</th><th>الكود</th></tr>
+<tr><td>رفض المزوّد</td><td><code>reject_order:150</code> → <code>REJECTED_BY_PROVIDER</code> + إن WALLET: <code>release_reservation:198</code> + إشعار العميل (C3) ✓</td></tr>
+<tr><td>مهلة عدم الردّ</td><td><code>auto_reject_stale_orders:61</code> (افتراضي 300ث) → نفس الحالة لكن <b>بلا استرداد/إشعار</b> (عيب ب) + <b>غير مربوطة</b> (عيب أ)</td></tr>
+<tr><td>لا سائق</td><td><code>awaiting_driver_escalation.py</code> → <code>NO_DRIVER_ESCALATION</code> (آلة الحالة + حلقة مربوطة)؛ <code>NO_DRIVER_ESCALATION → {AWAITING_DRIVER, CANCELLED_BY_CUSTOMER}</code></td></tr>
+<tr><td>الإلغاء/الاسترداد</td><td><code>cancel_order:799</code> + <code>release_reservation:848</code> → الإلغاء يُعيد حجز المحفظة ✓</td></tr>
+<tr><td>حالات التسليم (للمحادثة)</td><td><code>PICKED_UP → EN_ROUTE → ARRIVED_AT_DESTINATION → DELIVERED</code> (state_transitions.py)</td></tr>
+<tr><td>حارس SSE</td><td><code>order_tracking.py:_resolve_role</code> يدعم customer/driver/provider/ops؛ السائق المُسنَد عبر <code>DispatchOffer</code> ACCEPTED — <b>قابل لإعادة الاستخدام للمحادثة</b></td></tr>
+<tr><td>الاقتراحات</td><td><code>food_categories_router.py:140</code> = نفس المزوّد فقط → نبني «عبر مزوّدين»</td></tr>
+<tr><td>نمط المحادثة</td><td><code>SupportChatSession/Message</code> (operations.py:207/225) للاقتداء</td></tr>
+</table>
+
+<!-- ميزة 1 -->
+<h2>① المطعم لم يردّ / رفض (بعد الدفع) <span class="tag fix">إصلاح</span> <span class="tag exists">+ واجهة</span></h2>
+<div class="card">
+<b>الخلفية (إصلاح العيبين + توحيد):</b>
+<ul>
+<li>ربط <code>scheduled_accept_timeout_loop</code> في <code>main.py</code> (عيب أ).</li>
+<li>توحيد مسار المهلة مع الرفض الصريح: عند انتهاء المهلة → آلة الحالة الصحيحة + <b>إطلاق حجز المحفظة (WALLET)</b> + <b>إشعار العميل</b> + بثّ SSE (عيب ب).</li>
+<li>نقطة جديدة <code>GET /orders/{id}/alternatives</code>: أصناف بنفس <code>category_id</code> ضمن نطاق سعر، من مزوّدين <code>ACTIVE</code>، الأقرب أولاً.</li>
+</ul>
+<b>الواجهة (<code>OrderTrackingPage</code>):</b> بانر عند <code>REJECTED_BY_PROVIDER</code> + سطر استرداد (للمحفظة/البطاقة فقط) + زرّا «اقتراحات مشابهة / أبحث بنفسي» → الاقتراحات بطاقات تنقل لمطعم جديد.
+</div>
+<div class="mock">
+  <div class="banner"><div class="ic">😔</div><div class="t">المطعم لم يقبل الطلب</div><div class="d">قد يكون مزدحماً · تمّ إرجاع المبلغ لمحفظتك ✓</div></div>
+  <div class="brow"><div class="b p">✨ اقتراحات مشابهة</div><div class="b">🔎 أبحث بنفسي</div></div>
+  <div class="sug"><div style="flex:1">شاورما دجاج — مطعم النخلة</div><div class="px">قريب من طلبك</div></div>
+</div>
+
+<!-- ميزة 2 -->
+<h2>② لا يوجد سائق متاح <span class="tag exists">الحالة موجودة</span> <span class="tag new">+ إشعار/خيارات</span></h2>
+<div class="card">
+<b>الخلفية:</b> إضافة إشعار العميل عند <code>NO_DRIVER_ESCALATION</code> + نقطتان: «إعادة المحاولة» (→ <code>AWAITING_DRIVER</code> + إعادة <code>auto_dispatch</code>) و«إلغاء واسترداد» (→ <code>cancel_order</code> الذي يُعيد المبلغ).
+<br><b>الواجهة:</b> بانر «لا سائق متاح الآن» + الزرّان.
+</div>
+<div class="mock">
+  <div class="banner" style="background:#fdecea;border-color:#f4cfc9"><div class="ic">🛵❌</div><div class="t">لا يوجد سائق متاح الآن</div><div class="d">جرّب بعد قليل أو ألغِ مع استرداد المبلغ</div></div>
+  <div class="brow"><div class="b p">🔄 إعادة المحاولة</div><div class="b">إلغاء واسترداد</div></div>
+</div>
+<div class="warn"><b>الميزتان «لا بدّ منهما» — أولوية قصوى. بلا migration</b> (الحالتان موجودتان؛ نُصلح المهلة + نضيف واجهة + اقتراحات + إشعارات).</div>
+
+<!-- ميزة 3 -->
+<h2>③ محادثة السائق ↔ العميل (مثل أوبر) <span class="tag new">جديدة · migration aa15</span></h2>
+<div class="card">
+<ul>
+<li><b>جدول</b> <code>order_messages</code> (order_id, sender_id, sender_role, body, created_at) + <b>migration aa15</b> (مُتحقَّقة على PG).</li>
+<li><b>نقاط</b> <code>POST/GET /orders/{id}/messages</code> — <b>تُعيد استخدام حارس <code>order_tracking._resolve_role</code></b> (عميل الطلب + السائق المُسنَد عبر DispatchOffer + OPS فقط).</li>
+<li><b>فوري</b> عبر قناة SSE <code>order:{id}:chat</code> (بنية <code>publish</code> الجاهزة).</li>
+<li><b>التوقيت:</b> تظهر من <code>PICKED_UP</code> حتى <code>DELIVERED</code> ثم تُخفى (تبقى مخزّنة).</li>
+<li><b>الواجهة:</b> ودجة في <code>OrderTrackingPage</code> (العميل) و<code>DriverDelivery</code> (السائق) + ردود سريعة + زر اتصال (يحترم إخفاء الرقم).</li>
+<li><b>لوحة OPS:</b> صفحة «المحادثات» (قائمة + بحث بالسائق/العميل/رقم الطلب/الوقت/السعر) — تخزين دائم.</li>
+</ul>
+</div>
+<div class="mock">
+  <div class="banner" style="background:#eef6f2;border-color:#bfe6d2;padding:9px"><div class="t" style="margin:0">💬 محادثة الطلب · سالم السائق</div></div>
+  <div class="chat"><div class="msg them">في الطريق إليك 🛵</div><div class="msg me">البيت خلف المسجد</div><div class="msg them">وصلت</div></div>
+  <div class="brow"><div class="b">في الطريق</div><div class="b">وصلت</div><div class="b p">📞 اتصل</div></div>
+</div>
+
+<h2>🧠 محاكاة ذهنية (سيناريو سيناريو)</h2>
+<div class="sim"><b>مزوّد يرفض طلب محفظة:</b> → REJECTED_BY_PROVIDER → المبلغ يُعاد فوراً (موجود) → إشعار (موجود) → <b>بانر+اقتراحات (جديد)</b> → العميل يختار بديلاً أو يبحث.</div>
+<div class="sim"><b>مزوّد يتجاهل طلب محفظة (لا يردّ):</b> اليوم = يعلق للأبد + المبلغ محجوز 🔴 → بعد الإصلاح: الحلقة تُفعَّل بعد المهلة → REJECTED_BY_PROVIDER + <b>إرجاع المبلغ + إشعار + بانر</b>.</div>
+<div class="sim"><b>طلب نقدي مرفوض:</b> لا مال محجوز → البانر يظهر بلا سطر استرداد (نتجنّب إرباك عميل النقد).</div>
+<div class="sim"><b>لا سائق:</b> AWAITING_DRIVER → (حلقة) NO_DRIVER_ESCALATION → <b>إشعار+بانر</b> → «إعادة محاولة» (يعود للطابور) أو «إلغاء واسترداد» (cancel_order يُعيد المبلغ).</div>
+<div class="sim"><b>المحادثة:</b> السائق يستلم (PICKED_UP) → تظهر الودجة للطرفين فوراً (SSE) → يتبادلان رسائل → عند DELIVERED تُخفى وتبقى مخزّنة → المشغّل يبحث عنها لاحقاً.</div>
+<div class="sim"><b>حالة حافّة — لا اقتراح مناسب:</b> إن لم نجد بديلاً بنفس الفئة قريباً → نعرض «أبحث بنفسي» فقط (بلا اقتراح وهمي — احترام «بلا اختلاق»).</div>
+<div class="sim"><b>حالة حافّة — محاولة وصول غير مصرّح للمحادثة:</b> الحارس يرفض أي شخص غير عميل الطلب/سائقه/OPS (نفس ABAC المُجرَّب).</div>
+
+<h2>كيف يظهر في لوحة التحكم (OPS)</h2>
+<ul>
+<li><b>عنصر قائمة جديد «💬 المحادثات»</b> → صفحة: كل محادثات الطلبات مخزّنة + بحث بـ(اسم السائق · اسم العميل · رقم الطلب · الوقت · السعر · الحالة).</li>
+<li>الطلبات المرفوضة/لا-سائق تظهر كما هي في «الطلبات العالقة» (موجودة) — لا تتغيّر.</li>
+</ul>
+
+<h2>ما يتغيّر وما لا يتغيّر</h2>
+<table>
+<tr><th>لا يتغيّر</th><th>يُضاف/يُصلَح</th></tr>
+<tr><td>الرفض الصريح + استرداده + إشعاره · تصعيد لا-سائق · cancel_order · التسعير/الدفتر/FIN-COR (لا مال جديد؛ نُصلح استرداداً ناقصاً فقط) · الطلب الناجح</td><td>🔧 ربط حلقة المهلة + توحيد مسارها (استرداد+إشعار) · بانرات العميل (حالتان) · نقطة الاقتراحات · order_messages+aa15 · نقاط+SSE محادثة · صفحة OPS «المحادثات» · إشعار لا-سائق</td></tr>
+</table>
+
+<h2>الخطة المرحلية (محكومة · بلا نشر تلقائي)</h2>
+<table>
+<tr><th>المرحلة</th><th>المحتوى</th><th>migration</th></tr>
+<tr><td><b>ز-1 (أولوية)</b></td><td>إصلاح عيبَي المهلة (ربط الحلقة + توحيد المسار: استرداد WALLET+إشعار+SSE) + بانر الرفض + نقطة الاقتراحات عبر مزوّدين + واجهتها. اختبارات.</td><td>لا</td></tr>
+<tr><td><b>ز-2 (أولوية)</b></td><td>إشعار لا-سائق + بانر + «إعادة محاولة»/«إلغاء واسترداد». اختبارات.</td><td>لا</td></tr>
+<tr><td><b>ز-3</b></td><td>محادثة الطلب: order_messages + aa15 (PG) + نقاط (حارس مُعاد) + SSE + ودجتان (عميل/سائق).</td><td>aa15</td></tr>
+<tr><td><b>ز-4</b></td><td>لوحة OPS «المحادثات» (قائمة + بحث متعدّد).</td><td>لا</td></tr>
+</table>
+
+<h2>قرارات معلّقة لمراجعتك</h2>
+<div class="card"><ul>
+<li>مهلة ردّ المزوّد (الافتراضي الحالي 300ث = 5 دقائق — أبقيه أم نقصّره لـ90–120ث؟).</li>
+<li>مهلة البحث عن سائق (<code>awaiting_driver_timeout_seconds</code> الحالية)؟</li>
+<li>نطاق سعر الاقتراحات (±25%؟) وعددها (6؟).</li>
+<li>«إعادة المحاولة» لِلا-سائق: كم مرّة قبل الإلغاء التلقائي؟</li>
+<li>المحادثة: نصوص الردود السريعة + تأكيد زر الاتصال.</li>
+</ul></div>
+
+<p class="footnote">مراجع كودية: provider_service.py:150–204 · accept_timeout_service.py:41–90 (غير مربوط في main.py) · awaiting_driver_escalation.py · main.py:158 · order_service.py:799/848 · state_transitions.py:35–75 · sse/order_tracking.py:_resolve_role · food_categories_router.py:140 · models/operations.py:207/225. لم يُكتب أي كود — للمراجعة فقط.</p>
+</div>
+</body>
+</html>

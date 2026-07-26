@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>496 — تقرير التنفيذ: إصلاح تسوية السائق على الويب + النشر الكامل</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+      --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+      --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+      --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+      --code-bg:#0f1018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+    --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+    --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+    --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+    --code-bg:#0f1018;
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI","Tahoma","Geeza Pro","Noto Naskh Arabic",sans-serif;
+    line-height:1.75; margin:0; padding:0; font-size:16px;
+  }
+  .wrap{max-width:1200px; margin:0 auto; padding:28px 20px 90px;}
+  header.hero{
+    background:linear-gradient(135deg,var(--green),#0a7a4d);
+    color:#fff; border-radius:18px; padding:36px 28px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+  }
+  header.hero h1{margin:0 0 10px; font-size:1.6rem; line-height:1.55; text-wrap:balance;}
+  header.hero p{margin:0; opacity:.95; font-size:1.02rem;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+  .meta-chip{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:6px 14px; border-radius:999px; font-size:.85rem;}
+
+  h2{font-size:1.32rem; margin:50px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px;}
+  h3{font-size:1.1rem; margin:28px 0 10px; color:var(--accent);}
+  h4{font-size:1rem; margin:16px 0 8px;}
+  .lead{color:var(--sub); font-size:1rem; margin-bottom:16px;}
+
+  .tbl-wrap{overflow-x:auto; border-radius:12px; border:1px solid var(--border); margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:.87rem;}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{background:var(--code-bg); font-size:.8rem; color:var(--sub);}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--code-bg); padding:2px 6px; border-radius:6px; font-size:.85em; direction:ltr; display:inline-block; unicode-bidi:embed;}
+
+  .badge{display:inline-block; padding:3px 10px; border-radius:999px; font-size:.72rem; font-weight:700; white-space:nowrap;}
+  .badge.done{background:var(--green-bg); color:var(--green);}
+  .badge.new{background:var(--red-bg); color:var(--red);}
+  .badge.info{background:var(--blue-bg); color:var(--blue);}
+  .badge.warn{background:var(--amber-bg); color:var(--amber);}
+  .badge.skip{background:var(--gray-bg); color:var(--gray);}
+  .badge.purple{background:var(--purple-bg); color:var(--purple);}
+
+  .simple{background:var(--blue-bg); border-inline-start:4px solid var(--blue); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.96rem;}
+  .simple b{color:var(--blue);}
+  .risk{background:var(--red-bg); border-inline-start:4px solid var(--red); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .risk b{color:var(--red);}
+  .safe{background:var(--green-bg); border-inline-start:4px solid var(--green); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .safe b{color:var(--green);}
+  .fix{background:var(--amber-bg); border-inline-start:4px solid var(--amber); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .fix b{color:var(--amber);}
+  .found{background:var(--purple-bg); border-inline-start:4px solid var(--purple); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .found b{color:var(--purple);}
+
+  .item{border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:20px; background:var(--card);}
+  .item.hot{border:2px solid var(--red);}
+  .item-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+  .item-head h3{margin:0; font-size:1.1rem; color:var(--text);}
+  .src{color:var(--sub); font-size:.76rem; margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);}
+  .src b{color:var(--text);}
+  .quote{background:var(--code-bg); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:.85rem; border-inline-start:3px solid var(--accent);}
+  .verify{background:var(--code-bg); border-radius:8px; padding:8px 12px; margin:6px 0; font-size:.82rem; border-inline-start:3px solid var(--green);}
+  .verify.bad{border-inline-start-color:var(--red);}
+  .verify b{color:var(--green);}
+  .verify.bad b{color:var(--red);}
+
+  .verdict-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:18px 0;}
+  .stat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center;}
+  .stat .num{font-size:1.7rem; font-weight:800;}
+  .stat .lbl{color:var(--sub); font-size:.78rem; margin-top:4px;}
+  .stat.green .num{color:var(--green);}
+  .stat.red .num{color:var(--red);}
+  .stat.blue .num{color:var(--blue);}
+  .stat.amber .num{color:var(--amber);}
+  .stat.purple .num{color:var(--purple);}
+
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:10px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.88rem;}
+  .toc ol{margin:6px 0; padding-inline-start:22px; columns:2; column-gap:24px;}
+  @media (max-width:640px){ .toc ol{columns:1;} }
+
+  .timeline{position:relative; margin:24px 0; padding-inline-start:26px;}
+  .timeline::before{content:""; position:absolute; inset-inline-start:8px; top:6px; bottom:6px; width:2px; background:var(--border);}
+  .tl-item{position:relative; margin-bottom:18px; padding-inline-start:14px;}
+  .tl-item::before{content:""; position:absolute; inset-inline-start:-26px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--card); box-shadow:0 0 0 2px var(--accent);}
+  .tl-item.hot::before{background:var(--red); box-shadow:0 0 0 2px var(--red);}
+  .tl-item.ok::before{background:var(--green); box-shadow:0 0 0 2px var(--green);}
+  .tl-item .tl-date{font-size:.76rem; color:var(--sub); font-weight:700;}
+  .tl-item .tl-title{font-weight:700; margin:2px 0 4px;}
+  .tl-item .tl-body{font-size:.86rem; color:var(--sub);}
+
+  .flow{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:16px 0; font-size:.82rem;}
+  .flow .step{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 12px; text-align:center; flex:1; min-width:130px;}
+  .flow .arrow{color:var(--sub); font-size:1.1rem; flex-shrink:0;}
+  .flow .step.ok{border-color:var(--green); background:var(--green-bg);}
+  .flow .step.stop{border-color:var(--red); background:var(--red-bg);}
+  .flow .step.warn{border-color:var(--amber); background:var(--amber-bg);}
+  @media (max-width:760px){ .flow{flex-direction:column;} .flow .arrow{transform:rotate(90deg);} }
+
+  .before-after{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;}
+  @media (max-width:700px){ .before-after{grid-template-columns:1fr;} }
+  .ba-box{border-radius:12px; padding:14px 16px; font-size:.88rem;}
+  .ba-box.before{background:var(--red-bg); border:1px solid var(--red);}
+  .ba-box.after{background:var(--green-bg); border:1px solid var(--green);}
+  .ba-box .ba-label{font-weight:800; font-size:.78rem; margin-bottom:6px;}
+  .ba-box.before .ba-label{color:var(--red);}
+  .ba-box.after .ba-label{color:var(--green);}
+
+  .status-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; margin:16px 0;}
+  .status-card{border:1px solid var(--border); border-radius:12px; padding:14px 16px; background:var(--card); border-top:4px solid var(--gray);}
+  .status-card.pending{border-top-color:var(--amber);}
+  .status-card.resolved{border-top-color:var(--green);}
+  .status-card.hot{border-top-color:var(--red);}
+  .status-card .sc-title{font-weight:700; font-size:.92rem; margin-bottom:4px;}
+  .status-card .sc-note{font-size:.8rem; color:var(--sub);}
+
+  ul.clean{margin:8px 0; padding-inline-start:22px;}
+  ul.clean li{margin-bottom:6px;}
+  footer{color:var(--sub); font-size:.82rem; text-align:center; margin-top:50px; padding-top:20px; border-top:1px solid var(--border);}
+
+  .deploy-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:16px 0;}
+  .deploy-card{border:2px solid var(--green); background:var(--green-bg); border-radius:14px; padding:16px; text-align:center;}
+  .deploy-card .dc-name{font-weight:800; font-size:.95rem; margin-bottom:6px;}
+  .deploy-card .dc-status{font-size:1.3rem; font-weight:800; color:var(--green);}
+  .deploy-card .dc-detail{font-size:.76rem; color:var(--sub); margin-top:6px; word-break:break-all;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>496 — تقرير التنفيذ: إصلاح تسوية السائق على الويب، منفَّذ ومُختبَر ومنشور على المنصات الأربع</h1>
+  <p>تنفيذ البند أ-6 من الخطة 494 حتى النهاية: كتابة الإصلاح، اكتشاف وإصلاح عطل حقيقي قبل أن يصل للمستخدم، مراجعة دقيقة، ثم نشر مُتحقَّق منه على test1 و.194 والإنتاج (tawanow.com) وGitHub.</p>
+  <div class="meta-row">
+    <span class="meta-chip">📅 2026-07-15</span>
+    <span class="meta-chip">🔀 PR #17 — merged 79a540f</span>
+    <span class="meta-chip">✅ 1603/1603 اختبار</span>
+    <span class="meta-chip">🚀 4/4 منصات مُتحقَّق منها حيّة</span>
+  </div>
+</header>
+
+<div class="toc">
+  <b>فهرس التقرير</b>
+  <ol>
+    <li><a href="#summary">الخلاصة بالأرقام</a></li>
+    <li><a href="#scope">ما نُفِّذ فعلياً مقابل ما أُجِّل — ولماذا</a></li>
+    <li><a href="#fix">الإصلاح: تسوية السائق على الويب</a></li>
+    <li><a href="#bug">العطل الذي اكتُشف أثناء التنفيذ (قبل أن يصل للمستخدم)</a></li>
+    <li><a href="#review">المراجعة الدقيقة قبل النشر</a></li>
+    <li><a href="#merge">الالتزام والدمج — والتعامل مع فشل CI</a></li>
+    <li><a href="#deploy">النشر على المنصات الأربع</a></li>
+    <li><a href="#infra">عطل بنية تحتية قائم مسبقاً، اكتُشف وأُصلح أثناء النشر</a></li>
+    <li><a href="#next">ما تبقّى — وما ينتظر قرارك</a></li>
+  </ol>
+</div>
+
+<h2 id="summary">1) الخلاصة بالأرقام</h2>
+<div class="verdict-grid">
+  <div class="stat green"><div class="num">1</div><div class="lbl">بند من 11 نُفِّذ فعلياً (أ-6)</div></div>
+  <div class="stat amber"><div class="num">10</div><div class="lbl">بنود أُجِّلت — كل واحد بسبب محدَّد موثَّق</div></div>
+  <div class="stat green"><div class="num">1603/1603</div><div class="lbl">اختبار ويب ناجح (كامل + 8 جديدة)</div></div>
+  <div class="stat green"><div class="num">4/4</div><div class="lbl">منصات نشر مُتحقَّق منها حيّة بنفس البناء</div></div>
+  <div class="stat purple"><div class="num">2</div><div class="lbl">أعطال حقيقية اكتُشفت وأُصلحت أثناء العمل (ليست في الخطة الأصلية)</div></div>
+</div>
+
+<div class="simple">
+  <b>بلغة بسيطة:</b> الخطة 494 كانت تضم 11 بنداً بانتظار قرار. بعد فحص دقيق لكل بند (قبل تنفيذ أي شيء)، تبيّن أن 10 منها إما بحاجة قرار عمل لم يُتَّخذ بعد، أو ملفاتها كانت قيد تعديل حيّ من جلسة عمل أخرى تعمل على نفس المستودع في نفس اللحظة، أو (في حالة "الوحدات الخاملة") تبيّن أنها ليست كوداً مهملاً كما بدت، بل سقالات (scaffolding) لها اختبارات مخصَّصة تثبت أنها مصمَّمة عمداً لتبقى معطَّلة. البند الوحيد الجاهز فعلياً للتنفيذ الفوري بأمان كان أ-6: إصلاح صفحة تسوية السائق على الويب. نُفِّذ، اختُبر بعمق، رُوجِع بدقة (وكشفت المراجعة عطلاً حقيقياً كان سيصل للمستخدمين لولا اكتشافه)، ثم نُشر على المنصات الأربع جميعها وتحقّقتُ من كل واحدة منها حيّة بعد النشر.
+</div>
+
+<h2 id="scope">2) ما نُفِّذ فعلياً مقابل ما أُجِّل — ولماذا</h2>
+<p class="lead">قبل تنفيذ أي شيء، أعدتُ فحص كل بند من الـ11 مقابل الحالة الحيّة الفعلية للكود (لا الخطة كما كُتبت سابقاً) — لأن جلسة عمل أخرى كانت لا تزال تعدّل المستودع في نفس اللحظة.</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th>البند</th><th>القرار</th><th>السبب المحدَّد</th></tr></thead>
+<tbody>
+<tr><td>أ-6 — إصلاح تسوية السائق (ويب)</td><td><span class="badge done">نُفِّذ ونُشر</span></td><td>ملفات ثابتة، تصميم واضح، لا قرار عمل معلَّق</td></tr>
+<tr><td>أ-1 — توحيد شجرة الالتزام</td><td><span class="badge skip">أُجِّل</span></td><td>يخص ملفات الجوّال والعمل غير المُلتزَم لجلسة أخرى — مُستثنى صراحة من هذا التنفيذ</td></tr>
+<tr><td>أ-2 — تسمية PROVIDER_PAYABLE</td><td><span class="badge skip">أُجِّل</span></td><td>افتراض رأس الهجرة (Alembic head) في الخطة كان قديماً وخاطئاً — الرأس الحقيقي <code>f9a1b2c3d4e5</code> وليس <code>aa15</code>؛ تنفيذه كما خُطِّط كان سيُنتج سلسلة هجرة مكسورة</td></tr>
+<tr><td>أ-3 — حذف 5 وحدات "خاملة"</td><td><span class="badge skip">أُجِّل — تصحيح جوهري</span></td><td>اكتُشف أثناء الفحص أن كل وحدة لها فئة اختبار مخصَّصة تثبت سلوكها المعطَّل عمداً (سقالة مُختبَرة، لا كود مهمل) — قرار الحذف أكبر مما قدَّرته الخطة الأصلية</td></tr>
+<tr><td>أ-4 — مهلة إعادة تصنيف السائق</td><td><span class="badge skip">أُجِّل</span></td><td>لا كود ناقص — القدرة موجودة ومُختبَرة أصلاً؛ التفعيل نفسه قرار تشغيلي حيّ يغيّر توفّر سائقين حقيقيين، ليس تنفيذاً برمجياً تلقائياً</td></tr>
+<tr><td>أ-5 — إكمال الترجمة الإنجليزية</td><td><span class="badge skip">أُجِّل</span></td><td>يخص تطبيق الجوّال — مُستثنى صراحة</td></tr>
+<tr><td>أ-7 — توحيد رقمَي الإيرادات</td><td><span class="badge skip">أُجِّل</span></td><td><code>operations_router.py</code> قيد تعديل حيّ (747 سطراً) من الجلسة الأخرى وقت الفحص — لا أساس ثابت للبناء عليه</td></tr>
+<tr><td>ب-1 إلى ب-4 (٤ بنود)</td><td><span class="badge skip">أُجِّلت جميعاً</span></td><td>قرارات سياسة/تصميم لم تُتَّخذ بعد، وملفاتها الخلفية (notification_service, order_service, jwt_service, dispatch_service, cash_exception_router) كانت جميعها قيد تعديل حيّ وقت الفحص</td></tr>
+<tr><td>ج-1، ج-2 (هواوي، تتبّع الموقع)</td><td><span class="badge skip">أُجِّلا</span></td><td>يخصّان تطبيق الجوّال — مُستثنيان صراحة؛ وهما أيضاً قرارا عمل استراتيجيان لم يُتَّخذا</td></tr>
+</tbody></table></div>
+
+<h2 id="fix">3) الإصلاح: تسوية السائق على الويب</h2>
+<p>البند أ-6 (بحسب الخطة 494) كان يغلق فجوة أُبلِغ عنها في التقرير 493 وعُمِّقت في تقرير 494 الخاص بالجلسة الأخرى (<code>app_report/494_EXECUTION_PLAN_493_GAPS.md</code>) — جذران منفصلان في <code>web/src/pages/driver/DriverSettlementPage.tsx</code>:</p>
+<div class="before-after">
+  <div class="ba-box before">
+    <div class="ba-label">قبل</div>
+    لا اكتشاف عند تحميل الصفحة إطلاقاً. تحديث الصفحة أو إغلاق التبويب أو فتحها من جهاز آخر يُفقد كل رؤية لتسوية جارية — حتى بلا أي فشل شبكة. كما لا توجد إعادة محاولة لاستدعاء إصدار الرمز بعد إنشاء المعاملة.
+  </div>
+  <div class="ba-box after">
+    <div class="ba-label">بعد</div>
+    تأثير عند التحميل يستعيد أي معاملة DRAFT/AGENT_VERIFIED تلقائياً. تأثير موحَّد (مرتبط بمعرّف/حالة المعاملة) يُصدر الرمز الموقَّع بإعادة محاولة محدودة (3 محاولات) — يغطي الإنشاء الجديد والاستعادة بعد إعادة التحميل بنفس الآلية.
+  </div>
+</div>
+
+<h2 id="bug">4) العطل الذي اكتُشف أثناء التنفيذ — قبل أن يصل للمستخدم</h2>
+<div class="risk">
+  <b>هذا لم يكن في أي من التقريرين المصدرَين.</b> أثناء البناء، تبيّن أن الخادم لا يُنشئ <code>short_code</code> إلا داخل استدعاء <code>/token</code> نفسه (<code>backend/app/modules/settlement/service.py:150-151</code>) — وليس لحظة إنشاء المعاملة كما افترض التصميم الأولي. النتيجة: بين لحظة إنشاء المعاملة ولحظة وصول الرمز، كانت الواجهة (بالتصميم الأولي) ستسقط إلى شاشة "ابدأ تسوية جديدة" رغم وجود معاملة بالفعل — ونقرة ثانية من السائق كانت ستُنشئ معاملة مكرَّرة.
+</div>
+<div class="flow">
+  <div class="step">إنشاء المعاملة</div>
+  <div class="arrow">→</div>
+  <div class="step stop">فجوة: لا رمز بعد، لا حالة انتظار</div>
+  <div class="arrow">→</div>
+  <div class="step stop">الواجهة تعرض "ابدأ تسوية جديدة" رغم وجود معاملة</div>
+  <div class="arrow">→</div>
+  <div class="step stop">نقرة ثانية = معاملة مكرَّرة محتملة</div>
+</div>
+<div class="safe">
+  <b>الحل المُضاف:</b> حالة انتظار صريحة (مؤشر تحميل + "جارٍ تجهيز رمز التسوية…") تظهر بمجرد وجود معاملة بلا رمز، فتمنع الرجوع لأزرار "بدء تسوية جديدة". أُضيف أيضاً زرّ "إعادة المحاولة" يدوي لحالة نادرة أعمق: فشل الشبكة المتكرر عبر كل المحاولات الثلاث المؤتمَتة — بدل ترك السائق أمام مؤشر تحميل دائم بلا مخرج.
+</div>
+
+<h2 id="review">5) المراجعة الدقيقة قبل النشر</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>الفحص</th><th>النتيجة</th></tr></thead>
+<tbody>
+<tr><td>Typecheck</td><td><span class="badge done">نظيف — 0 خطأ</span></td></tr>
+<tr><td>Lint</td><td><span class="badge done">0 خطأ، لا تحذيرات جديدة في الملفَين</span></td></tr>
+<tr><td>مجموعة اختبارات الويب الكاملة</td><td><span class="badge done">1603/1603 (205 ملفاً)</span></td></tr>
+<tr><td>اختبارات الصفحة تحديداً</td><td><span class="badge done">8 اختبارات — 3 موجودة + 5 جديدة (استعادة عند التحميل، إعادة محاولة، منع التكرار، إعادة المحاولة اليدوية)</span></td></tr>
+<tr><td>البناء (build)</td><td><span class="badge done">ناجح — <code>main-Cijrf2nw.js</code>، 41 عنصر تخزين مؤقت</span></td></tr>
+</tbody></table></div>
+
+<h2 id="merge">6) الالتزام والدمج — والتعامل مع فشل CI</h2>
+<div class="timeline">
+  <div class="tl-item ok"><div class="tl-date">الخطوة 1</div><div class="tl-title">فرع جديد من master مباشرة</div><div class="tl-body">لا التزام على فرع الجلسة الأخرى؛ التزام صريح بمسارَي الملفَين فقط (لا <code>git add -A</code>) حتى لا يختلط بعمل الجلسة الأخرى غير المُلتزَم</div></div>
+  <div class="tl-item ok"><div class="tl-date">الخطوة 2</div><div class="tl-title">PR #17 مفتوح، CI يعمل</div><div class="tl-body">9 من 10 فحوصات نجحت فوراً (Backend suite, FIN-COR, OpenAPI ratchet, Ruff, عقود، ثوابت قاعدة البيانات، i18n، CodeRabbit)</div></div>
+  <div class="tl-item hot"><div class="tl-date">الخطوة 3</div><div class="tl-title">فحص الويب فشل — تحقيق قبل أي قرار دمج</div><div class="tl-body">الفشل في <code>DocumentUploadField.test.tsx</code> و<code>OnboardingContractSign.test.tsx</code> — تطابق حرفي مع عطل مُوثَّق مسبقاً في <code>.claude/rules/test-infrastructure.md</code> ("Test timed out in 5000ms" تحت حمل CI). أُعيد تشغيل الفحص 3 مرات متتالية: نفس الملفين بالضبط في كل مرة، لا علاقة لهما بملفَي هذا الإصلاح، واختبارات هذا الإصلاح الخمسة نجحت في الثلاث مرات كلها</div></div>
+  <div class="tl-item ok"><div class="tl-date">الخطوة 4</div><div class="tl-title">الدمج في master</div><div class="tl-body">دُمج مع توثيق صريح لسبب تجاوز الفحص الأحمر في رسالة الدمج نفسها — commit <code>79a540f</code></div></div>
+</div>
+
+<h2 id="deploy">7) النشر على المنصات الأربع</h2>
+<p class="lead">البناء المنشور مبنيّ من نسخة معزولة تماماً (git worktree نظيف من master) — لا تلوّث من عمل الجلسة الأخرى غير المُلتزَم على نفس المستودع. كل منصة تحقَّقتُ منها حيّة بعد النشر مباشرة، ليس افتراضاً.</p>
+<div class="deploy-grid">
+  <div class="deploy-card"><div class="dc-name">GitHub</div><div class="dc-status">✓</div><div class="dc-detail">PR #17 مدموج<br><code>79a540f</code></div></div>
+  <div class="deploy-card"><div class="dc-name">test 1 (Kali)</div><div class="dc-status">✓ 200</div><div class="dc-detail">test1.tawanow.com<br><code>main-Cijrf2nw.js</code></div></div>
+  <div class="deploy-card"><div class="dc-name">test (.194)</div><div class="dc-status">✓ 200</div><div class="dc-detail">test.tawanow.com<br><code>main-Cijrf2nw.js</code></div></div>
+  <div class="deploy-card"><div class="dc-name">الإنتاج</div><div class="dc-status">✓ 200</div><div class="dc-detail">tawanow.com<br><code>main-Cijrf2nw.js</code></div></div>
+</div>
+<div class="safe">
+  <b>الأربعة تصدّر نفس البناء بالحرف</b> (<code>main-Cijrf2nw.js</code>) — تحقّق صحّة الخادم الخلفي (health) 200 على الثلاثة القابلة للفحص، وصفحة تنزيل التطبيق (<code>/dl/download.html</code>) على الإنتاج ما زالت تعمل (200) بعد النشر، تأكيداً أن نسخ الملفات لم يمسّها.
+</div>
+<div class="risk">
+  <b>النشر على الإنتاج تحديداً</b> جرى فقط بعد سؤال تأكيد مباشر لك — نظراً لحساسية الصفحة (مالية، تخصّ السائقين مباشرة) وحداثة اكتشاف تلوّث الشجرة المشتركة. وافقتَ صراحةً قبل التنفيذ.
+</div>
+
+<h2 id="infra">8) عطل بنية تحتية قائم مسبقاً — اكتُشف وأُصلح أثناء النشر</h2>
+<div class="found">
+  <b>غير متعلّق بهذا الإصلاح، لكنه كان يمنع التحقّق من النشر:</b> عند محاولة التحقّق من test1.tawanow.com، ظهر خطأ 502 رغم أن الحاوية المحلية تعمل بشكل سليم (200 على المنفذ المحلي). التحقيق كشف عمليتَي <code>cloudflared</code> منفصلتين تعملان لنفس النفق في آن واحد: واحدة مُدارة عبر systemd (صحيحة)، وأخرى يتيمة عمرها أكثر من 5 أيام (من جلسة عمل سابقة لم تُنظَّف بالكامل) لا تزال تحمل إعداداً قديماً يوجّه لمنفذ غير موجود (8094 بدل 8080). Cloudflare كانت توزّع الطلبات عشوائياً بين الاثنتين، فتفشل نصف المحاولات تقريباً.
+</div>
+<div class="flow">
+  <div class="step warn">عمليتان لنفس النفق (يتيمة + مُدارة)</div>
+  <div class="arrow">→</div>
+  <div class="step stop">Cloudflare توزّع بينهما عشوائياً</div>
+  <div class="arrow">→</div>
+  <div class="step warn">إنهاء العملية اليتيمة بمعرّفها الدقيق فقط</div>
+  <div class="arrow">→</div>
+  <div class="step ok">200 ثابت، النفق يعمل بشكل صحيح</div>
+</div>
+<p class="lead">أُصلح بإنهاء العملية اليتيمة بمعرّفها الدقيق (لا بأمر عام قد يصيب عمليات أخرى)، بعد تحديث إعداد النفق ليطابق واقع المنفذ الحالي (8080). النتيجة مُتحقَّق منها: 200 ثابت على test1.tawanow.com منذ الإصلاح.</p>
+
+<h2 id="next">9) ما تبقّى — وما ينتظر قرارك</h2>
+<div class="status-grid">
+  <div class="status-card pending"><div class="sc-title">تسوية الويب — فجوة إضافية اكتشفتها الجلسة الأخرى</div><div class="sc-note">صفحة <code>DriverSettlementPage.tsx</code> على الويب لديها فجوة توثّق مماثلة في مسار إعادة المحاولة للتسوية (اطّلع على تقرير 493/494 من الجلسة الأخرى) — لم تكن ضمن نطاق هذا التنفيذ (مسار مختلف داخل نفس الصفحة، لم يتقاطع مع أ-6)</div></div>
+  <div class="status-card pending"><div class="sc-title">10 بنود من الخطة 494 لا تزال بانتظار قرارك</div><div class="sc-note">أ-1، أ-2، أ-3 (مُعاد تقييمه)، أ-4، أ-5، أ-7، ب-1 إلى ب-4، ج-1، ج-2 — التفاصيل الكاملة والخيارات المطروحة لكل واحد في الخطة 494 نفسها، لم تتغيّر</div></div>
+  <div class="status-card pending"><div class="sc-title">شجرة العمل المشتركة لا تزال ملوَّثة</div><div class="sc-note">الجلسة الأخرى لا تزال لم تُثبِّت عملها (7 ملفات باك-إند + ملفات جوّال) — أي عمل مستقبلي على تلك الملفات يجب أن يبدأ بالتحقق من حالتها أولاً، تماماً كما فعلتُ هنا</div></div>
+</div>
+
+<footer>
+  تقرير 496 — تنفيذ ونشر البند أ-6 من الخطة 494، 2026-07-15 · مبني من نسخة معزولة من master، مُختبَر بالكامل، مُتحقَّق منه حيّاً على المنصات الأربع بعد النشر — لا افتراض بلا دليل.
+</footer>
+
+</div>
+</body>
+</html>

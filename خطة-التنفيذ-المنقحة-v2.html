@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الخطة المنقّحة v2 — بعد المراجعة الدقيقة والمحاكاة (تووا)</title>
+<style>
+  :root{
+    --green:#0e7a4f; --green-d:#0a5d3c; --green-l:#e8f5ef;
+    --ink:#1c2b24; --muted:#5d6b64; --line:#e2e8e4; --bg:#f6f8f7; --card:#fff;
+    --crit:#b3261e; --crit-bg:#fdecea; --warn:#c4630b; --warn-bg:#fdf0e4;
+    --info:#3a6ea5; --info-bg:#eaf2fb; --ok:#0e7a4f; --ok-bg:#e8f5ef;
+    --code:#0e211a; --shadow:0 1px 3px rgba(0,0,0,.06),0 6px 24px rgba(14,122,79,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI","Noto Sans Arabic",Tahoma,system-ui,sans-serif;line-height:1.85;font-size:16px}
+  .wrap{max-width:1020px;margin:0 auto;padding:0 20px 80px}
+  header.hero{background:linear-gradient(135deg,var(--green) 0%,var(--green-d) 100%);color:#fff;padding:44px 0 36px}
+  header.hero .wrap{padding-bottom:0}
+  .logo{font-size:29px;font-weight:800;display:flex;align-items:center;gap:11px}
+  .logo .mark{background:#fff;color:var(--green);width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:24px}
+  header h1{font-size:23px;margin:15px 0 6px;font-weight:800}
+  header .sub{opacity:.93;font-size:14.5px;max-width:800px}
+  .meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-top:18px}
+  .meta-grid .m{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:11px;padding:9px 12px}
+  .meta-grid .m b{display:block;font-size:11px;opacity:.8;font-weight:600;margin-bottom:2px}
+  .meta-grid .m span{font-size:13.5px;font-weight:700}
+  .review{margin-top:16px;background:rgba(255,255,255,.16);border-radius:12px;padding:12px 16px;font-size:14px;border:1px dashed rgba(255,255,255,.5)}
+
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:23px 25px;margin-top:22px;box-shadow:var(--shadow)}
+  h2{font-size:19px;margin:0 0 12px;color:var(--green-d);display:flex;align-items:center;gap:9px;border-bottom:2px solid var(--green-l);padding-bottom:9px}
+  h3{font-size:16px;margin:18px 0 8px;color:var(--ink)}
+  p{margin:0 0 10px} .lead{color:var(--muted);font-size:14px;margin:-4px 0 14px}
+  code,.mono{font-family:"Cascadia Code",Consolas,Menlo,monospace;background:#eef3f0;padding:2px 7px;border-radius:6px;font-size:12px;direction:ltr;unicode-bidi:plaintext;display:inline-block}
+  pre{background:var(--code);color:#d6f5e6;padding:13px 15px;border-radius:10px;overflow:auto;direction:ltr;text-align:left;font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+  pre .rm{color:#ff9b91} pre .add{color:#9be8b6} pre .c{color:#7fae97} pre .cmd{color:#bfe0ff}
+
+  .sev{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:20px;color:#fff;letter-spacing:.3px}
+  .s-done{background:var(--ok)} .s-code{background:var(--info)} .s-deploy{background:var(--warn)} .s-crit{background:var(--crit)}
+
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13px}
+  th,td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f1f6f3;color:var(--green-d);font-size:12px}
+  .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:12px;white-space:nowrap}
+  .p-low{background:#e3f4ea;color:#0a5d3c} .p-mid{background:#fdf0e4;color:#c4630b} .p-hi{background:#fdecea;color:#b3261e}
+
+  .card2{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0;background:#fbfdfc}
+  .card2 .h{font-weight:800;color:var(--green-d);margin-bottom:6px;font-size:15px}
+  .acc{background:var(--ok-bg);border-radius:10px;padding:11px 14px;margin:11px 0;font-size:13.5px}
+  .acc .t{font-weight:800;color:var(--green-d);margin-bottom:4px}
+  .decision{background:var(--warn-bg);border-radius:10px;padding:12px 15px;margin:12px 0;font-size:14px;border-right:3px solid var(--warn)}
+  .decision .t{font-weight:800;color:var(--warn);margin-bottom:4px}
+  .gate{background:var(--info-bg);border-radius:10px;padding:11px 14px;margin:10px 0;font-size:13.5px;border-right:3px solid var(--info)}
+  .danger{background:var(--crit-bg);border-radius:10px;padding:12px 15px;margin:12px 0;font-size:14px;border-right:3px solid var(--crit)}
+  .danger .t{font-weight:800;color:var(--crit);margin-bottom:4px}
+  ul.dot{padding-right:20px;margin:7px 0} ul.dot li{margin:5px 0}
+  .step{display:flex;gap:11px;padding:10px 0;border-bottom:1px dashed var(--line)}
+  .step:last-child{border-bottom:0}
+  .step .box{min-width:20px;height:20px;border:2px solid var(--green);border-radius:5px;margin-top:3px}
+  .step .id{font-weight:800;color:var(--green-d);white-space:nowrap;margin-left:3px}
+  .flow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:12px 0;font-size:12.5px}
+  .flow .n{background:var(--green-l);border:1px solid var(--green);border-radius:8px;padding:5px 10px;font-weight:700;color:var(--green-d)}
+  .flow .a{color:var(--muted);font-weight:800}
+  .flow .stop{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+  .flow .r2{background:var(--crit-bg);border-color:var(--crit);color:var(--crit)}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px;padding-top:18px}
+  @media(max-width:600px){section{padding:18px 15px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="logo"><span class="mark">🔬</span> تووا · خطة v2</div>
+    <h1>الخطة التنفيذية المنقّحة — بعد المراجعة الدقيقة والمحاكاة الذهنية</h1>
+    <div class="sub">قارنتُ كل بند بالكود الفعلي، وتتبّعت الأثر على الملفات والدوال، وحاكيت البناء والتشغيل. استخرجتُ <strong>عيباً خفياً جديداً</strong> ودمجته، وأعدتُ هيكلة النشر إلى <strong>إصدارين مختلفي الخطورة</strong>. للمراجعة قبل التنفيذ.</div>
+    <div class="meta-grid">
+      <div class="m"><b>المرحلة</b><span>448</span></div>
+      <div class="m"><b>تغييرات الكود</b><span>مُطبّقة في الشجرة ✓</span></div>
+      <div class="m"><b>الحجم</b><span>ملفّان · ٥ أسطر</span></div>
+      <div class="m"><b>الاختبارات المُوجّهة</b><span>16/16 ✓</span></div>
+      <div class="m"><b>FIN-COR</b><span>بلا مساس</span></div>
+    </div>
+    <div class="review">✋ <strong>المستجدّ:</strong> إصلاحات الكود الثلاثة باتت <strong>مُطبّقة فعلاً في شجرة العمل</strong> (غير مُودعة، غير منشورة) — تحقّقتُ منها. <strong>لم أنشر شيئاً.</strong> النشر يبقى بقرارك. في النهاية ٤ قرارات + سجلّ العيوب المكتشفة.</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- 0 current state -->
+<section>
+  <h2>٠ · الحالة الفعلية الآن (مصدر الحقيقة: <code>git diff</code>)</h2>
+  <p class="lead">إصلاحات الكود طُبّقت في الشجرة. هذا <code>git diff</code> الكامل (٥ أسطر، ملفّان فقط، لا شيء آخر):</p>
+  <pre>web/nginx.conf                        | 2 +-
+web/src/components/LocationPicker.tsx | 8 ++++----
+
+<span class="c"># nginx.conf — CSP</span>
+<span class="rm">- img-src 'self' data: blob:;</span>
+<span class="add">+ img-src 'self' data: blob: https://*.tile.openstreetmap.org;</span>
+
+<span class="c"># LocationPicker.tsx — (١) أيقونات الماركر</span>
+<span class="rm">- iconUrl: "https://cdnjs.cloudflare.com/.../marker-icon.png", (×3)</span>
+<span class="add">+ iconUrl: new URL("leaflet/dist/images/marker-icon.png", import.meta.url).href, (×3)</span>
+<span class="c"># LocationPicker.tsx — (٢) ترتيب بلاطات الخريطة (عيب مكتشف)</span>
+<span class="rm">- url=".../{z}/{y}/{x}.png"</span>
+<span class="add">+ url=".../{z}/{x}/{y}.png"</span></pre>
+  <div class="acc"><div class="t">تحقّق منجز (قراءة فقط) على هذه الشجرة</div>
+    <ul class="dot" style="margin:4px 0">
+      <li><code>typecheck</code>: 0 أخطاء · <code>build</code>: نجح · لا <code>cdnjs</code> في <code>dist</code> · الماركر مُضمّن <code>data:</code> في ٤ حِزَم.</li>
+      <li>اختبارات مُوجّهة: <b>16/16</b> (header 4 · DriverMap 4 · FleetMapView 6 · LocationPicker 2).</li>
+      <li>نطاق الـ diff: ملفّان فقط — لا تسرّب لأي ملف آخر، لا مناطق محظورة، FIN-COR ثابت.</li>
+    </ul></div>
+</section>
+
+<!-- 1 deep per-change analysis -->
+<section>
+  <h2>١ · تحليل الأثر الكامل لكل تغيير (مع المحاكاة)</h2>
+
+  <div class="card2">
+    <div class="h">WI-1 · CSP: السماح ببلاطات OSM <span class="sev s-done">مُطبّق</span></div>
+    <table>
+      <tr><th>البُعد</th><th>التحليل</th></tr>
+      <tr><td>ماذا يتغيّر</td><td>إضافة مضيف واحد <code>https://*.tile.openstreetmap.org</code> إلى <code>img-src</code> فقط.</td></tr>
+      <tr><td>لماذا</td><td>Leaflet يجلب البلاطات من ذلك المضيف؛ بدون السماح يحجبها المتصفّح → خريطة رمادية.</td></tr>
+      <tr><td>نطاق التأثير</td><td>رأس استجابة <b>عام لكل الصفحات</b>. الأثر الوحيد: السماح بصور البلاطات. <code>script-src</code>/<code>connect-src</code> بلا تغيير → لا سطح هجوم جديد عدا مضيف صور واحد.</td></tr>
+      <tr><td>مصادر CSP الأخرى</td><td><b>لا يوجد</b>: لا <code>&lt;meta&gt;</code> CSP في <code>index.html</code>؛ مضيف vhost يضبط HSTS فقط؛ ملفات <code>deploy/*.md</code> توثيق لا إعداد. <code>nginx.conf</code> هو المصدر الوحيد الحيّ.</td></tr>
+      <tr><td>محاكاة التشغيل</td><td><code>{s}</code> = a/b/c → <code>a.tile.openstreetmap.org</code> يطابقه الـ wildcard → تُحمّل البلاطات. <code>data:</code> للأيقونات مسموح. لا محتوى مختلط (كله https).</td></tr>
+      <tr><td>الاختبار</td><td><code>nginx-security-headers.test.ts</code> يفحص وجود <code>default-src</code>/<code>frame-ancestors</code> فقط → يبقى أخضر (مؤكَّد).</td></tr>
+      <tr><td>المخاطرة</td><td><span class="pill p-low">منخفضة</span> + ملاحظة: سياسة OSM للاستخدام العادل في الإنتاج → الاستضافة الذاتية حلّ أمثل لاحقاً.</td></tr>
+    </table>
+  </div>
+
+  <div class="card2">
+    <div class="h">WI-2 · أيقونات الماركر: cdnjs → تضمين محلي <span class="sev s-done">مُطبّق</span></div>
+    <table>
+      <tr><th>البُعد</th><th>التحليل</th></tr>
+      <tr><td>الآلية (محاكاة البناء)</td><td>Vite يحلّ <code>new URL("leaflet/dist/images/…", import.meta.url)</code> ويُضمّن الصور الصغيرة (٢٤٦٤/١٤٦٦/٦١٨ بايت &lt; حدّ 4096) كـ <code>data:base64</code>. تحقّقتُ: <code>vite.config</code> لا يضبط <code>assetsInlineLimit</code> → الافتراضي يُطبَّق؛ و<code>dist</code> يحوي <code>data:</code> فعلاً.</td></tr>
+      <tr><td>عيب خفي حُلّ (D-2)</td><td>الأربع مكوّنات تستدعي <code>L.Icon.Default.mergeOptions</code> وهي <b>طفرة عامة</b> (global). سابقاً: LocationPicker=cdnjs والأشقّاء=محلي → الأيقونة الافتراضية العامة كانت <b>تابعة لترتيب التحميل</b> (قد تتسرّب cdnjs لخرائط الأشقّاء فتُحجب). الآن: الأربع متطابقة → <b>حتمية</b>. (تحسين معماري اختياري لاحقاً: توحيد الإصلاح في وحدة مشتركة واحدة.)</td></tr>
+      <tr><td>نصف قطر الأثر</td><td>مستهلكو <code>LocationPicker</code>: <code>AddressBook</code> · <code>ProviderSettings</code> · <code>RegistrationPage</code> — <b>غير متأثّرين سلوكياً</b> (تغيير داخلي، لا تغيير في واجهة المكوّن) — يحصلون فقط على ماركر يعمل.</td></tr>
+      <tr><td>بيئة الاختبار</td><td>النمط يعمل في vitest (اختبار LocationPicker ينجح 2/2).</td></tr>
+      <tr><td>المخاطرة</td><td><span class="pill p-low">منخفضة</span> — نمط مُجرّب لدى ٣ أشقّاء.</td></tr>
+    </table>
+  </div>
+
+  <div class="card2" style="border-color:var(--crit)">
+    <div class="h" style="color:var(--crit)">WI-2b · 🔴 عيب مكتشف أثناء المراجعة: قلب إحداثيات x/y <span class="sev s-done">مُطبّق</span></div>
+    <table>
+      <tr><th>البُعد</th><th>التحليل</th></tr>
+      <tr><td>الاكتشاف</td><td>الأصل المُودع في <code>LocationPicker</code> كان <code>…/{z}/{y}/{x}.png</code> — <b>x و y مقلوبتان</b> — بينما الأشقّاء الثلاثة والمعيار القياسي <code>…/{z}/{x}/{y}.png</code>.</td></tr>
+      <tr><td>الأثر لو شُحن مع CSP فقط</td><td>كانت خريطة اختيار العنوان ستطلب بلاطات <b>موقع خاطئ (منقول قطرياً)</b> أو فارغة — خريطة معطّلة حتى بعد فتح CSP. <b>كان مخفياً</b> لأن CSP يحجب كل البلاطات (المربّع الرمادي أخفى القلب).</td></tr>
+      <tr><td>الأهمية</td><td>هذا بالضبط ما تطلبته المراجعة العميقة: عيب كان سيُفسد الإصلاح. لو طبّقنا «CSP فقط» لظننا أننا أصلحنا الخريطة بينما تبقى معطّلة.</td></tr>
+      <tr><td>الحالة</td><td>صُحّح إلى <code>{z}/{x}/{y}</code> (مطابق للأشقّاء والمعيار). لا اختبار يثبّت الرابط → لا كسر.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- 2 discovered defects register -->
+<section>
+  <h2>٢ · سجلّ العيوب/المخاطر المكتشفة أثناء المراجعة</h2>
+  <table>
+    <tr><th>#</th><th>العيب / الخطر</th><th>الخطورة</th><th>الحالة</th></tr>
+    <tr><td>D-1</td><td>قلب x/y في بلاطات LocationPicker (خريطة موقع خاطئ)</td><td><span class="pill p-hi">حرج (كان مخفياً)</span></td><td>✅ صُحّح (WI-2b)</td></tr>
+    <tr><td>D-2</td><td>طفرة <code>L.Icon.Default</code> العامة تابعة لترتيب التحميل (تسرّب cdnjs محتمل لخرائط أخرى)</td><td><span class="pill p-mid">متوسط (كامن)</span></td><td>✅ حُلّ بتوحيد الأربعة (WI-2)</td></tr>
+    <tr><td>D-3</td><td>إصلاح البحث = <b>إصدار خلفي كامل</b> يطبّق ميغريشنات معلّقة (aa01–…) لا «إصلاحاً صغيراً»</td><td><span class="pill p-hi">عالٍ</span></td><td>⚠️ يُدار بإصدار منفصل (المرحلة ٤)</td></tr>
+    <tr><td>D-4</td><td>بلاطات OSM العامة تخالف الاستخدام العادل في الإنتاج (قد تُقيَّد)</td><td><span class="pill p-mid">متوسط</span></td><td>↗ استضافة ذاتية لاحقاً (C-R01)</td></tr>
+    <tr><td>D-5</td><td>التغييرات غير مُودعة + قاعدة لا-commit + مشروع محكوم بمراحل</td><td><span class="pill p-low">حوكمة</span></td><td>تقرير مرحلة 448 + لا commit</td></tr>
+    <tr><td>D-6</td><td>لم يُشغَّل <b>Vitest الكامل</b> على الشجرة الحالية بعد (فقط مُوجّه)</td><td><span class="pill p-low">تحقّق</span></td><td>خطوة إلزامية قبل الإغلاق</td></tr>
+    <tr><td>D-7</td><td>الموقع الحيّ فيه عيوب أخرى (settlement/agent/me 404 · customer/me 401 · تضارب رسم التوصيل · HSTS مكرّر)</td><td><span class="pill p-mid">خارج النطاق</span></td><td>بعضها يُحلّ بالإصدار الخلفي؛ بعضها إصلاحات منفصلة</td></tr>
+    <tr><td>D-8</td><td>HSTS على تصعيد تدريجي موثّق — <b>لا نلمسه</b> (تفادي توسّع النطاق)</td><td><span class="pill p-low">ملاحظة</span></td><td>بلا تغيير (مقصود)</td></tr>
+  </table>
+</section>
+
+<!-- 3 the big refinement: two releases -->
+<section>
+  <h2>٣ · إعادة الهيكلة الجوهرية — فصل النشر إلى إصدارين</h2>
+  <p class="lead">أهمّ ناتج للمراجعة: الخريطة والبحث <b>مختلفان جذرياً في الخطورة</b>، فلا يُنشران معاً.</p>
+
+  <div class="card2" style="border-color:var(--green)">
+    <div class="h" style="color:var(--green-d)">الإصدار ١ — أمامي فقط (الخريطة) <span class="sev s-deploy">نشر منخفض الخطورة</span></div>
+    <ul class="dot">
+      <li>يحمل: <code>web</code> build (WI-2 + WI-2b) + <code>nginx.conf</code> (WI-1).</li>
+      <li><b>لا backend، لا ميغريشنات</b> — مجرّد ملفات ثابتة + إعادة تحميل nginx (<code>deploy_web</code>-style).</li>
+      <li>الأثر: يُصلح المربّع الرمادي + ماركر LocationPicker على الموقع الحيّ.</li>
+      <li>التراجع: استرجاع نشرة الواجهة السابقة (ثوانٍ) — لا حالة قاعدة بيانات.</li>
+    </ul>
+    <div class="acc"><div class="t">لماذا أولاً؟</div> يُصلح أكثر الأعطال وضوحاً (الخريطة) بأقل خطورة ودون فتح الإصدار الخلفي الكبير.</div>
+  </div>
+
+  <div class="card2" style="border-color:var(--crit)">
+    <div class="h" style="color:var(--crit)">الإصدار ٢ — خلفي كامل (البحث) <span class="sev s-crit">نشر عالي الخطورة · بإذنك</span></div>
+    <ul class="dot">
+      <li>إصلاح البحث <b>يتطلّب</b> نشر الـ backend (<code>deploy_be_gated.sh</code>) الذي يشغّل <code>apply_migrations.sh</code> → يطبّق كل الميغريشنات المعلّقة على قاعدة البيانات الحيّة.</li>
+      <li>هذا يحمل <b>كل تغييرات ما بعد ١١ مايو</b> (مالية/سجلّ/حالات طلب جديدة…) — حدث كبير لا إصلاح بحث منعزل.</li>
+      <li><b>لا اختصار آمن:</b> حتى «مزوّد جيوكودينغ مؤقّت» يحتاج وجود <code>geo_router</code> على الـ backend الحيّ → أي يحتاج النشر الخلفي.</li>
+      <li>+ خدمة الجيوكودينغ: Nominatim ذاتي (C-R01، ساعات) أو مزوّد مُستضاف مؤقّت.</li>
+    </ul>
+    <div class="danger"><div class="t">شروط إلزامية قبل الإصدار ٢</div>
+      <ul class="dot" style="margin:4px 0">
+        <li>بروفة كاملة على staging أولاً (<code>deploy_to_staging.sh</code>).</li>
+        <li><b>نسخة احتياطية للقاعدة قبل الميغريشن</b> (الميغريشنات شبه غير قابلة للتراجع عملياً).</li>
+        <li>جاهزية runbook التراجع (<code>deploy/release/update-runbook.md</code>، مسارات A–F).</li>
+        <li><code>diff_local_vs_server.sh</code> لمعرفة الفجوة الكاملة قبل الترقية.</li>
+      </ul></div>
+  </div>
+</section>
+
+<!-- 4 execution steps -->
+<section>
+  <h2>٤ · خطوات التنفيذ بالترتيب</h2>
+
+  <h3>المرحلة أ — الإغلاق المحلي (حوكمة + تحقّق نهائي)</h3>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">A1</span> تثبيت نطاق الـ diff: ملفّان فقط (مؤكَّد). <div class="meta"><code>git diff --stat -- web/</code></div></div></div>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">A2</span> <b>تشغيل Vitest الكامل</b> (سدّ D-6) + lint:
+    <pre><span class="cmd">cd platform/web && npx vitest run && npm run lint</span>  <span class="c"># 0 فشل جديد · 0 lint errors</span></pre></div></div>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">A3</span> تحقّق FIN-COR (الهاشات ثابتة) + تأكيد عدم مساس المناطق المحظورة. <div class="meta"><code>contract_flag_hash_check.py</code></div></div></div>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">A4</span> كتابة تقرير المرحلة <code>app_report/448_*.md</code>. <b>بلا commit</b> (قاعدة المشروع).</div></div>
+  <div class="gate">🚦 <b>بوابة مراجعة ١:</b> أعرض نتائج A2–A3، وتقرّر الانتقال للإصدار ١.</div>
+
+  <h3>المرحلة ب — الإصدار ١ (أمامي، الخريطة)</h3>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">B1</span> نشر الواجهة فقط (build + nginx reload) عبر مسار <code>deploy_web</code> (دون <code>deploy_be</code>).</div></div>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">B2</span> تحقّق حيّ (Playwright على tawanow.com): البلاطات تظهر · ماركر LocationPicker يظهر · console خالٍ من انتهاكات CSP للبلاطات · مسار العنوان→الدفع سليم.</div></div>
+  <div class="acc"><div class="t">قبول الإصدار ١</div> الخريطة تعمل على الموقع الحيّ في نموذج العنوان والتتبّع، بلا أخطاء console متعلّقة بالخريطة.</div>
+
+  <h3>المرحلة ج — الإصدار ٢ (خلفي، البحث) — بقرار منفصل</h3>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">C1</span> بروفة staging كاملة + نسخة احتياطية للقاعدة + جاهزية تراجع.</div></div>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">C2</span> <code>deploy_be_gated.sh</code> → <code>apply_migrations.sh</code> → نشر الواجهة. يُزيل الـ404.</div></div>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">C3</span> تجهيز الجيوكودينغ (Nominatim ذاتي أو مزوّد مؤقّت) + <code>NOMINATIM_BASE_URL</code>.</div></div>
+  <div class="step"><div class="box"></div><div class="body"><span class="id">C4</span> تحقّق حيّ: <code>/api/geo/geocode?q=طرابلس → 200</code> بنتائج، والبحث يُظهر اقتراحات.</div></div>
+</section>
+
+<!-- 5 sequencing -->
+<section>
+  <h2>٥ · المخطّط الزمني</h2>
+  <div class="flow">
+    <span class="n">A1–A4 إغلاق محلي</span><span class="a">→</span>
+    <span class="n stop">🚦 مراجعة ١</span><span class="a">→</span>
+    <span class="n">إصدار ١: خريطة (أمامي)</span><span class="a">→</span>
+    <span class="n">تحقّق حيّ</span><span class="a">→</span>
+    <span class="n r2">🚦 قرار منفصل</span><span class="a">→</span>
+    <span class="n r2">إصدار ٢: بحث (خلفي + ميغريشن + Nominatim)</span><span class="a">→</span>
+    <span class="n">تحقّق حيّ</span>
+  </div>
+  <table>
+    <tr><th>المرحلة</th><th>المنفّذ</th><th>الخطورة</th><th>الجهد</th></tr>
+    <tr><td>أ — إغلاق محلي</td><td>أنا</td><td><span class="pill p-low">منخفضة</span></td><td>~١٥–٢٠ دقيقة (Vitest الكامل)</td></tr>
+    <tr><td>ب — إصدار ١ (خريطة)</td><td>المشغّل (بتحضيري)</td><td><span class="pill p-low">منخفضة</span></td><td>حسب runbook الواجهة</td></tr>
+    <tr><td>ج — إصدار ٢ (بحث)</td><td>المشغّل</td><td><span class="pill p-hi">عالية</span></td><td>بروفة + نسخ احتياطي + ساعات Nominatim</td></tr>
+  </table>
+</section>
+
+<!-- 6 decisions -->
+<section>
+  <h2>٦ · القرارات المطلوبة منك</h2>
+  <table>
+    <tr><th>#</th><th>القرار</th><th>الخيارات</th><th>توصيتي</th></tr>
+    <tr><td>١</td><td>إغلاق المرحلة 448 الآن</td><td>أشغّل A1–A4 (Vitest كامل + تقرير) ثم أتوقّف عند بوابة المراجعة</td><td><b>نعم</b></td></tr>
+    <tr><td>٢</td><td>توقيت إصدار الخريطة</td><td>أ) نشر أمامي الآن (منخفض الخطورة) · ب) تأجيله ليُجمَع مع الإصدار الخلفي</td><td><b>أ</b> — يُصلح الأبرز بأقل خطورة</td></tr>
+    <tr><td>٣</td><td>الإصدار الخلفي (البحث)</td><td>أ) نمضي ببروفة staging الآن · ب) نؤجّله كحدث إصدار مستقل لاحق</td><td><b>ب</b> غالباً — حدث كبير يحتاج تخطيطاً مستقلاً</td></tr>
+    <tr><td>٤</td><td>بلاطات الخريطة (للإنتاج)</td><td>أ) إبقاء OSM العام الآن · ب) جدولة الاستضافة الذاتية (C-R01)</td><td><b>أ الآن + ب لاحقاً</b></td></tr>
+  </table>
+  <div class="acc"><div class="t">تعريف «تمّ» — المرحلة 448 (إصدار الخريطة)</div>
+    <ul class="dot" style="margin:4px 0">
+      <li>Vitest كامل = الأساس بلا فشل جديد · lint 0 · typecheck 0 · build PASS.</li>
+      <li>لا cdnjs · CSP يسمح بالبلاطات · الماركر <code>data:</code> · ترتيب البلاطات <code>{z}/{x}/{y}</code>.</li>
+      <li>مناطق محظورة + FIN-COR بلا مساس · لا commit · تقرير 448 مكتوب.</li>
+      <li>(بعد إصدار ١) تحقّق حيّ: خريطة + ماركر يعملان، console نظيف.</li>
+    </ul></div>
+</section>
+
+<footer>
+  مسودّة v2 — لا تنفيذ/نشر قبل موافقتك. التغييرات مُطبّقة في الشجرة فقط (غير مُودعة وغير منشورة).<br>
+  عند موافقتك أبدأ بالمرحلة أ (إغلاق محلي) وأتوقّف عند 🚦 بوابة المراجعة قبل أي نشر.
+</footer>
+
+</div>
+</body>
+</html>

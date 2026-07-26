@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>545 — مراجعة أعمق جدًّا لخطّة 544: محاكاة ذهنيّة شاملة، وفجوات جديدة خارج النطاق</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2540; --text:#e8ecf7; --muted:#9aa5c0;
+    --line:#2a3350; --accent:#5b8cff;
+    --done:#1f7a4d; --done-bg:#123425; --done-fg:#7be3ab;
+    --partial:#8a6d1f; --partial-bg:#332a10; --partial-fg:#f0c95b;
+    --not:#9b2c2c; --not-bg:#3a1414; --not-fg:#ff8f8f;
+    --cant:#3a4a6b; --cant-bg:#1a2338; --cant-fg:#9db3e0;
+    --auth:#7a3fc9; --auth-bg:#241a3a; --auth-fg:#c9a8f5;
+    --new:#0a8a8a; --new-bg:#0d2e2e; --new-fg:#7fe8e8;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef1fa; --text:#1a2030; --muted:#5a6480;
+      --line:#dbe0ee; --accent:#2a5fd8;
+      --done:#0f6a3a; --done-bg:#e5f6ec; --done-fg:#0f6a3a;
+      --partial:#8a6d1f; --partial-bg:#fbf1d8; --partial-fg:#8a6d1f;
+      --not:#a12727; --not-bg:#fbe6e6; --not-fg:#a12727;
+      --cant:#3a4a6b; --cant-bg:#e7ecf8; --cant-fg:#3a4a6b;
+      --auth:#7a3fc9; --auth-bg:#f1e8fb; --auth-fg:#5c2c96;
+      --new:#0a8a8a; --new-bg:#e3f7f7; --new-fg:#0a6a6a;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","Cairo","Tahoma",sans-serif; line-height:1.75; margin:0; padding:0 0 60px 0;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+  header.hero{background:linear-gradient(160deg, var(--panel2), var(--bg)); border-bottom:1px solid var(--line); padding:48px 0 36px 0; margin-bottom:32px;}
+  h1{font-size:1.8rem; margin:0 0 10px 0;}
+  h1 .num{color:var(--accent); font-weight:800;}
+  .sub{color:var(--muted); font-size:1.05rem; max-width:920px;}
+  h2{font-size:1.4rem; margin:44px 0 16px 0; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  h3{font-size:1.18rem; margin:26px 0 10px 0; color:var(--accent);}
+  p{margin:0 0 14px 0;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:18px;}
+  .item-card{background:var(--panel); border:1px solid var(--line); border-inline-start:5px solid var(--accent); border-radius:10px; padding:18px 22px; margin-bottom:16px;}
+  .item-card.auth{border-inline-start-color:var(--auth);}
+  .item-card.crit{border-inline-start-color:var(--not);}
+  .item-card.new{border-inline-start-color:var(--new);}
+  .item-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:8px;}
+  .item-id{font-weight:800; color:var(--accent); font-size:1.05rem;}
+  .badge{display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.8rem; font-weight:700; white-space:nowrap;}
+  .b-phase{background:var(--panel2); color:var(--muted); border:1px solid var(--line);}
+  .b-auth{background:var(--auth-bg); color:var(--auth-fg); border:1px solid var(--auth);}
+  .b-crit{background:var(--not-bg); color:var(--not-fg); border:1px solid var(--not);}
+  .b-new{background:var(--new-bg); color:var(--new-fg); border:1px solid var(--new);}
+  .sim{margin:10px 0; padding:10px 14px; border-radius:8px; background:var(--panel2); font-size:0.92rem;}
+  .sim .k{font-weight:700; color:var(--accent);}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:20px 0;}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center;}
+  .stat .n{font-size:1.9rem; font-weight:800; color:var(--accent);}
+  .stat .l{color:var(--muted); font-size:0.85rem; margin-top:4px;}
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:0.9rem; min-width:640px;}
+  th,td{padding:9px 11px; text-align:right; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--panel2); color:var(--muted); font-size:0.78rem;}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--panel2); padding:1px 6px; border-radius:5px; font-size:0.88em; direction:ltr; display:inline-block;}
+  pre{background:var(--panel2); border-radius:8px; padding:12px 16px; overflow-x:auto; font-size:0.85rem; direction:ltr; text-align:left;}
+  .pipeline{display:flex; flex-wrap:wrap; gap:0; align-items:stretch; margin:24px 0; direction:ltr;}
+  .pnode{flex:1; min-width:150px; background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; direction:rtl;}
+  .pnode .t{font-weight:800; font-size:0.92rem; margin-bottom:4px;}
+  .pnode .d{color:var(--muted); font-size:0.76rem;}
+  .arrow{display:flex; align-items:center; justify-content:center; min-width:28px; color:var(--accent); font-size:1.3rem;}
+  @media (max-width:900px){ .pipeline{flex-direction:column;} .arrow{transform:rotate(90deg);} }
+  .callout{border-inline-start:5px solid var(--accent); background:var(--panel2); border-radius:10px; padding:16px 20px; margin:16px 0;}
+  .callout.crit{border-color:var(--not);}
+  .callout.auth{border-color:var(--auth); background:var(--auth-bg);}
+  .callout.new{border-color:var(--new); background:var(--new-bg);}
+  .toc{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px 24px;}
+  .toc a{color:var(--text); text-decoration:none; display:block; padding:5px 0; border-bottom:1px dashed var(--line);}
+  .toc a:last-child{border-bottom:none;}
+  .toc a:hover{color:var(--accent);}
+  .domain-h{background:var(--panel2); font-weight:800; padding:9px 14px; border-radius:8px; margin:26px 0 10px 0; display:inline-block;}
+  .checklist{list-style:none; padding:0; margin:14px 0;}
+  .checklist li{background:var(--panel2); border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; gap:10px;}
+  .checklist .cn{font-weight:800; color:var(--accent); min-width:22px;}
+  footer{color:var(--muted); text-align:center; font-size:0.85rem; margin-top:60px; padding-top:24px; border-top:1px solid var(--line);}
+  .kicker{color:var(--accent); font-weight:800; font-size:0.85rem; letter-spacing:0.04em; margin-bottom:6px;}
+  .cov-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0;}
+  @media (max-width:700px){ .cov-grid{grid-template-columns:1fr;} }
+  .cov-box{background:var(--panel2); border-radius:10px; padding:14px 18px;}
+  .cov-box h4{margin:0 0 8px 0; color:var(--accent); font-size:0.95rem;}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">تقرير 545 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-21 · خطّة فقط، لا تنفيذ</div>
+  <h1><span class="num">545</span> — مراجعة أعمق جدًّا لخطّة 544: محاكاة ذهنيّة شاملة، وفجوات جديدة خارج النطاق</h1>
+  <p class="sub">
+    هذا ليس تكرارًا لتقرير 544 — هو مراجعة عدائيّة لِـ544 نفسها (هل الخطّة متّسقة مع نفسها؟ هل تتعارض بنودها؟ هل تفترض أدوات لا توجد فعلًا؟)،
+    زائد تعميق كامل للمرحلة F (كانت سطحيّة عمدًا في 544)، زائد بحث جديد عن عيوب لم يذكرها أيّ تقرير سابق مطلقًا — لكن بانضباط صارم:
+    كل اكتشاف هنا مرتبط بسطر كود فعليّ، لا افتراضًا. القسم التالي مباشرة يشرح لماذا لا نستطيع، ولن نَدَّعي، أنّ هذا يُغلِق كل الفجوات المخفيّة نهائيًّا.
+  </p>
+</div></header>
+
+<div class="wrap">
+
+<div class="card toc">
+  <strong>فهرس سريع</strong>
+  <a href="#honesty">⓪ لماذا لا يمكن لأي تقرير — بما فيه هذا — أن يدّعي "لا عيوب مخفية"</a>
+  <a href="#master">① الاكتشاف الأهمّ: كل آليّة "تحذير ثمّ إلزام" في الخطّة بأكملها تعتمد على مراقبة غير موجودة فعليًّا</a>
+  <a href="#selfreview">② مراجعة عدائيّة لخطّة 544 نفسها — تعارضات وفجوات تصميم</a>
+  <a href="#newdefects">③ عيوب جديدة، خارج نطاق الـ108 نتيجة الأصليّة، بدليل كود مباشر</a>
+  <a href="#phaseF">④ تعميق كامل للمرحلة F (كانت سطحيّة عمدًا في 544)</a>
+  <a href="#future">⑤ توصيات مستقبليّة حقيقيّة (ليست عيوبًا — فرصًا)</a>
+  <a href="#timeline">⑥ الخطّة المحدَّثة والتسلسل الزمنيّ النهائيّ</a>
+</div>
+
+<h2 id="honesty">⓪ لماذا لا يمكن لأي تقرير أن يدّعي "لا عيوب مخفية"</h2>
+<div class="callout crit">
+  <p>
+    سلسلة التقارير نفسها (503→542) تُثبت هذا حرفيًّا: تقرير 538 ادّعى "134 من 134 ادّعاءً صحيح — تحقّق نانومتريّ لا يُخطئ"، ثمّ جاء تقرير 542
+    فوجد أنّ 23 من 30 بندًا فيه <strong>لم تُنفَّذ إطلاقًا</strong> رغم الادّعاء. كل "مراجعة نهائيّة/عدائيّة/أعمق" في هذه السلسلة اكتُشِف لاحقًا
+    أنّها ليست نهائيّة. لو صِيغ هذا التقرير على أنّه "المراجعة التي لا تُبقي عيبًا مخفيًّا"، لأصبح هو نفسه التقرير القادم الذي سيُفنِّده تقرير آخر.
+  </p>
+  <p style="margin-bottom:0;">
+    لذلك: هذا التقرير <strong>لا يدّعي الاكتمال</strong>. هو يوثّق بدقّة <em>ماذا فُحص تحديدًا</em> (مراجعة كاملة لمنطق خطّة 544 نفسها + بحث
+    مُوجَّه بأنماط مُثبَتة سابقًا: <code>except Exception: pass</code> على مسارات حسّاسة، ازدواج منطق العمل عبر ملفّات، تضارب مصادر IP)
+    <em>وماذا لم يُفحَص</em> (لا مسح شامل لكل سطر في المستودع، لا فحص لأنماط لم تظهر من قبل في هذه السلسلة إطلاقًا). هذا هو الفرق بين
+    ادّعاء اكتمال زائف وتقرير يمكن الوثوق بحدوده المُعلَنة.
+  </p>
+</div>
+
+<h2 id="master">① الاكتشاف الأهمّ في هذه المراجعة</h2>
+<div class="callout new">
+  <strong>خطّة 544 كاملة تعتمد على نمط "تحذير الآن، إلزام لاحقًا بعد مراقبة السجلّات" في نصف بنودها الحرجة تقريبًا
+  (B2، B6/D-26، D-09 الكامل، مسار الطوارئ في A1). هذا النمط يفترض أنّ أحدًا يشاهد هذه التحذيرات فعليًّا. الفحص المباشر يُظهِر أنّه لا يُشاهدها أحد اليوم.</strong>
+</div>
+<p>الدليل، بالترتيب:</p>
+<div class="tbl-wrap"><table>
+<tr><th>الطبقة</th><th>الحالة الفعليّة</th><th>الدليل</th></tr>
+<tr><td>سجلّات التتبّع (logs) عبر OTel</td><td>تُصدَّر إلى "debug" فقط</td><td><code>otel-collector-config.yaml</code>: كل الأنابيب الثلاثة (traces/metrics/logs) تصدّر إلى <code>exporters: [debug]</code> — طباعة على الطرفيّة الخاصّة بحاوية الـcollector نفسها فقط، لا Grafana ولا Loki ولا أي واجهة استعلام</td></tr>
+<tr><td>آليّة التنبيه الحقيقيّة الوحيدة (<code>fire_alert</code>)</td><td>موجودة، مصمَّمة جيّدًا (Slack/webhook + إزالة تكرار)، لكنّها "no-op صامت" افتراضيًّا</td><td><code>backend/app/core/alert_webhook.py</code>: <code>webhook_url = os.getenv("ALERT_WEBHOOK_URL", "").strip(); if not webhook_url: return</code> — وCLAUDE.md نفسه يُدرِج "operations alerting provider" ضمن بوّابات الإطلاق <strong>غير المكتملة</strong> اليوم</td></tr>
+<tr><td>سابقة "تحذير ثمّ إلزام" القائمة فعلًا (admin_ip_allowlist)</td><td>تسجيل عاديّ (log)، لا استدعاء لـ<code>fire_alert</code></td><td><code>config.py:750-751</code>: <code>logger.warning("CR-04: ADMIN_IP_ALLOWLIST is empty in %s...")</code> — لا استدعاء لـ<code>fire_alert</code> في نفس المسار</td></tr>
+<tr><td>معالج الأخطاء العامّ لأي عطل 500</td><td>تسجيل فقط، لا تتبّع أخطاء حيّ</td><td><code>main.py:1428</code> تعليق صريح: "<code>an error-tracker like Sentry can hook the same logger</code>" — بصيغة المستقبل، أي لم يُربَط بعد</td></tr>
+</table></div>
+<div class="callout crit">
+  <strong>الأثر على خطّة 544 مباشرة:</strong> كل مرّة كتبتُ فيها "راقب السجلّ لأيّام قبل التفعيل الصارم" أو "يظهر بندًا في لوحة المراقبة"،
+  كنتُ أفترض بنية مراقبة تُشاهَد فعليًّا. الواقع: هذه السجلّات تذهب لمكان لا يقرؤه أحد بشكل استباقيّ (فقط عبر <code>docker logs</code> يدويًّا لو قرَّر أحد النظر).
+  هذا يعني أنّ نمط "تحذير ثمّ إلزام" بأكمله — وهو النمط الذي تعتمد عليه أخطر 4 بنود في الخطّة كلّها — <strong>شبكة أمان على الورق فقط</strong> حتّى تُحلّ هذه الفجوة.
+</div>
+<div class="item-card new">
+  <div class="item-head"><span class="item-id">A0 — بند جديد، يُضاف قبل A1</span><span class="badge b-new">مُكتشَف في هذه المراجعة</span><span class="badge b-phase">FIX S — رخيص جدًّا وعالي الأثر</span></div>
+  <h3>وصل مسارات "التحذير" الجديدة والقائمة فعليًّا بآليّة fire_alert الموجودة أصلًا</h3>
+  <p><strong>الإصلاح المُقترَح، بجزأين منفصلَين تمامًا (لا يعتمد أحدهما على الآخر):</strong></p>
+  <div class="sim"><span class="k">الجزء الأوّل (قرار تشغيليّ، ليس كودًا):</span> تفعيل <code>ALERT_WEBHOOK_URL</code> فعليًّا (Slack أو أي webhook) على الأقلّ لبيئة الإنتاج — هذا وحده يُفعِّل <code>fire_alert</code> القائمة أصلًا بلا أي تعديل كود، ويُحرِّك تلقائيًّا كل الاستدعاءات الموجودة فعلًا (تنبيهات الطلبات العالقة، تنبيه الأداء، تنبيه إعادة التسوية) التي هي على الأرجح صامتة اليوم.</div>
+  <div class="sim"><span class="k">الجزء الثاني (كود، رخيص):</span> ربط كل مسار "تحذير ثمّ إلزام" الجديد المُقترَح في خطّة 544 (D-26، D-59/60/61، مسار الطوارئ في A1، اختلافات shadow-mode في D-09) باستدعاء <code>fire_alert()</code> بجانب <code>logger.warning()</code> — لا بديلًا عنه، إضافةً له — بنفس نمط الاستدعاء المستخدَم فعلًا في performance_aggregation_cron.py وmain.py.</div>
+  <div class="sim"><span class="k">لماذا هذا يُعاد ترتيب المرحلة A:</span> بدون A0، بنود B2/B6/D-09/A1-emergency في خطّة 544 تصبح "تحذير لا يراه أحد ثمّ فرض صارم بلا مراقبة حقيقيّة سبقته" — وهذا هو بالضبط النمط الذي أنتج ثغرة D-11 (فشل اختبار كامل لم يمنع عطلًا حيًّا لأنّ لا أحد كان يراقب المؤشّر الصحيح). A0 يجب أن يسبق أو يرافق B2/D-09 مباشرة، لا أن يُترَك للمرحلة F.</div>
+</div>
+
+<h2 id="selfreview">② مراجعة عدائيّة لخطّة 544 نفسها</h2>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">تعارض توقيت</span><span class="badge b-phase">بين B1 (D-34/35) وD-29</span></div>
+  <h3>تحديث حالة النزاع في D-29 يمكن أن يتسابق مع فحص أهليّة الحذف في B1</h3>
+  <div class="sim"><span class="k">السيناريو:</span> بعد تنفيذ B1 (فحص <code>ChargebackCase.state.in_(("OPEN","UNDER_REVIEW"))</code> عند الحذف) وD-29 (حلّ النزاع ينفِّذ أثرًا ماليًّا حقيقيًّا عبر LedgerService)، تخيَّل: مهمّة الحذف اليوميّة تقرأ حالة نزاع المستخدم في اللحظة <em>بعد</em> أن تتغيّر حالته إلى RESOLVED لكن <em>قبل</em> أن تكتمل معاملة ترحيل الأثر الماليّ (استرداد/تخصيص) الناتجة عن D-29 — فتسمح بالحذف بينما حركة ماليّة لا تزال قيد الترحيل لحساب على وشك إخفاء هويّته.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> يجب أن يكتمل تحديث <code>ChargebackCase.state</code> والترحيل الماليّ في D-29 داخل <strong>نفس المعاملة الذرّيّة (commit واحد)</strong> — لا خطوتين منفصلتين — بحيث لا توجد لحظة زمنيّة تكون فيها الحالة RESOLVED والأثر الماليّ لم يُرحَّل بعد. هذا شرط تصميميّ إضافيّ على D-29 لم يكن مذكورًا في 544، ويجب توثيقه كجزء من تصميمه، لا تُركه للصدفة.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">فجوة دائريّة</span><span class="badge b-phase">داخل A1 نفسها</span></div>
+  <h3>مسار الطوارئ في A1 يعتمد على نفس المراقبة غير الموجودة التي يحلّها A0</h3>
+  <div class="sim"><span class="k">المشكلة:</span> خطّة 544 اقترحت أنّ مسار طوارئ SUPER_ADMIN (C-11e) "يظهر بندًا حرِجًا بلوحة المراقبة" إن لم يُوقَّع عليه خلال 24 ساعة — لكن، كما أظهر القسم ① أعلاه، لا توجد لوحة مراقبة تُشاهَد فعليًّا اليوم. هذا يعني أنّ آليّة الأمان الوحيدة لمسار طوارئ يتجاوز الاعتماد المزدوج بالكامل كانت تعتمد ضمنيًّا على شيء غير موجود.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> A1's emergency-path يجب أن يُبنى <strong>بعد</strong> A0 مباشرة، لا بالتوازي معه — التبعيّة صريحة الآن: بلا A0، لا يوجد ضمان حقيقيّ أنّ توقيعًا متأخّرًا لعمليّة طوارئ ماليّة سيُلاحَظ خلال 24 ساعة، لا خلال 24 يومًا.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">ثغرة تصميميّة</span><span class="badge b-phase">في A3 (بوّابة ratchet الصلاحيّات)</span></div>
+  <h3>لا يوجد مسار استثناء لاستخدام require_role جديد ومشروع</h3>
+  <div class="sim"><span class="k">المشكلة:</span> خطّة 544 صمَّمت A3 كمنع مطلق لأي <code>require_role(</code> جديد خارج خطّ الأساس. لكن أثناء حملة D-09 (التي قد تستغرق أسابيع عبر 84 ملفًّا)، فرق عمل أخرى ستستمرّ بإضافة ميزات جديدة تحتاج فحص صلاحيّة بسيط ومنخفض المخاطر — منعها من استخدام require_role إطلاقًا (قبل أن يكون محرّك has_effective_permission سهل الاستخدام لكل حالة) سيدفعهم إمّا لتعطيل البوّابة (فشل الغرض كلّه) أو لاختراعات ملتوية لتفاديها.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> إضافة مسار استثناء صريح وموثَّق (تعليق كود بصيغة موحَّدة مثل <code># ratchet-exempt: reason=... approved_by=...</code>) يسمح للبوّابة الساكنة بتمييز الاستثناءات المُبرَّرة من الانتكاسات الحقيقيّة — لا حظر مطلق بلا صمّام أمان.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">فرصة تنسيق</span><span class="badge b-phase">بين D-44 وD-45</span></div>
+  <h3>كلاهما يمسّ نفس وحدة تكامل POS في نفس نافذة النشر</h3>
+  <div class="sim">تنفيذ D-44 (عميل آمن من SSRF) وD-45 (تشفير مغلّف للأسرار) كتغييرين منفصلين متتاليَين على نفس الوحدة (integrations/pos_outbound) يضاعف عدد نوافذ النشر الخطِرة على نفس الكود. <strong>الأفضل:</strong> دمجهما في دفعة نشر واحدة منسَّقة (لا بالضرورة نفس commit، لكن نفس نافذة الفحص الحيّ) لتقليل عدد المرّات التي يُعاد فيها بناء ونشر نفس الوحدة الحسّاسة خلال فترة قصيرة.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">تآزر إيجابيّ يستحقّ التوثيق</span><span class="badge b-phase">D-57 ⊃ D-58</span></div>
+  <h3>توحيد استدعاءات الأعلام على D-57 يمنح كل موقع مُرحَّل مناعة D-58 مجّانًا</h3>
+  <p>بما أنّ <code>is_enabled_3layer()</code> يحتوي أصلًا إصلاح D-58 (الرجوع لآخر قيمة سليمة في Redis قبل YAML)، فكل موقع استدعاء يُرحَّل ضمن حملة D-57 يكتسب تلقائيًّا مقاومة عطل قاعدة البيانات — دون أي عمل إضافيّ. يستحقّ ذكره صراحة كحافز إضافيّ لإكمال حملة D-57 بسرعة، لا فقط "توحيد نظافة الكود".</p>
+</div>
+
+<h2 id="newdefects">③ عيوب جديدة، خارج نطاق الـ108 نتيجة الأصليّة</h2>
+<p>عُثر عليها بتعميم أنماط <strong>مؤكَّدة سلفًا</strong> من تقرير 543 (لا تخمينًا): بحث عن كل استخدام مشابه لِـ<code>except Exception: pass</code> على مسارات أمنيّة/ماليّة، وكل استخدام آخر لـ<code>request.client.host</code> الخام غير المحصَّن.</p>
+
+<div class="item-card new">
+  <div class="item-head"><span class="item-id">جديد 1</span><span class="badge b-new">مُكتشَف الآن</span><span class="badge b-phase">منخفض الخطورة</span></div>
+  <h3>تسجيل الخروج (/auth/logout) يبتلع فشل استخراج jti صمتًا</h3>
+  <p><code>backend/app/modules/identity/auth_router.py:918-921</code> — استخراج <code>access_jti</code> من الرمز الحاليّ محاط بـ<code>except Exception: pass</code>؛ عند الفشل، تُلغى الجلسة عبر <code>refresh_token</code> فقط، بينما access token الحاليّ لا يُدرَج صراحة في قائمة الإبطال.</p>
+  <div class="sim"><span class="k">لماذا خطورته منخفضة (بعكس D-34):</span> access tokens قصيرة العمر أصلًا بالتصميم — أسوأ أثر هو بقاء رمز صالح لبقيّة عمره الطبيعيّ القصير بدل إبطال فوريّ، لا تجاوز صلاحيّة دائم كما في D-17/D-34.</div>
+  <div class="sim"><span class="k">الإصلاح المُقترَح:</span> نفس المبدأ العامّ لكل هذا التدقيق — لا تبتلع الفشل صمتًا؛ سجِّل تحذيرًا (عبر A0 إن وُجد) حتّى لو استمرّ تسجيل الخروج بنجاح عبر refresh_token وحده.</div>
+</div>
+
+<div class="item-card new">
+  <div class="item-head"><span class="item-id">جديد 2</span><span class="badge b-new">مُكتشَف الآن</span><span class="badge b-phase">متوسّط — سلامة سجلّ قانونيّ</span></div>
+  <h3>عنوان IP في سجلّات قبول الوثائق القانونيّة قابل للتزييف</h3>
+  <p><code>backend/app/modules/legal/legal_router.py:189-199</code> — دالّة <code>client_ip()</code> المشتركة (تُستخدَم لتسجيل عنوان IP وقت قبول المستخدم للوثائق القانونيّة/الموافقات) تقرأ رأس <code>X-Forwarded-For</code> مباشرة بلا أي تحقّق من أنّ الطلب فعلًا قادم عبر وكيل موثوق — بعكس <code>get_client_ip()</code> المُصلَح في rate_limiter.py (D-03/D-67) الذي يتحقّق من CIDR الوكيل الموثوق أوّلًا.</p>
+  <div class="sim"><span class="k">الأثر:</span> أي مستخدم يمكنه إرسال رأس <code>X-Forwarded-For</code> مزيَّف، فيُسجَّل عنوان IP كاذب في سجلّ قبول الوثيقة القانونيّة — سجلّ قد يُستخدَم لاحقًا كدليل في نزاع قانونيّ حول "هل وافق المستخدم فعلًا ومتى ومن أين".</div>
+  <div class="sim"><span class="k">الإصلاح المُقترَح:</span> إعادة استخدام نفس <code>get_client_ip()</code> المُصلَح والمُختبَر أصلًا في rate_limiter.py بدل دالّة <code>client_ip()</code> المنفصلة هنا — توحيد مصدر واحد للحقيقة لعنوان IP عبر المنصّة كلّها (بدل مصدرَين منفصلَين لهما نفس الغرض).</div>
+</div>
+
+<div class="item-card new">
+  <div class="item-head"><span class="item-id">جديد 3</span><span class="badge b-new">مُكتشَف الآن</span><span class="badge b-phase">متوسّط — قيمة سجلّ أمنيّ منعدمة عمليًّا</span></div>
+  <h3>سجلّ محاولات الدخول (login attempts) يُسجِّل عنوان الوكيل العكسيّ لا عنوان العميل الحقيقيّ</h3>
+  <p><code>backend/app/modules/identity/registration_router.py:978</code> و<code>:1160</code> — كلٌّ من مسار الدخول الفاشل والناجح بكلمة المرور يحسب <code>ip = request.client.host if request.client else None</code> محليًّا لتمريره إلى <code>_log_login_attempt(...)</code> — بعكس القرار الأمنيّ الفعليّ (قفل الحساب) في نفس الدالّة، أعلى بـ20 سطرًا تقريبًا، والذي يستخدم بحقّ <code>_get_client_ip()</code> المحصَّن ضدّ التزييف (سطر 951).</p>
+  <div class="sim"><span class="k">الأثر العمليّ:</span> بما أنّ الخادم يعمل خلف nginx (مؤكَّد من تعليق legal_router.py نفسه)، فإنّ <code>request.client.host</code> الخام هو على الأرجح عنوان الوكيل العكسيّ نفسه لكل الطلبات — ما يعني أنّ <strong>كل صفوف سجلّ محاولات الدخول قد تحمل نفس عنوان IP</strong> بصرف النظر عن العميل الحقيقيّ، ممّا يُبطِل الغرض الكامل من هذا السجلّ (رصد الأنماط المشبوهة حسب IP الحقيقيّ — هجوم تخمين موزَّع، مثلًا).</div>
+  <div class="sim"><span class="k">الإصلاح المُقترَح:</span> استبدال المتغيّر المحليّ <code>ip</code> في كلا الموقعَين بنفس <code>client_ip</code> المحصَّن المحسوب أصلًا أعلى في نفس الدالّة (سطر 951) — إصلاح من سطر واحد لكل موقع، إعادة استخدام قيمة محسوبة بالفعل، لا حساب جديد.</div>
+  <div class="sim"><span class="k">أهميّته لفهم بقيّة الخطّة:</span> هذا يعني أنّ أي تحليل مستقبليّ لسجلّ محاولات الدخول (مثلًا لتحسين آليّة القفل F-2 المذكورة في نفس الملفّ) يعتمد اليوم على بيانات IP مغلوطة بصمت — فجوة رصد لا فجوة تجاوز أمنيّ مباشر، لكنّها تُضعِف أي قرار أمنيّ مستقبليّ يُبنى على هذا السجلّ.</div>
+</div>
+
+<div class="callout">
+  <strong>ما جرى فحصه تحديدًا لهذا القسم (حدود صريحة):</strong> بحث شامل عن كل <code>except Exception: pass</code> في backend/app/modules (9 مواقع، فُحصت جميعها فرديًّا - 6 منها "فشل مفتوح" مقصود وموثَّق صراحة بتعليق "(fail-open)" لإشعارات غير حرجة، لا يستحقّ تغييرها)، وكل استخدام لـ<code>request.client.host</code> الخام (6 مواقع، 3 منها الآن مُدرَجة أعلاه)، وفحص هل يوجد نمط "قفل صفّ واحد عالميّ" آخر شبيه بـD-23 (لا يوجد غيره). <strong>لم يُفحَص:</strong> الواجهة الأماميّة (web/src, apps/mobile) بنفس عمق البحث، ولا اختبارات الأداء، ولا ملفّات الهجرة (migrations) القديمة بحثًا عن أنماط مشابهة.
+</div>
+
+<h2 id="phaseF">④ تعميق كامل للمرحلة F</h2>
+<p>كانت خطّة 544 عمدًا سطحيّة هنا ("لا تُبنَى الآن"). المطلوب الآن: نفس عمق المحاكاة الذهنيّة المطبَّق على بقيّة الخطّة.</p>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-62</span><span class="badge b-crit">BUILD XL</span><span class="badge b-auth">يمسّ docker-compose.yml — منطقة محظورة، إذن صريح</span></div>
+  <h3>عامل ARQ خلفيّ — تعميق</h3>
+  <div class="sim"><span class="k">خطر بنيويّ جديد لم يُذكَر في 544:</span> نقل حلقة من داخل عمليّة الخادم إلى عامل ARQ منفصل يعني أنّ أي حالة مشتركة داخل الذاكرة (in-process) تعتمد عليها تلك الحلقة تختفي فجأة — <strong>ومن المفارقات أنّ خطّة 544 نفسها أضافت للتوّ حالة من هذا النوع</strong> (السجلّ المحلّيّ الاحتياطيّ لتحديد المعدّل في D-65). أي حلقة تُرحَّل يجب تدقيقها أوّلًا: هل تقرأ/تكتب أي قاموس/متغيّر داخل عمليّة الذاكرة نفسها؟ إن كان كذلك، نقلها لعمليّة منفصلة يكسر هذا الافتراض بصمت.</div>
+  <div class="sim"><span class="k">فجوة مراقبة جديدة:</span> عامل منفصل يعني فشله لا يُسقِط الخادم الرئيسيّ (عزل جيّد) — لكن هذا يعني أيضًا أنّ صحّته أصبحت غير مرئيّة لفحص صحّة API نفسه، ما لم يُربَط بفحص صحّة (healthcheck) مستقلّ في docker-compose وبنفس آليّة A0 للتنبيه — وإلّا فعامل معطوب قد يبقى معطوبًا لأيّام بلا أن يلاحظ أحد (بالضبط نفس الفجوة الموصوفة في القسم ①).</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> جدول <code>job_runs</code> (كما اقترحته 539 أصلًا) + تنبيه فوريّ (عبر A0) عند غياب أي تشغيل ناجح للعامل خلال نافذة زمنيّة متوقَّعة — لا انتظار اكتشاف صدفة.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-53</span><span class="badge b-crit">BUILD XL — أكبر رهان معماريّ في كل السلسلة</span></div>
+  <h3>محرّك حالة/عمل موحَّد — تعميق</h3>
+  <div class="sim"><span class="k">خطر ازدواج معماريّ لم يُذكَر في 544:</span> D-53 (محرّك حالة/عمل عامّ) وA1 (جدول Governed Action المبنيّ الآن في المرحلة A) يحلّان نفس الفئة من المشكلة (طلب→موافقة→تنفيذ) على مستويَين مختلفَين من العموميّة. لو صُمِّم D-53 لاحقًا بمعزل عن A1 الموجود فعلًا، ستُبنى المنصّة نظامَي موافقة متوازيَين يحتاجان توحيدًا مؤلمًا لاحقًا.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج الآن، حتّى قبل بناء D-53:</span> أيّ تخطيط مستقبليّ لِـD-53 يجب أن يبدأ بشرط صريح: "استيعاب/تعميم جدول <code>governed_action_requests</code> الموجود من A1، لا استبداله بجدول موازٍ" — قيد تصميميّ يُسجَّل الآن كي لا يُنسى حين يُفتَح ملفّ D-53 فعليًّا بعد أشهر.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">INIT-1</span><span class="badge b-phase">BUILD XL — أوسع من D-09 بستّة أضعاف تقريبًا</span></div>
+  <h3>واجهة قدرات موحَّدة (~500 موضع) — تعميق</h3>
+  <div class="sim"><span class="k">تصحيح تقييم الخطورة:</span> رغم أنّ INIT-1 أكبر حجمًا من D-09 (500 موضع مقابل 84 ملفًّا)، فإنّ خطورته الفعليّة <strong>أقلّ</strong> إن نُفِّذ كطبقة تسجيل (logging) خالصة بلا أي تغيير في السلوك — بعكس D-09 الذي يغيّر قرار سماح/منع فعليًّا. الخطر الوحيد: أي إغراء لجعل الغلاف "يُنفِّذ" شيئًا لا "يُسجِّل" فقط يُعيد نفس درجة خطورة D-09 دفعة واحدة على 500 موضع بدل 84.</div>
+  <div class="sim"><span class="k">فرصة تقارب مع D-09 (يستحقّ ذكره الآن):</span> بنية "تسجيل قرار قديم مقابل جديد" التي تحتاجها حملة D-09 لوضع الظلّ (shadow-mode) يمكن أن تكون هي نفسها الأساس الذي يُبنى عليه INIT-1 لاحقًا — بدل بناء آليّتَي تسجيل منفصلتَين في وقتَين مختلفَين، الأفضل تصميم بنية تسجيل قرارات صلاحيّات عامّة واحدة تخدم كلا الغرضين.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">INIT-5</span><span class="badge b-phase">BUILD — أمان تقنيّ منخفض، مخاطرة تجربة استخدام عالية</span></div>
+  <h3>دمج ~75 صفحة لوحة عمليّات متشظّية — تعميق</h3>
+  <div class="sim"><span class="k">أثر جانبيّ على عادة الاستخدام لم يُذكَر في أي تقرير سابق:</span> موظّفو العمليّات الحاليّون لديهم على الأرجح روابط محفوظة (bookmarks) أو عادات تنقّل مباشرة لبعض هذه الـ75 صفحة. أي دمج يغيّر المسارات (URLs) بلا إعادة توجيه (redirect) من الروابط القديمة للصفحات المُدمَجة الجديدة سيكسر هذه العادات فجأة يوم النشر.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> أي دمج يجب أن يُبقي كل مسار قديم حيًّا كإعادة توجيه لصفحته المُدمَجة الجديدة، لا استبدالًا فوريًّا — استمراريّة الروابط شرط قبول لهذا البند، لا تفصيلًا لاحقًا.</div>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">D-46 (النسخة الكاملة)</span><span class="badge b-phase">BUILD L — بعد إثبات المرحلة A</span></div>
+  <h3>ورشة الاحتفاظ الكاملة — تعميق</h3>
+  <div class="sim"><span class="k">فجوة أساسيّة مشتركة مع B1/D-35 لم يُلاحَظ ترابطها في 544:</span> نسخة D-46 الكاملة تحتاج مفهوم "حجز قانونيّ" (legal hold) حقيقيًّا لتعليق تنفيذ الاحتفاظ على حساب متنازَع عليه — لكنّ B1/D-35 (في نفس هذه الخطّة) اكتشف أنّ <strong>لا وجود لأي مفهوم حجز قانونيّ في المنصّة كلّها اليوم</strong> (الفحص الوحيد الموجود مقصور على مزوّدين تحت تحقيق، لا عامّ). D-46 الكامل وB1/D-35 كلاهما يفترضان ضمنيًّا حاجة لهذا المفهوم بمعزل عن بعضهما.</div>
+  <div class="sim"><span class="k">الحلّ المُدرَج:</span> عندما يُفتَح تصميم D-46 الكامل، يجب أن يبني عمود/جدول "حجز قانونيّ" عامًّا واحدًا يُستهلَك من كلا المسارين (فحص أهليّة الحذف وتنفيذ الاحتفاظ)، لا مفهومَين منفصلَين مُخترَعَين في وقتَين مختلفَين — نفس فلسفة "يُبنى مرّة واحدة" التي حكمت المرحلة A، مطبَّقة هنا استباقيًّا.</div>
+</div>
+
+<h2 id="future">⑤ توصيات مستقبليّة حقيقيّة (فرص، لا عيوب)</h2>
+<div class="card">
+  <p>
+    بما أنّ آليّة <code>fire_alert</code> موجودة أصلًا وجيّدة التصميم (إزالة تكرار، fail-open، دعم Slack)، والفجوة الحقيقيّة هي فقط "غير مفعَّلة + غير مُستخدَمة في كل مكان يستحقّها" — أرخص استثمار مستقبليّ بأثر كبير هو:
+  </p>
+  <ol>
+    <li><strong>تفعيل ALERT_WEBHOOK_URL في الإنتاج فورًا</strong> (بند A0 أعلاه) — يُحرِّك تلقائيًّا تنبيهات موجودة أصلًا وصامتة اليوم (الطلبات العالقة، تسوية الأداء) بلا أي كتابة كود.</li>
+    <li><strong>توسيع أنبوب OTel لاحقًا</strong> (خارج نطاق هذه الخطّة، توصية فقط) ليصدِّر إلى خلفيّة استعلام حقيقيّة (Grafana Loki أو ما يكافئها) بدل exporter "debug" وحده — هذا يفتح الباب لاحقًا لاستبدال منطق "راقب السجلّ يدويًّا" في كل بند "تحذير-ثمّ-إلزام" بلوحات ومنبّهات حقيقيّة، لا ممارسة يدويّة متكرّرة.</li>
+    <li><strong>ربط معالج الأخطاء العامّ (main.py:1421) بخدمة تتبّع أخطاء</strong> (Sentry أو مكافئ) — الكود نفسه يوثّق أنّه جاهز لهذا الربط بلا إعادة هيكلة، فقط لم يُربَط بعد.</li>
+  </ol>
+</div>
+
+<h2 id="timeline">⑥ الخطّة المحدَّثة والتسلسل الزمنيّ النهائيّ</h2>
+<div class="pipeline">
+  <div class="pnode" style="border-color:var(--new); border-width:2px;"><div class="t">A0 (جديد)</div><div class="d">تفعيل ALERT_WEBHOOK_URL + ربط التحذيرات الجديدة به</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode" style="border-color:var(--accent); border-width:2px;"><div class="t">A1+A2+A3 + B كاملة</div><div class="d">بنية مشتركة (مع تصحيح A3 لإضافة صمّام استثناء) + كل الإصلاحات الرخيصة المستقلّة + العيوب الجديدة (منخفضة الخطورة) بالتوازي</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">C</div><div class="d">D-18/46/49 عبر A1 (مع قيد التزامن الذرّيّ على D-29) · D-32/33/41 عبر A2 · D-09 بنمط الظلّ (يعتمد على A0)</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">D</div><div class="d">بناء مجاليّ (D-44+D-45 منسَّقان معًا)</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">D-56 + E</div><div class="d">بعد اكتمال D-09 فقط + تنظيميّ</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">F (مُعمَّقة الآن)</div><div class="d">D-53 يستوعب A1 لا يستبدله · INIT-1 يشارك بنية تسجيل D-09 · INIT-5 بإعادة توجيه · D-46 الكامل بمفهوم حجز قانونيّ مشترك مع B1</div></div>
+</div>
+
+<div class="callout">
+  <strong>ملخّص الإضافات على خطّة 544:</strong> بند جديد واحد بأولويّة قصوى (A0)، تصحيح واحد على تصميم A3 (صمّام استثناء)، قيد تصميميّ جديد على D-29 (ذرّيّة مع تحديث حالة النزاع)، 3 عيوب جديدة صغيرة/متوسّطة مؤكَّدة بدليل كود (خارج الـ108 الأصليّة)، وتعميق كامل لخمسة بنود من المرحلة F كانت سطحيّة عمدًا. لا شيء من هذا يُبطِل خطّة 544 — كلّه يُحكِمها.
+</div>
+
+<footer>تقرير 545 · تووا (Tawa) — منصّة التوصيل الليبيّة · مراجعة عدائيّة لخطّة 544 + بحث موجَّه عن عيوب جديدة · 2026-07-21 · خطّة فقط، بانتظار مراجعة المشغّل</footer>
+
+</div>
+</body>
+</html>

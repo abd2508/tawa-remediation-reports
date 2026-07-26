@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير 480 — تدقيق التطابق: تطبيق الجوّال (RN) مقابل تطبيق الويب، كل الأدوار (عدا لوحة التحكم)</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.8; margin:0; font-size:16px;}
+  .wrap{max-width:1260px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:960px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.med .num{color:var(--med)} .stat.ok .num{color:var(--ok)}
+  .stat .lbl{color:var(--muted); font-size:.82rem; margin-top:4px}
+  section{margin:44px 0}
+  h2.sec-title{font-size:1.5rem; border-inline-start:5px solid var(--accent); padding-inline-start:14px; margin-bottom:18px; color:#fff}
+  h2.sec-title.blocker{border-color:var(--blocker)}
+  h2.sec-title.cluster{border-color:var(--accent2); font-size:1.3rem}
+  p.lead{color:var(--muted); max-width:960px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 24px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+  .card-title{font-size:1.1rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.88rem}
+  th,td{border:1px solid var(--border); padding:9px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight.blocker{background:rgba(255,45,85,.07); border-color:rgba(255,45,85,.4)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .insight.blocker h4{color:var(--blocker)}
+  .fine-list{background:rgba(55,201,135,.05); border:1px dashed rgba(55,201,135,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+  .verdict{background:linear-gradient(135deg,#2a0c14,#1a0c2a); border:1px solid rgba(255,45,85,.4); border-radius:16px; padding:24px 28px; margin:20px 0}
+  .verdict h3{margin:0 0 10px; color:#ff6b8f; font-size:1.2rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>📊 تقرير تدقيق التطابق — تطبيق الجوّال (RN) مقابل تطبيق الويب</h1>
+  <div class="sub">مقارنة شاملة شاشة-بشاشة عبر الأدوار الثلاثة (عميل، سائق، مزوّد) — لوحة العمليات مُستثناة عمداً حسب التوجيه. المنهجية: قراءة مباشرة للكود (حجم الملفات + المحتوى الفعلي)، لا افتراضات. هذا تدقيق على مستوى الكود، وليس اختباراً حياً على جهاز/محاكي.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-14</div>
+    <div class="badge">🔍 <b>الطريقة:</b> قراءة كود مباشرة + وكيلا بحث متخصّصان (سائق، مزوّد)</div>
+    <div class="badge">🎯 <b>النطاق:</b> عميل + سائق + مزوّد (عمليات مُستثناة)</div>
+  </div>
+</header>
+
+<div class="verdict">
+  <h3>❗ الخلاصة المباشرة</h3>
+  <p><b>لا، التطبيق ليس متطابقاً مع الويب.</b> خارج لوحة العمليات (مُستثناة صراحة)، توجد فجوات حقيقية — بعضها حرج — في الأدوار الثلاثة الأخرى، وخصوصاً في <b>مسار الطلب الأساسي للعميل</b> (السلة، الدفع، تتبّع الطلب) وفي <b>الشاشات التشغيلية اليومية للسائق والمزوّد</b>. كل ما بُني في الجلسة الأخيرة (11 شاشة) مطابق للعقد ومُتحقَّق منه؛ الفجوات الكبرى في شاشات <b>موروثة من عمل سابق</b> لم تُفحص أو تُختبر حياً حتى هذا التدقيق.</p>
+</div>
+
+<div class="stats-grid">
+  <div class="stat ok"><div class="num">11</div><div class="lbl">شاشة عميل جديدة — تطابق كامل</div></div>
+  <div class="stat blocker"><div class="num">3</div><div class="lbl">فجوات حرجة في مسار العميل الأساسي<br>(سلة، دفع، تتبّع)</div></div>
+  <div class="stat blocker"><div class="num">3</div><div class="lbl">فجوات حرجة تشغيلية/امتثال<br>(حالة الحساب، الصلاحيات، الاستلام الذاتي)</div></div>
+  <div class="stat high"><div class="num">~20</div><div class="lbl">فجوات حقيقية (🟠) موزّعة عبر الأدوار</div></div>
+  <div class="stat ok"><div class="num">1</div><div class="lbl">إضافة خاصة بـRN<br>(دليل عملاء VIP)</div></div>
+</div>
+
+<nav class="toc">
+  <b>فهرس التقرير</b>
+  <ul>
+    <li><a href="#customer">القسم الأول — دور العميل</a></li>
+    <li><a href="#driver">القسم الثاني — دور السائق</a></li>
+    <li><a href="#provider">القسم الثالث — دور المزوّد</a></li>
+    <li><a href="#ops">القسم الرابع — دور العمليات (مُستثنى)</a></li>
+    <li><a href="#excluded">القسم الخامس — المميزات المستبعدة والفجوات المكتشَفة</a></li>
+    <li><a href="#recommend">القسم السادس — التوصية</a></li>
+  </ul>
+</nav>
+
+<section id="customer">
+  <h2 class="sec-title">🛍️ القسم الأول — دور العميل</h2>
+
+  <h3 style="color:#fff">أ. الشاشات المبنيّة حديثاً هذه الجلسة — تطابق ممتاز</h3>
+  <table>
+    <tr><th>الميزة</th><th>الحالة</th><th>ملاحظة</th></tr>
+    <tr><td>دفتر العناوين</td><td><span class="tag ok">✅ كامل</span></td><td>أُعيد بناؤه بالكامل (كان عيباً خطيراً، أُصلِح)</td></tr>
+    <tr><td>المحفظة/المكافآت</td><td><span class="tag ok">✅ كامل</span></td><td>تطابق كامل مع loyalty_router.py</td></tr>
+    <tr><td>الدعم والمحادثة</td><td><span class="tag ok">✅ كامل</span></td><td>مشتركة بين 3 أدوار</td></tr>
+    <tr><td>اطلب أي شيء + تسوّق بالميزانية</td><td><span class="tag ok">✅ كامل</span></td><td>تطابق نطاق المرحلة 1 على الويب</td></tr>
+    <tr><td>البحث الموحّد + الفئات</td><td><span class="tag ok">✅ كامل</span></td><td></td></tr>
+    <tr><td>نسيت كلمة المرور</td><td><span class="tag ok">✅ كامل</span></td><td></td></tr>
+    <tr><td>حذف الحساب الذاتي</td><td><span class="tag ok">✅ كامل</span></td><td></td></tr>
+    <tr><td>حول التطبيق</td><td><span class="tag ok">✅ كامل</span></td><td></td></tr>
+    <tr><td>معرفة رقم الهاتف</td><td><span class="tag ok">✅ كامل</span></td><td></td></tr>
+    <tr><td>التسجيل الذاتي</td><td><span class="tag high">🟠 جزئي</span></td><td>ناقص عمداً: شروط قانونية + OTP إلزامي (معطَّلان افتراضياً على الخادم)</td></tr>
+    <tr><td>إعدادات العميل</td><td><span class="tag high">🟠 جزئي</span></td><td>ناقص عمداً: قسم المحظورين (لا واجهة حظر بأي مكان)</td></tr>
+  </table>
+
+  <h3 style="color:#fff">ب. الشاشات الموروثة — فُحصت لأول مرة اليوم</h3>
+
+  <div class="card blocker">
+    <div class="card-head"><div class="card-title">🔴 السلة — cart.tsx (109 سطر مقابل 793 على الويب)</div></div>
+    <div class="insight blocker"><h4>الأخطر</h4>لا يوجد أي نظام تخصيص للصنف (Variants/Modifiers) — الويب لديه <code>CustomizationModal.tsx</code> كامل (438 سطر): حجم، إضافات، حذف مكوّنات، تعديل صنف في السلة. RN: كل صنف سعر ثابت واحد بلا أي خيارات — <b>عميل RN لا يستطيع طلب بيتزا "كبيرة" أو شاورما "بدون مخلل"</b>.</div>
+    <p>مفقود أيضًا: صور الأصناف، تحذير الحد الأدنى للطلب، تأكيد قبل تفريغ السلة، سلة متعددة المتاجر (RN يقيّد بمتجر واحد عمداً).</p>
+  </div>
+
+  <div class="card blocker">
+    <div class="card-head"><div class="card-title">🔴 الدفع — checkout.tsx (139 سطر مقابل 1947 على الويب)</div></div>
+    <p>مفقود: الدفع المُجزَّأ (محفظة+نقاط+بطاقة)، الإكرامية، كوبون تلقائي، استلام ذاتي مقابل توصيل، الجدولة لوقت لاحق، بوّابة OTP للطلبات النقدية عالية القيمة، كتلة قبول الشروط، معالجة "دَين معلَّق يمنع الطلب"، معاينة رسم توصيل حيّة (RN يستخدم تقديراً ثابتاً).</p>
+  </div>
+
+  <div class="card blocker">
+    <div class="card-head"><div class="card-title">🔴 تتبّع الطلب — order/[id].tsx (69 سطر مقابل 1756 على الويب)</div></div>
+    <p>مفقود: خريطة حيّة لموقع السائق، اتصال/محادثة مع السائق، تفصيل عناصر الطلب، زر إلغاء، مطالبة تقييم بعد التسليم، صورة إثبات التسليم، زر نزاع.</p>
+  </div>
+
+  <table>
+    <tr><th>الشاشة</th><th>RN مقابل الويب</th><th>أهمّ الناقص</th></tr>
+    <tr><td>سجلّ الطلبات</td><td>61 / 383 سطر</td><td>إعادة الطلب، فلاتر، فرز</td></tr>
+    <tr><td>المحفظة</td><td>252 / 916 سطر</td><td>تفاصيل الحركة، دفع الديون، إخفاء الأزرار حسب الراية</td></tr>
+    <tr><td>تحويل المحفظة</td><td>121 / 686 سطر</td><td>QR إرسال/استلام، سجلّ التحويلات، تأكيد PIN</td></tr>
+    <tr><td>الصفحة الرئيسية</td><td>110 / 678 سطر</td><td>بنر استئناف الطلب، الأكثر طلباً، المتاجر الشائعة، البحث الأخير</td></tr>
+    <tr><td>صفحة المتجر</td><td>—</td><td>صور، وصف، تبويبات فئات، تقييمات — وبلا تخصيص أصناف (نفس جذر مشكلة السلة)</td></tr>
+  </table>
+
+  <div class="fine-list"><b>فرق معماري متعمَّد (ليس عيباً):</b> دخول العميل/السائق في RN عبر OTP (إنشاء حساب تلقائي)، بينما كل الأدوار على الويب — بما فيها العميل — عبر كلمة مرور. قرار سابق في الجلسة الطويلة (يحاكي تطبيق Flutter المرجعي).</div>
+</section>
+
+<section id="driver">
+  <h2 class="sec-title">🛵 القسم الثاني — دور السائق</h2>
+  <p class="lead">من تدقيق وكيل بحث متخصّص قرأ كل صفحة على حدة.</p>
+  <table>
+    <tr><th>الصفحة على الويب</th><th>مقابل RN</th><th>الحالة</th><th>التفاصيل</th></tr>
+    <tr><td>DriverDelivery.tsx</td><td>trip/[id].tsx</td><td><span class="tag blocker">🔴 جزئي</span></td><td>لا اختيار نوع إثبات التسليم، لا تحقق رمز التسليم، لا إبلاغ استثناء نقدي، لا تقييم العميل، لا محادثة، لا SOS، لا إشعار تأخير</td></tr>
+    <tr><td>DriverPickup.tsx</td><td>trip/[id].tsx</td><td><span class="tag blocker">🔴 جزئي</span></td><td>لا تدفّق طلبات المشاوير (ERRAND) إطلاقاً</td></tr>
+    <tr><td>DriverHome.tsx</td><td>home.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا زر رفض العرض (قبول فقط)، لا معاينة خريطة، لا تحذير تجاوز حدّ السيولة</td></tr>
+    <tr><td>DriverHistory.tsx</td><td>history.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا تصدير CSV، لا إحصائيات ملخّصة</td></tr>
+    <tr><td>DriverProfile.tsx</td><td>profile.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا شارة حالة الحساب (مقبول/مرفوض) — RN يضيف نموذج طوارئ حي غير موجود بالويب هنا</td></tr>
+    <tr><td>DriverSettings.tsx</td><td>settings.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا مناطق عمل، لا قسم مالي، لا وضع داكن، لا حذف حساب</td></tr>
+    <tr><td>DriverSettlementPage + DriverSettlements</td><td>settlement.tsx</td><td><span class="tag ok">✅ شبه كامل</span></td><td>أفضل شاشة — نقص بسيط فقط (QR فعلي، إعادة تعيين بعد الانتهاء)</td></tr>
+    <tr><td>DriverPending.tsx</td><td>documents.tsx</td><td><span class="tag blocker">🔴 شبه مفقود</span></td><td><b>لا توجد أي بوابة "قيد المراجعة/مرفوض" في أي مكان</b> — سائق غير معتمَد يرى تطبيقاً طبيعياً</td></tr>
+    <tr><td>DriverMapPage.tsx</td><td>—</td><td><span class="tag audit">🚫 مُستبعَد</span></td><td>مفتاح Google Maps API خارجي</td></tr>
+  </table>
+
+  <div class="card blocker">
+    <div class="card-head"><div class="card-title">نظام الطوارئ/SOS — فجوة كاملة</div></div>
+    <p>الويب: تقرير طوارئ (10 أنواع) + إشعار تأخير منفصل + <b>زر SOS فوري</b> + <b>رابط مشاركة الرحلة الحية</b>. RN: تقرير الطوارئ فقط، <b>منفصل عن الطلب النشط</b> (في الملف الشخصي لا شاشة الرحلة). <b>لا SOS، لا مشاركة رحلة، لا إشعار تأخير</b> في RN إطلاقاً.</p>
+  </div>
+
+  <div class="insight warn"><h4>الخلاصة العامة</h4>الهيكل الملاحي كامل ويعمل (قبول→استلام→توصيل→تسوية سليم)، لكن كل شاشة أرقّ من نظيرتها. الأخطر: لا بوابة لحالة الحساب في أي مكان، وتدفّق التسليم يفتقد رمز التسليم والإبلاغ النقدي وطلبات المشاوير ونظام SOS الكامل.</div>
+</section>
+
+<section id="provider">
+  <h2 class="sec-title">🏪 القسم الثالث — دور المزوّد</h2>
+  <p class="lead">من تدقيق وكيل بحث متخصّص قرأ كل صفحة على حدة.</p>
+  <table>
+    <tr><th>الصفحة على الويب</th><th>مقابل RN</th><th>الحالة</th><th>التفاصيل</th></tr>
+    <tr><td>MyPermissions.tsx</td><td>—</td><td><span class="tag blocker">🔴 مفقود</span></td><td>لا شاشة يرى فيها الموظف صلاحياته الخاصة</td></tr>
+    <tr><td>ProviderDashboard.tsx</td><td>home.tsx + settings.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا فتح/إغلاق بسيط، لا قبول تلقائي، لا إغلاق تدريجي، لا صندوق شكاوى، لا تحليلات مبيعات، لا تنبيه انتهاء وثائق</td></tr>
+    <tr><td>ProviderCatalog.tsx</td><td>catalog.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا منتقي صور، لا مجموعات تعديل/خيارات، لا إجراءات جماعية</td></tr>
+    <tr><td>ProviderOrderHistory.tsx</td><td>order-history.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا خط زمني تفصيلي، لا تصدير CSV</td></tr>
+    <tr><td><b>ProviderOrderQueue + ProviderOrders + ProviderPreparation</b><br>(طابور + تحضير الطلبات)</td><td>home.tsx</td><td><span class="tag blocker">🔴 يعمل لكن به ثغرتان حقيقيتان</span></td><td>✅ جوهر القبول→الرفض→التحضير→الجاهزية يعمل فعلياً. ❌ <b>لا بوابة صلاحيات</b> — كل موظف يرى كل الأزرار بصرف النظر عن صلاحياته الممنوحة. ❌ <b>لا زر إغلاق لطلبات الاستلام/التوصيل الذاتي إطلاقاً</b> — طريق مسدود وظيفي لتلك المتاجر</td></tr>
+    <tr><td>ProviderPending.tsx</td><td>—</td><td><span class="tag blocker">🔴 مفقود</span></td><td>نفس فجوة السائق — لا بوابة حالة حساب دائمة</td></tr>
+    <tr><td>ProviderSettings.tsx</td><td>settings.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا رفع شعار/غلاف، لا محرّر ساعات عمل، لا وضع داكن</td></tr>
+    <tr><td>ProviderStaff.tsx</td><td>staff.tsx</td><td><span class="tag high">🟠 جزئي</span></td><td>لا مفتاح توزيع تلقائي/يدوي، لا ملخّص تقييمات الفريق</td></tr>
+    <tr><td>ProviderDocuments / Earnings / Promotions / Settlement</td><td>نفس الأسماء</td><td><span class="tag ok">✅ كامل</span></td><td>تطابق كامل لأربع شاشات</td></tr>
+    <tr><td>— (لا مقابل على الويب)</td><td>⚪ customers.tsx</td><td><span class="tag ok">⚪ إضافة RN</span></td><td>دليل عملاء VIP — موجود في RN فقط</td></tr>
+  </table>
+
+  <div class="insight warn"><h4>الخلاصة العامة</h4>خلافاً للمخاوف الأولية، جوهر تدفّق قبول وتحضير الطلبات <b>يعمل فعلياً</b>. لكن توجد ثغرتان جوهريتان غير تجميليتين: غياب بوابة الصلاحيات، وعدم القدرة على إغلاق طلبات الاستلام/التوصيل الذاتي من التطبيق إطلاقاً.</div>
+</section>
+
+<section id="ops">
+  <h2 class="sec-title">🛠️ القسم الرابع — دور العمليات (مُستثنى من المقارنة)</h2>
+  <div class="fine-list">كما وضّحتَ، هذا مُستبعَد من معيار "يجب أن يكون كاملاً". للتوثيق فقط: RN شاشة واحدة (لوحة KPI للقراءة فقط) مقابل <b>80 صفحة</b> على الويب — متوقَّع ومقبول حسب توجيهك، وليس عيباً يُحتسَب.</div>
+</section>
+
+<section id="excluded">
+  <h2 class="sec-title">🚧 القسم الخامس — المميزات المستبعدة والفجوات المكتشَفة</h2>
+
+  <h3 style="color:#fff">أ. استبعادات واعية اتُّخذت هذه الجلسة (قرارات موثَّقة وقت اتخاذها)</h3>
+  <table>
+    <tr><th>الميزة</th><th>الحجم على الويب</th><th>السبب الدقيق</th></tr>
+    <tr><td>سلة الطلب الجماعي (Group Order)</td><td>~1400 سطر</td><td><code>group_order_enabled: false</code> افتراضيًا على مستوى المنصّة بأكملها — غير مفعّلة في أي مكان حاليًا حتى على الويب نفسه</td></tr>
+    <tr><td>قائمة الحظر للعميل</td><td>جزء من 896 سطر</td><td>لا واجهة "حظر" في أي شاشة أخرى بـRN لإنشاء إدخال حظر أصلًا</td></tr>
+    <tr><td>خريطة السائق الحية</td><td>—</td><td>تحتاج react-native-maps + مفتاح Google Maps API — اعتماد خارجي</td></tr>
+    <tr><td>نافذة الشروط القانونية + OTP إلزامي عند التسجيل</td><td>جزء من RegistrationPage</td><td><code>legal_registration_consent_required=False</code> و<code>registration_require_otp=False</code> — كلاهما معطَّل افتراضيًا على الخادم نفسه</td></tr>
+  </table>
+
+  <h3 style="color:#fff">ب. فجوات مكتشَفة الآن عبر هذا التدقيق — ليست قراراتي، بل نقص موروث</h3>
+  <div class="insight blocker">
+    <h4>هذه ليست استبعادات واعية</h4>
+    شاشات بُنيت في جزء سابق من الجلسة الطويلة، ولم يكن معروفًا لي مدى نقصها إلا بعد هذا التدقيق المخصَّص اليوم:
+    <ul>
+      <li>السلة والدفع وتتبّع الطلب للعميل (تخصيص الأصناف، الدفع المجزّأ، الخريطة الحية)</li>
+      <li>بوّابة حالة حساب السائق/المزوّد "قيد المراجعة" (غائبة تمامًا في كلا الدورين)</li>
+      <li>بوابة الصلاحيات في طابور طلبات المزوّد</li>
+      <li>إغلاق طلبات الاستلام/التوصيل الذاتي للمزوّد</li>
+      <li>نظام SOS/الطوارئ الكامل للسائق</li>
+      <li>MyPermissions للموظف</li>
+    </ul>
+  </div>
+  <p class="lead"><b>الفرق المهم:</b> (أ) قرارات اتُّخذت بوعي كامل مع تبرير موثَّق أثناء العمل، بينما (ب) حقائق مكتشَفة اليوم فقط بالتدقيق المباشر — لم تكن معروفة لي كـ"استبعادات" من قبل، بل تبيّن أنها لم تُبنَ قط في المقام الأول.</p>
+</section>
+
+<section id="recommend">
+  <h2 class="sec-title">🗺️ القسم السادس — التوصية</h2>
+  <table>
+    <tr><th>الأولوية</th><th>الإصلاح</th></tr>
+    <tr><td><span class="tag blocker">حرج</span></td><td>بوابة حالة الحساب (قيد المراجعة/مرفوض) للسائق والمزوّد — مسألة امتثال/سلامة تشغيلية</td></tr>
+    <tr><td><span class="tag blocker">حرج</span></td><td>بوابة الصلاحيات في طابور طلبات المزوّد — ثغرة تحكّم وصول فعلية</td></tr>
+    <tr><td><span class="tag blocker">حرج</span></td><td>إغلاق طلبات الاستلام/التوصيل الذاتي للمزوّد — طريق مسدود وظيفي</td></tr>
+    <tr><td><span class="tag high">عالٍ</span></td><td>تخصيص الأصناف (Variants/Modifiers) في السلة</td></tr>
+    <tr><td><span class="tag high">عالٍ</span></td><td>إثراء تتبّع الطلب (خريطة حية، اتصال بالسائق، تفاصيل)</td></tr>
+    <tr><td><span class="tag med">متوسط</span></td><td>نظام SOS/الطوارئ الكامل للسائق</td></tr>
+    <tr><td><span class="tag med">متوسط</span></td><td>إثراء الدفع (دفع مجزّأ، إكرامية، جدولة، بوابة OTP)</td></tr>
+    <tr><td><span class="tag low">لاحقًا</span></td><td>بقية الفجوات الأصغر (CSV، تحليلات، تصفية/فرز)</td></tr>
+  </table>
+</section>
+
+<footer>
+  تقرير 480 — تدقيق التطابق: تطبيق الجوّال (RN) مقابل تطبيق الويب، كل الأدوار · تووا (Tawa) Libya Delivery Platform · 2026-07-14
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>

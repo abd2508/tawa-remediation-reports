@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تقرير نظام الخبراء — تجربة حية على tawanow.com (2026-05-29)</title>
+<style>
+  :root{--g:#0e7a4f;--a:#f59e0b;--r:#b3261e;--bg:#f6f8f7;--bd:#e3e9ee;--tx:#1f2a30;--mut:#5d6b75}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,"Segoe UI",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--tx);line-height:1.7}
+  .wrap{max-width:1000px;margin:0 auto;padding:1.5rem}
+  h1{color:var(--g);font-size:1.5rem;margin:.2rem 0}
+  h2{color:var(--g);border-bottom:2px solid var(--bd);padding-bottom:.3rem;margin-top:2rem}
+  h3{margin:1.2rem 0 .3rem}
+  .sub{color:var(--mut);font-size:.9rem}
+  .card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:1rem 1.2rem;margin:.8rem 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:.6rem 0;font-size:.9rem;background:#fff}
+  th,td{border:1px solid var(--bd);padding:.5rem .6rem;text-align:right;vertical-align:top}
+  th{background:#eef4f1;color:var(--g)}
+  code{background:#eef2f4;padding:.05rem .35rem;border-radius:5px;font-size:.85em;direction:ltr;display:inline-block}
+  .ok{color:var(--g);font-weight:700}.warn{color:var(--a);font-weight:700}.bad{color:var(--r);font-weight:700}
+  .sev{font-weight:800;padding:.1rem .5rem;border-radius:999px;font-size:.78rem;color:#fff;white-space:nowrap}
+  .s-hi{background:var(--r)}.s-md{background:var(--a);color:#3a2600}.s-lo{background:#64748b}
+  .pill{display:inline-block;background:#eef4f1;color:var(--g);border:1px solid var(--bd);border-radius:999px;padding:.1rem .6rem;font-size:.8rem;margin:.1rem}
+  ul{margin:.3rem 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>تقرير نظام الخبراء — تجربة حيّة على tawanow.com</h1>
+  <p class="sub">2026-05-29 · وكلاء حقيقيون (غير محاكَين) مارسوا أدوارهم على واجهة الإنتاج الحيّة عبر الـ API الفعلي · حسابات تجريبية مُوَسَّمة (<code>خبير-*</code>) قابلة للحذف</p>
+
+  <div class="card">
+    <h3>المنهجية (مهم)</h3>
+    <p>منفذ الوكلاء (الوكيل) <b>محجوب من الوصول المباشر للإنترنت</b>، لذا نُفِّذت كل التدفّقات <b>من جهة الخادم</b> (SSH) بضرب الـ API الحيّ <code>https://tawanow.com/api</code> فعلياً: تسجيل حسابات جديدة، موافقات غرفة العمليات، توقيع عقود، طلبات نقدية، وتسليم كامل — <b>كتابات حقيقية في قاعدة الإنتاج</b>. رموز OTP تُجلب من سجلّ حاوية الخلفية. هذا «حقيقي وليس محاكى» ضمن حدود البيئة (لا متصفّح بشري على الموقع العامّ من هنا).</p>
+    <p><b>مراقب الانحراف:</b> كل نتيجة موثّقة برمز HTTP فعلي + الخطوة. النتائج التي تبيّن أنها أخطاء في أداة الاختبار (لا عيوب منصّة) أُعيد تصنيفها صراحةً (انظر القسم الأخير) لتجنّب الهلوسة/الإبلاغ الكاذب.</p>
+  </div>
+
+  <h2>1) ملخّص تنفيذي</h2>
+  <div class="card">
+    <p><span class="ok">دورة الحياة الكاملة عبر جميع الأدوار نجحت حتى <b>DELIVERED</b> على الإنتاج.</span> عميل جديد سجّل وطلب؛ مزوّد جديد سجّل ووافقت عليه غرفة العمليات ووقّع العقد ونشر صنفاً؛ سائق جديد سجّل ووُوفِق عليه ووقّع؛ موظّف انضمّ بكود دعوة؛ ثم سُلِّم الطلب نقداً مع حساب مالي صحيح (سلع+رسم، مقرّب لـ250).</p>
+    <p>الجوهر سليم. العيوب المؤكَّدة تقع عند <b>حواف الإعداد/التفعيل</b> لا في مسار المال: أبرزها أنّ المزوّد بعد اكتمال الإعداد (موافقة+عقد+نشر) يبقى «غير متاح» حتى يفعّل علَمين منفصلين يدوياً، وعدم اتّساق في رموز مستندات KYC، وعدم إنشاء عرض تلقائي للسائق المتاح.</p>
+  </div>
+
+  <h2>2) نتائج كل خبير (أدلّة حيّة)</h2>
+
+  <h3>👤 خبير العميل <span class="ok">— يعمل</span></h3>
+  <div class="card">
+    <span class="pill">register 201</span><span class="pill">login 200</span><span class="pill">browse 8 مزوّدين</span><span class="pill">address 201</span><span class="pill">quote 200</span><span class="pill">order 201</span><span class="pill">track 200</span><span class="pill">history/wallet/debts/categories 200</span>
+    <ul>
+      <li>طلب نقدي حقيقي: السلع 5.000 + رسم 3.000 → <code>cash_due=8.000</code> (مقرّب لـ250) ✓ · <code>eta_minutes=30</code> · <code>provider_name</code> يُحَلّ في التتبّع ✓</li>
+      <li><span class="warn">ملاحظة:</span> <code>delivery-quote</code> أعاد <code>distance_km=0.0</code> → رسم أساسي فقط؛ يُتحقَّق أنّ للمزوّد إحداثيات حقيقية وإلا يتدهور التسعير بالمسافة بصمت.</li>
+    </ul>
+  </div>
+
+  <h3>🏪 خبير المزوّد <span class="ok">— الإعداد والعقد يعملان</span></h3>
+  <div class="card">
+    <span class="pill">register 201 (PENDING)</span><span class="pill ">OPS approve 200</span><span class="pill">contract SIGNED 200</span><span class="pill">publish (بعد إضافة variant) 200</span>
+    <ul>
+      <li>تسلسل حقيقي: تسجيل → رفع مستند → ظهور في قائمة غرفة العمليات → موافقة (PROVIDER_ADMIN/ACTIVE) → إصدار عقد → توقيع باسم + صورة توقيع → نشر صنف.</li>
+    </ul>
+  </div>
+
+  <h3>🛵 خبير السائق <span class="ok">— الإعداد والعقد يعملان بالكامل</span></h3>
+  <div class="card"><span class="pill">register 201</span><span class="pill">upload license 200</span><span class="pill">OPS approve 200</span><span class="pill">contract SIGNED 200</span><span class="pill">available + offer + pickup + proof → DELIVERED</span></div>
+
+  <h3>👔 خبير الموظّف <span class="ok">— الانضمام بكود الدعوة يعمل</span></h3>
+  <div class="card"><span class="pill">provider invite code 200 (GPKH9QV8)</span><span class="pill">staff register 201</span><span class="pill">staff sees provider orders 200</span></div>
+
+  <h3>🎛️ خبير غرفة العمليات <span class="ok">— يعمل</span></h3>
+  <div class="card"><span class="pill">onboarding/pending 200</span><span class="pill">approve provider+driver 200</span><span class="pill">dashboard 200</span><span class="pill">conversations 200</span><span class="pill">create dispatch offer 200</span>
+  <ul><li>اضطرّت غرفة العمليات لإنشاء عرض التوزيع يدوياً لأنّ التوزيع التلقائي لم يُنشئ عرضاً لسائق متاح (انظر D-5).</li></ul></div>
+
+  <h2>3) العيوب المؤكَّدة (مرتّبة بالخطورة)</h2>
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>العيب</th><th>الدليل الحيّ</th><th>التوصية</th></tr>
+    <tr><td>PROV-1</td><td><span class="sev s-hi">عالٍ</span></td><td>المزوّد بعد اكتمال الإعداد (موافقة+عقد+نشر) يبقى <b>«Provider is not available»</b> ويرفض الطلبات حتى يفعّل علَمين منفصلين يدوياً: <code>PUT /providers/me/status {active_now}</code> و<code>POST /providers/me/accept-toggle {is_accepting_orders}</code>. لا يوجد زرّ «افتح المتجر» واحد، ومزوّد جديد لن يكتشف ذلك.</td><td>create order → <b>422</b> «Provider is not available»؛ بعد ضبط العلَمين → <b>201</b></td><td>زرّ «متصل/مفتوح» واحد يضبط العلَمين، أو تفعيلهما افتراضياً بعد توقيع العقد + أول نشر؛ ورسالة الطلب تشرح السبب.</td></tr>
+    <tr><td>PROV-2</td><td><span class="sev s-md">متوسط</span></td><td>لا يمكن نشر صنف قبل إضافة سعر/variant — <code>availability=PUBLISHED</code> يردّ 422 برسالة غير مُرشدة، ومسار «الموافقة على الصنف» في غرفة العمليات يردّ <code>NOT_PENDING</code> (الصنف ليس قيد مراجعة أصلاً) فيضلّل.</td><td>publish 422 (قبل variant) → variant 201 → publish 200؛ moderation approve 422 NOT_PENDING</td><td>رسالة واضحة «أضِف سعراً قبل النشر»؛ توضيح متى يخضع الصنف للمراجعة.</td></tr>
+    <tr><td>KYC-1</td><td><span class="sev s-md">متوسط</span></td><td>رموز مستندات KYC غير متّسقة: <code>commercial_register</code> مقبول (200) بينما <code>owner_id</code> و<code>food_license</code> مرفوضان (422). مزوّد يخمّن أسماء شائعة يُحجَب.</td><td>upload owner_id 422 · food_license 422 · commercial_register 200</td><td>كشف قائمة <code>doc_type</code> المسموحة عبر نقطة عامة (مثل نمط N2) وعرضها في الواجهة.</td></tr>
+    <tr><td>D-5</td><td><span class="sev s-md">متوسط</span></td><td>التوزيع التلقائي لم يُنشئ عرضاً لسائق <b>متاح على نفس الإحداثيات</b> بعد جهوزية الطلب؛ تطلّب تدخّل غرفة العمليات لإنشاء العرض يدوياً.</td><td><code>GET /dispatch/offers</code> فارغ بعد ready+available → أنشأت OPS العرض</td><td>فحص مسار auto_dispatch/GEO وأهلية السائق الطازج (سجلّ السائق/الإحداثيات/التوقيت) — مذكور كاحتمال GEOSEARCH/eligibility.</td></tr>
+    <tr><td>CUST-6</td><td><span class="sev s-lo">منخفض</span></td><td>معاينة الرسم أعادت <code>distance_km=0.0</code> (رسم أساسي فقط) — يحتمل غياب إحداثيات المزوّد المختار.</td><td>delivery-quote 200 · distance_km=0.0</td><td>تأكيد ضبط إحداثيات المزوّدين؛ مؤشّر «تقديري» عند غياب المسافة.</td></tr>
+    <tr><td>API-3</td><td><span class="sev s-lo">منخفض</span></td><td><code>POST /providers/catalog/items</code> يعيد <b>200</b> لا 201 (عدم اتّساق مع نقاط الإنشاء الأخرى).</td><td>create item HTTP 200</td><td>توحيد رمز الإنشاء على 201.</td></tr>
+  </table>
+
+  <h2>4) مراقب التدفّق — سلامة العمليات عبر اللوحات والخلفية</h2>
+  <div class="card">
+    <ul>
+      <li><span class="ok">آلة الحالات سليمة:</span> AWAITING_PROVIDER_ACCEPTANCE → ACCEPTED → IN_PREPARATION → READY_FOR_PICKUP → DRIVER_ASSIGNED → DRIVER_AT_PROVIDER → EN_ROUTE → ARRIVED → DELIVERED، كلّ انتقال بسلطته الصحيحة (الاستلام بسلطة المزوّد عبر verify-pickup).</li>
+      <li><span class="ok">المال سليم عبر الأدوار:</span> التحصيل النقدي 48.000 = سلع 45.000 + رسم 3.000، مقرّب لـ250؛ يتطابق مع <code>cash_due_minor</code> المعروض للعميل.</li>
+      <li><span class="ok">حواجز الصلاحيات تعمل:</span> العقد يحجب العمل حتى التوقيع؛ غرفة العمليات تملك الموافقة والتوزيع؛ بوابة قيد CHECK الجديدة (aa22) فعّالة على الإنتاج.</li>
+      <li><span class="warn">فجوة التفعيل (PROV-1)</span> هي أبرز انقطاع في تدفّق الإعداد→التشغيل.</li>
+    </ul>
+  </div>
+
+  <h2>5) مراقب الانحراف — تصحيح ادّعاءات</h2>
+  <div class="card">
+    <ul>
+      <li><b>«التقييمات معطّلة (422)» — أُعيد تصنيفها: ليست عيباً.</b> سبب 422 = إغفال أداة الاختبار للحقل المطلوب <code>target_id</code> في <code>POST /orders/{id}/ratings</code> (يتطلّب target_type + target_id + stars). ملاحظة UX حقيقية فقط: تأكّد أنّ استجابة تتبّع العميل تكشف <code>driver_id</code> ليتمكّن من تقييم السائق.</li>
+      <li>«publish 422» أوّل مرة لم يكن بوابة مراجعة بل غياب variant — صُحِّح بعد إضافة السعر (PROV-2).</li>
+      <li>كل رمز HTTP أعلاه من تشغيل فعليّ؛ لا توجد نتائج مُستنتجة بلا دليل.</li>
+    </ul>
+  </div>
+
+  <h2>6) التقييم العام والأولويات</h2>
+  <div class="card">
+    <p><b>الحكم:</b> المنصّة تؤدّي دورة الأعمال الكاملة (إعداد بموافقة وعقود → طلب → تسليم نقدي → دفتر مالي) على الإنتاج بنجاح. جاهزة للتجربة الداخلية؛ العيوب المُكتشفة لا تمنع التشغيل لكنها تعيق <b>الإعداد الذاتي</b> لمزوّد/سائق جديد دون مساعدة.</p>
+    <p><b>أولويات الإصلاح:</b></p>
+    <ol>
+      <li><span class="bad">PROV-1</span> زرّ «افتح المتجر» موحّد (أو تفعيل تلقائي بعد العقد+النشر) — أعلى أثر على تجربة المزوّد الجديد.</li>
+      <li><span class="warn">D-5</span> التحقّق من التوزيع التلقائي للسائق المتاح.</li>
+      <li><span class="warn">KYC-1</span> كشف قائمة doc_type المسموحة.</li>
+      <li><span class="warn">PROV-2</span> رسائل نشر الصنف الموجِّهة.</li>
+      <li><span class="sev s-lo">منخفض</span> CUST-6 (إحداثيات/تقدير الرسم) · API-3 (201).</li>
+    </ol>
+    <p class="sub"><b>بيانات اختبار أُنشئت على الإنتاج (مُوَسَّمة، للحذف):</b> عملاء/مزوّد/سائق/موظّف بأسماء «خبير-*» + 2 طلب (<code>093331e7</code> AWAITING، <code>04272b8c</code> DELIVERED). يمكن حذفها عند الطلب.</p>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير التدقيق الشامل — الخطط مقابل الكود</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1c2128;
+  --border: #21262d;
+  --border2: #30363d;
+  --text: #e6edf3;
+  --text-muted: #7d8590;
+  --text-dim: #484f58;
+  --green: #3fb950;
+  --green-bg: #0d2a14;
+  --amber: #d29922;
+  --amber-bg: #271e05;
+  --red: #f85149;
+  --red-bg: #2d1117;
+  --blue: #58a6ff;
+  --blue-bg: #0c1d36;
+  --purple: #bc8cff;
+  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Arabic', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+/* ── URGENT BANNER ── */
+.urgent {
+  background: linear-gradient(135deg, #3d1a0c 0%, #2d1117 100%);
+  border: 1.5px solid var(--red);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.urgent-icon { font-size: 1.8rem; flex-shrink: 0; line-height: 1; }
+.urgent h2 { color: var(--red); font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; }
+.urgent p { color: #e6c0bc; font-size: 0.92rem; line-height: 1.5; }
+.urgent code { background: rgba(248,81,73,0.15); color: var(--red); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 0.85em; }
+
+/* ── HEADER ── */
+.page-header { margin-bottom: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+.page-header .eyebrow { font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+.page-header h1 { font-size: 1.65rem; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 0.75rem; text-wrap: balance; }
+.page-header .meta { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+.page-header .meta span { font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.3rem; }
+
+/* ── STAT ROW ── */
+.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.25rem; }
+.stat-card .num { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stat-card .lbl { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem; }
+.stat-card.green .num { color: var(--green); }
+.stat-card.amber .num { color: var(--amber); }
+.stat-card.red .num { color: var(--red); }
+.stat-card.blue .num { color: var(--blue); }
+
+/* ── SECTION ── */
+.section { margin-bottom: 3rem; }
+.section-title { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); }
+.section-title .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: var(--green); }
+.dot-amber { background: var(--amber); }
+.dot-red { background: var(--red); }
+.dot-blue { background: var(--blue); }
+
+/* ── CHIPS ── */
+.chip { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+.chip-green { background: var(--green-bg); color: var(--green); }
+.chip-amber { background: var(--amber-bg); color: var(--amber); }
+.chip-red { background: var(--red-bg); color: var(--red); }
+.chip-blue { background: var(--blue-bg); color: var(--blue); }
+.chip-gray { background: #1c2128; color: var(--text-muted); }
+
+/* ── DIAGRAM ── */
+.diagram { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1.25rem; overflow-x: auto; }
+.diagram-title { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 1.25rem; text-transform: uppercase; }
+
+/* Flow diagram */
+.flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; row-gap: 0.75rem; }
+.flow-node { background: var(--surface2); border: 1px solid var(--border2); border-radius: 7px; padding: 0.55rem 0.9rem; font-size: 0.82rem; text-align: center; min-width: 110px; }
+.flow-node.done { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.flow-node.missing { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+.flow-node.partial { border-color: var(--amber); background: var(--amber-bg); color: var(--amber); }
+.flow-node.info { border-color: var(--blue); background: var(--blue-bg); color: var(--blue); }
+.flow-arrow { color: var(--text-dim); font-size: 1.1rem; padding: 0 0.4rem; }
+
+/* Split diagram */
+.split-diagram { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.split-side { border-radius: 8px; padding: 1rem; }
+.split-side.old { background: var(--red-bg); border: 1px solid var(--red); }
+.split-side.new { background: var(--green-bg); border: 1px solid var(--green); }
+.split-side h4 { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.75rem; }
+.split-side.old h4 { color: var(--red); }
+.split-side.new h4 { color: var(--green); }
+.split-side ul { font-size: 0.82rem; list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+.split-side.old li::before { content: "✗ "; color: var(--red); }
+.split-side.new li::before { content: "✓ "; color: var(--green); }
+
+/* ── TABLE ── */
+.tbl-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+thead th { background: var(--surface2); color: var(--text-muted); font-weight: 600; font-size: 0.78rem; letter-spacing: 0.04em; padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--border); text-align: right; }
+tbody td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.45; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: rgba(255,255,255,0.02); }
+.td-code { font-family: var(--mono); font-size: 0.8em; color: var(--text-muted); }
+
+/* ── CALLOUT ── */
+.callout { border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 0.88rem; line-height: 1.55; }
+.callout-green { background: var(--green-bg); border: 1px solid rgba(63,185,80,0.3); color: #b2f0b6; }
+.callout-amber { background: var(--amber-bg); border: 1px solid rgba(210,153,34,0.3); color: #f0d9a0; }
+.callout-red { background: var(--red-bg); border: 1px solid rgba(248,81,73,0.3); color: #f0bcb9; }
+.callout-blue { background: var(--blue-bg); border: 1px solid rgba(88,166,255,0.3); color: #b0d5f5; }
+.callout strong { font-weight: 700; }
+
+/* ── PROBLEM/SOLUTION CARD ── */
+.ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.ps-card { border-radius: 8px; padding: 1rem 1.25rem; }
+.ps-card.problem { background: var(--red-bg); border: 1px solid rgba(248,81,73,0.25); }
+.ps-card.solution { background: var(--green-bg); border: 1px solid rgba(63,185,80,0.25); }
+.ps-card h4 { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.6rem; }
+.ps-card.problem h4 { color: var(--red); }
+.ps-card.solution h4 { color: var(--green); }
+.ps-card p { font-size: 0.85rem; line-height: 1.5; }
+.ps-card code { font-family: var(--mono); font-size: 0.82em; background: rgba(255,255,255,0.08); padding: 2px 5px; border-radius: 3px; }
+
+/* ── BACKEND/FRONTEND LAYER DIAGRAM ── */
+.layer-diagram { display: flex; flex-direction: column; gap: 0.6rem; }
+.layer-row { display: flex; align-items: center; gap: 0.75rem; }
+.layer-label { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); width: 90px; flex-shrink: 0; text-align: left; direction: ltr; }
+.layer-bar { flex: 1; border-radius: 6px; padding: 0.5rem 0.75rem; font-size: 0.82rem; font-weight: 600; }
+.layer-bar.done { background: var(--green-bg); border: 1px solid rgba(63,185,80,0.4); color: var(--green); }
+.layer-bar.missing { background: var(--red-bg); border: 1px dashed rgba(248,81,73,0.4); color: #f0bcb9; }
+.layer-bar span { font-weight: 400; color: var(--text-muted); font-size: 0.78em; margin-right: 0.5rem; }
+
+/* ── PRIORITY LIST ── */
+.priority-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.priority-item { display: flex; align-items: flex-start; gap: 0.75rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1rem; }
+.priority-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+.p1 { background: #3d0e0a; color: #ff8a80; }
+.p2 { background: var(--amber-bg); color: var(--amber); }
+.p3 { background: var(--blue-bg); color: var(--blue); }
+.priority-item h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.2rem; }
+.priority-item p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.45; }
+
+/* ── STEPS ── */
+.steps { display: flex; flex-direction: column; gap: 0; }
+.step { display: flex; gap: 1rem; position: relative; padding-bottom: 1.5rem; }
+.step:last-child { padding-bottom: 0; }
+.step::before { content: ''; position: absolute; right: 15px; top: 32px; bottom: 0; width: 2px; background: var(--border); }
+.step:last-child::before { display: none; }
+.step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--surface2); border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; color: var(--text); }
+.step-body h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+.step-body p { font-size: 0.83rem; color: var(--text-muted); line-height: 1.5; }
+.step-body code { font-family: var(--mono); font-size: 0.82em; background: var(--surface2); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+@media (max-width: 600px) {
+  .split-diagram { grid-template-columns: 1fr; }
+  .ps-grid { grid-template-columns: 1fr; }
+  .stat-row { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- URGENT BANNER -->
+  <div class="urgent">
+    <div class="urgent-icon">🚨</div>
+    <div>
+      <h2>إجراء فوري مطلوب — لماذا لا تظهر التحديثات؟</h2>
+      <p>
+        الكود نُشر بنجاح الساعة 15:07 اليوم، لكن Cloudflare لا يزال يُقدّم نسخة <code>sw.js</code> مُخزَّنة قديمة.
+        الحل: افتح <strong>Cloudflare Dashboard → Caching → Purge Everything</strong> الآن.
+        بعد 30 ثانية ستظهر كل التحديثات فوراً لكل الزوار.
+      </p>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="eyebrow">تقرير تدقيق شامل</div>
+    <h1>الخطط مقابل الكود — ماذا نُفِّذ وماذا لم يُنفَّذ؟</h1>
+    <div class="meta">
+      <span>📅 5 يوليو 2026</span>
+      <span>🔍 فحص 3 خطط + كود المشروع</span>
+      <span>📦 آخر commit: <code style="font-family:var(--mono);font-size:0.9em">2c25e6e</code></span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stat-row">
+    <div class="stat-card green"><div class="num">8</div><div class="lbl">ميزة بُنيت اليوم</div></div>
+    <div class="stat-card amber"><div class="num">5</div><div class="lbl">بند لم يُنفَّذ بعد</div></div>
+    <div class="stat-card red"><div class="num">1</div><div class="lbl">مشكلة حرجة (السلة)</div></div>
+    <div class="stat-card blue"><div class="num">382</div><div class="lbl">ملف تغيّر في آخر commit</div></div>
+  </div>
+
+  <!-- SECTION 1: WHY NOTHING SHOWS -->
+  <div class="section">
+    <div class="section-title"><div class="dot dot-red"></div>لماذا لا تظهر التحديثات؟ — الشرح البسيط</div>
+
+    <div class="callout callout-red">
+      <strong>مثال بسيط:</strong> تخيّل أن Cloudflare مثل موظف في مخزن يحتفظ بنسخة من الموقع.
+      عندما تُغيّر الكود ونشره على السيرفر، الموظف لا يعلم — يُعطي الزوار النسخة القديمة من المخزن.
+      الحل هو أن "تُخبره" بحذف ما عنده وأخذ نسخة جديدة. هذا ما يفعله <strong>Purge</strong>.
+    </div>
+
+    <div class="diagram">
+      <div class="diagram-title">مسار تحديث الموقع — ما الذي يحدث الآن</div>
+      <div class="flow">
+        <div class="flow-node done">✓ كود جديد<br><small>GitHub</small></div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node done">✓ نُشر على<br>السيرفر</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node missing">✗ Cloudflare<br>يحمل القديم</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node missing">✗ المستخدم<br>يرى القديم</div>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <div class="diagram-title">بعد Purge — ما الذي سيحدث</div>
+      <div class="flow">
+        <div class="flow-node done">✓ كود جديد<br>السيرفر</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node done">✓ Cloudflare<br>يُحدَّث</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node done">✓ sw.js جديد<br>بدون cache</div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-node done">✓ المستخدم<br>يرى الجديد</div>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body"><h4>افتح Cloudflare Dashboard</h4><p>cloudflare.com ← ابحث عن موقع tawanow.com</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body"><h4>Caching → Configuration → Purge Cache</h4><p>اضغط على "Purge Everything" وأكّد</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body"><h4>انتظر 30 ثانية</h4><p>افتح tawanow.com في نافذة خاصة (Incognito) لترى النسخة الجديدة فوراً</p></div>
+      </div>
+    </div>
+
+    <div class="callout callout-green" style="margin-top:1rem">
+      <strong>الحماية المستقبلية (تمّت):</strong> nginx يضع الآن <code style="font-family:var(--mono);font-size:0.85em">Cache-Control: no-store</code> على <code style="font-family:var(--mono);font-size:0.85em">sw.js</code>
+      وذلك يمنع Cloudflare من تخزينه في المستقبل. المشكلة لن تتكرر بعد اليوم.
+    </div>
+  </div>
+
+  <!-- SECTION 2: WHAT WAS BUILT TODAY -->
+  <div class="section">
+    <div class="section-title"><div class="dot dot-green"></div>ما الذي بُني اليوم — 8 ميزات</div>
+
+    <div class="callout callout-blue">
+      <strong>ملاحظة مهمة:</strong> الـ7 مراحل (P1-P18) التي نُفِّذت سابقاً كانت <strong>backend فقط</strong> (قاعدة البيانات والـAPI) — لم تُضف أي واجهة مستخدم.
+      ما بُني اليوم هو <strong>الواجهة الأمامية</strong> لهذه المراحل.
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>الميزة</th>
+            <th>من يراها</th>
+            <th>أين تجدها في الموقع</th>
+            <th>الملف</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>زر الوردية (ShiftToggle)</strong><br><small style="color:var(--text-muted)">الموظف يضغط "أنهِ ورديتي" عند الانتهاء</small></td>
+            <td><span class="chip chip-amber">موظف المزوّد</span></td>
+            <td>لوحة المزوّد → الشريط السفلي</td>
+            <td class="td-code">ShiftToggle.tsx</td>
+            <td><span class="chip chip-green">✓ مكتمل</span></td>
+          </tr>
+          <tr>
+            <td><strong>عداد الموظفين النشطين</strong><br><small style="color:var(--text-muted)">يعرض "3 من 5 موظفون نشطون" لصاحب المتجر</small></td>
+            <td><span class="chip chip-blue">أدمن المزوّد</span></td>
+            <td>لوحة المزوّد → رأس الصفحة</td>
+            <td class="td-code">ActiveStaffBadge.tsx</td>
+            <td><span class="chip chip-green">✓ مكتمل</span></td>
+          </tr>
+          <tr>
+            <td><strong>تقييم النجوم للموظفين</strong><br><small style="color:var(--text-muted)">صاحب المتجر يعطي الموظف من 1 إلى 5 نجوم</small></td>
+            <td><span class="chip chip-blue">أدمن المزوّد</span></td>
+            <td>المزوّد → قائمة الموظفين</td>
+            <td class="td-code">StaffRating.tsx</td>
+            <td><span class="chip chip-green">✓ مكتمل</span></td>
+          </tr>
+          <tr>
+            <td><strong>أرشفة الإشعارات</strong><br><small style="color:var(--text-muted)">زر لأرشفة الإشعارات القديمة وتنظيف القائمة</small></td>
+            <td><span class="chip chip-gray">جميع الأدوار</span></td>
+            <td>أيقونة الجرس → NotificationInbox</td>
+            <td class="td-code">NotificationInbox.tsx</td>
+            <td><span class="chip chip-green">✓ مكتمل</span></td>
+          </tr>
+          <tr>
+            <td><strong>تعديل اسم الزبون</strong><br><small style="color:var(--text-muted)">الزبون يُغيّر اسمه مرة كل 30 يوماً</small></td>
+            <td><span class="chip chip-green">الزبون</span></td>
+            <td>إعدادات الزبون → قسم الاسم</td>
+            <td class="td-code">CustomerSettings.tsx</td>
+            <td><span class="chip chip-green">✓ مكتمل</span></td>
+          </tr>
+          <tr>
+            <td><strong>طلب تغيير الاسم الرسمي</strong><br><small style="color:var(--text-muted)">المزوّد يطلب تغيير اسمه، OPS يوافق أو يرفض</small></td>
+            <td><span class="chip chip-amber">المزوّد</span></td>
+            <td>إعدادات المزوّد → طلب تغيير الاسم</td>
+            <td class="td-code">ProviderSettings.tsx</td>
+            <td><span class="chip chip-green">✓ مكتمل</span></td>
+          </tr>
+          <tr>
+            <td><strong>OPS — إيقاف الأصناف مؤقتاً</strong><br><small style="color:var(--text-muted)">الإدارة توقف صنفاً محدداً من جميع المتاجر</small></td>
+            <td><span class="chip chip-blue">إدارة OPS</span></td>
+            <td>/ops/catalog-pause</td>
+            <td class="td-code">OpsCatalogItemPause.tsx</td>
+            <td><span class="chip chip-green">✓ مكتمل</span></td>
+          </tr>
+          <tr>
+            <td><strong>OPS — قائمة طلبات تغيير الأسماء</strong><br><small style="color:var(--text-muted)">الإدارة تراجع وتوافق على طلبات تغيير الأسماء</small></td>
+            <td><span class="chip chip-blue">إدارة OPS</span></td>
+            <td>/ops/name-changes</td>
+            <td class="td-code">OpsNameChangeRequests.tsx</td>
+            <td><span class="chip chip-green">✓ مكتمل</span></td>
+          </tr>
+          <tr>
+            <td><strong>إصلاح nginx + Cache-Control</strong><br><small style="color:var(--text-muted)">sw.js: no-store · index.html: no-cache · /assets/: immutable</small></td>
+            <td><span class="chip chip-gray">المنصة كلها</span></td>
+            <td>تلقائي — الزوار يرون التحديثات فوراً</td>
+            <td class="td-code">nginx.conf</td>
+            <td><span class="chip chip-amber">⚡ بعد Purge</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 3: P14 CART PROBLEM -->
+  <div class="section">
+    <div class="section-title"><div class="dot dot-red"></div>المشكلة الحرجة — السلة المقسّمة (P14)</div>
+
+    <div class="callout callout-amber">
+      <strong>الشرح البسيط:</strong> تخيّل زبوناً يريد يطلب من مطعم A ومن مقهى B في نفس الوقت.
+      الآن النظام يسمح فقط بمتجر واحد نشط، والباقي "يُحفظ جانباً" (Parked). الخطة كانت أن يُبنى نظام سلّة موحّدة يسمح بطلب من متاجر متعددة في نفس الطلب.
+      <strong>المشكلة: backend مكتمل 100% منذ ab03، لكن frontend لم يُبنَ أبداً.</strong>
+    </div>
+
+    <div class="diagram">
+      <div class="diagram-title">P14 — ما تم بناؤه مقابل ما يحتاج بناءه</div>
+      <div class="layer-diagram">
+        <div class="layer-row">
+          <div class="layer-label">Backend API</div>
+          <div class="layer-bar done">✓ /carts/*, /carts/quote, /carts/checkout-group — مكتمل منذ migration ab03 <span>5 endpoints كاملة</span></div>
+        </div>
+        <div class="layer-row">
+          <div class="layer-label">Database</div>
+          <div class="layer-bar done">✓ جدول cart_groups + cart_items — موجود في ab03 <span>migrations تمت</span></div>
+        </div>
+        <div class="layer-row">
+          <div class="layer-label">CartContext</div>
+          <div class="layer-bar missing">✗ لا يزال single-provider — لا يستدعي /carts/* <span>يحتاج rewrite كامل</span></div>
+        </div>
+        <div class="layer-row">
+          <div class="layer-label">CartPage</div>
+          <div class="layer-bar missing">✗ يعرض "سِلالٌ أخرى محفوظة" فقط — لا يدعم دفع موحّد <span>يحتاج بناء جديد</span></div>
+        </div>
+        <div class="layer-row">
+          <div class="layer-label">CheckoutPage</div>
+          <div class="layer-bar missing">✗ يُرسل ordersApi.create({provider_id}) لمتجر واحد فقط <span>لا يستدعي /carts/checkout-group</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ps-grid">
+      <div class="ps-card problem">
+        <h4>الوضع الحالي</h4>
+        <p>الزبون يفتح متجر B أثناء وجود سلّة في متجر A → يُسأل "هل تريد تفريغ سلّتك؟" أو تُحفظ جانباً ولا يمكن الدفع من الاثنين معاً.</p>
+      </div>
+      <div class="ps-card solution">
+        <h4>المطلوب (P14)</h4>
+        <p>CartContext يستدعي <code>/carts/*</code> → الزبون يضيف من متاجر متعددة → CheckoutPage يُرسل <code>/carts/checkout-group</code> → طلب واحد يشمل كل المتاجر.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: FULL PLAN COMPARISON -->
+  <div class="section">
+    <div class="section-title"><div class="dot dot-blue"></div>المقارنة الكاملة — الخطط مقابل الكود</div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>البند</th>
+            <th>المصدر</th>
+            <th>Backend</th>
+            <th>Frontend</th>
+            <th>ملاحظة</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>P1 — تحديث حالة المزوّد لحظياً</strong></td>
+            <td><span class="chip chip-gray">7-phase plan</span></td>
+            <td><span class="chip chip-green">✓ ab15</span></td>
+            <td><span class="chip chip-amber">⚠ جزئي</span></td>
+            <td>TopBarStatusBadge موجود لكن بدون SSE polling</td>
+          </tr>
+          <tr>
+            <td><strong>P3 — إيقاف الأصناف من OPS</strong></td>
+            <td><span class="chip chip-gray">7-phase</span></td>
+            <td><span class="chip chip-green">✓ ab14</span></td>
+            <td><span class="chip chip-green">✓ اليوم</span></td>
+            <td>OpsCatalogItemPause.tsx + badge في ProviderCatalog</td>
+          </tr>
+          <tr>
+            <td><strong>P4 — Multi-provider cart (P14)</strong></td>
+            <td><span class="chip chip-gray">ملاحظات المالك</span></td>
+            <td><span class="chip chip-green">✓ ab03</span></td>
+            <td><span class="chip chip-red">✗ لم يُبنَ</span></td>
+            <td>CartContext/CheckoutPage يحتاجان rewrite كامل</td>
+          </tr>
+          <tr>
+            <td><strong>P6/P7 — وردية الموظف + cascade</strong></td>
+            <td><span class="chip chip-gray">7-phase</span></td>
+            <td><span class="chip chip-green">✓ ab15</span></td>
+            <td><span class="chip chip-green">✓ اليوم</span></td>
+            <td>ShiftToggle.tsx في ProviderDashboard</td>
+          </tr>
+          <tr>
+            <td><strong>P8 — أرشفة الإشعارات</strong></td>
+            <td><span class="chip chip-gray">7-phase</span></td>
+            <td><span class="chip chip-green">✓ ab16</span></td>
+            <td><span class="chip chip-amber">⚠ جزئي</span></td>
+            <td>NotificationInbox.tsx مُنشأ، لكن جرس الإشعارات في Layout موجود لـOPS فقط — الواجهة الرئيسية (زبون/مزوّد/سائق) لا تزال بدون جرس مربوط</td>
+          </tr>
+          <tr>
+            <td><strong>P9 — إزالة حقل رسوم التوصيل المُضلِّل</strong></td>
+            <td><span class="chip chip-gray">ملاحظات المالك</span></td>
+            <td><span class="chip chip-gray">لا يلزم</span></td>
+            <td><span class="chip chip-red">✗ لم يُبنَ</span></td>
+            <td>الحقل لا يزال في إعدادات المزوّد</td>
+          </tr>
+          <tr>
+            <td><strong>P11a — تعديل اسم الزبون</strong></td>
+            <td><span class="chip chip-gray">7-phase</span></td>
+            <td><span class="chip chip-green">✓ ab18</span></td>
+            <td><span class="chip chip-green">✓ اليوم</span></td>
+            <td>CustomerSettings.tsx + 30-day cooldown</td>
+          </tr>
+          <tr>
+            <td><strong>P11b — طلب تغيير اسم المزوّد</strong></td>
+            <td><span class="chip chip-gray">7-phase</span></td>
+            <td><span class="chip chip-green">✓ ab19</span></td>
+            <td><span class="chip chip-green">✓ اليوم</span></td>
+            <td>ProviderSettings + OpsNameChangeRequests</td>
+          </tr>
+          <tr>
+            <td><strong>P12 — شارة حالة المزوّد في الوقت الحقيقي</strong></td>
+            <td><span class="chip chip-gray">7-phase</span></td>
+            <td><span class="chip chip-green">✓ ab15</span></td>
+            <td><span class="chip chip-amber">⚠ جزئي</span></td>
+            <td>Badge موجود لكن يحتاج SSE أو polling مستمر</td>
+          </tr>
+          <tr>
+            <td><strong>P13 — عداد الموظفين النشطين</strong></td>
+            <td><span class="chip chip-gray">7-phase</span></td>
+            <td><span class="chip chip-green">✓</span></td>
+            <td><span class="chip chip-green">✓ اليوم</span></td>
+            <td>ActiveStaffBadge.tsx — refetch كل 30 ثانية</td>
+          </tr>
+          <tr>
+            <td><strong>P16 — قبول الشروط عند التسجيل</strong></td>
+            <td><span class="chip chip-gray">ملاحظات المالك</span></td>
+            <td><span class="chip chip-green">✓ حقل موجود</span></td>
+            <td><span class="chip chip-red">✗ لم يُبنَ</span></td>
+            <td>RegistrationPage بدون checkbox للشروط</td>
+          </tr>
+          <tr>
+            <td><strong>P17 — كود الدعوة في صفحة الموظفين</strong></td>
+            <td><span class="chip chip-gray">ملاحظات المالك</span></td>
+            <td><span class="chip chip-green">✓</span></td>
+            <td><span class="chip chip-amber">⚠ جزئي</span></td>
+            <td>موجود في الصفحة الرئيسية لكن ليس في صفحة التسجيل الخاصة</td>
+          </tr>
+          <tr>
+            <td><strong>P18 — تقييم الموظفين</strong></td>
+            <td><span class="chip chip-gray">7-phase</span></td>
+            <td><span class="chip chip-green">✓ ab20</span></td>
+            <td><span class="chip chip-green">✓ اليوم</span></td>
+            <td>StaffRating.tsx — 5 نجوم تفاعلية</td>
+          </tr>
+          <tr>
+            <td><strong>nginx Cache-Control</strong></td>
+            <td><span class="chip chip-gray">تشخيص تقني</span></td>
+            <td><span class="chip chip-gray">لا يلزم</span></td>
+            <td><span class="chip chip-green">✓ اليوم</span></td>
+            <td>sw.js: no-store · index.html: no-cache · /assets/: immutable</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SECTION 5: WHAT'S MISSING -->
+  <div class="section">
+    <div class="section-title"><div class="dot dot-amber"></div>ما يتبقّى من تنفيذ — بالأولوية</div>
+
+    <div class="priority-list">
+      <div class="priority-item">
+        <div class="priority-badge p1">حرج</div>
+        <div>
+          <h4>P14 — السلة الموحّدة المتعددة المتاجر</h4>
+          <p>يحتاج: rewrite لـ CartContext.tsx + CheckoutPage.tsx ليستدعيا /carts/* بدلاً من ordersApi المباشر. Backend جاهز منذ ab03. حجم العمل: 1-2 يوم.</p>
+        </div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-badge p2">مهم</div>
+        <div>
+          <h4>P12 — تحديث حالة المزوّد لحظياً</h4>
+          <p>TopBarStatusBadge موجود لكن بدون SSE. يحتاج useSSE أو polling كل 15 ثانية على /providers/{id}/status لتحديث "يستقبل / متوقف" بشكل فوري.</p>
+        </div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-badge p2">مهم</div>
+        <div>
+          <h4>P16 — قبول الشروط والأحكام عند التسجيل</h4>
+          <p>RegistrationPage.tsx تحتاج checkbox إلزامي "أوافق على الشروط والأحكام" قبل الإرسال. Backend يملك حقل terms_accepted. تغيير بسيط.</p>
+        </div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-badge p3">عادي</div>
+        <div>
+          <h4>P9 — إزالة حقل رسوم التوصيل المُضلِّل</h4>
+          <p>في ProviderSettings.tsx حقل "رسوم التوصيل" لا يزال يظهر رغم أنه لا يُستخدم. يحتاج إخفاءه أو شرح أنه للعرض فقط.</p>
+        </div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-badge p2">مهم</div>
+        <div>
+          <h4>P8 — ربط جرس الإشعارات في الواجهة الرئيسية</h4>
+          <p>NotificationInbox.tsx مبني. لكن جرس الإشعارات في Layout.tsx موجود لـOPS فقط. يحتاج إضافة الجرس في الـLayout الرئيسي (customer/provider/driver) مع رابط لـNotificationInbox.</p>
+        </div>
+      </div>
+      <div class="priority-item">
+        <div class="priority-badge p3">عادي</div>
+        <div>
+          <h4>P17 — كود الدعوة في صفحة الموظفين</h4>
+          <p>رمز الدعوة موجود في الصفحة الرئيسية. الخطة كانت إضافته في صفحة تسجيل الموظف الخاصة لتسهيل التعيين.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: PROBLEMS & SOLUTIONS -->
+  <div class="section">
+    <div class="section-title"><div class="dot dot-amber"></div>المشاكل والحلول — قبل وبعد</div>
+
+    <div class="ps-grid">
+      <div class="ps-card problem">
+        <h4>المشكلة 1 — لا تظهر التحديثات</h4>
+        <p>Cloudflare كان يُخزَّن sw.js لـ4 ساعات. nginx لم يكن يضع Cache-Control headers. الكود يتغير على السيرفر لكن الزوار يرون النسخة القديمة.</p>
+      </div>
+      <div class="ps-card solution">
+        <h4>الحل — مكتمل + إجراء فوري</h4>
+        <p>nginx الآن يضع <code>no-store</code> على sw.js. بعد Purge من Cloudflare Dashboard، كل التحديثات تظهر فوراً. المشكلة لن تتكرر.</p>
+      </div>
+
+      <div class="ps-card problem">
+        <h4>المشكلة 2 — السلة مقسّمة</h4>
+        <p>CartContext.tsx يدعم متجراً واحداً نشطاً فقط. إضافة من متجر آخر تُعطّل السلة الأولى أو تحفظها جانباً. لا يمكن الدفع من متجرين معاً.</p>
+      </div>
+      <div class="ps-card solution">
+        <h4>الحل — يحتاج موجة مستقلة</h4>
+        <p>ربط CartContext بـ /carts/* API (جاهزة منذ ab03) + تحديث CheckoutPage لاستدعاء /carts/checkout-group. Backend مكتمل، فقط frontend يحتاج بناء.</p>
+      </div>
+
+      <div class="ps-card problem">
+        <h4>المشكلة 3 — 7 مراحل بلا واجهة</h4>
+        <p>المراحل P1-P18 كانت backend فقط (ab12-ab20). لا يوجد ولو زر واحد يُعبّر عنها في الواجهة. المستخدمون لا يرون أي تغيير رغم أن backend تغيّر كثيراً.</p>
+      </div>
+      <div class="ps-card solution">
+        <h4>الحل — أُنجز اليوم</h4>
+        <p>8 مكوّنات وصفحات بُنيت ونُشرت اليوم في commit 2c25e6e. بعد Purge Cloudflare، كل هذه الميزات ستظهر في الموقع.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="border-top:1px solid var(--border);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <div style="font-size:0.8rem;color:var(--text-muted)">توا ليبيا — تقرير تدقيق فني · 5 يوليو 2026</div>
+    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+      <span class="chip chip-green">8 ميزات مكتملة</span>
+      <span class="chip chip-red">P14 يحتاج موجة مستقلة</span>
+      <span class="chip chip-amber">Cloudflare Purge مطلوب الآن</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

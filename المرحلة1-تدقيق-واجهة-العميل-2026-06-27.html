@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المرحلة 1 — تدقيق واجهة العميل · تووا</title>
+<style>
+  :root{--g:#0a7d4d;--gd:#075c39;--gl:#e6f4ec;--gold:#c8941f;--goldl:#fcf3dd;--red:#b3261e;--redl:#fdecea;--blue:#1565c0;--bluel:#eef6ff;--purp:#6d4ca8;--purpl:#f1ecfa;--ink:#1c2b25;--muted:#5b6b63;--line:#d9e4dd;--bg:#f4f8f5}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.85;font-size:14.5px}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 18px 90px}
+  header.hero{background:linear-gradient(135deg,#075c39,#0a7d4d 48%,#1565c0);color:#fff;padding:48px 30px;border-radius:0 0 28px 28px}
+  header.hero h1{margin:0 0 9px;font-size:24px;font-weight:800}
+  header.hero p{margin:4px 0;font-size:14px;opacity:.96}
+  .badge{display:inline-block;background:rgba(255,255,255,.18);padding:7px 15px;border-radius:30px;font-size:12.5px;margin-top:13px}
+  h2{color:var(--gd);font-size:19px;margin:32px 0 11px;padding:12px 15px;background:linear-gradient(90deg,var(--gl),transparent);border-radius:12px;display:flex;align-items:center;gap:10px;border-right:6px solid var(--g)}
+  h2 .n{background:var(--g);color:#fff;min-width:32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:0 0 auto}
+  h3{color:var(--gd);font-size:16px;margin:18px 0 7px;display:flex;align-items:center;gap:7px}
+  .summary{background:var(--gl);border:1px solid #bfe0cd;border-radius:16px;padding:18px 22px;margin:18px 0}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.5px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--g);color:#fff;font-weight:700;font-size:12px}
+  tr:last-child td{border-bottom:none}
+  code{background:#eef3f0;padding:1px 5px;border-radius:5px;font-size:11px;direction:ltr;display:inline-block}
+  .simple{background:var(--bluel);border-right:4px solid var(--blue);border-radius:9px;padding:9px 13px;margin:8px 0;font-size:13.5px}.simple b{color:var(--blue)}
+  .scn{background:#f6f3fb;border-right:4px solid var(--purp);border-radius:9px;padding:9px 13px;margin:7px 0;font-size:12.8px}.scn b{color:var(--purp)}
+  .risk{background:var(--goldl);border-right:4px solid var(--gold);border-radius:9px;padding:9px 13px;margin:7px 0;font-size:12.8px}.risk b{color:#8a6410}
+  ul{margin:6px 0;padding-right:20px}li{margin:4px 0;font-size:13px}
+  .diagram{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0;overflow-x:auto}
+  .flow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center;margin:6px 0}
+  .node{background:var(--gl);border:1.5px solid var(--g);border-radius:10px;padding:6px 10px;font-size:11.5px;font-weight:600;color:var(--gd);text-align:center}
+  .node.alt{background:var(--goldl);border-color:var(--gold);color:#8a6410}
+  .node.bad{background:var(--redl);border-color:var(--red);color:var(--red)}
+  .node.blue{background:var(--bluel);border-color:var(--blue);color:var(--blue)}
+  .arrow{font-size:16px;color:var(--muted)}
+  footer{margin-top:44px;padding-top:18px;border-top:2px solid var(--line);font-size:12px;color:var(--muted)}
+  .kpi{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+  .kpi .box{flex:1 1 120px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;text-align:center}
+  .kpi .box .big{font-size:21px;font-weight:800;color:var(--g)}.kpi .box .l{font-size:11.5px;color:var(--muted)}
+  .pg{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 17px;margin:13px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .pg .route{font-size:12px;color:var(--muted);direction:ltr;text-align:left;margin-bottom:6px}
+  .tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:10.5px;font-weight:700}
+  .guest{background:var(--gl);color:var(--gd)}.auth{background:var(--purpl);color:var(--purp)}
+  .toc{columns:2;font-size:13px}.toc a{display:block;margin:3px 0}
+</style></head>
+<body>
+<header class="hero">
+  <h1>🔍 المرحلة 1 — تدقيق عميق لواجهة العميل (Customer)</h1>
+  <p>تتبُّع كل صفحة · كل زرّ · كل متغيّر · كل مسار · كل سيناريو (مباشر · غير مباشر · حافّة) · كل تأثير متقاطع — بالملف:السطر.</p>
+  <p>المصدر: 3 فِرَق تقصٍّ للقراءة فقط مسحت كامل سطح العميل. بلغة بسيطة + رسوم.</p>
+  <span class="badge">📅 27 يونيو 2026 · المرحلة 1 من 5 · تدقيق فقط (بلا تعديل) · ملفّ منفصل (سيُجمَع لاحقًا)</span>
+</header>
+<div class="wrap">
+
+<div class="kpi">
+  <div class="box"><div class="big">14</div><div class="l">صفحة/مكوّن عميل دُقِّق</div></div>
+  <div class="box"><div class="big">70+</div><div class="l">زرّ/مدخل/رابط مُتتبَّع</div></div>
+  <div class="box"><div class="big">~120</div><div class="l">سيناريو (مباشر+غير مباشر+حافّة)</div></div>
+  <div class="box"><div class="big">9</div><div class="l">ملاحظة/فجوة مرصودة</div></div>
+</div>
+
+<div class="summary"><b>محتوى المرحلة 1:</b>
+<div class="toc">
+<a href="#map">① خريطة سطح العميل</a>
+<a href="#home">② الرئيسيّة + البوّابة الموحّدة</a>
+<a href="#browse">③ المزوّد + الفئات + البحث</a>
+<a href="#cart">④ السلّة (+ سِلالي)</a>
+<a href="#checkout">⑤ الدفع (الأغنى — البوّابات والوسائل)</a>
+<a href="#track">⑥ تتبّع الطلب</a>
+<a href="#hist">⑦ سجلّ الطلبات + إعادة الطلب</a>
+<a href="#wallet">⑧ المحفظة + التحويل</a>
+<a href="#loyal">⑨ الولاء + الإعدادات + الحظر</a>
+<a href="#nav">⑩ الشريط العلويّ + التنقّل</a>
+<a href="#cross">⑪ التأثيرات المتقاطعة</a>
+<a href="#risks">⑫ الملاحظات والفجوات</a>
+</div></div>
+
+<h2 id="map"><span class="n">①</span> خريطة سطح العميل (نظرة عامة)</h2>
+<div class="diagram"><svg viewBox="0 0 760 230" width="100%" style="max-width:760px;font-family:inherit">
+  <rect x="300" y="8" width="160" height="34" rx="9" fill="#0a7d4d"/><text x="380" y="30" text-anchor="middle" font-size="13" fill="#fff" font-weight="bold">🏠 الرئيسيّة /</text>
+  <rect x="20" y="70" width="150" height="30" rx="8" fill="#e6f4ec" stroke="#0a7d4d"/><text x="95" y="90" text-anchor="middle" font-size="11.5" fill="#075c39">🛍️ اطلب أيّ شيء</text>
+  <rect x="190" y="70" width="150" height="30" rx="8" fill="#e6f4ec" stroke="#0a7d4d"/><text x="265" y="90" text-anchor="middle" font-size="11.5" fill="#075c39">🏪 المزوّد/الفئات/البحث</text>
+  <rect x="360" y="70" width="120" height="30" rx="8" fill="#e6f4ec" stroke="#0a7d4d"/><text x="420" y="90" text-anchor="middle" font-size="11.5" fill="#075c39">🛒 السلّة</text>
+  <rect x="500" y="70" width="120" height="30" rx="8" fill="#fcf3dd" stroke="#c8941f"/><text x="560" y="90" text-anchor="middle" font-size="11.5" fill="#8a6410">💳 الدفع</text>
+  <rect x="640" y="70" width="100" height="30" rx="8" fill="#eef6ff" stroke="#1565c0"/><text x="690" y="90" text-anchor="middle" font-size="11.5" fill="#1565c0">📦 التتبّع</text>
+  <rect x="60" y="130" width="130" height="28" rx="8" fill="#f1ecfa" stroke="#6d4ca8"/><text x="125" y="149" text-anchor="middle" font-size="11" fill="#6d4ca8">💰 المحفظة/التحويل</text>
+  <rect x="210" y="130" width="120" height="28" rx="8" fill="#f1ecfa" stroke="#6d4ca8"/><text x="270" y="149" text-anchor="middle" font-size="11" fill="#6d4ca8">🎁 الولاء</text>
+  <rect x="350" y="130" width="140" height="28" rx="8" fill="#f1ecfa" stroke="#6d4ca8"/><text x="420" y="149" text-anchor="middle" font-size="11" fill="#6d4ca8">⚙️ الإعدادات/الحظر</text>
+  <rect x="510" y="130" width="120" height="28" rx="8" fill="#f1ecfa" stroke="#6d4ca8"/><text x="570" y="149" text-anchor="middle" font-size="11" fill="#6d4ca8">📋 سجلّ الطلبات</text>
+  <rect x="240" y="185" width="280" height="30" rx="9" fill="#1c2b25"/><text x="380" y="205" text-anchor="middle" font-size="12" fill="#d8f0e2">التنقّل السفليّ: الرئيسيّة · السلّة · طلباتي · المحفظة · الإعدادات</text>
+</svg></div>
+<div class="simple"><b>القاعدة الأساسيّة المكتشَفة:</b> الواجهة عميلٌ نحيف — كل المنطق الماليّ والتحقّق في الخادم. السلّة <b>أحاديّة المزوّد</b> (وغيرها محفوظٌ في «سِلالي»). أيّ POST/PUT/DELETE إمّا idempotent أو محميّ بتحقّق الخادم.</div>
+
+<h2 id="home"><span class="n">②</span> الرئيسيّة + البوّابة الموحّدة</h2>
+
+<div class="pg"><h3>🏠 HomePage <span class="tag auth">CUSTOMER</span></h3>
+<div class="route">/ (HomePage.tsx)</div>
+<table>
+<tr><th>الزرّ/المدخل</th><th>الفعل</th><th>المسار/النقطة</th><th>سيناريوهات</th></tr>
+<tr><td>«تابع ←» (لافتة استئناف)</td><td><code>navigate(/order/{id})</code></td><td>تتبّع</td><td>يظهر فقط لطلب جارٍ عمره &lt;48س (الأقدم يُخفى)</td></tr>
+<tr><td>«إلغاء» (اللافتة)</td><td><code>POST /orders/{id}/cancel</code></td><td>—</td><td>409 (تغيّرت الحالة) → تحديث صامت</td></tr>
+<tr><td>حبّة المكافآت</td><td><code>navigate(/loyalty)</code></td><td>—</td><td>تظهر فقط إن النقاط&gt;0 · fail-silent للضيف</td></tr>
+<tr><td><b>🛍️ «اطلب أيّ شيء تتخيّله»</b></td><td><code>navigate(/order-anything)</code></td><td>—</td><td>زرّ واحد (بعد الدمج) · العنوان الفرعيّ يتغيّر حسب تفعيل errand</td></tr>
+<tr><td>بحث (Enter)</td><td><code>navigate(/search?q=)</code> + حفظ بالأخيرة</td><td>—</td><td>كتابة حيّة تُرشّح الشبكة دون تنقّل؛ Enter ينقل</td></tr>
+<tr><td>رقائق نوع المتجر</td><td><code>setFilter(type)</code></td><td><code>GET /providers/search</code></td><td>نوع بلا مزوّدين → «قريبًا» معطّل</td></tr>
+<tr><td>بطاقة مزوّد</td><td><code>navigate(/provider/{id})</code></td><td>—</td><td>—</td></tr>
+</table>
+<div class="scn"><b>متغيّرات مفتاحيّة:</b> <code>filter</code> · <code>q</code> (بحث حيّ) · <code>recent</code> (localStorage ≤10) · <code>loc</code> (GPS مُخبّأ) · <code>loyaltyBal</code>. <b>تأثير متقاطع:</b> <code>loc</code> يُغذّي رسوم التوصيل في الفئات/البحث/الميزانيّة.</div></div>
+
+<div class="pg"><h3>🛍️ OrderAnythingPage (البوّابة الموحّدة) <span class="tag guest">ضيف مسموح</span></h3>
+<div class="route">/order-anything?intent=budget|errand (OrderAnythingPage.tsx)</div>
+<div class="simple"><b>بلغة بسيطة:</b> صفحة واحدة بمفتاحين: «تصفّح بميزانيّتك» و«اكتب طلبك». كل نيّة تعرض الصفحة الأصليّة كاملةً (<code>embedded</code> يُخفي ترويستها فقط) → <b>لا تُفقَد ميزة</b>.</div>
+<div class="flow">
+<div class="node">مفتاح: تصفّح بميزانيّتك</div><span class="arrow">↔</span><div class="node alt">مفتاح: اكتب طلبك</div>
+</div>
+<table>
+<tr><th>الزرّ</th><th>الفعل</th><th>السيناريو</th></tr>
+<tr><td>نيّة «budget»</td><td>يعرض <code>&lt;BudgetShopPage embedded/&gt;</code></td><td>بحث ضمن سقف سعر → طلب عاديّ بأيّ وسيلة</td></tr>
+<tr><td>نيّة «errand»</td><td>يعرض <code>&lt;ErrandPage embedded/&gt;</code></td><td>إن errand مطفأة → بطاقة «غير متاحة»؛ وإلا طلب حرّ بمحفظة + تكلفة فعليّة</td></tr>
+</table></div>
+
+<div class="pg"><h3>✍️ ErrandPage («اطلب أيّ شيء») <span class="tag auth">CUSTOMER</span> · 🛒 BudgetShopPage <span class="tag guest">ضيف</span></h3>
+<table>
+<tr><th>الصفحة</th><th>المدخلات/الأزرار</th><th>قواعد التحقّق</th></tr>
+<tr><td>Errand</td><td>وصف (≤500) · متجر هدف (اختياريّ، ≤120) · ميزانيّة · عنوان · «اشحن المحفظة» · «اطلب المشوار»</td><td>مفعّل · وصف&gt;0 · ميزانيّة&gt;0 · ≤الحدّ الأقصى · ≤رصيد المحفظة · عنوان مختار · دفع <b>محفظة فقط</b> · idem <code>errand-{ts}</code></td></tr>
+<tr><td>Budget</td><td>ميزانيّة · صنف (اختياريّ) · «بحث» · +/− لكل صنف · «تابع الطلب من {متجر}»</td><td>ميزانيّة&gt;0 · «+» معطّل إن السعر&gt;المتبقّي · أصناف من عدّة متاجر → «كل طلب من متجر واحد»</td></tr>
+</table>
+<div class="risk"><b>حافّة errand:</b> طلب يحوي محتوًى ممنوعًا (خمر/مخدّر…) → الخادم يرفض بـ<code>ERRAND_CONTENT_BLOCKED</code> → رسالة ودّيّة. <b>شريط ميزانيّة حيّ</b> يتحدّث مع كل +/−.</div></div>
+
+<h2 id="browse"><span class="n">③</span> المزوّد + الفئات + البحث</h2>
+<div class="pg"><h3>🏪 ProviderDetailPage <span class="tag guest">ضيف</span></h3>
+<div class="route">/provider/:id (ProviderDetailPage.tsx)</div>
+<table>
+<tr><th>الزرّ</th><th>الفعل</th><th>سيناريوهات/حافّة</th></tr>
+<tr><td>«+» على صنف</td><td><code>handleAddItem</code> → جلب التفاصيل → نافذة تخصيص أو إضافة مباشرة</td><td><b>تبديل مزوّد:</b> «سنحفظ سلّتك في سِلالي ونبدأ سلّة جديدة» (تأكيد) · معطّل إن المتجر مغلق</td></tr>
+<tr><td>«−»</td><td><code>cart.decrement(id)</code></td><td>—</td></tr>
+<tr><td>🚫 «حظر هذا المتجر»</td><td>تأكيد → <code>POST /customer/blocklist</code> → <code>navigate(/)</code></td><td>يُسجَّل الحظر (إخفاؤه من التصفّح = متمّمة لاحقة)</td></tr>
+<tr><td>🛒 «{عدد} — {مجموع}»</td><td><code>navigate(/checkout/{id})</code></td><td>يظهر إن السلّة&gt;0 لهذا المزوّد</td></tr>
+<tr><td>«تأكيد الطلب» (شريط لاصق)</td><td><code>navigate(/checkout/{id})</code></td><td>معطّل إن دون الحدّ الأدنى أو المتجر مغلق</td></tr>
+<tr><td>نافذة التخصيص: «أضف إلى السلة»</td><td><code>cart.add(...)</code></td><td>معطّل حتى تُختار المجموعات الإلزاميّة · السعر = الأساس + الإضافات − المحذوف</td></tr>
+</table>
+<div class="scn"><b>حالات المتجر:</b> <code>storeOpen = is_currently_open ?? active_now ?? true) && (is_accepting_orders ?? true)</code> → مغلق: لافتة + أزرار معطّلة. <b>الحدّ الأدنى:</b> لكل مزوّد؛ شريط لاصق يوجّه «أضف X».</div></div>
+
+<div class="pg"><h3>📂 CategoryPage · 🔎 SearchResultsPage <span class="tag guest">ضيف</span></h3>
+<table>
+<tr><th>الصفحة</th><th>الأزرار</th><th>سيناريو</th></tr>
+<tr><td>Category</td><td>فئة فرعيّة (تنقّل) · فرز (شعبيّة/الأرخص/الأغلى) · بطاقة صنف → المزوّد · «إعادة المحاولة»</td><td>فرع → فئات فرعيّة؛ ورقة → أصناف · رسم توصيل حيّ إن GPS معروف وإلا «من X»</td></tr>
+<tr><td>Search</td><td>إدخال (debounce 300ms) · مفتاحان (أصناف/مطاعم) · بطاقة → المزوّد</td><td>جلب متوازٍ (Promise.allSettled)؛ فشل أحدهما لا يكسر الآخر · مزوّد مغلق → باهت غير قابل للنقر</td></tr>
+</table></div>
+
+<h2 id="cart"><span class="n">④</span> السلّة (+ «سِلالي» متعدّدة المزوّدين)</h2>
+<div class="pg"><h3>🛒 CartPage <span class="tag auth">CUSTOMER</span></h3>
+<div class="route">/cart (CartPage.tsx)</div>
+<table>
+<tr><th>الزرّ</th><th>الفعل</th><th>سيناريو مباشر</th><th>غير مباشر/حافّة</th></tr>
+<tr><td>«+»/«−»</td><td>زيادة/إنقاص محلّيًّا</td><td>المجموع يتحدّث</td><td>قد يفعّل الدفع لو تجاوز الحدّ الأدنى؛ صفر → السلّة تُفرَغ</td></tr>
+<tr><td>«متابعة للدفع»</td><td><code>navigate(/checkout/{id})</code></td><td>—</td><td><b>معطّل</b> إن المتجر مغلق أو دون الحدّ الأدنى</td></tr>
+<tr><td>«أضف المزيد من المتجر»</td><td><code>navigate(/provider/{id})</code></td><td>—</td><td>—</td></tr>
+<tr><td>«إفراغ السلة»</td><td><code>clear()</code></td><td>تُفرَغ النشطة</td><td><b>لا تمسح «سِلالي»</b> (محفوظات المزوّدين الآخرين تبقى)</td></tr>
+<tr><td>«استئناف» (سِلالي)</td><td><code>resumeBasket(pid)</code></td><td>سلّة محفوظة تصير نشطة</td><td>النشطة الحاليّة تُحفَظ؛ لو فارغة لا تُحفَظ</td></tr>
+<tr><td>🗑 «حذف المحفوظة»</td><td><code>discardBasket(pid)</code></td><td>تُحذف نهائيًّا</td><td>القسم يختفي إن لم يبقَ محفوظ</td></tr>
+</table>
+<div class="diagram"><div class="flow">
+<div class="node">سلّة (أ) نشطة</div><span class="arrow">+صنف (ب)</span><div class="node">نشط: (ب)</div><span class="arrow">+</span><div class="node alt">🧺 محفوظ: (أ)</div><span class="arrow">→</span><div class="node blue">«سِلالي»: استئناف/حذف</div>
+</div></div>
+<div class="risk"><b>حافّة:</b> مزوّد محفوظ حُذف لاحقًا → سلّته تبقى خاملة (استئناف/حذف فقط). <b>لا سقف للكميّة</b> (الخادم يتحقّق عند الإنشاء). يُجلَب <code>GET /providers/{id}</code> (fail-open: min=0, accepting=true عند الخطأ).</div></div>
+
+<h2 id="checkout"><span class="n">⑤</span> الدفع — الصفحة الأغنى (البوّابات والوسائل)</h2>
+<div class="pg"><h3>💳 CheckoutPage <span class="tag auth">CUSTOMER</span></h3>
+<div class="route">/checkout/:providerId (CheckoutPage.tsx) — ~1400 سطر</div>
+<div class="simple"><b>بلغة بسيطة:</b> هنا يجتمع كل شيء: نوع التسليم · العنوان · الملاحظات · الإكراميّة · وسيلة الدفع · <b>الدفع المجزّأ</b> (نقاط/محفظة/بطاقة/نقد) · الجدولة · و<b>5 بوّابات أمان</b> قد تظهر قبل الإتمام.</div>
+<h3>أ) المدخلات والأزرار (مختصر)</h3>
+<table>
+<tr><th>المجموعة</th><th>العناصر</th><th>الأثر</th></tr>
+<tr><td>نوع التسليم</td><td>🛵 توصيل / 🏪 استلام ذاتي</td><td>توصيل: عنوان+رسم+إكراميّة؛ استلام: لا عنوان، رسم=0، «ملاحظات للمتجر»، لا إكراميّة</td></tr>
+<tr><td>الجدولة</td><td>datetime-local</td><td>فارغ=فورًا؛ معبّأ→حالة SCHEDULED (يُحوَّل UTC)</td></tr>
+<tr><td>وسيلة الدفع</td><td>نقد/محفظة/بطاقة (غير المتاح «قريبًا» معطّل)</td><td>aria-pressed · فارغ المتاح → «لا طريقة دفع»</td></tr>
+<tr><td>العنوان</td><td>منسدلة + «من الخريطة» (للتوصيل)</td><td>تغييره يُعيد حساب الرسم والخصم فورًا</td></tr>
+<tr><td>الملاحظات</td><td>7 رقائق سريعة + نصّ (≤300)</td><td>الرقائق تُلحَق بـ«، »</td></tr>
+<tr><td>مستلِم بديل</td><td>صندوق + اسم + هاتف</td><td>يُرسَلان إن مُلِئا</td></tr>
+<tr><td>الإكراميّة</td><td>0/1/2/5 د.ل (نقد+توصيل فقط)</td><td>سقف 100 د.ل · تُضاف فوق الإجماليّ المقرَّب</td></tr>
+<tr><td><b>الدفع المجزّأ</b></td><td>مفتاح + نقاط + محفظة + بطاقة(قريبًا) + ملخّص</td><td>النقاط ≤ البضاعة؛ المجموع ≤ الإجماليّ وإلا لا يُفعَّل؛ الباقي نقدًا (مقرَّب ¼ دينار)</td></tr>
+</table>
+<h3>ب) بوّابات الأمان الخمس (تظهر بعد محاولة الإتمام)</h3>
+<div class="diagram"><svg viewBox="0 0 760 150" width="100%" style="max-width:760px">
+  <rect x="300" y="8" width="160" height="30" rx="8" fill="#c8941f"/><text x="380" y="28" text-anchor="middle" font-size="12" fill="#fff" font-weight="bold">«تقديم الطلب»</text>
+  <text x="380" y="52" text-anchor="middle" font-size="11" fill="#5b6b63">الخادم قد يردّ بأحد الرموز ↓</text>
+  <rect x="8" y="66" width="142" height="48" rx="8" fill="#fdecea" stroke="#b3261e"/><text x="79" y="84" text-anchor="middle" font-size="10.5" fill="#b3261e">OTP_REQUIRED_FOR_COD</text><text x="79" y="102" text-anchor="middle" font-size="10" fill="#b3261e">رمز تحقّق</text>
+  <rect x="158" y="66" width="142" height="48" rx="8" fill="#fdecea" stroke="#b3261e"/><text x="229" y="84" text-anchor="middle" font-size="10.5" fill="#b3261e">WALLET_STEP_UP</text><text x="229" y="102" text-anchor="middle" font-size="10" fill="#b3261e">OTP للمحفظة</text>
+  <rect x="308" y="66" width="142" height="48" rx="8" fill="#fdecea" stroke="#b3261e"/><text x="379" y="84" text-anchor="middle" font-size="10.5" fill="#b3261e">OUTSTANDING_DEBT</text><text x="379" y="102" text-anchor="middle" font-size="10" fill="#b3261e">ادفع رسم عدم الحضور</text>
+  <rect x="458" y="66" width="142" height="48" rx="8" fill="#fdecea" stroke="#b3261e"/><text x="529" y="84" text-anchor="middle" font-size="10.5" fill="#b3261e">TERMS_NOT_ACCEPTED</text><text x="529" y="102" text-anchor="middle" font-size="10" fill="#b3261e">موافقة الشروط</text>
+  <rect x="608" y="66" width="144" height="48" rx="8" fill="#fdecea" stroke="#b3261e"/><text x="680" y="84" text-anchor="middle" font-size="10" fill="#b3261e">COD_BLOCKED_HIGH_RISK</text><text x="680" y="102" text-anchor="middle" font-size="10" fill="#b3261e">حظر COD عالي الخطر</text>
+  <rect x="240" y="122" width="280" height="24" rx="7" fill="#0f261c"/><text x="380" y="138" text-anchor="middle" font-size="11" fill="#d8f0e2">كلٌّ يُعالَج ثم يُعاد الإرسال تلقائيًّا</text>
+</svg></div>
+<h3>ج) رموز الخطأ المُعالَجة (UI)</h3>
+<table>
+<tr><th>الرمز</th><th>المعالجة</th></tr>
+<tr><td>OTP_REQUIRED_FOR_COD / WALLET_STEP_UP_REQUIRED</td><td>جلب الهاتف → إرسال OTP → إدخال → تحقّق → إعادة الإرسال بـtoken</td></tr>
+<tr><td>OUTSTANDING_DEBT</td><td>زرّ «ادفع من المحفظة» → سداد كل الديون → إعادة</td></tr>
+<tr><td>TERMS_NOT_ACCEPTED</td><td>عرض الوثائق → قبول click-wrap → إعادة</td></tr>
+<tr><td>COD_BLOCKED_HIGH_RISK / COD_FRAUD_HIGH_RISK</td><td>رسالة: «يتطلّب دفعًا مسبقًا (محفظة) أو استلامًا ذاتيًّا»</td></tr>
+<tr><td>WALLET_INSUFFICIENT_FUNDS</td><td>تحذير استباقيّ قبل الإرسال + ملاحظة «تواصل مع الدعم» بعده</td></tr>
+<tr><td>TENDER_SUM_MISMATCH / POINTS_EXCEED_GOODS</td><td>الواجهة تمنعها مسبقًا (تقريب/سقف)؛ وإلا رسالة عامّة</td></tr>
+</table>
+<div class="scn"><b>سيناريو الفكّة:</b> إجماليّ 1.600 → يُقرَّب نقدًا إلى 1.500 (دلتا −0.100 تظهر سطرًا)؛ المحفظة تدفع بالضبط بلا تقريب. <b>سيناريو الرسم فشل:</b> <code>feeQuoteFailed</code> → يُسمَح بالإرسال (الخادم يُعيد الحساب) فلا شحنٌ خاطئ.</div></div>
+
+<h2 id="track"><span class="n">⑥</span> تتبّع الطلب</h2>
+<div class="pg"><h3>📦 OrderTrackingPage <span class="tag auth">CUSTOMER</span></h3>
+<div class="route">/order/:id (OrderTrackingPage.tsx) — ~1500 سطر</div>
+<table>
+<tr><th>الميزة/الزرّ</th><th>المسار</th><th>السيناريو</th></tr>
+<tr><td>خريطة السائق الحيّة</td><td>SSE + استطلاع 10ث احتياطًا</td><td>«السائق على وشك الوصول» (صوت+اهتزاز، حارس عدم تكرار)</td></tr>
+<tr><td>«إلغاء الطلب»</td><td><code>POST /orders/{id}/cancel</code> + تأكيد</td><td>سبب من 4 خيارات · حارس النقر المزدوج</td></tr>
+<tr><td>«تقديم شكوى»</td><td>اقتراح فئة (NLP عند ≥8 أحرف) → <code>POST /operations/complaints/{id}</code></td><td>SLA عدّاد · فشل الاقتراح صامت</td></tr>
+<tr><td>«فتح نزاع ماليّ»</td><td><code>POST /operations/disputes</code> (DELIVERED · سبب ≥10)</td><td>409 = موجود → نجاح</td></tr>
+<tr><td>تقييم المزوّد + السائق (مستقلّان)</td><td><code>POST /orders/{id}/ratings</code></td><td>409 (سبق التقييم) → نجاح صامت</td></tr>
+<tr><td>قبول/رفض البديل</td><td><code>POST .../substitutions/{id}/respond</code></td><td>تحديث تفاؤليّ + تراجع عند الخطأ</td></tr>
+<tr><td>لا سائق</td><td>«إلغاء واسترداد»</td><td>WALLET → استرداد · CASH → لم يُخصَم</td></tr>
+<tr><td>مشاركة الموقع الحيّ</td><td><code>POST /customer/me/location/{id}</code> كل 12ث</td><td>رفض GPS صامت؛ يتوقّف خارج حالات السائق النشطة</td></tr>
+</table></div>
+
+<h2 id="hist"><span class="n">⑦</span> سجلّ الطلبات + إعادة الطلب</h2>
+<div class="pg"><h3>📋 OrderHistoryPage <span class="tag auth">CUSTOMER</span></h3>
+<table>
+<tr><th>الزرّ</th><th>الفعل</th><th>سيناريو</th></tr>
+<tr><td>مفاتيح الفلترة (الكل/نشطة/منتهية/ملغاة/نزاع)</td><td><code>setFilter</code></td><td>تجميع الحالات (12 حالة نشطة)</td></tr>
+<tr><td>«تتبّع»/«عرض»</td><td><code>navigate(/order/{id})</code></td><td>حسب الحالة النشطة</td></tr>
+<tr><td><b>«إعادة الطلب»</b></td><td><code>GET /orders/{id}</code> → ملء السلّة → <code>navigate(/provider/{pid})</code></td><td>للمراجعة قبل الدفع · مخفيّ لـerrand</td></tr>
+<tr><td>«تقييم»</td><td>نافذة ThreeLayerRating</td><td>DELIVERED فقط</td></tr>
+<tr><td>«عرض المزيد»</td><td><code>fetchNextPage</code> (cursor)</td><td>ترقيم لا نهائيّ</td></tr>
+</table>
+<div class="scn"><b>إعادة الطلب (دقيق):</b> تحفظ <code>removed_component_ids</code> و<code>customized_price_minor</code> و<code>variant_id</code> و<code>modifier_option_ids</code> → نفس الوجبة تمامًا، ثم صفحة المزوّد للتعديل.</div></div>
+
+<h2 id="wallet"><span class="n">⑧</span> المحفظة + التحويل</h2>
+<div class="pg"><h3>💰 WalletPage · ↗ WalletTransferPage <span class="tag auth">CUSTOMER</span></h3>
+<table>
+<tr><th>الصفحة</th><th>الأزرار/المسار</th><th>سيناريو/حماية</th></tr>
+<tr><td>المحفظة</td><td>شحن (آلة حالة OTP) · «ادفع من المحفظة» (دين) · تفاصيل المعاملة · «↗ تحويل»</td><td>الشحن مُعطَّل («قريبًا») · الدين يحجب طلبات جديدة حتى السداد</td></tr>
+<tr><td>التحويل</td><td>رقم/هاتف/QR · «متابعة» (resolve) · «تأكيد التحويل» (idempotent)</td><td><b>حارس التحويل للنفس</b> (مقارنة رقم/هاتف مطبَّعَين) · رصيد لا يكفي → تحذير · PENDING للمبالغ الكبيرة</td></tr>
+</table>
+<div class="risk"><b>ملاحظة:</b> الرصيد ونقاط الولاء يُجلَبان مرّةً واحدة → قد يكونان قديمَين لو شُحِنت في تبويب آخر (الخادم يُعيد التحقّق).</div></div>
+
+<h2 id="loyal"><span class="n">⑨</span> الولاء + الإعدادات + الحظر</h2>
+<div class="pg"><h3>🎁 LoyaltyPage · ⚙️ CustomerSettings <span class="tag auth">CUSTOMER</span></h3>
+<table>
+<tr><th>الصفحة</th><th>أبرز الأزرار</th><th>سيناريو</th></tr>
+<tr><td>الولاء</td><td>نسخ الرمز · مشاركة واتساب · «استخدم الرمز»</td><td>رموز: SELF_REFERRAL/ALREADY_REDEEMED/INVALID_CODE/LOYALTY_DISABLED</td></tr>
+<tr><td>الإعدادات</td><td>الخصوصيّة (هاتف/موقع) · <b>المحظورون (فكّ الحظر)</b> · الإشعارات (مصفوفة قناة×فئة، مقفولة للمعاملاتيّ) · اللغة/الثيم · توثيق البريد (OTP) · الدعم/حذف الحساب</td><td>فكّ الحظر: <code>DELETE /customer/blocklist/{id}</code> (فشل صامت) · حفظ التفضيل: <code>PUT /customer/me/preferences</code></td></tr>
+<tr><td>العناوين</td><td>إضافة/تعديل/حذف(تأكيد)/«⭐ تعيين»/نسخ Plus Code/«إعادة المحاولة»</td><td>تحذير «بلا موقع» (يحجب حساب الرسم بالدفع)</td></tr>
+</table></div>
+
+<h2 id="nav"><span class="n">⑩</span> الشريط العلويّ + التنقّل السفليّ</h2>
+<div class="pg"><h3>🧭 Layout</h3>
+<div class="simple"><b>بعد الإصلاح:</b> الشريط نظيف بصفّ واحد — يسارًا الشعار + ترحيب صغير مقصوص؛ يمينًا <code>🎁 النقاط</code> + الثيم + اللغة + قائمة الحساب. التنقّل السفليّ (عميل): الرئيسيّة · السلّة (شارة العدد) · طلباتي · المحفظة · الإعدادات.</div>
+<table>
+<tr><th>العنصر</th><th>الفعل</th></tr>
+<tr><td>حبّة 🎁 النقاط</td><td><code>navigate(/loyalty)</code> (تظهر دائمًا للعميل)</td></tr>
+<tr><td>الثيم ☀️/🌙</td><td><code>flipTheme()</code> (متغيّرات CSS)</td></tr>
+<tr><td>اللغة AR/EN/FR</td><td><code>switchLang()</code> + <code>document.dir</code></td></tr>
+<tr><td>قائمة الحساب → خروج</td><td><code>logout()</code> (مسح الرموز)</td></tr>
+</table></div>
+
+<h2 id="cross"><span class="n">⑪</span> التأثيرات المتقاطعة (كيف تؤثّر الأجزاء على بعضها)</h2>
+<table>
+<tr><th>المصدر</th><th>الأثر</th></tr>
+<tr><td>السلّة (إضافة من مزوّد آخر)</td><td>تحفظ سلّة المزوّد السابق في «سِلالي» (لا تمسح)</td></tr>
+<tr><td>الإعدادات: مشاركة الموقع</td><td>تُفعّل زرّ المشاركة الحيّة في التتبّع</td></tr>
+<tr><td>دين عدم الحضور</td><td>يحجب الدفع حتى السداد من المحفظة</td></tr>
+<tr><td>اختيار العنوان</td><td>يُعيد حساب الرسم والخصم فورًا + يُحفظ كافتراضيّ</td></tr>
+<tr><td>تفضيلات الإشعار (صوت/اهتزاز)</td><td>تتبّع الطلب يحترمها عند تنبيه قرب السائق</td></tr>
+<tr><td>GPS المُخبّأ</td><td>يُغذّي رسوم التوصيل في الفئات/البحث/الميزانيّة</td></tr>
+<tr><td>الحظر (سائق)</td><td>التوزيع يستبعده (خلفيّة — المرحلة 4)</td></tr>
+</table>
+
+<h2 id="risks"><span class="n">⑫</span> الملاحظات والفجوات المرصودة (ما وجدته)</h2>
+<table>
+<tr><th>#</th><th>الملاحظة</th><th>الأثر</th><th>المستوى</th></tr>
+<tr><td>1</td><td>لا حقل «كود خصم» في الدفع (الخصم تلقائيّ فقط)</td><td>عميل بكود لا يستطيع إدخاله</td><td>فجوة متوسطة</td></tr>
+<tr><td>2</td><td>OTP بلا زرّ «إعادة إرسال» ظاهر</td><td>لو انتهى الرمز، تجربة أصعب</td><td>تحسين UX</td></tr>
+<tr><td>3</td><td>الجدولة بلا <code>min={now}</code> → يُمكن اختيار وقت ماضٍ (الواجهة)</td><td>الخادم يتحقّق؛ تجربة أنظف ممكنة</td><td>منخفض</td></tr>
+<tr><td>4</td><td>وسائل دفع فارغة → العميل عالق («لا طريقة دفع»)</td><td>حالة نادرة لكنّها حظر</td><td>حافّة</td></tr>
+<tr><td>5</td><td>الرصيد/النقاط يُجلبان مرّة → قد يقدُمان</td><td>تحذير قد يكون قديمًا (الخادم يحسم)</td><td>منخفض</td></tr>
+<tr><td>6</td><td>المتجر المحظور لا يُخفى من التصفّح بعد (متمّمة)</td><td>الحظر مسجَّل لكن أثره للمتاجر غير مرئيّ</td><td>متمّمة معروفة</td></tr>
+<tr><td>7</td><td>لا سقف ظاهر للكميّة في السلّة</td><td>الخادم يتحقّق عند الإنشاء</td><td>منخفض</td></tr>
+<tr><td>8</td><td>مزوّد يُغلق بين السلّة والدفع → نجاح محلّيّ ثم رفض الخادم</td><td>تجربة: رسالة متأخّرة بدل مبكّرة</td><td>منخفض</td></tr>
+<tr><td>9</td><td>تخبئة GPS قد تُبقي رسمًا قديمًا عند التنقّل</td><td>تحديث الصفحة يحسمه</td><td>منخفض</td></tr>
+</table>
+<div class="simple"><b>إيجابيّات مؤكَّدة:</b> الواجهة لا تكتب بقاعدة البيانات مباشرةً — كل إنشاء/إلغاء يتحقّق منه الخادم؛ حُرّاس idempotency على التحويل/الطلب؛ بوّابات أمان متدرّجة؛ fail-open/fail-silent حيث يجب؛ تقريب الفكّة دقيق؛ تعدّد المزوّدين دون خسارة.</div>
+
+<footer>
+<p><b>المرحلة 1 (العميل) — اكتملت.</b> 14 صفحة/مكوّن · 70+ زرّ · ~120 سيناريو · 9 ملاحظات — كلٌّ بالملف:السطر. <b>التالي:</b> المرحلة 2 (المزوّد + السائق). ثم 3 (OPS) · 4 (الخلفيّة) · 5 (التكامل والمخاطر) · ثم التقرير الجامع.</p>
+<p style="margin-top:8px">📄 المرحلة 1 — تدقيق واجهة العميل · <b>تووا</b> · 27 يونيو 2026 · New Folder 10</p>
+</footer>
+</div></body></html>

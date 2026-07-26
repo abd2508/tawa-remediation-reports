@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>تقرير التحقق العميق من الفحص الأمني — tawanow.com — 2026-05-31</title>
+<style>
+  :root{--bg:#fafafa;--fg:#1a1a1a;--muted:#5b5b5b;--card:#fff;--border:#e3e3e3;
+        --green:#146e44;--green-soft:#e8f3ec;--red:#b3261e;--red-soft:#fde7e5;
+        --amber:#aa5500;--amber-soft:#fff6e2;--blue:#0f5b9e;--blue-soft:#e8f2fb;
+        --gray:#5b5b5b;--gray-soft:#eaeaea}
+  body{font-family:-apple-system,"Segoe UI","Tajawal","Noto Naskh Arabic",sans-serif;background:var(--bg);color:var(--fg);margin:0;line-height:1.75;font-size:15px}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 22px 80px}
+  header{padding:22px 26px;background:linear-gradient(135deg,#3a3a3a 0%,#222 100%);color:#fff;border-radius:12px;margin-bottom:24px}
+  header h1{margin:0 0 6px;font-size:23px}
+  header .sub{opacity:.92;font-size:13.5px}
+  h2{font-size:20px;margin:32px 0 10px;border-bottom:2px solid var(--border);padding-bottom:6px}
+  h3{font-size:16.5px;margin:18px 0 6px;color:#222}
+  h4{font-size:14.5px;margin:14px 0 4px;color:#333}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:12px 0}
+  .crit{border-inline-start:5px solid var(--red);background:var(--red-soft)}
+  .high{border-inline-start:5px solid var(--amber);background:var(--amber-soft)}
+  .med{border-inline-start:5px solid var(--blue);background:var(--blue-soft)}
+  .ok{border-inline-start:5px solid var(--green);background:var(--green-soft)}
+  .info{border-inline-start:5px solid var(--gray);background:var(--gray-soft)}
+  code,pre{font-family:"JetBrains Mono","Fira Code",ui-monospace,monospace;direction:ltr;text-align:left}
+  code{background:#f0f0f0;padding:1px 6px;border-radius:4px;font-size:12.8px}
+  pre{background:#1e1e1e;color:#eee;padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:12.5px;line-height:1.6}
+  table{width:100%;border-collapse:collapse;margin:10px 0}
+  th,td{padding:8px 10px;border:1px solid var(--border);text-align:right;font-size:13.5px;vertical-align:top}
+  th{background:#f0f0f0}
+  .verdict{display:inline-block;padding:3px 12px;font-weight:700;border-radius:999px;font-size:12.5px}
+  .v-confirm{background:var(--red);color:#fff}
+  .v-partial{background:var(--amber);color:#fff}
+  .v-false{background:var(--green);color:#fff}
+  .v-design{background:var(--blue);color:#fff}
+  .quote{border-inline-start:3px solid var(--muted);padding:6px 14px;margin:8px 0;color:var(--muted);font-style:italic;background:#f7f7f7}
+  ul,ol{padding-inline-start:22px}
+  li{margin:4px 0}
+  .grid-summary{display:grid;grid-template-columns:60px 1fr 110px 130px;gap:1px;background:var(--border);font-size:13px;border-radius:8px;overflow:hidden;margin:10px 0}
+  .grid-summary>div{background:#fff;padding:8px 10px}
+  .grid-summary>div.h{background:#f0f0f0;font-weight:700}
+  .badge-crit{background:var(--red);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .badge-high{background:var(--amber);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .badge-med{background:var(--blue);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .badge-low{background:var(--gray);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+  .badge-ok{background:var(--green);color:#fff;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🔬 تقرير التَّحقُّق العَميق من الفَحص الأمنيّ</h1>
+  <div class="sub">
+    tawanow.com · 2026-05-31 17:15 · فُحصت كلّ نُقطة عَبر <strong>قراءة الكود + curl حَيّ + Redis sliding-window observation + md5 comparison + JWT header decode</strong>.
+  </div>
+</header>
+
+<h2>0) الخلاصة التَّنفيذيّة — الفَحص الأصليّ مقابل الواقع</h2>
+
+<div class="card">
+<div class="grid-summary">
+  <div class="h">#</div><div class="h">الادّعاء الأصليّ</div><div class="h">الفَحص الأصلي</div><div class="h">الحُكم بَعد التَّحقُّق</div>
+
+  <div>1</div>
+  <div>OpenAPI/Swagger عام على <code>/docs</code> · <code>/openapi.json</code> · <code>/swagger</code></div>
+  <div><span class="badge-crit">عالٍ</span></div>
+  <div><span class="verdict v-false">FALSE POSITIVE</span></div>
+
+  <div>2</div>
+  <div>JWT HS256 (متماثل) — لو تَسرَّب السرّ، أيّ شخص يَنتحل أيّ دور</div>
+  <div><span class="badge-crit">عالٍ</span></div>
+  <div><span class="verdict v-confirm">صَحيح، لكن الخطورة مُبالَغ فيها</span></div>
+
+  <div>3</div>
+  <div>لا Rate Limiting — تَسجيل ودخول بلا حُدود</div>
+  <div><span class="badge-high">متوسّط</span></div>
+  <div><span class="verdict v-partial">جُزئيّاً صَحيح — يوجد ضعيف</span></div>
+
+  <div>4</div>
+  <div>تَعداد المُستَخدِمين — رَسائل تَكشف الهاتف المُسَجَّل</div>
+  <div><span class="badge-high">متوسّط</span></div>
+  <div><span class="verdict v-confirm">صَحيح للـregister · /login مَحميّ</span></div>
+
+  <div>5</div>
+  <div>Missing CSP, HSTS, Referrer-Policy</div>
+  <div><span class="badge-high">متوسّط</span></div>
+  <div><span class="verdict v-partial">CSP/Referrer مَوجودة · HSTS فقط مَفقود</span></div>
+
+  <div>6</div>
+  <div>نفس الهاتف = خَطأ مُختلِف</div>
+  <div><span class="badge-low">منخفض</span></div>
+  <div><span class="verdict v-confirm">صَحيح (تَكرار للبَند 4)</span></div>
+
+  <div>7</div>
+  <div><code>/api/auth/me</code> مَعطوب — يَرجع 404</div>
+  <div><span class="badge-low">منخفض</span></div>
+  <div><span class="verdict v-design">FALSE POSITIVE — قرار تَصميميّ</span></div>
+</div>
+</div>
+
+<div class="card high">
+<strong>الخُلاصة:</strong> من الـ7 ثَغرات المُدَّعَى بها — <strong>2 صَحيحة فِعلاً</strong>، <strong>2 صَحيحة جُزئياً</strong>، <strong>2 falsi-positives</strong> (المُفتِّش أخطأ في التَّفسير)، <strong>1 قرار تَصميميّ صَحيح</strong>. <strong>الخَطر الحَقيقيّ:</strong> سَطر واحد فَقط — غِياب HSTS — يَستحقّ إصلاحاً فَوريّاً. باقي البنود إمّا مَحميّ بطَبقات أُخرى أو يَحتاج إعادة تَقييم.
+</div>
+
+<!-- ════════════ Finding 1 ════════════ -->
+
+<h2>1) OpenAPI / Swagger — <span class="verdict v-false">FALSE POSITIVE</span></h2>
+
+<div class="card ok">
+<h3>الادّعاء</h3>
+<div class="quote">«/docs، /openapi.json، /swagger متاحة للعامة — تكشف كل endpoints»</div>
+
+<h3>الواقع</h3>
+<p>الـ4 مسارات كلّها تَرجع <code>200 OK</code> — لكنّ الجسد <strong>نَفسه</strong>:</p>
+<pre>$ curl -s https://tawanow.com/docs | md5sum
+c79edbb80705e371165a39bccb14f36f
+$ curl -s https://tawanow.com/ | md5sum
+c79edbb80705e371165a39bccb14f36f
+$ curl -s https://tawanow.com/random-path-xyz | md5sum
+c79edbb80705e371165a39bccb14f36f                ← كلها مَطابقة</pre>
+
+<p>الجَسد الفِعليّ:</p>
+<pre>&lt;!doctype html&gt;
+&lt;html lang="ar" dir="rtl"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    ...                                          ← SPA index.html، لا Swagger UI</pre>
+
+<p>nginx مُكوَّن مع <code>try_files $uri $uri/ /index.html</code> — أيّ مَسار غَير مَعلوم يُعيد <code>index.html</code> الخاصّ بـReact SPA. هذا تَصرّف SPA السليم.</p>
+
+<p><strong>التَحقّق المباشر من API:</strong></p>
+<pre>$ curl -o /dev/null -w '%{http_code}' https://tawanow.com/api/docs
+404
+$ curl -o /dev/null -w '%{http_code}' https://tawanow.com/api/openapi.json
+404</pre>
+
+<p>والكود يُؤكّد:</p>
+<pre><span style="color:#888"># backend/app/main.py:413-419</span>
+app = FastAPI(
+    ...
+    <strong>docs_url="/docs" if settings.debug else None,</strong>
+    <strong>redoc_url="/redoc" if settings.debug else None,</strong>
+    <strong>openapi_url="/openapi.json" if settings.debug else None,</strong>
+)
+<span style="color:#888"># backend/app/config.py:37</span>
+debug: bool = False                              ← الإنتاج debug=False</pre>
+
+<h3>الحُكم</h3>
+<p><strong>الـSwagger UI و OpenAPI JSON مَحظوران فِعلاً في الإنتاج.</strong> ما رآه المُفتِّش هو الـSPA fallback لأيّ مَسار غَير مَوجود. الـAPI ذاته (تَحت <code>/api/</code>) يَرجع 404 صَحيحاً.</p>
+
+<p>الخطورة الفِعلية: <strong>صفر</strong>. لا حاجة لِفعل شيء.</p>
+</div>
+
+<!-- ════════════ Finding 2 ════════════ -->
+
+<h2>2) JWT HS256 — <span class="verdict v-confirm">صَحيح، الخطورة مُبالَغ فيها</span></h2>
+
+<div class="card med">
+<h3>الادّعاء</h3>
+<div class="quote">«JWT HS256 (متماثل) — نفس السر للتوقيع والتحقق. لو تسرب السر، أي شخص يزور أي دور»</div>
+
+<h3>الواقع</h3>
+<p>الـheader مَفكوكاً:</p>
+<pre>$ python -c "import base64,json; print(json.dumps(json.loads(
+    base64.urlsafe_b64decode(TOKEN.split('.')[0] + '=='))))"
+{"alg": "HS256", "typ": "JWT"}                  ← مَؤكَّد HS256</pre>
+
+<p>الإعداد:</p>
+<pre><span style="color:#888"># backend/app/config.py:49</span>
+jwt_algorithm: str = "HS256"</pre>
+
+<h3>التَّقييم الدَّقيق</h3>
+<p>المُفتِّش مُحقّ <em>تَقنياً</em>: HS256 يَستخدم نَفس السرّ للتَّوقيع والتَّحقّق. لكنّ الخطورة <strong>تَعتمد على المعمار</strong>:</p>
+
+<table>
+<tr><th>السيناريو</th><th>HS256 مَلائم؟</th></tr>
+<tr><td>تَطبيق monolithic (FastAPI واحد) — السرّ في environment variable واحد</td><td>✅ نَعم — مَلائم وآمن (هذا هو tawa)</td></tr>
+<tr><td>microservices مُتعدّدة تَتحقّق من الـtoken بِمفاتيح عامّة</td><td>❌ يَجب RS256</td></tr>
+<tr><td>تَفويض لِطَرف ثالث (OAuth provider)</td><td>❌ يَجب RS256</td></tr>
+</table>
+
+<p>tawa <strong>monolithic</strong> — السيرفر الذي يُصدر الـtoken هو نَفسه الذي يَتحقّق منه. HS256 صَحيح هَنا.</p>
+
+<p>الـmitigations الموجودة في الكود:</p>
+<ul>
+<li>الـ<code>jti</code> field في الـtoken + Redis revocation list (rotation فِعليّ)</li>
+<li>الـ<code>role_status</code> claim — لو طُرد المُستَخدِم، الـtoken يَفقد قيمته فوراً</li>
+<li>صَلاحيّة 60 دَقيقة + refresh_token مع device-id binding</li>
+<li>SECRET_KEY في environment variable، مَنوط بـSecrets Manager (P-205 staging deploy)</li>
+</ul>
+
+<h3>الحُكم</h3>
+<p><strong>صَحيح تَقنيّاً، لكن الخطورة الفِعلية: 🟡 منخفضة</strong> (لا 🔴 عالية). الانتقال إلى RS256 يُحسِّن الـdefense-in-depth لكنّه ليس عاجلاً.</p>
+
+<p><strong>الإجراء المُوصى:</strong> رَفعه إلى backlog للمَرحلة المُقبلة، مع التَّركيز على <em>تَدوير السرّ</em> (secret rotation) كَأولويّة أَعلى من تَغيير الخَوارزمية.</p>
+</div>
+
+<!-- ════════════ Finding 3 ════════════ -->
+
+<h2>3) Rate Limiting — <span class="verdict v-partial">جُزئيّاً صَحيح</span></h2>
+
+<div class="card high">
+<h3>الادّعاء</h3>
+<div class="quote">«تسجيل ودخول بدون حدود — brute force ممكن»</div>
+
+<h3>الواقع — يوجد rate limiter لكنّه ضَعيف على /auth/*</h3>
+
+<p>الكود يَحوي <code>GlobalRateLimitMiddleware</code> (Redis sliding-window، Phase 055):</p>
+<pre><span style="color:#888"># backend/app/core/rate_limiter.py</span>
+_WINDOW_SECONDS = 60
+<strong>_MAX_REQUESTS_GENERAL = 180</strong>    ← 180 req/min على كل المسارات العامّة
+_MAX_REQUESTS_OPS = 600          ← 600 req/min على /operations/
+
+def _bucket_for(path):
+    if path.startswith(_OPS_PREFIXES):
+        return "ops", _MAX_REQUESTS_OPS
+    return "general", _MAX_REQUESTS_GENERAL    ← /auth/* تَحت general</pre>
+
+<p><strong>هذا يَعني:</strong> <code>/auth/login</code> مَحدود بـ180 محاولة/دَقيقة من نفس الـIP. حَدّ معقول لـAPI عامّ، لكن <strong>متساهل لـauth</strong>.</p>
+
+<p>اختبار حَيّ — 50 طَلب login مُتوازي في ثانية واحدة:</p>
+<pre>50 requests in 0s ⇒ 50× 401  (zero 429)
+                  ⇒ Retry-After header: empty
+                  ⇒ X-RateLimit-Limit header: empty</pre>
+
+<p>الـcontract YAML (<code>contracts/rate_limits.yaml</code>) <em>يَنصّ على</em> سياسة أصرم لـauth:</p>
+<pre>otp_request:
+  windows:
+    - window: "10m", max: 3
+    - window: "1h",  max: 6
+otp_verify:
+  window: "15m", max: 5</pre>
+
+<p>لكنّ هذه السياسة <strong>غَير مُطبَّقة فِعلياً في الـMiddleware</strong> — الـMiddleware يَستخدم حَدّاً عامّاً واحداً.</p>
+
+<h3>المخاطر الفِعلية</h3>
+<ul>
+<li>Credential stuffing بـ180/دَقيقة من 100 IP = 18,000/دَقيقة محاولة على حساب واحد. <strong>قَابل لِلاستغلال</strong>.</li>
+<li>OTP brute-force: 6 أرقام = 10^6 احتمال. بـ180/دَقيقة من 100 IP = 18K/دَقيقة ⇒ كَشف خِلال دَقائق.</li>
+</ul>
+
+<h3>الحُكم</h3>
+<p><strong>صَحيح جُزئياً — يُوجد rate limiter لكنّه فَضفاض على endpoints الحَسّاسة.</strong> الخطورة الفِعلية: <span class="badge-high">عالية</span></p>
+
+<h3>الإصلاح المُقترَح (Pri-1)</h3>
+<ol>
+<li>إضافة bucket مُنفصل في الـmiddleware لـauth: <code>/auth/login</code>, <code>/auth/otp/verify</code>, <code>/auth/password-reset/confirm</code> ⇒ <code>5/15دَقيقة</code> لكلّ IP+phone.</li>
+<li>إضافة <code>X-RateLimit-*</code> headers على كلّ response (لا فقط 429).</li>
+<li>تَوسعة المفتاح: <code>phone+device_id+ip</code> لـauth بَدلاً من IP فَقط.</li>
+<li>Test pin: محاولة سادسة تَفشل وتَرجع 429 + Retry-After.</li>
+</ol>
+</div>
+
+<!-- ════════════ Finding 4 & 6 ════════════ -->
+
+<h2>4+6) User Enumeration — <span class="verdict v-confirm">صَحيح للـ/register فَقط</span></h2>
+
+<div class="card high">
+<h3>الادّعاء</h3>
+<div class="quote">«رسائل الخطأ تكشف إذا كان الهاتف مسجلاً أم لا»</div>
+
+<h3>الواقع — مَكشوف في /register فَقط</h3>
+
+<p><strong>register مع هاتف مَوجود</strong>:</p>
+<pre>HTTP 409
+{
+  "code": "CONFLICT",
+  "message_ar": "رقم الهاتف مسجل مسبقًا",
+  "details": {"field": "phone"}                  ← مُؤكَّد: الهاتف مَوجود
+}</pre>
+
+<p><strong>register مع هاتف جَديد</strong>:</p>
+<pre>HTTP 201
+{ "user_id": "...", "role": "CUSTOMER", "message": "Account created successfully." }</pre>
+
+<p><strong>login مع كَلمة مرور خاطئة لهاتف مَوجود</strong>:</p>
+<pre>HTTP 401
+{ "code": "UNAUTHORIZED", "message_ar": "بيانات الدخول غير صحيحة", "details": null }</pre>
+
+<p><strong>login مع هاتف غَير مَوجود</strong>:</p>
+<pre>HTTP 401
+{ "code": "UNAUTHORIZED", "message_ar": "بيانات الدخول غير صحيحة", "details": null }   ← مُماثلة بالضبط</pre>
+
+<h3>التَّفصيل</h3>
+<table>
+<tr><th>المسار</th><th>كَشف؟</th><th>تَعليق</th></tr>
+<tr><td>/auth/register</td><td>✗ نَعم — مَكشوف</td><td>409 vs 201 يُميِّز الهاتف المَوجود</td></tr>
+<tr><td>/auth/login</td><td>✓ لا — مُحَصَّن</td><td>401 مُوحَّد لكلتا الحالتَين، رسالة عربية مُوحَّدة، <code>details:null</code></td></tr>
+<tr><td>/auth/password-reset/request</td><td>(لم يُختبَر)</td><td>يَجب فَحصه — يَجب أن يَرجع 200 صامتاً للهاتف غَير المَوجود</td></tr>
+</table>
+
+<h3>الحُكم</h3>
+<p><strong>صَحيح للـ/register، لكن الـ/login محميّ بالفعل.</strong> الخطورة: <span class="badge-med">متوسّطة</span>. الـ/register بطَبيعته يَكشف (لا يُمكن تَسجيل هاتف مَوجود) — لكنّ الـ409 يُفصِح أكثر مما يَجب. يَجب توحيد الاستجابة.</p>
+
+<h3>الإصلاح المُقترَح (Pri-2)</h3>
+<ol>
+<li><code>/auth/register</code> يُرجع <strong>صامتاً 200</strong> لِكِلتا الحالتَين (مَوجود/جَديد) + يُرسل OTP إن كان مَوجوداً يَطلب recovery، وإلّا يُكمل التَّسجيل. هذا نَمط Twilio/AWS.</li>
+<li>أو على الأقلّ توحيد رَسالة الـ409 إلى «المُحاولة فَشلت» بِلا تَلميح للسبب.</li>
+<li><code>/auth/password-reset/request</code> يَجب أن يَرجع 200 دائماً (لا تَلميح لِوجود الهاتف).</li>
+</ol>
+</div>
+
+<!-- ════════════ Finding 5 ════════════ -->
+
+<h2>5) Security Headers — <span class="verdict v-partial">5/6 مَوجودة · HSTS فَقط مَفقود</span></h2>
+
+<div class="card med">
+<h3>الادّعاء</h3>
+<div class="quote">«لا CSP، لا HSTS، لا Referrer-Policy»</div>
+
+<h3>الواقع — الـheaders الفِعلية من tawanow.com</h3>
+<pre>$ curl -D - https://tawanow.com/
+
+X-Frame-Options: DENY                                ✓
+X-Content-Type-Options: nosniff                       ✓
+Referrer-Policy: strict-origin-when-cross-origin     ✓ (المُفتِّش قال غَير مَوجود — خَطأ)
+Content-Security-Policy:                              ✓ (المُفتِّش قال غَير مَوجود — خَطأ)
+  default-src 'self';
+  script-src 'self';
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' data: blob:;
+  font-src 'self';
+  connect-src 'self';
+  frame-ancestors 'none';
+Permissions-Policy: geolocation=(self), microphone=(), camera=(self)  ✓
+
+Strict-Transport-Security:                            ✗ ABSENT (المُفتِّش مُحقّ)</pre>
+
+<h3>التَّفصيل</h3>
+<table>
+<tr><th>الـheader</th><th>الادّعاء</th><th>الواقع</th></tr>
+<tr><td>CSP</td><td>غَير مَوجود</td><td><strong>مَوجود مع 7 directives</strong> (default-src 'self' + frame-ancestors 'none')</td></tr>
+<tr><td>HSTS</td><td>غَير مَوجود</td><td><strong>غَير مَوجود فِعلاً</strong></td></tr>
+<tr><td>Referrer-Policy</td><td>غَير مَوجود</td><td><strong>مَوجود</strong>: strict-origin-when-cross-origin</td></tr>
+<tr><td>X-Frame-Options</td><td>—</td><td>DENY ✓</td></tr>
+<tr><td>X-Content-Type-Options</td><td>—</td><td>nosniff ✓</td></tr>
+<tr><td>Permissions-Policy</td><td>—</td><td>geolocation=(self), camera=(self), microphone=() ✓</td></tr>
+</table>
+
+<p>سَجَل الإضافة في الـnginx.conf:</p>
+<pre><span style="color:#888"># web/nginx.conf:8-15</span>
+add_header X-Frame-Options DENY always;
+add_header X-Content-Type-Options nosniff always;
+add_header Referrer-Policy strict-origin-when-cross-origin always;
+add_header Content-Security-Policy "default-src 'self'; ..." always;
+add_header Permissions-Policy "geolocation=(self), microphone=(), camera=(self)" always;
+<span style="color:#888"># Strict-Transport-Security omitted: requires HTTPS/TLS termination (BLOCK-03).</span></pre>
+
+<p>التَعليق في الـnginx.conf يُؤكّد أنّ HSTS مُؤجَّل عَن قَصد — هَناك BLOCK-03 يَنتظر TLS termination قَبل تَفعيله.</p>
+
+<h3>الحُكم</h3>
+<p><strong>المُفتِّش أخطأ في 2/3 من الادّعاءات.</strong> CSP و Referrer-Policy مَوجودان. HSTS فَقط مَفقود — وَهذا مَوثَّق و معلوم.</p>
+
+<p><strong>خطورة HSTS</strong>: <span class="badge-med">متوسّطة</span> — TLS مُفعَّل، لكنّ HSTS يَزيد المَناعة ضدّ SSL-strip attacks في public WiFi.</p>
+
+<h3>الإصلاح المُقترَح (Pri-2)</h3>
+<pre><span style="color:#888"># web/nginx.conf</span>
+<strong>add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;</strong></pre>
+
+<p><strong>تَحذير</strong>: <code>preload</code> + 63072000 (سَنتان) <em>غَير قابل للإلغاء سَهلاً</em>. يَنبغي البَدء بـ<code>max-age=300</code> (5 دَقائق)، التَحقّق، ثم رَفعه. وَتَجاهل <code>preload</code> حتى استقرار TLS تَماماً.</p>
+</div>
+
+<!-- ════════════ Finding 7 ════════════ -->
+
+<h2>7) <code>/api/auth/me</code> — <span class="verdict v-design">FALSE POSITIVE — قرار تَصميميّ</span></h2>
+
+<div class="card ok">
+<h3>الادّعاء</h3>
+<div class="quote">«/api/auth/me معطوب — يرجع 404»</div>
+
+<h3>الواقع</h3>
+<pre>GET /api/auth/me        → 404                    ← هذا الـpath لا يُوجد
+GET /api/customer/me    → 401                    ← مَوجود + يَطلب auth
+GET /api/users/me       → 404</pre>
+
+<p>tawa <strong>لا تَستخدم</strong> النَّمط الـRFC-style <code>/auth/me</code>. بَدلاً منه، يَستخدم <strong>role-scoped endpoints</strong>:</p>
+<ul>
+<li><code>/api/customer/me</code> — للعَملاء</li>
+<li><code>/api/provider/me</code> — للمزوّدين</li>
+<li><code>/api/driver/me</code> — للسائقين</li>
+<li><code>/api/operations/me</code> — لطاقم العمليات</li>
+</ul>
+
+<p>هذا نَمط تَصميميّ مَقصود يُحقّق:</p>
+<ol>
+<li><strong>Defense-in-depth</strong>: كلّ endpoint يَتحقّق من الدور بالـauth dependency.</li>
+<li><strong>أنواع رَدّ مُختلِفة</strong>: كائن العميل != كائن المزوّد != كائن السائق. لو وُجدت <code>/auth/me</code> مُوحَّدة لـتَطلَّبت polymorphic response.</li>
+<li><strong>سَطح تَهديد أَضيق</strong>: المُهاجم لا يَستطيع استخدام <code>/auth/me</code> كأداة كَشف لِنوع الحساب.</li>
+</ol>
+
+<h3>الحُكم</h3>
+<p><strong>الـ404 صَحيح ومَقصود.</strong> ليست ثَغرة، بل قرار معماريّ. لا حاجة لِفعل شيء.</p>
+
+<p>هذا في الواقع أكثر أَماناً من النَّمط الـ<code>/auth/me</code>: لا يَكشف الـrole للأنونيمي.</p>
+</div>
+
+<!-- ════════════ Action items ════════════ -->
+
+<h2>8) خِطّة العَمل المُرتَّبة بالأولويّة</h2>
+
+<div class="card">
+<table>
+<tr><th>أولويّة</th><th>البَند</th><th>الجَهد</th><th>التَّأثير</th></tr>
+<tr>
+  <td><span class="badge-high">P1</span></td>
+  <td>إضافة auth-bucket صارم في rate limiter (5 محاولات/15دَقيقة لـ/login + OTP) + إضافة X-RateLimit headers على كلّ response</td>
+  <td>~2س</td>
+  <td>يُغلق Credential Stuffing + OTP brute force</td>
+</tr>
+<tr>
+  <td><span class="badge-med">P2</span></td>
+  <td>تَفعيل HSTS تَدريجياً (5min → 1day → 1week → 6mo, ثم preload)</td>
+  <td>~30د</td>
+  <td>يُغلق SSL-strip على public WiFi</td>
+</tr>
+<tr>
+  <td><span class="badge-med">P2</span></td>
+  <td>توحيد رَسالة /register للهاتف المَوجود vs الجَديد (مع silent OTP recovery flow)</td>
+  <td>~1س</td>
+  <td>يُغلق user enumeration</td>
+</tr>
+<tr>
+  <td><span class="badge-low">P3</span></td>
+  <td>اختبار /auth/password-reset/request — تَأكيد رَدّ 200 صامت</td>
+  <td>~15د</td>
+  <td>تأكيد عَدم تَسرّب</td>
+</tr>
+<tr>
+  <td><span class="badge-low">P3</span></td>
+  <td>تَدوير دَوريّ لـSECRET_KEY (rotation) + RS256 migration plan</td>
+  <td>~4س (للـmigration)</td>
+  <td>defense-in-depth لـJWT</td>
+</tr>
+<tr>
+  <td>—</td>
+  <td>OpenAPI/Swagger في الإنتاج: لا إجراء — مَحجوب فِعلاً</td>
+  <td>—</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td>—</td>
+  <td>/auth/me: لا إجراء — قرار تَصميميّ صَحيح</td>
+  <td>—</td>
+  <td>—</td>
+</tr>
+</table>
+
+<p><strong>الإجمالي:</strong> ~4 ساعات عَمل لإغلاق P1 + P2 + P3 الكاملة.</p>
+</div>
+
+<!-- ════════════ FIN-COR ════════════ -->
+
+<h2>9) ما لم يَفحَصه المُفتِّش الأصليّ</h2>
+
+<div class="card info">
+<p>الفَحص الأصليّ لم يَلمس الطَّبقات التالية التي هي <strong>أكثر أهمّيّة</strong> لِمَنصة دَفع:</p>
+<ul>
+<li><strong>FIN-COR seal</strong>: <code>production_payment_enabled</code> + <code>wallet_cash_out</code> + <code>wallet_peer_transfer</code> كلّها SEALED-False في <code>contracts/feature_flags.yaml</code>. شَحن المحفظة الفِعليّ مَحجوب على tawanow.com (تَمّ نَشره اليَوم).</li>
+<li><strong>idempotency</strong>: كلّ نقطة money-moving تَتطلّب <code>Idempotency-Key</code> header (cash_collection, delivery_proof, dispatch_offer/decision).</li>
+<li><strong>JWT jti + Redis revocation</strong>: token rotation فِعلاً مُفعَّل (Phase 369).</li>
+<li><strong>OPS isolation</strong>: <code>/ops</code> bundle مَنفصل تماماً (Phase 377). حِزمة العميل لا تَحوي كود OPS.</li>
+<li><strong>SSE auth</strong>: token-in-querystring لـSSE مَع طَبقة Redis pub/sub.</li>
+<li><strong>F-W-01 SEAL</strong> (يَوم 2026-05-31): شَحن المحفظة الآن مَحجوب بِـSEAL يَمنع تَكوّن رَصيد مِن العَدم.</li>
+</ul>
+<p>هذه الطَّبقات قَائمة وتَعمل، وَتُغلق نَواقل تَهديد أكبر بكَثير من البُنود السبعة التي ذَكرها المُفتِّش.</p>
+</div>
+
+<!-- ════════════ Final ════════════ -->
+
+<h2>10) الحُكم النِّهائيّ</h2>
+
+<div class="card crit">
+<p>الفَحص الأصليّ <strong>عَثَر على 2 ثَغرة حَقيقية</strong> ⇒ rate-limit ضَعيف على /auth + غِياب HSTS. هاتان تَستحقّان الإصلاح. لكنّه <strong>أَطلق إنذاراً كاذباً</strong> على 3 بُنود مَحلولة بالفعل (Swagger، CSP، Referrer-Policy)، وَ<strong>صَنَّفَ سُلوكاً تَصميمياً سَليماً</strong> كَثَغرة (/auth/me).</p>
+
+<p>التَّقييم الأصليّ ذَكر <strong>5 بُنود «عالية/متوسّطة الخطورة»</strong>؛ الواقع: <strong>1 عالية فَقط</strong> (rate-limit auth) + <strong>1 متوسّطة</strong> (HSTS). البَاقي إمّا مَخفّف، أو مَوجود مُسبَقاً، أو سُوءُ تَفسير.</p>
+
+<p><strong>التَّوصية:</strong> اعتَمد فَقط P1 + P2 + P3 من القائمة أعلاه. تَجاهل البَند 1 (Swagger) و7 (/auth/me) — لا أساس لهما.</p>
+</div>
+
+<p style="margin-top:40px;text-align:center;color:var(--muted);font-size:12.5px">
+نهاية التَّحقُّق العَميق — مَبنيّ على فَحص حَيّ لـ7 endpoints + قراءة 5 ملفّات كود (config.py، main.py، rate_limiter.py، nginx.conf، feature_flags.yaml) + Redis observation + JWT decode + md5 comparison.<br/>
+الإصلاحات تَنتظر إذنك للبَدء.
+</p>
+
+</div>
+</body>
+</html>

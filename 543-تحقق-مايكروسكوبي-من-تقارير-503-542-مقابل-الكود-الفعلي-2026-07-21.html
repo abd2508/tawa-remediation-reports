@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>543 — تحقّق مايكروسكوبي: كل بند في تقارير 503–542 مقابل الكود الفعليّ</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2540; --text:#e8ecf7; --muted:#9aa5c0;
+    --line:#2a3350; --accent:#5b8cff;
+    --done:#1f7a4d; --done-bg:#123425; --done-fg:#7be3ab;
+    --partial:#8a6d1f; --partial-bg:#332a10; --partial-fg:#f0c95b;
+    --not:#9b2c2c; --not-bg:#3a1414; --not-fg:#ff8f8f;
+    --cant:#3a4a6b; --cant-bg:#1a2338; --cant-fg:#9db3e0;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef1fa; --text:#1a2030; --muted:#5a6480;
+      --line:#dbe0ee; --accent:#2a5fd8;
+      --done:#0f6a3a; --done-bg:#e5f6ec; --done-fg:#0f6a3a;
+      --partial:#8a6d1f; --partial-bg:#fbf1d8; --partial-fg:#8a6d1f;
+      --not:#a12727; --not-bg:#fbe6e6; --not-fg:#a12727;
+      --cant:#3a4a6b; --cant-bg:#e7ecf8; --cant-fg:#3a4a6b;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI","Cairo","Tahoma",sans-serif;
+    line-height:1.75; margin:0; padding:0 0 60px 0;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+  header.hero{
+    background:linear-gradient(160deg, var(--panel2), var(--bg));
+    border-bottom:1px solid var(--line); padding:48px 0 36px 0; margin-bottom:32px;
+  }
+  h1{font-size:1.9rem; margin:0 0 10px 0;}
+  h1 .num{color:var(--accent); font-weight:800;}
+  .sub{color:var(--muted); font-size:1.05rem; max-width:900px;}
+  h2{font-size:1.4rem; margin:44px 0 16px 0; padding-bottom:10px; border-bottom:2px solid var(--line); color:var(--text);}
+  h3{font-size:1.15rem; margin:28px 0 12px 0; color:var(--accent);}
+  p{margin:0 0 14px 0;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:18px;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:20px 0;}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center;}
+  .stat .n{font-size:2.1rem; font-weight:800;}
+  .stat .l{color:var(--muted); font-size:0.85rem; margin-top:4px;}
+  .stat.done .n{color:var(--done-fg);}
+  .stat.partial .n{color:var(--partial-fg);}
+  .stat.not .n{color:var(--not-fg);}
+  .stat.cant .n{color:var(--cant-fg);}
+  .badge{
+    display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.82rem; font-weight:700;
+    white-space:nowrap;
+  }
+  .b-done{background:var(--done-bg); color:var(--done-fg); border:1px solid var(--done);}
+  .b-partial{background:var(--partial-bg); color:var(--partial-fg); border:1px solid var(--partial);}
+  .b-not{background:var(--not-bg); color:var(--not-fg); border:1px solid var(--not);}
+  .b-cant{background:var(--cant-bg); color:var(--cant-fg); border:1px solid var(--cant);}
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:0.92rem; min-width:720px;}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--panel2); color:var(--muted); font-size:0.8rem; text-transform:uppercase; letter-spacing:0.03em; position:sticky; top:0;}
+  tr:last-child td{border-bottom:none;}
+  td.id{font-weight:800; color:var(--accent); white-space:nowrap;}
+  td code{background:var(--panel2); padding:1px 6px; border-radius:5px; font-size:0.85em; direction:ltr; display:inline-block;}
+  .evid{font-size:0.86rem; color:var(--muted);}
+  .note{font-size:0.86rem;}
+  .note.flag{color:var(--not-fg); font-weight:700;}
+  .pipeline{display:flex; flex-wrap:wrap; gap:0; align-items:stretch; margin:24px 0; direction:ltr;}
+  .pnode{
+    flex:1; min-width:190px; background:var(--panel2); border:1px solid var(--line); border-radius:12px;
+    padding:16px; text-align:center; position:relative; direction:rtl;
+  }
+  .pnode .t{font-weight:800; font-size:0.95rem; margin-bottom:6px;}
+  .pnode .d{color:var(--muted); font-size:0.8rem;}
+  .arrow{display:flex; align-items:center; justify-content:center; min-width:34px; color:var(--accent); font-size:1.4rem;}
+  @media (max-width:820px){ .pipeline{flex-direction:column;} .arrow{transform:rotate(90deg);} }
+  .callout{border-inline-start:5px solid var(--accent); background:var(--panel2); border-radius:10px; padding:16px 20px; margin:16px 0;}
+  .callout.crit{border-color:var(--not);}
+  .callout.warn{border-color:var(--partial);}
+  .toc{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px 24px;}
+  .toc a{color:var(--text); text-decoration:none; display:block; padding:5px 0; border-bottom:1px dashed var(--line);}
+  .toc a:last-child{border-bottom:none;}
+  .toc a:hover{color:var(--accent);}
+  .toc .n{color:var(--accent); font-weight:800; margin-left:8px;}
+  .domain-h{background:var(--panel2); font-weight:800; padding:9px 14px; border-radius:8px; margin:22px 0 8px 0; display:inline-block;}
+  footer{color:var(--muted); text-align:center; font-size:0.85rem; margin-top:60px; padding-top:24px; border-top:1px solid var(--line);}
+  .kicker{color:var(--accent); font-weight:800; font-size:0.85rem; letter-spacing:0.04em; margin-bottom:6px;}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">تقرير 543 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-21</div>
+  <h1><span class="num">543</span> — هل كل ما قِيل إنّه "أُنجز" في السلسلة 503–542 منفَّذ فعلًا بالكود؟</h1>
+  <p class="sub">
+    فحص مستقلّ جديد، اليوم، لكل بند ورد في سلسلة تقارير 503 حتّى 542 — ليس بقراءة التقارير وتصديقها، بل بقراءة الكود الحيّ نفسه سطرًا سطرًا،
+    مقارنةً بكل ادّعاء. هذا التقرير لا يكرّر ما فحصته التقارير السابقة (خصوصًا 538 و542) بل يكمل عليها: يفحص تحديدًا
+    البنود الـ85 (D-01 حتّى D-85) التي خرجت من تقرير 539، وما إذا نُفِّذت فعلًا بعد تقريرَي التنفيذ 540/541، بالإضافة لمراجعة عيّنة
+    من بنود C/INIT (30 بندًا) التي فحصها تقرير 542 بنفسه أمس.
+  </p>
+</div></header>
+
+<div class="wrap">
+
+<div class="card toc">
+  <strong>فهرس سريع</strong>
+  <a href="#chain">① كيف تتبّعنا السلسلة الزمنية (لا كل تقرير على حدة)</a>
+  <a href="#headline">② الخلاصة الرقمية</a>
+  <a href="#top5">③ أخطر 5 اكتشافات في هذا الفحص</a>
+  <a href="#patterns">④ نمطان متكرّران يستحقّان انتباهك</a>
+  <a href="#full-table">⑤ الجدول الكامل — كل بند من D-01 إلى D-85</a>
+  <a href="#cinit">⑥ بنود C-XX / INIT-XX (تدقيق تكميليّ فوق تقرير 542)</a>
+  <a href="#method">⑦ المنهجية، والقيود، وماذا لا يستطيع هذا التقرير إثباته</a>
+</div>
+
+<h2 id="chain">① كيف تتبّعنا السلسلة الزمنية</h2>
+<p>
+  تقارير 503–542 ليست 39 قائمة مستقلّة — إنّها سلسلة واحدة تتطوّر عبر الزمن، كل تقرير يبني على سابقه أو يصحّحه.
+  لو فحصنا كل تقرير على حدة لكرّرنا نفس البند 4 أو 5 مرّات (لأنّ تقارير لاحقة صحّحت تقارير سابقة). لذلك تتبّعنا
+  <strong>الحالة النهائيّة لكل بند</strong> عبر السلسلة كاملة، لا كل تقرير بمفرده. هذا هو المسار الذي انتهينا إليه:
+</p>
+
+<div class="pipeline">
+  <div class="pnode"><div class="t">تدقيق خارجيّ 1</div><div class="d">49 ادّعاء (تقرير 533)<br>أصبحت لاحقًا C-01→C-15 + H-01→H-34</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">تدقيق خارجيّ 2</div><div class="d">85 ادّعاء جديد (D-01→D-85)<br>خريطة تنفيذيّة كاملة (تقرير 539)</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">تحقّق مزدوج</div><div class="d">تقرير 538: 134/134 ادّعاء صحيح<br>تقرير 542: 30 بند C/INIT فُحصت مباشرة بالكود</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode"><div class="t">التنفيذ الفعليّ</div><div class="d">تقريرا 540/541: "المرحلة صفر" (36 بندًا) + D-11 + D-50<br>منشور على 4 مواضع</div></div>
+  <div class="arrow">→</div>
+  <div class="pnode" style="border-color:var(--accent); border-width:2px;"><div class="t">🔬 هذا التقرير</div><div class="d">فحص مستقلّ جديد اليوم لكل الـ85 + عيّنة C/INIT<br>لا ثقة بأي نصّ سابق</div></div>
+</div>
+
+<div class="callout">
+  <strong>لماذا لم نُعِد فحص بنود C/INIT الثلاثين كاملةً؟</strong>
+  لأنّ تقرير 542 (بالأمس، بعد آخر تعديل على الكود) فعل ذلك بالضبط — قراءة مباشرة لكل بند، بدليل من الكود، بلا ثقة بأي تقرير سابق.
+  إعادة نفس العمل تكرار بلا قيمة. بدل ذلك: تحقّقنا شخصيًّا من أخطر بندَين فيه (INIT-9 وC-10a، انظر القسم التالي)
+  لتأكيد أنّ الفحص لا يزال دقيقًا اليوم، ثمّ خصّصنا الجهد الجديد بالكامل لِما لم يُفحص من قبل بنفس الدقّة: الـ85 بندًا الجديدة (D-01→D-85).
+</div>
+
+<h2 id="headline">② الخلاصة الرقميّة</h2>
+<p>85 بندًا (D-01 إلى D-85) — كل واحد فُحص اليوم بقراءة مباشرة لملفّ الكود الفعليّ، لا بتصديق أي تقرير سابق:</p>
+
+<div class="stat-grid">
+  <div class="stat done"><div class="n">26</div><div class="l">✅ منجَز فعلًا<br>(31٪)</div></div>
+  <div class="stat partial"><div class="n">15</div><div class="l">🟡 جزئيّ<br>(18٪)</div></div>
+  <div class="stat not"><div class="n">43</div><div class="l">❌ غير منفَّذ<br>(51٪)</div></div>
+  <div class="stat cant"><div class="n">1</div><div class="l">⚠️ لا يمكن التحقّق محليًّا<br>(1٪)</div></div>
+</div>
+
+<div class="callout warn">
+  <strong>كيف نقرأ هذا الرقم بإنصاف:</strong> نسبة الـ51٪ "غير منفَّذ" ليست بالضرورة إخفاقًا — معظم هذه البنود (نحو 43 بندًا) كانت
+  مصنَّفة أصلًا في خطّة 539/540 كأعمال "BUILD" للمرحلتين 2، 3، أو 4 (لاحقة عمدًا)، لا كجزء من "المرحلة صفر" التي نُفِّذت هذا الأسبوع.
+  خطّة 541 لم تَدَّعِ إنجاز الـ85 بندًا كلّها — فقط نحو 36 منها. <strong>المشكلة الحقيقيّة التي يكشفها هذا التقرير ليست في الـ49 بندًا
+  المؤجَّلة عمدًا، بل في مجموعة أصغر وأخطر: بنود كانت مخطَّطة تحديدًا ضمن "المرحلة صفر" (يُفترض أنّها الأسهل والأسرع) ولم تُنفَّذ رغم ذلك،
+  وبنود أخرى قيل إنّها "منجَزة" لكنّ الكود يُظهِر إنجازًا جزئيًّا فقط.</strong> هذا بالضبط ما يفصّله القسم التالي.
+</div>
+
+<h2 id="top5">③ أخطر 5 اكتشافات في هذا الفحص</h2>
+
+<div class="card">
+  <h3>1) الثغرة الأخطر في كل السلسلة لا تزال حيّة اليوم — D-34 / INIT-9</h3>
+  <p>
+    تحقَّقتُ من هذا <strong>بنفسي مباشرة</strong> (بلا وسيط) بقراءة <code>backend/app/modules/identity/deletion_eligibility.py</code> سطرًا سطرًا.
+    دالّة <code>check_identity_deletion_eligibility</code> — وهي نقطة العبور الوحيدة لكل مسارات حذف الحساب الثلاثة (حذف ذاتيّ، مهمّة يوميّة مجدولة، ومحو نهائيّ) —
+    لا تزال تحتوي حرفيًّا:
+  </p>
+  <div class="tbl-wrap"><table><tr><td style="font-family:monospace; direction:ltr; text-align:left; background:var(--panel2);">
+try:<br>&nbsp;&nbsp;dispute = await db.execute(select(FinancialDispute.id).where(FinancialDispute.state == "OPEN", ...))<br>&nbsp;&nbsp;if dispute: return ("OPEN_DISPUTE", ...)<br>except Exception:  # noqa: BLE001<br>&nbsp;&nbsp;pass&nbsp;&nbsp;&nbsp;&nbsp;# ← أي عطل هنا = "لا يوجد نزاع"، والحذف يستمرّ
+  </td></tr></table></div>
+  <p>
+    أي عطل عابر (انقطاع اتّصال، مهلة استعلام، حتّى خطأ استيراد) يجعل النظام يتابع الحذف وكأنّه تحقَّق من عدم وجود نزاع ماليّ مفتوح — بينما لم يتحقَّق من شيء إطلاقًا.
+    <strong>هذا البند كان مخطَّطًا ضمن "المرحلة صفر" (الأسهل والأسرع) في خطّة 539/540، ومع ذلك غاب تمامًا من قائمة الـ36 بندًا الفعليّة التي وثَّقها تقرير 541.</strong>
+    الإصلاح لا يحتاج ترحيل قاعدة بيانات ولا بوّابة تشغيليّة — مجرّد استبدال <code>pass</code> بإرجاع نفس نتيجة "رفض الحذف" الموجودة أصلًا في السطر السابق.
+  </p>
+  <span class="badge b-not">❌ غير منفَّذ — حرِج وحيّ</span>
+</div>
+
+<div class="card">
+  <h3>2) نفس نمط الثغرة، في مكان ماليّ آخر — C-10a (لا فحص هويّة على الاعتماد الثاني للاسترجاع)</h3>
+  <p>
+    تحقَّقتُ بنفسي أيضًا من <code>backend/app/modules/finance/refund_router.py</code>. الاعتماد <strong>النهائيّ</strong> للاسترجاع
+    (<code>finance_approve_refund</code>, سطر 269) يفحص فعلًا أنّ المعتمِد ليس هو الطالب، وأنّ المعتمِد الثاني ليس نفس المعتمِد النهائيّ (سطر 299).
+    لكن نقطة <strong>الاعتماد الثاني نفسها</strong> (<code>finance_second_approve_refund</code>, سطر 598–668) لا تحتوي أي فحص من هذا النوع إطلاقًا —
+    فلا شيء يمنع الشخص الذي طلب الاسترجاع من تسجيل "الموافقة الثانية" عليه بنفسه، تاركًا فقط طرفًا ثالثًا نهائيًّا بدل ثلاثة أطراف مستقلّة كما يفترض التصميم.
+  </p>
+  <span class="badge b-not">❌ غير منفَّذ — فجوة ماليّة حيّة (نفس تقييم تقرير 542)</span>
+</div>
+
+<div class="card">
+  <h3>3) نمط "أُصلح جزئيًّا فقط"— أخطر مثال: إخفاء بيانات المستخدمين (D-50)</h3>
+  <p>
+    قرار D-50 (إخفاء رقم الهاتف/البريد افتراضيًّا) حصل على إذن تشغيل صريح ونُفِّذ فعلًا في تقرير 541، وحتّى مراجعة Codex العدائيّة
+    وجدت أنّ صفحة "كل المستخدمين" وصندوق البحث السريع كانا لا يزالان يُظهران الرقم كاملًا، وأُصلِح ذلك أيضًا.
+    <strong>لكنّ الفحص الجديد اليوم وجد أنّ الإصلاح لم يمتدّ لثلاث صفحات أخرى</strong> تعرض نفس البيانات عبر دالّة مشتركة واحدة
+    (<code>_cp_people_by_role()</code> في <code>control_panel_router.py:1270-1271</code>):
+    <code>/control-panel/customers</code>، <code>/control-panel/providers</code>، و<code>/control-panel/drivers</code> —
+    الثلاثة تُرسِل رقم الهاتف والبريد كاملَين بلا أي إخفاء أو سجلّ تدقيق، وواجهة <code>ControlPanelCustomers.tsx</code> تعرضهما مباشرة.
+  </p>
+  <span class="badge b-partial">🟡 جزئيّ — 3 من 6 نقاط عرض لا تزال مكشوفة</span>
+</div>
+
+<div class="card">
+  <h3>4) بنود مخطَّطة صراحةً لـ"المرحلة صفر" اختفت بصمت من التنفيذ الفعليّ</h3>
+  <p>
+    بالإضافة لـD-34→D-37 أعلاه، وجدنا أنّ الفحوصات الإضافيّة المخطَّطة لدالّة <code>validate_production_settings()</code>
+    (أدوار MFA الإلزاميّة، عتبات COD/المحفظة، صندوق الإشعارات — D-59/D-60/D-61) <strong>لم تُضَف إطلاقًا</strong> — الدالّة اليوم
+    لا تزال تحتوي فقط الفحوصات القديمة (secret_key، otp_provider، allowed_origins، admin_ip_allowlist). وبالمثل، تشفير التخزين
+    المحليّ للجوّال (D-70) لا يزال يستخدم <code>AsyncStorage</code> عاديًّا غير مشفَّر، رغم أنّ خطّة 539 وصفته بأنّه "نقطة تبديل جاهزة، رخيصة التنفيذ".
+  </p>
+  <span class="badge b-not">❌ 6 بنود على الأقلّ من "المرحلة صفر" المخطَّطة لم تصل للتنفيذ: D-34, D-35, D-36, D-37, D-59, D-60, D-61, D-70</span>
+</div>
+
+<div class="card">
+  <h3>5) بنية اختبار قاعدة البيانات الحقيقيّة (Postgres) في CI معطوبة بصمت — D-78</h3>
+  <p>
+    ملفّ <code>.github/workflows/ci.yml</code> يُشغِّل فعلًا خدمة Postgres ويمرّر متغيّر <code>DATABASE_URL</code> — يبدو للوهلة الأولى وكأنّ
+    الاختبارات تعمل ضدّ قاعدة بيانات حقيقيّة. لكنّ <code>backend/tests/conftest.py</code> يقرأ متغيّرًا مختلفًا تمامًا:
+    <code>TEST_DATABASE_URL</code>. النتيجة: خدمة Postgres تعمل في CI لكن <strong>لا يصلها أي اختبار فعليًّا</strong> —
+    100٪ من مجموعة pytest لا تزال تُشغَّل على SQLite الوهميّة، رغم وجود سكربت <code>run_pg_tests.sh</code> جاهز وصحيح لكنّه غير مُستدعًى من CI إطلاقًا.
+    هذا يعني أنّ كل بنود التزامن (D-01، D-19، D-23، D-28، D-32، D-33، D-43) التي يُفترَض أن يثبتها هذا المسار — لم تُثبَت فعليًّا بعد.
+  </p>
+  <span class="badge b-not">❌ غير منفَّذ — يبدو منجَزًا للوهلة الأولى، لكنّه معطوب بصمت (خطأ اسم متغيّر بيئة)</span>
+</div>
+
+<h2 id="patterns">④ نمطان متكرّران يستحقّان انتباهك</h2>
+
+<div class="card">
+  <h3>النمط الأوّل: "أُصلح في مكان واحد، ونُسي مكانه المكرَّر"</h3>
+  <p>هذا النمط ظهر <strong>4 مرّات منفصلة على الأقلّ</strong> في هذا الفحص وحده — إصلاح صحيح ودقيق، لكن مطبَّق في نسخة واحدة فقط من كود مكرَّر في عدّة ملفّات:</p>
+  <div class="tbl-wrap"><table>
+    <tr><th>البند</th><th>أُصلح في</th><th>نُسي في</th></tr>
+    <tr><td class="id">D-39</td><td><code>ControlPanelUsers.tsx</code> — نصّ "معلَّق" بدل "أُضيف"</td><td><code>ControlPanelCustomers.tsx</code> لا يزال يقول "تمّ الإضافة"</td></tr>
+    <tr><td class="id">D-40</td><td><code>ControlPanelUsers.tsx</code> — حدّ من الخادم حسب الدور</td><td><code>ControlPanelCustomers.tsx</code> و<code>OpsWalletCredit.tsx</code> — الأخير لا يزال <strong>يُنفِّذ فعليًّا</strong> الحدّ الثابت 10000 (ليس مجرّد نصّ قديم)</td></tr>
+    <tr><td class="id">D-50</td><td>صفحة مستخدم واحد + قائمة كل المستخدمين + البحث السريع</td><td>3 صفحات تصفّح حسب الدور (عملاء/مزوّدين/سائقين) عبر <code>_cp_people_by_role()</code></td></tr>
+    <tr><td class="id">D-08</td><td>مسارَا التحقّق الأصليّان</td><td>(هذا واحد أُصلِح بنجاح لاحقًا — الاستثناء الإيجابيّ الوحيد؛ ذُكر هنا للمقارنة)</td></tr>
+  </table></div>
+  <p>الدرس العمليّ: عندما يظهر نفس الحقل/المنطق في أكثر من ملفّ واجهة، يستحقّ فحص "هل يوجد نسخ أخرى؟" أن يكون خطوة إلزاميّة قبل إغلاق أي بند مشابه مستقبلًا.</p>
+</div>
+
+<div class="card">
+  <h3>النمط الثاني: ادّعاءات صحيحة حرفيًّا لكنّها مبالَغ في تصويرها كـ"مكتمل"</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>البند</th><th>الادّعاء</th><th>الواقع الأدقّ</th></tr>
+    <tr><td class="id">D-26</td><td>"تضييق حالات الموافقة الثانية"</td><td>تسجيل تحذير فقط (log)، لا رفض فعليّ بعد — الكود نفسه يقول "الخطوة 1 من 2"</td></tr>
+    <tr><td class="id">D-72</td><td>"مسار Playwright الحاجب لطبقة web موجود"</td><td><code>test:e2e</code> غير مربوط بأي وظيفة CI إطلاقًا اليوم — سكربت موجود، لا يُشغَّل تلقائيًّا</td></tr>
+    <tr><td class="id">D-77</td><td>"فحص آليّ يتأكّد من ثنائيّة اللغة"</td><td>موجود فقط داخل سكربت فحص يدويّ، غير مربوط بـ CI ولا بمجموعة pytest</td></tr>
+    <tr><td class="id">D-84</td><td>"مُصلَح فعلًا من مرحلة سابقة، لا حاجة لعمل جديد"</td><td>لم يُعثر على أي ميزة "تجميع حسب اليوم/اليوم" في كل الواجهة أو الخلفيّ — الادّعاء نفسه غير مؤكَّد</td></tr>
+    <tr><td class="id">D-85</td><td>"مُختبَر بخطّة استعلام حقيقيّة على 100 ألف سجلّ"</td><td>الفهرس والاستعلام صحيحان فعلًا، لكن لا يوجد أي اختبار EXPLAIN بهذا الوصف في المستودع</td></tr>
+  </table></div>
+</div>
+
+<h2 id="full-table">⑤ الجدول الكامل — كل بند من D-01 إلى D-85</h2>
+<p>مرتَّب حسب المجال، كما في تقرير 539 الأصليّ. كل حكم هنا من قراءة مباشرة للكود اليوم (2026-07-21)، لا من أي تقرير سابق.</p>
+
+<div class="domain-h">🔑 الهويّة، OTP، الجلسات، الصلاحيّات (D-01 → D-17)</div>
+<div class="tbl-wrap"><table>
+<tr><th>#</th><th>الموضوع</th><th>الحكم</th><th>الدليل / الملاحظة</th></tr>
+<tr><td class="id">D-01</td><td>فهرس فريد جزئيّ لإصدارات التطبيق الفعّالة</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">هجرة <code>ab52</code> + معالج IntegrityError → 409 في main.py</td></tr>
+<tr><td class="id">D-02</td><td>رفض صيغة إصدار مشوَّهة (422)</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid"><code>app_version_router.py:69-89</code> فحص صارم بـ regex</td></tr>
+<tr><td class="id">D-03</td><td>IP حقيقيّ للخادم لا المرسَل من العميل (طلب OTP)</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">مسار OTP الرئيسيّ مُصلَح؛ <code>registration_router.py:1242</code> (إعادة تعيين كلمة المرور) لا يزال يقرأ <code>request.client.host</code> مباشرة</td></tr>
+<tr><td class="id">D-04</td><td>حالة تسليم OTP حقيقيّة لا "sent" ثابتة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid"><code>otp_service.py:183-216</code> — الحالة تُضبَط قبل محاولة الإرسال، وفشل الإرسال يُسجَّل فقط بلا تغيير الحالة</td></tr>
+<tr><td class="id">D-05</td><td>نمط Outbox لتسليم OTP</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا outbox أو عملية تسوية منفصلة لهذا الغرض</td></tr>
+<tr><td class="id">D-06</td><td>دمج مفتاحَي Redis (hash+purpose) لـOTP</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا تزال مفتاحَين منفصلَين (<code>otp:</code> و<code>otp_purpose:</code>)</td></tr>
+<tr><td class="id">D-07</td><td>تحقّق ذرّيّ عبر Lua/EVAL لمحاولات OTP</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا EVAL أو سكربت Lua في otp_service.py</td></tr>
+<tr><td class="id">D-08</td><td>حذف refresh_token من جسم JSON للويب — كل المسارات الأربعة</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">دالّة مشتركة <code>platform_wants_refresh_body()</code> مطبَّقة على تسجيل الدخول بكلمة المرور، OTP، التجديد، وإكمال TOTP</td></tr>
+<tr><td class="id">D-09</td><td>ترحيل require_role إلى محرّك الصلاحيّات (84 ملفًّا)</td><td><span class="badge b-not">❌ غير منفَّذ (متوقَّع)</span></td><td class="evid">110 استدعاء require_role في operations_router.py وحدها؛ المحرّك البديل يُستدعى 4 مرّات فقط</td></tr>
+<tr><td class="id">D-10</td><td>سياسة فشل مغلَق صريحة بدل رجوع صامت للدور الأساسيّ</td><td><span class="badge b-partial">🟡 جزئيّ / آليّة موجودة من عمل سابق مختلف</span></td><td class="evid note">آليّة فشل مغلَق موجودة فعلًا (<code>dependencies.py:308-331</code>) لكن أُضيفت بعمل سابق (commit 717b8e1) غير مرتبط بهذه الدفعة تحديدًا — يستحقّ تأكيد التصنيف مع المشغّل</td></tr>
+<tr><td class="id">D-11</td><td>حسابات فريق العمليّات بدعوة + TOTP إلزاميّ</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">تحقّق كامل: نموذج الدعوة، بصمة الرمز لا نصّ صريح، انتهاء 7 أيّام، علم <code>mfa_enrollment_pending</code> يُفحَص عند كل دخول بلا استثناء</td></tr>
+<tr><td class="id">D-12/13/14</td><td>تزويد ذرّيّ + رفض الدفعة كاملةً عند وجود صلاحيّة غير صالحة</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">الذرّيّة (commit واحد) منجَزة فعلًا؛ لكنّ الصلاحيّات غير الصالحة تُتجاهَل بصمت (<code>continue</code>) بدل رفض الطلب كاملًا — تعليق الكود يدّعي أنّ D-11 "يستوعب" هذا، لكنّه لا يفعل</td></tr>
+<tr><td class="id">D-15</td><td>قطع فوريّ للرمز عند تغيير الدور</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid"><code>promote_ops_account</code> يستدعي <code>revoke_all_sessions()</code> مباشرة قبل commit</td></tr>
+<tr><td class="id">D-16</td><td>تدقيق تغيير الدور في نفس معاملة الكتابة</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">نفس الدالّة، نفس الـcommit</td></tr>
+<tr><td class="id">D-17</td><td>تعليق الحساب كسجلّات مصدر لا حقل واحد</td><td><span class="badge b-not">❌ غير منفَّذ — حرِج</span></td><td class="evid note flag"><code>controls_service.py</code> — <code>lift_suspension()</code> يقلب الحالة لـACTIVE بلا أي فحص مصدر؛ لا جدول <code>suspension_events</code> إطلاقًا</td></tr>
+</table></div>
+
+<div class="domain-h">💰 القيد اليدويّ، التدقيق، الاسترداد، نزاع الدفع (D-18 → D-30)</div>
+<div class="tbl-wrap"><table>
+<tr><th>#</th><th>الموضوع</th><th>الحكم</th><th>الدليل / الملاحظة</th></tr>
+<tr><td class="id">D-18</td><td>عكس القيد اليدويّ عبر موافقة مستقلّة ثانية</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال ينفَّذ فورًا؛ لا جدول "إجراء محكوم" في المستودع كلّه</td></tr>
+<tr><td class="id">D-19</td><td>قيد فريد على مرجع القيد اليدويّ</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">فهرس فريد جزئيّ لمراجع idempotency + التقاط IntegrityError</td></tr>
+<tr><td class="id">D-20</td><td>تسمية الزرّ الصحيحة</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">"إرسال للاعتماد" بدل "ترحيل القيد"</td></tr>
+<tr><td class="id">D-21</td><td>Hash قانونيّ شامل + عمود schema_version</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">الحقول الإضافيّة (السبب/البيانات الوصفيّة/الدور/correlation_id) لا تزال خارج الـhash</td></tr>
+<tr><td class="id">D-22</td><td>Hash كامل 64 حرفًا بلا اقتطاع</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">لا اقتطاع؛ العمود String(64)</td></tr>
+<tr><td class="id">D-23</td><td>تقسيم سلسلة التدقيق (لا قفل عامّ واحد)</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال صفّ <code>AuditChainState('GLOBAL')</code> وحيدًا يقفل كل كتابة</td></tr>
+<tr><td class="id">D-24</td><td>إرساء Merkle خارجيّ (MinIO Object-Lock)</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا آليّة إرساء خارجيّ إطلاقًا</td></tr>
+<tr><td class="id">D-25</td><td>عكس عمولة الاسترداد</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">يستخدم <code>ReconciliationException</code> عند الفشل، بنفس نمط chargeback</td></tr>
+<tr><td class="id">D-26</td><td>تضييق حالات الموافقة الثانية للاسترجاع</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">تحذير (log) فقط، لا رفض فعليّ — الكود يصرّح "خطوة 1 من 2"</td></tr>
+<tr><td class="id">D-27</td><td>صلاحيّة منفصلة لتقديم/مراجعة نزاع الدفع</td><td><span class="badge b-not">❌ غير منفَّذ (خُفِّف الخطر بآليّة أخرى)</span></td><td class="evid">نفس الصلاحيّة <code>chargeback:manage</code> لكليهما؛ فحص "لا تحلّ قضيّتك أنت" موجود بدلًا منه</td></tr>
+<tr><td class="id">D-28</td><td>قفل صفّ الطلب أثناء تقديم نزاع الدفع</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid"><code>SELECT FOR UPDATE</code> مضاف، بنفس نمط refund_router.py</td></tr>
+<tr><td class="id">D-29</td><td>حلّ النزاع ينفّذ أثرًا ماليًّا حقيقيًّا</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال تغيير حالة نصّيّ فقط؛ صفر تفاعل مع LedgerService</td></tr>
+<tr><td class="id">D-30</td><td>سقف تراكميّ لمبلغ النزاع لكل طلب</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">سقف على مجموع القضايا النشطة لكل طلب</td></tr>
+</table></div>
+
+<div class="domain-h">🧾 التسوية، تكرار الطلبات، حذف الحساب، المحفظة، POS (D-31 → D-45)</div>
+<div class="tbl-wrap"><table>
+<tr><th>#</th><th>الموضوع</th><th>الحكم</th><th>الدليل / الملاحظة</th></tr>
+<tr><td class="id">D-31</td><td>سكربت ترحيل DRIVER_PAYABLE</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid">السكربت موجود وصحيح (dry-run/--apply)؛ لا دليل على تشغيل --apply فعليًّا — ⚠️ لا يمكن التحقّق من التطبيق الحيّ محليًّا</td></tr>
+<tr><td class="id">D-32/33</td><td>حجز ذرّيّ لمفتاح idempotency الطلبات</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال فحص→إنشاء→تسجيل خطوات منفصلة؛ لا UPSERT ذرّيّ</td></tr>
+<tr><td class="id">D-34</td><td>فحص نزاع الحذف يُبتلَع بصمت</td><td><span class="badge b-not">❌ غير منفَّذ — حرِج وحيّ</span></td><td class="evid note flag">مؤكَّد شخصيًّا مرّتين (انظر القسم ③)</td></tr>
+<tr><td class="id">D-35</td><td>فحص UNDER_REVIEW/حجز قانونيّ عند الحذف</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">الفحص يغطّي "OPEN" فقط، لا "UNDER_REVIEW"؛ لا فحص لقضايا chargeback إطلاقًا</td></tr>
+<tr><td class="id">D-36</td><td>فحص دَين/رصيد محجوز عند حذف المحفظة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">يفحص فقط <code>balance_minor > 0</code>؛ لا فحص لحجوزات WalletReservation</td></tr>
+<tr><td class="id">D-37</td><td>افتراض متجر واحد للمزوّد عند الحذف</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid"><code>scalar_one_or_none()</code> على استعلام لا قيد فريد عليه — يفشل أو يتجاهل صمتًا لمزوّد متعدّد المتاجر</td></tr>
+<tr><td class="id">D-38</td><td>كشف حساب المحفظة من الـLedger مباشرة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال اتحاد 3 استعلامات؛ ManualWalletCredit مُستبعَدة صمتًا</td></tr>
+<tr><td class="id">D-39</td><td>واجهة "معلَّق" بدل "أُضيف" لرصيد المحفظة</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">مُصلَح في ControlPanelUsers.tsx فقط؛ ControlPanelCustomers.tsx لا يزال يقول "أُضيف"</td></tr>
+<tr><td class="id">D-40</td><td>حدّ رصيد المحفظة من الخادم لا ثابتًا</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">مُصلَح في مكان واحد؛ OpsWalletCredit.tsx لا يزال <strong>يُنفِّذ فعليًّا</strong> الحدّ الثابت 10000</td></tr>
+<tr><td class="id">D-41</td><td>إعادة قراءة الفائز الحقيقيّ عند تعارض Event ID (POS)</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال يُرجِع "PROCESSED" ثابتة عند التعارض</td></tr>
+<tr><td class="id">D-42</td><td>تعيين هويّة SKU/variant صريح</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا عمود SKU على ItemVariant</td></tr>
+<tr><td class="id">D-43</td><td>قفل تفاؤليّ (version) على الكتالوج</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا عمود version على catalog_items/item_variants</td></tr>
+<tr><td class="id">D-44</td><td>عميل آمن من SSRF لطلبات POS الصادرة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال urllib خامًا، صفر ضوابط SSRF</td></tr>
+<tr><td class="id">D-45</td><td>تشفير مغلّف لأسرار POS</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">تخزين نصّ صريح، لا KMS ولا تدوير</td></tr>
+</table></div>
+
+<div class="domain-h">🔐 الاحتفاظ، الخصوصيّة، PII، DLQ، صلاحيّات الواجهة، الأعلام (D-46 → D-58)</div>
+<div class="tbl-wrap"><table>
+<tr><th>#</th><th>الموضوع</th><th>الحكم</th><th>الدليل / الملاحظة</th></tr>
+<tr><td class="id">D-46</td><td>تنفيذ الاحتفاظ عبر لقطة/موافقة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">الحذف يُستدعى مباشرة داخل حلقة الفحص، لا موافقة مستقلّة</td></tr>
+<tr><td class="id">D-47</td><td>استعلام مجمَّع بدل N+1 لمرشَّحي الاحتفاظ</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال 4 استعلامات منفصلة لكل مستخدم داخل الحلقة</td></tr>
+<tr><td class="id">D-48</td><td>إزالة ادّعاء اكتمال كاذب من تصدير الخصوصيّة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال يدّعي فئات بيانات (معاملات، أجهزة) لا تُرجَع فعليًّا</td></tr>
+<tr><td class="id">D-49</td><td>سجلّات محو ثابتة بدل SystemEvent متحوّل</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال <code>event.event_type</code> يُعدَّل مباشرة في نفس الصفّ</td></tr>
+<tr><td class="id">D-50</td><td>إخفاء PII افتراضيًّا — كل نقاط العرض</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">3 من 6 صفحات لا تزال تكشف الرقم/البريد كاملَين (انظر القسم ③)</td></tr>
+<tr><td class="id">D-51</td><td>تدقيق مُلزِم قبل كشف PII</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">لا يوجد try/except يبتلع فشل كتابة سجلّ التدقيق</td></tr>
+<tr><td class="id">D-52</td><td>سبب إلزاميّ لإغلاق DLQ</td><td><span class="badge b-done">✅ منجَز (بالنطاق المعلَن، الجزئيّ)</span></td><td class="evid">حقل reason إلزاميّ + عمود resolved_reason؛ ورشة الإعادة الكاملة مؤجَّلة كما أُعلِن</td></tr>
+<tr><td class="id">D-53</td><td>محرّك حالة/عمل موحَّد</td><td><span class="badge b-not">❌ غير منفَّذ (متوقَّع، مرحلة 4)</span></td><td class="evid">لا وجود لأي محرّك من هذا النوع</td></tr>
+<tr><td class="id">D-54</td><td>حدود صلاحيّة الواجهة من لقطة خادم حقيقيّة</td><td><span class="badge b-not">❌ غير منفَّذ (تأجيل متعمَّد ومُوثَّق)</span></td><td class="evid">opsAccess.ts لا يزال خريطة ثابتة يدويّة</td></tr>
+<tr><td class="id">D-55</td><td>فشل مغلَق افتراضيًّا لمسارات الواجهة غير المصنَّفة</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">مسار غير مصنَّف = ممنوع + اختبار تغطية شامل</td></tr>
+<tr><td class="id">D-56</td><td>إزالة وراثة ADMIN الواسعة</td><td><span class="badge b-not">❌ غير منفَّذ (بالتسلسل الصحيح المخطَّط)</span></td><td class="evid">لا تزال وراثة واسعة في roles.py</td></tr>
+<tr><td class="id">D-57</td><td>توحيد محلِّل الأعلام (23 موقعًا)</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">موقعان فقط رُحِّلا من أصل ~23</td></tr>
+<tr><td class="id">D-58</td><td>رجوع لآخر قيمة سليمة قبل YAML عند عطل قاعدة البيانات</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">تخزين مؤقّت في Redis لـ5 دقائق يُفحَص أوّلًا</td></tr>
+</table></div>
+
+<div class="domain-h">⚙️ إعدادات الإنتاج، المهامّ الخلفيّة، تحديد المعدّل، الجوّال، CI (D-59 → D-72)</div>
+<div class="tbl-wrap"><table>
+<tr><th>#</th><th>الموضوع</th><th>الحكم</th><th>الدليل / الملاحظة</th></tr>
+<tr><td class="id">D-59</td><td>فحص أدوار MFA الإلزاميّة عند الإقلاع</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid note flag">مخطَّط لـ"المرحلة صفر" لكن غائب تمامًا من التنفيذ الفعليّ</td></tr>
+<tr><td class="id">D-60</td><td>فحص عتبات COD/المحفظة عند الإقلاع</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid note flag">نفس الملاحظة أعلاه</td></tr>
+<tr><td class="id">D-61</td><td>فحص صندوق الإشعارات عند الإقلاع</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid note flag">نفس الملاحظة أعلاه</td></tr>
+<tr><td class="id">D-62</td><td>عامل ARQ خلفيّ مخصّص</td><td><span class="badge b-not">❌ غير منفَّذ (متوقَّع، مرحلة 3)</span></td><td class="evid">لا يزال ~27 حلقة داخل عمليّة الخادم</td></tr>
+<tr><td class="id">D-63</td><td>إيقاف موحَّد عبر asyncio.gather</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">استُبدلت 23 استدعاءً منفصلًا بـgather واحدة</td></tr>
+<tr><td class="id">D-64</td><td>تحقّق ذاتيّ من alembic head عند الإقلاع</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid"><code>_verify_alembic_head()</code> تُستدعى في lifespan</td></tr>
+<tr><td class="id">D-65</td><td>قاطع دارة محلّيّ لتحديد المعدّل عند عطل Redis</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">شرط >= صحيح (كان == معطوبًا)؛ نظافة دوريّة للسجلّ المحلّي</td></tr>
+<tr><td class="id">D-66</td><td>عدّاد بايتات حقيقيّ لحجم الجسم</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">middleware ASGI مُعاد كتابتها بالكامل</td></tr>
+<tr><td class="id">D-67</td><td>ثقة الوكيل مقصورة على CIDR صريح</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">نطاق Docker فقط، لا RFC1918 كاملة</td></tr>
+<tr><td class="id">D-68</td><td>Retry-After كحدّ أدنى لا أقصى (جوّال)</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">Math.max + دعم صيغة HTTP-date</td></tr>
+<tr><td class="id">D-69</td><td>معرّف جهاز عشوائيّ مشفَّر (جوّال)</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">Crypto.randomUUID() من expo-crypto</td></tr>
+<tr><td class="id">D-70</td><td>تخزين محلّيّ مشفَّر (جوّال)</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid note flag">لا يزال AsyncStorage عاديًّا؛ MMKV غير مثبَّتة أصلًا</td></tr>
+<tr><td class="id">D-71</td><td>مهمّة CI حاجبة للجوّال</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">وظيفة mobile-tests جديدة في ci.yml</td></tr>
+<tr><td class="id">D-72</td><td>Playwright حاجب لطبقة web فقط</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">test:e2e موجود لكن غير مربوط بأي وظيفة CI إطلاقًا اليوم</td></tr>
+</table></div>
+
+<div class="domain-h">📋 أدلّة CI، التوثيق، i18n، بوّابات الإطلاق (D-73 → D-85)</div>
+<div class="tbl-wrap"><table>
+<tr><th>#</th><th>الموضوع</th><th>الحكم</th><th>الدليل / الملاحظة</th></tr>
+<tr><td class="id">D-73</td><td>حماية فرع master على GitHub</td><td><span class="badge b-cant">⚠️ لا يمكن التحقّق محليًّا</span></td><td class="evid">واجهة GitHub API لهذه الميزة محجوبة خلف خطّة مدفوعة للمستودعات الخاصّة</td></tr>
+<tr><td class="id">D-74</td><td>وثيقة تتبّع دَين العقد</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا وجود لـdocs/contract_debt.md</td></tr>
+<tr><td class="id">D-75</td><td>تأكيدات حقيقيّة بدل قبول 403/404/422</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid">أُصلِح في ops_test_v2.sh فقط؛ ops_test_report.sh لا يزال بالنمط القديم</td></tr>
+<tr><td class="id">D-76</td><td>إثبات عدم انعكاس/تسرّب SQLi/XSS</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">كلا السكربتين يفحصان فقط code<500، لا فحص محتوى الاستجابة</td></tr>
+<tr><td class="id">D-77</td><td>فحص آليّ لثنائيّة اللغة</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">موجود فقط في سكربت يدويّ، غير مربوط بـCI أو pytest</td></tr>
+<tr><td class="id">D-78</td><td>مسار Postgres حقيقيّ في CI</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid note flag">معطوب بصمت — اختلاف اسم متغيّر البيئة (انظر القسم ③)</td></tr>
+<tr><td class="id">D-79</td><td>README يوثّق React Native حصرًا</td><td><span class="badge b-partial">🟡 جزئيّ (مكتمل أساسًا)</span></td><td class="evid">README مُصلَح؛ إشارة قديمة لعدد اختبارات Flutter لا تزال في ملفّ قواعد منفصل (كما هو متوقَّع ومُعلَن)</td></tr>
+<tr><td class="id">D-80</td><td>تفعيل بوّابة i18n كحاجبة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا تزال continue-on-error: true</td></tr>
+<tr><td class="id">D-81</td><td>ملاحظات تحديث ثنائيّة اللغة</td><td><span class="badge b-done">✅ منجَز</span></td><td class="evid">عمودان + دالّة اختيار حسب اللغة + اختبارات</td></tr>
+<tr><td class="id">D-82</td><td>تعيين ملاّك بوّابات الإطلاق</td><td><span class="badge b-not">❌ غير منفَّذ (متوقَّع، قرار تشغيليّ)</span></td><td class="evid">كل البوّابات التسع لا تزال owner: TBD</td></tr>
+<tr><td class="id">D-83</td><td>بصمة SHA256 لبوّابات الإطلاق لم تُمَسّ بلا طقس إعادة معايرة</td><td><span class="badge b-done">✅ مؤكَّد</span></td><td class="evid">بصمة الملفّ الفعليّة مطابقة تمامًا لما وثَّقه CLAUDE.md</td></tr>
+<tr><td class="id">D-84</td><td>صندوق إشعارات — تجميع "اليوم"</td><td><span class="badge b-not">❌ غير منفَّذ / الادّعاء نفسه غير مؤكَّد</span></td><td class="evid note flag">بحث شامل لم يجد أي ميزة تجميع بهذا الوصف في كل المستودع</td></tr>
+<tr><td class="id">D-85</td><td>فهرسة تتبّع مسار الطلب</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid note flag">الفهرس والاستعلام صحيحان؛ اختبار "100 ألف سجلّ + EXPLAIN" المزعوم غير موجود</td></tr>
+</table></div>
+
+<h2 id="cinit">⑥ بنود C-XX / INIT-XX — تدقيق تكميليّ (30 بندًا، من تقرير 542)</h2>
+<p>
+  هذه الـ30 بندًا فحصها تقرير 542 بالأمس مباشرة من الكود، بعد آخر تعديل حقيقيّ على المستودع — لا قيمة في إعادة نفس الفحص من الصفر.
+  بدل ذلك: تحقَّقنا شخصيًّا من أخطر بندَين فيه (<strong>INIT-9</strong> و<strong>C-10a</strong>، القسم ③ أعلاه) لتأكيد أنّ نتائج 542 لا تزال صحيحة اليوم، ثمّ
+  اعتمدنا بقيّة أحكامه هنا كما هي، <strong>مع تصحيح تداخل مهمّ</strong>: سبعة من هذه الـ30 بندًا هي في الحقيقة نفس بنود D-XX المذكورة أعلاه بأسماء مختلفة
+  (رقمين مختلفين لنفس الإصلاح الفعليّ) — نعرضها هنا كإشارة فقط، بلا عدّها مرّتين في الإحصاء.
+</p>
+
+<div class="stat-grid">
+  <div class="stat done"><div class="n">3</div><div class="l">✅ منجَز<br>(من 23 بندًا غير مكرَّر)</div></div>
+  <div class="stat partial"><div class="n">1</div><div class="l">🟡 جزئيّ</div></div>
+  <div class="stat not"><div class="n">19</div><div class="l">❌ غير منفَّذ</div></div>
+</div>
+
+<div class="tbl-wrap"><table>
+<tr><th>الرمز</th><th>الموضوع</th><th>الحكم</th><th>الدليل / الملاحظة</th></tr>
+<tr><td class="id">C-01(a)</td><td>رفض نشر إصدار متزامن بلا خطأ 500</td><td><span class="badge b-done">✅ منجَز (بآليّة مختلفة)</span></td><td class="evid">إعادة محاولة + معالج IntegrityError عامّ في main.py يُرجِع 409</td></tr>
+<tr><td class="id">C-03(a)</td><td>نتائج لكل عنصر في دفعة POS</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">الدفعة كلّها SAVEPOINT واحد (الكل أو لا شيء)</td></tr>
+<tr><td class="id">C-04(a)</td><td>خيار "لصالح المنصّة" ناقص بشاشتَي الحلّ</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">غائب من OpsBulkActions.tsx وOpsComplaints.tsx رغم دعم الخادم الكامل</td></tr>
+<tr><td class="id">C-06(c)</td><td>علم ميزة لإرسال SMS الحقيقيّ</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">الإرسال مفعَّل عبر متغيّر بيئة منفصل، لا عبر flags.yaml</td></tr>
+<tr><td class="id">C-08</td><td>حقل تأكيد "سُجِّل خروجك من الأجهزة الأخرى"</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">الخادم يُلغي الجلسات فعلًا لكن لا يُبلِغ بذلك بالاستجابة</td></tr>
+<tr><td class="id">C-10(a)</td><td>فحص هويّة للاعتماد الثاني للاسترجاع</td><td><span class="badge b-not">❌ غير منفَّذ — فجوة ماليّة حيّة</span></td><td class="evid note flag">مؤكَّد شخصيًّا (القسم ③) — نفس النتيجة</td></tr>
+<tr><td class="id">C-11(e)</td><td>مسار قيد طوارئ لـSUPER_ADMIN</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا وجود لأي نقطة نهاية طوارئ في manual_journal_router.py</td></tr>
+<tr><td class="id">C-12(f)</td><td>حالة "يحتاج إصلاحًا ماليًّا" رسميّة</td><td><span class="badge b-not">❌ غير منفَّذ (لكن الأثر الأخطر أُصلِح بآليّة أخرى)</span></td><td class="evid">لا حالة رسميّة؛ تتبّع فشل عكس العمولة نفسه أُصلِح مسبقًا (= D-25 أعلاه)</td></tr>
+<tr><td class="id">C-13.1–13.5</td><td>5 مواضع صلاحيّات واجهة لاستثناءات النقد</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">FINANCE_AGENT مستبعَد من قوائم الأدوار بالواجهة رغم امتلاكه الصلاحيّة بالخادم</td></tr>
+<tr><td class="id">C-14.1</td><td>تسجيل/مقياس على مسار الفشل الصامت للصلاحيّات</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا استدعاء logger داخل معالج الاستثناء في dependencies.py</td></tr>
+<tr><td class="id">C-14.3</td><td>قاطع دائرة لمحرّك الصلاحيّات</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">النمط موجود فقط في rate_limiter.py، لم يُستنسَخ للصلاحيّات</td></tr>
+<tr><td class="id">C-15.1</td><td>توقيع HMAC بدل SHA-256 لسلسلة التدقيق</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا يزال hashlib.sha256 صرفًا، بلا مفتاح</td></tr>
+<tr><td class="id">C-15.2/15.3</td><td>تسجيل تدقيق للقيد اليدويّ والنزاع</td><td><span class="badge b-done">✅ منجَز (قبل سلسلة D-XX أصلًا)</span></td><td class="evid">أُنجز بعمل سابق منفصل (commit 717b8e1)، قبل نشر تقرير 538 بساعات</td></tr>
+<tr><td class="id">INIT-0</td><td>مشغِّل قاعدة بيانات يمنع تعديل سجلّ التدقيق</td><td><span class="badge b-done">✅ منجَز (نفس commit 717b8e1)</span></td><td class="evid">هجرة ab51</td></tr>
+<tr><td class="id">INIT-1</td><td>واجهة قدرات موحَّدة (~500 موضع)</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">صفر من 500 موضع مُسجَّل</td></tr>
+<tr><td class="id">INIT-2</td><td>استخراج فحص "الطالب≠المعتمِد" كقطعة مشتركة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا تزال مكرَّرة يدويًّا بـ5 مواضع، وغائبة من مسار حلّ النزاع (D-29)</td></tr>
+<tr><td class="id">INIT-3(d)</td><td>كشف expires_at بواجهة العمليّات</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">غائب حتّى من الصفحة "المرجعيّة" التي افترضت الخطّة أنّها تعرضه</td></tr>
+<tr><td class="id">INIT-4</td><td>مصدر حقيقة واحد للأعلام — ترحيل وحدة المدفوعات (14 موضعًا)</td><td><span class="badge b-partial">🟡 جزئيّ</span></td><td class="evid">is_enabled_3layer جاهزة، لكن 0٪ من مواضع المدفوعات رُحِّلت (يتّسق مع D-57)</td></tr>
+<tr><td class="id">INIT-5</td><td>دمج ~75 صفحة لوحة عمليّات متشظّية</td><td><span class="badge b-not">❌ غير منفَّذ (متوقَّع، مشروع كبير مستقلّ)</span></td><td class="evid">لا دمج حتّى الآن</td></tr>
+<tr><td class="id">INIT-6(a)</td><td>تعميم وحدة رفع ملفّات KYC</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">الدلو ونوع الملفّ لا يزالان ثابتَين بالكود</td></tr>
+<tr><td class="id">INIT-7</td><td>جرد 27 مهمّة خلفيّة + دفعة تجريبيّة</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا ملفّات مهامّ خلفيّة جديدة/مُعدَّلة</td></tr>
+<tr><td class="id">INIT-8</td><td>استدعاء محجوب (urllib) داخل سياق غير متزامن</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">لا مستدعٍ إنتاجيّ اليوم (اختبارات فقط) — خطر كامن لا نشط</td></tr>
+<tr><td class="id">INIT-10</td><td>مفتاح سياسة منفصل لكل نوع قرار</td><td><span class="badge b-not">❌ غير منفَّذ</span></td><td class="evid">جدول الأعلام لا يزال منطقًا ثنائيًّا بسيطًا</td></tr>
+</table></div>
+
+<div class="callout">
+  <strong>بنود تتقاطع مع القسم أعلاه (لأسماء مختلفة لنفس الإصلاح) — غير معدودة مرّتين:</strong>
+  C-01(b) = D-01 (منجَز) · C-03(c) = D-43 (غير منفَّذ) · C-07(a) = D-06/D-07 (غير منفَّذ) ·
+  INIT-3(a) = D-11 (منجَز) · INIT-3(b) = D-69 (منجَز) · INIT-6(b) = D-31 (جزئيّ) · <strong>INIT-9 = D-34 (غير منفَّذ — حرِج وحيّ)</strong>.
+</div>
+
+<div class="card">
+  <h3>📐 الإحصاء المدمَج النهائيّ — D-XX (85) + C/INIT غير المكرَّر (23) = 108 بندًا</h3>
+  <div class="stat-grid">
+    <div class="stat done"><div class="n">29</div><div class="l">✅ منجَز (27٪)</div></div>
+    <div class="stat partial"><div class="n">16</div><div class="l">🟡 جزئيّ (15٪)</div></div>
+    <div class="stat not"><div class="n">62</div><div class="l">❌ غير منفَّذ (57٪)</div></div>
+    <div class="stat cant"><div class="n">1</div><div class="l">⚠️ لا يمكن التحقّق (1٪)</div></div>
+  </div>
+</div>
+
+<h2 id="method">⑦ المنهجية، والقيود</h2>
+<div class="card">
+<ul>
+<li><strong>القاعدة الوحيدة:</strong> لا ثقة بأي نصّ تقرير سابق — كل حكم هنا من قراءة مباشرة لملفّ الكود الفعليّ اليوم (فرع <code>fix/r535-c16-c05-audit-logging-2026-07-19</code>)، بالسطر والدليل.</li>
+<li><strong>ما لا يستطيع هذا التقرير إثباته:</strong> حالة النشر الحيّ الفعليّة على test1/.194/الإنتاج (تقارير 540/541 تدّعي نشرًا وفحصًا حيًّا على الأربعة، لكن هذا الفحص عمل من المستودع المحليّ فقط ولا يستطيع التحقّق من حالة الخوادم البعيدة الآن)؛ ولا حالة إعدادات GitHub الإداريّة (حماية الفرع، D-73) التي تتطلّب خطّة مدفوعة للتحقّق منها عبر الواجهة البرمجيّة.</li>
+<li><strong>الفرق بين "غير منفَّذ" و"إخفاق":</strong> معظم البنود المصنَّفة ❌ في هذا التقرير كانت مصنَّفة أصلًا BUILD لمراحل لاحقة (2، 3، 4) في خطّة 539/540 — أي لم تكن مطروحة للتنفيذ في هذه الدفعة أصلًا. الإخفاقات الحقيقيّة الجديرة بالاهتمام هي تحديدًا تلك المذكورة في القسم ③: بنود خُطِّط لها في "المرحلة صفر" ولم تصل، وبنود قيل إنّها اكتملت لكنّها جزئيّة فعلًا.</li>
+<li><strong>الفحص أُجري عبر 6 فرق تحقّق مستقلّة متوازية</strong> (وكيل واحد لكل مجموعة من ~13-17 بندًا)، كل فريق يقرأ الكود بنفسه، مع طلب صريح بعدم الوثوق بأي وصف مُعطى له بلا تحقّق — وقد اكتشفت الفرق فعلًا حالات يكون فيها الوصف المُعطى غير دقيق (مثال: D-10، D-15).</li>
+</ul>
+</div>
+
+<footer>تقرير 543 · تووا (Tawa) — منصّة التوصيل الليبيّة · فحص مستقلّ لسلسلة تقارير 503–542 مقابل الكود الفعليّ · 2026-07-21</footer>
+
+</div>
+</body>
+</html>

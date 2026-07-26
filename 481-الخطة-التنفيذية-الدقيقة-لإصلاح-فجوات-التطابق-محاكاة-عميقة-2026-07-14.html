@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير 481 — الخطة التنفيذية الدقيقة لإصلاح فجوات التطابق (RN vs Web)، بعد محاكاة ذهنية عميقة لكل نقطة</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e; --waveA:#ff2d55; --waveB:#ff9f43; --waveC:#2aa5d8; --waveD:#9b7bd8;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.85; margin:0; font-size:16px;}
+  .wrap{max-width:1280px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:1000px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.med .num{color:var(--med)} .stat.ok .num{color:var(--ok)}
+  .stat .lbl{color:var(--muted); font-size:.82rem; margin-top:4px}
+  section{margin:50px 0}
+  h2.sec-title{font-size:1.55rem; border-inline-start:6px solid var(--accent); padding-inline-start:16px; margin-bottom:10px; color:#fff}
+  h2.sec-title.waveA{border-color:var(--waveA)} h2.sec-title.waveB{border-color:var(--waveB)}
+  h2.sec-title.waveC{border-color:var(--waveC)} h2.sec-title.waveD{border-color:var(--waveD)}
+  h3.item-title{font-size:1.25rem; color:#fff; margin:36px 0 6px; padding-inline-start:12px; border-inline-start:3px solid var(--border)}
+  h4.sub-title{font-size:1.02rem; color:var(--accent2); margin:20px 0 8px}
+  p.lead{color:var(--muted); max-width:1000px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card.warn{border-inline-start:5px solid var(--high)}
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+  .card-title{font-size:1.1rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700; white-space:nowrap}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .tag.waveA{background:rgba(255,45,85,.15); color:var(--waveA); border:1px solid rgba(255,45,85,.4)}
+  .tag.waveB{background:rgba(255,159,67,.15); color:var(--waveB); border:1px solid rgba(255,159,67,.4)}
+  .tag.waveC{background:rgba(42,165,216,.15); color:var(--waveC); border:1px solid rgba(42,165,216,.4)}
+  .tag.waveD{background:rgba(155,123,216,.15); color:var(--waveD); border:1px solid rgba(155,123,216,.4)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.78rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.87rem}
+  th,td{border:1px solid var(--border); padding:8px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight.blocker{background:rgba(255,45,85,.07); border-color:rgba(255,45,85,.4)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .insight.blocker h4{color:var(--blocker)}
+  .verdict{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid rgba(55,201,135,.4); border-radius:16px; padding:24px 28px; margin:20px 0}
+  .verdict h3{margin:0 0 10px; color:var(--accent); font-size:1.2rem}
+
+  /* scenario tables */
+  .scenario-table td:first-child{white-space:nowrap; font-weight:700; color:var(--accent2)}
+  .scenario-table .sev-crit{color:var(--blocker); font-weight:700}
+  .scenario-table .sev-high{color:var(--high); font-weight:700}
+  .scenario-table .sev-med{color:var(--med)}
+  .scenario-table .sev-low{color:var(--low)}
+
+  /* diagrams: simple box+arrow flexbox layout */
+  .diagram{background:var(--code-bg); border:1px solid var(--border); border-radius:14px; padding:26px; margin:18px 0; overflow-x:auto}
+  .flow-row{display:flex; align-items:center; gap:0; flex-wrap:nowrap; min-width:max-content}
+  .flow-box{background:var(--panel); border:1.5px solid var(--accent2); border-radius:10px; padding:12px 16px; font-size:.82rem; text-align:center; min-width:130px; color:var(--text)}
+  .flow-box.start{border-color:var(--accent)} .flow-box.end{border-color:var(--ok); background:rgba(55,201,135,.08)}
+  .flow-box.danger{border-color:var(--blocker); background:rgba(255,45,85,.08)}
+  .flow-box.warn{border-color:var(--high); background:rgba(255,159,67,.08)}
+  .flow-arrow{color:var(--muted); font-size:1.3rem; padding:0 10px; flex-shrink:0}
+  .flow-label{font-size:.68rem; color:var(--muted); text-align:center; margin-top:4px}
+  .branch-wrap{display:flex; flex-direction:column; gap:14px; margin:14px 0}
+  .branch{display:flex; align-items:center; gap:10px}
+  .branch .cond{font-size:.75rem; color:var(--muted); min-width:170px; text-align:left; direction:ltr}
+  .seq-diagram{display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; font-size:.78rem}
+  .seq-col{border-inline-end:1px dashed var(--border); padding:0 14px; position:relative}
+  .seq-col:last-child{border-inline-end:none}
+  .seq-actor{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px; text-align:center; font-weight:700; color:var(--accent2); margin-bottom:16px}
+  .seq-step{background:var(--panel2); border-radius:8px; padding:8px 10px; margin-bottom:10px; color:var(--text)}
+  .gantt{display:flex; flex-direction:column; gap:6px; margin:16px 0}
+  .gantt-row{display:flex; align-items:center; gap:10px}
+  .gantt-label{min-width:230px; font-size:.85rem; color:var(--text)}
+  .gantt-bar{height:26px; border-radius:6px; display:flex; align-items:center; padding:0 10px; font-size:.72rem; color:#0b100e; font-weight:700}
+  .side-effect-table th{white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>🗺️ الخطة التنفيذية الدقيقة لإصلاح فجوات التطابق (RN مقابل الويب)</h1>
+  <div class="sub">تحويل تقرير التدقيق 480 إلى خطة عمل قابلة للتنفيذ — بعد التحقّق من كل عقد باك-إند مباشرة من الكود (لا افتراضات)، ومحاكاة ذهنية لكل نقطة: <b>ماذا يحدث أثناء البناء/الإصلاح</b> (تعارضات، ترحيل بيانات، كسر شاشات أخرى) و<b>ماذا يحدث أثناء التشغيل الفعلي</b> (سيناريوهات المستخدم، الحالات الحدّية، السباقات)، مع تسجيل كل عرَض جانبي مكتشَف وخطة علاجه ضمن نفس الخطة.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-14</div>
+    <div class="badge">🔎 <b>المنهجية:</b> تحقّق مباشر من كود الباك-إند لكل نقطة قبل التخطيط لها (مسار الملف + رقم السطر)</div>
+    <div class="badge">🌊 <b>الهيكلة:</b> 4 موجات عمل (Waves) مرتّبة حسب الأولوية والاعتماديات</div>
+  </div>
+</header>
+
+<div class="stats-grid">
+  <div class="stat blocker"><div class="num">4</div><div class="lbl">عناصر الموجة A<br>(امتثال/تحكّم وصول حرجة)</div></div>
+  <div class="stat high"><div class="num">3</div><div class="lbl">عناصر الموجة B<br>(تجارة العميل الأساسية)</div></div>
+  <div class="stat med"><div class="num">5</div><div class="lbl">عناصر الموجة C<br>(سلامة وتشغيل السائق)</div></div>
+  <div class="stat"><div class="num">~14</div><div class="lbl">عناصر الموجة D<br>(إثراءات ثانوية)</div></div>
+  <div class="stat ok"><div class="num">120+</div><div class="lbl">سيناريو بناء/تشغيل مُحاكى</div></div>
+  <div class="stat waveA-stat" style="border-inline-start:3px solid var(--blocker)"><div class="num">1</div><div class="lbl">عنصر يحتاج <b>عملاً في الباك-إند</b><br>(سبب الرفض — لا يوجد endpoint)</div></div>
+</div>
+
+<div class="verdict">
+  <h3>✅ تصحيح على تقرير التدقيق السابق (480)</h3>
+  <p>أثناء التحقّق المباشر لهذه الخطة تبيّن أن أحد نتائج تقرير التدقيق كان غير دقيق: <b>"عدم عرض تفاصيل عناصر الطلب في شاشة تتبّع الطلب" ليس فجوة حقيقية</b> — تحققتُ من كود الويب نفسه (<code>OrderTrackingPage.tsx</code>) وعقد الباك-إند (<code>OrderSummary</code> في <code>order_router.py</code>) فوجدت أن الويب نفسه **لا يعرض قائمة عناصر الطلب بالاسم** في شاشة التتبّع — فقط <code>items_count</code> (عدد العناصر). كلا التطبيقين متطابقان في هذه النقطة تحديدًا. بقية فجوات تتبّع الطلب (الخريطة الحية، الاتصال بالسائق، الإلغاء، التقييم، النزاع) **حقيقية ومؤكَّدة** وبقيت في هذه الخطة.</p>
+</div>
+
+<nav class="toc">
+  <b>فهرس الخطة</b>
+  <ul>
+    <li><a href="#sequencing">خريطة التسلسل العامة (Gantt مبسّط)</a></li>
+    <li><a href="#waveA">الموجة A — الامتثال وتحكّم الوصول (حرجة)</a></li>
+    <li><a href="#waveB">الموجة B — تجارة العميل الأساسية</a></li>
+    <li><a href="#waveC">الموجة C — سلامة وتشغيل السائق</a></li>
+    <li><a href="#waveD">الموجة D — الإثراءات الثانوية</a></li>
+    <li><a href="#registry">سجلّ الأعراض الجانبية الموحَّد</a></li>
+    <li><a href="#deps">مصفوفة الاعتماديات بين العناصر</a></li>
+  </ul>
+</nav>
+
+<section id="sequencing">
+  <h2 class="sec-title">🗓️ خريطة التسلسل العامة</h2>
+  <p class="lead">الترتيب هنا حسب <b>الأولوية والاعتماد</b>، لا حسب الحجم. الموجة A لا تعتمد على شيء ويمكن أن تبدأ فورًا (كلها تغييرات واجهة بحتة تقريبًا، تستهلك عقودًا موجودة فعلاً في الباك-إند). الموجة B تغيّر شكل بيانات السلة، لذا يجب أن تُبنى دفعة واحدة متماسكة. الموجة C مستقلة تمامًا عن B ويمكن أن تسير بالتوازي معها. الموجة D تعتمد جزئيًا على B (بعض شاشات المحفظة تتقاطع مع منطق الدفع الجديد).</p>
+  <div class="gantt">
+    <div class="gantt-row"><div class="gantt-label">A — الامتثال وتحكّم الوصول</div><div class="gantt-bar" style="background:var(--waveA); width:22%">أسبوع 1</div></div>
+    <div class="gantt-row"><div class="gantt-label">B — تجارة العميل الأساسية</div><div class="gantt-bar" style="background:var(--waveB); width:45%; margin-inline-start:8%">أسبوعان 1-3</div></div>
+    <div class="gantt-row"><div class="gantt-label">C — سلامة وتشغيل السائق</div><div class="gantt-bar" style="background:var(--waveC); width:38%; margin-inline-start:8%">أسبوعان 1-2.5</div></div>
+    <div class="gantt-row"><div class="gantt-label">D — الإثراءات الثانوية</div><div class="gantt-bar" style="background:var(--waveD); width:35%; margin-inline-start:53%">بعد B</div></div>
+  </div>
+  <div class="fine-list card">💡 <b>لماذا هذا الترتيب:</b> الموجة A تُصلح ثغرات امتثال/تحكّم وصول حقيقية بأقل تغيير ممكن في الكود (لا تغيير في شكل البيانات المخزَّنة) — أعلى قيمة بأقل خطر، تُنجَز أولًا. الموجة B تغيّر <code>CartLine</code> نفسها (شكل البيانات المُخزَّنة محليًا على أجهزة المستخدمين) — هذا يحتاج مسار ترحيل حذر، فهي الأطول زمنيًا وتُعطى مساحة كافية. الموجة C مستقلة تمامًا (لا تلمس السلة/الدفع) فتسير بالتوازي. الموجة D تُؤجَّل لأنها تحسينات لا تمنع الاستخدام.</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WAVE A -->
+<!-- ============================================================ -->
+<section id="waveA">
+  <h2 class="sec-title waveA">🔴 الموجة A — الامتثال وتحكّم الوصول (حرجة، تبدأ فورًا)</h2>
+  <p class="lead">أربعة عناصر، ثلاثة منها <b>واجهة فقط</b> (الباك-إند يملك العقد الكامل بالفعل ومُتحقَّق منه سطرًا بسطر)، وواحد يحتاج تعديلًا صغيرًا في الباك-إند.</p>
+
+  <h3 class="item-title">A1 — بوابة حالة الحساب (قيد المراجعة / مرفوض) للسائق والمزوّد</h3>
+  <div class="tag-row">
+    <span class="tag waveA">الموجة A</span><span class="tag blocker">حرج</span><span class="tag ok">واجهة فقط</span>
+  </div>
+
+  <h4 class="sub-title">جذر المشكلة</h4>
+  <p>القيمة <code>role_status</code> (القيم: <code>ACTIVE</code> / <code>PENDING_VERIFICATION</code> / <code>REJECTED</code>) موجودة فعلاً **داخل مطالبات JWT نفسها** (<code>auth_router.py</code> → <code>jwt_service.py:214,231,277,287</code>) — أي أن RN يملكها بالفعل في كل استجابة تسجيل دخول <b>ولا يستخدمها لأي شيء</b>. كذلك <code>GET /auth/me</code> يعيدها مباشرة، و<code>GET /dispatch/drivers/me/status</code> يعطي تفصيلًا أغنى للسائق تحديدًا (متاح حتى للحساب المُعلَّق عمدًا).</p>
+
+  <h4 class="sub-title">التصميم التقني</h4>
+  <div class="diagram">
+    <div class="branch-wrap">
+      <div class="flow-row">
+        <div class="flow-box start">تسجيل الدخول (OTP/كلمة مرور)</div><div class="flow-arrow">←</div>
+        <div class="flow-box">فكّ ترميز JWT<br><code style="font-size:.68rem">claims.role_status</code></div><div class="flow-arrow">←</div>
+        <div class="flow-box">تخزين role_status في<br>useSession (store/session.ts)</div>
+      </div>
+      <div class="branch"><div class="cond">role_status == ACTIVE</div><div class="flow-arrow">→</div><div class="flow-box end">التطبيق الطبيعي (الحالة الحالية)</div></div>
+      <div class="branch"><div class="cond">role_status == PENDING_VERIFICATION</div><div class="flow-arrow">→</div><div class="flow-box warn">شاشة "قيد المراجعة" (جديدة) — تعرض تقدّم استيفاء الوثائق (KYC) + زر تحديث + رابط الدعم</div></div>
+      <div class="branch"><div class="cond">role_status == REJECTED</div><div class="flow-arrow">→</div><div class="flow-box danger">شاشة "تم الرفض" (جديدة) — السبب إن توفّر (A2) + زر إعادة التقديم + رابط الدعم</div></div>
+    </div>
+  </div>
+  <ul>
+    <li>ملف جديد: <code>app/(driver)/pending.tsx</code> و<code>app/(provider)/pending.tsx</code> (أو شاشة مشتركة <code>app/account-pending.tsx</code> بمعامل دور).</li>
+    <li>تعديل <code>store/session.ts</code>: إضافة <code>roleStatus: string | null</code> إلى الحالة، تعبئته من <code>decodeTokenClaims()</code> عند <code>signIn</code> (الدالة موجودة فعلاً وتُستخدَم لاستخراج <code>role</code> — إضافة استخراج <code>role_status</code> بجانبها تمامًا نفس النمط).</li>
+    <li>تعديل <code>app/(driver)/_layout.tsx</code> و<code>app/(provider)/_layout.tsx</code>: عند دخول أي شاشة داخل المجموعة، إن كان <code>roleStatus !== 'ACTIVE'</code> يُعاد التوجيه لشاشة الحالة بدل عرض التبويبات الطبيعية.</li>
+    <li>الشاشة نفسها تستدعي <code>GET /dispatch/drivers/me/status</code> (للسائق) لعرض تقدّم الوثائق تفصيليًا، أو تكتفي بـ<code>GET /auth/me</code> (للمزوّد، لا يوجد نظير أغنى موثَّق).</li>
+  </ul>
+
+  <h4 class="sub-title">محاكاة أثناء البناء (Build-Time)</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج في الخطة</th></tr>
+    <tr><td>B1</td><td>مستخدم لديه جلسة قديمة (توكن صادر <b>قبل</b> هذا الإصلاح) — هل يحمل <code>role_status</code> أصلاً؟</td><td class="sev-high">عالية</td><td>معالجة القيمة الغائبة كـ<code>undefined</code> → افتراض <code>ACTIVE</code> (نفس سلوك الباك-إند الافتراضي <code>claims.get("role_status","ACTIVE")</code>) — لا حجب رجعي لمستخدمين نشطين بالفعل</td></tr>
+    <tr><td>B2</td><td>تعديل <code>_layout.tsx</code> يُدخل حلقة توجيه لا نهائية إن كانت شاشة "قيد المراجعة" نفسها داخل نفس المجموعة المحمية</td><td class="sev-crit">حرجة</td><td>شاشة الحالة يجب أن تكون <b>خارج</b> مجموعة `(driver)`/`(provider)` (توجيه على مستوى `app/` الجذر)، أو استثناء صريح لمسارها من فحص `_layout.tsx`</td></tr>
+    <tr><td>B3</td><td>سائق/مزوّد ACTIVE لكن مع تعليق مؤقت من نوع آخر (`is_suspended`, `SUSPENDED`) — هل تُخلَط هذه الحالة بـPENDING عن طريق الخطأ؟</td><td class="sev-med">متوسطة</td><td>الفحص يقتصر حصرًا على القيم الثلاث الموثَّقة (`ACTIVE`/`PENDING_VERIFICATION`/`REJECTED`)؛ أي قيمة أخرى (`SUSPENDED` إلخ) تمرّ للتطبيق الطبيعي وتُعالَج بآلياتها الحالية (403 من `require_active_role` مع رسالة موجودة بالفعل)، فلا تُدمَج ضمن هذا الإصلاح</td></tr>
+    <tr><td>B4</td><td>تعطيل RN الحالي لأي استدعاء `getDriverProfile`/`getProviderProfile` أثناء PENDING (كانت تُستدعى بحرية سابقًا وقد تُعيد 403 الآن لأول مرة لأن الشاشة الجديدة توقّفها مبكرًا)</td><td class="sev-low">منخفضة</td><td>ترتيب منطقي: فحص `roleStatus` في `_layout.tsx` يحدث **قبل** أي استعلام react-query تابع للشاشات الداخلية، فلا تُستدعى أصلًا</td></tr>
+  </table>
+
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي (Runtime)</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>سائق PENDING يفتح التطبيق، يُوافَق عليه بينما التطبيق مفتوح (لا إعادة تشغيل)</td><td class="sev-med">متوسطة</td><td>زر "تحديث الحالة" صريح على شاشة الانتظار (لا اعتماد على إعادة تسجيل الدخول)؛ الزر يُعيد جلب `/auth/me` بلا حاجة لتوكن جديد لأن `role_status` من نسخة JWT المخزَّنة، **فلن يتغيّر إلا بتوكن جديد** — لذا الزر فعليًا يجب أن يُشغّل تجديد التوكن (`refreshTokens`) لا مجرّد استعلام، لأن `role_status` مضمَّن داخل التوكن نفسه لا استجابة منفصلة تتغيّر لوحدها</td></tr>
+    <tr><td>R2</td><td>سائق REJECTED يضغط "إعادة التقديم" — ما الذي يحدث فعليًا؟ لا يوجد endpoint لإعادة تقديم صريح في الأبحاث</td><td class="sev-high">عالية</td><td>الزر يوجّه لشاشة الوثائق (`documents.tsx`) لتحديث/إعادة رفع الوثائق المرفوضة فقط — **لا يوجد تحويل تلقائي لـPENDING** (قرار OPS يدوي)، فالزر يوضّح هذا بنص صريح: "بعد تحديث وثائقك سيُعاد فحص طلبك من قِبل الفريق"</td></tr>
+    <tr><td>R3</td><td>موظف مزوّد (PROVIDER_STAFF) ينضمّ حديثًا عبر كود دعوة — `role_status` لموظف الطاقم `ACTIVE` فورًا (`registration_router.py`: `staff: "ACTIVE"`)، فلن يمرّ بهذه الشاشة إطلاقًا — سلوك صحيح أم يحتاج توضيحًا؟</td><td class="sev-low">منخفضة</td><td>سلوك صحيح ومقصود (تأكَّد من `ROLE_STATUS_MAP` في البحث)؛ لا حاجة لتغيير — يُوثَّق في الكود بتعليق فقط لتفادي "إصلاح" هذا لاحقًا بالخطأ</td></tr>
+    <tr><td>R4</td><td>انقطاع شبكة أثناء تحميل شاشة "قيد المراجعة" — تعليق لانهائي على مؤشر تحميل؟</td><td class="sev-med">متوسطة</td><td>نفس نمط `ErrorState`+`onRetry` المُستخدَم في كل شاشات RN الأخرى هذه الجلسة — لا استثناء</td></tr>
+  </table>
+
+  <div class="insight blocker">
+    <h4>⚠️ عرَض جانبي مكتشَف: انتقال الحالة من ACTIVE إلى PENDING لا يظهر فورًا</h4>
+    بما أن `role_status` جزء من محتوى JWT الموقَّع (لا يتغيّر تلقائيًا)، فسائق كان ACTIVE ثم جُمِّد حسابه (مثلًا تعليق تشغيلي) <b>لن يرى شاشة الحالة الجديدة</b> حتى ينتهي التوكن الحالي ويُجدَّد — القناة الحقيقية لحجبه هي 403 من `require_active_role` على كل استدعاء فعلي (موجودة بالفعل ومستقلة عن هذا الإصلاح). <b>الحل المُدرَج:</b> هذا الإصلاح (A1) يعالج فقط لحظة "الدخول الأول وأنت لست ACTIVE بعد" (سائق/مزوّد جديد)؛ حالة "كنتَ ACTIVE ثم عُلِّقتَ" تبقى معتمِدة على معالجة 403 الموجودة أصلًا في `normalizeError`، وهذا سلوك مقبول ولا يحتاج تغييرًا إضافيًا ضمن هذا العنصر تحديدًا — يُوثَّق كحد معروف (known limitation)، لا كخلل.
+  </div>
+
+  <h3 class="item-title">A2 — عرض سبب الرفض (يحتاج عمل باك-إند إضافي)</h3>
+  <div class="tag-row"><span class="tag waveA">الموجة A</span><span class="tag blocker">حرج</span><span class="tag high">يحتاج باك-إند</span></div>
+  <div class="insight blocker">
+    <h4>هذا العنصر الوحيد في الخطة كلها الذي يحتاج تعديلًا في الباك-إند</h4>
+    البحث المباشر أكّد: سبب الرفض **يُكتَب فعلاً** (`OnboardingDecision.reason` عند `POST /operations/onboarding/{user_id}/reject`) لكن <b>لا يوجد أي endpoint يقرأه مرة أخرى</b> لصالح صاحب الحساب نفسه — كل مسارات `/operations/onboarding/*` مقصورة على فريق العمليات فقط. لا حل واجهة بحتة ممكن هنا.
+  </div>
+  <h4 class="sub-title">التصميم التقني (يشمل الباك-إند)</h4>
+  <ul>
+    <li><b>باك-إند (جديد):</b> `GET /dispatch/drivers/me/rejection-reason` و/أو توسيع `GET /auth/me` بحقل اختياري `rejection_reason: string | null` — يُقرأ من `OnboardingDecision` حيث `target_user_id == caller.user_id` و`decision == "REJECTED"`، الأحدث فقط. **يجب أن يقتصر الاستعلام على سجلّ المستخدم نفسه فقط** (لا تسريب بيانات مستخدمين آخرين) — هذا هو الخطر الأمني الوحيد الحقيقي في هذا العنصر.</li>
+    <li><b>RN:</b> استهلاك الحقل الجديد في شاشة "تم الرفض" من A1.</li>
+  </ul>
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>مستخدم رُفض أكثر من مرة (تقديم → رفض → إعادة تقديم → رفض مجدَّدًا) — أي سجلّ يُعرَض؟</td><td class="sev-med">متوسطة</td><td>الأحدث دائمًا (`ORDER BY created_at DESC LIMIT 1`)</td></tr>
+    <tr><td>B2</td><td>Endpoint جديد بلا اختبار خلفي (backend tests) يكسر ميزان `python -m pytest backend/tests/` الأساسي (~3237 اختبار) — يحتاج migration؟</td><td class="sev-low">منخفضة</td><td>لا — قراءة فقط من جدول موجود بالفعل، بلا حاجة لهجرة (migration) جديدة؛ يحتاج اختبارًا خلفيًا جديدًا واحدًا فقط (نجاح + تأكيد عزل بيانات مستخدم آخر)</td></tr>
+    <tr><td>B3</td><td>هذا العنصر يلمس <code>backend/app/modules/</code> — منطقة محظورة صراحة في حوكمة المشروع</td><td class="sev-high">عالية (حوكمة)</td><td>تحت التصريح الصريح "أعطيك الصلاحيات التامة للدخول إلى المناطق المحظورة"؛ يبقى تعديلًا صغيرًا ومعزولًا (endpoint قراءة فقط، بلا لمس لأي راية مالية `contracts/feature_flags.yaml` أو منطق دفع) — لا يخالف الوقف الصارم الوارد في CLAUDE.md بشأن `wallet_cash_out`/`wallet_peer_transfer`</td></tr>
+  </table>
+
+  <h3 class="item-title">A3 — بوابة الصلاحيات في طابور طلبات المزوّد</h3>
+  <div class="tag-row"><span class="tag waveA">الموجة A</span><span class="tag blocker">حرج</span><span class="tag ok">واجهة فقط</span></div>
+  <h4 class="sub-title">جذر المشكلة</h4>
+  <p>الباك-إند **يفرض فعلاً** 403 صحيحًا عبر `require_provider_permission(...)` على كل نقطة نهاية (قبول/رفض/تحضير/تسليم) — لا ثغرة أمنية فعلية في تنفيذ العملية نفسها. الثغرة **واجهة فقط**: RN يعرض الأزرار لكل موظف بصرف النظر عن صلاحياته، فيضغط الموظف الزر ليتفاجأ بخطأ 403 غامض بدل عدم رؤية الزر أصلًا (تجربة مستخدم مكسورة، لا خطر أمني حقيقي — لكنها لا تزال فجوة تطابق حقيقية تستحق الإصلاح).</p>
+  <h4 class="sub-title">التصميم التقني</h4>
+  <div class="diagram">
+    <div class="flow-row">
+      <div class="flow-box start">فتح شاشة home.tsx<br>(طابور الطلبات)</div><div class="flow-arrow">←</div>
+      <div class="flow-box">GET /me/permissions<br>(جديد في RN — endpoint موجود)</div><div class="flow-arrow">←</div>
+      <div class="flow-box">can('provider_order:accept')<br>can('provider_order:reject')<br>can('provider_order:prepare')<br>can('provider_order:handoff')</div><div class="flow-arrow">←</div>
+      <div class="flow-box end">إخفاء/تعطيل الأزرار<br>غير الممنوحة</div>
+    </div>
+  </div>
+  <ul>
+    <li>إضافة `getMyPermissions(): Promise&lt;{role, isSuper, permissions: string[]}&gt;` في `services/api/index.ts` (mock + حقيقي) → `GET /me/permissions`.</li>
+    <li>هوك جديد `hooks/useMyPermissions.ts` يماثل تمامًا هوك الويب (`can: (code) => isSuper || permissions.includes(code)`).</li>
+    <li>تعديل `app/(provider)/home.tsx`: لف كل زر (قبول/رفض/بدء تحضير/جاهز) بفحص `can(...)` المطابق تمامًا لقائمة الأكواد المؤكَّدة من البحث.</li>
+    <li>هذا نفسه الهوك يُستخدَم لاحقًا في A4 (زر إغلاق الاستلام الذاتي يحتاج `provider_order:handoff`).</li>
+  </ul>
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>مالك المتجر (`PROVIDER_ADMIN`) — هل يملك `isSuper` أم قائمة صلاحيات صريحة؟ إن أُخطئ التعامل معه، قد تُخفى أزراره هو نفسه</td><td class="sev-crit">حرجة</td><td>البحث أكّد: صلاحيات المالك تأتي من `ROLE_PERMISSIONS[PROVIDER_ADMIN]` (تشمل `PROVIDER_PERMS_GRANTABLE` كاملة) — **ليست** `is_super` (ذلك للعمليات فقط) — يجب اختبار المالك تحديدًا بعد التغيير للتأكد أن كل أزراره ظاهرة كما كانت</td></tr>
+    <tr><td>B2</td><td>استعلام `/me/permissions` يفشل (شبكة) أثناء تحميل الشاشة — هل تختفي كل الأزرار بالخطأ فيظن الموظف أنه فقد كل صلاحياته؟</td><td class="sev-high">عالية</td><td>حالة تحميل صريحة (Skeleton/Loading) قبل عرض أي زر — لا افتراض "بلا صلاحيات" كحالة افتراضية عند الفشل؛ عند فشل الاستعلام تُعرَض كل الأزرار **مع** الاعتماد على 403 الخلفي كخط دفاع أخير (نفس السلوك الحالي بالضبط)، تفاديًا لتعطيل عمل حقيقي بسبب عطل شبكي عابر</td></tr>
+    <tr><td>B3</td><td>تخزين مؤقت (cache) لنتيجة `/me/permissions` عبر react-query — صلاحية جديدة مُنحَت من المالك أثناء أن الموظف يستخدم التطبيق، هل تظهر فورًا؟</td><td class="sev-med">متوسطة</td><td>مطابقة إعداد الويب (`useMyPermissions` بلا `staleTime` طويل) + دعوة `invalidateQueries(['me','permissions'])` عند أي رجوع للشاشة (`onFocus`) بدل انتظار انتهاء صلاحية cache تلقائيًا</td></tr>
+  </table>
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>موظف يملك `provider_order:accept` لكن ليس `provider_order:prepare` — يقبل الطلب بنجاح، ثم لا يرى زر "بدء التحضير" — هل تبقى واجهة الطلب واضحة أن أحدًا آخر يجب أن يكمل؟</td><td class="sev-med">متوسطة</td><td>نص توضيحي بديل مكان الزر المخفي: "بحاجة لصلاحية بدء التحضير — اطلب من المالك" بدل فراغ صامت مربك</td></tr>
+    <tr><td>R2</td><td>المالك يسحب صلاحية `provider_order:accept` من موظف <b>أثناء</b> وجود طلب معروض عليه للقبول — سباق حقيقي</td><td class="sev-high">عالية</td><td>خط الدفاع الأخير 403 الخلفي يتكفّل بهذا (نفس نمط الويب — لا حل خاص إضافي في RN، القرار الصحيح هو الاعتماد على ما هو مُثبَت فعليًا في الويب بدل اختراع حل مختلف)</td></tr>
+  </table>
+
+  <h3 class="item-title">A4 — إغلاق طلبات الاستلام الذاتي والتوصيل الذاتي</h3>
+  <div class="tag-row"><span class="tag waveA">الموجة A</span><span class="tag blocker">حرج</span><span class="tag ok">واجهة فقط</span></div>
+  <h4 class="sub-title">التصميم التقني</h4>
+  <ul>
+    <li>إضافة `confirmSelfPickup(orderId, pickupCode?): Promise&lt;void&gt;` → `POST /orders/{id}/confirm-pickup` بجسم اختياري `{pickup_code}`.</li>
+    <li>إضافة `confirmSelfDelivery(orderId): Promise&lt;void&gt;` → `POST /orders/{id}/confirm-self-delivery` (بلا جسم).</li>
+    <li>تعديل حالة `READY_FOR_PICKUP` في `home.tsx`: بدل نص للقراءة فقط دائمًا، يُفحَص `order.fulfillmentType`/`provider.deliveryMethod` (يحتاج الحقل الأخير أن يُجلَب من ملف المزوّد الحالي، متاح بالفعل عبر `getProviderProfile`) → عرض الزر المناسب، محميًا بـ`can('provider_order:handoff')` من A3.</li>
+  </ul>
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>حقل `pickup_code` اختياري — متى يجب إرساله فعليًا؟ (البحث: يُقارَن مقابل `delivery_handoff_code` فقط إن أُرسِل)</td><td class="sev-med">متوسطة</td><td>إدخال اختياري في نموذج التأكيد ("أدخل الرمز الذي يعرضه العميل، إن وُجد") — لا إلزام، مطابقةً تمامًا لسلوك الباك-إند الاختياري</td></tr>
+    <tr><td>B2</td><td>متجر لديه `delivery_method == "SELF_DELIVERY"` **و**`fulfillment_type` الفعلي للطلب `"SELF_PICKUP"` في آنٍ (حالة نظرية: هل تتعارض الحقلان؟)</td><td class="sev-low">منخفضة</td><td>الحقلان مستقلان في النموذج (أحدهما خاصية المتجر الثابتة، الآخر خاصية الطلب الفردية) — لا تعارض منطقي؛ الفحص في RN يعطي أولوية لـ`fulfillment_type=="SELF_PICKUP"` أولًا (تحقّق `confirm-pickup`)، ثم `delivery_method=="SELF_DELIVERY"` (تحقّق `confirm-self-delivery`)، تطابقًا لتفرّع الباك-إند نفسه (كل مسار يرفض 422 إن لم تتحقق شرطه بالضبط `not_self_pickup`/`not_self_delivery`)</td></tr>
+  </table>
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>عميل يُدخل رمز استلام خاطئ 3 مرات (لا حدّ أقصى موثَّق لهذا المسار تحديدًا في البحث خلافًا لـ`verify-handoff` السائق الذي له `MAX_HANDOFF_ATTEMPTS=3`) — تجربة مستخدم عند الرفض المتكرر</td><td class="sev-low">منخفضة</td><td>422 عادي `pickup_code_mismatch` يُعرَض برسالة عربية عبر `normalizeError` الموجود، بلا حاجة لمنطق حدّ محاولات خاص في RN (الباك-إند لا يفرضه هنا أصلًا لهذا المسار تحديدًا)</td></tr>
+    <tr><td>R2</td><td>الطلب انتقل من `READY_FOR_PICKUP` إلى حالة أخرى (مثلًا أُلغي من العميل) بين لحظة عرض الزر على الشاشة ولحظة الضغط عليه (تحديث الشاشة متأخّر)</td><td class="sev-med">متوسطة</td><td>422 `InvalidTransitionError` من الباك-إند يُعرَض + تحديث فوري للقائمة (`invalidateQueries`) بدل ترك الطلب "الشبَح" ظاهرًا</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- WAVE B -->
+<!-- ============================================================ -->
+<section id="waveB">
+  <h2 class="sec-title waveB">🟠 الموجة B — تجارة العميل الأساسية</h2>
+  <p class="lead">أكبر موجة تقنيًا — تغيّر شكل بيانات السلة المُخزَّنة محليًا. يجب أن تُبنى الثلاثة عناصر بترتيب صارم: <b>B1 (تخصيص الأصناف) أولًا</b> لأنها تغيّر <code>CartLine</code> نفسها التي يعتمد عليها B2 والسلة والدفع.</p>
+
+  <h3 class="item-title">B1 — تخصيص الأصناف (Variants / Modifiers / Components) في السلة</h3>
+  <div class="tag-row"><span class="tag waveB">الموجة B</span><span class="tag blocker">حرج</span><span class="tag audit">يغيّر شكل البيانات المحلية</span></div>
+
+  <h4 class="sub-title">العقد المؤكَّد من الباك-إند</h4>
+  <pre>GET /catalog/items/{itemId}?provider_id={id}
+→ { id, names_json, description_json, availability,
+    variants: [{id, size_label, base_price, minimum_price, currency, status}],
+    components: [{id, name_json, is_required, is_removable, price_delta, allergen_flags}],
+    modifier_groups: [{id, name_json, min_select, max_select, is_required,
+                        options: [{id, name_json, price_delta, status}]}] }
+
+POST /orders  body.items[]:
+{ catalog_item_id, variant_id?, qty, modifier_option_ids: [], removed_component_ids: [] }</pre>
+
+  <h4 class="sub-title">مخطط تدفّق البيانات (من الفتح حتى إنشاء الطلب)</h4>
+  <div class="diagram">
+    <div class="seq-diagram">
+      <div class="seq-col">
+        <div class="seq-actor">restaurant/[id].tsx</div>
+        <div class="seq-step">عميل يضغط على صنف</div>
+        <div class="seq-step">GET /catalog/items/{id}<br>(جديد في RN)</div>
+        <div class="seq-step">فتح CustomizationModal<br>(مكوّن جديد)</div>
+      </div>
+      <div class="seq-col">
+        <div class="seq-actor">CustomizationModal (جديد)</div>
+        <div class="seq-step">اختيار الحجم (variant)</div>
+        <div class="seq-step">اختيار الإضافات (modifiers)<br>ضمن min/max لكل مجموعة</div>
+        <div class="seq-step">إزالة مكوّنات (components)</div>
+        <div class="seq-step">حساب السعر الحيّ<br>base + Σ deltas</div>
+      </div>
+      <div class="seq-col">
+        <div class="seq-actor">store/cart.ts (مُعدَّل)</div>
+        <div class="seq-step">CartLine جديد بمفتاح مركّب:<br>itemId+variantId+hash(selections)</div>
+        <div class="seq-step">نفس الصنف بتخصيص مختلف<br>= سطر منفصل في السلة</div>
+        <div class="seq-step">checkout.tsx → POST /orders<br>بالحقول الأربعة كاملة</div>
+      </div>
+    </div>
+  </div>
+
+  <h4 class="sub-title">التصميم التقني التفصيلي</h4>
+  <ul>
+    <li><b>نوع جديد</b> `CartLine` (توسيع، لا استبدال — حفاظًا على التوافق الرجعي):
+      <pre>interface CartLine {
+  lineKey: string;          // itemId + variantId + hash(selections) — مفتاح فريد جديد
+  itemId: string;
+  providerId: string;
+  nameAr: string;
+  variantId?: string;
+  variantLabel?: string;    // "كبير" — للعرض فقط
+  modifierOptionIds: string[];
+  removedComponentIds: string[];
+  customizationSummary?: string; // "كبير، بدون بصل، +جبنة إضافية" — للعرض فقط
+  unitPriceMinor: number;   // = base_price + Σ(modifier deltas) - محسوبة وقت الإضافة
+  qty: number;
+}</pre>
+    </li>
+    <li><b>مكوّن جديد</b> `components/business/CustomizationModal.tsx` — نافذة اختيار (Modal بالكامل على الجوّال، لا حاجة لتطابق حرفي مع تصميم الويب، لكن نفس البيانات ونفس القواعد: `min_select`/`max_select` لكل مجموعة، `is_required` يمنع التأكيد بلا اختيار).</li>
+    <li><b>تعديل</b> `restaurant/[id].tsx`: الضغط على "أضف" يفتح `CustomizationModal` بدل استدعاء `cart.add(item)` مباشرة — إلا إذا كان الصنف بلا أي `variants`/`modifier_groups`/`components` قابلة للإزالة (حالة شائعة لصنف بسيط) فتُضاف فورًا بلا نافذة (تفاديًا لخطوة إضافية غير ضرورية على 90% من الأصناف البسيطة في المنصّة).</li>
+    <li><b>مسار الترحيل</b> (Migration): زيادة `version: 1 → 2` في `persist` الخاص بـ`store/cart.ts`؛ دالة `migrate` الموجودة بالفعل (النمط الحالي جاهز لهذا تمامًا) تحوّل كل `CartLine` قديم بإضافة `lineKey: itemId` (بلا تخصيص) و`modifierOptionIds: []`/`removedComponentIds: []` فارغة — **لا فقدان بيانات**، السلال القديمة المفتوحة تبقى صالحة.</li>
+  </ul>
+
+  <h4 class="sub-title">محاكاة أثناء البناء (Build-Time) — الأكثر خطورة في الخطة كلها</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>مستخدم لديه سلة محفوظة (v1) بها 3 أصناف، يفتح التطبيق بعد التحديث — هل تُفرَّغ سلته بالخطأ؟</td><td class="sev-crit">حرجة</td><td>دالة `migrate` تُختبَر بوحدة اختبار مخصَّصة (jest) تُحاكي بيانات v1 حقيقية وتتأكد من نجاة كل سطر — <b>لا اعتماد على الاختبار اليدوي فقط</b></td></tr>
+    <tr><td>B2</td><td>تغيير مفتاح السطر من `itemId` إلى `lineKey` يكسر كل مكان آخر يستخدم `line.itemId` كمفتاح React `key=` أو في `setQty(itemId, qty)`</td><td class="sev-crit">حرجة</td><td>جرد شامل (`grep -rn "\.itemId\|setQty(" apps/mobile/src`) لكل موضع استخدام قبل التعديل — `cart.tsx`، `checkout.tsx`، أي مكان آخر — تحويل التوقيعات لتستخدم `lineKey` بدل `itemId` بمرور واحد متكامل، لا تدريجي (تفاديًا لحالة نصف-محدَّثة تُكسِر التطبيق)</td></tr>
+    <tr><td>B3</td><td>صنف نُشِر وقت إضافته للسلة بمتغيّر (variant) معيّن، ثم أُرشِف ذلك المتغيّر من قِبل المزوّد قبل أن يُتمّ العميل الدفع</td><td class="sev-high">عالية</td><td>الباك-إند يرفض عند إنشاء الطلب فعليًا (لا حاجة لتحقق إضافي في RN) — لكن **يجب** أن تُترجَم رسالة الخطأ الخلفية (على الأرجح 422 بكود واضح) لنص عربي مفهوم "أحد الأصناف لم يعد متوفرًا بهذا الخيار، يرجى تعديل طلبك" بدل رسالة عامة — يحتاج التحقق الفعلي من الرسالة الحرفية التي يعيدها `create_order` في هذه الحالة قبل الإطلاق</td></tr>
+    <tr><td>B4</td><td>حساب `unitPriceMinor` محليًا في RN وقت الإضافة للسلة — إن تغيّر السعر الفعلي على الخادم لاحقًا (المزوّد عدّل السعر)، تعرض السلة سعرًا قديمًا حتى لحظة الدفع</td><td class="sev-med">متوسطة</td><td>نفس السلوك المقبول أصلًا في نسخة السلة الحالية غير المخصَّصة (لا فرق جوهري) — الباك-إند هو مصدر الحقيقة النهائي عند إنشاء الطلب فعليًا (`price_snapshot`)، فأي فرق يظهر للعميل في شاشة تأكيد الطلب بعد الإرسال، لا قبله؛ يُوثَّق كسلوك معروف موروث، لا عرَض جانبي جديد</td></tr>
+    <tr><td>B5</td><td>مكوّن `CustomizationModal` الجديد يحتاج اختبار State معقّد (اختيار متعدد بحدود min/max) — خطر أخطاء منطقية دقيقة (مثال: السماح بتجاوز `max_select`)</td><td class="sev-high">عالية</td><td>اختبار وحدة (jest) مخصَّص لمنطق الحساب واختيار الخيارات بمعزل عن React Native (نفس نمط `cartSubtotal`/`cartCount` الحاليَين — دوال نقية قابلة للاختبار بمعزل عن الواجهة)</td></tr>
+    <tr><td>B6</td><td>الطلبات من نوع ERRAND (بلا كتالوج، `items: []`) — هل يتأثر مسارها بهذا التعديل؟</td><td class="sev-low">منخفضة</td><td>لا — `errand.tsx` لا يمرّ عبر `store/cart.ts` إطلاقًا (بُني هذا الجلسة كمسار منفصل تمامًا)، فلا تقاطع</td></tr>
+  </table>
+
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي (Runtime)</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>عميل يضيف "بيتزا كبيرة + جبنة إضافية" مرتين بضغطتين متتاليتين — هل تُدمَج الكمية في سطر واحد أم سطرين منفصلين؟</td><td class="sev-med">متوسطة</td><td>نفس `lineKey` (نفس التخصيص بالضبط) → دمج الكمية في نفس السطر (سلوك الويب: "تعديل صنف موجود في السلة")؛ تخصيص مختلف ولو بخيار واحد → سطر منفصل — منطق `add()` في `cart.ts` يُقارَن بـ`lineKey` الكامل، لا `itemId` وحده</td></tr>
+    <tr><td>R2</td><td>عميل يفتح `CustomizationModal` لصنف، يبدأ الاختيار، يخرج من التطبيق (تبديل تطبيقات) قبل التأكيد — هل يُفقَد الاختيار الجزئي؟</td><td class="sev-low">منخفضة</td><td>مقبول — نافذة الاختيار حالة مؤقتة غير محفوظة (نفس سلوك الويب: تحديث الصفحة يفقد اختيار النافذة المفتوحة أيضًا)؛ لا حاجة لحفظ حالة جزئية</td></tr>
+    <tr><td>R3</td><td>مجموعة تعديل `is_required: true` بلا أي خيار `status: "AVAILABLE"` (كلها OUT_OF_STOCK/HIDDEN) — صنف لا يمكن طلبه فعليًا رغم ظهوره في القائمة</td><td class="sev-high">عالية</td><td>زر "تأكيد" في `CustomizationModal` مُعطَّل ما دامت مجموعة إلزامية بلا خيار متاح مُختار، مع رسالة توضيحية — بدل السماح بالمضي قدمًا والفشل لاحقًا عند إنشاء الطلب</td></tr>
+    <tr><td>R4</td><td>تعديل صنف <b>موجود بالفعل</b> في السلة (وليس إضافة جديدة) — الويب يدعم "تعديل" (`mode: "edit"`) لا الويب فقط "أضف"</td><td class="sev-med">متوسطة</td><td>يُدرَج ضمن نطاق B1: الضغط على سطر في `cart.tsx` يفتح نفس `CustomizationModal` بوضع `edit` مع تعبئة الاختيار الحالي مسبقًا (نفس نمط الويب حرفيًا) — لا يُبنى كعنصر منفصل لاحقًا</td></tr>
+  </table>
+
+  <div class="insight warn">
+    <h4>⚠️ عرَض جانبي مكتشَف: صفحة المتجر (restaurant/[id].tsx) تحتاج توسيعًا موازيًا</h4>
+    شاشة المتجر الحالية قائمة مسطّحة بلا صور ولا تجميع فئات (مذكور في تقرير 480). B1 وحده لا يُصلح هذا — لكنه <b>يُحتّم</b> إضافة استدعاء `GET /catalog/items/{id}` عند الضغط على أي صنف، وهذا يفتح الفرصة الطبيعية لإضافة صورة/وصف الصنف في نفس النافذة الجديدة (`CustomizationModal` تعرضها أصلًا ضمن التفاصيل المُرجَعة) <b>بلا تكلفة إضافية تُذكَر</b> — يُدرَج كتحسين مصاحب لـB1 لا عنصر منفصل في الموجة D.
+  </div>
+
+  <h3 class="item-title">B2 — إثراء الدفع (Checkout)</h3>
+  <div class="tag-row"><span class="tag waveB">الموجة B</span><span class="tag blocker">حرج</span><span class="tag audit">يعتمد على B1</span></div>
+  <h4 class="sub-title">ترتيب الأولوية الفرعي (حسب الحالة الفعلية للرايات على الخادم)</h4>
+  <table>
+    <tr><th>الميزة</th><th>حالة الراية على الخادم</th><th>القرار</th></tr>
+    <tr><td>الدفع المُجزَّأ (نقد + محفظة)</td><td><code>split_payment_enabled = True</code> — <b>مفعَّلة فعليًا</b></td><td>✅ تُبنى بأولوية عالية — ميزة حية</td></tr>
+    <tr><td>الجدولة لوقت لاحق</td><td>حدود `scheduled_order_min_lead_minutes=45`/`max_advance_days=7` بلا راية إيقاف — <b>مفعَّلة</b></td><td>✅ تُبنى بأولوية عالية</td></tr>
+    <tr><td>بوّابة OTP للطلبات النقدية عالية القيمة</td><td>`cod_high_value_otp_threshold_minor` قابلة للتفعيل التشغيلي</td><td>✅ تُبنى (الكود يعمل بصرف النظر عن قيمة العتبة، والعتبة قرار تشغيلي منفصل)</td></tr>
+    <tr><td>الإكرامية (tip)</td><td>حقل `tip_minor` مقبول دومًا، نقدي فقط</td><td>✅ تُبنى بأولوية متوسطة</td></tr>
+    <tr><td>كوبون/خصم تلقائي</td><td><code>promotions_enabled = False</code> — <b>معطَّلة افتراضيًا</b></td><td>🟡 تُؤجَّل لموجة D (بناء واجهة لميزة معطَّلة هو نفس الخطأ الذي وقعتُ في تفاديه هذه الجلسة مع سلة الطلب الجماعي)</td></tr>
+    <tr><td>استلام ذاتي مقابل توصيل</td><td>حي بالكامل (`fulfillment_type`)</td><td>✅ تُبنى بأولوية عالية</td></tr>
+  </table>
+
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>الدفع المُجزَّأ يتطلّب `tenders: [{tender_type, amount_minor}]` حيث Σ = الإجمالي بالضبط — خطأ تقريب مِلّي واحد يرفض الطلب بالكامل</td><td class="sev-high">عالية</td><td>الجزء الأخير (النقد أو المحفظة، أيهما أُدخِل ثانيًا) يُحسَب تلقائيًا كـ`الإجمالي - الجزء الأول` بدل إدخال حرّ لكليهما، فيستحيل حسابيًا عدم التطابق</td></tr>
+    <tr><td>B2</td><td>اختيار "استلام ذاتي" يُصفّر رسم التوصيل — يجب إزالة/تعطيل مربع "العنوان" في النموذج نفس اللحظة، وإلا يظل العميل يرى حقل عنوان لا معنى له</td><td class="sev-med">متوسطة</td><td>تصيير شرطي صريح لقسم العنوان بالكامل حسب `fulfillmentType`، مطابقًا لبنية الويب</td></tr>
+    <tr><td>B3</td><td>بوّابة OTP للقيمة العالية تُعيد كود مخصَّص (`OTP_REQUIRED_FOR_COD`) يجب أن يُفعّل تدفّق OTP **مطابقًا** لآلية `requestOtp`/`verifyOtp` الموجودة (لكن بـ`purpose=ORDER_CONFIRMATION` لا `PROVIDER_LOGIN`) — خطر تكرار نفس خلل "قيمة purpose خاطئة" المُكتشَف والمُصلَح سابقًا هذه الجلسة إن لم يُتحقَّق بدقة</td><td class="sev-crit">حرجة</td><td>تحقّق صريح: `ORDER_CONFIRMATION` <b>موجودة فعلاً</b> في enum `OTPPurpose` المؤكَّد سابقًا (البند رقم 8 من القائمة الثمانية) — استخدامها هنا آمن؛ يُضاف اختبار وحدة يمنع مستقبلًا إرسال أي قيمة purpose غير مطابقة للقائمة الثمانية الموثَّقة (حارس عام، يمنع تكرار نفس فئة الخلل الحرج بالكامل)</td></tr>
+    <tr><td>B4</td><td>معاينة رسم التوصيل الحية (`GET /orders/delivery-quote`) تحتاج استدعاءً إضافيًا عند كل تغيير عنوان — قد يُبطئ الشاشة أو يُطلَق كثيرًا (كل ضغطة حرف في حقل بحث العنوان مثلًا)</td><td class="sev-med">متوسطة</td><td>Debounce (تأخير 300-500ms) + `enabled: !!addressId` (لا استدعاء بلا عنوان محدَّد فعليًا) — نفس نمط `search.tsx` المبني هذه الجلسة تمامًا</td></tr>
+  </table>
+
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>عميل يجدول طلبًا لوقت خارج نطاق `scheduled_order_max_advance_days=7` — يجب منعه في الواجهة قبل الإرسال، لا بعده فقط</td><td class="sev-med">متوسطة</td><td>مُنتقي التاريخ/الوقت (date-time picker) في RN يُقيَّد فعليًا بنفس الحدّين (لا حرية اختيار خارج النطاق) — يطابق تجربة الويب</td></tr>
+    <tr><td>R2</td><td>عميل بدأ دفعًا مُجزَّأً، فقد الاتصال بالشبكة أثناء الإرسال — هل يُخصَم من محفظته دون اكتمال الطلب؟ (خطر مالي حقيقي)</td><td class="sev-crit">حرجة</td><td>لا حل خاص في RN مطلوب — هذا محكوم بمفتاح idempotency الموجود بالفعل في `client.ts` (`Idempotency-Key`) على كل طلب `POST /orders`؛ إعادة المحاولة بنفس المفتاح آمنة (لا ازدواج خصم) — يجب فقط <b>التأكد</b> أن مسار الدفع الجديد يمرّ عبر نفس آلية `request()` الموجودة، لا استدعاء مخصَّص يتجاوزها</td></tr>
+    <tr><td>R3</td><td>عميل نقاطه في المحفظة غير كافية لتغطية الجزء المخصَّص لها من الدفع المُجزَّأ — رسالة الخطأ يجب أن تُميّز "المحفظة غير كافية" عن "خطأ عام"</td><td class="sev-med">متوسطة</td><td>يعتمد على أن الباك-إند يعيد `WALLET_INSUFFICIENT_FUNDS` (كود موجود مذكور في ملاحظات الويب `checkout.tsx`) — يُترجَم عبر خريطة أكواد أخطاء مخصَّصة، بنفس نمط أكواد الولاء الأربعة المبنية سابقًا هذه الجلسة</td></tr>
+  </table>
+
+  <h3 class="item-title">B3 — إثراء تتبّع الطلب</h3>
+  <div class="tag-row"><span class="tag waveB">الموجة B</span><span class="tag blocker">حرج</span><span class="tag ok">مستقل عن B1/B2</span></div>
+  <h4 class="sub-title">التصميم التقني</h4>
+  <ul>
+    <li><b>الخريطة الحيّة:</b> `GET /sse/orders/{id}/track?token=` — تيار SSE موجود ومُتحقَّق منه سابقًا في هذه الجلسة (استُخدم فهمه أصلًا عند بناء ميزات أخرى). React Native لا يدعم `EventSource` أصلًا — يحتاج مكتبة polyfill (`react-native-sse` أو ما يعادلها) أو **بديلًا عمليًا أبسط**: استقصاء (polling) كل 5-8 ثوانٍ لموقع السائق طالما الطلب في حالة نشطة، مطابقًا لنمط `support.tsx` المبني هذه الجلسة (استقصاء 5 ثوانٍ) — **قرار عملي:** البديل بالاستقصاء أبسط وأقل خطرًا من إدخال مكتبة SSE خارجية جديدة على منصّة الجوّال؛ يُختار ما لم يُفضَّل المشغّل خلاف ذلك صراحة.</li>
+    <li><b>عرض الموقع:</b> لا حاجة لمكتبة خرائط تفاعلية كاملة (نفس عائق `DriverMapPage` الخارجي) — بديل مبسَّط: نقطة ثابتة + مسافة/اتجاه نصي "السائق على بعد 1.2 كم" بدل خريطة تفاعلية كاملة، إلى أن يُوفَّر مفتاح Google Maps API مستقبلًا.</li>
+    <li><b>الإلغاء:</b> زر يظهر فقط إن كان `"order:cancel_own"` ضمن `order.allowedActions` (الحقل موجود فعلاً في `OrderSummary`، RN يستقبله بالفعل عبر `toCamelCase` التلقائي — لا حاجة لمنطق حالة إضافي مكرَّر في RN) → `POST /orders/{id}/cancel` بجسم `{reason, reason_code?}`.</li>
+    <li><b>التقييم:</b> `POST /orders/{id}/ratings` بجسم `{target_type: "PROVIDER"|"DRIVER", target_id, stars, comment?}` + `GET /orders/{id}/ratings` لمنع إعادة العرض بعد تقييم سابق (تفاديًا لـ409).</li>
+    <li><b>النزاع:</b> نموذج نص حر (لا تفاصيل عقد إضافية مطلوبة، الويب يستخدم حدًا أدنى 10 أحرف للسبب).</li>
+    <li><b>اتصال بالسائق:</b> رقم الهاتف <b>غير مُعاد</b> في `OrderSummary` أصلًا (خصوصية) — لا يمكن بناء "زر اتصال" بدون بحث إضافي عن كيفية توفير الويب لهذا (على الأرجح عبر endpoint منفصل مخصَّص للكشف المحدود وقت التوصيل فقط) — **يُعلَّم كبند يحتاج بحثًا إضافيًا قبل البناء الفعلي**، لا يُفترَض حل جاهز.</li>
+  </ul>
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>الاستقصاء (polling) البديل عن SSE يستهلك بطارية/بيانات أكثر على رحلة توصيل طويلة (قد تمتد 30-60 دقيقة)</td><td class="sev-med">متوسطة</td><td>تقليل معدّل الاستقصاء تدريجيًا حسب الحالة: كل 5 ثوانٍ فقط أثناء `EN_ROUTE` (اللحظات الحرجة)، كل 20 ثانية في حالات أبكر (`DRIVER_ASSIGNED`, `PICKED_UP`)</td></tr>
+    <tr><td>B2</td><td>مكوّن `OrderStatusBadge`/`ORDER_TIMELINE` الحاليان (`lib/orderStatus.ts`) مبنيّان لعرض بسيط — إضافة الخريطة/الأزرار الجديدة فوقهما قد تكسر تخطيط الشاشة الحالي (69 سطرًا بسيطًا جدًا حاليًا)</td><td class="sev-low">منخفضة</td><td>إعادة بناء الشاشة بالكامل بدل الإضافة التراكمية فوق البنية الصغيرة الحالية — أقل خطرًا من محاولة "حشر" ميزات كبيرة في مكوّن صُمِّم لبساطة قصوى</td></tr>
+  </table>
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>عميل يحاول تقييم السائق قبل اكتمال التسليم فعليًا</td><td class="sev-low">منخفضة</td><td>زر التقييم يظهر فقط عند `orderState === 'DELIVERED'` (مطابقًا لسلوك الويب)</td></tr>
+    <tr><td>R2</td><td>عميل يضغط "إلغاء" في اللحظة التي يقبل فيها المزوّد الطلب (سباق حقيقي بين طلبين متزامنين)</td><td class="sev-high">عالية</td><td>خطأ 409/422 من الباك-إند (تغيّرت الحالة) يُعرَض برسالة واضحة + تحديث فوري للشاشة (`invalidateQueries`) بدل بقاء زر إلغاء نشط على طلب لم يعد قابلًا للإلغاء</td></tr>
+    <tr><td>R3</td><td>الاستقصاء يستمر في الخلفية بعد أن يغادر المستخدم الشاشة (لم يُنظَّف الـinterval)</td><td class="sev-med">متوسطة</td><td>تنظيف صريح في `useEffect` cleanup — نفس نمط `refetchInterval` عبر react-query (يتوقف تلقائيًا عند unmount الشاشة، لا حاجة لإدارة interval يدوية أصلًا إن استُخدِمت الآلية القياسية بدل `setInterval` خام)</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- WAVE C -->
+<!-- ============================================================ -->
+<section id="waveC">
+  <h2 class="sec-title waveC">🔵 الموجة C — سلامة وتشغيل السائق (مستقلة عن B، تسير بالتوازي)</h2>
+
+  <h3 class="item-title">C1 — نظام SOS الفوري + رابط مشاركة الرحلة</h3>
+  <div class="tag-row"><span class="tag waveC">الموجة C</span><span class="tag med">متوسط</span><span class="tag ok">واجهة فقط</span></div>
+  <div class="insight warn"><h4>⚠️ تمييز مهم مؤكَّد من البحث</h4>هذا نظام <b>منفصل تمامًا</b> عن نموذج "الإبلاغ عن طوارئ" الموجود بالفعل في RN (`profile.tsx`، `driver_emergency_router.py`). لا يجوز دمجهما بالخطأ — <code>POST /sos</code> فوري وحرج (تنبيه CRITICAL فوري لغرفة العمليات)، بينما نظام الطوارئ الحالي تصنيفي (10 أنواع، بلا استعجال فوري بنفس الدرجة).</div>
+  <h4 class="sub-title">التصميم التقني</h4>
+  <pre>POST /sos  { order_id?, kind: "SOS"|"PANIC", lat?, lng?, note? }  [أي عميل/سائق مسجَّل]
+POST /orders/{id}/trip-share  (بلا جسم)  → { token, order_id, ttl_seconds }
+GET /trip-share/{token}  [عام، بلا مصادقة] → { order_id, order_state, location }</pre>
+  <ul>
+    <li>زر SOS ثابت ومرئي دومًا في `trip/[id].tsx` (ليس مدفونًا في قائمة) — إرسال فوري بلا نموذج تأكيد وسيط (سرعة الاستجابة أولوية في حالة طارئة حقيقية) لكن مع تأكيد بصري/صوتي بعد الإرسال أن التنبيه وصل.</li>
+    <li>زر "مشاركة رحلتي" يُنشئ رابطًا ويعرضه جاهزًا للنسخ/المشاركة عبر واتساب (نفس نمط `Share.share()` المستخدَم في `loyalty.tsx` هذه الجلسة لمشاركة رمز الإحالة).</li>
+  </ul>
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>زر SOS بلا أي تأكيد وسيط يُعرِّض لضغط عرضي (خطأ بشري) يُطلق تنبيهًا CRITICAL كاذبًا لغرفة عمليات حقيقية</td><td class="sev-high">عالية</td><td>موازنة مقصودة: تأكيد بصري خفيف جدًا (اهتزاز + عدّاد تراجع نصف ثانية "اضغط مطوّلًا" أو Undo فوري 3 ثوانٍ) — لا نموذج حواري كامل يُبطئ حالة طارئة حقيقية، لكن ليس بلا أي حاجز إطلاقًا أيضًا</td></tr>
+    <tr><td>B2</td><td>رابط مشاركة الرحلة عام تمامًا (`GET /trip-share/{token}` بلا مصادقة) — أي من يحصل على الرابط يرى موقع السائق الحي</td><td class="sev-med">متوسطة</td><td>هذا قرار أمني موجود بالفعل في الباك-إند (TTL محدود ~4 ساعات، توكن 32 بايت غير قابل للتخمين) — لا تغيير مطلوب في RN، لكن يُضاف نص تحذيري عربي واضح عند إنشاء الرابط: "أي شخص يملك هذا الرابط سيرى موقعك المباشر لمدة 4 ساعات" حتى يفهم السائق ما يشاركه فعليًا</td></tr>
+  </table>
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>سائق في منطقة بلا تغطية شبكة يضغط SOS — الطلب يفشل بصمت؟</td><td class="sev-crit">حرجة</td><td>معالجة صريحة لفشل الشبكة على وجه التحديد لهذا الزر (لا الاعتماد على `normalizeError` العام فقط) — رسالة واضحة "تعذّر إرسال SOS، تحقّق من الاتصال" + إعادة محاولة تلقائية عند عودة الاتصال (استخدام `useOnline` الموجود بالفعل في RN)</td></tr>
+    <tr><td>R2</td><td>سائق يضغط SOS مرتين متتاليتين بالخطأ (عصبية الموقف) — يُنشئ بلاغين مكرَّرين لنفس الحادثة</td><td class="sev-low">منخفضة</td><td>تعطيل الزر لثوانٍ معدودة بعد أول ضغطة ناجحة (تفاديًا للازدواج) + نص "تم الإرسال ✓" واضح</td></tr>
+  </table>
+
+  <h3 class="item-title">C2 — إشعار التأخير</h3>
+  <div class="tag-row"><span class="tag waveC">الموجة C</span><span class="tag low">بسيط نسبيًا</span></div>
+  <pre>POST /dispatch/orders/{id}/delay-notice  { order_id, reason: TRAFFIC|WEATHER|PROVIDER_DELAY|CUSTOMER_NOT_AVAILABLE|OTHER, eta_extra_minutes: 5..60 }</pre>
+  <p>نموذج بسيط (5 أزرار سبب + منزلق دقائق 5-60) في `trip/[id].tsx`. القيد الوحيد الحقيقي المكتشَف: السائق يجب أن يملك عرضًا `ACCEPTED` فعليًا والطلب في حالة توصيل نشطة، وإلا 403/422 — يُخفى الزر أصلًا خارج هاتين الحالتين بدل الاعتماد على رفض الخادم فقط.</p>
+
+  <h3 class="item-title">C3 — التحقق برمز التسليم (Handoff Code)</h3>
+  <div class="tag-row"><span class="tag waveC">الموجة C</span><span class="tag blocker">حرج</span><span class="tag audit">يعتمد عليه C4</span></div>
+  <div class="diagram">
+    <div class="flow-row">
+      <div class="flow-box start">العميل يفتح تتبّع الطلب<br>(من B3)</div><div class="flow-arrow">←</div>
+      <div class="flow-box">GET /orders/{id}/handoff-code<br>يعرض الرمز المكوَّن من 4 أرقام</div>
+    </div>
+    <div class="flow-label">العميل يُطلع السائق على الرمز شفهيًا عند الباب</div>
+    <div class="flow-row" style="margin-top:14px">
+      <div class="flow-box start">السائق في trip/[id].tsx<br>(جديد: خطوة إدخال الرمز)</div><div class="flow-arrow">←</div>
+      <div class="flow-box">POST /dispatch/orders/{id}/verify-handoff<br>{code}</div><div class="flow-arrow">←</div>
+      <div class="branch-wrap" style="gap:8px">
+        <div class="flow-box end" style="min-width:110px">صحيح → متابعة</div>
+        <div class="flow-box danger" style="min-width:110px">خطأ → محاولة أخرى<br>(3 كحدّ أقصى)</div>
+      </div>
+    </div>
+  </div>
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>هذه الخطوة إلزامية فقط لأنواع إثبات معيّنة (`QR`/`SIGNATURE`/`MANUAL_REVIEW`) وليست لـ`PHOTO_AT_DOOR` — يجب أن يعكس تدفّق RN هذا التفرّع بدقة، لا فرضه دومًا</td><td class="sev-high">عالية</td><td>خطوة التحقق تظهر شرطيًا في `trip/[id].tsx` فقط عندما يختار السائق نوع إثبات غير `PHOTO_AT_DOOR` في C4 — ترابط مباشر بين العنصرين، يُبنيان معًا فعليًا لا بترتيب منفصل صارم رغم تصنيفهما كبندين</td></tr>
+    <tr><td>B2</td><td>الحدّ الأقصى 3 محاولات (`MAX_HANDOFF_ATTEMPTS`) — بعد الفشل الثالث 429 "تواصل مع الدعم" — يحتاج RN مسارًا واضحًا لما بعد ذلك (لا طريق مسدود بصري)</td><td class="sev-med">متوسطة</td><td>عند 429، عرض زر "تواصل مع الدعم" يفتح شاشة `support.tsx` الموجودة بالفعل (مبنية هذه الجلسة) مباشرة — إعادة استخدام حقيقية، لا شاشة جديدة</td></tr>
+  </table>
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>عميل غير موجود فعليًا في التطبيق وقت التسليم (لا يستطيع فتح شاشة تتبّع الطلب لرؤية الرمز)</td><td class="sev-med">متوسطة</td><td>خارج نطاق هذا الإصلاح — قيد تشغيلي أصلي في تصميم الميزة نفسها (P-610)، لا عيب في RN تحديدًا؛ يُوثَّق كحد معروف موروث من تصميم الباك-إند</td></tr>
+    <tr><td>R2</td><td>الاستلام المفوَّض (`delegate-recipient`، مكتشَف في البحث كنقطة نهاية ذات صلة) — شخص آخر غير العميل يستلم، هل يعرف الرمز؟</td><td class="sev-med">متوسطة</td><td>خارج نطاق C3 تحديدًا لكن يُسجَّل كملاحظة اعتماد: مسار "استلام مفوَّض" (`POST /orders/{id}/delegate-recipient`) غير مبني في RN إطلاقًا حتى تاريخه — يُضاف كبند D جديد في الموجة الثانوية إن رغب المشغّل بإكماله لاحقًا</td></tr>
+  </table>
+
+  <h3 class="item-title">C4 — اختيار نوع إثبات التسليم</h3>
+  <div class="tag-row"><span class="tag waveC">الموجة C</span><span class="tag blocker">حرج</span><span class="tag audit">مرتبط بـC3</span></div>
+  <pre>POST /orders/{id}/delivery-proofs  [يتطلب رأس Idempotency-Key]
+{ proof_type: QR|SIGNATURE|PHOTO_AT_DOOR|MANUAL_REVIEW, proof_nonce, client_operation_id,
+  lat, lng, media_key?, signature_hash?, notes? }</pre>
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td>4 أنواع إثبات مختلفة تحتاج 4 مسارات جمع بيانات مختلفة فعليًا (QR يحتاج قارئ كاميرا، SIGNATURE يحتاج لوحة توقيع، PHOTO يحتاج كاميرا مباشرة، MANUAL يحتاج نموذج نصّي) — نطاق واجهة أوسع بكثير من زر واحد</td><td class="sev-high">عالية</td><td>ترتيب أولوية داخلي: `PHOTO_AT_DOOR` أولًا (الأبسط تقنيًا، يعيد استخدام `documentPicker.ts`/الكاميرا الموجودة فعلاً من مسار وثائق KYC هذه الجلسة)، ثم `MANUAL_REVIEW` (نموذج نصّي بسيط)، ثم `QR`/`SIGNATURE` لاحقًا إن استلزم الأمر مكتبات جديدة (قارئ QR، لوحة توقيع تفاعلية) — لا يُشترط بناء الأربعة معًا دفعة واحدة</td></tr>
+    <tr><td>B2</td><td>`Idempotency-Key` مطلوب صراحة (422 بدونه) — خطر نسيانه عند البناء السريع لأن معظم استدعاءات RN الأخرى `POST` لا تتطلبه</td><td class="sev-med">متوسطة</td><td>استخدام آلية `client.ts` الموجودة بالفعل (`idempotencyKey` كخيار في `request()`) — لا حل مخصَّص جديد، فقط التأكد من تمريره فعليًا عند البناء (نقطة تحقق صريحة في مراجعة الكود قبل الدمج)</td></tr>
+  </table>
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>السائق يلتقط صورة إثبات (PHOTO_AT_DOOR) في مكان مظلم/غير واضح — لا رفض تلقائي من الخادم موثَّق (يُخزَّن `geofence_valid`/`review_status` فقط)</td><td class="sev-low">منخفضة</td><td>عرض حالة `PROOF_REVIEW_REQUIRED` بوضوح إن أعادها الخادم (حالة موجودة أصلًا في `OrderState` بـRN) بدل تركها كنص عام غامض — إصلاح مصاحب مذكور في تقرير التدقيق أصلًا</td></tr>
+  </table>
+
+  <h3 class="item-title">C5 — الإبلاغ عن استثناء نقدي عند الباب</h3>
+  <div class="tag-row"><span class="tag waveC">الموجة C</span><span class="tag high">عالٍ</span></div>
+  <pre>POST /driver/cash-exceptions
+{ order_id?, exception_code: CUSTOMER_CANT_PAY|PARTIAL_PAYMENT|NO_CHANGE,
+  amount_due_minor, amount_collected_minor?, note? }</pre>
+  <h4 class="sub-title">محاكاة أثناء البناء</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>B1</td><td><code>PARTIAL_PAYMENT</code> يتطلب <code>amount_collected_minor</code> إلزاميًا (422 بدونه) بخلاف الرمزين الآخرين — منطق شرطي دقيق في النموذج</td><td class="sev-med">متوسطة</td><td>حقل "المبلغ المُحصَّل" يظهر ويصبح إلزاميًا فقط عند اختيار "دفع جزئي" تحديدًا — تعطيل زر الإرسال بدونه</td></tr>
+    <tr><td>B2</td><td>استثناء واحد مفتوح فقط لكل طلب (فهرس فريد في قاعدة البيانات) — محاولة ثانية تُرفَض 409</td><td class="sev-low">منخفضة</td><td>عرض الاستثناء المفتوح الحالي بدل نموذج جديد إن وُجد مسبقًا لنفس الطلب (تحقّق أولي عبر `GET /driver/cash-exceptions` قبل عرض زر "إبلاغ جديد")</td></tr>
+  </table>
+  <h4 class="sub-title">محاكاة أثناء التشغيل الفعلي</h4>
+  <table class="scenario-table">
+    <tr><th>#</th><th>السيناريو</th><th>الخطورة</th><th>الحل المُدرَج</th></tr>
+    <tr><td>R1</td><td>السائق يبلّغ عن استثناء بعد إتمام تسليم الطلب فعليًا وإغلاقه (حالة متأخرة، هل الباك-إند يمنعها؟ غير موثَّق صراحة في البحث)</td><td class="sev-med">متوسطة</td><td>الزر يظهر فقط أثناء وجود الطلب في حالة توصيل نشطة (`PICKED_UP`/`EN_ROUTE`/`ARRIVED_AT_DESTINATION`) قبل الضغط على "تم التسليم" النهائي — يمنع محاولة الإبلاغ المتأخر من الواجهة أصلًا</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- WAVE D -->
+<!-- ============================================================ -->
+<section id="waveD">
+  <h2 class="sec-title waveD">🟣 الموجة D — الإثراءات الثانوية (بعد B و C)</h2>
+  <p class="lead">عناصر لا تمنع الاستخدام الأساسي — تُعالَج بمعالجة أخف (تصميم + مخاطر رئيسية فقط، بلا محاكاة سيناريوهات مطوَّلة لكل بند، تفاديًا لإطالة الوثيقة على حساب الوضوح).</p>
+
+  <h4 class="sub-title">دور السائق</h4>
+  <table>
+    <tr><th>البند</th><th>ملخّص التصميم</th><th>أهمّ خطر واحد + حل</th></tr>
+    <tr><td>زر رفض العرض</td><td>زر ثانٍ بجانب "قبول" في `home.tsx`، مع سبب اختياري</td><td>سائق يرفض عروضًا كثيرة بلا سبب واضح قد يُخفض تقييمه — عرض تحذير خفيف بعد 3 رفضات متتالية</td></tr>
+    <tr><td>تصدير CSV للسجلّ</td><td>تنزيل ملف عبر `expo-file-system`/مشاركة بدل عرض مباشر (لا متصفح على الجوّال)</td><td>ملفات CSV كبيرة (سائق نشط لسنة) — تحديد نطاق تاريخ إلزامي قبل التصدير</td></tr>
+    <tr><td>إحصائيات ملخّصة</td><td>بطاقة أعلى `history.tsx`: عدد رحلات/كم/أرباح (حساب من `DELIVERED` فقط، محليًا من نفس البيانات المُجلَبة أصلًا — بلا استدعاء إضافي)</td><td>لا خطر يُذكَر — حساب محلي بحت</td></tr>
+    <tr><td>أقسام الإعدادات الناقصة (عمل، مالي، مركبة، لغة، حذف حساب)</td><td>أقسام إضافية في `settings.tsx`، كل قسم يعيد استخدام مكوّنات/أنماط قائمة (رابط للوثائق، رابط لحذف الحساب المبني هذه الجلسة للعميل يُوسَّع ليشمل السائق)</td><td>حذف حساب السائق قد يصطدم بقيود مختلفة عن العميل (مركبة نشطة، رصيد نقدي مستحق) — التحقّق من `deletion_eligibility` المذكور سابقًا هذه الجلسة يشمل فرعًا للسائق فعلًا (مؤكَّد من قراءة الكود وقت بناء حذف حساب العميل)</td></tr>
+  </table>
+
+  <h4 class="sub-title">دور المزوّد</h4>
+  <table>
+    <tr><th>البند</th><th>ملخّص التصميم</th><th>أهمّ خطر واحد + حل</th></tr>
+    <tr><td>لوحة تحكّم موحّدة (فتح/إغلاق، قبول تلقائي، إغلاق تدريجي، شكاوى، تحليلات، تنبيه وثائق)</td><td>شاشة `home.tsx` تُقسَّم لتبويبين: "الطابور" (الموجود) و"لوحة التحكّم" (جديد) بدل حشر كل شيء في شاشة واحدة</td><td>نطاق كبير — يُقسَّم لدفعات فرعية (فتح/إغلاق أولًا كأبسط عنصر، التحليلات آخرًا كأكبرها)</td></tr>
+    <tr><td>منتقي الصور + مجموعات التعديل في الكتالوج</td><td>يعيد استخدام `documentPicker.ts` للصور؛ إدارة المجموعات نموذج CRUD جديد (نفس نمط `staff.tsx` لإدارة الصلاحيات)</td><td>تحرير مجموعات تعديل حيّة على أصناف قيد الطلب فعليًا وقت التعديل — لا قيد خاص مطلوب، الباك-إند يتعامل مع هذا أصلًا (لقطة سعر `price_snapshot` عند الطلب، لا مرجع حي)</td></tr>
+    <tr><td>الخط الزمني التفصيلي لتاريخ الطلبات</td><td>عرض توسّعي (accordion) لكل طلب في `order-history.tsx`</td><td>لا خطر يُذكَر — بيانات موجودة أصلًا في تفاصيل الطلب</td></tr>
+    <tr><td>MyPermissions (عرض ذاتي)</td><td>شاشة جديدة صغيرة تستهلك `GET /me/permissions` (نفس endpoint من A3 — إعادة استخدام كاملة)</td><td>لا خطر — قراءة فقط</td></tr>
+    <tr><td>مفتاح توزيع تلقائي/يدوي + ملخّص تقييمات الفريق</td><td>إضافات بسيطة في `staff.tsx`</td><td>لا خطر يُذكَر</td></tr>
+  </table>
+
+  <h4 class="sub-title">دور العميل</h4>
+  <table>
+    <tr><th>البند</th><th>ملخّص التصميم</th><th>أهمّ خطر واحد + حل</th></tr>
+    <tr><td>إثراء المحفظة (تفاصيل حركة، دفع الديون، إخفاء الأزرار حسب الراية)</td><td>ربط `customer/debts` (موجود من بناء إعدادات العميل هذه الجلسة) + قراءة رايات `wallet_topup_enabled`/`transfer_enabled` من استجابة الحالة العامة</td><td>إخفاء زر شحن المحفظة فجأة لمستخدم اعتاد رؤيته إن أُغلقت الراية تشغيليًا — سلوك مقصود ومطابق للويب، لا عيب</td></tr>
+    <tr><td>إثراء تحويل المحفظة (QR إرسال/استلام، سجلّ، تأكيد PIN)</td><td>QR يحتاج مكتبة قارئ كاميرا جديدة (نفس اعتماد C4/QR) — يُبنى بعد حسم اختيار مكتبة QR في C4 لتفادي ازدواج القرار التقني</td><td>—</td></tr>
+    <tr><td>إثراء الرئيسية (استئناف الطلب، الأكثر طلبًا، الشائعة، البحث الأخير)</td><td>استعلامات إضافية موازية (`useQuery` منفصلة لكل قسم) — بند "استئناف الطلب" يعيد استخدام منطق B3 (allowed_actions) لزر الإلغاء المصاحب للبنر</td><td>إطالة زمن تحميل الرئيسية بعدة استعلامات متوازية — تحميل كسول (lazy) لكل قسم بعد عرض الهيكل الأساسي، لا حجب الشاشة كاملة بانتظار الكل</td></tr>
+    <tr><td>سجلّ الطلبات: إعادة الطلب + فلاتر + فرز</td><td>"إعادة الطلب" يعيد بناء سطور سلة (`CartLine[]`) من الطلب القديم — <b>يعتمد على B1</b> إن كان الطلب القديم يحوي تخصيصات (variant/modifiers) يجب استعادتها بدقة</td><td>صنف/متغيّر أُرشِف منذ الطلب الأصلي — نفس معالجة B1-B3 (رسالة "لم يعد متوفرًا" بدل فشل صامت)</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="registry">
+  <h2 class="sec-title">📋 سجلّ الأعراض الجانبية الموحَّد (كل الموجات)</h2>
+  <p class="lead">تجميع كل عرَض جانبي "غير بديهي" مكتشَف أثناء المحاكاة عبر كل الموجات، في مكان واحد، لضمان عدم إغفال أيٍّ منها أثناء التنفيذ الفعلي.</p>
+  <table class="side-effect-table">
+    <tr><th>العرَض الجانبي</th><th>مصدره</th><th>الحل المُدرَج</th></tr>
+    <tr><td>حلقة توجيه لا نهائية إن كانت شاشة الحالة داخل نفس مجموعة `_layout.tsx` المحمية</td><td>A1</td><td>وضع شاشة الحالة خارج المجموعة المحمية صراحة</td></tr>
+    <tr><td>سائق كان ACTIVE ثم عُلِّق لا يرى شاشة الحالة الجديدة فورًا (JWT لا يتحدّث تلقائيًا)</td><td>A1</td><td>يُترَك لمعالجة 403 الموجودة أصلًا — حدّ معروف موثَّق، لا يُصلَح ضمن A1</td></tr>
+    <tr><td>مالك المتجر قد تُخفى أزراره بالخطأ إن عولج كموظف عادي بلا `is_super`</td><td>A3</td><td>التحقق الصريح أن صلاحيات المالك من `ROLE_PERMISSIONS[PROVIDER_ADMIN]` لا `is_super`</td></tr>
+    <tr><td>فشل شبكي في `/me/permissions` يُخفي كل الأزرار خطأً فيظن الموظف فقدان صلاحياته</td><td>A3</td><td>عند فشل الاستعلام: إبقاء الأزرار ظاهرة، الاعتماد على 403 الخلفي كخط دفاع أخير</td></tr>
+    <tr><td>سلال المستخدمين المحفوظة قبل B1 قد تُفرَّغ أو تُكسَر عند الترحيل</td><td>B1</td><td>اختبار وحدة مخصَّص لدالة `migrate` يحاكي بيانات v1 حقيقية</td></tr>
+    <tr><td>تغيير مفتاح سطر السلة من `itemId` إلى `lineKey` يكسر كل استخدام سابق لـ`itemId` كمفتاح</td><td>B1</td><td>جرد شامل + تحويل دفعة واحدة متكاملة، لا تدريجي</td></tr>
+    <tr><td>تكرار خلل "قيمة purpose خاطئة" عند بناء بوّابة OTP لطلبات القيمة العالية</td><td>B2</td><td>تأكيد صريح أن `ORDER_CONFIRMATION` ضمن الثمانية القيم الصحيحة + اختبار حارس عام يمنع أي قيمة غير مطابقة مستقبلًا</td></tr>
+    <tr><td>خصم مزدوج محتمل عند انقطاع شبكة أثناء الدفع المُجزَّأ</td><td>B2</td><td>الاعتماد على `Idempotency-Key` الموجود أصلًا في `client.ts` — التأكد أن مسار الدفع الجديد يمرّ عبره لا يتجاوزه</td></tr>
+    <tr><td>استقصاء تتبّع الطلب يستهلك بطارية/بيانات أكثر على رحلة طويلة</td><td>B3</td><td>معدّل استقصاء متدرّج حسب حالة الطلب (5 ثوانٍ وقت الذروة، 20 ثانية غير ذلك)</td></tr>
+    <tr><td>ازدواج بلاغ SOS بضغطة عرضية مزدوجة</td><td>C1</td><td>تعطيل الزر لثوانٍ بعد أول إرسال ناجح</td></tr>
+    <tr><td>خطوة التحقق برمز التسليم تُفرَض دومًا رغم أنها غير مطلوبة لـ`PHOTO_AT_DOOR`</td><td>C3+C4</td><td>ترابط شرطي مباشر بين اختيار نوع الإثبات في C4 وظهور خطوة C3</td></tr>
+    <tr><td>"إعادة الطلب" (D) قد تُعيد بناء سطر سلة بتخصيص لم يعد متاحًا</td><td>D (سجلّ الطلبات)</td><td>نفس معالجة رسالة "لم يعد متوفرًا" المبنية أصلًا في B1</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="deps">
+  <h2 class="sec-title">🔗 مصفوفة الاعتماديات بين العناصر</h2>
+  <table>
+    <tr><th>العنصر</th><th>يعتمد على</th><th>يُستخدَم لاحقًا في</th></tr>
+    <tr><td>A1 (بوابة الحالة)</td><td>لا شيء</td><td>A2 (سبب الرفض يُعرَض داخل شاشة A1)</td></tr>
+    <tr><td>A2 (سبب الرفض)</td><td>A1 (الشاشة التي يُعرَض فيها)</td><td>لا شيء</td></tr>
+    <tr><td>A3 (بوابة الصلاحيات)</td><td>لا شيء</td><td>A4 (زر الإغلاق الذاتي محميّ بنفس الهوك)</td></tr>
+    <tr><td>A4 (إغلاق الاستلام الذاتي)</td><td>A3 (هوك الصلاحيات)</td><td>لا شيء</td></tr>
+    <tr><td>B1 (تخصيص الأصناف)</td><td>لا شيء (يجب أن يُبنى أولًا داخل الموجة B)</td><td>B2 (الدفع يستهلك سطور السلة الجديدة)، D (إعادة الطلب)</td></tr>
+    <tr><td>B2 (إثراء الدفع)</td><td>B1</td><td>لا شيء</td></tr>
+    <tr><td>B3 (تتبّع الطلب)</td><td>لا شيء (مستقل فعليًا عن B1/B2)</td><td>D (بنر استئناف الطلب في الرئيسية)</td></tr>
+    <tr><td>C3 (رمز التسليم)</td><td>لا شيء</td><td>C4 (شرط ظهور مرتبط)</td></tr>
+    <tr><td>C4 (نوع الإثبات)</td><td>C3 (مرتبطان تصميميًا، يُبنيان معًا)</td><td>لا شيء</td></tr>
+    <tr><td>كل عناصر D الخاصة بالمحفظة/QR</td><td>C4 (حسم اختيار مكتبة قارئ QR أولًا)</td><td>لا شيء</td></tr>
+  </table>
+</section>
+
+<footer>
+  تقرير 481 — الخطة التنفيذية الدقيقة لإصلاح فجوات التطابق (RN مقابل الويب) بعد محاكاة ذهنية عميقة · تووا (Tawa) Libya Delivery Platform · 2026-07-14
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>

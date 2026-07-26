@@ -1,0 +1,276 @@
+<title>560 — فحص الكود الحي فقط: Tawa Trade وارتباطه بمنصّة توا</title>
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74;
+  --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  direction:rtl;line-height:1.7;max-width:980px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:72ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.86em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.8em}
+a{color:var(--accent2)}
+
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.8em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:130px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.55em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.78em}
+
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+.callout.good{border-inline-start:5px solid var(--good)}
+.callout.bad{border-inline-start:5px solid var(--bad)}
+
+section{margin:44px 0}
+section > h2{font-size:1.35em;padding-bottom:10px;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:10px}
+section > h2 .n{font-family:var(--mono);color:var(--sub);font-size:.7em}
+
+.chip{display:inline-block;font-size:.72em;font-weight:700;padding:2px 9px;border-radius:999px;margin-inline-end:5px;white-space:nowrap}
+.chip.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.good{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.chip.info{background:color-mix(in srgb,var(--info) 16%,transparent);color:var(--info)}
+
+.finding{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:16px 0}
+.finding h3{margin:0 0 6px;font-size:1.06em;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.finding .meta-row{color:var(--sub);font-size:.83em;margin-bottom:10px}
+.finding .files{font-family:var(--mono);font-size:.78em;color:var(--sub);direction:ltr;text-align:left;margin-top:8px}
+
+.correction-box{background:color-mix(in srgb,var(--bad) 6%,var(--panel));border:1px dashed var(--bad);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.92em}
+.correction-box b{color:var(--bad)}
+.decision-box{background:color-mix(in srgb,var(--warn) 8%,var(--panel));border:1px solid var(--warn);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.92em}
+.decision-box b{color:var(--warn)}
+.solved-box{background:color-mix(in srgb,var(--good) 8%,var(--panel));border:1px solid var(--good);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.92em}
+.solved-box b{color:var(--good)}
+
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.87em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--line);font-weight:700}
+tr:nth-child(even) td{background:color-mix(in srgb,var(--line) 35%,transparent)}
+
+.flow{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;margin:20px 0}
+.flow .step{flex:1;min-width:130px;background:var(--panel);border:2px solid var(--line);border-radius:10px;
+  padding:14px 12px;text-align:center;font-size:.83em;position:relative}
+.flow .step b{display:block;font-size:1.05em;margin-bottom:4px}
+.flow .step.good{border-color:var(--good)}
+.flow .step.bad{border-color:var(--bad)}
+.flow .arrow{display:flex;align-items:center;justify-content:center;font-size:1.4em;color:var(--sub);padding:0 6px}
+
+.stack{display:flex;flex-direction:column;gap:8px;margin:20px 0}
+.stack .layer{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:12px 18px;font-size:.88em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.stack .layer.shared{border-color:var(--good);background:color-mix(in srgb,var(--good) 6%,var(--panel))}
+.stack .layer.gap{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 6%,var(--panel))}
+.stack .layer .tag{font-size:.74em;font-weight:700;padding:2px 10px;border-radius:999px}
+.stack .layer.shared .tag{background:color-mix(in srgb,var(--good) 20%,transparent);color:var(--good)}
+.stack .layer.gap .tag{background:color-mix(in srgb,var(--bad) 20%,transparent);color:var(--bad)}
+
+.target-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
+.target-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.target-card h4{margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.target-card .dot{width:10px;height:10px;border-radius:50%;display:inline-block;background:var(--info)}
+
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+</style>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 560 · فحص كود حيّ بحت — بلا أي اعتماد على تقارير سابقة</div>
+  <h1>Tawa Trade: فحص من الصفر بقراءة الكود الفعلي فقط، وكيف يرتبط بمنصّة توا</h1>
+  <div class="meta">
+    تصحيح منهجي: التقرير السابق (559) اعتمد جزئيًّا على تقارير قديمة (550-554) دون التحقّق الكامل من كل ادّعاء ضدّ الكود الحيّ اليوم. هذا التقرير يُلغي ذلك الاعتماد بالكامل. كل سطر هنا مصدره: قراءة كاملة لملفّات الكود الفعليّة (لا عيّنات، لا استنتاج من تقرير)، بالإضافة إلى تحقّق مباشر مكرَّر لأهمّ الادّعاءات بنفسي على الكود الحيّ. 2026-07-25
+  </div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>1</b><span>موقع واحد فقط في كل الكود يُسجَّل فيه قيد ماليّ لـTrade</span></div>
+  <div class="stat"><b>32</b><span>مواقع استدعاء لنظام دفتر الأستاذ في كل المنصّة — واحد منها فقط لـTrade</span></div>
+  <div class="stat"><b>0</b><span>أعلام تفعيل/تعطيل (feature flag) لـTrade — لا يوجد مفتاح إيقاف طارئ</span></div>
+  <div class="stat"><b>2</b><span>صفحتان من 5 صفحات Trade في لوحة العمليّات بلا فحص صلاحيّة دقيق فعليّ (عيب مؤكَّد اليوم)</span></div>
+  <div class="stat"><b>0</b><span>سطر واحد كُتِب اعتمادًا على تقرير قديم في هذا التقرير</span></div>
+</div>
+
+<div class="callout method">
+  <b>منهجيّة هذا التقرير تحديدًا:</b> فُحِص الكود الخلفي والأمامي بشكل منفصل ومستقلّ عبر وكيلين مختلفين، بأمر صريح لكل منهما بعدم فتح أو قراءة أي ملفّ HTML لتقرير سابق إطلاقًا. كل وكيل قرأ الملفّات المصدريّة كاملة (لا مقتطفات grep فقط) للنقاط المهمّة، ونقل السطر الفعلي من الكود كدليل. بعد استلام النتيجتين، تحقّقتُ بنفسي مباشرة من أهمّ 3 ادّعاءات حاسمة (موقع تسجيل القيد الماليّ، الفجوة في فحص الصلاحيّات بالواجهة، غياب Trade من خريطة الحسابات الرسميّة) بقراءة نفس الأسطر بنفسي قبل كتابة أي استنتاج.
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li>الخلاصة بلغة بسيطة</li>
+    <li>خريطة جداول Trade والوصلات الفعليّة بينها وبين توا</li>
+    <li>مسار المال الكامل: أين بالضبط يلمس Trade دفتر الأستاذ؟</li>
+    <li>هل منطق العمولة نُسِخ بدقّة أم بتصرّف؟</li>
+    <li>الصلاحيّات: مقارنة حرفيّة بين Trade والمزوّدين</li>
+    <li>الواجهة الأماميّة: التوجيه، القائمة، وفجوة حقيقيّة مؤكَّدة</li>
+    <li>أثر الأخطاء الماليّة المحتملة — بدقّة أكبر من التقرير السابق</li>
+    <li>لا يوجد مفتاح إيقاف طارئ لـTrade</li>
+    <li>الخلاصة النهائيّة</li>
+  </ol>
+</div>
+
+<section id="simple">
+  <h2><span class="n">§1</span> الخلاصة بلغة بسيطة</h2>
+  <p>Tawa Trade قسم تجارة جملة كامل مبنيّ <b>داخل</b> نفس تطبيق توا — ليس تطبيقًا أو خادمًا منفصلًا. له جداول بيانات خاصّة به بالكامل، لكنّه يستعير من توا ثلاثة أشياء أساسيّة بدقّة شديدة: (1) نظام تسجيل الدخول والصلاحيّات نفسه، (2) نظام دفتر الأستاذ الماليّ نفسه حرفيًّا (المكان الذي تُسجَّل فيه كل الأموال في توا)، و(3) نفس تطبيق الواجهة الأماميّة ونفس قائمة التنقّل.</p>
+  <p>بعد قراءة كل سطر ذي صلة في الكود الفعلي اليوم (لا تخمين، لا نقل عن تقرير)، الحقائق الثلاث الأهمّ هي:</p>
+  <ol>
+    <li><b>يوجد موقع واحد فقط، بالضبط، في كل الكود يسجّل فيه Trade قيدًا ماليًّا حقيقيًّا</b> — دالّة واحدة، سطر واحد للاستدعاء. هذا يجعل تتبّع أي مشكلة ماليّة مستقبليّة بسيطًا جدًّا لأن مصدرها الوحيد الممكن معروف بدقّة.</li>
+    <li><b>لا يوجد أي "مفتاح إيقاف طارئ" لـTrade</b> — كل ميزات توا الأخرى الحسّاسة (مثل المحفظة والدفع) لها علم تفعيل/تعطيل في ملفّ إعدادات مركزي؛ Trade لا يملك هذا إطلاقًا. الطريقة الوحيدة لإيقافه هي سحب صلاحيّات كل من يملكها فرديًّا.</li>
+    <li><b>عيب حقيقي مؤكَّد اليوم في الواجهة</b>: صفحتان من صفحات Trade الخمس في لوحة العمليّات (الموردون، والقضايا) تعرضان أزرار تنفيذ إجراءات (تفعيل مورّد، حسم قضيّة) لأي موظّف عمليّات بناءً على دوره العام فقط — لا تتحقّقان فعليًّا من أن هذا الموظّف يملك الصلاحيّة الدقيقة الممنوحة له من الخادم. الصفحة الثالثة (أوامر الشراء) تفعل هذا الفحص بشكل صحيح — أي أن العيب غير متّسق حتى داخل قسم Trade نفسه.</li>
+  </ol>
+</section>
+
+<section id="tables">
+  <h2><span class="n">§2</span> خريطة جداول Trade والوصلات الفعليّة بينها وبين توا</h2>
+  <p>قُرِئ ملفّ تعريف النماذج كاملًا (546 سطرًا). كل وصلة (foreign key) حقيقيّة موجودة، مذكورة هنا حرفيًّا:</p>
+  <table>
+    <tr><th>جدول Trade</th><th>يتّصل بـ (foreign key فعليّة)</th><th>ملاحظة</th></tr>
+    <tr><td><code>trade_suppliers</code></td><td><code>users.id</code> (منشئ السجلّ فقط)</td><td>المورّد نفسه ليس له حساب دخول — لا وصلة لأي جدول آخر</td></tr>
+    <tr><td><code>trade_products</code></td><td><code>trade_suppliers.id</code></td><td>داخلي بالكامل</td></tr>
+    <tr><td><code>trade_reservations</code></td><td><code>trade_products.id</code>، <code>providers.id</code> (المزوّد المشتري)</td><td>هذه أوّل نقطة اتّصال فعليّة بجدول أساسي في توا (Provider)</td></tr>
+    <tr><td><code>trade_purchase_orders</code></td><td><code>providers.id</code>، <code>trade_suppliers.id</code></td><td>لا وصلة بجدول <code>orders</code> (طلبات التوصيل) إطلاقًا</td></tr>
+    <tr><td><code>trade_shipments</code></td><td><code>trade_purchase_orders.id</code> (وصلة فريدة 1:1)</td><td>لا يمسّ حالة أمر الشراء نفسه عمدًا (موثَّق في الكود)</td></tr>
+    <tr><td><code>trade_goods_receipts</code></td><td><code>trade_purchase_orders.id</code> (فريدة 1:1)</td><td>—</td></tr>
+    <tr><td><code>trade_invoices</code></td><td><code>trade_purchase_orders.id</code> (فريدة 1:1)</td><td>هذا الجدول تحديدًا هو مصدر القيد الماليّ (§3)</td></tr>
+    <tr><td><code>work_items</code></td><td><code>users.id</code> فقط (لا وصلة مباشرة لـTradeInvoice)</td><td>يربط بـ<code>TradeInvoice</code> عبر زوج نصّي (<code>subject_type</code>/<code>subject_id</code>) وليس مفتاحًا حقيقيًّا في قاعدة البيانات — قرار متعمَّد لأن هذا الجدول عام لأنواع قضايا مختلفة</td></tr>
+  </table>
+  <div class="callout good">
+    <b>نتيجة مباشرة من القراءة الكاملة:</b> لا يوجد أي جدول من جداول Trade التسعة يتّصل بجدول <code>orders</code> (طلبات التوصيل) أو <code>drivers</code> (السائقين) إطلاقًا — لا FK واحدة. نقطة الاتّصال الوحيدة بجدول أساسي هي <code>providers.id</code> (المزوّد بصفته مشتريًا)، ونقاط تدقيق <code>users.id</code> (من أنشأ/أنهى كل سجلّ).
+  </div>
+</section>
+
+<section id="money">
+  <h2><span class="n">§3</span> مسار المال الكامل: أين بالضبط يلمس Trade دفتر الأستاذ؟</h2>
+  <p>قُرِئت كل الرواتر الخمسة لـTrade كاملة (سطرًا بسطر، لا عيّنات). النتيجة: من بين كل نقاط النهاية (endpoints) في الوحدة كلّها، <b>نقطة نهاية واحدة فقط</b> تلمس دفتر الأستاذ:</p>
+  <div class="flow">
+    <div class="step">حجز بضاعة<br><small>لا قيد ماليّ</small></div>
+    <div class="arrow">←</div>
+    <div class="step">إصدار أمر شراء<br><small>لا قيد ماليّ</small></div>
+    <div class="arrow">←</div>
+    <div class="step">موافقة العمليّات<br><small>لا قيد ماليّ</small></div>
+    <div class="arrow">←</div>
+    <div class="step">تسجيل شحنة ووصولها<br><small>لا قيد ماليّ</small></div>
+    <div class="arrow">←</div>
+    <div class="step bad"><b>الفاتورة (تطابق)</b><br>هنا فقط ⚡</div>
+  </div>
+  <p>الكود الفعلي (تحقّقتُ منه بنفسي مباشرة، <code>po_router.py</code> السطر 635-660):</p>
+  <pre>entries = [
+    {"account_code": f"TRADE_BUYER_RECEIVABLE_{po.buyer_provider_id}",
+     "account_type": "ASSET", "debit_minor": total_invoiced_minor},
+    {"account_code": f"TRADE_SUPPLIER_PAYABLE_{po.supplier_id}",
+     "account_type": "LIABILITY", "credit_minor": total_invoiced_minor - fee},
+]
+if fee:
+    entries.append({"account_code": "TRADE_REVENUE", "account_type": "REVENUE", "credit_minor": fee})
+
+journal_id = await LedgerService(db).post_journal(
+    entries, reference_type="trade_invoice", reference_id=invoice.id
+)</pre>
+  <p>هذا يستدعي <b>نفس الدالّة</b> <code>LedgerService.post_journal()</code> التي تُسجَّل عبرها كل الأموال في توا. جرى فحص هذه الدالّة نفسها كاملة: تتحقّق أن مجموع المدين = مجموع الدائن تمامًا قبل قبول أي قيد (نفس القاعدة المحاسبيّة الأساسيّة)، ولا تسمح بقيد فارغ أو غير متوازن — لا فرق في القواعد بين قيد من توصيل عادي وقيد من Trade.</p>
+  <div class="finding">
+    <h3>فحصنا كل استدعاء لنظام دفتر الأستاذ في المنصّة كلّها — 32 موقعًا</h3>
+    <p>بحث شامل (<code>grep</code>) عن كل مكان يُستدعى فيه <code>LedgerService(...)</code> في كامل الكود الخلفي وجد <b>32 موقعًا</b> — المحفظة، العمولات، رواتب الموظّفين، تسويات السائقين، الاسترجاعات، برنامج الولاء، إلخ. <b>موقع واحد فقط من الـ32</b> يخصّ Trade (<code>po_router.py:658</code>). لا يوجد أي موقع آخر في كل المنصّة — لا في وحدة الماليّة، ولا في وحدة العمليّات — يذكر Trade بأي شكل يتعلّق بالمال. هذا يعني: خطر Trade الماليّ على باقي توا محصور تقنيًّا في نقطة واحدة معروفة بدقّة، لا منتشر في أماكن متعدّدة.</p>
+  </div>
+</section>
+
+<section id="commission">
+  <h2><span class="n">§4</span> هل منطق العمولة نُسِخ بدقّة أم بتصرّف؟</h2>
+  <p>ملفّ حساب عمولة Trade (<code>trade_commission.py</code>) يقول في تعليقه إنّه "ينسخ" منطق عمولة المزوّدين العاديّين (<code>provider_commission.py</code>). قارنّا الملفّين سطرًا بسطر بدل تصديق التعليق:</p>
+  <div class="solved-box">
+    <b>مؤكَّد: نسخ حرفي دقيق، لا مجرّد تشابه عام.</b> دالّة تقييد الحدّ الأدنى/الأقصى للعمولة، دالّة اختيار الشريحة السعريّة، منطق حساب النسبة المئويّة (<code>(المبلغ × نقاط_الأساس) ÷ 10000</code>)، وترتيب البحث عن الإعداد المطبَّق (إعداد خاصّ بالمورّد ← إعداد عامّ ← قيمة افتراضيّة من متغيّرات البيئة) — كل هذه متطابقة بنية وترتيبًا بين الملفّين، بفارق الأسماء فقط. لا انحراف واحد وُجد.
+  </div>
+</section>
+
+<section id="permissions">
+  <h2><span class="n">§5</span> الصلاحيّات: مقارنة حرفيّة بين Trade والمزوّدين</h2>
+  <p>قُرئ ملفّ الصلاحيّات الرئيسي كاملًا (513 سطرًا). النتيجة الأهمّ التي لم يذكرها أي تقرير سابق بهذا الوضوح:</p>
+  <div class="finding">
+    <h3>Trade لا يملك "صلاحيّات أساسيّة تلقائيّة" لأي دور — بخلاف المزوّدين <span class="chip info">فرق هيكلي حقيقي، موثَّق كقرار متعمَّد</span></h3>
+    <p>موظّفو المزوّد (<code>PROVIDER_STAFF</code>) يحصلون تلقائيًّا على مجموعة صلاحيّات أساسيّة بمجرّد تعيينهم (بلا منح فردي). فحصنا قائمة صلاحيّات كل دور في توا (<code>ROLE_PERMISSIONS</code>، الكاملة) ولم نجد <b>ولا صلاحيّة واحدة</b> من صلاحيّات Trade ممنوحة تلقائيًّا لأي دور — حتى <code>trade:access</code> نفسه (مجرّد عرض الصفحة) يحتاج منحًا فرديًّا صريحًا لكل موظّف، ولو كان مديرًا (<code>ADMIN</code>). الاستثناء الوحيد هو <code>SUPER_ADMIN</code> عبر صلاحيّته الشاملة. هذا موثَّق في تعليق الكود نفسه كقرار مقصود: "مغلق افتراضيًّا للجميع إلا SUPER_ADMIN — موظّف مُسمًّى بعينه، لا افتراضًا حسب الدور".</p>
+  </div>
+  <p>باقي البنية متطابقة تمامًا مع نمط المزوّدين: مستويان (صلاحيّات عاديّة قابلة للمنح، وصلاحيّة واحدة حسّاسة جدًّا لا تُمنَح إلا لـSUPER_ADMIN وهي <code>trade:invoice_manage</code> — الصلاحيّة التي تفتح باب تسجيل الفاتورة الماليّة)، ونفس سلسلة الفحوصات الخماسيّة (الدور ← حالة الحساب ← الحساب التشغيلي ← حظر الحساب ← الصلاحيّة الفعليّة الممنوحة) تُطبَّق حرفيًّا على Trade كما تُطبَّق على كل شيء آخر.</p>
+</section>
+
+<section id="frontend">
+  <h2><span class="n">§6</span> الواجهة الأماميّة: التوجيه، القائمة، وفجوة حقيقيّة مؤكَّدة</h2>
+  <p>صفحات Trade مسجَّلة في <b>نفس</b> جدول التوجيه الذي تستخدمه كل صفحات لوحة العمليّات، بنفس الطريقة الحرفيّة (نفس غلاف الحماية <code>ProtectedRoute</code>، نفس أسلوب التحميل الكسول) — لا فرق بنيوي عن أي صفحة أخرى. تظهر كقسم عاشر عاديّ في نفس القائمة الجانبيّة.</p>
+
+  <div class="finding">
+    <h3>عيب حقيقي مؤكَّد اليوم: صفحتان من 5 بلا فحص صلاحيّة دقيق <span class="chip bad">تحقّقتُ منه بنفسي مباشرة</span></h3>
+    <p>الخادم يفرض صلاحيّات دقيقة منفصلة لكل إجراء (<code>trade:supplier_manage</code>، <code>trade:catalog_manage</code>، <code>trade:case_manage</code>، <code>trade:invoice_manage</code>) — لكن الواجهة لا تعكس هذا بشكل متّسق:</p>
+    <table>
+      <tr><th>الصفحة</th><th>كيف تقرّر إظهار زرّ الإجراء؟</th></tr>
+      <tr><td><code>OpsTradeSuppliers.tsx</code> (الموردون)</td><td class="chip bad">دور عام فقط — لا فحص صلاحيّة دقيق إطلاقًا</td></tr>
+      <tr><td><code>OpsTradeWorkItems.tsx</code> (القضايا)</td><td class="chip bad">دور عام فقط — لا فحص صلاحيّة دقيق إطلاقًا</td></tr>
+      <tr><td><code>OpsTradePurchaseOrders.tsx</code> (أوامر الشراء)</td><td class="chip good">دور عام + فحص صلاحيّة دقيق فعلي (<code>can("trade:invoice_manage")</code>)</td></tr>
+    </table>
+    <div class="correction-box"><b>الأثر العملي:</b> أي موظّف عمليّات بدور عام مناسب (حتى لو لم يُمنَح صلاحيّة <code>trade:supplier_manage</code> أو <code>trade:case_manage</code> فعليًّا) سيرى زرّ "تفعيل مورّد" أو زرّ "حسم قضيّة" ويستطيع الضغط عليه — الخادم سيرفض الطلب بخطأ 403 بشكل صحيح (لا ثغرة أمنيّة حقيقيّة)، لكن تجربة المستخدم مضلِّلة: يبدو الإجراء متاحًا وهو ليس كذلك. صفحة أوامر الشراء المجاورة تتعامل مع نفس الموقف بشكل صحيح تمامًا — يُخفي الزرّ فعليًّا لمن لا يملك الصلاحيّة، لا يتركه ليصطدم برفض.</div>
+  </div>
+</section>
+
+<section id="risk-precise">
+  <h2><span class="n">§7</span> أثر الأخطاء الماليّة المحتملة — بدقّة أكبر</h2>
+  <p>الفحص الحيّ الدقيق كشف تفصيلًا لم يكن واضحًا في المحاولة الأولى: هناك <b>مستويان مختلفان</b> من تقارير توا الماليّة، وكل منهما يتأثّر بشكل مختلف:</p>
+  <div class="stack">
+    <div class="layer gap"><span><b>الميزان التجريبي / قائمة الدخل / الميزانيّة العموميّة</b> (الأرقام الإجماليّة التي تراها الإدارة يوميًّا)</span><span class="tag">تختلط فيها أرقام Trade بأرقام توا — لا فصل، مؤكَّد</span></div>
+    <div class="layer gap"><span><b>خريطة الحسابات الرسميّة (Chart of Accounts)</b> — التصنيف المحاسبي الرسمي</span><span class="tag">حسابات Trade غير مصنَّفة إطلاقًا — تسقط في تصنيف عامّ لا تمييز فيه</span></div>
+  </div>
+  <p>بمعنى آخر: المشكلة ليست فقط "الأرقام تُجمَع معًا" — بل إن حسابات Trade (<code>TRADE_BUYER_RECEIVABLE</code>، <code>TRADE_SUPPLIER_PAYABLE</code>، <code>TRADE_REVENUE</code>) لا تملك حتى تصنيفًا رسميًّا خاصًّا بها في خريطة الحسابات — قرأنا الملفّ المسؤول عن هذا التصنيف كاملًا ولا يوجد فيه أي إدخال لـTrade. هذا لا يعني خطأً في الأرقام نفسها (رموز الحسابات الحقيقيّة تبقى دقيقة وقابلة للتصفية يدويًّا)، لكنّه يعني أن أي تقرير جاهز يعتمد على التصنيف الرسمي لن يُظهر Trade كبند منفصل.</p>
+</section>
+
+<section id="flag">
+  <h2><span class="n">§8</span> لا يوجد مفتاح إيقاف طارئ لـTrade</h2>
+  <p>قرأنا ملفّ إعدادات التفعيل/التعطيل الكامل لتوا (<code>feature_flags.yaml</code>) وبحثنا في كل ملفّات Trade الثمانية عن أي فحص من نوع "هل هذه الميزة مفعَّلة؟". <b>لا يوجد أي علم من هذا النوع لـTrade إطلاقًا.</b> ميزات حسّاسة أخرى في توا (مثل سحب الأموال من المحفظة، أو تفعيل الدفع الفعلي) لها مفتاح مركزي واحد يمكن قلبه فورًا عند الحاجة. الطريقة الوحيدة لإيقاف Trade اليوم هي سحب صلاحيّات <code>trade:*</code> من كل حساب يملكها فرديًّا — أبطأ وأصعب تنسيقًا من قلب مفتاح واحد.</p>
+</section>
+
+<section id="conclusion">
+  <h2><span class="n">§9</span> الخلاصة النهائيّة</h2>
+  <table>
+    <tr><th>السؤال</th><th>الإجابة المؤكَّدة من الكود الحيّ اليوم</th></tr>
+    <tr><td>هل Trade مرتبط بتوا؟</td><td>نعم، بإحكام — نفس تسجيل الدخول، نفس الصلاحيّات، نفس دفتر الأستاذ، نفس الواجهة</td></tr>
+    <tr><td>أين بالضبط تلتقي أموالهما؟</td><td>نقطة واحدة محدَّدة بدقّة: <code>po_router.py:658</code>، عند تسجيل فاتورة متطابقة</td></tr>
+    <tr><td>هل منطق العمولة موثوق؟</td><td>نعم — نسخ حرفي مؤكَّد سطرًا بسطر من نمط مُختبَر بالفعل في توا</td></tr>
+    <tr><td>هل الصلاحيّات محكمة؟</td><td>نعم من جهة الخادم (مغلقة افتراضيًّا للجميع) — لكن الواجهة بها فجوة حقيقيّة في صفحتين من 5</td></tr>
+    <tr><td>هل الأرقام الماليّة الإجماليّة تتأثّر؟</td><td>نعم، تختلط بلا فصل في التقارير الجاهزة وفي خريطة الحسابات الرسميّة</td></tr>
+    <tr><td>هل يوجد مفتاح إيقاف سريع؟</td><td>لا — الإيقاف الوحيد هو سحب صلاحيّات فرديّة</td></tr>
+  </table>
+  <div class="callout warn">
+    <b>التوصيتان الوحيدتان المبنيّتان على كود حيّ فعلي:</b>
+    <ol>
+      <li>إضافة نفس فحص الصلاحيّة الدقيق (<code>can("trade:...")</code>) لصفحتَي الموردين والقضايا، على نمط صفحة أوامر الشراء المجاورة بالضبط — تصحيح نصف يوم.</li>
+      <li>فصل حسابات Trade عن الأرقام الإجماليّة في التقارير الجاهزة (تصفية بادئة <code>TRADE_</code>) قبل أي استخدام تجاري حقيقي أوّل.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  تقرير 560 · فحص كود حيّ بحت — بلا أي اعتماد على تقارير سابقة (550-554 أو 559) · وكيلان منفصلان مُنِعا صراحة من قراءة أي تقرير HTML، بالإضافة إلى تحقّق مباشر مكرَّر من أهمّ 3 ادّعاءات · لا تعديل كود في هذا التقرير — فحص وتوثيق فقط · 2026-07-25
+</footer>

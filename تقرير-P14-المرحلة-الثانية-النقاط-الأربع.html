@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير P14 المرحلة الثانية — النقاط الأربع</title>
+<style>
+  :root {
+    --bg: #0B0F1A;
+    --surface: #131929;
+    --surface2: #1a2438;
+    --border: #1E2D47;
+    --text: #BEC8DC;
+    --text-dim: #7A8BA0;
+    --accent: #4A9EFF;
+    --accent2: #6AB8FF;
+    --good: #34C77A;
+    --warn: #E8A825;
+    --crit: #FF5C5C;
+    --info: #8B7CF6;
+    --purple: #C084FC;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    font-size: 15px; line-height: 1.7;
+    display: flex; min-height: 100vh;
+  }
+
+  nav {
+    width: 250px; min-width: 250px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    position: sticky; top: 0;
+    height: 100vh; overflow-y: auto;
+    padding: 24px 0; order: 2;
+  }
+  nav h3 {
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text-dim); padding: 0 20px 8px; margin-top: 16px;
+  }
+  nav a {
+    display: block; padding: 7px 20px;
+    color: var(--text-dim); text-decoration: none; font-size: 13px;
+    border-right: 3px solid transparent;
+    transition: color .15s, border-color .15s;
+  }
+  nav a:hover, nav a.active {
+    color: var(--accent); border-right-color: var(--accent);
+    background: rgba(74,158,255,.06);
+  }
+  nav .logo { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  nav .logo-title { font-size: 15px; font-weight: 700; color: var(--accent); }
+  nav .logo-sub { font-size: 11px; color: var(--text-dim); }
+
+  main { flex: 1; padding: 48px 64px; max-width: 920px; order: 1; }
+  h1 { font-size: 30px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 8px; }
+  h2 { font-size: 21px; font-weight: 700; color: #fff; margin-top: 52px; margin-bottom: 16px;
+       padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  h3 { font-size: 16px; font-weight: 600; color: var(--accent2); margin-top: 28px; margin-bottom: 10px; }
+  h4 { font-size: 13.5px; font-weight: 600; color: var(--text); margin-top: 16px; margin-bottom: 6px; }
+  p { margin-bottom: 12px; }
+
+  .hero-meta { display: flex; gap: 14px; flex-wrap: wrap; margin: 18px 0 38px; }
+  .hero-chip {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 13px; font-size: 12.5px;
+  }
+  .hero-chip span { color: var(--accent); font-weight: 600; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 4px; padding: 3px 9px; font-size: 11.5px; font-weight: 600;
+    letter-spacing: .04em;
+  }
+  .chip-ok   { background: rgba(52,199,122,.15); color: var(--good);   border: 1px solid rgba(52,199,122,.3); }
+  .chip-warn { background: rgba(232,168,37,.15); color: var(--warn);   border: 1px solid rgba(232,168,37,.3); }
+  .chip-crit { background: rgba(255,92,92,.15);  color: var(--crit);   border: 1px solid rgba(255,92,92,.3);  }
+  .chip-info { background: rgba(139,124,246,.15);color: var(--info);   border: 1px solid rgba(139,124,246,.3);}
+  .chip-dim  { background: rgba(122,139,160,.1); color: var(--text-dim); border: 1px solid var(--border);    }
+  .chip-purple{ background: rgba(192,132,252,.15);color: var(--purple); border: 1px solid rgba(192,132,252,.3);}
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .summary-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 30px;
+  }
+  .stat-card {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 18px; text-align: center;
+  }
+  .stat-num { font-size: 34px; font-weight: 800; line-height: 1; }
+  .stat-num.ok  { color: var(--good);   }
+  .stat-num.acc { color: var(--accent); }
+  .stat-num.info{ color: var(--info);  }
+  .stat-label { font-size: 11.5px; color: var(--text-dim); margin-top: 4px; letter-spacing: .06em; }
+
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    background: var(--surface2); color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: .07em; font-size: 10.5px;
+    padding: 10px 14px; text-align: right;
+  }
+  td { padding: 10px 14px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: rgba(74,158,255,.03); }
+  .row-ok  td { background: rgba(52,199,122,.03); }
+  .row-warn td { background: rgba(232,168,37,.03); }
+
+  pre {
+    background: #0a0e18; border: 1px solid var(--border); border-radius: 6px;
+    padding: 15px 17px; overflow-x: auto; font-size: 12px; line-height: 1.6;
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    margin: 10px 0;
+  }
+  code {
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    background: rgba(74,158,255,.1); color: var(--accent2);
+    padding: 1px 5px; border-radius: 3px; font-size: 12.5px;
+  }
+
+  .diagram-wrap {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 22px; margin: 18px 0; overflow-x: auto;
+  }
+  .diagram-wrap svg { max-width: 100%; display: block; margin: 0 auto; }
+
+  .deploy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 14px 0; }
+  .deploy-card {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .deploy-card.ok { border-color: rgba(52,199,122,.4); }
+  .deploy-card .dn { font-weight: 700; font-size: 13.5px; margin-bottom: 3px; }
+  .deploy-card .du { font-size: 11.5px; color: var(--text-dim); }
+
+  .item-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 18px 20px; margin-bottom: 14px;
+  }
+  .item-num {
+    width: 28px; height: 28px; min-width: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px; margin-left: 10px; flex-shrink: 0;
+  }
+  .num-done    { background: var(--good);   color: #fff; }
+  .num-confirm { background: var(--accent); color: #fff; }
+  .num-warn    { background: var(--warn);   color: #000; }
+
+  .alert { border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 13.5px; }
+  .alert-ok   { background: rgba(52,199,122,.1);  border: 1px solid rgba(52,199,122,.3);  }
+  .alert-warn { background: rgba(232,168,37,.1);  border: 1px solid rgba(232,168,37,.3);  }
+  .alert-info { background: rgba(139,124,246,.1); border: 1px solid rgba(139,124,246,.3); }
+
+  .file-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .file-row:last-child { border-bottom: none; }
+  .file-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 6px;
+  }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  @media (max-width: 860px) {
+    body { flex-direction: column; }
+    nav { width: 100%; height: auto; position: static; order: 1; }
+    main { padding: 24px 18px; order: 2; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .deploy-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-title">توا — P14 المرحلة 2</div>
+    <div class="logo-sub">النقاط الأربع — تحليل من الجذور</div>
+  </div>
+  <h3>نظرة عامة</h3>
+  <a href="#summary">ملخص التنفيذ</a>
+  <a href="#diagnosis">التشخيص من الجذور</a>
+  <a href="#tests">نتائج الاختبارات</a>
+  <h3>النقاط الأربع</h3>
+  <a href="#s15">S15 — Wallet Step-Up</a>
+  <a href="#p14-7">P14-7 — OrderGroupPage</a>
+  <a href="#p14-8">P14-8 — مؤشر المجموعة</a>
+  <a href="#success">شاشة النجاح</a>
+  <h3>التفاصيل التقنية</h3>
+  <a href="#scenarios">السيناريوهات المحدّثة</a>
+  <a href="#files">الملفات المُعدَّلة</a>
+  <h3>النشر</h3>
+  <a href="#deploy">حالة النشر</a>
+  <a href="#fincor">سلامة العقود</a>
+  <a href="#next">الخطوات التالية</a>
+</nav>
+
+<main>
+
+  <h1>تقرير P14 — المرحلة الثانية<br>النقاط الأربع: تحليل من الجذور</h1>
+  <div class="hero-meta">
+    <div class="hero-chip">التاريخ: <span>6 يوليو 2026</span></div>
+    <div class="hero-chip">الـ Commit: <span>bf0a2ce</span></div>
+    <div class="hero-chip">الفرع: <span>master</span></div>
+    <div class="hero-chip">البناء: <span>main-KDUEUoQM.js</span></div>
+    <div class="hero-chip">الاختبارات: <span>1371 / 1371</span></div>
+  </div>
+
+  <!-- ═══ SUMMARY ═══ -->
+  <h2 id="summary">ملخص التنفيذ</h2>
+
+  <p style="color:var(--text-dim)">
+    بدأنا بفحص ميكروسكوبي لكل النقاط الأربع من الجذور: قراءة الكود سطراً سطراً،
+    فحص ملفات الـ backend، والـ API types، والـ MSW handlers. وجدنا أن
+    <strong style="color:#fff">S15 مكتمل تماماً في الكود</strong>
+    (التسمية "جزئي" كانت مضللة — الفرق هو إعداد من المشغّل لا نقص في الكود)،
+    ثم نفّذنا البنود الثلاثة المتبقية من الصفر.
+  </p>
+
+  <div class="summary-grid">
+    <div class="stat-card"><div class="stat-num ok">1371</div><div class="stat-label">اختباراً ناجحاً</div></div>
+    <div class="stat-card"><div class="stat-num ok">0</div><div class="stat-label">أخطاء TypeScript</div></div>
+    <div class="stat-card"><div class="stat-num ok">0</div><div class="stat-label">أخطاء Lint</div></div>
+    <div class="stat-card"><div class="stat-num acc">4</div><div class="stat-label">اختبارات جديدة ناجحة</div></div>
+    <div class="stat-card"><div class="stat-num info">3</div><div class="stat-label">ملفات معدَّلة</div></div>
+    <div class="stat-card"><div class="stat-num info">2</div><div class="stat-label">ملفات جديدة</div></div>
+  </div>
+
+  <div class="alert alert-ok">
+    ✅ <strong>الحالة النهائية:</strong> FIN-COR PASS — 1371/1371 اختباراً — بناء ناجح —
+    النشر مكتمل على الأربعة مواقع بالبناء <code>main-KDUEUoQM.js</code>
+  </div>
+
+  <!-- ═══ DIAGNOSIS ═══ -->
+  <h2 id="diagnosis">التشخيص من الجذور — ماذا كان منجزاً وماذا ينقص؟</h2>
+
+  <p style="color:var(--text-dim)">
+    فحصنا كل بند بالقراءة المباشرة للكود — لا تخمين، لا افتراضات.
+  </p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>#</th><th>البند</th><th>الحالة قبل هذه المرحلة</th><th>التشخيص الحقيقي</th><th>الإجراء</th></tr>
+      <tr class="row-ok">
+        <td><strong>S15</strong></td>
+        <td>Wallet Step-Up</td>
+        <td><span class="chip chip-warn">⚠ جزئي</span></td>
+        <td>الكود <strong>مكتمل 100%</strong> — lines 219–285 + 448–450 مُنفَّذة بالكامل. "جزئي" = المشغّل لم يُفعّل العتبة (<code>wallet_spend_stepup_threshold_minor = 0</code>)</td>
+        <td><span class="chip chip-ok">✅ لا تغيير — كود صحيح</span></td>
+      </tr>
+      <tr class="row-warn">
+        <td><strong>P14-7</strong></td>
+        <td>OrderGroupPage</td>
+        <td><span class="chip chip-crit">✗ غير موجود</span></td>
+        <td><code>cartsApi.getGroup()</code> موجود لكن لا صفحة، لا route، لا اختبارات</td>
+        <td><span class="chip chip-ok">✅ بُني من الصفر</span></td>
+      </tr>
+      <tr class="row-warn">
+        <td><strong>P14-8</strong></td>
+        <td>مؤشر المجموعة</td>
+        <td><span class="chip chip-crit">✗ غير موجود</span></td>
+        <td><code>tawa_group_map</code> يُحفظ في localStorage لكن لا أحد يقرأه في OrderHistoryPage</td>
+        <td><span class="chip chip-ok">✅ أُضيف chip + navigation</span></td>
+      </tr>
+      <tr class="row-warn">
+        <td><strong>Success</strong></td>
+        <td>شاشة النجاح</td>
+        <td><span class="chip chip-warn">⚠ يذهب لـ /orders</span></td>
+        <td>بعد نجاح الدفع، الزر يوجّه لسجل الطلبات العام بدلاً من صفحة المجموعة</td>
+        <td><span class="chip chip-ok">✅ يوجّه الآن لـ /order-group/:id</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══ TESTS ═══ -->
+  <h2 id="tests">نتائج الاختبارات</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>النوع</th><th>النتيجة</th><th>الملاحظة</th></tr>
+      <tr class="row-ok">
+        <td>Vitest (كامل)</td>
+        <td><span class="chip chip-ok">✅ 1371 / 1371</span></td>
+        <td>183 ملف اختبار — 4 اختبارات جديدة ناجحة، لا انحدار</td>
+      </tr>
+      <tr class="row-ok">
+        <td>TypeScript typecheck</td>
+        <td><span class="chip chip-ok">✅ 0 أخطاء</span></td>
+        <td><code>tsc --noEmit</code> نظيف تماماً</td>
+      </tr>
+      <tr class="row-ok">
+        <td>ESLint</td>
+        <td><span class="chip chip-ok">✅ 0 أخطاء</span></td>
+        <td>5 تحذيرات pre-existing في ملفات أخرى — لا أخطاء جديدة</td>
+      </tr>
+      <tr class="row-ok">
+        <td>Build</td>
+        <td><span class="chip chip-ok">✅ exit 0</span></td>
+        <td><code>npm run build</code> — 40 precache entries — <code>main-KDUEUoQM.js</code></td>
+      </tr>
+      <tr class="row-ok">
+        <td>FIN-COR</td>
+        <td><span class="chip chip-ok">✅ PASS</span></td>
+        <td>كلا ملفي العقد غير مُسَّين — الأعلام المحمية سليمة</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══ S15 ═══ -->
+  <h2 id="s15">S15 — Wallet Step-Up: التحليل الكامل من الجذور</h2>
+
+  <div class="alert alert-ok">
+    ✅ <strong>الحكم النهائي: مكتمل تماماً في الكود.</strong>
+    التسمية "⚠️ جزئي" في التقرير السابق كانت تعني إعداداً من المشغّل، لا نقصاً في البرمجة.
+  </div>
+
+  <h3>ما الذي فحصناه بالتفصيل؟</h3>
+
+  <div class="item-card">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+      <span class="item-num num-confirm">1</span>
+      <strong>startWalletStepUp (lines 219–241)</strong>
+    </div>
+    <p style="color:var(--text-dim)">
+      ترسل OTP بالغرض <code>WALLET_ACCESS</code> — وتضع <code>walletStepUp = true</code>.
+      مطابقة تامة لنمط <code>CheckoutPage</code> (السطر 519).
+    </p>
+    <pre>const startWalletStepUp = async (failedIdx: number) => {
+  setWalletStepUp(true);
+  // ...
+  await authApi.requestOtp(phone, deviceId, "WALLET_ACCESS");
+};</pre>
+  </div>
+
+  <div class="item-card">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+      <span class="item-num num-confirm">2</span>
+      <strong>verifyOtpAndSubmit — فرع wallet (lines 270–285)</strong>
+    </div>
+    <p style="color:var(--text-dim)">
+      يستدعي <code>authApi.verifyOtp</code> بالغرض <code>WALLET_ACCESS</code>، يستخرج
+      <code>wallet_session_token</code>، يُخزّنه في <code>walletTokens[failedIdx]</code>،
+      ثم يُعيد الإرسال تلقائياً.
+    </p>
+    <pre>if (walletStepUp) {
+  const { data } = await authApi.verifyOtp(phone, deviceId, code, "WALLET_ACCESS");
+  const token = data.wallet_session_token;
+  if (token) {
+    const newWalletTokens = { ...walletTokens, [otpFailedIndex]: token };
+    setWalletTokens(newWalletTokens);
+    await handleSubmit(otpTokens, newWalletTokens); // ← إعادة إرسال تلقائية
+  }
+}</pre>
+  </div>
+
+  <div class="item-card">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+      <span class="item-num num-confirm">3</span>
+      <strong>handleSubmit — تضمين wallet_session_token (line 373)</strong>
+    </div>
+    <p style="color:var(--text-dim)">
+      كل طلب فرعي يحمل توكن المحفظة الخاص به مستقلاً — إذا لم يكن هناك توكن، لا يُرسل شيء.
+    </p>
+    <pre>sub_orders = allBaskets.map((b, i) => ({
+  ...
+  ...(currentWalletTokens[i] ? { wallet_session_token: currentWalletTokens[i] } : {}),
+}));</pre>
+  </div>
+
+  <div class="item-card">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px">
+      <span class="item-num num-confirm">4</span>
+      <strong>معالجة الخطأ (line 448)</strong>
+    </div>
+    <p style="color:var(--text-dim)">
+      عندما يُعيد الخادم <code>WALLET_STEP_UP_REQUIRED</code>، يُطلق الدالة تلقائياً.
+    </p>
+    <pre>} else if (e.code === "WALLET_STEP_UP_REQUIRED") {
+  setSubmitting(false);
+  await startWalletStepUp(idx ?? 0);
+}</pre>
+  </div>
+
+  <div class="item-card" style="border-right: 4px solid var(--warn)">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+      <span class="item-num num-warn">⚙</span>
+      <strong>إعداد المشغّل المطلوب</strong>
+    </div>
+    <p style="color:var(--text-dim)">
+      الـ backend يحتوي على <code>wallet_spend_stepup_threshold_minor: int = 0</code> في
+      <code>backend/app/config.py:125</code>. القيمة صفر = الميزة مُعطَّلة بشكل مقصود
+      حتى يُعيّن المشغّل العتبة. مثال: إذا أراد المشغّل طلب التحقق عند الطلبات فوق 200 د.ل:
+    </p>
+    <pre># في .env أو المتغيرات البيئية:
+WALLET_SPEND_STEPUP_THRESHOLD_MINOR=200000  # 200 د.ل = 200,000 مليم</pre>
+    <p style="color:var(--warn); font-size:13px; margin-top:8px">
+      ⚠ لا يحتاج أي تغيير في الكود — يحتاج فقط إعداداً من المشغّل عند رغبته في التفعيل.
+    </p>
+  </div>
+
+  <!-- ═══ P14-7 ═══ -->
+  <h2 id="p14-7">P14-7 — OrderGroupPage: صفحة تفاصيل المجموعة (جديدة)</h2>
+
+  <p style="color:var(--text-dim)">
+    صفحة جديدة كاملة في المسار <code>/order-group/:groupId</code>
+    تعرض جميع الطلبات الفرعية لعملية الدفع الموحد مع حالتها الحالية.
+  </p>
+
+  <h3>ما تفعله الصفحة</h3>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 700 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ar1" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#4A9EFF"/>
+        </marker>
+        <marker id="ar2" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#34C77A"/>
+        </marker>
+      </defs>
+      <!-- URL -->
+      <rect x="10" y="80" width="150" height="50" rx="8" fill="#131929" stroke="#4A9EFF" stroke-width="1.5"/>
+      <text x="85" y="102" fill="#BEC8DC" font-size="12" text-anchor="middle" font-weight="600">/order-group/</text>
+      <text x="85" y="118" fill="#7A8BA0" font-size="10" text-anchor="middle">:groupId</text>
+      <path d="M160 105 L200 105" stroke="#4A9EFF" stroke-width="2" marker-end="url(#ar1)"/>
+      <!-- API call -->
+      <rect x="200" y="80" width="130" height="50" rx="8" fill="#131929" stroke="#1E2D47"/>
+      <text x="265" y="102" fill="#BEC8DC" font-size="11.5" text-anchor="middle">GET /carts/</text>
+      <text x="265" y="117" fill="#7A8BA0" font-size="10" text-anchor="middle">groups/:groupId</text>
+      <path d="M330 105 L370 105" stroke="#4A9EFF" stroke-width="2" marker-end="url(#ar1)"/>
+      <!-- Page -->
+      <rect x="370" y="55" width="160" height="100" rx="8" fill="#131929" stroke="#4A9EFF" stroke-width="1.5"/>
+      <text x="450" y="82" fill="#BEC8DC" font-size="11.5" text-anchor="middle" font-weight="600">OrderGroupPage</text>
+      <text x="450" y="97" fill="#7A8BA0" font-size="10" text-anchor="middle">──────────────</text>
+      <text x="450" y="112" fill="#34C77A" font-size="10" text-anchor="middle">✓ حالة كل طلب</text>
+      <text x="450" y="127" fill="#34C77A" font-size="10" text-anchor="middle">✓ أسماء المتاجر</text>
+      <text x="450" y="142" fill="#34C77A" font-size="10" text-anchor="middle">✓ زر تتبّع / عرض</text>
+      <!-- Provider names -->
+      <path d="M450 55 L450 35 L550 35" stroke="#6AB8FF" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#ar1)"/>
+      <rect x="550" y="20" width="130" height="30" rx="5" fill="#0f1d2e" stroke="#6AB8FF"/>
+      <text x="615" y="39" fill="#6AB8FF" font-size="10" text-anchor="middle">Promise.allSettled</text>
+      <!-- Navigate -->
+      <path d="M530 105 L600 105 L600 180 L450 180 L450 170" stroke="#8B7CF6" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#ar1)"/>
+      <rect x="380" y="165" width="140" height="28" rx="5" fill="#1a1529" stroke="#8B7CF6"/>
+      <text x="450" y="183" fill="#8B7CF6" font-size="10" text-anchor="middle">navigate(/order/:id)</text>
+
+      <text x="350" y="210" fill="#7A8BA0" font-size="10" text-anchor="middle">الخط الأزرق المتقطع = أسماء المتاجر (async) · الأرجواني = تتبّع طلب معين</text>
+    </svg>
+  </div>
+
+  <h3>الخصائص التقنية</h3>
+  <div class="card">
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--good)"></div>
+      <div>
+        <strong>تحميل المجموعة</strong>
+        <div style="font-size:13px;color:var(--text-dim);margin-top:3px">
+          <code>cartsApi.getGroup(groupId)</code> — يعرض: حالة المجموعة، عدد الطلبات، الإجمالي الكلي + إجمالي التوصيل
+        </div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--good)"></div>
+      <div>
+        <strong>أسماء المتاجر</strong>
+        <div style="font-size:13px;color:var(--text-dim);margin-top:3px">
+          <code>Promise.allSettled</code> — فشل متجر واحد لا يُعطّل البقية
+        </div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--good)"></div>
+      <div>
+        <strong>حالات مختلفة لكل طلب</strong>
+        <div style="font-size:13px;color:var(--text-dim);margin-top:3px">
+          الطلبات النشطة: زر "🛰 تتبّع" / المنتهية: زر "عرض" — عبر
+          <code>ACTIVE_STATES</code> set
+        </div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--good)"></div>
+      <div>
+        <strong>معالجة الخطأ</strong>
+        <div style="font-size:13px;color:var(--text-dim);margin-top:3px">
+          404 / شبكة → رسالة خطأ واضحة + زر "← سجل الطلبات". لا انهيار صامت.
+        </div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--accent)"></div>
+      <div>
+        <strong>groupStateLabel</strong>
+        <div style="font-size:13px;color:var(--text-dim);margin-top:3px">
+          ترجمة الحالات: ACTIVE / COMPLETED / PARTIALLY_FULFILLED / CANCELLED → عربي
+        </div>
+      </div>
+    </div>
+    <div class="file-row" style="border:none">
+      <div class="file-dot" style="background:var(--info)"></div>
+      <div>
+        <strong>4 اختبارات جديدة</strong>
+        <div style="font-size:13px;color:var(--text-dim);margin-top:3px">
+          تُغطّي: التحميل الناجح، الإجمالي، حالة الخطأ، أزرار التتبّع/العرض
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ P14-8 ═══ -->
+  <h2 id="p14-8">P14-8 — مؤشر المجموعة في سجل الطلبات</h2>
+
+  <p style="color:var(--text-dim)">
+    كانت <code>tawa_group_map</code> تُحفظ في localStorage عند كل نجاح جماعي، لكن
+    صفحة سجل الطلبات لا تقرأها أبداً. أضفنا خريطة عكسية واستخدمناها لعرض Chip على كل طلب يخص مجموعة.
+  </p>
+
+  <h3>كيف يعمل؟</h3>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 680 170" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ar3" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#4A9EFF"/>
+        </marker>
+      </defs>
+      <!-- localStorage -->
+      <rect x="10" y="60" width="145" height="55" rx="8" fill="#0f1d2e" stroke="#4A9EFF" stroke-width="1.5"/>
+      <text x="82" y="82" fill="#BEC8DC" font-size="11" text-anchor="middle" font-weight="600">localStorage</text>
+      <text x="82" y="97" fill="#7A8BA0" font-size="10" text-anchor="middle">tawa_group_map:</text>
+      <text x="82" y="110" fill="#7A8BA0" font-size="9" text-anchor="middle">{groupId:[orderId,...]}</text>
+      <path d="M155 87 L195 87" stroke="#4A9EFF" stroke-width="2" marker-end="url(#ar3)"/>
+      <!-- useMemo -->
+      <rect x="195" y="60" width="145" height="55" rx="8" fill="#131929" stroke="#1E2D47"/>
+      <text x="267" y="82" fill="#BEC8DC" font-size="11" text-anchor="middle" font-weight="600">useMemo</text>
+      <text x="267" y="97" fill="#7A8BA0" font-size="10" text-anchor="middle">خريطة عكسية:</text>
+      <text x="267" y="110" fill="#7A8BA0" font-size="9" text-anchor="middle">{orderId:groupId}</text>
+      <path d="M340 87 L380 87" stroke="#4A9EFF" stroke-width="2" marker-end="url(#ar3)"/>
+      <!-- Order card -->
+      <rect x="380" y="45" width="155" height="90" rx="8" fill="#131929" stroke="#4A9EFF" stroke-width="1.5"/>
+      <text x="457" y="67" fill="#BEC8DC" font-size="11" text-anchor="middle" font-weight="600">بطاقة الطلب</text>
+      <rect x="400" y="76" width="115" height="20" rx="4" fill="#1a1529" stroke="#4A9EFF"/>
+      <text x="457" y="90" fill="#4A9EFF" font-size="9.5" text-anchor="middle">🛒 مجموعة &lt;chip&gt;</text>
+      <text x="457" y="118" fill="#34C77A" font-size="9.5" text-anchor="middle">onClick → /order-group/:id</text>
+      <!-- navigate -->
+      <path d="M535 87 L590 87" stroke="#34C77A" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#ar3)"/>
+      <rect x="590" y="70" width="70" height="30" rx="5" fill="#0f2018" stroke="#34C77A"/>
+      <text x="625" y="89" fill="#34C77A" font-size="9.5" text-anchor="middle">OrderGroup</text>
+      <text x="265" y="148" fill="#7A8BA0" font-size="10" text-anchor="middle">try/catch يُغلّف كل عملية localStorage — لا انهيار في التصفح الخاص</text>
+    </svg>
+  </div>
+
+  <h3>الكود المُضاف في OrderHistoryPage</h3>
+  <pre>// P14-8: reverse lookup { orderId → groupId } — guarded for private browsing
+const groupByOrderId = useMemo&lt;Record&lt;string, string&gt;&gt;(() => {
+  try {
+    const raw = localStorage.getItem("tawa_group_map");
+    if (!raw) return {};
+    const map: Record&lt;string, string[]&gt; = JSON.parse(raw);
+    const reverse: Record&lt;string, string&gt; = {};
+    for (const [gid, oids] of Object.entries(map)) {
+      for (const oid of oids) reverse[oid] = gid;
+    }
+    return reverse;
+  } catch { return {}; }  // private browsing / quota errors → silent
+}, []);</pre>
+
+  <div class="card" style="border-right:3px solid var(--accent)">
+    <strong>ملاحظة مهمة حول المصدر:</strong>
+    <p style="font-size:13.5px; color:var(--text-dim); margin-top:6px; margin-bottom:0">
+      المؤشر يعتمد على <code>localStorage</code> فقط (لا يحتاج تغييراً في الـ backend).
+      بمعنى: إذا سجّل الدخول من جهاز آخر، لن يرى المؤشر. هذا قرار معماري مقصود —
+      الخلفية لا تُعيد <code>cart_group_id</code> في API الطلبات الفردية حالياً.
+      إذا أراد المشغّل إظهار المؤشر لجميع الأجهزة، يحتاج تغيير backend وهو خارج الحدود الحالية.
+    </p>
+  </div>
+
+  <!-- ═══ SUCCESS SCREEN ═══ -->
+  <h2 id="success">شاشة النجاح — التوجيه الصحيح</h2>
+
+  <p style="color:var(--text-dim)">
+    بعد نجاح الدفع الموحد، كان الزر يوجّه للمستخدم إلى <code>/orders</code> (السجل العام)
+    دون ربطه بمجموعته المحددة. أصبح الآن يوجّه مباشرة لصفحة المجموعة.
+  </p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>قبل</th><th>بعد</th></tr>
+      <tr>
+        <td>
+          <code>onClick={() => navigate("/orders")}</code><br>
+          <span style="font-size:12px;color:var(--text-dim)">زر واحد → السجل العام</span>
+        </td>
+        <td>
+          <code>onClick={() => navigate(successGroupId ? `/order-group/${successGroupId}` : "/orders")}</code><br>
+          <span style="font-size:12px;color:var(--good)">زر رئيسي → صفحة المجموعة + زر ثانوي → السجل</span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="alert alert-info">
+    💡 المنطق الاحترازي: إذا كان <code>successGroupId</code> فارغاً لأي سبب، يعود للسلوك القديم (<code>/orders</code>).
+    لا انهيار، لا صفحة خطأ.
+  </div>
+
+  <!-- ═══ SCENARIOS ═══ -->
+  <h2 id="scenarios">السيناريوهات المحدّثة (15 سيناريو)</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>#</th><th>السيناريو</th><th>الحالة</th><th>الملاحظة</th></tr>
+      <tr class="row-ok"><td>S1</td><td>دفع ناجح بالنقد</td><td><span class="chip chip-ok">✅</span></td><td>شاشة نجاح → صفحة المجموعة مباشرة</td></tr>
+      <tr class="row-ok"><td>S2</td><td>دفع بالمحفظة</td><td><span class="chip chip-ok">✅</span></td><td>فحص رصيد + تحذير</td></tr>
+      <tr class="row-ok"><td>S3</td><td>OTP لأحد المزودين</td><td><span class="chip chip-ok">✅</span></td><td>inline OTP لا يؤثر على بقية السلال</td></tr>
+      <tr class="row-ok"><td>S4</td><td>تغيير عنوان سريع</td><td><span class="chip chip-ok">✅</span></td><td>cancelled flag — BUG-1</td></tr>
+      <tr class="row-ok"><td>S5</td><td>انقطاع شبكة + إعادة</td><td><span class="chip chip-ok">✅</span></td><td>idem key محفوظ — BUG-2</td></tr>
+      <tr class="row-ok"><td>S6</td><td>فشل جلب اسم متجر</td><td><span class="chip chip-ok">✅</span></td><td>allSettled — BUG-4</td></tr>
+      <tr class="row-ok"><td>S7</td><td>شروط جديدة</td><td><span class="chip chip-ok">✅</span></td><td>موافقة + إعادة إرسال</td></tr>
+      <tr class="row-ok"><td>S8</td><td>ديون معلقة</td><td><span class="chip chip-ok">✅</span></td><td>سداد + إعادة إرسال</td></tr>
+      <tr class="row-ok"><td>S9</td><td>OTP منتهٍ</td><td><span class="chip chip-ok">✅</span></td><td>مؤقت 30 ث + إعادة إرسال</td></tr>
+      <tr class="row-ok"><td>S10</td><td>حد أدنى غير مكتمل</td><td><span class="chip chip-ok">✅</span></td><td>تحذير + تعطيل الزر</td></tr>
+      <tr class="row-ok"><td>S11</td><td>تصفح خاص</td><td><span class="chip chip-ok">✅</span></td><td>try/catch على كل localStorage</td></tr>
+      <tr class="row-ok"><td>S12</td><td>قارئ شاشة — خطأ</td><td><span class="chip chip-ok">✅</span></td><td>role=alert دائماً في DOM — BUG-3</td></tr>
+      <tr class="row-ok"><td>S13</td><td>قارئ شاشة — نجاح</td><td><span class="chip chip-ok">✅</span></td><td>focus → successHeadingRef — BUG-5</td></tr>
+      <tr class="row-ok"><td>S14</td><td>حذف سلة أثناء التسعير</td><td><span class="chip chip-ok">✅</span></td><td>لا إعادة حساب</td></tr>
+      <tr class="row-ok">
+        <td>S15</td>
+        <td>Wallet step-up (مبلغ كبير)</td>
+        <td><span class="chip chip-ok">✅ مكتمل</span></td>
+        <td>
+          <span style="color:var(--good)">كود مكتمل 100%</span> —
+          <code>startWalletStepUp</code> + <code>WALLET_ACCESS</code> OTP +
+          <code>wallet_session_token</code> مُدمج في الإرسال.
+          التفعيل يحتاج إعداد مشغّل: <code>WALLET_SPEND_STEPUP_THRESHOLD_MINOR &gt; 0</code>
+        </td>
+      </tr>
+      <tr class="row-ok">
+        <td>S16<span class="chip chip-info" style="font-size:10px;margin-right:4px">جديد</span></td>
+        <td>فتح /order-group/:id بعد النجاح</td>
+        <td><span class="chip chip-ok">✅</span></td>
+        <td>cartsApi.getGroup → يعرض الطلبين / الأربعة بحالتهم</td>
+      </tr>
+      <tr class="row-ok">
+        <td>S17<span class="chip chip-info" style="font-size:10px;margin-right:4px">جديد</span></td>
+        <td>مؤشر المجموعة في السجل التاريخي</td>
+        <td><span class="chip chip-ok">✅</span></td>
+        <td>chip "🛒 مجموعة" يظهر على الطلبات المرتبطة — click → /order-group/:id</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══ FILES ═══ -->
+  <h2 id="files">الملفات المُعدَّلة / المُضافة</h2>
+
+  <div class="card">
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--info)"></div>
+      <div>
+        <code>web/src/pages/customer/OrderGroupPage.tsx</code>
+        <span class="chip chip-info" style="margin-right:8px">جديد — 205 سطر</span>
+        <div style="font-size:12.5px;color:var(--text-dim);margin-top:4px">
+          صفحة تفاصيل المجموعة: تحميل البيانات، أسماء المتاجر، حالات الطلبات، الإجماليات، navigation
+        </div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--info)"></div>
+      <div>
+        <code>web/src/pages/customer/OrderGroupPage.test.tsx</code>
+        <span class="chip chip-info" style="margin-right:8px">جديد — 4 اختبارات</span>
+        <div style="font-size:12.5px;color:var(--text-dim);margin-top:4px">
+          تغطية: تحميل ناجح + short ID، الإجمالي، حالة الخطأ، زر تتبّع/عرض
+        </div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--warn)"></div>
+      <div>
+        <code>web/src/router.tsx</code>
+        <span class="chip chip-warn" style="margin-right:8px">تعديل</span>
+        <div style="font-size:12.5px;color:var(--text-dim);margin-top:4px">
+          إضافة: <code>import OrderGroupPage</code> + route <code>/order-group/:groupId</code>
+        </div>
+      </div>
+    </div>
+    <div class="file-row">
+      <div class="file-dot" style="background:var(--warn)"></div>
+      <div>
+        <code>web/src/pages/customer/OrderHistoryPage.tsx</code>
+        <span class="chip chip-warn" style="margin-right:8px">تعديل</span>
+        <div style="font-size:12.5px;color:var(--text-dim);margin-top:4px">
+          إضافة: <code>groupByOrderId</code> (useMemo) + <code>navigateToGroup</code> (useCallback) + chip "🛒 مجموعة" في كل بطاقة طلب
+        </div>
+      </div>
+    </div>
+    <div class="file-row" style="border:none">
+      <div class="file-dot" style="background:var(--warn)"></div>
+      <div>
+        <code>web/src/pages/customer/CartGroupCheckoutPage.tsx</code>
+        <span class="chip chip-warn" style="margin-right:8px">تعديل</span>
+        <div style="font-size:12.5px;color:var(--text-dim);margin-top:4px">
+          زر النجاح: من <code>navigate("/orders")</code> إلى
+          <code>navigate(successGroupId ? `/order-group/${successGroupId}` : "/orders")</code>
+          + زر ثانوي "عرض تاريخ الطلبات"
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DEPLOY ═══ -->
+  <h2 id="deploy">حالة النشر على الأربعة مواقع</h2>
+
+  <div class="deploy-grid">
+    <div class="deploy-card ok">
+      <div class="dn">✅ GitHub (الهدف 1)</div>
+      <div class="du">github.com/abd2508/tawa-platform</div>
+      <div style="margin-top:8px;font-size:13px">
+        Commit: <code>bf0a2ce</code><br>
+        <code>git push origin master</code> ✓
+      </div>
+    </div>
+    <div class="deploy-card ok">
+      <div class="dn">✅ Kali محلي (الهدف 2)</div>
+      <div class="du">127.0.0.1:8080 — tawalocal</div>
+      <div style="margin-top:8px;font-size:13px">
+        بناء: <code>main-KDUEUoQM.js</code><br>
+        Container healthy ✓
+      </div>
+    </div>
+    <div class="deploy-card ok">
+      <div class="dn">✅ Ubuntu .194 (الهدف 3)</div>
+      <div class="du">192.168.178.194 — tawa-test</div>
+      <div style="margin-top:8px;font-size:13px">
+        بناء: <code>main-KDUEUoQM.js</code><br>
+        docker save | gzip | ssh | load ✓
+      </div>
+    </div>
+    <div class="deploy-card ok">
+      <div class="dn">✅ Hetzner Staging (الهدف 4)</div>
+      <div class="du">staging.tawanow.com</div>
+      <div style="margin-top:8px;font-size:13px">
+        بناء: <code>main-KDUEUoQM.js</code><br>
+        Container healthy ✓
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <strong>تسلسل النشر الآمن المتّبع:</strong>
+    <ol style="padding-right:20px;line-height:2.1;color:var(--text-dim);margin-top:10px">
+      <li><strong style="color:var(--text)">FIN-COR</strong> — SHA256 مطابق ✓</li>
+      <li><strong style="color:var(--text)">Vitest</strong> — 1371/1371 ✓</li>
+      <li><strong style="color:var(--text)">TypeScript + Lint + Build</strong> — 0 أخطاء ✓</li>
+      <li><strong style="color:var(--text)">بناء Docker</strong> — <code>tawalocal-web-frontend:latest</code> → <code>main-KDUEUoQM.js</code> ✓</li>
+      <li><strong style="color:var(--text)">Kali</strong> — <code>docker compose -p tawalocal up -d --no-deps web-frontend</code> ✓</li>
+      <li><strong style="color:var(--text)">Ubuntu .194</strong> — docker save → gzip → ssh → load ✓</li>
+      <li><strong style="color:var(--text)">Hetzner</strong> — نفس آلية النقل ✓</li>
+      <li><strong style="color:var(--text)">GitHub</strong> — <code>git push origin master</code> → <code>bf0a2ce</code> ✓</li>
+    </ol>
+  </div>
+
+  <!-- ═══ FINCOR ═══ -->
+  <h2 id="fincor">سلامة العقود المالية (FIN-COR)</h2>
+
+  <div class="alert alert-ok">
+    ✅ <strong>PASS</strong> — كلا ملفي العقد لم يُمَسّا في هذه المرحلة.
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>الملف</th><th>SHA256</th><th>الحالة</th></tr>
+      <tr>
+        <td><code>contracts/feature_flags.yaml</code></td>
+        <td style="font-family:monospace;font-size:11px;direction:ltr">25ddf010…1f91557</td>
+        <td><span class="chip chip-ok">✓ مطابق</span></td>
+      </tr>
+      <tr>
+        <td><code>contracts/launch_gates.yaml</code></td>
+        <td style="font-family:monospace;font-size:11px;direction:ltr">6c78dc89…cd68414</td>
+        <td><span class="chip chip-ok">✓ مطابق</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══ NEXT ═══ -->
+  <h2 id="next">الخطوات التالية</h2>
+
+  <div class="alert alert-warn">
+    جميع الخطوات التالية تحتاج موافقة المشغّل — لا تُنفَّذ تلقائياً.
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>البند</th><th>الوصف</th><th>المطلوب</th></tr>
+      <tr>
+        <td><code>wallet_spend_stepup_threshold_minor</code></td>
+        <td>تفعيل step-up عند مبلغ معين (S15)</td>
+        <td><span class="chip chip-warn">إعداد env من المشغّل</span></td>
+      </tr>
+      <tr>
+        <td>Stage-2 DB migrations</td>
+        <td>تطبيق aa01–aa15 عند إعادة بناء صورة الـ DB</td>
+        <td><span class="chip chip-crit">موافقة مشغّل</span></td>
+      </tr>
+      <tr>
+        <td>مؤشر مجموعة متعدد الأجهزة</td>
+        <td>backend يُعيد cart_group_id في API الطلبات — يُزيل قيد localStorage</td>
+        <td><span class="chip chip-dim">تغيير backend (خارج الحدود الحالية)</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <hr>
+  <p style="color:var(--text-dim);font-size:13px;text-align:center;padding-bottom:32px">
+    تقرير P14 المرحلة الثانية — منصة توا للتوصيل في ليبيا<br>
+    تم الإنشاء: 6 يوليو 2026 · Commit: bf0a2ce · main-KDUEUoQM.js
+  </p>
+
+</main>
+
+<script>
+const sections = document.querySelectorAll('h2[id]');
+const links = document.querySelectorAll('nav a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

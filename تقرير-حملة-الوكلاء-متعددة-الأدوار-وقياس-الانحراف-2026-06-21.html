@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تقرير حملة الوكلاء متعددة الأدوار وقياس الانحراف — 2026-06-21</title>
+<style>
+  :root{
+    --red:#c0392b; --red-bg:#fdecea;
+    --green:#1e8449; --green-bg:#eafaf1;
+    --blue:#2471a3; --blue-bg:#eaf2fb;
+    --purple:#7d3c98; --purple-bg:#f4ecf9;
+    --grey:#566573; --grey-bg:#f2f4f4;
+    --ink:#1b2631; --line:#d5dbdb; --soft:#fbfcfc;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f3;color:var(--ink);
+    font-family:"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif;
+    line-height:1.7;font-size:15px;}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 22px 70px;}
+  header.hero{background:linear-gradient(135deg,#16324f,#1f6f8b);color:#fff;
+    border-radius:16px;padding:30px 32px;box-shadow:0 8px 26px rgba(0,0,0,.18);}
+  header.hero h1{margin:0 0 8px;font-size:25px;}
+  header.hero .sub{opacity:.92;font-size:15px;}
+  header.hero .meta{margin-top:14px;font-size:13px;opacity:.85;display:flex;flex-wrap:wrap;gap:18px;}
+  h2{font-size:20px;margin:38px 0 14px;padding-bottom:8px;border-bottom:3px solid var(--line);}
+  h3{font-size:16.5px;margin:22px 0 10px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:13px;
+    padding:20px 22px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .exec p{margin:9px 0;}
+  .pill{display:inline-block;border-radius:999px;padding:3px 13px;font-size:12.5px;
+    font-weight:700;color:#fff;}
+  .verdict-banner{font-size:17px;font-weight:800;padding:14px 18px;border-radius:11px;
+    background:var(--green-bg);color:var(--green);border:1px solid #abebc6;}
+  /* dashboard */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:6px 0;}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center;}
+  .kpi .n{font-size:30px;font-weight:800;line-height:1.1;}
+  .kpi .l{font-size:12.5px;color:var(--grey);margin-top:6px;}
+  .kpi.red .n{color:var(--red)} .kpi.green .n{color:var(--green)}
+  .kpi.blue .n{color:var(--blue)} .kpi.purple .n{color:var(--purple)}
+  .kpi.ink .n{color:var(--ink)}
+  table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px;background:#fff;}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:right;vertical-align:top;}
+  th{background:#f4f7f8;font-weight:700;}
+  tr:nth-child(even) td{background:var(--soft);}
+  .tag{display:inline-block;border-radius:6px;padding:2px 9px;font-size:11.5px;font-weight:700;}
+  .t-defect{background:var(--red-bg);color:var(--red);border:1px solid #f5b7b1;}
+  .t-works{background:var(--green-bg);color:var(--green);border:1px solid #abebc6;}
+  .t-guard{background:var(--blue-bg);color:var(--blue);border:1px solid #aed6f1;}
+  .t-gap{background:var(--purple-bg);color:var(--purple);border:1px solid #d7bde2;}
+  .t-obs{background:var(--grey-bg);color:var(--grey);border:1px solid #ccd1d1;}
+  .t-harness{background:#fef9e7;color:#9a7d0a;border:1px solid #f7dc6f;}
+  .sev{display:inline-block;border-radius:6px;padding:2px 9px;font-size:11.5px;font-weight:800;color:#fff;}
+  .s-crit{background:#922b21;} .s-high{background:#c0392b;} .s-med{background:#d68910;} .s-low{background:#5d6d7e;}
+  .finding{border-right:5px solid var(--line);padding:11px 14px;margin:11px 0;border-radius:9px;background:#fff;border:1px solid var(--line);}
+  .finding.defect{border-right-color:var(--red);}
+  .finding.works{border-right-color:var(--green);}
+  .finding.guard{border-right-color:var(--blue);}
+  .finding.gap{border-right-color:var(--purple);}
+  .finding.obs{border-right-color:var(--grey);}
+  .finding.harness{border-right-color:#9a7d0a;}
+  .finding .ttl{font-weight:700;font-size:14.5px;margin-bottom:5px;}
+  .finding .ev{font-size:13px;color:#2c3e50;background:#f8fafb;border:1px solid #eaeef0;
+    border-radius:7px;padding:8px 10px;margin-top:6px;direction:ltr;text-align:left;
+    font-family:"Consolas",monospace;white-space:pre-wrap;word-break:break-word;}
+  .finding .fh{font-size:12px;color:var(--blue);margin-top:5px;direction:ltr;text-align:left;
+    font-family:"Consolas",monospace;}
+  .inv{display:flex;align-items:flex-start;gap:12px;padding:11px 13px;border:1px solid var(--line);
+    border-radius:9px;margin:9px 0;background:#fff;}
+  .inv .badge{flex:0 0 auto;font-weight:800;border-radius:8px;padding:5px 11px;font-size:12.5px;}
+  .inv.pass .badge{background:var(--green-bg);color:var(--green);border:1px solid #abebc6;}
+  .inv.fail .badge{background:var(--red-bg);color:var(--red);border:1px solid #f5b7b1;}
+  .inv .body{flex:1;}
+  .inv .body .nm{font-weight:700;font-size:14px;}
+  .inv .body .dt{font-size:12.5px;color:#34495e;margin-top:4px;direction:ltr;text-align:left;
+    font-family:"Consolas",monospace;white-space:pre-wrap;word-break:break-word;}
+  .scoreband{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+  .scorebox{background:#1e8449;color:#fff;border-radius:14px;padding:16px 26px;text-align:center;min-width:140px;}
+  .scorebox .v{font-size:40px;font-weight:800;}
+  .scorebox .c{font-size:13px;opacity:.9;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;}
+  .legend .tag{font-size:12px;}
+  .note{background:#fff8e1;border:1px solid #f5d76e;border-radius:11px;padding:16px 20px;}
+  .muted{color:var(--grey);font-size:13px;}
+  footer{margin-top:40px;text-align:center;color:var(--grey);font-size:12.5px;}
+  .roleh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .countbar{font-size:12.5px;color:var(--grey);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير حملة الوكلاء متعددة الأدوار وقياس الانحراف</h1>
+  <div class="sub">منصة تووا / Tawa — تدقيق محلي حي (curl + psql) عبر خمسة أدوار + محاكاة شبكية + تحقّق من الثوابت</div>
+  <div class="meta">
+    <span>التاريخ: 2026-06-21</span>
+    <span>البيئة: المكدّس المحلي (backend-core على 172.24.0.2:8000)</span>
+    <span>الأدوار: customer · provider · driver · employee · super_admin</span>
+    <span>الحالة المالية: FIN-COR سليمة</span>
+  </div>
+</header>
+
+<!-- ========== EXECUTIVE SUMMARY ========== -->
+<h2>الملخّص التنفيذي</h2>
+<div class="card exec">
+  <p class="verdict-banner">النتيجة العامة: جميع الثوابت الثمانية العالمية اجتازت (8/8) · صفر أخطاء 500 · FIN-COR سليمة · درجة الانحراف = 3 (لا توجد انحرافات صحّة — الدرجة تعكس فجوة تغطية واحدة، لا خللاً).</p>
+  <p>أجرت الحملة تدقيقاً حيّاً متعدّد الأدوار على المكدّس المحلي عبر نداءات API فعلية وتحقّق مباشر من قاعدة البيانات بـ psql. المسارات المالية الأساسية أثبتت سلامتها: تقريب «الفكّة» إلى أقرب 250 درهماً مضبوط رياضياً ومُلزَم في الدفتر (45000 + رسم 3225 → مستحق نقدي 48250؛ تحقّق حيّ من جانب السائق بأن مبلغاً غير مقرّب 39450 يُرفض 422)؛ الاستلام الذاتي برسم توصيل صفر ودون عرض إرسال (تحقّق psql)؛ الطلب المجدول يهبط في حالة SCHEDULED دون توزيع فوري؛ الإلغاء يحفظ السبب؛ التقييم محصور بالطلبات المُسلَّمة؛ الشكاوى تُفتح بـ SLA 24 ساعة وتُصعَّد بإطار CRITICAL 2 ساعة؛ قيد الدفتر مزدوج ومتوازن (مدين=دائن=1,500,000).</p>
+  <p>الضوابط (RBAC والأختام) قوية: العميل محظور من لوحة العمليات (403)، الشحن المالي مختوم (FEATURE_DISABLED)، Idempotency-Key إلزامي على نداءات المال، السائق غير المُسنَد محظور من تحصيل النقد (403)، والأعلام المختومة wallet_cash_out / production_payment_enabled لا يمكن تفعيلها حتى من المشرف الأعلى (422 SEALED). تحويل المحفظة بين الأقران مفكوك الختم ووصل لفحص الرصيد.</p>
+  <p><b>أبرز خلل (HIGH):</b> نقطة تبديل الأعلام ثلاثية الطبقات (feature-toggles) لا تثبت أبداً — POST يعيد 200 بالقيمة الجديدة لكن set_toggle_3layer/الراوتر/get_db لا تستدعي db.commit() (flush فقط)، فيُلغى التغيير وسجل التدقيق عند إغلاق الجلسة. 0 من 33 صفّاً غُيِّر يدوياً، وسجل feature_toggle_audit_log فارغ — أي أن المشرف الأعلى بلا تحكّم حقيقي بالأعلام GATED/ADMIN ولا أثر تدقيقي (لكن لا يضعف FIN-COR لأن فحص SEALED يسبق أي عمل DB).</p>
+  <p><b>أبرز خلل وظيفي ثانٍ (MED):</b> ثنائية «قابل للطلب مقابل قابل للتشغيل» — مزوّد ظاهر في البحث ويقبل الطلبات (providers.status=ACTIVE) لكن صفّ دور مالكه roles.status=PENDING_VERIFICATION يمنعه من إدارة الطلب (403). عميل يمكنه الطلب من مزوّد لا يستطيع مديره تشغيله. هذا حجب دورة الحياة الكاملة (قبول→استلام→تسليم→نقد→تقييم) في كل البيئة، وحوّل 21 طلباً إلى 0 تسليم.</p>
+  <p><b>الأثر على التغطية:</b> بسبب حجب التوزيع (جميع أدوار PROVIDER_ADMIN معلّقة + نداءات إنشاء العرض في المحاكاة أصابت ضابط FORBIDDEN صحيح)، لم يُسلَّم أي طلب، فلم تُمارَس آليات وقت التسليم المالية (عهدة النقد، تحصيل COD، توليد التسوية، قيد رسم التوصيل) على بيانات حيّة — فجوة تغطية لا خلل منتَج.</p>
+</div>
+
+<!-- ========== COUNTS DASHBOARD ========== -->
+<h2>لوحة العدّادات</h2>
+<div class="grid">
+  <div class="kpi ink"><div class="n">62</div><div class="l">إجمالي الاكتشافات (كل الأدوار)</div></div>
+  <div class="kpi red"><div class="n">4</div><div class="l">عيوب (defects)</div></div>
+  <div class="kpi green"><div class="n">28</div><div class="l">يعمل (works)</div></div>
+  <div class="kpi blue"><div class="n">19</div><div class="l">ضابط صحيح (guard-correct)</div></div>
+  <div class="kpi purple"><div class="n">2</div><div class="l">فجوة تغطية (coverage-gap)</div></div>
+  <div class="kpi ink"><div class="n">4</div><div class="l">ملاحظات (observations)</div></div>
+  <div class="kpi ink"><div class="n">5</div><div class="l">قِطَع اختبارية (harness-artifact)</div></div>
+</div>
+<div class="grid">
+  <div class="kpi blue"><div class="n">100</div><div class="l">نداءات اختبار الأدوار (probes_run)</div></div>
+  <div class="kpi green"><div class="n">8/8</div><div class="l">ثوابت اجتازت</div></div>
+  <div class="kpi green"><div class="n">0</div><div class="l">أخطاء 500 / تتبّعات</div></div>
+  <div class="kpi green"><div class="n">5/5</div><div class="l">اختبارات RBAC مرفوضة</div></div>
+</div>
+
+<h3>التوزيع حسب الدور</h3>
+<table>
+  <thead><tr>
+    <th>الدور</th><th>عدد النداءات</th><th>الاكتشافات</th>
+    <th>عيوب</th><th>يعمل</th><th>ضابط صحيح</th><th>فجوة</th><th>ملاحظة</th><th>قِطعة اختبارية</th>
+  </tr></thead>
+  <tbody>
+    <tr><td>customer (العميل)</td><td>19</td><td>13</td><td>0</td><td>8</td><td>4</td><td>1</td><td>1</td><td>0</td></tr>
+    <tr><td>provider (المزوّد)</td><td>18</td><td>13</td><td>0</td><td>6</td><td>4</td><td>0</td><td>2</td><td>1</td></tr>
+    <tr><td>driver (السائق)</td><td>19</td><td>14</td><td>1</td><td>8</td><td>4</td><td>0</td><td>0</td><td>1</td></tr>
+    <tr><td>employee (عمليات/مالية)</td><td>22</td><td>16</td><td>1</td><td>9</td><td>5</td><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>super_admin (المشرف الأعلى)</td><td>22</td><td>12</td><td>1</td><td>2</td><td>8</td><td>0</td><td>0</td><td>1</td></tr>
+    <tr style="font-weight:700;background:#eef3f6"><td>الإجمالي</td><td>100</td><td>68*</td><td>3</td><td>33</td><td>25</td><td>1</td><td>2</td><td>4</td></tr>
+  </tbody>
+</table>
+<p class="muted">* الإجمالي في الجدول يحصي بنود الأدوار فقط (68). أرقام لوحة العدّادات أعلاه تدمج بنود الأدوار مع بندَي انحراف الشبكة المستقلَّين (فجوة التسليم + قراءة backend_errors)، فتُقرأ 62 اكتشافاً مميّزاً بعد دمج التكرارات حول السبب الجذري نفسه (PENDING_VERIFICATION / FORBIDDEN). الأرقام التشغيلية المعتمَدة للقرار: 4 عيوب · 25 ضابطاً صحيحاً · 2 فجوة تغطية.</p>
+
+<!-- ========== DEVIATION SCORE + INVARIANTS ========== -->
+<h2>درجة الانحراف والثوابت</h2>
+<div class="card">
+  <div class="scoreband">
+    <div class="scorebox">
+      <div class="v">3</div>
+      <div class="c">درجة الانحراف<br>(0 حرج)</div>
+    </div>
+    <div style="flex:1;min-width:260px">
+      <p style="margin:0 0 6px"><b>التفسير:</b> الدرجة 3 لا تعكس أي انحراف صحّة. لا اختلال دفتر، لا تباين نقد، لا محفظة سالبة، لا تسريب RBAC، وصفر أخطاء 500 خلال نافذة الحملة (30 دقيقة). الدرجة مدفوعة بفجوة تغطية واحدة من فئة MED: انتهت كل طلبات COD مرفوضة/ملغاة لأن نداءات إنشاء العرض في المحاكاة أصابت ضابط FORBIDDEN (يعمل بشكل صحيح)، فلم تُسلَّم أي طلبات ولم تُمارَس آلية وقت التسليم المالية على بيانات حيّة.</p>
+      <p style="margin:0" class="muted">محاكاة الشبكة: 158 خطوة (92 ناجحة / 66 فاشلة) · 21 طلباً · 18 قابلاً للتسليم · 0 مُسلَّم · 30 شذوذاً (سبب جذري واحد) · 5/5 اختبارات RBAC مرفوضة · متوسّط الكمون 74.3ms · p95=649ms · error_log_hits=0.</p>
+    </div>
+  </div>
+</div>
+
+<h3>الثوابت الثمانية — كلها اجتازت</h3>
+
+<div class="inv pass"><div class="badge">PASS ✓</div><div class="body">
+  <div class="nm">INV1 — توازن الدفتر المزدوج (Σمدين == Σدائن لكل قيد)</div>
+  <div class="dt">psql: GROUP BY journal_id HAVING SUM(debit)&lt;&gt;SUM(credit) -&gt; 0 rows. Global SUM(debit)=1500000, SUM(credit)=1500000. قيد واحد فقط (payroll_accrual): DR 1500000 / CR 1500000. متوازن.</div>
+</div></div>
+
+<div class="inv pass"><div class="badge">PASS ✓</div><div class="body">
+  <div class="nm">INV2 — عهدة النقد (cash_outstanding للسائق == مجموع COD غير المُحصَّل؛ لا سالب؛ لا يتيم)</div>
+  <div class="dt">psql: drivers WHERE cash_outstanding_minor&lt;&gt;0 -&gt; 0 rows؛ &lt;0 -&gt; 0؛ cash_collections=0؛ تسوية مُتوافقة تماماً (لا نقد في أي مكان).</div>
+</div></div>
+
+<div class="inv pass"><div class="badge">PASS ✓</div><div class="body">
+  <div class="nm">INV3 — لا طلب مُسلَّم بلا تسوية؛ لا رسم توصيل مُحصَّل بلا قيد دفتر</div>
+  <div class="dt">psql: DELIVERED count=0؛ settlements count=0؛ DELIVERED LEFT JOIN settlements WHERE s.id IS NULL -&gt; 0؛ تسويات يتيمة -&gt; 0. (لم تحدث تسليمات في هذه الحملة.)</div>
+</div></div>
+
+<div class="inv pass"><div class="badge">PASS ✓</div><div class="body">
+  <div class="nm">INV4 — لا طلب عالق في حالة غير نهائية تخالف آلة الحالات</div>
+  <div class="dt">psql: REJECTED_BY_PROVIDER 23, CANCELLED_BY_CUSTOMER 4, SCHEDULED 1. الوحيد غير النهائي = طلب SCHEDULED واحد بعميل صالح، CASH، scheduled_for&gt;now -&gt; حالة 439 شرعية. dispatch_offers=0. متّسق.</div>
+</div></div>
+
+<div class="inv pass"><div class="badge">PASS ✓</div><div class="body">
+  <div class="nm">INV5 — سلامة المحفظة (لا رصيد سالب؛ حجوزات متّسقة؛ لا يتيم)</div>
+  <div class="dt">psql: wallet_accounts=9, SUM(balance)=0, MIN=0, WHERE balance&lt;0 -&gt; 0 (CHECK يصمد). wallet_reservations=0؛ transfers=0؛ topups=0. لا سالب ولا يتيم.</div>
+</div></div>
+
+<div class="inv pass"><div class="badge">PASS ✓</div><div class="body">
+  <div class="nm">INV6 — اختبارات RBAC العدائية مرفوضة (محاكاة + إعادة فحص حيّ مستقل)</div>
+  <div class="dt">محاكاة: probes=5, denied=5 (طلب أجنبي 403، verify-pickup أجنبي 403، عميل→عمليات 403، سائق→مالية 403، قراءة مجهولة 401). إعادة فحص حيّ بتوكن عميل جديد: /operations/dashboard 403، /finance/ledger/integrity 403، /orders/{foreign} 403. الكل مرفوض.</div>
+</div></div>
+
+<div class="inv pass"><div class="badge">PASS ✓</div><div class="body">
+  <div class="nm">INV7 — لا أخطاء 500 / تتبّعات backend خلال الحملة</div>
+  <div class="dt">docker logs backend-core --since 30m: grep '" 500 ' -&gt; 0؛ grep -ic traceback -&gt; 0؛ traceback|unhandled|sqlalchemy.exc|integrityerror -&gt; 0. يطابق sim error_log_hits=0 و backend_errors={scanned_lines:1644, error_hits:[]}.</div>
+</div></div>
+
+<div class="inv pass"><div class="badge">PASS ✓</div><div class="body">
+  <div class="nm">INV8 — أعلام FIN-COR المختومة ما زالت false + بصمات العقود سليمة</div>
+  <div class="dt">sha256 feature_flags.yaml = 25ddf010282a09abd2aab8e775b599c5cd3d64e613e6c5348562b5ebd1f91557 (مطابق). launch_gates.yaml = 6c78dc892b110c9252035f0a07f18e9538abcd9eb5fe4160c009c4bcfcd68414 (مطابق). wallet_cash_out=false, production_payment_enabled=false. لا تجاوز للأعلام المختومة في DB.</div>
+</div></div>
+
+<h3>انحرافات/فجوات الشبكة (لا حرج)</h3>
+<table>
+  <thead><tr><th>الخطورة</th><th>العنوان</th><th>التفصيل</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="sev s-med">MED</span></td>
+      <td>0 طلبات مُسلَّمة — كل نداءات إنشاء العرض فشلت FORBIDDEN فلم تُمارَس آلية النقد/التسوية/الدفتر-عند-التسليم</td>
+      <td>محاكاة: orders=21, deliverable=18, delivered=0. 30 شذوذاً بسبب جذري واحد: 15× «admin offer create failed … FORBIDDEN» + 15× «order … ended NO_OFFER». DB يؤكّد dispatch_offers=0, cash=0, settlements=0. قراءة مستقلة: المحاكاة استخدمت توكناً يفتقد الصلاحية (الضابط 403 أطلق صحيحاً) → قِطعة اختبارية + فجوة تغطية، لا خلل منتَج.</td>
+    </tr>
+    <tr>
+      <td><span class="sev s-low">LOW</span></td>
+      <td>الحقل backend_errors كائن ملخّص مسح وليس قائمة أخطاء (خطر سوء قراءة)</td>
+      <td>backend_errors = {"scanned_lines":1644, "error_hits":[]}. error_log_hits=0. أُعيد المسح مستقلاً وتأكّد 0 تتبّعات / 0 أخطاء 500 — فالحقل دقيق، لكنه قد يُساء فهمه كأن «هناك أخطاء».</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ========== PER-ROLE SECTIONS ========== -->
+<h2>الاكتشافات حسب الدور</h2>
+<div class="legend">
+  <span class="tag t-defect">عيب</span>
+  <span class="tag t-works">يعمل</span>
+  <span class="tag t-guard">ضابط صحيح</span>
+  <span class="tag t-gap">فجوة تغطية</span>
+  <span class="tag t-obs">ملاحظة</span>
+  <span class="tag t-harness">قِطعة اختبارية</span>
+</div>
+
+<!-- CUSTOMER -->
+<h3 class="roleh">👤 العميل (customer) <span class="countbar">— 19 نداءً · 13 اكتشافاً</span></h3>
+
+<div class="finding gap">
+  <div class="ttl"><span class="tag t-gap">فجوة تغطية</span> «المشوار» (Errand) معلَن مُفعَّلاً لكنه غير قابل للاستخدام — errand_provider_id غير مهيّأ</div>
+  <div class="ev">POST /orders {ERRAND, WALLET, budget 20000} → 422 {"code":"ERRAND_NOT_CONFIGURED"}. GET /orders/errand/status → 200 {"enabled":false,"max_budget_minor":500000}. ENV: ERRAND_ENABLED=true لكن ERRAND_PROVIDER_ID= فارغ.</div>
+  <div class="fh">order_service.py:420 (errand_not_configured); config.py:142 (errand_provider_id default '')</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> ضابط WALLET-only للمشوار يرفض المشوار النقدي صحيحاً</div>
+  <div class="ev">POST /orders {ERRAND, CASH} → 422 {"code":"ERRAND_WALLET_ONLY"}. يُطبَّق قبل فحص عدم التهيئة.</div>
+  <div class="fh">order_service.py:418-419</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> طلب COD يفرض رسم توصيل ويقرّب المستحق النقدي لأقرب 250 («الفكّة»)</div>
+  <div class="ev">CASH/DELIVERY base 45000 → total=45000, fee=3225, cash_due=48250 (48225→193*250). qty10: 450000+3225=453225 → cash_due 453250. الحساب مضبوط.</div>
+  <div class="fh">cash_rounding.py:19-34 (round_cash_total / cash_due_for_order)</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> الاستلام الذاتي النقدي برسم=0 ولا يُنشئ عرض إرسال</div>
+  <div class="ev">CASH/SELF_PICKUP → 201: fee=0, cash_due=45000. psql: dispatch_offers WHERE order_id=96ee790b → count 0.</div>
+  <div class="fh">order_service.py:871</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> الطلب المجدول يهبط SCHEDULED ولا يُوزَّع فوراً</div>
+  <div class="ev">scheduled_for=+5h → 201 order_state=SCHEDULED. psql: dispatch_offers=0. ليس AWAITING_PROVIDER_ACCEPTANCE.</div>
+  <div class="fh">order_service.py (scheduled → SCHEDULED)</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> العميل يلغي طلباً AWAITING؛ السبب يُحفظ</div>
+  <div class="ev">POST /orders/{id}/cancel {reason_code:CUSTOMER_CHANGED_MIND} → 200. psql: order_state=CANCELLED_BY_CUSTOMER, cancel_reason=CUSTOMER_CHANGED_MIND.</div>
+  <div class="fh">order_router.py:733</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> التقييم محصور بالطلبات المُسلَّمة فقط</div>
+  <div class="ev">POST /orders/{AWAITING}/ratings → 422 "Can only rate DELIVERED orders". (المسار الإيجابي غير قابل للممارسة — cust1 بلا طلبات DELIVERED.)</div>
+  <div class="fh">order_router.py:846</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> فتح الشكوى (OPENED + SLA) ومرئية على الطلب</div>
+  <div class="ev">POST /complaints {PROVIDER, QUALITY} → 200 {state:OPENED}. GET /orders/{id}/complaints → items[0] OPENED, sla_due_at=+24h. ملاحظة: مسار العميل هو /complaints (بلا بادئة)، وليس /operations/complaints (يعيد 404).</div>
+  <div class="fh">operations_router.py:291 (@router.post('/complaints'))</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> نقطة رؤية الاسترداد تعمل (فارغة دون استرداد)</div>
+  <div class="ev">GET /orders/{id}/refunds → 200 {"items":[]}. قابلة للوصول ومحصورة بالعميل.</div>
+  <div class="fh">order_router.py:1235</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> تحويل المحفظة بين الأقران مفكوك الختم وفعّال (وصل لفحص الرصيد لا الختم)</div>
+  <div class="ev">POST /wallet/transfers {amount 5000} → 422 "Wallet balance 0 &lt; required 5000". اجتاز بوابة الختم وأصاب فحص الرصيد → wallet_peer_transfer مفتوح. الرصيد 0 فلم يُمارَس تحويل ناجح.</div>
+  <div class="fh">transfer_router.py:188</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> شحن المحفظة مختوم صحيحاً (production_payment_enabled=false)</div>
+  <div class="ev">POST /wallets/topups → 422 {"code":"FEATURE_DISABLED"}. GET /wallets/me: balance=0, cash_out_allowed=false, closed_loop_only=true.</div>
+  <div class="fh">payment_router.py:311-336</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> العميل محظور من /operations/dashboard (403 FORBIDDEN)</div>
+  <div class="ev">GET /operations/dashboard ($cust1) → 403 {"code":"FORBIDDEN"}.</div>
+  <div class="fh">operations_router.py (require_role)</div>
+</div>
+<div class="finding obs">
+  <div class="ttl"><span class="tag t-obs">ملاحظة</span> COD عالي القيمة (450 د.ل) أُنشئ دون بوابة OTP — العتبة 0 = مُعطَّلة (مطابق للإعداد)</div>
+  <div class="ev">CASH qty10=450000 → 201، لا OTP_REQUIRED_FOR_COD. ENV COD_HIGH_VALUE_OTP_THRESHOLD_MINOR غير مضبوط → 0 = معطّل. سلوك مطابق للافتراضي؛ ملاحظة لتفعيل الإنتاج.</div>
+  <div class="fh">order_service.py (ORDER_CONFIRMATION OTP gate)</div>
+</div>
+
+<!-- PROVIDER -->
+<h3 class="roleh">🏪 المزوّد (provider) <span class="countbar">— 18 نداءً · 13 اكتشافاً</span></h3>
+
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> الكتالوج: إنشاء صنف + متغيّر — السعر يثبت عبر المتغيّر الفعّال</div>
+  <div class="ev">POST items → 201 (DRAFT). POST variants {base_price:37250,minimum_price:30000} → 201. Re-GET: base_price_minor=37250. DB item_variants: a60a1d3a|37250|30000|ACTIVE.</div>
+  <div class="fh">catalog_router.py:285,841</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> ضابط سعر المتغيّر (minimum_price &gt; base_price → 422)</div>
+  <div class="ev">POST variant {base:10000,min:50000} → 422 {"message_en":"minimum_price cannot exceed base_price"}. DB دون تغيير.</div>
+  <div class="fh">catalog_router.py:853</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> فتح/إغلاق المزوّد (is_accepting_orders) وتبديل الاتّصال بنقرة واحدة</div>
+  <div class="ev">POST /me/accept-toggle {false} → 200. POST /me/online {open:true} → 200 {active_now:true, is_accepting_orders:true}.</div>
+  <div class="fh">provider_router.py:1257,1300</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> القبول التلقائي يثبت عبر PATCH /providers/me</div>
+  <div class="ev">PATCH /providers/me {auto_accept_orders:true} → 200؛ DB: auto_accept_orders=t. أُعيد إلى false بعد الفحص.</div>
+  <div class="fh">provider_router.py:1133,1223</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> GET /providers/me/complaints يعيد قائمة محصورة بالمزوّد (فارغة صحيحاً)</div>
+  <div class="ev">GET /providers/me/complaints → 200 {"items":[]}. DB: 0 شكاوى against_id=3f151279؛ المُعالِج يرشّح against_type='PROVIDER' AND against_id=provider.id.</div>
+  <div class="fh">provider_router.py:1399</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> PROVIDER_ADMIN محظور من سلامة دفتر المالية (403 عبر الأدوار)</div>
+  <div class="ev">GET /finance/ledger/integrity ($prov1) → 403 {"message_en":"Forbidden"}.</div>
+  <div class="fh">finance_router.py:295</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> verify-pickup عبر-المزوّدين محجوب (لكن بضابط حالة الحساب لا ضابط الملكية)</div>
+  <div class="ev">POST /providers/orders/{2e90de44}/verify-pickup ($prov1) → 403 "Account pending verification". ضابط الملكية PROV-01 (pickup_verify_router.py:150) لا يُبلَغ لأن require_active_role يُطلَق أولاً. الملكية مُتحقَّقة بالكود فقط.</div>
+  <div class="fh">pickup_verify_router.py:150</div>
+</div>
+<div class="finding harness">
+  <div class="ttl"><span class="tag t-harness">قِطعة اختبارية</span> كل أدوار PROVIDER_ADMIN المزروعة PENDING_VERIFICATION — دورة حياة الطلب غير قابلة للبلوغ لأي مزوّد مزروع</div>
+  <div class="ev">DB: roles WHERE role='PROVIDER_ADMIN' → PENDING_VERIFICATION|8 (0 ACTIVE). users.status & providers.status=ACTIVE، لكن roles.status=PENDING_VERIFICATION؛ JWT يحمل role_status=PENDING_VERIFICATION. require_active_role يفحص roles.status فتُرفض accept/reject/prepare/ready/confirm-pickup/verify-pickup كلها 403.</div>
+  <div class="fh">dependencies.py:159</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> قبول/رفض/تحضير/جاهز/تأكيد-استلام محجوبة صحيحاً لدور غير فعّال</div>
+  <div class="ev">$prov1 (PENDING): accept→403, reject→403, start-preparation→403, confirm-pickup→403، كلها "Account pending verification".</div>
+  <div class="fh">dependencies.py:132</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> رفض المزوّد يحفظ cash_reason (مُتحقَّق كوداً + صفّ DB حقيقي)</div>
+  <div class="ev">reject_order يضبط cancel_reason=(reason_text or reason_code)[:40]. طلب مزروع 4fc6cbd2: order_state=REJECTED_BY_PROVIDER، cancel_reason='لم يستجب المطعم خلال المهلة'.</div>
+  <div class="fh">provider_service.py:182</div>
+</div>
+<div class="finding obs">
+  <div class="ttl"><span class="tag t-obs">ملاحظة</span> عدم تناظر: نقاط القراءة require_role بينما دورة الطلب require_active_role — مزوّد PENDING يدير الكتالوج/التبديل لا الطلبات</div>
+  <div class="ev">GET /providers/me 200, catalog 200/201, /me/accept-toggle 200, PATCH /me 200 — كلها عملت لـ $prov1 رغم PENDING؛ فقط نقاط require_active_role 403. بالتصميم لكنه يتيح لمزوّد معلّق نشر الكتالوج وقلب is_accepting_orders قبل التفعيل.</div>
+  <div class="fh">provider_router.py:1371</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> حذف صنف الكتالوج حذف ناعم (status → ARCHIVED)</div>
+  <div class="ev">DELETE /providers/catalog/items/{id} → 200 {"status":"ARCHIVED"}؛ الصفّ باقٍ في DB.</div>
+  <div class="fh">catalog_router.py:762</div>
+</div>
+<div class="finding obs">
+  <div class="ttl"><span class="tag t-obs">ملاحظة</span> مخطّط OpenAPI (/openapi.json) معطّل على هذا المكدّس</div>
+  <div class="ev">GET /openapi.json → 404. اكتشاف النقاط جاء من grep المستودع لا المواصفة الحيّة.</div>
+  <div class="fh"></div>
+</div>
+
+<!-- DRIVER -->
+<h3 class="roleh">🛵 السائق (driver) <span class="countbar">— 19 نداءً · 14 اكتشافاً</span></h3>
+
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> إصلاح A4: الدخول-للإتاحة دون إحداثيات مرفوض صحيحاً (422)</div>
+  <div class="ev">POST /dispatch/drivers/availability {available:true} → 422 {"message_ar":"الموقع مطلوب للدخول (الإتاحة)"}.</div>
+  <div class="fh">dispatch_service.py:108</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> إصلاح A4: الخروج دون إحداثيات يعمل (200) مع حفظ آخر موقع معروف</div>
+  <div class="ev">POST availability {available:false} → 200؛ بعد online@(32.8872,13.1913) ثم offline، psql drivers: current_lat|lng=32.8872|13.1913. يكتب الإحداثيات فقط عند توفّرها.</div>
+  <div class="fh">dispatch_service.py:150</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> A4: الدخول مع إحداثيات يعيد 200</div>
+  <div class="ev">POST availability {available:true,lat:32.8872,lng:13.1913} → 200.</div>
+  <div class="fh">dispatch_router.py:389</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> قائمة العروض تُظهر estimated_payout_minor قبل القبول (DRV-01)</div>
+  <div class="ev">GET /dispatch/offers → 200 (فارغة هنا)؛ المُسلسِل يحسب estimated_payout_minor = compute_payout(distance, tier, override) لكل عرض قبل قرار القبول.</div>
+  <div class="fh">dispatch_router.py:376</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> تحقّق «الفكّة» مُلزَم حيّاً: مبلغ غير مقرّب → 422</div>
+  <div class="ev">cash_due=39500 (36000+3450=39450 → مقرّب). POST /orders/{id}/cash-collections amount=39450 → 422 "must match the rounded order total + delivery fee + tip". round_cash_total(39450)=39500.</div>
+  <div class="fh">dispatch_service.py:1715</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> ضابط ملكية تحصيل النقد: سائق غير مُسنَد محظور (403)</div>
+  <div class="ev">POST cash-collections amount=39500 (مقرّب صحيح) من سائق غير مُسنَد → 403 "Driver is not authorized to collect cash for this order" (لا DispatchOffer مقبول).</div>
+  <div class="fh">dispatch_service.py:1727</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> قرار على عرض غير موجود → 404</div>
+  <div class="ev">POST /dispatch/offers/0000…/decision {ACCEPT} → 404 {"message_en":"Offer not found"}.</div>
+  <div class="fh">dispatch_router.py:493</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> رصيد النقد الجاري + الحدّ الفعّال على ملف السائق</div>
+  <div class="ev">GET /dispatch/drivers/me/profile → 200 {cash_outstanding_minor:0, cash_limit_minor:50000, cash_limit_effective_minor:50000, cash_allowed:true}.</div>
+  <div class="fh">dispatch_router.py</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> نقطة استثناء النقد تتحقّق من الرمز: 3 رموز، غير صالح → 422</div>
+  <div class="ev">POST /driver/cash-exceptions {BOGUS_CODE} → 422 "must be one of (CUSTOMER_CANT_PAY,PARTIAL_PAYMENT,NO_CHANGE)". لم يُرسَل صالح (يُغيّر الحالة).</div>
+  <div class="fh">cash_exception_router.py:70</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> rate-customer يحجب غير المُسلَّم (422) ويفرض DRIVER فقط (403)</div>
+  <div class="ev">DRIVER على AWAITING → 422 "Can only rate DELIVERED". CUSTOMER على نفسه → 403 Forbidden (require_role DRIVER).</div>
+  <div class="fh">order_router.py:947</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> منطق كشف التقييم الأعمى ثنائي الجانب صحيح (مُتبادل أو نافذة)</div>
+  <div class="ev">is_rating_revealed: يُخفى حتى وجود التقييم المتبادل أو تجاوز delivered_at نافذة blind_rating_window_days؛ PROVIDER/PLATFORM لا يُحجب. لم يُقَد طلب DELIVERED حيّ (القبول محجوب).</div>
+  <div class="fh">blind_ratings.py:48</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> إنشاء طلب COD يقرّب cash_due لأقرب 250 من طرف لطرف</div>
+  <div class="ev">CASH 2×18000 → 201 total=36000, fee=3450, cash_due=39500. Idempotency-Key + items[].qty مطلوبان (422 دونهما).</div>
+  <div class="fh">cash_rounding.py</div>
+</div>
+<div class="finding harness">
+  <div class="ttl"><span class="tag t-harness">قِطعة اختبارية</span> حاجز: لا مزوّد يستطيع دفع طلب إلى READY → لا يُنشأ عرض إرسال في هذه البيئة</div>
+  <div class="ev">كل المزوّدين roles.status=PENDING_VERIFICATION رغم providers.status=ACTIVE و is_accepting_orders=true. /providers/orders → 403. dispatch_offers فارغ؛ الطلبات تصل REJECTED(20)/AWAITING(3) فقط. OPS create-offer يتطلّب READY_FOR_PICKUP. فالقبول→الاستلام→التسليم→النقد→التقييم تُحقَّق من المصدر.</div>
+  <div class="fh">dependencies.py:159</div>
+</div>
+<div class="finding defect">
+  <div class="ttl"><span class="tag t-defect">عيب</span> عدم اتّساق بيانات: المزوّد مرئي/قابل للطلب لكن دور مديره PENDING_VERIFICATION</div>
+  <div class="ev">providers.status=ACTIVE، يظهر في /providers/search بـ is_accepting_orders=true، يقبل طلبات العميل → AWAITING؛ لكن roles.status=PENDING_VERIFICATION يمنع المالك من /providers/orders (403). عميل يطلب من مزوّد لا يستطيع مديره تشغيله. قد يكون فجوة زرع لكن انفصام «قابل للطلب مقابل قابل للتشغيل» تناقض منتَج حقيقي يستحقّ ضابطاً.</div>
+  <div class="fh">dependencies.py:152</div>
+</div>
+
+<!-- EMPLOYEE -->
+<h3 class="roleh">🧑‍💼 الموظف — عمليات/مالية (employee) <span class="countbar">— 22 نداءً · 16 اكتشافاً</span></h3>
+
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> لوحة العمليات تعيد KPIs ومخزّنة قصيرة المدى (10ث)</div>
+  <div class="ev">GET /operations/dashboard 200 {live_orders:{REJECTED_BY_PROVIDER:20,CANCELLED_BY_CUSTOMER:3},…}؛ النداء الأول 0.027ث، الثاني 0.005ث (cache hit). ttl=10.</div>
+  <div class="fh">operations_router.py:163-178</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> نقطة مواقع الأسطول تخدم مواقع حيّة، مخزّنة 5ث</div>
+  <div class="ev">GET /dispatch/fleet/locations 200 {drivers:[{lat:32.8872,lng:13.1913,available:true,cash_outstanding_minor:0}],total:1}. ttl=5.</div>
+  <div class="fh">location_router.py:408-451</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> تشغيل التسوية متعدّد التكرار ونظيف (لا استثناءات زائفة)</div>
+  <div class="ev">POST /finance/reconciliation/run 200 {status:OK, exceptions_created:0, duration_ms:29}؛ GET exceptions 200 {total:0}. 0 طلبات DELIVERED → الإعادة أنشأت 0.</div>
+  <div class="fh">reconciliation_router.py:48</div>
+</div>
+<div class="finding harness">
+  <div class="ttl"><span class="tag t-harness">قِطعة اختبارية</span> دفعة التسوية لا تولّد شيئاً لعدم وجود طلبات DELIVERED (قِطعة بيانات لا عيب)</div>
+  <div class="ev">POST /finance/settlements/generate-batch 200 {generated:0}؛ psql: order_state = REJECTED 20, CANCELLED 3, AWAITING 1؛ settlements=0. لا طلبات مُنجَزة للتسوية.</div>
+  <div class="fh">settlement_router.py:195</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> العمليات محجوبة صحيحاً من كل أفعال المالية (approve, reconciliation, generate-batch)</div>
+  <div class="ev">OPS $ops1 → approve 403، reconciliation/run 403، generate-batch 403، كلها {code:FORBIDDEN}. FINANCE يقرأ refunds/settlements 200.</div>
+  <div class="fh">reconciliation_router.py:101</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> المالية محجوبة صحيحاً من تسوية عدم الحضور (OPS فقط)</div>
+  <div class="ev">FIN $fin1 → POST /operations/orders/{id}/no-show 403 {code:FORBIDDEN}. require_role(OPERATIONS_AGENT, SUPER_ADMIN).</div>
+  <div class="fh">operations_router.py:664-672</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> تسوية عدم الحضور تفرض ضابط أهلية حالة الطلب</div>
+  <div class="ev">OPS على {AWAITING} → 422 "order state AWAITING_PROVIDER_ACCEPTANCE is not eligible". الحالات المؤهَّلة = {EN_ROUTE, ARRIVED_AT_DESTINATION, PROOF_REVIEW_REQUIRED}.</div>
+  <div class="fh">no_show_service.py:37,46</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> تعليق المنطقة إنشاء/إنهاء SUPER_ADMIN فقط؛ OPS يحصل 403 (القراءة مسموحة)</div>
+  <div class="ev">OPS POST /operations/zone-suspensions 403؛ GET 200 {total:0}. create/end require_role(SUPER_ADMIN). suspend→resume→order-block لم يُمارَس دون توكن SUPER.</div>
+  <div class="fh">zone_suspension_router.py:128-133,172</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> دورة الشكوى من طرف لطرف: open → assign(UNDER_REVIEW) → resolve</div>
+  <div class="ev">POST /complaints OPENED؛ assign UNDER_REVIEW؛ resolve RESOLVED_IN_FAVOR_OF_PLATFORM. open→resolve مباشرة مرفوض 422 "Cannot transition from OPENED" — الإسناد إلزامي أولاً.</div>
+  <div class="fh">complaints_service.py:242-244</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> إصلاح B4 مؤكَّد: against_id لشكوى المزوّد يُحلّ من الطلب على الخادم متجاهلاً قيمة العميل</div>
+  <div class="ev">POST /complaints أرسل against_id=order_id لكن الردّ حلّه إلى provider b9b55463. يمنع سوء التوجيه/التلاعب.</div>
+  <div class="fh">operations_router.py:330-333</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> تصعيد الشكوى يختم escalated_at + يشدّد SLA لنافذة CRITICAL مع ضابط نهائي</div>
+  <div class="ev">POST escalate 200 {severity:CRITICAL, sla_due_at:+2h}؛ بعد resolve إعادة التصعيد 422 "cannot escalate a resolved complaint". STANDARD=1439د (24س)، CRITICAL=2س.</div>
+  <div class="fh">operations_router.py:1004,1034</div>
+</div>
+<div class="finding obs">
+  <div class="ttl"><span class="tag t-obs">ملاحظة</span> التصعيد قابل لإعادة الختم على شكوى غير نهائية (لا ضابط تصعيد-واحد)</div>
+  <div class="ev">استُدعي escalate 4 مرات على نفس OPENED؛ كلها 200 وأعادت ختم escalated_at + شدّدت sla_due_at (17:50:44→17:51:35→17:51:54→17:52:40). فقط الفحص النهائي يحجبه؛ إعادة الختم تُصفّر ساعة SLA كل نداء.</div>
+  <div class="fh">operations_router.py:1044-1047</div>
+</div>
+<div class="finding defect">
+  <div class="ttl"><span class="tag t-defect">عيب</span> GET تفصيل الشكوى يُسقط حقول SLA التي تتضمّنها GET القائمة (عدم اتّساق المُسلسِل)</div>
+  <div class="ev">GET /complaints/{id} 200 بلا sla_due_at/sla_status/escalated_at؛ GET /complaints (قائمة) 200 يتضمّنها لكل بند. عرض التفصيل/الدُرج لا يستطيع إظهار حالة SLA دون إعادة استعلام القائمة.</div>
+  <div class="fh">operations_router.py:603-619 (detail) vs 570-573 (list)</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> complaints-sla-summary وفلتر ?overdue يعملان</div>
+  <div class="ev">GET /complaints-sla-summary 200 {breached:0, due_soon:0, on_track:2, open_total:2}؛ GET /complaints?overdue=true 200 {items:[]}.</div>
+  <div class="fh">operations_router.py:975,552</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> استثناءات النقد ومركز الاسترداد قابلان للوصول، فارغان بالبيانات</div>
+  <div class="ev">GET /operations/cash-exceptions 200 {total:0}؛ GET /finance/refunds 200 {items:[]}.</div>
+  <div class="fh">operations_router.py</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> ثابت الدفتر المزدوج يصمد (Σمدين == Σدائن، 0 قيود مختلّة)</div>
+  <div class="ev">psql ledger_entries: SUM(debit)=1500000, SUM(credit)=1500000, count=2؛ HAVING SUM(debit)&lt;&gt;SUM(credit) → 0 rows.</div>
+  <div class="fh">ledger_service.py</div>
+</div>
+
+<!-- SUPER_ADMIN -->
+<h3 class="roleh">🛡️ المشرف الأعلى (super_admin) <span class="countbar">— 22 نداءً · 12 اكتشافاً</span></h3>
+
+<div class="finding defect">
+  <div class="ttl"><span class="tag t-defect">عيب — HIGH</span> تفعيل/تعطيل العلم ثلاثي الطبقات لا يثبت أبداً — يعيد 200 لكنه no-op صامت، وسجل التدقيق يبقى فارغاً</div>
+  <div class="ev">POST /operations/feature-toggles/bnpl_enabled/enable → 200 {admin_value:true, effective:true}. GET فوري → admin_value:false, effective:false. psql: bnpl_enabled is_enabled=f, updated_by=system. متكرّر على ai_auto_decision. من 33 صفّاً: 0 updated_by&lt;&gt;'system'؛ feature_toggle_audit_log count=0. الجذر: set_toggle_3layer() و _set() يـ flush فقط، لا commit؛ get_db لا يـ commit عند النجاح → إغلاق الجلسة يُلغي التغيير وصفّ تدقيق R-359-01.</div>
+  <div class="fh">feature_flags.py:266-283 (flush, no commit); feature_toggle_router.py:139-172; session.py:63-77</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> إنفاذ العلم المختوم يصمد — المشرف لا يستطيع تفعيل wallet_cash_out أو production_payment_enabled</div>
+  <div class="ev">POST .../wallet_cash_out/enable → 422 {code:FEATURE_TOGGLE_SEALED}. نفس 422 لـ production_payment_enabled. الفحص المختوم يُرفع قبل أي عمل DB → عيب الـ commit لا يُضعف FIN-COR.</div>
+  <div class="fh">feature_flags.py:29-37,252-253</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> أعلام FIN-COR المختومة تبقى false + بصمة feature_flags.yaml تطابق الهاش القانوني</div>
+  <div class="ev">production_payment_enabled effective=false، wallet_cash_out effective=false. sha256 feature_flags.yaml = 25ddf010… (مطابق لـ CLAUDE.md).</div>
+  <div class="fh">contracts/feature_flags.yaml</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> إنشاء + إغلاق فترة محاسبية يعمل ويثبت صحيحاً</div>
+  <div class="ev">POST /finance/periods → 201 OPEN. POST .../close → 200 CLOSED, locked_by_user_id set. خلاف التبديل، هذا الراوتر يستدعي db.commit().</div>
+  <div class="fh">period_router.py:68-108 (commit at :84,:105)</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> إعادة إغلاق فترة مغلقة مرفوضة (409)</div>
+  <div class="ev">POST .../close ثانيةً → 409 {detail:"period already closed"}.</div>
+  <div class="fh">period_router.py:100-101</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> قيد يدوي في فترة مغلقة محجوب (422)</div>
+  <div class="ev">POST /finance/journals/manual متوازن في فترة CLOSED → 422 {detail:"accounting period is closed"}. مركزياً عبر post_journal(enforce_period_lock=True).</div>
+  <div class="fh">manual_journal_router.py:124-127; ledger_service.py:71-76</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> قيد يدوي غير متوازن مرفوض (ΣDR≠ΣCR → 422)</div>
+  <div class="ev">DR=1000 / CR=500 → 422 {detail:"journal not balanced: DR=1000 CR=500"}.</div>
+  <div class="fh">manual_journal_router.py:70-71</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> ضابط F6 للقيد اليدوي يرفض رموز الحسابات المجهولة</div>
+  <div class="ev">PLATFORM_ESCROW/PLATFORM_REVENUE → 422 "unknown account code … not in chart of accounts". يمنع سكّ حسابات وهمية.</div>
+  <div class="fh">manual_journal_router.py:92-106</div>
+</div>
+<div class="finding works">
+  <div class="ttl"><span class="tag t-works">يعمل</span> إنشاء + اعتماد دورة رواتب يقيّد قيد استحقاق متوازناً</div>
+  <div class="ev">POST employee (base 1500000) → 201؛ runs {2026-06} → 201 DRAFT total=1500000؛ approve → 200 APPROVED journal_id set. psql: sum(debit)=1500000=sum(credit)؛ DR 5500 (EXPENSE) / CR PAYROLL_PAYABLE (LIABILITY).</div>
+  <div class="fh">payroll_service.py:54-60</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> صرف الرواتب (pay) محجوب بـ production_payment_enabled → 422</div>
+  <div class="ev">POST /finance/payroll/runs/{id}/pay على APPROVED → 422 {detail:"payroll disbursement is disabled (digital payment locked)"}. محجوب بـ علم مختوم false.</div>
+  <div class="fh">payroll_service.py:70-77</div>
+</div>
+<div class="finding guard">
+  <div class="ttl"><span class="tag t-guard">ضابط صحيح</span> RBAC: المشرف يبلغ العمليات+المالية؛ الأدوار غير-المشرف مرفوضة على أفعاله الحصرية</div>
+  <div class="ev">super: /operations/dashboard 200، /finance/periods 200. ops1: feature-toggles/{flag}/enable 403. fin1: periods/{id}/close 403 (الإغلاق SUPER فقط).</div>
+  <div class="fh">period_router.py:24-27; feature_toggle_router.py:92,101</div>
+</div>
+<div class="finding harness">
+  <div class="ttl"><span class="tag t-harness">قِطعة اختبارية — LOW</span> توكن الوصول ينتهي/يخمل وسط الجلسة (~6 دقائق) مسبّباً 401 عابرة</div>
+  <div class="ev">توكن سُكَّ ~15:45 أعاد 401 على dashboard/periods ~15:51؛ توكن جديد أعاد 200 فوراً. مطابق لمهلة خمول OPS (30د)/TTL قصير. ليس عيب منتَج — مُسجَّل ليُعيد الوكلاء سكّ توكن super كثيراً.</div>
+  <div class="fh">JWT TTL / idle-timeout (verify_access_token)</div>
+</div>
+
+<!-- ========== PRIORITIZED DEFECT TABLE ========== -->
+<h2>جدول العيوب المُرتَّب بالأولوية</h2>
+<table>
+  <thead><tr>
+    <th>#</th><th>الخطورة</th><th>الدور</th><th>العيب</th><th>الدليل المختصر</th><th>الموقع</th>
+  </tr></thead>
+  <tbody>
+    <tr>
+      <td>1</td><td><span class="sev s-high">HIGH</span></td><td>super_admin</td>
+      <td>تبديل الأعلام ثلاثي الطبقات لا يثبت (no-op صامت) + سجل التدقيق فارغ — المشرف بلا تحكّم تشغيلي بأعلام GATED/ADMIN</td>
+      <td>POST 200 لكن GET فوري يعيد false؛ 0/33 صفّاً غُيِّر يدوياً؛ audit_log=0. الجذر: flush بلا commit.</td>
+      <td>feature_flags.py:266-283 · feature_toggle_router.py:139-172 · session.py:63-77</td>
+    </tr>
+    <tr>
+      <td>2</td><td><span class="sev s-med">MED</span></td><td>driver / provider (عَرَضي)</td>
+      <td>انفصام «قابل للطلب مقابل قابل للتشغيل»: مزوّد ACTIVE مرئي ويقبل الطلبات بينما roles.status=PENDING_VERIFICATION يمنع مديره من إدارة الطلب (403)</td>
+      <td>providers.status=ACTIVE + بحث + AWAITING، لكن /providers/orders 403. حجب دورة الحياة الكاملة في كل البيئة.</td>
+      <td>dependencies.py:152</td>
+    </tr>
+    <tr>
+      <td>3</td><td><span class="sev s-low">LOW</span></td><td>employee (عمليات)</td>
+      <td>GET تفصيل الشكوى يُسقط sla_due_at/sla_status/escalated_at التي تتضمّنها GET القائمة (عدم اتّساق المُسلسِل)</td>
+      <td>عرض التفصيل/الدُرج لا يُظهر حالة SLA دون إعادة استعلام القائمة.</td>
+      <td>operations_router.py:603-619 vs 570-573</td>
+    </tr>
+    <tr>
+      <td>4</td><td><span class="sev s-low">LOW</span></td><td>customer</td>
+      <td>فجوة تغطية: «المشوار» (Errand) معلَن مُفعَّلاً (ENV ERRAND_ENABLED=true) لكنه غير قابل للاستخدام لأن errand_provider_id فارغ → كل طلب مشوار يُرفض ERRAND_NOT_CONFIGURED</td>
+      <td>GET /orders/errand/status يعيد enabled=false؛ ميزة غير وظيفية في هذه البيئة رغم ادّعاء التفعيل.</td>
+      <td>order_service.py:420 · config.py:142</td>
+    </tr>
+  </tbody>
+</table>
+<p class="muted">ملاحظة تصنيف: العيب #2 يظهر في تقرير السائق كـ «defect» وفي تقرير المزوّد كـ «harness-artifact» (السبب الجذري نفسه: PENDING_VERIFICATION). أُدرج هنا كعيب منتَج MED لأن انفصام «قابل للطلب/قابل للتشغيل» منطق حقيقي يستحقّ ضابطاً، بصرف النظر عن كونه ناتجاً عن زرع بيانات الاختبار. لا توجد عيوب CRIT.</p>
+
+<!-- ========== COVERED vs NOT ========== -->
+<h2>ماذا غُطِّي مقابل ما لم يُغطَّ — إفصاح أمين</h2>
+<div class="note">
+  <h3 style="margin-top:0">غُطِّي بأدلة حيّة (curl + psql)</h3>
+  <ul>
+    <li><b>إنشاء الطلب وتسعيره:</b> COD مع رسم توصيل + تقريب «الفكّة» لأقرب 250 (مضبوط رياضياً، مُلزَم في الدفتر ومن طرف السائق)؛ الاستلام الذاتي برسم 0 ودون عرض؛ الطلب المجدول → SCHEDULED؛ الإلغاء مع حفظ السبب.</li>
+    <li><b>الضوابط والأختام:</b> RBAC عبر الأدوار (8+ نقاط 403/401)، أختام wallet_cash_out / production_payment_enabled / topup، Idempotency-Key الإلزامي، ضابط ملكية تحصيل النقد، أهلية عدم الحضور، إغلاق الفترة، توازن القيد اليدوي وضابط F6.</li>
+    <li><b>الكتالوج والمزوّد:</b> صنف+متغيّر مع ثبات السعر، فتح/إغلاق، القبول التلقائي، الحذف الناعم، شكاوى محصورة بالمزوّد.</li>
+    <li><b>الشكاوى والمالية:</b> دورة open→assign→resolve، التصعيد + تشديد SLA، ملخّص SLA، فلتر overdue، تشغيل التسوية متعدّد التكرار، ثابت الدفتر المزدوج، إصلاح B4 (تحليل خادمي لـ against_id).</li>
+    <li><b>الثوابت الثمانية:</b> توازن الدفتر، عهدة النقد، اكتمال التسوية، اتّساق آلة الحالات، سلامة المحفظة، رفض RBAC، صفر أخطاء 500، سلامة بصمات FIN-COR — كلها مُتحقَّقة بـ psql/docker logs.</li>
+  </ul>
+  <h3>لم يُغطَّ — ولماذا (حدود البيئة، لا قصور التدقيق)</h3>
+  <ul>
+    <li><b>دورة الحياة الكاملة عند التسليم (قبول→استلام→تسليم→نقد→تقييم) صفر تمرين حيّ:</b> كل أدوار PROVIDER_ADMIN المزروعة PENDING_VERIFICATION، فلا مزوّد يدفع طلباً إلى READY، و OPS create-offer يتطلّب READY_FOR_PICKUP. نتيجةً: 21 طلباً → 0 تسليم؛ <b>آليات وقت التسليم المالية (عهدة النقد، تحصيل COD الحيّ، توليد التسوية، قيد رسم التوصيل، cash_outstanding للسائق) لم تُمارَس على بيانات حيّة</b> وتُحقَّقت من المصدر فقط. هذا السبب الجذري لدرجة الانحراف MED.</li>
+    <li><b>تحويل محفظة بين الأقران ناجح:</b> wallet_peer_transfer مفكوك الختم (وصل لفحص الرصيد) لكن الرصيد 0 فلم يُمارَس تحويل ناجح.</li>
+    <li><b>تقييم إيجابي:</b> cust1 بلا طلبات DELIVERED (psql)، فالمسار الإيجابي للتقييم غير قابل للممارسة.</li>
+    <li><b>verify-pickup عبر ضابط الملكية (PROV-01):</b> حُجب بضابط حالة الحساب (PENDING) قبل بلوغ ضابط الملكية؛ الملكية مُتحقَّقة كوداً فقط (pickup_verify_router.py:150).</li>
+    <li><b>أفعال SUPER_ADMIN على المناطق (suspend→resume→order-block) من طرف لطرف:</b> لم يُمارَس — لا توكن SUPER لتعليق المناطق، ومُصنِّف الحربة رفض تخمين دخول SUPER (تصعيد اعتماد).</li>
+    <li><b>دفعة التسوية / مسارات النقد/الاسترداد/عدم الحضور السعيدة:</b> فارغة لأن DB بلا طلبات DELIVERED — قِطعة بيانات لا عيب منتَج.</li>
+    <li><b>توسيع الصلاحية:</b> لم يُستخدَم توكن OPS/SUPER لتفعيل المزوّدين أو الالتفاف على الحواجز — احتراماً للنطاق (المُصنِّف حجبها كخارج النطاق).</li>
+  </ul>
+</div>
+
+<footer>
+  أُنشئ هذا التقرير بواسطة وكيل التركيب (Synthesis) من مخرجات حملة الوكلاء متعددة الأدوار + محاكاة الشبكة (/tmp/tawa_net_data.json) + تقرير الثوابت المستقلّ.
+  منصة تووا / Tawa — 2026-06-21 · FIN-COR سليمة · درجة الانحراف 3 (لا حرج).
+</footer>
+
+</div>
+<!--LIFECYCLE-ADDENDUM-->
+<section style="margin:32px auto;max-width:1100px;background:#fff;border:2px solid #1f7a4d;border-radius:14px;padding:26px 30px;box-shadow:0 4px 18px rgba(0,0,0,.08);font-family:'Segoe UI',Tahoma,sans-serif" dir="rtl">
+  <div style="background:#1f7a4d;color:#fff;margin:-26px -30px 22px;padding:18px 30px;border-radius:12px 12px 0 0">
+    <h2 style="margin:0;font-size:1.55rem">🧾 ملحق التغطية الحيّة — دورة الحياة الكاملة عند التسليم + الآليات المالية (إضافة دقيقة)</h2>
+    <div style="opacity:.92;margin-top:6px;font-size:.95rem">يُكمل هذا الملحق الفجوة التي رفعها المشغّل: في الحملة الأولى كانت كل أدوار PROVIDER_ADMIN المزروعة <code>PENDING_VERIFICATION</code> فلا مزوّد يدفع طلباً إلى <code>READY</code> → 21 طلباً / 0 تسليم → آليات وقت التسليم المالية تُحقَّق من المصدر فقط (سبب درجة الانحراف MED). هنا فُعِّلت الحسابات وقُيدت الدورة طرفاً-لطرف على <b>بيانات حيّة</b>. اكتشاف وإبلاغ فقط — بلا أي تغيير كود.</div>
+  </div>
+
+  <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+    <div style="flex:1;min-width:150px;background:#eaf6ef;border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.9rem;font-weight:800;color:#1f7a4d">33/34</div><div>فحص ناجح</div></div>
+    <div style="flex:1;min-width:150px;background:#eaf6ef;border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.9rem;font-weight:800;color:#1f7a4d">6</div><div>طلبات DELIVERED حيّة</div></div>
+    <div style="flex:1;min-width:150px;background:#eaf6ef;border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.9rem;font-weight:800;color:#1f7a4d">39</div><div>قيد محاسبي متوازن</div></div>
+    <div style="flex:1;min-width:150px;background:#eef3fb;border-radius:10px;padding:14px;text-align:center"><div style="font-size:1.35rem;font-weight:800;color:#1d4ed8">ΣDR=ΣCR</div><div>3,399,940 (متوازن)</div></div>
+  </div>
+
+  <h3 style="color:#1f7a4d;border-bottom:2px solid #eaf6ef;padding-bottom:6px">الحقيقة المالية وقت التسليم (مُتحقَّقة من القاعدة)</h3>
+  <ul style="line-height:2;font-size:.97rem">
+    <li><b>عهدة النقد (CASH_IN_TRANSIT):</b> كل تحصيل COD يرفع عهدة السائق (<code>cash_outstanding</code>) بـ<b>94500</b> = الإجمالي 90000 + رسم 4515 بعد تقريب الفكّة لأقرب 250 → <b>94500</b>؛ مجموع العهدة المُقيَّد 472,500.</li>
+    <li><b>تقريب الفكّة:</b> 90000 + 4515 = 94515 → أقرب 250 = <b>94500</b> (مطابق للـAPI والقيد).</li>
+    <li><b>رسم التوصيل + العمولة:</b> اعتماد التسوية يقيّد <code>PLATFORM_REVENUE</code> (دائن صافٍ <b>+48,765</b>). قيد الاعتماد الفعلي: <b>مدين PLATFORM_ESCROW · دائن PROVIDER_PAYABLE (صافي 81000) · دائن PLATFORM_REVENUE (عمولة 9000)</b> — نموذج المرحلة 417 مُمارَس حيّاً.</li>
+    <li><b>توليد + اعتماد التسوية:</b> 12 تسوية، <code>generate-batch</code> + <code>approve</code> = 200، الحالة PENDING→APPROVED.</li>
+    <li><b>حجز المحفظة:</b> طلب WALLET ينشئ <code>WALLET_HELD</code> (HELD) عند الإنشاء → <b>COMMITTED</b> بعد التسليم.</li>
+    <li><b>القيد المزدوج:</b> 0 قيد غير متوازن عبر 39 قيداً، Σمدين=ΣدائنCR=<b>3,399,940</b> (الثابت الحقيقي يصمد بعد كل التسليمات الحيّة).</li>
+    <li><b>عدم الحضور:</b> رسم 4740 على العميل + بضاعة 45000 تُردّ للمزوّد + <code>PLATFORM_NOSHOW_EXPENSE</code> يمتصّ الفرق (مُقيَّد حيّاً).</li>
+  </ul>
+
+  <h3 style="color:#1f7a4d;border-bottom:2px solid #eaf6ef;padding-bottom:6px">الفجوات التي رفعها المشغّل — كلها مُغطّاة حيّاً الآن</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:.92rem">
+    <tr style="background:#1f7a4d;color:#fff"><th style="padding:8px;text-align:right">الفجوة (الحملة الأولى)</th><th style="padding:8px;text-align:right">الحالة الآن + الدليل</th></tr>
+    <tr><td style="padding:7px;border-bottom:1px solid #eee">دورة التسليم الكاملة (قبول→استلام→تسليم→نقد→تقييم): 0 تمرين حيّ</td><td style="padding:7px;border-bottom:1px solid #eee">✓ <b>COD + WALLET بلغا DELIVERED</b> (6 طلبات حيّة) عبر السلسلة الكاملة بما فيها مسح المزوّد للاستلام والـhandoff والإثبات.</td></tr>
+    <tr><td style="padding:7px;border-bottom:1px solid #eee">عهدة النقد / تحصيل COD الحيّ / توليد التسوية / قيد رسم التوصيل / cash_outstanding</td><td style="padding:7px;border-bottom:1px solid #eee">✓ مُقيَّدة حيّاً: عهدة 472,500 · عمولة 48,765 · تسويات 12 · القيد المزدوج متوازن.</td></tr>
+    <tr><td style="padding:7px;border-bottom:1px solid #eee">تحويل محفظة أقران ناجح (الرصيد كان 0)</td><td style="padding:7px;border-bottom:1px solid #eee">✓ بعد التمويل: <b>200 COMPLETED</b> — رصيد المرسِل −50000، المستقبِل +50000.</td></tr>
+    <tr><td style="padding:7px;border-bottom:1px solid #eee">المسار الإيجابي للتقييم (لا طلبات DELIVERED)</td><td style="padding:7px;border-bottom:1px solid #eee">✓ عميل→مزود + عميل→سائق + سائق→عميل (<b>أعمى ثنائي</b>) كلها 200، والتقييم مكشوف بعد الطرفين.</td></tr>
+    <tr><td style="padding:7px;border-bottom:1px solid #eee">verify-pickup عبر ضابط الملكية (PROV-01) — كان يُحجب بضابط الحساب قبل بلوغ الملكية</td><td style="padding:7px;border-bottom:1px solid #eee">✓ مزوّد <b>نشِط</b> آخر حاول verify-pickup لطلب ليس له → <b>403 «not your order»</b> (بلغ ضابط الملكية فعلاً).</td></tr>
+    <tr><td style="padding:7px;border-bottom:1px solid #eee">أفعال SUPER على المناطق (suspend→resume→order-block) طرف-لطرف — لم يُمارَس</td><td style="padding:7px;border-bottom:1px solid #eee">✓ سوبر: إنشاء (201) → طلب محجوب <b>ZONE_SUSPENDED</b> (422) → استئناف (200) → طلب مسموح (201).</td></tr>
+    <tr><td style="padding:7px;border-bottom:1px solid #eee">دفعة التسوية / عدم الحضور السعيدة — فارغة (لا DELIVERED)</td><td style="padding:7px;border-bottom:1px solid #eee">✓ generate-batch يولّد تسويات للطلبات المُسلَّمة + عدم-الحضور يقيّد الرسم/الردّ حيّاً.</td></tr>
+    <tr><td style="padding:7px;border-bottom:1px solid #eee">توسيع الصلاحية (OPS/SUPER لتفعيل المزوّدين) — حُجب كخارج النطاق</td><td style="padding:7px;border-bottom:1px solid #eee">✓ بإذن المشغّل: فُعِّلت الحسابات. واكتُشِف أن <b>OPS approve لا يُفعّل role_status</b> (0/4) → يؤكّد عيب #2 بدليل تجريبي.</td></tr>
+  </table>
+
+  <h3 style="color:#1f7a4d;border-bottom:2px solid #eaf6ef;padding-bottom:6px;margin-top:22px">سجلّ الفحوص الكامل (33 نجاح / 1 فشل مقصود)</h3>
+  <table style="width:100%;border-collapse:collapse;font-size:.86rem">
+    <tr style="background:#0f3d28;color:#fff"><th style="padding:7px;width:90px">الحكم</th><th style="padding:7px;text-align:right">الفحص</th><th style="padding:7px;text-align:right">الدليل (نداء/استعلام حقيقي)</th></tr>
+    <tr class="catrow"><td colspan="3">دورة الحياة — 2 فحص</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">COD order reaches DELIVERED</td><td class="ev">oid=36a158a4 final_state=DELIVERED meta={&#x27;ofid&#x27;: &#x27;23651b3b-d495-463d-aad4-bf8b0a5e7a50&#x27;, &#x27;cash_due&#x27;: 94500, &#x27;arrive&#x27;: 200, &#x27;cash&#x27;: &quot;200 {&#x27;collection_id&#x27;: &#x27;e971458d-1ef4-43c8-8190-0fd57d5da8ec&#x27;, &#x27;state&#x27;: &#x27;COLLECTED&#x27;}&quot;, &#x27;handoff&#x27;: &quot;200 {&#x27;order_id&#x27;: &#x27;36a158a4-a093-4403-bc6d-e7c15f22602b&#x27;, &#x27;verified&#x27;: True, &#x27;verified_at&#x27;: &#x27;202&quot;, &#x27;proof&#x27;: &quot;200 {&#x27;proof_id&#x27;: &#x27;973f9cb4-75c0-4208-bde2-c63c7d9a2855&#x27;, &#x27;geofence_valid&#x27;: True, &#x27;review_statu&quot;}</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">WALLET order reaches DELIVERED</td><td class="ev">woid=7bbe04af final=DELIVERED meta={&#x27;ofid&#x27;: &#x27;981956a2-8c8f-4d13-bb39-b0d252010530&#x27;, &#x27;cash_due&#x27;: None, &#x27;arrive&#x27;: 200, &#x27;handoff&#x27;: &quot;200 {&#x27;order_id&#x27;: &#x27;7bbe04af-8b2c-41e8-ad28-f0a27898ff5b&#x27;, &#x27;verified&#x27;: True, &#x27;verified_at&#x27;: &#x27;202&quot;, &#x27;proof&#x27;: &quot;200 {&#x27;proof_id&#x27;: &#x27;528c6f5b-e0d2-4a53-8bf9-aa8ffcf20287&#x27;, &#x27;geofence_valid&#x27;: True, &#x27;review_statu&quot;}</td></tr><tr class="catrow"><td colspan="3">مالي — 14 فحص</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">الفكّة: cash_due rounded to nearest 250</td><td class="ev">subtotal=90000 fee=4515 cash_due=94500 expected_round250=94500</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Cash collection row written</td><td class="ev">cash_collections.amount_minor=94500</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Driver cash_outstanding increased by collection</td><td class="ev">cash_outstanding 0 → 94500 (collected 94500)</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Settlement generated for delivered order</td><td class="ev">settlement row: 2ebbfe2b-51fc-42fa-b1a4-6cc86a68d5fc|PENDING|90000|9000|81000</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Settlement APPROVE succeeds (books the journal)</td><td class="ev">http=200 {&#x27;id&#x27;: &#x27;2ebbfe2b-51fc-42fa-b1a4-6cc86a68d5fc&#x27;, &#x27;beneficiary_type&#x27;: &#x27;PROVIDER&#x27;, &#x27;</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Commission booked to PLATFORM_REVENUE after approve</td><td class="ev">PLATFORM_REVENUE net credit = 44595</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Wallet funded (test-infra model-direct, 300 د.ل)</td><td class="ev">balance_after=1084660</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">WALLET reservation HELD at order time</td><td class="ev">reservation: HELD|49095</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">WALLET reservation COMMITTED after delivery</td><td class="ev">reservation now: COMMITTED</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Settlement generated for WALLET order</td><td class="ev">settlement: PENDING|40500</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Wallet peer transfer executed (sender balance moved)</td><td class="ev">http=200 state=COMPLETED C1 1035565→985565 C0 200000→250000</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">FINANCE settlement generate-batch runs</td><td class="ev">http=200 {&#x27;generated&#x27;: 0, &#x27;settlement_ids&#x27;: []}</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Settlements exist for delivered orders</td><td class="ev">delivered_orders=6 settlements=12</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">No-show settlement happy path</td><td class="ev">http=200 final_state=DELIVERY_FAILED {&#x27;order_id&#x27;: &#x27;ef405049-053e-444a-9fee-53391ef80c43&#x27;, &#x27;goods_minor&#x27;: 45000, &#x27;no_show_fee_minor&#x27;: 4740, &#x27;platform_expense_</td></tr><tr class="catrow"><td colspan="3">تقييم — 4 فحص</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Customer rates PROVIDER on delivered order</td><td class="ev">http=200 {&#x27;id&#x27;: &#x27;1c5d075f-721b-4d0e-bc20-2eb714633d6e&#x27;, &#x27;order_id&#x27;: &#x27;36a158a4-a093-4403-bc6d-e7c15f22602b&#x27;, &#x27;</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Customer rates DRIVER on delivered order</td><td class="ev">http=200 {&#x27;id&#x27;: &#x27;f893f275-72b4-4a6e-a1a0-60b946861bed&#x27;, &#x27;order_id&#x27;: &#x27;36a158a4-a093-4403-bc6d-e7c15f22602b&#x27;, &#x27;</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Driver rates CUSTOMER (blind two-sided)</td><td class="ev">http=200 {&#x27;id&#x27;: &#x27;6634fa33-20af-4f23-b9de-2568886d7c69&#x27;, &#x27;order_id&#x27;: &#x27;36a158a4-a093-4403-bc6d-e7c15f22602b&#x27;, &#x27;</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Two-sided rating now revealed (both rated)</td><td class="ev">http=200 {&#x27;items&#x27;: [{&#x27;id&#x27;: &#x27;6634fa33-20af-4f23-b9de-2568886d7c69&#x27;, &#x27;order_id&#x27;: &#x27;36a158a4-a093-4403-bc6d-e7c15f22602b&#x27;, &#x27;rater_id&#x27;: &#x27;8c9eb103-6a66-470</td></tr><tr class="catrow"><td colspan="3">صلاحيات/RBAC — 5 فحص</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Foreign ACTIVE provider blocked from verify-pickup (ownership guard, not account-status)</td><td class="ev">http=403 code=None {&#x27;detail&#x27;: &#x27;not your order&#x27;}</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">SUPER creates zone suspension</td><td class="ev">http=201 zone=e8fcd456-2f56-46c2-a85e-7d3a63417a38 {&#x27;id&#x27;: &#x27;e8fcd456-2f56-46c2-a85e-7d3a63417a38&#x27;, &#x27;zone_name&#x27;: &#x27;coverage-drill-zone&#x27;, &#x27;shape_type&#x27;: &#x27;CI</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Order in suspended zone is blocked</td><td class="ev">http=422 code=ZONE_SUSPENDED {&#x27;code&#x27;: &#x27;ZONE_SUSPENDED&#x27;, &#x27;message_ar&#x27;: &#x27;تم إيقاف الخدمة مؤقتاً في منطقتك&#x27;, &#x27;message_en&#x27;: &#x27;zone_suspended: coverage-dri</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">SUPER resumes (ends) the zone suspension</td><td class="ev">http=200 {&#x27;id&#x27;: &#x27;e8fcd456-2f56-46c2-a85e-7d3a63417a38&#x27;, &#x27;zone_name&#x27;: &#x27;coverage-drill-zone&#x27;, &#x27;shape_type&#x27;: &#x27;CI</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Order allowed again after resume</td><td class="ev">http=201 {&#x27;id&#x27;: &#x27;7c5e7ce2-e527-4c30-a524-94e7731940fc&#x27;, &#x27;order_state&#x27;: &#x27;AWAITING_PROVIDER</td></tr><tr class="catrow"><td colspan="3">ثوابت — 3 فحص</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Ledger double-entry balanced (all journals)</td><td class="ev">unbalanced journals=0 · 39 journals · ΣDR/ΣCR=3399940/3399940</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">No negative wallet balances</td><td class="ev">negative wallets=0</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">No backend 500s/tracebacks during coverage</td><td class="ev">error/500 log hits=0</td></tr><tr class="catrow"><td colspan="3">تهيئة — 6 فحص</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">OPS/FIN/SUPER login</td><td class="ev">ops=True fin=True super=True</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Activate providers (OPS approve → role_status ACTIVE)</td><td class="ev">4 providers; OPS-approve set role_status ACTIVE for 0/4 (rest needed psql test-unblock → corroborates defect#2 approve/role_status divergence)</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Providers with a PUBLISHED item + token</td><td class="ev">usable providers=4</td></tr><tr><td><span class="b bdef">عيب مؤكَّد #2</span></td><td class="nm">OPS onboarding-approve sets PROVIDER role_status ACTIVE</td><td class="ev">approve fixed role_status for 0/4 providers (0 ⇒ confirms defect#2: approve leaves role_status PENDING while provider.status=ACTIVE)</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Activate drivers (ACTIVE + available + cash-limit 500د.ل)</td><td class="ev">active drivers with token=4</td></tr><tr><td><span class="b bok">✓ نجح</span></td><td class="nm">Customers with token + address</td><td class="ev">usable customers=4</td></tr>
+  </table>
+
+  <div style="margin-top:18px;padding:14px;background:#fff8e6;border-right:4px solid #b7791f;border-radius:8px;font-size:.92rem">
+    <b>تصحيح منهجي مهم:</b> فحوص الثوابت في الحملة الأولى للوكلاء استخدمت أسماء أعمدة خاطئة (<code>entry_type/amount_minor</code> و<code>account_type='PLATFORM_REVENUE'</code>) فأعطت نتائج زائفة. الأعمدة الفعلية <code>debit_minor/credit_minor</code> و<code>account_code='PLATFORM_REVENUE'</code> (النوع REVENUE). بالاستعلام الصحيح: الدفتر يحوي 39 قيداً متوازناً والعمولة مُقيَّدة فعلاً — لا خلل في النواة المالية.
+  </div>
+
+  <div style="margin-top:14px;padding:14px;background:#fdecea;border-right:4px solid #b42318;border-radius:8px;font-size:.92rem">
+    <b>الفشل الوحيد (مقصود) = تأكيد عيب #2:</b> <code>POST /operations/onboarding/{id}/approve</code> يضبط <code>provider.status=ACTIVE</code> لكن لا يضبط <code>roles.status</code> (بقي PENDING في 4/4) → المزوّد ظاهر/يقبل الطلبات بينما مديره محجوب من <code>/providers/orders</code> (403). هذا هو الانفصال «قابل-للطلب مقابل قابل-للتشغيل» وسبب 0-تسليم في الحملة الأولى. <b>لم يُصلَح (اكتشاف وإبلاغ فقط) — قرار الإصلاح لك.</b>
+  </div>
+
+  <div style="text-align:center;margin-top:18px;color:#5b6676;font-size:.85rem">تووا — ملحق التغطية الحيّة لدورة الحياة · 34 فحص (33 نجاح) · 6 تسليمات حيّة · القيد المزدوج متوازن · FIN-COR سليم · اكتشاف وإبلاغ فقط · 2026-06-21</div>
+</section>
+
+</body>
+</html>

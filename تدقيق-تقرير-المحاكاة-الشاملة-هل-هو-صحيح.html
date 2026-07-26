@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تدقيق تقرير المحاكاة الشاملة — هل هو صحيح؟ (مقارنة بالكود الفعلي)</title>
+<style>
+  :root{
+    --bg:#eef2f7;--card:#fff;--ink:#1f2d3d;--muted:#6b7a8d;
+    --primary:#12507b;--primary2:#2f80b8;
+    --true:#1f9d55;--true-bg:#e6f6ec;
+    --partial:#d98a00;--partial-bg:#fdf3e0;
+    --false:#c0392b;--false-bg:#fdeceb;
+    --radius:14px;--shadow:0 4px 22px rgba(20,50,80,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.9}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 1rem 4rem}
+  header.top{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border-radius:0 0 26px 26px;padding:2.6rem 2rem 2.2rem;box-shadow:var(--shadow)}
+  header.top h1{margin:0 0 .5rem;font-size:1.85rem}
+  header.top p{margin:.2rem 0;opacity:.94;font-size:.98rem}
+  .verdict-chip{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:.45rem 1rem;border-radius:999px;font-weight:700;margin-top:.9rem;font-size:1rem}
+  h2.sec{font-size:1.35rem;color:var(--primary);margin:2.4rem 0 .3rem;display:flex;align-items:center;gap:.6rem}
+  h2.sec .ic{width:38px;height:38px;background:var(--primary);color:#fff;border-radius:11px;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem;flex-shrink:0}
+  .sub{color:var(--muted);margin:.1rem 0 1rem;font-size:.95rem}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:1.5rem 1.7rem;margin:1rem 0}
+  .lead{font-size:1.05rem}
+  .kbd{background:#0f2233;color:#d7e6f2;font-family:Consolas,monospace;font-size:.78rem;padding:.08rem .4rem;border-radius:5px;direction:ltr;display:inline-block}
+  /* stat cards */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin:1.2rem 0}
+  .stat{background:#fff;border-radius:var(--radius);padding:1.1rem;text-align:center;box-shadow:var(--shadow);border-top:5px solid var(--primary)}
+  .stat .n{font-size:2.3rem;font-weight:800;line-height:1}
+  .stat .l{color:var(--muted);font-size:.85rem;margin-top:.3rem}
+  .stat.t{border-top-color:var(--true)}.stat.t .n{color:var(--true)}
+  .stat.p{border-top-color:var(--partial)}.stat.p .n{color:var(--partial)}
+  .stat.f{border-top-color:var(--false)}.stat.f .n{color:var(--false)}
+  /* legend */
+  .legend{display:flex;gap:1.3rem;flex-wrap:wrap;margin:.6rem 0 1rem;font-size:.9rem}
+  .legend span{display:inline-flex;align-items:center;gap:.4rem}
+  .dot{width:14px;height:14px;border-radius:4px;display:inline-block}
+  .dot.t{background:var(--true)}.dot.p{background:var(--partial)}.dot.f{background:var(--false)}
+  /* role bars */
+  .rolebar{display:grid;grid-template-columns:130px 1fr 46px;align-items:center;gap:.7rem;margin:.55rem 0}
+  .rolebar .name{font-weight:700;font-size:.9rem}
+  .track{display:flex;height:26px;border-radius:8px;overflow:hidden;background:#f0f3f7}
+  .track i{display:block;height:100%}
+  .track i.t{background:var(--true)}.track i.p{background:var(--partial)}.track i.f{background:var(--false)}
+  .track .lab{color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;min-width:14px}
+  .rolebar .tot{font-size:.82rem;color:var(--muted);text-align:center}
+  /* verdict tables */
+  table.v{width:100%;border-collapse:collapse;margin:.6rem 0;font-size:.9rem;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+  table.v th{background:var(--primary);color:#fff;padding:.6rem .7rem;text-align:right;font-size:.85rem}
+  table.v td{padding:.6rem .7rem;border-top:1px solid #eef2f6;vertical-align:top}
+  table.v tr:nth-child(even) td{background:#fafcfe}
+  .b{display:inline-block;padding:.16rem .55rem;border-radius:999px;font-size:.72rem;font-weight:800;white-space:nowrap}
+  .b.t{background:var(--true-bg);color:var(--true)}
+  .b.p{background:var(--partial-bg);color:var(--partial)}
+  .b.f{background:var(--false-bg);color:var(--false)}
+  .claim{font-weight:700}
+  .real{color:var(--muted);font-size:.85rem}
+  .real code{background:#eef3f8;color:#123;padding:.05rem .35rem;border-radius:4px;direction:ltr;display:inline-block;font-size:.76rem}
+  /* callout */
+  .callout{border-radius:var(--radius);padding:1.1rem 1.3rem;margin:1rem 0;box-shadow:var(--shadow)}
+  .callout.false{background:var(--false-bg);border-right:6px solid var(--false)}
+  .callout.ok{background:var(--true-bg);border-right:6px solid var(--true)}
+  .callout.warn{background:var(--partial-bg);border-right:6px solid var(--partial)}
+  .callout h3{margin:.1rem 0 .5rem;font-size:1.05rem}
+  .callout.false h3{color:var(--false)}.callout.ok h3{color:var(--true)}.callout.warn h3{color:var(--partial)}
+  ul.tidy{margin:.4rem 0;padding-inline-start:1.3rem}
+  ul.tidy li{margin:.35rem 0}
+  .analogy{background:linear-gradient(135deg,#fff,#eef6ff);border:1px dashed #a9c8e6;border-radius:var(--radius);padding:1.2rem 1.4rem;margin:1rem 0}
+  .analogy .big{font-size:1.5rem}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:2.5rem;padding-top:1.4rem;border-top:1px solid #dde5ee}
+  .toc{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem 1.3rem;margin:1.2rem 0}
+  .toc a{color:var(--primary);text-decoration:none;font-size:.9rem;display:inline-block;margin:.15rem .8rem .15rem 0;border-bottom:1px dashed #cdd}
+  svg{max-width:100%;height:auto}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin:.6rem 0;font-size:.82rem}
+  .flow .node{background:#eef3f8;border:1px solid #cfe0ee;border-radius:8px;padding:.35rem .6rem;font-weight:700}
+  .flow .node.bad{background:var(--false-bg);border-color:#f0bfb9;color:var(--false)}
+  .flow .node.good{background:var(--true-bg);border-color:#bfe6cd;color:var(--true)}
+  .flow .arw{color:var(--muted);font-weight:800}
+  @media(max-width:640px){.rolebar{grid-template-columns:96px 1fr 40px}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap" style="padding:0">
+    <h1>🔎 تدقيق «تقرير المحاكاة الشاملة» — هل هو صحيح؟</h1>
+    <p>فحصنا كل ادعاء في تقريرك الأصلي وقارنّاه <strong>سطراً بسطر بالكود الفعلي</strong> للمنصة (Backend + Web + Expo + Flutter).</p>
+    <p>الهدف: نقول لك بصدق ما هو <strong>صحيح</strong>، وما هو <strong>مبالغ فيه</strong>، وما هو <strong>خاطئ تماماً (إنذار كاذب)</strong>.</p>
+    <span class="verdict-chip">الخلاصة السريعة: التقرير الأصلي «جيد جداً في جوهره لكنه غير دقيق في تفاصيله» — 75% صحيح</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="toc">
+  <strong>محتويات هذا التدقيق:</strong>
+  <a href="#tldr">1) الحكم في سطر واحد</a>
+  <a href="#numbers">2) الأرقام والرسوم</a>
+  <a href="#byrole">3) النتيجة حسب كل دور</a>
+  <a href="#falsealarms">4) أخطر شيء: الإنذارات الكاذبة</a>
+  <a href="#meta">5) مشكلة «العنوان الخاطئ»</a>
+  <a href="#details">6) التفصيل الكامل لكل ادعاء</a>
+  <a href="#positives">7) النقاط الإيجابية</a>
+  <a href="#platform">8) جدول المنصات</a>
+  <a href="#do">9) ماذا تفعل الآن</a>
+</div>
+
+<!-- ============ 1. TLDR ============ -->
+<h2 class="sec" id="tldr"><span class="ic">١</span> الحكم في سطر واحد</h2>
+<div class="card lead">
+  <p><strong>تقريرك الأصلي صادق في الاتجاه العام: معظم العيوب التي ذكرها موجودة فعلاً في الكود.</strong>
+  لكنه <strong>ليس دقيقاً 100%</strong> كما يدّعي في مقدمته. المشاكل الثلاث فيه:</p>
+  <ul class="tidy">
+    <li>🟠 <strong>أرقام الأسطر والمقتطفات غالباً غير دقيقة</strong> — كثير منها «تقريبي» أو مُعاد كتابته من الذاكرة، وبعض الملفات والدوال المذكورة <em>غير موجودة أصلاً</em>.</li>
+    <li>🔴 <strong>7 ادعاءات خاطئة تماماً</strong> — بينها «ثغرات خطيرة» غير حقيقية (الكود يحميها فعلاً). لو صدّقتها وأصلحتها ستضيّع وقتك أو تكسر شيئاً سليماً.</li>
+    <li>🟠 <strong>8 ادعاءات مبالغ فيها</strong> — أصل المشكلة صحيح لكن النتيجة/الخطورة مضخّمة.</li>
+  </ul>
+  <p class="sub">النطاق: دقّقنا <strong>59 «بطاقة عيب» مفصّلة</strong> + <strong>13 نقطة إيجابية</strong> + <strong>جدول المنصات (19 صفاً)</strong>، عبر 8 فرق فحص متوازية قرأت الملفات الفعلية.</p>
+</div>
+
+<!-- ============ 2. NUMBERS ============ -->
+<h2 class="sec" id="numbers"><span class="ic">٢</span> الأرقام والرسوم التوضيحية</h2>
+<p class="sub">من أصل 59 ادعاءً مفصّلاً في تقريرك، هذا ما وجدناه بعد المقارنة بالكود:</p>
+
+<div class="stats">
+  <div class="stat t"><div class="n">44</div><div class="l">✅ صحيح تماماً</div></div>
+  <div class="stat p"><div class="n">8</div><div class="l">⚠️ صحيح جزئياً / مبالغ فيه</div></div>
+  <div class="stat f"><div class="n">7</div><div class="l">❌ خاطئ (إنذار كاذب)</div></div>
+  <div class="stat"><div class="n">59</div><div class="l">إجمالي ما دُقّق</div></div>
+</div>
+
+<div class="card">
+  <strong>نسبة الدقة الإجمالية (الرسم الدائري):</strong>
+  <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:.6rem">
+  <!-- Donut: 44/59=74.6% true(268.6deg), 8/59=13.6%(48.8deg), 7/59=11.9%(42.7deg) -->
+  <svg viewBox="0 0 240 240" width="240" role="img" aria-label="رسم دائري للنتائج">
+    <circle cx="120" cy="120" r="90" fill="none" stroke="#eef2f7" stroke-width="38"/>
+    <!-- true: start -90deg(top), length 268.6deg -->
+    <circle cx="120" cy="120" r="90" fill="none" stroke="#1f9d55" stroke-width="38"
+      stroke-dasharray="421.9 565.5" transform="rotate(-90 120 120)"/>
+    <!-- partial: after true (rotate -90+268.6=178.6) length 48.8deg -> dash 76.6 -->
+    <circle cx="120" cy="120" r="90" fill="none" stroke="#d98a00" stroke-width="38"
+      stroke-dasharray="76.6 565.5" transform="rotate(178.6 120 120)"/>
+    <!-- false: after (rotate 178.6+48.8=227.4) length 42.7deg -> dash 67.1 -->
+    <circle cx="120" cy="120" r="90" fill="none" stroke="#c0392b" stroke-width="38"
+      stroke-dasharray="67.1 565.5" transform="rotate(227.4 120 120)"/>
+    <text x="120" y="112" text-anchor="middle" font-size="40" font-weight="800" fill="#1f9d55">75%</text>
+    <text x="120" y="140" text-anchor="middle" font-size="15" fill="#6b7a8d">صحيح</text>
+  </svg>
+  <div>
+    <div class="legend" style="flex-direction:column;gap:.5rem">
+      <span><span class="dot t"></span> صحيح تماماً — 44 (75%)</span>
+      <span><span class="dot p"></span> مبالغ فيه — 8 (13%)</span>
+      <span><span class="dot f"></span> خاطئ تماماً — 7 (12%)</span>
+    </div>
+    <p class="sub" style="max-width:280px">بمعنى مبسّط: من كل 4 ملاحظات في التقرير، <strong>3 صحيحة</strong> وواحدة إما مبالغ فيها أو غلط.</p>
+  </div>
+  </div>
+</div>
+
+<!-- ============ 3. BY ROLE ============ -->
+<h2 class="sec" id="byrole"><span class="ic">٣</span> النتيجة حسب كل دور (رسم بياني)</h2>
+<p class="sub">طول كل شريط = عدد الادعاءات في ذلك الدور. الألوان توضّح كم منها صحيح/مبالغ فيه/خاطئ.</p>
+<div class="card">
+  <div class="legend">
+    <span><span class="dot t"></span> صحيح</span>
+    <span><span class="dot p"></span> مبالغ فيه</span>
+    <span><span class="dot f"></span> خاطئ</span>
+  </div>
+  <!-- widths: 1 claim = 34px -->
+  <div class="rolebar"><div class="name">👤 العميل</div>
+    <div class="track"><i class="t lab" style="width:238px">7</i><i class="p lab" style="width:68px">2</i><i class="f lab" style="width:34px">1</i></div><div class="tot">10</div></div>
+  <div class="rolebar"><div class="name">🏪 مالك المزود</div>
+    <div class="track"><i class="t lab" style="width:306px">9</i><i class="p lab" style="width:34px">1</i></div><div class="tot">10</div></div>
+  <div class="rolebar"><div class="name">👨‍💼 موظف المزود</div>
+    <div class="track"><i class="p lab" style="width:34px">1</i><i class="f lab" style="width:136px">4</i></div><div class="tot">5</div></div>
+  <div class="rolebar"><div class="name">🚗 السائق</div>
+    <div class="track"><i class="t lab" style="width:306px">9</i><i class="p lab" style="width:34px">1</i></div><div class="tot">10</div></div>
+  <div class="rolebar"><div class="name">🛡️ العمليات/الأدمن</div>
+    <div class="track"><i class="t lab" style="width:204px">6</i><i class="p lab" style="width:68px">2</i><i class="f lab" style="width:68px">2</i></div><div class="tot">10</div></div>
+  <div class="rolebar"><div class="name">🔒 الأمن المتقاطع</div>
+    <div class="track"><i class="t lab" style="width:442px">13</i><i class="p lab" style="width:34px">1</i></div><div class="tot">14</div></div>
+  <p class="sub" style="margin-top:1rem">👀 لاحظ الفرق الصارخ: قسم <strong>«الأمن المتقاطع»</strong> شبه ممتاز (13 من 14 صحيح)، بينما قسم <strong>«موظف المزود»</strong> هو الأسوأ — 4 من 5 ادعاءات فيه <strong>خاطئة</strong> (الكود يعالجها فعلاً).</p>
+</div>
+
+<!-- ============ 4. FALSE ALARMS ============ -->
+<h2 class="sec" id="falsealarms"><span class="ic">٤</span> أخطر ما في التقرير: الإنذارات الكاذبة</h2>
+<p class="sub">هذه الادعاءات <strong>خاطئة</strong> — الكود يفعل الصواب فعلاً. لو نفّذت «إصلاحاتها» ستضيّع وقتك أو تكسر ميزة سليمة. اقرأها بعناية:</p>
+
+<div class="callout false">
+  <h3>❌ 1. «أي مستخدم يستطيع إضافة رصيد لأي محفظة — ثغرة مالية كبرى» (OPS #3)</h3>
+  <p>ادّعى التقرير أن <span class="kbd">wallet-credit</span> يستخدم <span class="kbd">get_current_user</span> فيسمح لأي شخص. <strong>هذا غير صحيح.</strong> نعم السطر الأول يستخدم <span class="kbd">get_current_user</span>، لكن بعده مباشرة (الأسطر 1774–1785) يوجد فحص صلاحيات صريح يرفض أي أحد ليس <span class="kbd">OPS</span> أو <span class="kbd">SUPER_ADMIN</span> بـ 403، إضافةً إلى حدود قصوى للمبلغ. <strong>لا توجد ثغرة.</strong></p>
+  <div class="flow">
+    <span class="node">طلب wallet-credit</span><span class="arw">←</span>
+    <span class="node">get_current_user</span><span class="arw">←</span>
+    <span class="node good">فحص: هل أنت OPS/SUPER؟</span><span class="arw">←</span>
+    <span class="node bad">لا → 403 مرفوض</span>
+  </div>
+</div>
+
+<div class="callout false">
+  <h3>❌ 2. «الموظف يرى كود الدعوة + زر القبول التلقائي + إعدادات الأدمن» (موظف المزود #2 و#3 و#4)</h3>
+  <p>ثلاثة ادعاءات دفعة واحدة، وكلها <strong>خاطئة</strong>. في <span class="kbd">ProviderDashboard.tsx</span>:</p>
+  <ul class="tidy">
+    <li>بطاقة كود الدعوة مغلّفة فعلاً بشرط <span class="kbd">{isAdmin &amp;&amp; &lt;StaffInviteCard/&gt;}</span> (سطر 314) — الموظف <strong>لا</strong> يراها.</li>
+    <li>زر «القبول التلقائي» و«فتح/إغلاق المتجر» داخل كتلة <span class="kbd">{isAdmin &amp;&amp; (...)}</span> (أسطر 339–449) — والتعليق البرمجي نفسه يقول «يجب إخفاؤها عن الموظف».</li>
+    <li>إعدادات توزيع الطلبات في <span class="kbd">ProviderStaff.tsx</span> تظهر <strong>دائماً</strong> حتى بصفر موظفين — عكس ما ادّعى التقرير تماماً.</li>
+  </ul>
+</div>
+
+<div class="callout false">
+  <h3>❌ 3. «لا توجد صلاحية دقيقة لبدء التحضير» (موظف المزود #5)</h3>
+  <p>هذا الادعاء <strong>قديم/متجاوَز</strong>. الكود الحالي في <span class="kbd">start_preparation</span> يفرض فعلاً <span class="kbd">require_provider_permission("provider_order:prepare")</span>. نظام الصلاحيات الدقيقة <em>موجود ومفعّل</em> (أُضيف في Wave 2 وهجرة قاعدة البيانات ab04). التقرير يصف حالة الكود قبل هذا التحديث.</p>
+</div>
+
+<div class="callout false">
+  <h3>❌ 4. «إعادة تفعيل السائق لا تُلغي التعليق» (OPS #10)</h3>
+  <p>ادّعى أن <span class="kbd">reinstate</span> يحدّث <span class="kbd">User.status</span> فقط. الحقيقة أن التعليق والإلغاء آليتان <strong>متماثلتان ومتناظرتان</strong>: التعليق (سطر 5269) أيضاً يحدّث <span class="kbd">User.status</span> فقط، و<span class="kbd">is_suspended</span> آلية منفصلة تُدار عبر <span class="kbd">/suspend</span> و<span class="kbd">/lift-suspension</span>. التقرير خلط بين آليتين مستقلتين.</p>
+</div>
+
+<div class="callout false">
+  <h3>❌ 5. «الويب لا يدعم الفرنسية ولا المصادقة الثنائية 2FA» (جدول المنصات)</h3>
+  <p>كلاهما <strong>موجود في الويب</strong>: ملف <span class="kbd">i18n/fr.json</span> فيه 1170 سطراً و<span class="kbd">supportedLngs:["ar","en","fr"]</span>؛ والمصادقة الثنائية TOTP موجودة كاملة (<span class="kbd">ilSetup/ilEnable/ilVerify</span> مع تدفق <span class="kbd">pre_auth</span>) — الاسم التجاري لها «IL» فقط، لذلك فات على معدّ التقرير.</p>
+</div>
+
+<div class="callout false">
+  <h3>❌ 6. «حقل هاتف Expo يقطع الأرقام الدولية» (العميل #1)</h3>
+  <p><span class="kbd">maxLength={10}</span> موجود فعلاً، لكن الحقل مصمّم لاستقبال <strong>الأرقام المحلية</strong> (بدون +218)، ودالة <span class="kbd">toE164()</span> تضيف بادئة الدولة قبل الإرسال. لا يوجد «قطع» — قراءة خاطئة للسياق.</p>
+</div>
+
+<div class="callout warn">
+  <h3>⚠️ 7. «أي شخص يسجّل برقم غيره لأن التسجيل بلا OTP» (العميل #10) — مبالغ فيه بشدة</h3>
+  <p>ليس اختراعاً كاملاً لكنه مضلّل: متغيّر <span class="kbd">isOtpEnabled</span> المذكور <strong>غير موجود</strong>؛ الموجود ثابتٌ باسم <span class="kbd">REGISTRATION_OTP_REQUIRED = false</span>. والأهم: <strong>كل آلية OTP مبنية وموجودة</strong> (<span class="kbd">sendOtp / verifyRegistrationOtp</span>) لكنها <strong>مُطفأة عمداً</strong> عبر هذا الإعداد لأنه لا يوجد مزوّد SMS بعد. أي أنها مسألة تفعيل إعداد، لا «ثغرة تصميم» ولا كود ناقص.</p>
+</div>
+
+<!-- ============ 5. META ============ -->
+<h2 class="sec" id="meta"><span class="ic">٥</span> المشكلة المنهجية: «المشكلة صحيحة، لكن العنوان خاطئ»</h2>
+<div class="analogy">
+  <p class="big">🏚️ تشبيه بسيط:</p>
+  <p>تخيّل مفتّشاً زار مبنى وكتب: «يوجد تسريب ماء في <strong>الشقة 305</strong>». تذهب إلى الشقة 305 فتجدها سليمة — لكن التسريب موجود فعلاً في الشقة <strong>307</strong>. المفتّش <em>محقّ في وجود المشكلة</em>، لكنه <em>أخطأ في العنوان</em>.</p>
+  <p>هذا بالضبط حال تقريرك: كثير من العيوب <strong>حقيقية</strong>، لكن «العنوان» (المسار + رقم السطر + مقتطف الكود) <strong>غالباً غير دقيق</strong>.</p>
+</div>
+<div class="card">
+  <p><strong>أمثلة على «العناوين الخاطئة» التي وجدناها:</strong></p>
+  <ul class="tidy">
+    <li>🚫 <strong>ملفات مخترعة:</strong> التقرير يستشهد بـ <span class="kbd">backend/app/modules/drivers/driver_kyc_router.py</span> — <em>هذا الملف والمجلد غير موجودين أصلاً</em>. الكود الحقيقي في <span class="kbd">models/dispatch.py:337</span>.</li>
+    <li>🚫 <strong>دوال مخترعة:</strong> دالة <span class="kbd">assign_order_auto</span> (توزيع الطلبات) — لا وجود لها؛ الأسطر المذكورة تخص كتلة ترتيب طابور VIP.</li>
+    <li>🚫 <strong>متغيرات مخترعة:</strong> <span class="kbd">isOtpEnabled</span> و<span class="kbd">PaymentSelector</span> — أسماء غير موجودة في الكود.</li>
+    <li>📍 <strong>أرقام أسطر مزاحة:</strong> كثير من الاستشهادات تشير لأسطر قريبة من الصواب لكن ليست عليه (مثلاً «110–120» والدالة فعلياً عند 57، أو «78–156» في ملف طوله 69 سطراً فقط).</li>
+    <li>✍️ <strong>المقتطفات «إعادة صياغة» لا نسخ حرفي:</strong> رغم أن التقرير يَعِد في مقدمته بـ«مقتطف الكود الفعلي من المشروع».</li>
+  </ul>
+  <p class="sub">الخلاصة: <strong>ثق بجوهر الملاحظات، لا تثق بالإحداثيات.</strong> قبل إصلاح أي بند، ابحث عن الدالة بالاسم وتحقق من الملف الحقيقي — لا تعتمد على رقم السطر الوارد.</p>
+</div>
+
+<!-- ============ 6. DETAILS ============ -->
+<h2 class="sec" id="details"><span class="ic">٦</span> التفصيل الكامل — كل ادعاء وحكمه</h2>
+<p class="sub">لكل بند: الحكم، ثم «الحقيقة من الكود» بلغة مبسّطة مع الموقع الحقيقي.</p>
+
+<h3 style="color:var(--primary)">👤 دور العميل (10)</h3>
+<table class="v">
+  <tr><th style="width:34%">الادعاء في تقريرك</th><th style="width:14%">الحكم</th><th>الحقيقة من الكود</th></tr>
+  <tr><td class="claim">1. حقل هاتف Expo يقطع الأرقام الدولية</td><td><span class="b f">خاطئ</span></td><td class="real">الحقل يأخذ الرقم المحلي و<code>toE164()</code> يضيف +218 قبل الإرسال. لا قطع.</td></tr>
+  <tr><td class="claim">2. لا رسالة «توصيل ذاتي» في الدفع</td><td><span class="b t">صحيح</span></td><td class="real"><code>_provider_public_dict</code> لا يُرجع <code>delivery_method</code> للعميل، وصفحة الدفع لا تُظهر أن المزود يوصّل بنفسه.</td></tr>
+  <tr><td class="claim">3. غياب روابط التواصل الاجتماعي</td><td><span class="b t">صحيح</span></td><td class="real">نموذج <code>Provider</code> فيه <code>contact_phone</code> فقط؛ لا أعمدة فيسبوك/إنستغرام، ولا حقول في إعدادات الويب.</td></tr>
+  <tr><td class="claim">4. دفع Expo يدعم CASH فقط</td><td><span class="b t">صحيح</span></td><td class="real"><code>paymentMethod:'CASH'</code> ثابت. (لكن مكوّن «PaymentSelector» المذكور مخترع — لا يوجد.)</td></tr>
+  <tr><td class="claim">5. عنوان Flutter بلا إحداثيات GPS</td><td><span class="b t">صحيح</span></td><td class="real">النموذج يرسل label/address_line/city فقط، بلا lat/lng ولا خريطة. (أسماء الحقول في تقريرك مختلفة عن الواقع.)</td></tr>
+  <tr><td class="claim">6. صفحة مزود Flutter لا تفحص الإغلاق</td><td><span class="b t">صحيح</span></td><td class="real">لا فحص <code>is_open</code>؛ زر الإضافة للسلة فعّال دائماً.</td></tr>
+  <tr><td class="claim">7. تتبّع Expo بلا خريطة أو موقع سائق</td><td><span class="b p">جزئي</span></td><td class="real">«لا خريطة» صحيح، لكن «لا اشتراك/تحديث» <strong>خطأ</strong>: يوجد بث حي SSE + استطلاع كل 12 ثانية. والأسطر المذكورة تتجاوز نهاية الملف (69 سطراً).</td></tr>
+  <tr><td class="claim">8. لا شاشة محفظة في Expo</td><td><span class="b t">صحيح</span></td><td class="real">لا يوجد أي مسار/شاشة محفظة في تطبيق Expo.</td></tr>
+  <tr><td class="claim">9. لا تقييم للأصناف في Flutter</td><td><span class="b t">صحيح</span></td><td class="real">التقييم للمزود والسائق فقط، لا «صنف». (لكنها ليست «قائمة منسدلة» بل قسمَا نجوم ثابتان.)</td></tr>
+  <tr><td class="claim">10. تسجيل الويب بلا OTP (ثابت)</td><td><span class="b p">مبالغ فيه</span></td><td class="real">آلية OTP كاملة موجودة لكنها مُطفأة بإعداد <code>REGISTRATION_OTP_REQUIRED=false</code> (لا يوجد مزوّد SMS بعد). ليست ثغرة تصميم، والمتغيّر <code>isOtpEnabled</code> مخترع.</td></tr>
+</table>
+
+<h3 style="color:var(--primary)">🏪 دور مالك المزود (10)</h3>
+<table class="v">
+  <tr><th style="width:34%">الادعاء</th><th style="width:14%">الحكم</th><th>الحقيقة من الكود</th></tr>
+  <tr><td class="claim">1. لا زر إيقاف مؤقت مع قيود زمنية</td><td><span class="b t">صحيح</span></td><td class="real">مجرد مفتاح ثنائي <code>is_accepting_orders</code>؛ لا مفهوم pause/مدة/استئناف تلقائي.</td></tr>
+  <tr><td class="claim">2. لا موافقة منصة على العروض</td><td><span class="b t">صحيح</span></td><td class="real"><code>create_provider_promotion</code> يفعّل <code>is_active=True</code> فوراً حتى لو المموّل هو المنصة؛ لا عمود <code>approval_status</code>.</td></tr>
+  <tr><td class="claim">3. «الأرباح» مقابل «المبيعات»</td><td><span class="b p">جزئي</span></td><td class="real">تضارب التسمية حقيقي (Earnings تستخدم «الأرباح»، Dashboard «المبيعات»)، لكنهما ليسا نفس الرقم تماماً (تسويات مقابل مبيعات 30 يوماً).</td></tr>
+  <tr><td class="claim">4. لا إدارة مخزون في الكتالوج</td><td><span class="b t">صحيح</span></td><td class="real">لا عمود كمية على <code>CatalogItem</code>/<code>ItemVariant</code>. (يوجد <code>InventoryItem</code> لكنه مخزون مكوّنات/وصفات لا كمية بيع الصنف.)</td></tr>
+  <tr><td class="claim">5. سجل الطلبات بلا أوقات انتقال</td><td><span class="b t">صحيح</span></td><td class="real">يعرض رقم/مجموع/دفع/تاريخ فقط؛ لا أوقات قبول/تحضير/تعيين سائق.</td></tr>
+  <tr><td class="claim">6. الإعدادات تعيد 403 للموظف</td><td><span class="b t">صحيح</span></td><td class="real"><code>GET /providers/me</code> يتطلب <code>PROVIDER_ADMIN</code> فيرفض الموظف بـ 403.</td></tr>
+  <tr><td class="claim">7. عدم تطابق doc_type في KYC (Flutter)</td><td><span class="b t">صحيح</span></td><td class="real">قيم Flutter الأربع تُرفَض جميعاً بـ 422 مقابل <code>VALID_PROVIDER_DOC_TYPES</code> في الخادم.</td></tr>
+  <tr><td class="claim">8. Ledger يتوقع حقل summary مفقود</td><td><span class="b t">صحيح</span></td><td class="real">الخادم يُرجع entries+total فقط، فيبقى النصف العلوي فارغاً.</td></tr>
+  <tr><td class="claim">9. لا بطاقة «عروض» في لوحة المزود</td><td><span class="b t">صحيح</span></td><td class="real">الشبكة بلا بطاقة promotions (رغم وجود صفحة <code>ProviderPromotions</code>).</td></tr>
+  <tr><td class="claim">10. توزيع تلقائي بلا موازنة حمل</td><td><span class="b t">صحيح*</span></td><td class="real">صحيح في الجوهر، لكن دالة <code>assign_order_auto</code> المذكورة مخترعة؛ في الواقع «الوضع التلقائي» غير مُنفَّذ أصلاً — يوجد تعيين يدوي فقط.</td></tr>
+</table>
+
+<h3 style="color:var(--primary)">👨‍💼 دور موظف المزود (5) — القسم الأضعف في تقريرك</h3>
+<table class="v">
+  <tr><th style="width:34%">الادعاء</th><th style="width:14%">الحكم</th><th>الحقيقة من الكود</th></tr>
+  <tr><td class="claim">1. عنوان اللوحة يعتمد isAdmin بشكل غير كافٍ</td><td><span class="b p">جزئي</span></td><td class="real">العنوان مربوط فعلاً بـ isAdmin، لكن الكود المقتبس خطأ (<code>role==="PROVIDER_ADMIN"</code> لا <code>roles.includes</code>) ورقم السطر خطأ. قلق الدور المزدوج مجرد رأي تصميمي لا خلل مثبت.</td></tr>
+  <tr><td class="claim">2. كود دعوة موظف يظهر للموظف</td><td><span class="b f">خاطئ</span></td><td class="real">مغلّف بـ <code>{isAdmin &amp;&amp; &lt;StaffInviteCard/&gt;}</code> (سطر 314). الموظف لا يراه.</td></tr>
+  <tr><td class="claim">3. زر القبول التلقائي يظهر للموظف</td><td><span class="b f">خاطئ</span></td><td class="real">داخل كتلة <code>isAdmin</code> (339–449)، وتعليق الكود يؤكد إخفاءه عن الموظف.</td></tr>
+  <tr><td class="claim">4. لا إعدادات عامة عند صفر موظفين</td><td><span class="b f">خاطئ</span></td><td class="real">إعداد وضع التوزيع يظهر دائماً؛ سطر 140 هو رسالة «لا يوجد موظفون» — عكس الادعاء.</td></tr>
+  <tr><td class="claim">5. لا صلاحية دقيقة «بدء التحضير»</td><td><span class="b f">خاطئ</span></td><td class="real">متجاوَز: الكود الآن يفرض <code>require_provider_permission("provider_order:prepare")</code>.</td></tr>
+</table>
+
+<h3 style="color:var(--primary)">🚗 دور السائق (10)</h3>
+<table class="v">
+  <tr><th style="width:34%">الادعاء</th><th style="width:14%">الحكم</th><th>الحقيقة من الكود</th></tr>
+  <tr><td class="claim">1. عدم تطابق enum وثائق السائق</td><td><span class="b t">صحيح</span></td><td class="real">Web يرسل «LICENSE» وFlutter «DRIVER_LICENSE» بينما الخادم يطلب «DRIVING_LICENSE». التطابق فعلاً مكسور — لكن الفشل «صامت» عند بوابة الاعتماد لا 422 عند الرفع (الرفع يقبل نصاً حرّاً).</td></tr>
+  <tr><td class="claim">2. غياب حقل الرقم الوطني للسائق</td><td><span class="b t">صحيح</span></td><td class="real"><code>DriverVehicleProfile</code> بلا <code>national_id</code>.</td></tr>
+  <tr><td class="claim">3. غياب صور المركبة والتوكيلات في KYC</td><td><span class="b t">صحيح</span></td><td class="real">القيم الثلاث فقط. (لكن الملف المستشهَد به مخترع؛ الحقيقي <code>models/dispatch.py:337</code>.)</td></tr>
+  <tr><td class="claim">4. رقم اللوحة اختياري</td><td><span class="b t">صحيح</span></td><td class="real"><code>plate_number ... nullable=True</code> (سطر 141).</td></tr>
+  <tr><td class="claim">5. تطبيق سائق Expo هيكل فقط</td><td><span class="b t">صحيح</span></td><td class="real">مفتاح محلي فقط، أرباح 45000 ثابتة، زر القبول <code>onPress=()=&gt;undefined</code>.</td></tr>
+  <tr><td class="claim">6. لا شريط حالة الحساب (Flutter)</td><td><span class="b t">صحيح</span></td><td class="real">لا مكوّن StatusBadge ولا استدعاء account-status.</td></tr>
+  <tr><td class="claim">7. لا QR في استلام Flutter</td><td><span class="b t">صحيح</span></td><td class="real">مربّعات فحص + زر فقط؛ لا QR ولا استطلاع. (الويب لديه QR فعلاً كما ذُكر.)</td></tr>
+  <tr><td class="claim">8. لا حقل handoff في تسليم Flutter</td><td><span class="b p">جزئي</span></td><td class="real">لا كلمة «handoff»، لكن يوجد حقل «رمز التحقق» <code>_nonceCtrl</code> يرسل <code>proof_nonce</code> (هو نفسه رمز الخادم). نتيجة «يستحيل التسليم» مبالغ فيها.</td></tr>
+  <tr><td class="claim">9. لا معالجة إلغاء أثناء التوصيل</td><td><span class="b t">صحيح</span></td><td class="real">جلب لمرّة واحدة في <code>initState</code>؛ لا استطلاع/بث لكشف الإلغاء.</td></tr>
+  <tr><td class="claim">10. تسمية «بطاقة وطنية» تُقصي غير الليبيين</td><td><span class="b t">صحيح</span></td><td class="real">التسميات «بطاقة وطنية — الأمام/الخلف» بلا خيار جواز سفر.</td></tr>
+</table>
+
+<h3 style="color:var(--primary)">🛡️ دور العمليات/الأدمن (10)</h3>
+<table class="v">
+  <tr><th style="width:34%">الادعاء</th><th style="width:14%">الحكم</th><th>الحقيقة من الكود</th></tr>
+  <tr><td class="claim">1. total_today يجمع كل الطلبات</td><td><span class="b t">صحيح</span></td><td class="real"><code>sum(state_counts.values())</code> بلا فلتر تاريخ؛ المؤشر «اليوم» خاطئ فعلاً.</td></tr>
+  <tr><td class="claim">2. الموافقة الجماعية لا تفعّل السائق</td><td><span class="b t">صحيح</span></td><td class="real">تفعّل الأدوار والمزوّدين لا صفّ السائق؛ الموافقة الفردية تفعّله — فالسلوك غير متماثل.</td></tr>
+  <tr><td class="claim">3. wallet_credit مفتوح لأي مستخدم</td><td><span class="b f">خاطئ</span></td><td class="real">يوجد فحص صلاحيات صريح (OPS/SUPER وإلا 403) + حدود مبلغ. لا ثغرة.</td></tr>
+  <tr><td class="claim">4. تغيير كلمة المرور لا يُبطل JWT</td><td><span class="b t">صحيح</span></td><td class="real">يغيّر الهاش فقط؛ لا إبطال جلسات ولا token_version — الجلسة القديمة تبقى صالحة.</td></tr>
+  <tr><td class="claim">5. فلتر «المتأخرة» بعد الترقيم</td><td><span class="b t">صحيح</span></td><td class="real">التقسيم أولاً ثم الفلترة في Python — قد يُخفي شكاوى متأخرة في صفحات لاحقة.</td></tr>
+  <tr><td class="claim">6. استرداد بلا فحص حالة الطلب</td><td><span class="b t">صحيح</span></td><td class="real"><code>refund_request</code> بلا شرط الحالة النهائية — يمكن استرداد طلب قيد التنفيذ.</td></tr>
+  <tr><td class="claim">7. بوابات الإطلاق في الذاكرة فقط</td><td><span class="b p">جزئي</span></td><td class="real">حالة البوابة <strong>محفوظة في قاعدة البيانات</strong> (LaunchGateRecord)؛ فقط «تجاوز العَلَم» مؤقت. ادعاء «تُفتح بعد إعادة التشغيل» غير صحيح.</td></tr>
+  <tr><td class="claim">8. تعليق المناطق يحمّل كل السجلات</td><td><span class="b t">صحيح</span></td><td class="real">يحمّل كل النشِط ويفحص في Python بلا فهرس مكاني. (الخطورة منخفضة عملياً — العدد صغير.)</td></tr>
+  <tr><td class="claim">9. create_incident يقبل dict بلا تحقّق</td><td><span class="b p">جزئي</span></td><td class="real"><code>body: dict</code> وبلا حد أطوال — صحيح؛ لكن <code>severity</code> <strong>يُتحقَّق منه</strong> كقائمة قيم مسموحة، فادعاء «بلا تحقّق» مبالغ.</td></tr>
+  <tr><td class="claim">10. إعادة التفعيل لا تمسح is_suspended</td><td><span class="b f">خاطئ</span></td><td class="real">التعليق/الإلغاء آليتان متناظرتان؛ <code>is_suspended</code> مسار منفصل. خلط بين آليتين.</td></tr>
+</table>
+
+<h3 style="color:var(--primary)">🔒 الأمن المتقاطع (14) — القسم الأقوى في تقريرك</h3>
+<table class="v">
+  <tr><th style="width:34%">الادعاء</th><th style="width:14%">الحكم</th><th>الحقيقة من الكود</th></tr>
+  <tr><td class="claim">1. المستخدم المعلّق يمرّ عبر get_current_user</td><td><span class="b t">صحيح</span></td><td class="real"><strong>أخطر بند صحيح.</strong> قائمة الحظر تُفرَض فقط في <code>require_role</code>، أما نقاط النهاية التي تستخدم <code>get_current_user</code> المجرّدة (عرض المحفظة/الطلب/الشكوى) فيصلها المعلّق. (ملاحظة: إنشاء الطلب محمي بـ require_role.)</td></tr>
+  <tr><td class="claim">2. Refresh tokens تتجدد للأبد</td><td><span class="b t">صحيح</span></td><td class="real">كل تجديد يعطي 30 يوماً جديدة بلا سقف مطلق ولا عدّاد.</td></tr>
+  <tr><td class="claim">3. أكواد العروض لا تتبع استخدام كل عميل</td><td><span class="b t">صحيح</span></td><td class="real">فحص عام فقط؛ لا حد لكل عميل رغم تخزين <code>customer_id</code>.</td></tr>
+  <tr><td class="claim">4. Outbox يحذف عند أي 4xx</td><td><span class="b t">صحيح</span></td><td class="real">يحذف عند أي استجابة خادم؛ خطأ 422 عابر يُسقِط العملية بصمت.</td></tr>
+  <tr><td class="claim">5. XSS مخزّن في وصف المزود</td><td><span class="b t">صحيح</span></td><td class="real">يُخزَّن ويُرجَع الوصف خاماً بلا <code>bleach</code>. (رقم السطر مزاح.)</td></tr>
+  <tr><td class="claim">6. لا حد لحجم طلب HTTP</td><td><span class="b t">صحيح</span></td><td class="real">لا middleware يحدّ حجم الجسم.</td></tr>
+  <tr><td class="claim">7. إنشاء الطلب بلا rate limit مخصّص</td><td><span class="b t">صحيح</span></td><td class="real">حدّ عام لكل IP فقط، لا حدّ لكل مستخدم.</td></tr>
+  <tr><td class="claim">8. الشكاوى بلا rate limit لكل مستخدم</td><td><span class="b t">صحيح</span></td><td class="real">الحدّ العام فقط.</td></tr>
+  <tr><td class="claim">9. رسائل الدعم بلا rate limit للجلسة</td><td><span class="b t">صحيح</span></td><td class="real">لا حدّ لكل جلسة.</td></tr>
+  <tr><td class="claim">10. Correlation-ID قابل للتخمين</td><td><span class="b t">صحيح</span></td><td class="real"><code>millisecondsSinceEpoch</code> — قابل للتخمين/التصادم.</td></tr>
+  <tr><td class="claim">11. Idempotency-Key غير مستقر</td><td><span class="b p">جزئي</span></td><td class="real">المفتاح الاحتياطي يتغيّر، لكن إنشاء الطلب والتسليم/الكاش تستخدم مفاتيح <strong>ثابتة</strong>. نتيجة «طلبان بضغطة مزدوجة» غير صحيحة.</td></tr>
+  <tr><td class="claim">12. مسارات Flutter غير محمية (Deep-Link)</td><td><span class="b t">صحيح</span></td><td class="real">أسوأ مما ذُكر: كل المسارات في <code>ShellRoute</code> مشترك، والـ redirect لا يحرس المسارات المحمية حسب الدور.</td></tr>
+  <tr><td class="claim">13. reassign يتجاوز State Machine</td><td><span class="b t">صحيح</span></td><td class="real">يضبط الحالة مباشرة (والتعليق يعترف بذلك). (الدالة اسمها <code>reassign_driver</code> والسطر مختلف.)</td></tr>
+  <tr><td class="claim">14. غياب CI/CD بالكامل</td><td><span class="b t">صحيح</span></td><td class="real">لا <code>.github/workflows</code> ولا GitLab CI ولا Jenkinsfile.</td></tr>
+</table>
+
+<!-- ============ 7. POSITIVES ============ -->
+<h2 class="sec" id="positives"><span class="ic">٧</span> النقاط الإيجابية الـ13 — هل هي صحيحة؟</h2>
+<div class="callout ok">
+  <h3>✅ نعم — قسم الإيجابيات هو الأدق في التقرير كله</h3>
+  <p>من 13 نقطة، <strong>12 صحيحة تماماً</strong> وواحدة دقيقة عدا رقم واحد صغير:</p>
+  <ul class="tidy">
+    <li>حدود OTP متعدّدة الطبقات، حدّ دخول منفصل 12/دقيقة، حارس نوع JWT، عزل المزوّدين، معرّفات طلبات UUIDv4 عشوائية، منع الإلغاء بعد الاستلام، بوابات إثبات التسليم (نطاق 500م + منع إعادة + مطابقة نقدية)، OTP نقدي لمرة واحدة، لا حقن SQL، حساب الأسعار في الخادم، تطبيع الهاتف، فرض آلة الحالة — <strong>كلها مؤكّدة في الكود.</strong></li>
+    <li>⚠️ التصحيح الوحيد: حدّ رفع الملفات هو <strong>5 ميغابايت</strong> فعلياً، لا 10 كما ذُكر (بقية ضوابط الرفع — MIME + magic bytes + امتداد من الخادم — صحيحة).</li>
+  </ul>
+</div>
+
+<!-- ============ 8. PLATFORM TABLE ============ -->
+<h2 class="sec" id="platform"><span class="ic">٨</span> جدول مقارنة المنصات — دقيق مع تحفّظين مهمّين</h2>
+<div class="card">
+  <p>جوهر الجدول <strong>صحيح</strong>: Expo هو الأقل نضجاً، والويب هو الأكمل، وFlutter في المنتصف. لكن انتبه:</p>
+  <ul class="tidy">
+    <li>🟠 <strong>خطآن في عمود الويب:</strong> «لا فرنسية» و«لا 2FA» — <strong>كلاهما موجود في الويب</strong> (راجع الإنذار الكاذب #5).</li>
+    <li>🟠 <strong>Flutter أنضج مما يصوّره الجدول:</strong> كثير من الميزات موجودة لكن <em>مدمجة داخل شاشات أخرى</em> لا كملفات مستقلة (الجدولة/الوكالة/OTP النقدي/الديون داخل شاشة تأكيد الطلب؛ الخريطة والإلغاء داخل شاشة التتبّع)، وشحن المحفظة موجود فعلاً (بلا بوابة بطاقة فقط).</li>
+    <li>🟠 <strong>أسماء المكوّنات في التقرير «مفاهيمية»:</strong> مثل PromoInput/SchedulePicker/CodOtpModal — لا توجد بهذه الأسماء الحرفية كملفات، لكن وظائفها موجودة بأسماء أخرى.</li>
+    <li>✅ ما تأكّد غيابه فعلاً: تقييم الأصناف، شاشة استرداد مستقلة، شاشة شكوى للعميل، حذف الحساب، إعدادات الإشعارات — في Flutter.</li>
+  </ul>
+</div>
+
+<!-- ============ 9. DO NOW ============ -->
+<h2 class="sec" id="do"><span class="ic">٩</span> ماذا تفعل الآن؟ (توصية عملية)</h2>
+<div class="card">
+  <p><strong>🟢 أصلح هذه أولاً — مؤكّدة وحقيقية وعالية الأثر:</strong></p>
+  <ul class="tidy">
+    <li>🔒 <strong>SEC #1</strong> — منع المستخدمين المعلّقين على نقاط <code>get_current_user</code> (أخطر بند حقيقي).</li>
+    <li>💳 <strong>OPS #4</strong> — إبطال الجلسات/التوكنات عند تغيير كلمة المرور.</li>
+    <li>📊 <strong>OPS #1</strong> — تصحيح مؤشر «طلبات اليوم».</li>
+    <li>✅ <strong>OPS #2</strong> — الموافقة الجماعية تفعّل صفّ السائق.</li>
+    <li>💸 <strong>OPS #6</strong> — منع الاسترداد قبل الحالة النهائية.</li>
+    <li>🪪 <strong>KYC</strong> — توحيد قيم <code>doc_type</code> بين الويب/Flutter/الخادم (السائق والمزود).</li>
+    <li>🛡️ <strong>SEC #4</strong> (outbox) و<strong>SEC #12</strong> (حراسة مسارات Flutter) و<strong>XSS</strong> في وصف المزود.</li>
+  </ul>
+  <p><strong>🔴 تجاهل هذه — إنذارات كاذبة (لا تصلح ما ليس مكسوراً):</strong></p>
+  <ul class="tidy">
+    <li>OPS #3 (wallet-credit) · موظف المزود #2/#3/#4/#5 · OPS #10 · العميل #1 · «الويب بلا فرنسية/2FA».</li>
+  </ul>
+  <p><strong>🟠 راجعها بعين ناقدة — النتيجة مبالغ فيها:</strong></p>
+  <ul class="tidy">
+    <li>العميل #10 (OTP التسجيل مطفأ بإعداد، ليس ثغرة) · السائق #8 (حقل الرمز موجود) · SEC #11 (المفاتيح المهمّة ثابتة) · OPS #7 (البوابات محفوظة في DB) · OPS #9 (severity يُتحقَّق منه).</li>
+  </ul>
+  <p class="sub" style="margin-top:1rem">⚙️ <strong>وقبل كل شيء:</strong> لا تعتمد على أرقام الأسطر في التقرير الأصلي — ابحث عن كل دالة باسمها وتأكّد من الملف الحقيقي، لأن «العناوين» غالباً خاطئة حتى حين تكون المشكلة صحيحة.</p>
+</div>
+
+<footer>
+  تدقيق أُجري بمقارنة كل ادعاء بالكود الفعلي عبر 8 فرق فحص متوازية قرأت ملفات Backend / Web / Expo / Flutter مباشرةً.<br>
+  النطاق: 59 بطاقة عيب + 13 نقطة إيجابية + جدول 19 صفاً · النتيجة: <strong>44 صحيح · 8 مبالغ فيه · 7 خاطئ</strong> (دقة ≈ 75%).<br>
+  تاريخ التدقيق: 2026-07-01 · منصة توا (Tawa).
+</footer>
+
+</div>
+</body>
+</html>

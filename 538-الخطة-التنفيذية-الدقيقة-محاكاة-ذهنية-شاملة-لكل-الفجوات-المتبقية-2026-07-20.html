@@ -1,0 +1,533 @@
+<meta charset="utf-8">
+<title>تقرير 538 — الخطة التنفيذية الدقيقة: محاكاة ذهنية شاملة لكل الفجوات المتبقية من تقرير 537</title>
+<style>
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px 100px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 92ch; color: var(--ink); }
+  p.lead { font-size: 1.04rem; color: var(--ink-muted); max-width: 78ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.85em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🧠"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1100px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.48rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 64ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 88ch; font-size: 1.0rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.2rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.7rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; position: sticky; top: 0; background: var(--bg); z-index: 5; padding: 10px 0; }
+  nav.toc a { font-size: 0.72rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 50px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 0.94rem; color: var(--ink-muted); max-width: 90ch; margin-bottom: 20px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.92rem; max-width: 80ch; }
+  .plain b { color: var(--accent-deep); }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.92rem; max-width: 84ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.92rem; max-width: 84ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .info-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .info-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .info-box p { margin: 0; color: var(--info-ink); font-size: 0.92rem; max-width: 84ch; }
+  .info-box b { color: var(--info-ink); }
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 22px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.71rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  pre { background: #0d1611; color: #d7e6da; border-radius: 10px; padding: 12px 14px; overflow-x: auto; font-size: 0.72rem; direction: ltr; text-align: left; margin: 8px 0 14px; border: 1px solid #1d3324; }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.83rem; }
+  table th, table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; vertical-align: top; }
+  table th { background: var(--surface-2); font-weight: 700; color: var(--ink-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .table-wrap { overflow-x: auto; }
+  .stat-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 16px 0; }
+  .stat-mini { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; min-width: 130px; }
+  .stat-mini .n { font-size: 1.2rem; font-weight: 800; color: var(--accent-deep); font-family: var(--font-mono); }
+  .stat-mini .l { font-size: 0.72rem; color: var(--ink-muted); }
+
+  .fix-card { border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); background: var(--surface); padding: 18px 20px; margin-bottom: 14px; }
+  .fix-card .f-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .fix-card .f-id { font-family: var(--font-mono); font-weight: 800; font-size: 0.8rem; background: var(--surface-2); border-radius: 6px; padding: 2px 8px; }
+  .fix-card .f-title { font-weight: 800; font-size: 0.94rem; }
+  .fix-card .f-loc { font-size: 0.78rem; color: var(--ink-muted); margin-bottom: 10px; }
+  .fix-card .f-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; margin-top: 8px; }
+  @media (max-width: 780px) { .fix-card .f-grid { grid-template-columns: 1fr; } }
+  .fix-card .f-block { font-size: 0.83rem; }
+  .fix-card .f-block .k { font-weight: 800; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-deep); margin-bottom: 3px; }
+  .fix-card .f-block p { margin: 0; color: var(--ink-muted); font-size: 0.83rem; }
+  .fix-card .f-scenarios { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .fix-card .f-scenarios li { font-size: 0.81rem; color: var(--ink-muted); display: flex; gap: 6px; }
+  .fix-card .f-scenarios li::before { content: "▸"; color: var(--accent); flex-shrink: 0; }
+  .fix-card .f-rollback { margin-top: 10px; font-size: 0.78rem; background: var(--info-bg); color: var(--info-ink); border-radius: 6px; padding: 6px 10px; }
+
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; margin: 16px 0; }
+  @media (max-width: 760px) { .flow { grid-template-columns: 1fr; } .flow .arrow { transform: rotate(90deg); } }
+  .flow .box { border-radius: 10px; padding: 12px 14px; font-size: 0.82rem; border: 1px solid; }
+  .flow .box.before { background: var(--crit-bg); border-color: var(--crit-border); color: var(--crit-ink); }
+  .flow .box.after { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-ink); }
+  .flow .box .k { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.75; margin-bottom: 4px; }
+  .flow .arrow { font-size: 1.4rem; color: var(--ink-faint); text-align: center; }
+
+  .timeline { position: relative; margin: 24px 0; padding-inline-start: 26px; border-inline-start: 2px solid var(--border); }
+  .t-step { position: relative; margin-bottom: 22px; }
+  .t-step::before { content: ""; position: absolute; inline-size: 12px; block-size: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); inset-inline-start: -32px; top: 4px; box-shadow: 0 0 0 2px var(--accent); }
+  .t-step.warn::before { background: var(--accent-2); box-shadow: 0 0 0 2px var(--accent-2); }
+  .t-step.crit::before { background: var(--crit-ink); box-shadow: 0 0 0 2px var(--crit-ink); }
+  .t-step .t-title { font-weight: 800; font-size: 0.92rem; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .t-step .t-body { font-size: 0.84rem; color: var(--ink-muted); }
+
+  .engine-card { border: 2px solid var(--border); background: var(--surface); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 16px; }
+  .engine-card h4 { margin: 0 0 6px; font-size: 1.05rem; }
+  .engine-card .verdict { display: inline-block; margin-bottom: 10px; }
+
+  .roadmap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+  @media (max-width: 900px) { .roadmap-grid { grid-template-columns: 1fr 1fr; } }
+  .roadmap-col { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+  .roadmap-col h5 { margin: 0 0 8px; font-size: 0.82rem; font-weight: 800; }
+  .roadmap-col ul { margin: 0; padding-inline-start: 18px; font-size: 0.78rem; color: var(--ink-muted); }
+  .roadmap-col ul li { margin-bottom: 4px; }
+
+  footer { text-align: center; padding: 40px 0 10px; color: var(--ink-faint); font-size: 0.8rem; }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">🧠 تقرير 538 · محاكاة ذهنية شاملة + خطة تنفيذية دقيقة · 2026-07-20</span>
+    <h1>لكل فجوة متبقية من تقرير 537: أين بالضبط، ماذا يتصل بها، ما الذي يمكن أن ينكسر، وكيف نصلحه بأمان</h1>
+    <p class="lead">هذا التقرير ليس استنتاجات — كل سطر فيه ناتج عن قراءة مباشرة للكود الحيّ اليوم: مكان الإصلاح بالضبط (الملف والدالة)، كل ما يتصل به فعليًّا (مستدعون، اختبارات، ترحيلات، صفحات واجهة)، ترحيل قاعدة البيانات إن لزم، الأعراض الجانبية المحتملة، سيناريوهات محاكاة كاملة لما قد يحدث أثناء البناء وأثناء التشغيل الطبيعي، وخطة تراجع واضحة لكل بند. 24 فجوة من تقرير 537، مقسَّمة على 75+ نقطة فرعية، كل واحدة مدقَّقة بنفس الصرامة.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">75+</div><div class="l">نقطة فرعية، كل واحدة بموقع دقيق ودليل من الكود</div></div>
+      <div class="s"><div class="n">3</div><div class="l">اكتشافات حرجة عابرة للبنود تُعيد ترتيب الأولويات</div></div>
+      <div class="s"><div class="n">1</div><div class="l">قيد تشغيلي حاسم: حساب SUPER_ADMIN واحد فقط يحدّ من إصلاحات فصل السلطات</div></div>
+      <div class="s"><div class="n">3</div><div class="l">توصيات هندسية صريحة: لا تبنِ محرّكًا عامًّا حيث لا يستحق الخطر ذلك</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#cross-cutting">اكتشافات عابرة للبنود</a>
+  <a href="#roadmap">خارطة التنفيذ الموصى بها</a>
+  <a href="#c01-04">C-01 → C-04</a>
+  <a href="#c06-08">C-06 → C-08</a>
+  <a href="#c10-12">C-10 → C-12</a>
+  <a href="#c13-15">C-13 → C-15 + INIT-0</a>
+  <a href="#engines">المحرّكات الثلاثة</a>
+  <a href="#init9">أخطر بند أمني — INIT-9</a>
+  <a href="#init-rest">باقي المبادرات المعماريّة</a>
+  <a href="#summary">الخلاصة</a>
+</nav>
+
+<section id="cross-cutting">
+  <span class="section-eyebrow">🔑 اكتشافات عابرة للبنود</span>
+  <h2>ثلاثة اكتشافات، كل واحد منها يُعيد ترتيب أولويات عدّة بنود معًا</h2>
+  <p class="intro">أثناء التصميم العميق لكل فجوة على حدة، ظهرت حقائق لا تخصّ بندًا واحدًا فقط، بل تُغيِّر كيف يجب تسلسل عدّة بنود معًا. هذه هي أهمّ ثلاثة.</p>
+
+  <div class="crit-box">
+    <div class="ic">👤</div>
+    <p><b>1) المنصّة اليوم عليها حساب SUPER_ADMIN واحد فقط بتصميم مقصود (سقف صارم 1، مؤكَّد في الكود والاختبارات).</b> هذا الحساب الواحد يرث صلاحيتي الطلب والاعتماد معًا لكل شيء تقريبًا. معنى ذلك: أي إصلاح يفرض «الطالب لا يساوي المعتمِد» بصرامة كاملة فورًا — C-10(a) تحديدًا، ومسار الطوارئ الجديد في C-11(e) — سيوقف معالجة كل الاسترجاعات الكبيرة والقيود اليدوية الطارئة <b>فورًا</b> إن لم يكن هناك حساب FINANCE_AGENT ثانٍ فعليّ ونشط قبل التفعيل. هذا ليس تحذيرًا نظريًّا؛ حساب FINANCE_AGENT ثانٍ <b>قابل للإنشاء اليوم</b> عبر مسار ترقية موجود فعليًّا (`promote_ops_account`)، لكن لم يُستخدَم بعد على الأرجح. <b>القاعدة المطبَّقة في كل بند يتأثّر بهذا:</b> الإصلاح المنطقي (فحص الطالب≠المعتمِد) يُشحَن غير مشروط دائمًا — أبدًا لا يُؤجَّل — لكن أي بوابة تشغيلية جديدة (علم ميزة، فحص وجود شخصين) تُشحَن معه <b>معطَّلة افتراضيًّا</b>، مع بند عمل صريح: «تأكَّد من وجود حساب مالية ثانٍ نشط قبل التفعيل».</p>
+  </div>
+
+  <div class="warn-box">
+    <div class="ic">📅</div>
+    <p><b>2) رأس سلسلة ترحيلات قاعدة البيانات الفعليّ هو <code>ab51</code>، لا <code>ab36</code> كما تذكر ملفات المشروع الحاليّة.</b> تحقَّق أكثر من فريق تحقّق مستقلّ من هذا عبر أداة فحص السلسلة المباشرة (<code>alembic.script.ScriptDirectory.get_heads()</code>) وحصل على نفس النتيجة. أي ترحيل جديد لأيّ بند في هذا التقرير يجب أن يتفرَّع من <code>ab51</code>، لا من الرقم القديم الموثَّق. يُنصَح بتصحيح هذا التوثيق بشكل مستقلّ عن هذه الخطة، بأسرع وقت.</p>
+  </div>
+
+  <div class="info-box">
+    <div class="ic">⚙️</div>
+    <p><b>3) ثلاث «محرّكات» مطلوبة (INIT-1، INIT-2، INIT-4) — واحد منها فقط يستحق البناء الكامل بالفعل.</b> التحليل العميق لكل محرّك (قسم مخصَّص أدناه) خلص إلى توصية هندسية صريحة مختلفة لكل واحد: INIT-1 (واجهة القدرات) يستحق البناء لكن حجمه الحقيقيّ هو لمسة ميكانيكية على 500 موضع، لا تصميمًا معماريًّا جديدًا. INIT-2 (محرّك الموافقات) — الدليل يقول: لا تُعِد بناء منطق الاسترجاع الناضج والمختبَر؛ استخرج فقط فحص الهويّة المتكرِّر (الطالب≠المعتمِد) كقطعة عامّة صغيرة. INIT-4 (مصدر حقيقة واحد) أصلاً موجود ومُثبَت في مواضع أخرى؛ العمل المتبقّي ترحيل تدريجيّ منضبط، لا بناء محرّك من الصفر.</p>
+  </div>
+</section>
+
+<section id="roadmap">
+  <span class="section-eyebrow">🗺️ خارطة التنفيذ</span>
+  <h2>الترتيب الموصى به عبر كل الفجوات، مبنيّ على المخاطر الفعليّة المكتشفة لا الترتيب الأصليّ فقط</h2>
+  <div class="roadmap-grid">
+    <div class="roadmap-col">
+      <h5>🟢 الموجة 1 — منخفضة المخاطر، تبدأ فورًا</h5>
+      <ul>
+        <li>C-13 (5 مواضع صلاحيات واجهة — تبديل ثابت واحد لكل موضع)</li>
+        <li>C-04(a) الخيار الناقص في قائمة سبب الحلّ</li>
+        <li>C-01(a) التقاط IntegrityError</li>
+        <li>C-08 حقل استجابة «سُجِّل خروجك من الأجهزة الأخرى»</li>
+        <li>C-14.1 تسجيل/مقياس على مسار الفشل الصامت</li>
+        <li>C-15.2/C-15.3 (تسجيل التدقيق للقيد اليدوي/النزاع — منجز فعلًا هذه الجلسة)</li>
+      </ul>
+    </div>
+    <div class="roadmap-col">
+      <h5>🟡 الموجة 2 — تحتاج ترحيل قاعدة بيانات إضافي، بلا قيد تشغيليّ</h5>
+      <ul>
+        <li>C-01(b) الفهرس الفريد الجزئيّ لإصدار التطبيق</li>
+        <li>C-03(a)/(c) نتائج لكل عنصر + قفل تفاؤليّ POS</li>
+        <li>C-12(f) حالة «يحتاج إصلاحًا ماليًّا» الوسيطة</li>
+        <li>INIT-9(a)/(c) تصدير بيانات حقيقيّ + توسيع فحوصات الأهليّة</li>
+        <li>INIT-3(a)/(b)/(c) دعوات، اختيار شخصية، بصمة جهاز عشوائية</li>
+      </ul>
+    </div>
+    <div class="roadmap-col">
+      <h5>🟠 الموجة 3 — تحتاج بوابة تشغيليّة قبل التفعيل</h5>
+      <ul>
+        <li><b>C-10(a) فحص الموافقة الثانية للاسترجاع</b> — يحتاج تأكيد حساب مالية ثانٍ أولًا</li>
+        <li><b>C-11(e) مسار قيد الطوارئ</b> — نفس القيد بالضبط</li>
+        <li>C-06 (سقف SMS يوميّ + علم ميزة + FIN-COR إعادة بصمة)</li>
+        <li>C-14.3 قاطع الدائرة لمحرّك الصلاحيات</li>
+        <li>C-15.1 توقيع HMAC (نقطة قطع تاريخيّة، لا إعادة توقيع رجعيّ)</li>
+        <li><b>INIT-9 — إصلاح فشل فحص نزاع الدفع الصامت (أولويّة أمنيّة قصوى، قسم مخصَّص أدناه)</b></li>
+      </ul>
+    </div>
+    <div class="roadmap-col">
+      <h5>🔵 الموجة 4 — معماريّة كبرى، تُبنى بالتوازي مع الموجات أعلاه</h5>
+      <ul>
+        <li>INIT-1 واجهة القدرات (5 دفعات تدريجيّة، الماليّة/الهويّة آخرًا)</li>
+        <li>INIT-2 — استخراج فحص الهويّة المشترك فقط أولًا، لا محرّكًا كاملًا</li>
+        <li>INIT-4 — ترحيل مواضع المدفوعات الـ14 دفعة بدفعة، مع مقارنة YAML/DB قبل كل موضع</li>
+        <li>INIT-7 — دفعة تجريبيّة من 5-8 مهام (الأقلّ حساسيّة زمنيًّا)</li>
+        <li>INIT-5 — تبدأ بأصغر قسم (المستندات والجغرافيا)، تنتهي بالماليّة</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div id="c01-04"></div>
+<section>
+  <span class="section-eyebrow">🩹 المجموعة الأولى</span>
+  <h2>C-01 → C-04</h2>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-01(a)</span><span class="f-title">التقاط IntegrityError عند نشر إصدار متزامن، إرجاع 409</span><span class="pill ok" style="margin-inline-start:auto">منخفض المخاطر</span></div>
+    <div class="f-loc">📍 <code>backend/app/modules/operations/app_version_router.py</code> — دالة <code>publish_version</code></div>
+    <div class="f-grid">
+      <div class="f-block"><div class="k">يتصل بـ</div><p>مستهلك واحد فقط (زر النشر بلوحة العمليات). لا مستدعٍ آخر لهذه الدالة في المستودع.</p></div>
+      <div class="f-block"><div class="k">الترحيل</div><p>لا شيء بمفرده — يصبح ذا معنى فقط بعد C-01(b). يجب شحنهما معًا.</p></div>
+    </div>
+    <ul class="f-scenarios">
+      <li>مسؤولان ينشران لنفس المنصّة في نفس اللحظة → الثاني يصطدم بالقيد الجديد، يحصل على 409 واضح بدل خطأ 500 عام.</li>
+      <li>ترحيل C-01(b) لم يصل بعد لأحد الأهداف الثلاثة (تجزئة نشر جزئيّ) → القفل غائب هناك، السباق القديم لا يزال ممكنًا على ذلك الهدف تحديدًا حتى يكتمل النشر على الثلاثة.</li>
+    </ul>
+    <div class="f-rollback">🔙 إزالة كتلة try/except وحدها — آمن تمامًا، يعود لسلوك اليوم غير الضارّ.</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-01(b)</span><span class="f-title">فهرس فريد جزئيّ — نسخة «نشطة» واحدة لكل منصّة</span><span class="pill warn" style="margin-inline-start:auto">يحتاج تنظيف بيانات أولًا</span></div>
+    <div class="f-loc">📍 ترحيل جديد يتفرَّع من <code>ab51</code> (الرأس الفعليّ، لا <code>ab36</code>)</div>
+    <div class="f-grid">
+      <div class="f-block"><div class="k">شكل الترحيل</div><p>خطوة أولى: تنظيف أي تكرار حاليّ (الاحتفاظ بالأحدث نشطًا فقط) عبر <code>ROW_NUMBER()</code>. خطوة ثانية: <code>CREATE UNIQUE INDEX ... WHERE is_active = true</code>. جدول صغير، لا قفل يُذكر.</p></div>
+      <div class="f-block"><div class="k">التسلسل</div><p>الترحيل قبل الكود دائمًا — عكس الترتيب يعني القيد يُطبَّق قبل أن يصبح الكود قادرًا على التعامل مع الرفض.</p></div>
+    </div>
+    <ul class="f-scenarios">
+      <li>نشر جزئيّ على البيئات الثلاث (الترحيل وصل هدفًا، لم يصل آخر بعد) → السباق القديم يبقى ممكنًا على الهدف المتأخر فقط — التزام صارم بترتيب النشر الرباعيّ المعتمَد في المشروع يمنع هذا.</li>
+      <li>اختبار SQLite قد يحتاج صياغة مختلفة للفهرس الجزئيّ عن PostgreSQL — يجب التحقّق من سابقة مماثلة في نفس سلسلة الترحيلات قبل الافتراض أنه يعمل بلا تعديل.</li>
+    </ul>
+    <div class="f-rollback">🔙 <code>alembic downgrade -1</code> يحذف الفهرس فقط؛ خطوة تنظيف التكرار غير قابلة للتراجع لكنها غير ضارّة (تُسكِت تكرارًا كان خطأً أصلًا).</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-03(a)+(c)</span><span class="f-title">نتائج لكل عنصر في دفعة POS + قفل تفاؤليّ على السعر/المخزون</span><span class="pill crit" style="margin-inline-start:auto">أوسع أثرًا ممّا يبدو</span></div>
+    <div class="f-loc">📍 <code>backend/app/modules/integrations/pos_router.py</code> + <code>backend/app/models/catalog.py</code></div>
+    <div class="f-grid">
+      <div class="f-block"><div class="k">الاكتشاف الحاسم</div><p>القفل التفاؤليّ لا يحمي شيئًا إن طُبِّق على مسار POS فقط — نفس الحقول (<code>base_price</code>، <code>status</code>) تُكتَب أيضًا من مسار تعديل الكتالوج اليدويّ للمزوّد (<code>catalog_router.py</code>)، ومن خدمتَي الإشراف. أي مسار لا يشارك في فحص «الإصدار» يبقى قادرًا على الكتابة فوق تعديل POS بصمت، والعكس.</p></div>
+      <div class="f-block"><div class="k">الترحيل</div><p>عمود <code>version INTEGER DEFAULT 0</code> على جدولَي <code>item_variants</code> و<code>catalog_items</code> — إضافيّ وآمن، لا قفل جدول على PostgreSQL الحديث.</p></div>
+    </div>
+    <ul class="f-scenarios">
+      <li>إعادة محاولة POS متأخّرة (بعد السماح بإعادة معالجة FAILED من C-03b) تصادف أن مزوّدًا عدّل السعر يدويًّا في الأثناء عبر مسار لا يفحص الإصدار → الكتابة القديمة تفوز بصمت، بالضبط العيب الذي يُفترَض أن هذا الإصلاح يمنعه — ما لم يُحدَّث مسار التعديل اليدويّ أيضًا في نفس التغيير.</li>
+      <li>تعارض إصدار على عنصر واحد وسط دفعة من 100 يُسقِط الدفعة كاملة (بسبب SAVEPOINT الموجود أصلًا) — قرار منتج صريح مطلوب: هل هذا مقبول أم يجب تخطّي العنصر المتعارض فقط؟</li>
+    </ul>
+    <div class="f-rollback">🔙 <code>alembic downgrade -1</code> يحذف عمودَي الإصدار؛ العودة للكتابة المباشرة بلا فحص — آمن طالما لم يُفرَض <code>version</code> كمعامل إلزاميّ في أي واجهة برمجية عامّة.</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-04(a)</span><span class="f-title">قائمة اختيار سبب الحلّ الجماعيّ ناقصة قيمة، وناقصة في شاشتين لا شاشة واحدة</span><span class="pill warn" style="margin-inline-start:auto">يحتاج إذن نصّ واجهة</span></div>
+    <div class="f-loc">📍 <code>web/src/pages/operations/OpsBulkActions.tsx</code> <b>و</b> <code>OpsComplaints.tsx</code> (اكتشاف إضافيّ: نفس الفجوة في شاشة الحلّ الفرديّ أيضًا، لم تكن مذكورة في أي تقرير سابق)</div>
+    <div class="f-grid">
+      <div class="f-block"><div class="k">القيد المشروعيّ</div><p>هذا المشروع يمنع أي تعديل نصّ واجهة مرئيّ بلا إذن صريح من المشغّل — إضافة قيمة عربية جديدة («لصالح المنصّة») تحتاج هذا الإذن أولًا رغم أنها إصلاح خلل واضح.</p></div>
+      <div class="f-block"><div class="k">الأمان الخلفيّ</div><p>الخادم يرفض بالفعل أي قيمة غير معروفة — إضافة الخيار في الواجهة فقط تُعيد قدرة كانت موجودة في الخادم دومًا لكن غير قابلة للاستخدام.</p></div>
+    </div>
+    <div class="f-rollback">🔙 حذف السطر المُضاف من القائمة — بلا أي أثر بيانات.</div>
+  </div>
+</section>
+
+<div id="c06-08"></div>
+<section>
+  <span class="section-eyebrow">📱 المجموعة الثانية</span>
+  <h2>C-06 → C-08 — رموز التحقق والجلسات</h2>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-06(c)</span><span class="f-title">علم ميزة مخصَّص لتفعيل الإرسال الحقيقيّ — يمسّ ملفًّا محميًّا بالبصمة</span><span class="pill crit" style="margin-inline-start:auto">يحتاج إعادة بصمة FIN-COR</span></div>
+    <div class="f-loc">📍 <code>contracts/feature_flags.yaml</code> — ملفّ محميّ ببصمة SHA256 ثابتة يجب ألّا تتغيّر بلا إذن</div>
+    <div class="crit-box" style="margin:8px 0"><div class="ic">⚠️</div><p>إضافة أي علم جديد لهذا الملفّ تُغيِّر بصمته، وهذا يتطلَّب خطوة «إعادة تأسيس» موثَّقة صريحة، منفصلة عن مراجعة الكود العاديّة — هذا الملفّ من نوع الملفّات التي لا تُلمَس بلا وعي كامل بالأثر.</p></div>
+    <ul class="f-scenarios">
+      <li>العلم يبقى معطَّلًا بعد ضبط مزوّد SMS حقيقيّ في بيئة إنتاجية → إعادة إنتاج نفس عيب C-06 الأصليّ خلف علم جديد — يحتاج تنبيه إقلاع صريح إن كان المزوّد مضبوطًا والعلم معطَّلًا.</li>
+    </ul>
+    <div class="f-rollback">🔙 إعادة العلم إلى false في YAML (يتطلَّب إعادة تأسيس بصمة أخرى) أو التراجع عن فحص الكود — كلاهما يعيد سلوك اليوم بالكامل.</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-07(a)</span><span class="f-title">دمج رمز OTP والغرض في مفتاح Redis واحد ذرّيّ</span><span class="pill ok" style="margin-inline-start:auto">نافذة انتقالية قصيرة، لا تحتاج مسار احتياطيّ</span></div>
+    <div class="f-loc">📍 <code>backend/app/modules/identity/otp_service.py</code> + مُستدعيان في <code>auth_router.py</code>/<code>registration_router.py</code></div>
+    <div class="f-grid">
+      <div class="f-block"><div class="k">لماذا لا يحتاج مسارًا احتياطيًّا</div><p>مدّة صلاحية رمز OTP نحو 5 دقائق فقط — أي رمز بالصيغة القديمة يكون قد انتهى تمامًا خلال 5 دقائق من اكتمال النشر. المخاطرة الوحيدة نافذة ضيقة (≤5 دقائق) حيث رمز صيغة قديمة يُقرأ بكود جديد؛ يُرفَض برفض افتراضيّ آمن (المُطبَّق أصلًا)، لا بثغرة.</p></div>
+      <div class="f-block"><div class="k">أثر جانبيّ حقيقيّ</div><p>خلال نافذة النشر تلك، مستخدم شرعيّ قد يُطلَب منه طلب رمز جديد مرّة واحدة — مقبول وموثَّق كتكلفة نشر محدودة، لا عيبًا دائمًا.</p></div>
+    </div>
+    <div class="f-rollback">🔙 عودة لمفتاحين منفصلين في كلا الملفّين — لا فقدان بيانات لأن الصيغة الجديدة تحتوي كل معلومات القديمة.</div>
+  </div>
+</section>
+
+<div id="c10-12"></div>
+<section>
+  <span class="section-eyebrow">💰 المجموعة الثالثة — الأخطر ماليًّا</span>
+  <h2>C-10 → C-12 — فصل السلطات المالي</h2>
+  <p class="intro">هذه المجموعة تحمل الاكتشاف الأخطر في كل الخطة (موافقة الاسترجاع الثانية بلا أي فحص هويّة) والقيد التشغيليّ الأخطر (سقف حساب SUPER_ADMIN الواحد).</p>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-10(a)</span><span class="f-title">إضافة فحص هويّة لموافقة الاسترجاع الثانية — التي لا تملك أي فحص اليوم إطلاقًا</span><span class="pill crit" style="margin-inline-start:auto">حرج ماليّ — يحتاج بوابة تشغيلية</span></div>
+    <div class="f-loc">📍 <code>backend/app/modules/finance/refund_router.py</code> — دالة <code>finance_second_approve_refund</code></div>
+    <div class="flow">
+      <div class="box before"><div class="k">اليوم</div>موافقة الاعتماد النهائيّ الوحيدة تفحص «ليس أنا الطالب». موافقة «الثانية» ذاتها — بلا أي فحص من أي نوع.</div>
+      <div class="arrow">←</div>
+      <div class="box after"><div class="k">بعد الإصلاح</div>نفس فحص «الطالب لا يساوي المعتمِد» يُضاف في نقطة الموافقة الثانية نفسها — غير مشروط، يُشحَن دائمًا.</div>
+    </div>
+    <div class="f-grid">
+      <div class="f-block"><div class="k">القيد الحاسم</div><p>حساب SUPER_ADMIN محدود بـ1 بتصميم مقصود ومُختبَر. إن كان هذا الحساب الوحيد هو من يطلب ويعتمد كل شيء اليوم، هذا الفحص وحده يوقف كل استرجاع كبير فورًا.</p></div>
+      <div class="f-block"><div class="k">الحلّ</div><p>الفحص نفسه يُشحَن غير مشروط (لا تراجع عنه أبدًا). بوابة تشغيلية منفصلة (علم ميزة معطَّل افتراضيًّا) تتحقّق من وجود حساب مالية ثانٍ نشط قبل أن يُطلَب من الفحص أن يعمل بصرامة كاملة على الإنتاج.</p></div>
+    </div>
+    <div class="subhead">🔬 سيناريوهات محاكاة</div>
+    <ul class="f-scenarios">
+      <li>سباق تزامن: نفس الشخص يحاول الموافقة الثانية من جلستين — القيد الفريد على جدول الموافقات (موجود أصلًا) يمنع الاعتماد المزدوج بغضّ النظر عن الهويّة.</li>
+      <li>نافذة نشر جزئيّة: خادم قديم بلا الفحص يخدم طلبًا لثوانٍ أثناء التدرّج — مخاطرة محدودة الأثر ومقبولة، القيد الفريد على الصفّ يبقى خطّ الدفاع الأخير.</li>
+      <li>يحظر عمليات روتينية: بالضبط السيناريو الذي صُمِّمت البوابة التشغيلية لمنعه — وثيقة تحقّق تشغيليّ إلزامية قبل التفعيل، لا اختيارية.</li>
+    </ul>
+    <div class="f-rollback">🔙 إزالة سطر الفحص الواحد — لا مساس بالبيانات أو الترحيلات، تراجع كودي بحت.</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-11(e)</span><span class="f-title">مسار «قيد طوارئ» لـSUPER_ADMIN مع مراجعة إلزامية لاحقة</span><span class="pill crit" style="margin-inline-start:auto">أخطر بند تقنيّ في المجموعة — تجاوز موافقة ذاتية مصمَّم عمدًا</span></div>
+    <div class="f-loc">📍 نقطة نهاية جديدة في <code>manual_journal_router.py</code>، مقصورة على SUPER_ADMIN فقط</div>
+    <p class="muted" style="font-size:0.88rem">هذا البند فريد بين كل الـ75 نقطة: هو تصميم متعمَّد لثغرة تجاوز موافقة ذاتية — لأنه لا يوجد بنيويًّا «شخص آخر» يمكن أن يفحص ضده على حساب واحد مسموح به. الحماية هنا إجرائية (مراجعة لاحقة إلزامية موثَّقة)، لا تقنية.</p>
+    <ul class="f-scenarios">
+      <li>«المراجعة اللاحقة في نفس اليوم» بلا آلية تتبّع مهلة زمنية آليّة تتحوّل لوعد فارغ — يحتاج مهمة يوميّة تُعلِّم أي قيد طوارئ لم يُراجَع بعد.</li>
+      <li>SUPER_ADMIN يستخدم هذا المسار كطريق مختصر روتينيّ بدل المسار العاديّ — يحتاج تمييزًا واضحًا في أي لوحة مالية حتى يكون الاستخدام المفرط مرئيًّا فورًا.</li>
+    </ul>
+    <div class="f-rollback">🔙 تعطيل/حذف نقطة النهاية؛ أي قيد سبق ترحيله عبرها يبقى صحيحًا في دفتر الأستاذ (لا يحتاج عكسًا إلّا إن كان القيد نفسه خاطئًا).</div>
+  </div>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-12(f)</span><span class="f-title">حالة «يحتاج إصلاحًا ماليًّا» رسمية بدل «خسارة» صامتة</span><span class="pill ok" style="margin-inline-start:auto">آمن، بلا ترحيل قاعدة بيانات</span></div>
+    <div class="f-loc">📍 <code>backend/app/modules/finance/chargeback_router.py</code></div>
+    <div class="f-grid">
+      <div class="f-block"><div class="k">لماذا آمن</div><p>عمود الحالة نصّ حرّ بلا قيد CHECK — إضافة قيمة جديدة لا تحتاج ترحيلًا إطلاقًا، ولا واجهة أماميّة تقرأ هذا الجدول اليوم (تعمل على جدول منفصل) — سطح تعرّض صفريّ.</p></div>
+      <div class="f-block"><div class="k">الفجوة المصاحبة</div><p>بلا شاشة إدارية تعرض هذه الحالة، القضايا العالقة فيها تبقى غير مرئية — يحتاج بند متابعة صغيرًا (شاشة أو استعلام) ليكون التغيير مفيدًا عمليًّا لا نظريًّا فقط.</p></div>
+    </div>
+    <div class="f-rollback">🔙 عودة معالج الاستثناء لسلوكه القديم (تسجيل فقط)؛ أي قضية في هذه الحالة اليوم تُراجَع يدويًّا لا تُعاد تلقائيًّا لحالة «خسارة».</div>
+  </div>
+</section>
+
+<div id="c13-15"></div>
+<section>
+  <span class="section-eyebrow">🔐 المجموعة الرابعة</span>
+  <h2>C-13 → C-15 + INIT-0 — صلاحيات الواجهة، محرّك الصلاحيات، سجلّ التدقيق</h2>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-13.5</span><span class="f-title">استثناءات النقد — إصلاح مختلف نوعيًّا عن باقي المواضع الأربعة</span><span class="pill info" style="margin-inline-start:auto">دور → صلاحية</span></div>
+    <div class="f-loc">📍 <code>web/src/opsRouter.tsx</code> + <code>OpsTopNav.tsx</code></div>
+    <p class="muted" style="font-size:0.88rem">المواضع الأربعة الأخرى (القائمة العلوية، شريط المؤشرات) إصلاحها تبديل ثابت دور واحد بآخر أوسع. هذا الموضع مختلف: الخادم الحقيقيّ يفحص <b>صلاحية</b> (<code>cash:audit</code>) لا دورًا — وFINANCE_AGENT يملك هذه الصلاحية لكنه مستبعَد من كل حارس واجهة قائم على الدور. الإصلاح الصحيح هنا حارس مبنيّ على الصلاحية، لا توسيع قائمة الأدوار.</p>
+    <ul class="f-scenarios">
+      <li>FINANCE_AGENT يكتسب رؤية القائمة/الشارة لأول مرة (الأثر المقصود)؛ زرّ «حلّ» الإجراء يبقى مقصورًا على الأدوار الأربعة كما اليوم — فحصان منفصلان داخل نفس الشاشة، لا فحص واحد موسَّع.</li>
+    </ul>
+  </div>
+
+  <div class="fix-card">
+    <div class="f-head"><span class="f-id">C-15.1</span><span class="f-title">توقيع HMAC بدل SHA-256 عاديّ — بلا إعادة توقيع تاريخيّ رجعيّ</span><span class="pill warn" style="margin-inline-start:auto">نقطة قطع تاريخيّة (Epoch)، لا إعادة كتابة</span></div>
+    <div class="f-loc">📍 <code>backend/app/core/audit.py</code> — دالة <code>_chain_link</code></div>
+    <div class="crit-box" style="margin:8px 0"><div class="ic">🚫</div><p><b>لا تُعاد كتابة أي صفّ قديم إطلاقًا.</b> إعادة توقيع صفوف قديمة تعديل بحدّ ذاته — يخالف مبدأ «سجلّ لا يُعدَّل أبدًا» الذي بُني هذا القسم كلّه لأجله، ويصطدم فعليًّا بقيد قاعدة البيانات الذي يمنع UPDATE/DELETE. الحلّ: نقطة قطع صريحة («عصر HMAC») — صفوف ما قبل النشر تبقى SHA-256، صفوف ما بعده HMAC، أي أداة تحقّق مستقبلية تعرف الحدّ وتتبدَّل تلقائيًّا.</p></div>
+  </div>
+</section>
+
+<div id="engines"></div>
+<section>
+  <span class="section-eyebrow">⚙️ القسم الأعمق</span>
+  <h2>المحرّكات الثلاثة — حكم هندسيّ صريح لكل واحد، مبنيّ على الدليل لا على الطموح</h2>
+  <p class="intro">طُلِب من هذا التحليل تحديدًا أن يجيب: هل بناء محرّك عامّ مجرَّد هو القرار الصحيح فعلًا هنا، أم أن الدليل من الكود يقترح خطوة أضيق وأقلّ خطورة؟ الإجابات الثلاث مختلفة عن بعضها عمدًا.</p>
+
+  <div class="engine-card">
+    <h4>INIT-1 — واجهة القدرات الموحَّدة</h4>
+    <span class="verdict pill ok">✅ يستحق البناء — لكن حجمه الحقيقيّ مختلف عمّا يبدو</span>
+    <p class="muted" style="font-size:0.9rem">وُجِد فعليًّا: 500 موضع <code>require_role(</code> عبر 26 وحدة، و23 موضع <code>require_permission(</code> منفصلة — آليّتان مختلفتان تمامًا (الأولى دالة صرفة من الدور، الثانية تقرأ استثناءات فرديّة من قاعدة البيانات). التصميم الموصى به: تسجيل خفيف (<code>capability_gate</code>) يُلبِس كل <code>require_role</code> قائم بمفتاح ملاحة واحد، بلا إعادة كتابة منطق التفويض نفسه إطلاقًا — الجزء الصعب الحقيقيّ هو لمسة ميكانيكية على 500 موضع عبر 5 دفعات (الأقلّ حساسية أولًا، الماليّة والهويّة أخيرًا)، لا تصميم معماريّ جديد.</p>
+    <p class="muted" style="font-size:0.9rem"><b>الحماية من الانحراف أثناء الفترة الانتقالية:</b> فحص تلقائيّ في CI يقارن مخرجات نقطة القدرات الجديدة بجدول <code>opsAccess.ts</code> القديم لكل دور × كل مفتاح، طوال فترة الترحيل — بالضبط الفحص الذي كان سيكتشف أخطاء C-13 الأربعة فور حدوثها بدل أن تبقى صامتة لأسابيع.</p>
+  </div>
+
+  <div class="engine-card">
+    <h4>INIT-2 — محرّك الموافقات الموحَّد</h4>
+    <span class="verdict pill warn">⚠️ لا تبنِ محرّكًا كاملًا الآن — استخرج القطعة الصغيرة المتكرِّرة فقط</span>
+    <p class="muted" style="font-size:0.9rem">الدليل الفعليّ يناقض الإطار الأصليّ للمبادرة: نزاع الدفع لا يملك أي موافقة مزدوجة حقيقية اليوم (فحص هويّة واحد فقط)، والقيد اليدويّ حصل على نظامه الخاصّ <b>هذا الأسبوع</b> — «توحيد ثلاثة أنظمة ناضجة» ليس ما يحدث فعليًّا؛ الأنظمة الثلاثة تبتعد عن بعضها لا تقترب.</p>
+    <div class="flow">
+      <div class="box before"><div class="k">الخيار المرفوض</div>إعادة بناء منطق الاسترجاع الناضج (قفل صفوف، عتبة مبلغ، تحويلات ماليّة حقيقية مُختبَرة) داخل محرّك عامّ جديد.</div>
+      <div class="arrow">←</div>
+      <div class="box after"><div class="k">الموصى به</div>استخراج فحص «الطالب≠المعتمِد» فقط (سطر واحد متكرِّر 3 مرّات) كقطعة عامّة صغيرة. منطق تحريك الأموال يبقى بمكانه تمامًا، يُستدعى كدالّة منفَّذة مسجَّلة.</div>
+    </div>
+    <p class="muted" style="font-size:0.9rem">القيد اليدويّ تحديدًا: يُترَك بلا مساس الآن — أُصلِح للتوّ (نفس هذه الجلسة)، وإعادة هجرته مرّتين في نفس دورة الإصدار مخاطرة بلا فائدة مستخدم حقيقية.</p>
+  </div>
+
+  <div class="engine-card">
+    <h4>INIT-4 — مصدر حقيقة واحد للإعدادات</h4>
+    <span class="verdict pill info">ℹ️ المحرّك موجود أصلًا ومُثبَت — المتبقّي ترحيل منضبط، لا بناء</span>
+    <p class="muted" style="font-size:0.9rem"><code>is_enabled_3layer</code> موجودة وتعمل بالفعل في وحدتين أخريين من المستودع. العمل المتبقّي: 13 موضعًا فقط في وحدة المدفوعات (لا 14 كما افترضت الخطة الأصلية — أحد المواضع دالّة محلّية غير متعلّقة صادف أنها تحمل نفس الاسم). 7 من الـ13 على أعلام محمية أصلًا (SEALED)، الترحيل آمن بالبناء. الـ4 الباقية على أعلام غير محمية — تحتاج مقارنة صريحة بين قيمة YAML وقيمة قاعدة البيانات <b>قبل</b> ترحيل كل موضع تحديدًا، لأن أي فرق موجود سيغيِّر سلوك دفع حيّ فور الترحيل بصمت.</p>
+  </div>
+</section>
+
+<div id="init9"></div>
+<section>
+  <span class="section-eyebrow">🚨 أخطر بند في كل هذا التقرير</span>
+  <h2>INIT-9 — فحص نزاع الدفع أثناء حذف الهويّة يفشل بصمت ويسمح بالحذف</h2>
+  <p class="intro">هذا البند حصل على أعمق معالجة في كل الخطة لأنه البند الوحيد الذي يجمع بين: خطرًا أمنيًّا حقيقيًّا وقائمًا اليوم، إصلاحًا يمكن تطبيقه فورًا (لا يحتاج ترحيلًا ولا بوابة تشغيلية)، وسابقة مباشرة في نفس المستودع (C-14) تحدِّد بالضبط كيف يجب أن يبدو الحلّ.</p>
+
+  <div class="crit-box">
+    <div class="ic">🔓</div>
+    <p><b>الكود الحاليّ بالضبط:</b></p>
+  </div>
+  <pre><code>try:
+    dispute = (...).scalar_one_or_none()
+    if dispute:
+        return ("OPEN_DISPUTE", "...")
+except Exception:  # noqa: BLE001
+    pass   # ← أي عطل هنا = المتابعة كأن لا نزاع موجودًا</code></pre>
+
+  <div class="flow">
+    <div class="box before"><div class="k">اليوم</div>أي استثناء (عطل قاعدة بيانات، خطأ استيراد) → <code>pass</code> صامت → الحذف يتابع وكأنه تحقَّق من عدم وجود نزاع، بينما لم يتحقَّق فعليًّا من شيء.</div>
+    <div class="arrow">←</div>
+    <div class="box after"><div class="k">بعد الإصلاح</div>أي استثناء → إرجاع نفس شكل «نزاع مفتوح» (رفض الحذف) — مطابقًا تمامًا لمبدأ C-14 القائم بالفعل: «هذا الفحص لا يملك نسخة منخفضة المخاطرة؛ التدمير غير القابل للتراجع لا يحصل على استثناء المرور عند الشكّ.»</div>
+  </div>
+
+  <div class="subhead">🔬 ستّ محاكاة كاملة (بدل الثلاث المعتادة، نظرًا لخطورة هذا البند تحديدًا)</div>
+  <div class="timeline">
+    <div class="t-step"><div class="t-title">1) التشغيل العاديّ — لا نزاع</div><div class="t-body">الاستعلام ينجح، يُرجِع لا شيء، الحذف يتابع بشكل صحيح — بلا أي تغيير عن اليوم.</div></div>
+    <div class="t-step"><div class="t-title">2) التشغيل العاديّ — نزاع موجود</div><div class="t-body">الاستعلام ينجح، يجد النزاع، الحذف يُرفَض بشكل صحيح — بلا أي تغيير عن اليوم.</div></div>
+    <div class="t-step crit"><div class="t-title">3) عطل قاعدة بيانات أثناء هذا الاستعلام تحديدًا (الحالة الحرجة)</div><div class="t-body">اليوم: يمرّ الحذف بصمت رغم احتمال وجود نزاع مفتوح فعليًّا. بعد الإصلاح: يُرفَض الحذف برسالة واضحة قابلة لإعادة المحاولة — لا فقدان بيانات، فقط تأخير آمن.</div></div>
+    <div class="t-step crit"><div class="t-title">4) فاعل يستغلّ توقيت عطل معروف أو مفتعَل عمدًا لتمرير حذف حساب عليه نزاع مفتوح</div><div class="t-body">هذه ثغرة استغلال حقيقية اليوم — نافذة توقيت أي عطل تصبح نافذة تحايل أمنيّ. بعد الإصلاح، نفس التوقيت بالضبط يُنتج رفضًا نظيفًا بدل تحايل — النافذة تُغلَق كليًّا بغضّ النظر عن دقّة توقيت المهاجم.</div></div>
+    <div class="t-step"><div class="t-title">5) التفاعل مع الفحوصات الستّة الأخرى</div><div class="t-body">هذا الفحص رابع من سبعة؛ إن رفض فحص سابق أصلًا (رصيد محفظة موجب مثلًا)، لا يصل التنفيذ لهذا الاستثناء إطلاقًا — الإصلاح يغيِّر النتيجة فقط في الحالة التي يكون فيها هذا الفحص تحديدًا أوّل عائق كان سيُواجَه.</div></div>
+    <div class="t-step crit"><div class="t-title">6) المهمة اليوميّة غير المراقَبة تصادف نفس العطل (الأخطر عمليًّا)</div><div class="t-body">مسار الحذف اليدويّ على الأقلّ يمرّ عبر إنسان قد يلاحظ. مهمة التنظيف اليوميّة المجدولة (<code>account_deletion_cron.py</code>) لا يراقبها أحد سطرًا بسطر — عطل عابر هناك يعني حذفًا خاطئًا صامتًا تمامًا بلا أي شاهد. هذا على الأرجح أخطر تجلٍّ فعليّ لهذا الخلل في كل المنصّة.</div></div>
+  </div>
+
+  <div class="plain">
+    <div class="ic">✅</div>
+    <p><b>الإصلاح لا يحتاج ترحيل قاعدة بيانات، ولا تغيير توقيع دالّة، ولا بوابة تشغيلية.</b> هو تغيير سطر واحد داخل معالج استثناء موجود، يطبِّق مبدأً هذا المشروع نفسه أثبت صحّته بالفعل في C-14. هذا يجعله من أرخص الإصلاحات في كل الخطة تكلفةً، وأخطرها أثرًا لو تُرِك دون إصلاح.</p>
+  </div>
+</section>
+
+<div id="init-rest"></div>
+<section>
+  <span class="section-eyebrow">🏗️ باقي المبادرات المعماريّة</span>
+  <h2>INIT-3، INIT-5، INIT-6، INIT-7، INIT-8، INIT-10 — أهمّ نتيجة واحدة من كلٍّ</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>المبادرة</th><th>أهمّ نتيجة تصميم واحدة</th></tr></thead>
+    <tbody>
+      <tr><td>INIT-3(a) دعوات بدل كلمة مرور</td><td>نمط دعوة المزوّدين للطاقم موجود ويعمل فعليًّا اليوم — يُستنسَخ لحسابات العمليّات بدل بناء آليّة جديدة كليًّا</td></tr>
+      <tr><td>INIT-3(d) كشف <code>expires_at</code> في واجهة العمليّات</td><td>الخادم <b>مكتمل بالفعل</b> — الفجوة الوحيدة واجهة أمامية بحتة، بنمط جاهز مطابق تمامًا من صفحة طاقم المزوّد</td></tr>
+      <tr><td>INIT-5 دمج لوحة العمليّات</td><td>ترتيب الأمان: المستندات/الجغرافيا أوّلًا (4 مداخل، أقلّ خطرًا)، الماليّة أخيرًا (23 مدخلًا، الأعلى استخدامًا يوميًّا)</td></tr>
+      <tr><td>INIT-6(a) رفع ملفّات كشوف الحسابات</td><td>وحدة رفع KYC الحالية مقفلة على دلو ونوع ملف واحد لغرض التحقّق من الهويّة — التعميم الآمن يمرِّر اسم الدلو ونوع الملفّ كمعاملات، لا تعديل القائمة المشتركة نفسها</td></tr>
+      <tr><td>INIT-6(b) بوابة ترحيل مستحقّات السائقين الإلزامية</td><td>يحتاج جردًا فعليًّا لعدد الحسابات غير المُرحَّلة <b>قبل</b> التفعيل — قد يُجمِّد صرف مجموعة كبيرة من السائقين فجأة إن لم يُنفَّذ الترحيل التمهيديّ أولًا</td></tr>
+      <tr><td>INIT-7 الجرد الكامل لـ27 مهمة خلفية</td><td>دفعة تجريبية آمنة محدَّدة بدقّة: 5-8 مهام تنظيف/تنبيه بلا أثر على تجربة العميل الفوريّة، مع استبعاد صريح لمهمّة توزيع الأحداث الماليّة (SLA 15 ثانية) من أي دفعة مبكرة</td></tr>
+      <tr><td>INIT-8 الاستدعاء المحجوب في سياق غير متزامن</td><td>اكتشاف مهمّ: هذه الدالّة بلا أي مستدعٍ في الإنتاج اليوم (اختبارات فقط) — خطأ حقيقيّ لكنه خامل، يجب إصلاحه قبل أي ربط مستقبليّ بحدث طلب حقيقيّ، لا بعده</td></tr>
+      <tr><td>INIT-10 فصل مفتاح واحد لكل نوع قرار</td><td>نظام الأعلام ثلاثيّ الطبقات (INIT-4) الحاليّ لا يملك عمودًا لتخزين قيم مركَّبة (أوزان) — جدول سياسة مخصَّص أرخص من توسيع نظام الأعلام لغرض لم يُصمَّم له</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="summary">
+  <span class="section-eyebrow">📋 الخلاصة</span>
+  <h2>كل شيء في هذا التقرير مصدره الكود، لا الاستنتاج</h2>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="n">75+</div><div class="l">نقطة فرعية مصمَّمة بموقع دقيق ودليل</div></div>
+    <div class="stat-mini"><div class="n">7</div><div class="l">تحقيقات مستقلّة متوازية، كل واحدة تقرأ الكود الفعليّ مباشرة</div></div>
+    <div class="stat-mini"><div class="n">3</div><div class="l">اكتشافات جديدة لم تكن في أي تقرير سابق (أشهرها: INIT-3 الذرّية، ودالّة POS الخاملة)</div></div>
+  </div>
+  <div class="plain">
+    <div class="ic">✅</div>
+    <p>كل موقع إصلاح، كل مستدعٍ، كل ترحيل، كل سيناريو محاكاة في هذا التقرير مصدره قراءة مباشرة للملفّ المذكور — لا افتراض، ولا تعميم من تقرير سابق. حيثما وُجِد قيد تشغيليّ حقيقيّ (حساب SUPER_ADMIN الواحد) أو ملفّ محميّ ببصمة (FIN-COR)، ذُكِر صراحة كخطوة عمل يجب تنفيذها <b>قبل</b> التفعيل، لا كملاحظة هامشية. القرار النهائيّ بشأن أيّ بند يبدأ أوّلًا، وأيّ بوابة تشغيلية يجب تأمينها قبل كلّ إصلاح ماليّ، يبقى للمشغّل — هذا التقرير مادّة قرار جاهزة، لا أمر تنفيذ.</p>
+  </div>
+</section>
+
+<footer>تقرير 538 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-20</footer>
+
+</div>

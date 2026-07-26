@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>محاكاة 8 وكلاء — اكتشافات حيّة على staging</title>
+<style>
+  :root { --green:#0e7a4f; --green-soft:#e6f3ed; --red:#b3261e; --red-soft:#fde7e6;
+          --amber:#b86e00; --amber-soft:#fff3df; --blue:#1a73e8; --blue-soft:#eef5ff;
+          --purple:#7b1fa2; --purple-soft:#f3e5f5;
+          --gray:#5a5a5a; --border:#d8d8d8; }
+  body { font-family:"Noto Naskh Arabic","Amiri","Segoe UI",Tahoma,sans-serif;
+         max-width:1180px; margin:2rem auto; padding:0 1.25rem; line-height:1.85;
+         color:#1c1c1c; background:#fafafa; }
+  h1 { color:var(--green); border-bottom:3px solid var(--green); padding-bottom:0.5rem; }
+  h2 { color:var(--green); margin-top:2.5rem; background:var(--green-soft);
+       padding:0.6rem 0.9rem; border-radius:0 6px 6px 0; border-right:4px solid var(--green); }
+  h3 { color:#224d3a; margin-top:1.6rem; }
+  h4 { margin-top:1rem; margin-bottom:0.3rem; color:#333; }
+  .meta { color:var(--gray); font-size:0.92rem; margin-bottom:1.5rem; }
+  .badge { display:inline-block; padding:0.15rem 0.6rem; border-radius:999px;
+           font-size:0.82rem; font-weight:700; }
+  .badge.p0 { background:var(--red-soft); color:var(--red); }
+  .badge.p1 { background:var(--amber-soft); color:var(--amber); }
+  .badge.p2 { background:var(--blue-soft); color:var(--blue); }
+  .badge.p3 { background:#f3f3f3; color:var(--gray); }
+  .badge.ok { background:var(--green-soft); color:var(--green); }
+  .badge.fixed { background:var(--purple-soft); color:var(--purple); }
+  .card { background:white; border:1px solid var(--border); border-radius:10px;
+          padding:1.2rem 1.4rem; margin:1rem 0; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  .card.win { border-right:5px solid var(--green); }
+  .card.crit { border-right:5px solid var(--red); background:#fffbfb; }
+  .card.high { border-right:5px solid var(--amber); background:#fffcf6; }
+  .card.fact { border-right:5px solid var(--blue); background:#f9fbff; }
+  .agent-card { background:white; border:2px solid var(--border); border-radius:12px;
+                padding:1.1rem 1.3rem; margin:0.7rem 0; }
+  .agent-card .head { display:flex; justify-content:space-between; align-items:baseline; }
+  .agent-card .name { font-weight:800; color:var(--green); font-size:1.05rem; }
+  .agent-card .role { color:var(--gray); font-size:0.88rem; }
+  code { background:#f6f6f6; border:1px solid #eaeaea; border-radius:4px;
+         padding:0.05rem 0.35rem; font-size:0.92em; direction:ltr; display:inline-block;
+         font-family:"Fira Code","JetBrains Mono",monospace; }
+  pre { background:#1e1e2e; color:#e6e6e6; padding:0.9rem 1rem; border-radius:8px;
+        overflow-x:auto; direction:ltr; font-family:"Fira Code",monospace;
+        font-size:0.82rem; line-height:1.55; }
+  pre.ascii { background:#fafafa; color:#222; border:1px solid var(--border); direction:rtl;
+              text-align:right; }
+  table { width:100%; border-collapse:collapse; margin:0.75rem 0; background:white;
+          border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+  th, td { border:1px solid var(--border); padding:0.55rem 0.75rem; text-align:right; vertical-align:top; }
+  th { background:var(--green-soft); color:var(--green); font-weight:700; }
+  tr.bad td { background:#fff5f5; }
+  tr.ok td { background:#f0faf4; }
+  .file { font-family:"Fira Code",monospace; direction:ltr; display:inline-block; color:#224d3a; }
+  .kpi { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+         gap:0.6rem; margin:1rem 0; }
+  .kpi .box { background:white; border:1px solid var(--border); border-radius:8px;
+              padding:0.7rem 0.9rem; text-align:center; }
+  .kpi .box .v { font-size:1.45rem; font-weight:800; color:var(--green); }
+  .kpi .box .l { font-size:0.82rem; color:var(--gray); }
+  .toc { background:white; border:1px solid var(--border); border-radius:8px; padding:1rem 1.5rem; }
+  .toc a { color:var(--green); text-decoration:none; }
+  .pipeline { font-family:"Fira Code",monospace; white-space:pre; direction:ltr;
+              background:#1e1e2e; color:#e6e6e6; padding:0.9rem; border-radius:8px;
+              overflow-x:auto; font-size:0.78rem; line-height:1.5; }
+  ul.compact li { margin:0.18rem 0; }
+  details summary { cursor:pointer; font-weight:700; color:var(--green); padding:0.3rem 0; }
+</style>
+</head>
+<body>
+
+<h1>محاكاة 8 وكلاء — اكتشافات حيّة على staging</h1>
+<div class="meta">
+  📅 <strong>التاريخ:</strong> 2026-05-26 &nbsp;·&nbsp;
+  🌐 <strong>المنصّة:</strong> staging.tawanow.com (رأس DB: <code>aa15</code> — قبل نَشر 449) &nbsp;·&nbsp;
+  ⏱️ <strong>مدّة الـsim:</strong> ~28 دقيقة &nbsp;·&nbsp;
+  📍 <strong>إحداثيات حقيقية:</strong> طرابلس + بنغازي + تاجوراء + مصراتة
+</div>
+
+<div class="card win">
+<h3>التصميم — كيف عَملت المحاكاة بدقّة</h3>
+<ul class="compact">
+<li><strong>8 وكلاء مستقلّون</strong> كلّ منهم بشخصيّة + سيناريو + ذاكرة منفصلة — أُطلِقوا بالتوازي.</li>
+<li><strong>4 أدوار:</strong> مزوّدان (طرابلس + بنغازي) · سائقان (طرابلس + بنغازي) · عميلان (طرابلس + بنغازي) · مشرف OPS · مراقب التدفّقات.</li>
+<li><strong>لا VPN:</strong> الموقع يُحدَّد بـإحداثيات GPS التي يُرسلها السائق لـ<code>POST /dispatch/drivers/location</code> — أَنظف من VPN وأَدقّ. كل سائق أَرسل 3-4 نقاط GPS ليبية حقيقية مع <code>sleep 3</code> بينها.</li>
+<li><strong>كل وكيل كَتب تقريراً</strong> في <code>/tmp/agent_sim/reports/{id}.md</code> (8 ملفّات، 860 سطراً).</li>
+<li><strong>المراقب الكلّي</strong> فَحص logs الـbackend عبر SSH + استعلم DB حيّة + قَرأ تقارير الوكلاء الـ7.</li>
+</ul>
+</div>
+
+<h2>أرقام المحاكاة</h2>
+<div class="kpi">
+  <div class="box"><div class="v">8</div><div class="l">وكلاء مستقلّون</div></div>
+  <div class="box"><div class="v">322</div><div class="l">طلب HTTP في 15 د</div></div>
+  <div class="box"><div class="v">0</div><div class="l">خطأ 5xx (مستقرّ!)</div></div>
+  <div class="box"><div class="v">3</div><div class="l">عيوب 🔴 P0 حرجة</div></div>
+  <div class="box"><div class="v">8</div><div class="l">عيوب 🟠 P1 عالية</div></div>
+  <div class="box"><div class="v">11</div><div class="l">عيوب 🔵 P2/P3 متوسّطة</div></div>
+  <div class="box"><div class="v">7</div><div class="l">مُصلَحة فعلاً في 449</div></div>
+</div>
+
+<div class="toc">
+<strong>محتويات التقرير</strong>
+<ul class="compact">
+  <li><a href="#summary">١. الملخّص التنفيذي (3 سطور)</a></li>
+  <li><a href="#pipeline">٢. مخطّط الـpipeline — أين توقّف بالضبط</a></li>
+  <li><a href="#critical">٣. العيوب الحرجة <span class="badge p0">P0</span></a></li>
+  <li><a href="#high">٤. العيوب العالية <span class="badge p1">P1</span></a></li>
+  <li><a href="#medium">٥. العيوب المتوسّطة <span class="badge p2">P2</span> ومنخفضة <span class="badge p3">P3</span></a></li>
+  <li><a href="#agents">٦. ما رَآه كلّ وكيل (8 بطاقات)</a></li>
+  <li><a href="#already-fixed">٧. ما حَلّته مرحلة 449 بالفعل</a></li>
+  <li><a href="#wins">٨. ما عَمل بسلاسة (positive findings)</a></li>
+  <li><a href="#deploy">٩. ما يَنتظر إذنك</a></li>
+</ul>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="summary">١. الملخّص التنفيذي</h2>
+<div class="card crit">
+<ol style="line-height:2">
+<li><strong>الـBackend مُستقرّ تقنيّاً:</strong> 0×5xx في 322 طلب — لكن الـpipeline التشغيلي
+<strong>توقّف عند خطوة «اعتماد السائق»</strong> فلم يُنشأ طلب واحد ولم يُبثّ موقع واحد إلى الخريطة.
+السبب: <code>POST /operations/onboarding/{uid}/approve</code> يَرفض بـ422 «vehicle data required»
+<strong>بلا أيّ endpoint للمشرف لإكمال هذه البيانات</strong> → كل dispatch محجوب 403 → لا طلبات.</li>
+
+<li><strong>اكتشاف حرج خامل (P0) في الـbackground:</strong> حلقة <code>accept_timeout</code> sweep
+تَفشل <strong>كل دقيقة</strong> منذ ساعات بـ<code>InFailedSQLTransactionError</code> (&gt;100 مرّة/14ساعة).
+السبب الجذريّ: <code>CancelledError</code> من SSE/<code>BaseHTTPMiddleware</code> يَترك asyncpg
+transaction في حالة aborted ثم الـbackground job يَستعير نفس الـconnection → الـsafety-net
+لإنقاذ طلبات العملاء المعلَّقة معطّل في الإنتاج بصمت.</li>
+
+<li><strong>3 ثغرات أمنية/منطقية مؤكَّدة:</strong>
+(أ) <code>/files/upload</code> يَقبل ملفّ نصّي مع <code>Content-Type: image/jpeg</code> بلا magic-bytes
+[<strong>مُصلَح في 449-SEC</strong>]؛
+(ب) <code>PROVIDER_ADMIN</code> في حالة <code>PENDING_VERIFICATION</code> يَستطيع نشر صنف عمومي
+بـ<code>base_price_minor=null</code>؛
+(ج) <code>GET /providers/{id}</code> العام يُسرّب الاسم الكامل لمالك المتجر بلا توكن.</li>
+</ol>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="pipeline">٢. مخطّط الـpipeline — أين تَوقّف بالضبط</h2>
+<pre class="pipeline">┌──────────────────────────────────────────────────────────────────┐
+│  1) تسجيل المزوّد         ✅ 2/2 (نخيل، الواحة) — 201           │
+│  2) رفع وثائق المزوّد     ✅ 6/6 PENDING                        │
+│  3) اعتماد المزوّد         ✅ 2/2 ACTIVE (B: ~140ms)            │
+│  3.5) كتالوج المزوّد      ⚠️ صنف بـprice=null من PENDING (BUG)  │
+│                                                                  │
+│  4) تسجيل السائق          ✅ 2/2 (أحمد طرابلس + خالد بنغازي)    │
+│  5) رفع وثائق السائق      ✅ 6/6 PENDING                        │
+│  6) اعتماد وثائق السائق   ⚠️ 3/6 APPROVED فقط                   │
+│  7) اعتماد السائق نفسه    🔴 0/2 BLOCKED                        │
+│      └─ 422: «vehicle make/model/plate required»                 │
+│      └─ لا endpoint للمشرف لإكمال البيانات                       │
+│                                                                  │
+│              ▼ كل ما تحت هذه النقطة محجوب                        │
+│                                                                  │
+│  8)  السائق يُفعّل توفّره   🔴 403 — حسابك قيد المراجعة          │
+│  9)  بثّ موقع GPS           🔴 403 (DB: location_events=0)       │
+│  10) العميل يُنشئ طلباً     ⚠️ يَعمل لكن AWAITING_PROVIDER إلى   │
+│       الأبد لأن لا سائق متاح (D1: timed out بعد 5 د)             │
+│  11) dispatch → driver      🔴 not reached                       │
+│  12) pickup → delivery      🔴 not reached                       │
+│                                                                  │
+│  Background safety-net:                                          │
+│  • accept_timeout sweep    🔴 dormant: InFailedSQLTransactionErr │
+│                              كل 60 ث منذ ساعات (&gt;100 مرّة)      │
+└──────────────────────────────────────────────────────────────────┘
+نقطة التوقّف = الخطوة 7. مفتاح فتح كل ما تحتها.</pre>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="critical">٣. العيوب الحرجة <span class="badge p0">P0</span></h2>
+
+<div class="card crit">
+<h3>🔴 P0-1 — <code>accept_timeout</code> sweep معطّل صامتاً</h3>
+<p><strong>اكتشاف:</strong> SIM-E (المراقب).</p>
+<p><strong>ما يَحدث:</strong> حلقة الخلفية التي تُنقذ الطلبات العالقة (مزوّد لا يَقبل) تَفشل كل دقيقة:</p>
+<pre>logger=accept_timeout
+"Accept-timeout sweep failed: ... InFailedSQLTransactionError:
+ current transaction is aborted, commands ignored until end of transaction block"
+يَسبقها: CancelledError من <code>starlette.middleware.base.BaseHTTPMiddleware</code> على SSE</pre>
+<p><strong>السبب الجذريّ:</strong> عميل SSE يَنقطع → middleware يُلغي الـtask → asyncpg يَترك tx مفتوحة (لا commit/rollback) → الـconnection يَعود aborted إلى الـpool → الـbackground job يَلتقطه ويَفشل.</p>
+<p><strong>التأثير:</strong> في الإنتاج، أيّ طلب عميل لا يَجد مزوّداً يَقبل خلال المهلة سيَبقى عالقاً للأبد (الـsafety-net الذي بنيناه في مرحلة 447/ز-1 معطّل).</p>
+<p><strong>الإصلاح المقترَح:</strong> الـsweep يَفتح <code>async with AsyncSessionLocal()</code> session خاصّ به (لا يُشارك pool التطبيق) + <code>try/except InFailedSQLTransactionError → rollback → استئناف</code>.</p>
+</div>
+
+<div class="card crit">
+<h3>🔴 P0-2 — اعتماد السائق محجوب: لا يَستطيع المشرف إكمال بيانات المركبة</h3>
+<p><strong>اكتشاف:</strong> SIM-B (المشرف) + SIM-C1/C2 (السائقَين).</p>
+<p><strong>ما يَحدث:</strong> <code>POST /operations/onboarding/{user_id}/approve</code> يُرجع 422:</p>
+<pre>{"detail":"vehicle make/model/plate_number required"}</pre>
+<p><strong>الفجوة:</strong> الـregistration الحالي لا يَجمع <code>make/model/plate_number</code>. الـschema يَتطلّبها للاعتماد. لا <code>PATCH /operations/drivers/{id}/vehicle</code> ولا UI للمشرف يَملأها.</p>
+<p><strong>التأثير:</strong> أيّ سائق جديد يُسجّل ⇒ عالق للأبد ⇒ 0 سائقين جدد على المنصّة بلا تَعديل كود.</p>
+<p><strong>الإصلاح المقترَح:</strong>
+  (أ) إمّا إضافة الحقول في RegistrationPage للسائق (يَملأها نفسه)،
+  (ب) أو endpoint <code>PATCH /operations/drivers/{id}/vehicle</code> للمشرف يَملأها نيابةً،
+  (ج) أو فصل approve عن validation (approve يُمرّ، تَفعيل الـdispatch يَتأخّر حتى تَكتمل بيانات المركبة).
+</p>
+</div>
+
+<div class="card crit">
+<h3>🔴 P0-3 — محفظة العميل معطّلة كلّيّاً (Topup 500)</h3>
+<p><strong>اكتشاف:</strong> SIM-D2 (محمد).</p>
+<p><strong>ما يَحدث:</strong> <code>POST /wallets/topups</code> يُرجع 500 INTERNAL_ERROR على كل المحاولات:</p>
+<pre>جُرّب 5 قيم source_method: MANUAL_TEST, CASH_AGENT, BANK_TRANSFER, AGENT_DEPOSIT, WALLET_LOAD
++ 2 مبالغ مختلفة → كلّها 500</pre>
+<p><strong>التأثير:</strong> العميل لا يَستطيع شَحن محفظته ⇒ كل مسار <code>payment_method=WALLET</code> محجوب ⇒ منظومة المحفظة (HELD/COMMITTED/RELEASED) معطّلة فعليّاً للمستخدم النهائي.</p>
+<p><strong>الإصلاح المقترَح:</strong> فحص الـcorrelation_id في logs السيرفر لتَحديد الـtraceback، ثم إمّا (أ) كشف enum <code>source_method</code> في OpenAPI، (ب) أو إصلاح الـvalidation/handler.</p>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="high">٤. العيوب العالية <span class="badge p1">P1</span></h2>
+
+<table>
+<thead><tr><th>#</th><th>العيب</th><th>الـAgent المُكتشِف</th><th>التأثير</th><th>الحالة في 449</th></tr></thead>
+<tbody>
+<tr class="bad"><td>H1</td><td><strong>رفع ملفّ نصّي بـContent-Type: image/jpeg → 200 + ربط كوثيقة</strong> (لا فحص magic bytes)</td><td>A2, E</td><td>RCE / Stored XSS محتمل</td><td><span class="badge fixed">مُصلَح 449-SEC</span></td></tr>
+<tr class="bad"><td>H2</td><td><strong>PROVIDER_ADMIN حالته PENDING يَنشر صنفاً عمومياً</strong> بـ<code>base_price_minor=null</code> يَظهر للعملاء</td><td>A2, E</td><td>متجر «مفتوح بأسعار null» يَكسر السلّة</td><td>غير مُصلَح — يَحتاج 449-R01</td></tr>
+<tr class="bad"><td>H3</td><td><code>GET /api/providers/{id}</code> (anon) يُسرّب الاسم الكامل للمالك</td><td>A1, E</td><td>PII leak</td><td>غير مُصلَح — يَحتاج 449-R02</td></tr>
+<tr class="bad"><td>H4</td><td><strong>السائق «أعمى»</strong>: لا <code>GET /drivers/me/status</code> يَشرح ما يَنقصه (وثائق مرفوضة؟ بيانات مركبة ناقصة؟ مهلة؟)</td><td>C1, C2</td><td>دعم يَومي مرتفع · هَجر السائقين</td><td>غير مُصلَح — يَحتاج 449-R03</td></tr>
+<tr class="bad"><td>H5</td><td>المزوّد لا يَرى «<strong>وثائقي المطلوبة</strong>» (يَرى المرفوع فقط)</td><td>A2</td><td>فاطمة لا تَعرف أنّها ينقصها HEALTH</td><td><span class="badge fixed">مُصلَح 449-B</span> (compliance API)</td></tr>
+<tr class="bad"><td>H6</td><td>المزوّد النشط لا يَستطيع رفع/تَجديد وثيقة بعد الاعتماد</td><td>A1, A2</td><td>وثائق منتهية بلا مسار تجديد</td><td><span class="badge fixed">مُصلَح 449-B</span> (ProviderDocuments)</td></tr>
+<tr class="bad"><td>H7</td><td>أنواع الوثائق <strong>12 enum إنجليزيّ تقنيّ</strong>: <code>BUSINESS_REG, TRADE_LICENSE, ID_FRONT, ID_BACK, VAT_CERT, ESTABLISHMENT_LICENSE, COMMERCIAL_REGISTER…</code> غير مُعرَّب وفيه تكرار</td><td>A1, A2, C1, C2</td><td>UX سيّء + ضياع للمستخدم</td><td><span class="badge fixed">مُصلَح جزئياً 449-D</span> (Policies في OPS — قابلة للتعريب)</td></tr>
+<tr class="bad"><td>H8</td><td>OPS KPI <code>pending_onboarding=0</code> <strong>خاطئ</strong> بينما الصفّ فيه 2 سائقَين معلَّقَين</td><td>B</td><td>المشرف لا يَرى ما يَجب فعله صباحاً</td><td>غير مُصلَح — يَحتاج 449-R04</td></tr>
+</tbody>
+</table>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="medium">٥. العيوب المتوسّطة <span class="badge p2">P2</span> ومنخفضة <span class="badge p3">P3</span></h2>
+
+<table>
+<thead><tr><th>#</th><th>العيب</th><th>الـAgent</th><th>الحالة</th></tr></thead>
+<tbody>
+<tr><td>M1</td><td>33×404 من aliases مفقودة: <code>/drivers/me/location</code>، <code>/drivers/me/orders/active</code>، <code>/providers/me/catalog/items</code>…</td><td>C1, A2, E</td><td>P2 — أضف 308 redirects</td></tr>
+<tr><td>M2</td><td><strong>RBAC inversion:</strong> SUPER يَستطيع رؤية وثائق السائق لكن <strong>403</strong> على وثائق المزوّد</td><td>B, E</td><td>P2</td></tr>
+<tr><td>M3</td><td><code>provider_name=null</code> في رد <code>POST /orders</code> رغم تَوفّر <code>provider_id</code></td><td>D1</td><td>P2</td></tr>
+<tr><td>M4</td><td>لا feedback للعميل أثناء <code>AWAITING_PROVIDER_ACCEPTANCE</code> (لا «نَنتظر… 03:24 من 10:00»)</td><td>D1</td><td>P2 — UX</td></tr>
+<tr><td>M5</td><td><code>delivery_handoff_code=2440</code> بلا تفسير للعميل («أخبر السائق بهذا الرمز»)</td><td>D1</td><td>P3 — UX</td></tr>
+<tr><td>M6</td><td><code>delivery-quote</code> يَحسب رسم 500 د.ل على مسافة 651 كم (بنغازي↔طرابلس) بلا حدّ جغرافي</td><td>D2</td><td>P2 — يَحتاج radius cap</td></tr>
+<tr><td>M7</td><td><code>qty=9999</code> مَقبول → طلب 280k د.ل بلا <code>COD_HIGH_VALUE_OTP</code> (الحدّ 0)</td><td>D2</td><td>P2 — تَفعيل الـthreshold</td></tr>
+<tr><td>M8</td><td>لا فلتر <code>radius_km</code> في <code>/providers/search</code>؛ مسار <code>/providers/nearby</code> = 404</td><td>D2</td><td>P2 — UX حرج لتطبيق ليبي</td></tr>
+<tr><td>M9</td><td>لا endpoint <strong>عام</strong> للشكاوى (الحالي يَفرض ربطها بـorder)</td><td>D2</td><td>P3 — Talabat-style support</td></tr>
+<tr><td>M10</td><td>polling 60ث للطلب بينما SSE موجود (382/431) ولا يُستخدَم في صفحة التَتبّع للعميل</td><td>D1</td><td>P2 — كلفة شبكة على المستخدم الليبي</td></tr>
+<tr><td>M11</td><td>عقد API غير مُتّسق: <code>name</code>/<code>names_json</code>، <code>id</code>/<code>user_id</code>، <code>score</code>/<code>stars</code>، <code>detail:[]</code> مقابل <code>{code, message_ar, message_en}</code></td><td>D2</td><td>P2 — يَكسر تطبيقات native</td></tr>
+</tbody>
+</table>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="agents">٦. ما رَآه كلّ وكيل (8 بطاقات)</h2>
+
+<div class="agent-card">
+<div class="head"><span class="name">🍽️ SIM-A1 — عبدالرحمن «مطعم النخيل»</span><span class="role">مزوّد · طرابلس</span></div>
+<p><strong>أنجز:</strong> سَجّل + رَفع 3 وثائق (ESTABLISHMENT_LICENSE/HEALTH_CERTIFICATE/MANAGER_ID) → كلّها PENDING وجاهزة للمشرف.</p>
+<p><strong>اكتشف:</strong>
+<ul class="compact">
+<li>README الـsim ناقصه <code>device_id</code> و<code>confirm_password</code> (الـregister يَفرضهما)</li>
+<li>قيمة <code>LICENSE</code> مرفوضة (الصحيح <code>ESTABLISHMENT_LICENSE</code>) — 12 enum غير مُعرَّب</li>
+<li><strong>تَسريب أمني:</strong> <code>GET /providers/{id}</code> العام يُعيد الاسم الكامل للمالك «عبدالرحمن محمد السراج» بلا توكن</li>
+</ul></p>
+<p><strong>التقرير:</strong> <code>/tmp/agent_sim/reports/A1_provider_nakheel.md</code> (70 سطر)</p>
+</div>
+
+<div class="agent-card">
+<div class="head"><span class="name">☕ SIM-A2 — فاطمة «مقهى الواحة»</span><span class="role">مزوّدة · بنغازي</span></div>
+<p><strong>أنجز:</strong> سَجّلت + رَفعت وثيقتَين (ID_FRONT + TRADE_LICENSE)؛ الشهادة الصحية ناقصة قَصدياً.</p>
+<p><strong>اكتشفت 3 ثغرات:</strong>
+<ul class="compact">
+<li>🔴 <strong>أمن:</strong> رَفعت ملفّاً نصّياً 41 بايت بـ<code>Content-Type: image/jpeg</code> → 200 + ربط كوثيقة PENDING (لا magic bytes) ← <span class="badge fixed">مُصلَح 449-SEC</span></li>
+<li>🔴 <strong>منطق:</strong> وهي <code>PENDING_VERIFICATION</code> أَنشأت صنفاً ونَشرته عمومياً بسعر null</li>
+<li>⚠️ <code>PATCH /providers/catalog/items/{id} status:"PUBLISHED"</code> يُرجع 200 لكن يَبتلع التغيير ويُعيد DRAFT (UX خادع)</li>
+</ul></p>
+<p><strong>التقرير:</strong> <code>/tmp/agent_sim/reports/A2_provider_wahaa.md</code> (95 سطر)</p>
+</div>
+
+<div class="agent-card">
+<div class="head"><span class="name">🎛️ SIM-B — خالد «مشرف OPS»</span><span class="role">SUPER_ADMIN</span></div>
+<p><strong>أنجز:</strong> اعتمد المزوّدَين الجديدَين (200 في ~140ms) + 3/6 وثائق سائق.</p>
+<p><strong>اكتشف:</strong>
+<ul class="compact">
+<li>🔴 <strong>P0:</strong> اعتماد السائق نفسه يَفشل 422 «vehicle data required» — لا endpoint لإكمالها</li>
+<li>🔴 لا <code>/operations/document-inbox</code>، لا <code>/operations/zones</code>، لا <code>/operations/document-policies</code> (404 على 12 endpoint متوقَّع)</li>
+<li>🔴 KPI <code>pending_onboarding=0</code> خاطئ (في الـDB 2)</li>
+<li>⚠️ <code>GET /providers/{id}/documents</code> يُرجع 403 لـSUPER (RBAC inversion)</li>
+</ul></p>
+<p><strong>التقرير:</strong> <code>/tmp/agent_sim/reports/B_ops_manager.md</code> (113 سطر)</p>
+</div>
+
+<div class="agent-card">
+<div class="head"><span class="name">🛵 SIM-C1 — أحمد «سائق دراجة»</span><span class="role">سائق · طرابلس</span></div>
+<p><strong>أنجز:</strong> سَجّل + رَفع 3 وثائق + اعتمَدتها B (APPROVED).</p>
+<p><strong>تَعثّر:</strong> 6×403 «حسابك قيد المراجعة» على availability + 4 نقاط location + offers → لم يَستلم أيّ عرض، لم يَصل أيّ نقطة GPS لـOPS. 5×404 على aliases بديهية.</p>
+<p><strong>اقتراح:</strong> <code>GET /drivers/me/status</code> يَشرح ما الذي يَنقص + ETA الاعتماد.</p>
+<p><strong>التقرير:</strong> <code>/tmp/agent_sim/reports/C1_driver_ahmed.md</code> (70 سطر)</p>
+</div>
+
+<div class="agent-card">
+<div class="head"><span class="name">🚗 SIM-C2 — خالد «سائق سيّارة»</span><span class="role">سائق · بنغازي</span></div>
+<p><strong>أنجز:</strong> سَجّل + رَفع وثائق + اختَبر RBAC (<code>/operations/dashboard</code> → 403 ✓).</p>
+<p><strong>اكتشف:</strong>
+<ul class="compact">
+<li>«وضعية مشغول» غير موجودة كحالة منفصلة (الـAPI ثنائي <code>available true/false</code> فقط)؛ Uber/Bolt يَملكون 3 حالات (ONLINE/ON_TRIP/OFFLINE)</li>
+<li><code>/dispatch/drivers/me/earnings</code> = 404 (الصحيح <code>/drivers/me/earnings</code>) — حتى عند الإصلاح: 403 لـPENDING بلا وضوح</li>
+</ul></p>
+<p><strong>التقرير:</strong> <code>/tmp/agent_sim/reports/C2_driver_khaled.md</code> (71 سطر)</p>
+</div>
+
+<div class="agent-card">
+<div class="head"><span class="name">👩 SIM-D1 — ليلى «معلّمة»</span><span class="role">عميلة · طرابلس · CASH</span></div>
+<p><strong>أنجز:</strong> <strong>رحلة كاملة!</strong> سَجّلت + عنوان + تَصفّحت «كافيه كازا» (53 صنفاً) + طلبَت ساندويتش حلوم + ميني بيتزا = 24د.ل + رسم 6.870 = <strong>30.750 د.ل مُقرَّب فكّة 250 درهم ✓</strong> → تَتبّعت 5×60ث → الطلب بقي AWAITING_PROVIDER (المزوّد لم يَقبل) → أَلغته بنجاح.</p>
+<p><strong>3 عيوب UX:</strong>
+<ul class="compact">
+<li><code>Idempotency-Key</code> يَجب أن يُولّده الـclient لا الـbackend</li>
+<li>حقول <code>notes</code>/<code>phone</code> على العنوان <strong>تُسقَط صامتاً</strong> (الـField الحقيقي <code>delivery_notes_default</code>) → السائق لن يَرى ملاحظات العميل</li>
+<li>polling 60ث على شبكات ليبيا مُكلف بينما SSE موجود</li>
+</ul></p>
+<p><strong>إيجابي:</strong> معاينة الرسم قبل الإرسال تَعمل · فكّة 250 درهم صحيحة · رسائل خطأ ثنائية اللغة.</p>
+<p><strong>التقرير:</strong> <code>/tmp/agent_sim/reports/D1_customer_layla.md</code> (82 سطر)</p>
+</div>
+
+<div class="agent-card">
+<div class="head"><span class="name">👨‍💻 SIM-D2 — محمد «مهندس»</span><span class="role">عميل ناقد · بنغازي · WALLET</span></div>
+<p><strong>أنجز:</strong> رحلة CASH كاملة (تَسجيل → عنوان → طلب → إلغاء → شكوى → رسالة chat).</p>
+<p><strong>اكتشف 3 عيوب حرجة:</strong>
+<ul class="compact">
+<li>🔴 <strong>P0:</strong> <code>POST /wallets/topups</code> = 500 على كل المحاولات ⇒ المحفظة معطّلة كلّيّاً</li>
+<li>🔴 <code>delivery-quote</code> يَحسب 500 د.ل على 651 كم بلا حدّ + <code>qty=9999</code> = طلب 280k د.ل بلا OTP</li>
+<li>⚠️ عقد API غير مُتّسق (<code>id</code>/<code>user_id</code>، <code>name</code>/<code>names_json</code>) يَكسر apps native</li>
+</ul></p>
+<p><strong>إيجابي:</strong> Idempotency-Key قويّ (16-128 char، 409 على body مختلف) · RBAC نظيف بلا IDOR.</p>
+<p><strong>التقرير:</strong> <code>/tmp/agent_sim/reports/D2_customer_mohammed.md</code> (194 سطر)</p>
+</div>
+
+<div class="agent-card">
+<div class="head"><span class="name">🔍 SIM-E — المراقب الكلّي</span><span class="role">logs + DB + flow</span></div>
+<p><strong>أنجز:</strong> فَحص logs 15 دقيقة + استعلم 14 جدولاً + قَرأ تقارير الـ7 + رَسم الـpipeline.</p>
+<p><strong>اكتشاف P0 الحرج:</strong> <code>accept_timeout sweep</code> يَفشل كل دقيقة منذ ساعات (&gt;100 مرّة في 14 ساعة) بـ<code>InFailedSQLTransactionError</code> → الـsafety-net للطلبات المعلّقة <strong>معطّل صامتاً في الإنتاج</strong>.</p>
+<p><strong>الأرقام النهائية:</strong> 322 طلب HTTP / 0 خطأ 5xx / 33 خطأ 404 / 15 خطأ 422 / 0 طلبات إنشأت / 0 إحداثيات بُثَّت / 6 وثائق مزوّد + 6 وثائق سائق رُفعت / 4 OTP في staging logs.</p>
+<p><strong>التقرير:</strong> <code>/tmp/agent_sim/reports/E_monitor_full_analysis.md</code> (165 سطراً)</p>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="already-fixed">٧. ما حَلّته مرحلة 449 بالفعل (7 من 22)</h2>
+
+<table>
+<thead><tr><th>الفجوة</th><th>الـAgent المُكتشِف</th><th>أين أُصلِحت في 449</th></tr></thead>
+<tbody>
+<tr class="ok"><td>رفع ملفّ غير صحيح بـContent-Type مزوَّر يُقبَل</td><td>A2, E</td><td>449-SEC: 4 طبقات (whitelist MIME + magic bytes + 5MB cap + safe ext)</td></tr>
+<tr class="ok"><td>المزوّد النشط لا يَستطيع رفع وثائق</td><td>A1, A2</td><td>449-B: <code>ProviderDocuments</code> في ProviderSettings + endpoint compliance</td></tr>
+<tr class="ok"><td>المزوّد لا يَرى المطلوب مقابل المرفوع</td><td>A2</td><td>449-B: <code>GET /providers/me/document-compliance</code> + بطاقة state</td></tr>
+<tr class="ok"><td>لا inbox موحَّد للوثائق</td><td>B, E</td><td>449-D: <code>OpsDocumentInbox</code> + <code>GET /operations/document-inbox</code></td></tr>
+<tr class="ok"><td>لا سياسات وثائق قابلة للتعديل</td><td>B, E</td><td>449-D: <code>OpsDocumentPolicies</code> SUPER + endpoint PUT</td></tr>
+<tr class="ok"><td>لا إدارة جغرافية</td><td>B, E</td><td>449-C+D: <code>OpsGeographicRegions</code> + 9 مناطق + 66 بلدية مَزروعة</td></tr>
+<tr class="ok"><td>أنواع الوثائق غير قابلة للتعريب</td><td>A1, A2, C1, C2</td><td>449-D: <code>name_ar</code> في كل سياسة، قابلة للتعديل من OPS</td></tr>
+</tbody>
+</table>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="wins">٨. ما عَمل بسلاسة (positive findings)</h2>
+
+<div class="card win">
+<h4>تَقني (الـbackend مستقرّ)</h4>
+<ul class="compact">
+<li><strong>0×5xx</strong> في 322 طلب — البنية التحتية متينة</li>
+<li><strong>0 IDOR</strong> — كل وكيل حاوَل الوصول لبيانات وكيل آخر، كلّها رُدّت بـ403</li>
+<li><strong>Idempotency-Key</strong> قوي (16-128 char، 409 على body مختلف)</li>
+<li><strong>OTP في staging logs</strong> بصيغة <code>TAWA_STAGING_OTP phone_last4 device_id_prefix otp</code> — مفيد للـmulti-agent</li>
+<li><strong>RBAC نظيف:</strong> CUSTOMER لا يَصل OPS، DRIVER لا يَصل OPS، PROVIDER لا يَصل DRIVER، إلخ</li>
+</ul>
+</div>
+
+<div class="card win">
+<h4>UX (المنصّة مَفهومة للمستخدم العربي)</h4>
+<ul class="compact">
+<li>رسائل خطأ <strong>ثنائية اللغة</strong> (<code>message_ar/message_en</code>)</li>
+<li>أسماء عربية في <code>names_json.ar</code></li>
+<li><strong>معاينة رسم التوصيل</strong> قبل الإرسال (مرحلة 424) تَعمل بدقّة</li>
+<li><strong>فكّة 250 درهم</strong> (مرحلة 425): D1 شاهدت 24.000 + 6.870 = 30.870 → مقرَّبة لـ30.750 (الفرق 120 درهم تَلقاه المنصّة)</li>
+<li><strong>price_snapshot كامل</strong> في الطلب (يَحمي العميل من تغيير سعر بعد الإرسال)</li>
+</ul>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="deploy">٩. ما يَنتظر إذنك</h2>
+
+<div class="card crit">
+<h3>P0 — يَحتاج إصلاحاً قبل أيّ إطلاق إنتاج</h3>
+<ol>
+<li><strong>إصلاح <code>accept_timeout</code> sweep</strong> (~30 دقيقة عمل): تَعديل في <code>app/main.py</code> ليَفتح session خاصّ به + معالجة <code>InFailedSQLTransactionError</code>.</li>
+<li><strong>فتح خطوة اعتماد السائق</strong> (~1 ساعة): إضافة حقول vehicle في RegistrationPage أو endpoint <code>PATCH /operations/drivers/{id}/vehicle</code>.</li>
+<li><strong>إصلاح <code>POST /wallets/topups</code> 500</strong> (~1 ساعة): فحص الـtraceback عبر correlation_id + إصلاح handler.</li>
+</ol>
+</div>
+
+<div class="card high">
+<h3>P1 — جزء مُصلَح في 449 (يَحتاج النشر) + جزء يَحتاج عمل</h3>
+<ul class="compact">
+<li><strong>4 من 8</strong> P1 مُصلَحة في 449 — تَحتاج فقط النشر (<code>apply_migrations.sh</code> + <code>deploy_be.sh</code> + <code>deploy_web.sh</code>).</li>
+<li><strong>4 الأخرى</strong> تَحتاج عمل جديد:
+  <ul>
+    <li>H2 (نشر صنف من PENDING بـprice=null) → فرض <code>role_status==ACTIVE</code> + <code>base_price&gt;0</code></li>
+    <li>H3 (PII leak <code>/providers/{id}</code>) → إخفاء <code>owner_full_name</code> + <code>phone</code></li>
+    <li>H4 (السائق أعمى) → <code>GET /drivers/me/status</code></li>
+    <li>H8 (KPI pending خاطئ) → دمج DRIVER في الـcount</li>
+  </ul>
+</li>
+</ul>
+</div>
+
+<div class="card fact">
+<h3>الخيارات أمامك</h3>
+<ol>
+<li><strong>«أصلح P0 ال 3 + انشر 449»</strong> ← يَفتح المنصّة لـsim ثانٍ كامل (تَجد أنّ الـpipeline يَمرّ ل end-to-end)</li>
+<li><strong>«انشر 449 فقط»</strong> ← يَحلّ 7 فجوات، لكن السائق ما زال عالقاً (P0-2)</li>
+<li><strong>«أصلح P0-1 (accept_timeout) فقط»</strong> ← يُعيد الـsafety-net للعمل، يَكسب وقتاً للباقي</li>
+<li><strong>«أَطلق sim ثانٍ بعد أن تُكمل النواقص»</strong> ← أُكرّر المحاكاة لأرى التحسّن قياساً</li>
+</ol>
+</div>
+
+<hr style="margin:2rem 0; border:none; border-top:1px solid var(--border);" />
+<p style="text-align:center; color:var(--gray); font-size:0.85rem;">
+محاكاة 8 وكلاء حيّة على staging · 22 فجوة موثَّقة · 7 مُصلَحة فعلاً في 449 · 3 P0 يَحتاج عملاً · 2026-05-26
+</p>
+
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تدقيق عميق: أخطاء وتحسينات منظومة تووا (tawanow.com) — 2026-06-22</title>
+<style>
+  :root{
+    --green:#1b7f4f;--green-d:#0f5c38;--amber:#9a6b00;--red:#b3261e;--blue:#1558b0;--purple:#6b3fa0;
+    --bg:#f5f7f6;--card:#fff;--ink:#17241e;--muted:#5b6b63;--line:#dde6e1;
+    --ok:#e8f5ee;--okl:#9fd6b7;--warn:#fdf4e3;--warnl:#e9cd8f;--bad:#fdecea;--badl:#f0b3ad;--blbg:#e7eefb;--bll:#b9cdf0;--pur:#f1eafa;--purl:#cdb6ea;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;line-height:1.85}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f5c38,#1b7f4f);color:#fff;border-radius:18px;padding:34px;box-shadow:0 10px 30px rgba(15,92,56,.25)}
+  header.hero h1{margin:0 0 8px;font-size:25px;line-height:1.5}
+  header.hero p{margin:4px 0;opacity:.95;font-size:14px}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+  .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:12.5px}
+  h2{margin:34px 0 14px;font-size:21px;color:var(--green-d);border-right:6px solid var(--green);padding:8px 14px 8px 0;background:linear-gradient(90deg,#eef6f1,transparent)}
+  h3{margin:18px 0 9px;font-size:16px;color:var(--green-d)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:14px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#eef6f1;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fbfdfc}
+  .ok{background:var(--ok)!important}.warn{background:var(--warn)!important}.bad{background:var(--bad)!important}.bl{background:var(--blbg)!important}
+  .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;white-space:nowrap}
+  .pill.g{background:var(--ok);color:var(--green-d);border:1px solid var(--okl)}
+  .pill.a{background:var(--warn);color:var(--amber);border:1px solid var(--warnl)}
+  .pill.r{background:var(--bad);color:var(--red);border:1px solid var(--badl)}
+  .pill.b{background:var(--blbg);color:var(--blue);border:1px solid var(--bll)}
+  .pill.p{background:var(--pur);color:var(--purple);border:1px solid var(--purl)}
+  code{background:#eef2ef;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-family:"Cascadia Code",Consolas,monospace;font-size:12px;direction:ltr;display:inline-block}
+  pre{background:#10241b;color:#d7ffe9;border-radius:12px;padding:14px;overflow:auto;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.6px;line-height:1.5}
+  pre .c{color:#7fb89a}pre .r{color:#ff9a8c}pre .y{color:#ffd479}pre .g{color:#7fffb0}pre .b{color:#8cc6ff}
+  .diag{background:#0e1f18;border-radius:12px;padding:16px;color:#d7ffe9;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.7px;line-height:1.62;overflow:auto;white-space:pre}
+  .diag .y{color:#ffd479}.diag .r{color:#ff9a8c}.diag .g{color:#7fffb0}.diag .b{color:#8cc6ff}.diag .m{color:#d9a8ff}.diag .c{color:#7fb89a}
+  .simple{background:#eef6ff;border:1px solid var(--bll);border-radius:10px;padding:11px 13px;margin:9px 0;font-size:13.5px}
+  .simple b{color:var(--blue)}
+  .tech{background:#f3fbf6;border:1px solid var(--okl);border-radius:10px;padding:11px 13px;margin:9px 0;font-size:13px}
+  .tech b{color:var(--green-d)}
+  .note{font-size:12.3px;color:var(--muted)}
+  .dash{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+  .kpi{flex:1 1 150px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center}
+  .kpi.r{background:var(--bad);border-color:var(--badl)}.kpi.a{background:var(--warn);border-color:var(--warnl)}.kpi.g{background:var(--ok);border-color:var(--okl)}
+  .kpi .n{font-size:17px;font-weight:800;color:var(--green-d)}.kpi.r .n{color:var(--red)}.kpi.a .n{color:var(--amber)}
+  .kpi .l{font-size:11px;color:var(--muted)}
+  .toc{columns:2;font-size:14px;gap:24px}@media(max-width:760px){.toc{columns:1}}
+  .toc a{color:var(--blue);text-decoration:none;display:block;padding:3px 0}
+  .sev{font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px;margin-left:6px}
+  .s-crit{background:var(--bad);color:var(--red)}.s-high{background:var(--warn);color:var(--amber)}.s-med{background:var(--blbg);color:var(--blue)}.s-low{background:#eee;color:#555}
+  .footer{margin:30px 0 8px;text-align:center;color:var(--muted);font-size:12.5px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;margin:6px 0}
+  .legend span{padding:3px 9px;border-radius:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تدقيق عميق نقطة-بنقطة: أخطاء وتحسينات منظومة تووا</h1>
+  <p>الهدف: السيرفر الأصليّ <code>tawanow.com</code> + المسار المحلّي للكود · مقارنة كل نقطة بالكود الفعليّ (file:line) · أحدث التقنيات (2024–2026)</p>
+  <p>التاريخ: 2026-06-22 · المنهج: ملاحقة الجذور في السجلّ الحيّ للإنتاج + 4 وكلاء تدقيق متوازين على الكود</p>
+  <div class="meta">
+    <span>🔴 خطأ «طلباتي» 500 — جذر مؤكَّد + مُصلَح محلّيّاً</span>
+    <span>🟢 استئناف بعد الإغلاق — مدروس</span>
+    <span>🟠 خريطة السائق + معاينة قبل القبول — ناقصة</span>
+    <span>🟠 تجميع الرحلات بالطريق — قرب لا ممرّ</span>
+    <span>🟠 تنبيه وصول السائق للمزوّد — بلا وميض/صوت</span>
+    <span>🟠 بقشيش + تقييم بعد التسليم — ناقص</span>
+  </div>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:0">📑 الفهرس</h3>
+  <div class="toc">
+    <a href="#p0">0 · لوحة النتائج + الأولويّات</a>
+    <a href="#p1">1 · خطأ «طلباتي» الداخليّ (500) — الجذر + الإصلاح</a>
+    <a href="#p2">2 · الاستئناف بعد إغلاق التطبيق / نفاد البطّاريّة</a>
+    <a href="#p3">3 · أيقونة الخريطة الثابتة للسائق</a>
+    <a href="#p4">4 · الخريطة + المسار + السعر/الكيلومتر قبل القبول</a>
+    <a href="#p5">5 · تجميع الرحلات في نفس الطريق</a>
+    <a href="#p6">6 · تنبيه وصول السائق على بطاقة طلب المزوّد</a>
+    <a href="#p7">7 · رسالة البقشيش + التقييم بعد التسليم</a>
+    <a href="#p8">8 · خارطة الطريق المقترحة (الأولويّات)</a>
+  </div>
+  <div class="legend">
+    <span class="s-crit">CRITICAL حرِج</span><span class="s-high">HIGH عالٍ</span><span class="s-med">MEDIUM متوسّط</span><span class="s-low">LOW منخفض</span>
+    <span class="pill g">موجود/يعمل</span><span class="pill a">ناقص جزئيّاً</span><span class="pill r">مفقود/معطّل</span>
+  </div>
+</div>
+
+<!-- ============ 0 ============ -->
+<h2 id="p0">0) لوحة النتائج + الأولويّات</h2>
+<div class="dash">
+  <div class="kpi r"><div class="n">1 حرِج</div><div class="l">«طلباتي» 500 (مُصلَح محلّيّاً)</div></div>
+  <div class="kpi g"><div class="n">قويّ</div><div class="l">استئناف السائق بعد الإغلاق</div></div>
+  <div class="kpi a"><div class="n">2 فجوة</div><div class="l">استئناف العميل + سائق «متاح» شبح</div></div>
+  <div class="kpi r"><div class="n">0</div><div class="l">خريطة في تطبيق السائق</div></div>
+  <div class="kpi a"><div class="n">قرب≠ممرّ</div><div class="l">تجميع الرحلات</div></div>
+  <div class="kpi a"><div class="n">بلا وميض</div><div class="l">تنبيه وصول السائق</div></div>
+</div>
+<table>
+  <tr><th>#</th><th>النقطة</th><th>الحالة في الكود</th><th>الخطورة</th><th>أهمّ إجراء</th></tr>
+  <tr class="bad"><td>1</td><td>خطأ «طلباتي» 500</td><td>استيراد بمسار خاطئ — GET /orders يفشل لأيّ عميل لديه طلبات</td><td><span class="sev s-crit">CRITICAL</span></td><td>✅ مُصلَح محلّيّاً (سطر واحد) — جاهز للنشر بإذنك</td></tr>
+  <tr class="ok"><td>2</td><td>استئناف بعد الإغلاق</td><td>الجلسة + رحلة السائق تُستأنَف جيّداً (خادم-مرجعيّ)؛ فجوتان</td><td><span class="sev s-med">MEDIUM</span></td><td>شريط «تابع طلبك» للعميل + تفعيل نبضة حضور السائق</td></tr>
+  <tr class="bad"><td>3</td><td>خريطة ثابتة للسائق</td><td>لا أيقونة خريطة · لا خريطة داخل تطبيق السائق إطلاقاً</td><td><span class="sev s-high">HIGH</span></td><td>تبويب «خريطة» دائم + إحياء <code>TripRouteMap</code> الميّت</td></tr>
+  <tr class="bad"><td>4</td><td>معاينة قبل القبول</td><td>لا خريطة/مسار قبل القبول؛ يظهر «المسافة إليك» فقط لا كيلومتر الرحلة</td><td><span class="sev s-high">HIGH</span></td><td>backend: كشف الإحداثيّات + كيلومتر الرحلة → خريطة 3 نقاط في العرض</td></tr>
+  <tr class="warn"><td>5</td><td>تجميع الرحلات بالطريق</td><td>مُوصَّل (مُطفأ افتراضيّاً) لكن يجمع بالقُرب لا بالممرّ؛ مزوّد واحد فقط</td><td><span class="sev s-med">MEDIUM</span></td><td>تطابق ممرّ OSRM + اتجاه + تعدّد مزوّدين + شاشة متعدّدة المحطّات</td></tr>
+  <tr class="warn"><td>6</td><td>تنبيه وصول السائق</td><td>الشارة + زرّ المسح موجودان؛ لا وميض/صوت/بثّ حيّ على شاشة التحضير</td><td><span class="sev s-high">HIGH</span></td><td>وميض البطاقة + SSE + حدث «وصل السائق» + صوت</td></tr>
+  <tr class="warn"><td>7</td><td>بقشيش + تقييم بعد التسليم</td><td>التقييم للمزوّد فقط بعد التسليم؛ تقييم السائق معطّل (null)؛ لا بقشيش بعديّ</td><td><span class="sev s-med">MEDIUM</span></td><td>بطاقة «قيّم وأكرِم» موحّدة + إضافة <code>driver_id</code> للنوع (بلا backend)</td></tr>
+</table>
+
+<!-- ============ 1 ============ -->
+<h2 id="p1">1) خطأ «طلباتي»: «حدث خطأ داخليّ» (500) <span class="pill r">حرِج — مُصلَح محلّيّاً</span></h2>
+<div class="card">
+  <h3>ماذا حدث (من سجلّ الإنتاج الحيّ)</h3>
+  <p>عند فتح «طلباتي» على tawanow.com بحساب عميل لديه طلبات، يفشل النداء وتظهر الرسالة الحمراء. الجذر من سجلّ الخلفية مباشرةً:</p>
+  <pre><span class="r">GET /orders?limit=20 HTTP/1.1" 500 Internal Server Error</span>
+ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  └─ <span class="r">ModuleNotFoundError: No module named 'app.modules.complaints.complaints_service'</span></pre>
+
+  <h3>الجذر (مقارنة بالكود — file:line)</h3>
+  <table>
+    <tr><th>الحقيقة</th><th>التفصيل</th></tr>
+    <tr><td>الموقع الفعليّ للوحدة</td><td><code>backend/app/modules/<b>operations</b>/complaints_service.py</code> (هنا تُعرَّف <code>COMPLAINT_TERMINAL_STATES</code>)</td></tr>
+    <tr class="bad"><td>الاستيراد الخاطئ</td><td><code>order_router.py:335</code> كان: <code>from app.modules.<b>complaints</b>.complaints_service import …</code></td></tr>
+    <tr><td>لماذا يفشل</td><td>مجلّد <code>app/modules/complaints/</code> <b>فارغ</b> (فيه <code>__init__.py</code> فقط، لا <code>complaints_service.py</code>) → الوحدة غير موجودة → <code>ModuleNotFoundError</code></td></tr>
+    <tr class="warn"><td>متى يُطلَق</td><td>داخل حسبة «شارة النزاع» التي تعمل <code>if items:</code> أي <b>لأيّ قائمة طلبات فيها عنصر واحد فأكثر</b> (<code>order_router.py:326-346</code>)</td></tr>
+  </table>
+  <div class="diag"><span class="b">تدفّق الخطأ:</span>
+
+  العميل يفتح «طلباتي»
+        │
+        ▼
+  GET /orders  ──►  list_orders()  ──►  items = [طلبات العميل]
+                                              │
+                                   <span class="y">if items:  (لديه ≥ 1 طلب)</span>
+                                              │
+                          ┌───────────────────┴────────────────────┐
+                          │  حسبة شارة النزاع (Audit#9 / C-708)      │
+                          │  import COMPLAINT_TERMINAL_STATES        │
+                          │  <span class="r">from app.modules.complaints.…  ✗ غير موجود</span> │
+                          └───────────────────┬────────────────────┘
+                                              ▼
+                                <span class="r">ModuleNotFoundError → 500</span>
+                                              ▼
+                          «حدث خطأ داخليّ يرجى المحاولة لاحقاً»
+
+  <span class="g">عميل بلا طلبات (items فارغة) → يتخطّى الكتلة → لا خطأ</span>  ← لهذا لا يظهر للجميع</div>
+
+  <h3>إجاباتك الثلاث صراحةً</h3>
+  <table>
+    <tr><th>سؤالك</th><th>الجواب (مؤكَّد بالكود)</th></tr>
+    <tr><td>ما الذي ظهر بالضبط على الاستاجينج/الإنتاج؟</td><td>500 على <code>GET /orders</code> سببه <code>ModuleNotFoundError</code> لوحدة الشكاوى — ليس خطأً بيئيّاً.</td></tr>
+    <tr class="bad"><td>هل الخطأ في المسار المحلّي؟</td><td><b>نعم</b> — العيب كان حرفيّاً في <code>order_router.py:335</code> المحلّي (وهو ما نُشِر على الإنتاج).</td></tr>
+    <tr class="bad"><td>هل متوقَّع على السيرفر الرئيسيّ؟</td><td><b>هو حادث الآن فعليّاً</b> على الإنتاج (مؤكَّد في السجلّ) — ويصيب كل عميل لديه طلبات.</td></tr>
+  </table>
+
+  <h3>الإصلاح ✅ (طُبِّق على المسار المحلّي)</h3>
+  <pre><span class="c">// order_router.py — سطر واحد، آمن، بلا migration</span>
+- from app.modules.<span class="r">complaints</span>.complaints_service import COMPLAINT_TERMINAL_STATES
++ from app.modules.<span class="g">operations</span>.complaints_service import COMPLAINT_TERMINAL_STATES</pre>
+  <p class="note">تحقّق: الصياغة سليمة · 0 مسارات خاطئة متبقّية · <code>COMPLAINT_TERMINAL_STATES</code> مُصدَّر فعلاً من <code>operations/complaints_service.py</code>. <b>لم يُنشَر بعد على الإنتاج — جاهز للنشر الجرّاحيّ (ملفّ واحد) بإذنك.</b></p>
+  <div class="tech"><b>أحدث التقنيات (وقاية):</b> الحزمة WP4 التي بنيتُها للتوّ (مُبلِّغ الأخطاء الصامتة → <code>error_events</code>) كانت ستُظهر هذا النوع فوراً بدل «خطأ داخليّ» مبهم. توصية إضافيّة: <b>اختبار استيراد شامل في CI</b> (<code>python -c "import app.main"</code> أو فحص AST يتأكّد أنّ كل <code>from app.modules…</code> يحلّ فعلاً) — يمنع أيّ مسار-وحدة خاطئ من الوصول للإنتاج.</div>
+</div>
+
+<!-- ============ 2 ============ -->
+<h2 id="p2">2) العودة بعد إغلاق التطبيق بالخطأ / نفاد البطّاريّة <span class="pill g">قويّ — بفجوتين</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>سؤالك ببساطة:</b> إذا أُغلق التطبيق فجأة أو نفدت البطّاريّة، حين يعود — هل يعود بنفس الطلبات والحالة السابقة أم نظيفاً من جديد؟ <b>الخلاصة:</b> الحالة <b>خادم-مرجعيّة</b> (محفوظة على الخادم لا في الهاتف)، فالعودة تستعيد الحقيقة. السائق تحديداً مُعالَج جيّداً؛ العميل فيه نقص.</div>
+
+  <h3>أ) البقاء مسجَّلاً للدخول — نعم ✅</h3>
+  <p>توكن الوصول في الذاكرة فقط (<code>tokenStore.ts:12</code>)، والاستمراريّة من <b>كوكي تحديث HttpOnly</b> + <code>device_id</code> في localStorage. عند كل فتح، <code>AuthProvider.bootstrap()</code> يُعيد سكّ توكن جديد تلقائيّاً (<code>AuthContext.tsx:42-64</code>). → <b>يعود مسجَّلاً دون إعادة دخول</b> (ما لم تنتهِ صلاحيّة الكوكي).</p>
+
+  <h3>ب) استئناف رحلة السائق — مُعالَج بعمق ✅</h3>
+  <div class="diag"><span class="b">السائق يُعيد فتح التطبيق:</span>
+
+  DriverHome (mount)
+      │  GET /drivers/me/trips/history          <span class="c">(dispatch.ts:92)</span>
+      ▼
+  يجد الطلب بحالة ضمن PICKUP_STATES / DELIVERY_STATES   <span class="c">(DriverHome.tsx:43-52)</span>
+      │
+      ▼
+  بطاقة بارزة: <span class="g">«📦 متابعة الطلب الحاليّ →»</span>   <span class="c">(DriverHome.tsx:248-287)</span>
+      │           ┌──────────────┴──────────────┐
+      ▼           ▼                             ▼
+  /driver/pickup/:id              /driver/delivery/:id
+  (يُعيد الجلب خادم-مرجعيّ)        (يُرطّب cash_collected/proof_submitted)
+                                   <span class="c">(WP7-أ — order_service.py:1580-1597)</span></div>
+  <table>
+    <tr><th>يُستعاد عند العودة</th><th>يُفقَد (محلّيّ فقط — غير مؤذٍ)</th></tr>
+    <tr><td class="ok">التعيين · الحالة · الشاشة الصحيحة · <b>علم تحصيل النقد</b> · <b>علم رفع الإثبات</b> · المبلغ المتوقَّع · بيانات المستلِم/الهاتف</td>
+        <td class="warn">تأشيرات قائمة فحص الاستلام · إدخال رمز التسليم · مسوّدات نماذج غير مُرسَلة (تُعاد بنقرة؛ الحقيقة على الخادم)</td></tr>
+  </table>
+  <p class="note">العرض الحيّ عند العطل: العودة خلال نافذة ~120 ثانية → العرض ما زال قابلاً للقبول؛ بعدها → انتهى وأُعيد توزيعه على سائق آخر. <b>لا ازدواج تعيين، لا طلب ضائع</b> (<code>dispatch_service.py:658-668</code>).</p>
+
+  <h3>الفجوتان (يجب معالجتهما)</h3>
+  <table>
+    <tr><th>الفجوة</th><th>التفصيل (file:line)</th><th>الأثر</th></tr>
+    <tr class="warn"><td>العميل بلا «تابع طلبك»</td><td><code>HomePage.tsx</code> لا شريط/تحويل لطلب نشِط؛ <code>RoleHomeRedirect.tsx:43</code> يُنزله على المتجر</td><td>عميل تعطّل أثناء التتبّع يُلقى على المتجر ويبحث يدويّاً في «طلباتي»</td></tr>
+    <tr class="warn"><td>سائق «متاح» شبح</td><td>كنس الحضور موجود لكنّه <b>مُطفأ افتراضيّاً</b> (<code>driver_presence_timeout_seconds=0</code>، <code>config.py:362</code>؛ <code>presence_service.py</code>)</td><td>سائق نفدت بطّاريّته وهو «متاح» يبقى متاحاً ويُعرَض عليه طلبات حتى تنتهي مهلتها</td></tr>
+  </table>
+  <div class="tech"><b>أحدث التقنيات:</b> (1) <b>شريط استئناف للعميل</b> يحاكي نمط السائق (استعلام أحدث طلب غير منتهٍ → بطاقة «📦 تتبّع طلبك →»). (2) <b>تفعيل نبضة الحضور</b> (heartbeat / <code>last_seen_at</code>): ضبط المهلة ~90–120 ث فيُقلَب السائق الصامت «غير متاح» آليّاً. (3) <b>نقطة موحّدة</b> <code>GET /me/active-context</code> ترجع {الدور، الطلب النشِط، الحالة، الخطوة} كمصدر وحيد للاستئناف العميق — نمط «الجلسة القابلة للاستئناف» الحديث، ومهمّ جدّاً لتطبيق الموبايل القادم. (4) صندوق صادر offline (موجود وقويّ) — توسيعه ليشمل pickup-confirm/arrive.</div>
+</div>
+
+<!-- ============ 3 ============ -->
+<h2 id="p3">3) أيقونة الخريطة الثابتة للسائق <span class="pill r">مفقودة</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>ملاحظتك:</b> السائق عنده أيقونات سفليّة لكن <b>لا أيقونة خريطة</b> يضغطها، وتريد خريطة ثابتة تظهر سواء عنده مهمّة أم لا. <b>المؤكَّد بالكود:</b> صحيح تماماً — تطبيق السائق <b>لا يعرض أيّ خريطة إطلاقاً</b>.</div>
+  <table>
+    <tr><th>الشريط السفليّ للسائق (<code>Layout.tsx:353-388</code>)</th><th>مكوّنات الخريطة وأين تُرسَم اليوم</th></tr>
+    <tr><td>
+      1. 🏠 الرئيسيّة (<code>/driver</code>)<br>
+      2. 📜 سجلّي (<code>/driver/history</code>)<br>
+      3. 🧾 التسوية (<code>/driver/settlements</code>)<br>
+      4. ⚙️ الإعدادات (<code>/driver/settings</code>)<br>
+      <span class="pill r">لا يوجد تبويب خريطة · لا مسار <code>driver/map</code></span>
+    </td><td>
+      • <code>DriverMap</code> → للعميل فقط (<code>OrderTrackingPage</code>)<br>
+      • <code>FleetMapView</code> → لغرفة العمليّات فقط<br>
+      • <code>TripRouteMap</code> → <b class="pill r">كود ميّت</b> (صفر استدعاءات!) رغم أنّ توثيقه يقول «يُستخدم في DriverPickup/Delivery»<br>
+      • <code>LocationPicker</code> → اختيار دبّوس عنوان لا خريطة رحلة
+    </td></tr>
+  </table>
+  <div class="tech"><b>أحدث التقنيات:</b> (1) <b>تبويب «خريطة» خامس دائم</b> في <code>Layout.tsx</code> + مسار <code>driver/map</code>: حين لا مهمّة → موقع السائق الحيّ (إعادة استخدام حلقة <code>navigator.geolocation</code> في <code>DriverHome.tsx:127-143</code>)؛ حين مهمّة نشِطة → المسار فوقه. ثبات الحالة بين التبويبات عبر context صغير. (2) <b>إحياء <code>TripRouteMap</code> الميّت</b> فوراً داخل DriverPickup/DriverDelivery (نيّته الأصليّة) = خريطة داخل التطبيق فوراً. (3) المكتبة: المشروع كلّه على <b>react-leaflet + بلاطات OSM ذاتيّة الاستضافة</b> (<code>/tiles/{z}/{x}/{y}.png</code>) → أبقِ Leaflet (ترقية MapLibre GL + PMTiles خيار لاحق اختياريّ). الإحداثيّات تحتاج كشفاً من الخلفية — انظر النقطة 4.</div>
+</div>
+
+<!-- ============ 4 ============ -->
+<h2 id="p4">4) الخريطة + المسار + السعر + الكيلومتر قبل قبول الطلب <span class="pill r">مفقودة (تحتاج backend)</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>طلبك:</b> قبل أن يقبل السائق، تظهر له خريطة بمسار «موقعي → المزوّد → العميل» مع أسماء الأماكن مكتوبة، والسعر بوضوح، وعدد الكيلومترات بوضوح. <b>المؤكَّد:</b> بطاقة العرض الحاليّة تُظهر نصّاً + سعراً فقط، <b>بلا خريطة وبلا مسار</b>، والمسافة المعروضة «إليك» (سائق→مزوّد) لا كيلومتر الرحلة الكاملة.</div>
+  <table>
+    <tr><th>ما تريده قبل القبول</th><th>الموجود اليوم (<code>DriverHome.tsx:591-710</code>)</th></tr>
+    <tr class="bad"><td>خريطة بالمسار</td><td><span class="pill r">لا شيء</span> — لا خريطة في بطاقة العرض إطلاقاً</td></tr>
+    <tr class="bad"><td>مسار موقعي → المزوّد → العميل</td><td><span class="pill r">لا شيء</span></td></tr>
+    <tr class="ok"><td>أسماء أماكن الاستلام/التسليم (مكتوبة)</td><td><span class="pill a">جزئيّ</span> — اسم المزوّد + المدينة + تلميح العنوان كنصّ (جيّد للأسماء، بلا خريطة)</td></tr>
+    <tr class="ok"><td>السعر بوضوح</td><td><span class="pill g">موجود</span> — قيمة الطلب + الأجر المتوقَّع</td></tr>
+    <tr class="bad"><td>الكيلومتر بوضوح</td><td><span class="pill r">مضلِّل</span> — يظهر «المسافة إليك» (سائق→مزوّد) فقط؛ <b>كيلومتر الرحلة الكاملة لا يُعرَض</b> رغم وجوده خادم-جانبيّاً (<code>order.distance_km</code>)</td></tr>
+  </table>
+  <h3>الجذر: فجوة backend (الإحداثيّات موجودة لكنّها لا تُرسَل)</h3>
+  <p>كلا المُسلسِلَين الموجَّهَين للسائق لا يكشفان إحداثيّات: <code>GET /dispatch/offers</code> (<code>dispatch_router.py:365-385</code>) يُصدِر نصّاً + رقماً فقط؛ <code>get_order_for_driver</code> (<code>order_service.py</code>) <code>pickup_info</code>/<code>dropoff_info</code> نصّيّة. الإحداثيّات (<code>provider.lat/lng</code> · <code>order.delivery_lat/lng</code> · <code>driver.current_lat/lng</code>) <b>موجودة في قاعدة البيانات</b> (تُستخدَم خادم-جانبيّاً للأجر) لكن <b>لا تُرسَل للسائق</b> → لا يمكن رسم خريطة مسار اليوم.</p>
+  <div class="diag"><span class="b">ما يلزم (الخطّة):</span>
+  backend:  وسّع payload العرض ليُصدِر
+            provider_lat/lng · dropoff_lat/lng · driver_lat/lng · <span class="y">order.distance_km (كيلومتر الرحلة)</span>
+                    │
+  geo:       OSRM موجود (المرحلة 385) — لكن <span class="r">overview=false</span> فلا يرجع خطّ المسار
+            ► غيّرها إلى <span class="g">overview=full&geometries=geojson</span> → خطّ طريق حقيقيّ + ETA
+                    │
+  frontend:  بطاقة العرض ترسم خريطة 3 نقاط (أنا→مزوّد→عميل) + الخطّ + كيلومتر الرحلة + ETA
+            (أحيِ TripRouteMap الميّت وأطعِمه خطّ OSRM بدل الخطّ المستقيم)</div>
+  <div class="tech"><b>أحدث التقنيات:</b> إعادة استخدام <b>OSRM/Nominatim ذاتيّ الاستضافة (المرحلة 385، <code>geo_providers.py</code>)</b> — بلا مفتاح API. خطّ المسار الحقيقيّ من <code>overview=full&geometries=geojson</code> يُرسَم كـPolyline في Leaflet. هذا يغلق «معاينة قبل القبول» + «الخريطة أثناء الرحلة» معاً.</div>
+</div>
+
+<!-- ============ 5 ============ -->
+<h2 id="p5">5) تجميع الرحلات في نفس الطريق <span class="pill a">مُوصَّل لكن «قرب» لا «ممرّ»</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>طلبك:</b> اجمع 2–3 طلبات لسائق واحد إذا كانوا في <b>نفس الطريق/الممرّ</b> (يأخذ من مزوّد 1، وفي طريقه من مزوّد 2…) بشرط نفس الطريق/قرب شديد/لا ازدحام. <b>المؤكَّد:</b> خوارزميّة التجميع <b>موجودة ومُوصَّلة بمسار التوزيع الحيّ</b> (مُطفأة افتراضيّاً) لكنّها تجمع بـ<b>قُرب نقاط التسليم</b> لا بـ<b>الممرّ</b>، ومن <b>مزوّد واحد فقط</b>.</div>
+  <p class="note">تصحيح مهمّ: CLAUDE.md يقول «غير مُوصَّلة بعد» — هذا <b>لم يعد دقيقاً</b>؛ <code>auto_dispatch_for_order</code> يستدعي <code>_dispatch_batch</code> عند تفعيل العلَم (<code>dispatch_service.py:516-611</code>) مع <code>batch_id</code> على العروض وقبول/رفض ذرّي للأشقّاء.</p>
+  <table>
+    <tr><th>الموجود (<code>batching_service.compute_batch</code>)</th><th>الفجوة مقابل «نفس الطريق»</th></tr>
+    <tr><td>
+      • قرب: تسليم المرشّح ضمن <code>max_distance_km</code> من <b>مرساة</b> التسليم (هافرسين)<br>
+      • نقد: تراكم COD ≤ حدّ السائق<br>
+      • سقف: ≤ <code>max_orders</code> (3)<br>
+      • مُطفأة: <code>order_batching_enabled=False</code><br>
+      • <span class="pill p">مُحسِّن VROOM موجود لكن ميّت (صفر استدعاءات)</span>
+    </td><td>
+      <span class="pill r">قرب ≠ ممرّ</span>: طلبان متقابلان عبر الطريق السريع «قريبان» فيُجمَعان خطأً<br>
+      <span class="pill r">لا تطابق مسار/اتجاه/انعطاف/ازدحام</span> إطلاقاً<br>
+      <span class="pill r">مزوّد واحد فقط</span> → «الأخذ من مزوّد ثانٍ في الطريق» مستحيل بنيويّاً<br>
+      اختيار السائق بـ«الأقرب للمزوّد» لا باتّجاهه<br>
+      عرض السائق لا يحمل <code>batch_id</code> · لا شاشة متعدّدة المحطّات
+    </td></tr>
+  </table>
+  <div class="tech"><b>أحدث التقنيات (2024–2026):</b> (1) <b>الإدراج بأقلّ كلفة هامشيّة (cheapest-insertion)</b> — معيار صناعة توصيل الطعام (DoorDash/Uber Eats): اجمع فقط إذا <code>detour_ratio = الزمن المضاف ÷ الزمن المنفرد ≤ 1.2–1.5</code>. (2) <b>تطابق ممرّ OSRM + مرشّح اتجاه (bearing)</b>: اجلب خطّ كل طلب (<code>overview=full</code>) واجمع حين تتداخل الخطوط والاتّجاهات ضمن ~30–45°. (3) <b>حلّال PDPTW</b> (الاستلام-والتسليم بنوافذ زمنيّة) عبر <b>OR-Tools</b> أو <b>VROOM</b> المُجهَّز أصلاً (أقلّ جهد — فقط فعّل <code>compute_batch_optimized</code> ووسّعه لتعدّد المزوّدين). (4) <b>وعي بالازدحام</b>: مصفوفات زمن متغيّرة (OSRM بملفّات سرعة، أو Valhalla بتكلفة وقت اليوم). (5) <b>نافذة توزيع مؤجَّل</b> (30–90 ث) لتجميع الطلبات + اختيار سائق <b>اتّجاهه</b> يوافق الممرّ.</div>
+</div>
+
+<!-- ============ 6 ============ -->
+<h2 id="p6">6) تنبيه «وصل السائق» على بطاقة طلب المزوّد <span class="pill a">الشارة موجودة · الوميض/الصوت/البثّ مفقود</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>طلبك:</b> حين يصل السائق، تبدأ بطاقة الطلب المنتهي (المنتظِر للسائق) بالوميض، وتظهر رسالة في مربّع الطلب نفسه أنّ سائقه وصل — خصوصاً لو عند المزوّد عدّة طلبات. <b>المؤكَّد:</b> الشارة + زرّ المسح موجودان، لكن <b>لا وميض ولا صوت ولا بثّ حيّ</b> على شاشة التحضير.</div>
+  <table>
+    <tr><th>الموجود</th><th>الفجوة</th></tr>
+    <tr><td class="ok">
+      حالة <code>DRIVER_AT_PROVIDER</code> → شارة <b>«🚗 السائق وَصل — تأكّد من الرمز»</b> (<code>ProviderPreparation.tsx:165</code>)<br>
+      + زرّ مسح رمز السائق (QR + 4 أرقام)
+    </td><td class="bad">
+      <span class="pill r">لا وميض/تمييز</span>: أنيميشن <code>new-order-flash</code> موجود لكنّه على شاشة <b>الطلبات الجديدة</b> فقط لا التحضير؛ بطاقة الوصول <code>className="card"</code> عاديّة<br>
+      <span class="pill r">لا بثّ حيّ</span>: شاشة التحضير تستطلع كل <b>15 ث</b> (لا SSE)؛ والخلفية <b>لا تنشر حدثاً</b> للمزوّد عند الوصول<br>
+      <span class="pill r">لا صوت/اهتزاز/إشعار</span>
+    </td></tr>
+  </table>
+  <div class="tech"><b>أحدث التقنيات:</b> (1) <b>نبضة/توهّج لكل بطاقة</b> مفتاحها <code>order_state==="DRIVER_AT_PROVIDER"</code> (وسّع <code>@keyframes new-order-flash</code> كحالة دائمة لا ومضة واحدة + احترام <code>prefers-reduced-motion</code>). (2) <b>SSE على شاشة التحضير + نشر حدث وصول</b>: أضف <code>EventSource</code> (يحاكي <code>ProviderOrderQueue.tsx:84-95</code>) + <code>publish_provider_order_event(provider_id,"order.driver_arrived",…)</code> عند انتقال <code>DRIVER_AT_PROVIDER</code> (<code>dispatch_service.py:982-992</code>) — نفس بنية SSE+Redis القائمة، بلا بنية جديدة. (3) <b>صوت + اهتزاز</b> (<code>new Audio().play()</code> + <code>navigator.vibrate()</code> المُستخدَم أصلاً عند العميل) — نمط شاشات مطابخ POS (Uber Eats/Toast).</div>
+</div>
+
+<!-- ============ 7 ============ -->
+<h2 id="p7">7) رسالة البقشيش + التقييم للعميل بعد التسليم <span class="pill a">التقييم للمزوّد فقط · تقييم السائق معطّل · لا بقشيش بعديّ</span></h2>
+<div class="card">
+  <div class="simple">🟦 <b>طلبك:</b> بعد التسليم، رسالة خفيفة تسأل العميل إن أراد إضافة بقشيش للسائق + تقييم السائق (من 10) أسفلها، بنصّ «إن أعجبتك الخدمة، قيّم السائق وأضِف بقشيشاً». <b>المؤكَّد:</b> بعد التسليم يُقيَّم <b>المزوّد فقط</b> (5 نجوم)؛ تقييم السائق موجود في «طلباتي» لكنّه <b>مُمرَّر <code>null</code> أي معطّل</b>؛ ولا بقشيش بعد التسليم.</div>
+  <table>
+    <tr><th>العنصر</th><th>الحالة في الكود</th></tr>
+    <tr class="bad"><td>بقشيش بعد التسليم</td><td><span class="pill r">مفقود</span> — البقشيش فقط في الخروج قبل الطلب (<code>CheckoutPage.tsx</code>)، <b>نقديّ</b> يأخذه السائق. لا تدفّق بقشيش بعديّ.</td></tr>
+    <tr class="warn"><td>تقييم بعد التسليم (شاشة التتبّع)</td><td><span class="pill a">للمزوّد فقط</span> — <code>OrderTrackingPage.tsx:256</code> يُثبّت <code>target_type:"PROVIDER"</code> (5 نجوم). لا تقييم سائق هنا.</td></tr>
+    <tr class="bad"><td>تقييم السائق</td><td><span class="pill r">معطّل</span> — في «طلباتي» عبر <code>ThreeLayerRating</code> لكنّه يُستدعى بـ<code>driverId={null}</code> (<code>OrderHistoryPage.tsx:248</code>) → نجوم السائق لا تُرسِل شيئاً. الخلفية تدعمه كاملاً.</td></tr>
+    <tr class="warn"><td>«من 10»</td><td><span class="pill r">غير مدعوم</span> — الواجهة والخلفية كلتاهما 5 نجوم (<code>order_router.py:835,945</code> مقيّدة <code>le=5</code>).</td></tr>
+  </table>
+  <h3>أهمّ عائقَين</h3>
+  <ul style="font-size:13.5px">
+    <li><b>عائق بسيط (واجهة فقط):</b> النوع <code>OrderSummary</code> لا يحمل <code>driver_id</code> (<code>types.ts:51</code>) رغم أنّ الخلفية تُرجِعه للطلبات المُسلَّمة → <b>إضافة الحقل تُحيي تقييم السائق دون أيّ تغيير backend</b>.</li>
+    <li><b>عائق ماليّ (مهمّ):</b> البقشيش اليوم 100% <b>نقديّ</b> يُسلَّم للسائق. بقشيش <b>رقميّ</b> بعد التسليم يحتاج مسار دفع — و<code>production_payment_enabled=false</code> <b>علَم مختوم</b> (Hard Stop). فالممكن الآن: <b>(أ)</b> رسالة عرض-فقط «هل أكرمت سائقك نقداً؟» أو <b>(ب)</b> تذكير ببقشيش الخروج النقديّ — لا حركة مال رقميّة قبل فكّ ختم الدفع.</li>
+  </ul>
+  <div class="tech"><b>أحدث التقنيات (نمط Uber/Bolt):</b> <b>بطاقة «قيّم وأكرِم» موحّدة بعد الرحلة</b> داخل كتلة DELIVERED في <code>OrderTrackingPage</code>: تقييم السائق أعلى (نجوم + رقائق سريعة) + بقشيش مقترَح أسفله. أحيِ مسار السائق في <code>ThreeLayerRating</code> بإضافة <code>driver_id</code> للنوع. المقياس: أبقِ 5 نجوم (يطابق نموذج التقييم الأعمى الثنائيّ، المرحلة 434)؛ لو «من 10» إلزاميّ → نصف-نجوم (دقّة /10) أو وسّع <code>le=5→le=10</code> (تغيير عقد يُعلَن صراحةً). البقشيش الرقميّ = بند ماليّ مؤجَّل حتى فكّ ختم الدفع.</div>
+</div>
+
+<!-- ============ 8 ============ -->
+<h2 id="p8">8) خارطة الطريق المقترحة (حسب الأولويّة والجهد)</h2>
+<div class="card">
+  <table>
+    <tr><th>الموجة</th><th>البند</th><th>الجهد</th><th>backend؟</th><th>ملاحظة</th></tr>
+    <tr class="bad"><td>الآن</td><td>① نشر إصلاح «طلباتي» 500 على الإنتاج</td><td>دقائق</td><td>سطر واحد · لا migration</td><td>مُصلَح محلّيّاً — بانتظار إذنك للنشر الجرّاحيّ</td></tr>
+    <tr class="ok"><td>أ (واجهة-آمن)</td><td>⑦ إضافة <code>driver_id</code> للنوع → إحياء تقييم السائق + بطاقة «قيّم وأكرِم» (تقييم + تذكير بقشيش نقديّ)</td><td>صغير</td><td>لا</td><td>بلا backend · البقشيش الرقميّ مؤجَّل (دفع مختوم)</td></tr>
+    <tr class="ok"><td>أ</td><td>② شريط «تابع طلبك» للعميل + إحياء <code>TripRouteMap</code> الميّت داخل شاشات السائق</td><td>صغير–متوسّط</td><td>كشف إحداثيّات</td><td>يغلق فجوة استئناف العميل + أوّل خريطة داخل تطبيق السائق</td></tr>
+    <tr class="warn"><td>ب</td><td>③④ تبويب «خريطة» دائم + معاينة قبل القبول (خريطة 3 نقاط + كيلومتر الرحلة + ETA عبر OSRM)</td><td>متوسّط</td><td>كشف إحداثيّات + <code>overview=full</code></td><td>يعيد استخدام OSRM المرحلة 385</td></tr>
+    <tr class="warn"><td>ب</td><td>⑥ تنبيه وصول السائق: وميض البطاقة + SSE على شاشة التحضير + حدث «وصل السائق» + صوت</td><td>متوسّط</td><td>نشر حدث SSE</td><td>نفس بنية SSE+Redis القائمة</td></tr>
+    <tr class="warn"><td>ج</td><td>② تفعيل نبضة الحضور (سائق «متاح» شبح) + نقطة <code>/me/active-context</code> موحّدة</td><td>صغير (config) + متوسّط</td><td>config + endpoint</td><td>مهمّ لتطبيق الموبايل القادم</td></tr>
+    <tr class="bl"><td>د (متقدّم)</td><td>⑤ تجميع «نفس الطريق»: تطابق ممرّ OSRM + اتجاه + تعدّد مزوّدين + شاشة متعدّدة المحطّات + وعي ازدحام</td><td>كبير</td><td>كبير</td><td>يُحقَّق تحت حِمل حقيقيّ؛ VROOM المُجهَّز نقطة بداية</td></tr>
+  </table>
+  <p class="note">المبادئ المحفوظة: لا migration في الموجات أ–ج · FIN-COR لا يُمَسّ · البقشيش الرقميّ وأيّ حركة مال بعد التسليم محجوبان بالعلَم المختوم <code>production_payment_enabled=false</code> حتى فكّه. كل التوصيات تعيد استخدام بنية موجودة (OSRM/Nominatim المرحلة 385 · SSE+Redis المراحل 431/432/435 · Leaflet+بلاطات ذاتيّة).</p>
+</div>
+
+<div class="footer">
+  تدقيق عميق نقطة-بنقطة مقابل الكود الفعليّ (file:line) عبر سجلّ الإنتاج الحيّ + 4 وكلاء تدقيق متوازين · الجذر الحرِج (طلباتي 500) مؤكَّد ومُصلَح محلّيّاً · لا تعديل على الكود سوى إصلاح الـ500 · 2026-06-22
+</div>
+
+</div>
+</body>
+</html>

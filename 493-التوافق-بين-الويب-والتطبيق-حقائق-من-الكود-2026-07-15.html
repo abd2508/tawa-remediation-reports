@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>493 — التوافق بين الويب والتطبيق: حقائق من الكود</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e; --web:#a78bfa; --mob:#2aa5d8;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.85; margin:0; font-size:16px;}
+  .wrap{max-width:1420px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#1a0c2a,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:1120px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.35rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.ok .num{color:var(--ok)}
+  .stat .lbl{color:var(--muted); font-size:.74rem; margin-top:4px}
+  section{margin:52px 0}
+  h2.sec-title{font-size:1.5rem; border-inline-start:6px solid var(--accent); padding-inline-start:16px; margin-bottom:10px; color:#fff}
+  h2.sec-title.crit{border-color:var(--blocker)}
+  h3.item-title{font-size:1.18rem; color:#fff; margin:32px 0 8px; padding:10px 16px; background:var(--panel2); border-radius:10px; border-inline-start:4px solid var(--accent2)}
+  h4.sub-title{font-size:.95rem; color:var(--accent2); margin:16px 0 8px; font-weight:800}
+  p.lead{color:var(--muted); max-width:1100px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .tag{font-size:.66rem; padding:3px 9px; border-radius:999px; font-weight:700; white-space:nowrap; display:inline-block}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.new{background:rgba(42,165,216,.18); color:var(--accent2); border:1px solid rgba(42,165,216,.5)}
+  .tag.web{background:rgba(167,139,250,.18); color:var(--web); border:1px solid rgba(167,139,250,.45)}
+  .tag.mob{background:rgba(42,165,216,.18); color:var(--mob); border:1px solid rgba(42,165,216,.45)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.79rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.75rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  pre .c-cmd{color:#6fd3ff} pre .c-out{color:#9fb3aa} pre .c-err{color:#ff6b85} pre .c-ok{color:#37c987} pre .c-web{color:var(--web)}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.81rem}
+  th,td{border:1px solid var(--border); padding:7px 10px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:6px; break-inside:avoid; font-size:.88rem}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:16px 20px; margin:16px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight.blocker{background:rgba(255,45,85,.07); border-color:rgba(255,45,85,.4)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)} .insight.blocker h4{color:var(--blocker)}
+  .diagram{background:var(--code-bg); border:1px solid var(--border); border-radius:14px; padding:24px; margin:16px 0; overflow-x:auto}
+  .flow-row{display:flex; align-items:center; gap:0; flex-wrap:wrap; min-width:max-content}
+  .flow-box{background:var(--panel); border:1.5px solid var(--accent2); border-radius:10px; padding:10px 14px; font-size:.76rem; text-align:center; min-width:110px; color:var(--text)}
+  .flow-box.start{border-color:var(--accent)} .flow-box.end{border-color:var(--ok); background:rgba(55,201,135,.08)}
+  .flow-box.danger{border-color:var(--blocker); background:rgba(255,45,85,.08)}
+  .flow-box.web{border-color:var(--web); background:rgba(167,139,250,.08)}
+  .flow-arrow{color:var(--muted); font-size:1.2rem; padding:0 8px; flex-shrink:0}
+  .rc-box{background:rgba(255,45,85,.05); border:1px dashed var(--blocker); border-radius:10px; padding:12px 16px; margin:8px 0; font-size:.87rem}
+  .rc-box .k{color:var(--blocker); font-weight:800; font-size:.72rem}
+  .fix-box{background:rgba(55,201,135,.05); border:1px dashed var(--ok); border-radius:10px; padding:12px 16px; margin:8px 0; font-size:.87rem}
+  .fix-box .k{color:var(--ok); font-weight:800; font-size:.72rem}
+  .checklist{list-style:none; padding:0; margin:10px 0}
+  .checklist li{padding:6px 0; border-bottom:1px dashed var(--border); display:flex; gap:10px; align-items:flex-start}
+  .checklist li:last-child{border-bottom:none}
+  .check-ok{color:var(--ok); font-weight:900} .check-x{color:var(--blocker); font-weight:900} .check-warn{color:var(--high); font-weight:900}
+  .fileline{font-family:"Fira Code",Consolas,monospace; direction:ltr; display:inline-block; color:var(--accent2); font-size:.78rem}
+  .verdict{display:inline-block; font-weight:900; font-size:1.05rem; padding:8px 18px; border-radius:10px; margin:8px 0}
+  .verdict.yes{background:rgba(55,201,135,.18); color:var(--ok); border:1px solid rgba(55,201,135,.5)}
+  .verdict.no{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.5)}
+  .verdict.mixed{background:rgba(255,159,67,.18); color:var(--high); border:1px solid rgba(255,159,67,.5)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>🔍 التوافق بين تطبيق الجوّال والويب — حقائق من الكود، لا استنتاجات</h1>
+  <div class="sub">إجابة على 4 أسئلة مباشرة عن منصّة تووا (Tawa)، كل إجابة مبنيّة على قراءة مباشرة للكود الفعلي في <code>web/src/</code> و<code>apps/mobile/src/</code> و<code>backend/app/</code> — لا افتراضات. تشمل كل نتيجة اقتباسًا من الملف والسطر الذي استُخرِجت منه.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-15</div>
+    <div class="badge">🏗️ <b>المشروع:</b> تووا (Tawa) — منصّة توصيل ليبيا</div>
+    <div class="badge"><span style="color:var(--web)">■</span> الويب = <code>platform/web/</code> · <span style="color:var(--mob)">■</span> التطبيق = <code>platform/apps/mobile/</code></div>
+  </div>
+</header>
+
+<div class="stats-grid">
+  <div class="stat ok"><div class="num">✓</div><div class="lbl">نفس الخادم الخلفي بالضبط<br>لا BFF منفصل لأي طرف</div></div>
+  <div class="stat ok"><div class="num">5</div><div class="lbl">إصلاحات خادم مشتركة<br>أفادت الويب والتطبيق معًا</div></div>
+  <div class="stat high"><div class="num">6</div><div class="lbl">إصلاحات كانت الويب تملكها<br>مسبقًا — التطبيق لحق بها فقط</div></div>
+  <div class="stat blocker"><div class="num">1</div><div class="lbl">عطل حقيقي لا يزال موجودًا<br>على الويب أيضًا، لم يُصلَح</div></div>
+  <div class="stat"><div class="num">1</div><div class="lbl">تعارض تعريف جديد<br>لرقم "مبيعات اليوم"</div></div>
+</div>
+
+<nav class="toc">
+  <b>فهرس التقرير</b>
+  <ul>
+    <li><a href="#q1">السؤال 1: هل التطبيق متوافق مع الويب في الأدوار الأربعة؟</a></li>
+    <li><a href="#q2">السؤال 2: هل يتغذّى كلاهما من نفس المكان؟</a></li>
+    <li><a href="#q3">السؤال 3: هل السلوك نفسه؟</a></li>
+    <li><a href="#q4">السؤال 4: هل غُيِّر الباك إند لصالح التطبيق على حساب الويب؟</a></li>
+    <li><a href="#shared">تفصيل كامل: الإصلاحات المشتركة (أفادت الطرفَين معًا)</a></li>
+    <li><a href="#caughtup">تفصيل كامل: حالات كانت الويب متقدّمة والتطبيق لحق بها</a></li>
+    <li><a href="#mobileonly">تفصيل كامل: أعطال كانت خاصّة بالتطبيق فقط</a></li>
+    <li><a href="#stillbroken">⚠ الأهمّ: عطل لا يزال موجودًا على الويب أيضًا، لم يُصلَح</a></li>
+    <li><a href="#gmv">⚠ تعارض جديد: رقمان مختلفان لـ"مبيعات اليوم"</a></li>
+    <li><a href="#summary">الخلاصة المباشرة لكل سؤال</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================ -->
+<section id="q1">
+  <h2 class="sec-title">السؤال 1: هل التطبيق متوافق مع الويب في الأدوار الأربعة؟</h2>
+  <div class="verdict yes">نعم — الأدوار الأربعة موجودة في الطرفَين، والويب أوسع فعليًّا في دور العمليات</div>
+  <p class="lead">فحص مباشر لمجلّدات الشاشات في الطرفَين:</p>
+  <table>
+    <tr><th>الدور</th><th>التطبيق (<code>apps/mobile/src/app/</code>)</th><th>الويب (<code>web/src/pages/</code>)</th></tr>
+    <tr><td>العميل</td><td><code>(tabs)/</code> + شاشات جذرية (سلّة، دفع، محفظة، عناوين...)</td><td><code>customer/</code></td></tr>
+    <tr><td>السائق</td><td><code>(driver)/</code> — 8 شاشات (رئيسية، رحلة، تسوية، سجلّ، مستندات...)</td><td><code>driver/</code> — 11 شاشة (بما فيها خريطة منفصلة واستلام منفصل)</td></tr>
+    <tr><td>المزوّد</td><td><code>(provider)/</code> — 12 شاشة</td><td><code>provider/</code> — 13 شاشة</td></tr>
+    <tr><td>العمليات (موظّفو تووا)</td><td><code>(ops)/</code> — شاشة واحدة فقط (لوحة KPI)</td><td><code>operations/</code> + <code>ops/</code> — <b>أكثر من 60 شاشة مخصّصة</b> (مركز تحكّم، مراجعة احتيال، محاسبة، تسويات، دفاتر محاسبية، مركز حوادث...)</td></tr>
+  </table>
+  <div class="insight">
+    <h4>الحقيقة الدقيقة</h4>
+    التطبيق ليس نسخة كاملة موازية للويب في دور العمليات — لوحة العمليات في التطبيق شاشة واحدة مختصرة (KPI فقط)، بينما الويب هو الأداة الفعلية الشاملة لموظّفي العمليات (تصميم منطقي: موظّف العمليات يعمل من مكتب على شاشة كبيرة، لا من هاتف). أمّا أدوار العميل والسائق والمزوّد فمتوازية فعليًّا بين الطرفَين بنسبة تغطية متقاربة جدًّا.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="q2">
+  <h2 class="sec-title">السؤال 2: هل يتغذّى كلاهما من نفس المكان؟</h2>
+  <div class="verdict yes">نعم — نفس الخادم الخلفي (FastAPI) بالضبط، بلا أي طبقة وسيطة منفصلة لأي طرف</div>
+  <pre><span class="c-out">web/src/api/client.ts:12</span>
+<span class="c-web">const BASE_URL = import.meta.env.VITE_API_URL || "/api";</span>  <span class="c-out">← يمرّ عبر nginx إلى نفس الخادم</span>
+
+<span class="c-out">apps/mobile/src/services/api/config.ts</span>
+<span class="c-web">export const BASE_URL: string = extra.baseUrl ?? 'http://mock.local/api';</span>  <span class="c-out">← في وضع "real" يُضبَط على نفس عنوان tawanow.com/api</span></pre>
+  <div class="insight">
+    <h4>ماذا يعني هذا عمليًّا؟</h4>
+    كل قاعدة عمل مكتوبة داخل الخادم (Python/FastAPI) — التحقّق من الأرصدة، منطق الدفع المختلط، بوّابات إثبات التسليم، صلاحيات الأدوار — تُطبَّق <b>مرّة واحدة فقط</b> على مستوى الخادم، وتُطبَّق تلقائيًّا على أي طرف يستدعي نفس نقطة النهاية (endpoint)، سواء كان الويب أو التطبيق. لا يوجد اختلاف في "مصدر الحقيقة" بين الطرفَين إطلاقًا.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="q3">
+  <h2 class="sec-title">السؤال 3: هل السلوك نفسه؟</h2>
+  <div class="verdict mixed">لقواعد العمل في الخادم: نعم دائمًا (لأنها نفس الكود). لسلوك الواجهة نفسها: كانت هناك فروق حقيقية موجودة مسبقًا — هذه الجلسة قرّبت بينها في 6 حالات، وتركت حالة واحدة معروفة مفتوحة</div>
+  <p class="lead">هذا هو السؤال الأدقّ. الإجابة القصيرة: أي قاعدة عمل تُنفَّذ في الخادم (مثل "متى يُسمَح بإثبات التسليم") تُطبَّق بنفس الدقّة على الطرفَين لأنها نفس السطر من الكود. لكن <b>سلوك واجهة العميل نفسها</b> (متى تُعاد المحاولة، متى تُنهى الجلسة، كيف تُعزَل بيانات الحسابات) كود منفصل تمامًا في كل تطبيق — وهنا وُجِدت فروق حقيقية، أغلبها كانت الويب فيها <b>أكثر نضجًا من التطبيق</b>، لا العكس. التفاصيل الكاملة في الأقسام أدناه.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="q4">
+  <h2 class="sec-title crit">السؤال 4: هل غُيِّر الباك إند لصالح التطبيق على حساب الويب؟</h2>
+  <div class="verdict no">لا — كل تعديل في الخادم كان في كود مشترك بلا أي تفريع حسب نوع العميل، وأفاد الطرفَين معًا حيثما ينطبق</div>
+  <p class="lead">لا يوجد في أي من التعديلات السبعة على ملفّات الخادم هذه الجلسة أي شرط من نوع "إن كان الطلب من التطبيق افعل كذا" — كل تعديل كان في دالّة أو شرط عام يُنفَّذ بصرف النظر عن مصدر الطلب. الدليل المباشر في القسم التالي (الإصلاحات المشتركة) يوضّح كيف استفادت شاشات الويب <b>نفسها</b> من كل إصلاح دون أي تعديل على كود الويب إطلاقًا.</p>
+  <div class="insight warn">
+    <h4>الاستثناء الوحيد الذي يستحقّ الإفصاح الكامل</h4>
+    إضافة واحدة فقط كانت "إضافية بحتة" لخدمة شاشة التطبيق تحديدًا (<code>today_gmv_minor</code> في <code>/operations/live-kpis</code>) — لم تُغيِّر أو تكسر أي شيء موجود للويب، لكنها خلقت رقمًا ثانيًا لـ"مبيعات اليوم" بتعريف مختلف عن الرقم الذي يعرضه الويب مسبقًا من نقطة نهاية أخرى. مفصَّل بالكامل في قسم مخصّص أدناه — هذا ليس "تفضيلًا للتطبيق على حساب الويب"، لكنه تعارض تعريفات يستحقّ الحلّ لاحقًا.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="shared">
+  <h2 class="sec-title" style="border-color:var(--ok)">تفصيل كامل: الإصلاحات المشتركة (أفادت الطرفَين معًا تلقائيًّا)</h2>
+  <p class="lead">5 إصلاحات في كود الخادم المشترك — كل واحد منها يُثبَت هنا بدليل مباشر من كود الويب نفسه يستدعي نفس نقطة النهاية.</p>
+
+  <h3 class="item-title"><span class="tag ok">مشترك</span> دفع "100% محفظة" كان يتحوّل صامتًا لنقدي — الويب كانت تملك نفس العطل بالضبط</h3>
+  <div class="rc-box"><span class="k">الدليل من كود الويب (لم يكن معروفًا قبل هذا الفحص):</span> صفحة الدفع في الويب تستخدم نفس الشرط بالضبط الذي كان في التطبيق:</div>
+  <pre><span class="c-out">web/src/pages/customer/CheckoutPage.tsx:322</span>
+<span class="c-web">const splitActive =
+  isCashPay &&        ← الدفع المختلط لا يُفعَّل إلا إذا كانت paymentMethod === "CASH"
+  splitOn &&
+  ...</span>  <span class="c-out">نفس نمط apps/mobile/checkout.tsx بالضبط — عميل الويب الذي يغطّي 100% من طلبه بالمحفظة كان أيضًا سيُسجَّل "نقدي" صامتًا</span></pre>
+  <div class="fix-box"><span class="k">الإصلاح:</span> إصلاح واحد في <code>backend/app/modules/orders/order_service.py</code> (شرط سطر واحد) أصلح هذا العطل المالي الأخطر <b>للطرفَين معًا في نفس اللحظة</b> — بلا أي تعديل في كود الويب.</div>
+
+  <h3 class="item-title"><span class="tag ok">مشترك</span> جمود الدفع المختلط بمبلغ صفر + عدم اشتراط تحصيل نقدي إلا عند وجود مبلغ فعلي</h3>
+  <p>الإصلاح في <code>dispatch_service.py</code> (بوّابة إثبات التسليم). كود الويب يستدعي نفس نقطة النهاية بالضبط:</p>
+  <pre><span class="c-out">web/src/api/orders.ts:188</span>
+<span class="c-web">apiClient.post(`/orders/${orderId}/delivery-proofs`, body, ...)</span>  <span class="c-out">← نفس دالّة submit_delivery_proof في dispatch_service.py</span></pre>
+
+  <h3 class="item-title"><span class="tag ok">مشترك</span> تبادل الاستبعاد بين "تحصيل نقدي" و"استثناء مفتوح"</h3>
+  <p>يفيد سائق الويب (إن استُخدِم) <b>وموظّف العمليات على الويب أيضًا</b> — الويب يملك شاشة مخصّصة لحسم الاستثناءات النقدية تستدعي نفس نقطة النهاية:</p>
+  <pre><span class="c-out">web/src/api/dispatch.ts:92</span>
+<span class="c-web">apiClient.post("/driver/cash-exceptions", body)</span>
+
+<span class="c-out">web/src/pages/operations/OpsCashExceptions.tsx:95</span>
+<span class="c-web">.resolveCashException(id, { ... })</span>  <span class="c-out">← نفس resolve_cash_exception في cash_exception_router.py</span></pre>
+  <div class="insight">
+    <h4>أثر إضافي مهمّ على الويب تحديدًا</h4>
+    إصلاح "منع فتح استثناء دفع جزئي على طلب دفع مختلط" يحمي موظّف العمليات على الويب من الوصول أصلًا لاستثناء محكوم عليه بالفشل عند التسوية — بدل اكتشاف الفشل بعد المحاولة كما كان يحدث سابقًا في شاشة <code>OpsCashExceptions.tsx</code>.
+  </div>
+
+  <h3 class="item-title"><span class="tag ok">مشترك</span> حالة الدور بعد تجديد الرمز (role_status) — أخطر إصلاح أمني هذه الجلسة</h3>
+  <p>مسار تجديد الرمز (<code>/auth/refresh</code>) مشترك بالكامل. الويب يقرأ نفس الحقل بالضبط من الرمز المُفكَّك:</p>
+  <pre><span class="c-out">web/src/auth/AuthContext.tsx:32</span>
+<span class="c-web">roleStatus: claims.role_status ?? "ACTIVE",</span>  <span class="c-out">← جلسة ويب لسائق/مزوّد عُلِّق حسابه كانت ستستمرّ "نشطة" بعد كل تجديد صامت، تمامًا كما كان يحدث في التطبيق</span></pre>
+  <div class="fix-box"><span class="k">الإصلاح:</span> <code>backend/app/modules/identity/jwt_service.py</code> — إصلاح واحد أغلق هذه الثغرة الأمنية على مستوى الجلسة المشتركة بالكامل، لا التطبيق فقط.</div>
+
+  <h3 class="item-title"><span class="tag ok">مشترك</span> نبض الحياة (last_seen_at) عند تفعيل "متصل"</h3>
+  <p>نقطة النهاية <code>/dispatch/drivers/availability</code> مشتركة — شاشة <code>DriverHome.tsx</code> في الويب تستدعيها أيضًا. الأثر العملي على الويب أصغر (لأن الويب أصلًا يُرسِل نبضًا كل 15 ثانية — انظر القسم التالي)، لكن الإصلاح نفسه صحيح للطرفَين على حدّ سواء.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="caughtup">
+  <h2 class="sec-title" style="border-color:var(--web)">تفصيل كامل: حالات كانت الويب متقدّمة فيها — والتطبيق لحق بها فقط</h2>
+  <p class="lead">هذا القسم هو الأهمّ للإجابة الصادقة على السؤال 3. في 6 حالات، الفحص المباشر لكود الويب أظهر أنها كانت تملك الحلّ الصحيح مسبقًا — وأن ما فُعِل هذه الجلسة في التطبيق كان "لحاقًا" بمعيار كانت الويب تطبّقه بالفعل، لا "تفضيلًا" جديدًا للتطبيق.</p>
+
+  <h3 class="item-title"><span class="tag web">الويب سبقت</span> إعادة الاتصال اللحظي (SSE) بعد الانقطاع</h3>
+  <div class="rc-box"><span class="k">حالة التطبيق قبل هذه الجلسة:</span> <code>pollingInterval: 0</code> — إعادة الاتصال معطَّلة كليًّا بعد أي عطل واحد.</div>
+  <div class="fix-box"><span class="k">حالة الويب — لم تتغيّر، كانت صحيحة أصلًا:</span></div>
+  <pre><span class="c-out">web/src/hooks/useSSE.ts</span>
+<span class="c-web">const RECONNECT_DELAY_MS = 5000;
+const MAX_RECONNECTS = 5;
+...
+const connToken = await getSseToken(token);  ← تذكرة اتصال قصيرة العمر جديدة عند كل محاولة إعادة اتصال</span>
+<span class="c-out">أكثر أمانًا حتى من الإصلاح الجديد في التطبيق (الذي يعيد قراءة رمز الدخول الخام، لا يُصدِر تذكرة منفصلة قصيرة العمر)</span></pre>
+
+  <h3 class="item-title"><span class="tag web">الويب سبقت</span> انتقال الواجهة لحالة "زائر" عند فشل تجديد الجلسة نهائيًّا</h3>
+  <pre><span class="c-out">web/src/hooks/useSessionExpiry.ts:66</span>
+<span class="c-web">else if (outcome.fatal) onExpired();</span>  <span class="c-out">← كانت الويب تفعل هذا بالفعل؛ التطبيق لم يكن يفعله إطلاقًا قبل هذه الجلسة</span></pre>
+
+  <h3 class="item-title"><span class="tag web">الويب سبقت</span> تقييد إعادة المحاولة التلقائية بالعمليات الآمنة للتكرار</h3>
+  <pre><span class="c-out">web/src/api/client.ts (في مُعترِض الاستجابة)</span>
+<span class="c-web">qcfg.offlineQueueable === true &&
+MUTATION_METHODS.has(method) &&
+idempotencyKey &&</span>  <span class="c-out">← الويب تشترط "تفعيلًا صريحًا لكل استدعاء" + مفتاح منع تكرار معًا — أكثر تحفّظًا من قاعدة التطبيق الجديدة (GET أو مفتاح منع تكرار)</span></pre>
+
+  <h3 class="item-title"><span class="tag web">الويب سبقت</span> عزل قائمة الانتظار غير المتّصلة حسب صاحب الحساب</h3>
+  <div class="insight">
+    <h4>هذا الاكتشاف هو الأهمّ في هذا القسم</h4>
+    كود الويب يحمل إشارة صريحة لإصلاح سابق فعلي بمعرِّف <code>R-OFFLINE01</code>، ونمط التصميم <b>مطابق تقريبًا حرفيًّا</b> لما بُني في التطبيق هذه الجلسة (بشكل مستقلّ تمامًا، دون الاطّلاع على كود الويب مسبقًا):
+  </div>
+  <pre><span class="c-out">web/src/offline/outbox.ts:44,138,150,168</span>
+<span class="c-web">userId?: string;
+...
+await s.put({ ...entry, userId: entry.userId ?? currentUserId() ?? undefined });
+...
+// Entries stamped with a different userId (queued under a different account)
+...
+.filter((e) => !e.userId || e.userId === owner)</span></pre>
+  <p>نفس الفكرة بالضبط طُبِّقت في <code>apps/mobile/src/services/outbox.ts</code> هذه الجلسة: وسم كل عنصر بهوية صاحبه عند الإدراج، وتصفية إعادة الإرسال حسب تطابق الهوية الحالية، مع توافق خلفي للعناصر القديمة بلا وسم. هذا تقارب تصميم مستقلّ يؤكّد صحّة الاتجاه، لا اختراعًا جديدًا.</p>
+
+  <h3 class="item-title"><span class="tag web">الويب سبقت</span> تسجيل الخروج يستدعي نقطة الخادم الحقيقية</h3>
+  <pre><span class="c-out">web/src/auth/AuthContext.tsx:95</span>
+<span class="c-web">void apiClient.post("/auth/logout", { device_id: deviceId })...</span>  <span class="c-out">← كانت الويب تفعل هذا؛ التطبيق لم يكن يستدعي /auth/logout إطلاقًا قبل هذه الجلسة</span></pre>
+
+  <h3 class="item-title"><span class="tag web">الويب سبقت</span> نبض حياة السائق على مستوى التطبيق كاملًا، لا شاشة واحدة</h3>
+  <div class="rc-box"><span class="k">إشارة صريحة لإصلاح سابق موثَّق في كود الويب نفسه:</span></div>
+  <pre><span class="c-out">web/src/components/Layout.tsx:119</span>
+<span class="c-web">// R11 #38: moved from DriverHome (which only mounts on /driver) so an available
+// driver's GPS pings keep flowing on every driver screen (map/history/settlements/
+// settings), not just the home tab.
+...
+const id = setInterval(postLoc, 15000);</span>  <span class="c-out">فاصل ثابت 15 ثانية، يعيد التحقّق من "متصل" في كل نبضة عبر استعلام فعلي، لا حالة محلّية مخزَّنة</span></pre>
+  <p>هذا بالضبط نفس المشكلة التي أصلحتُها في التطبيق هذه الجلسة (نقل النبض من شاشة <code>home.tsx</code> إلى مستوى <code>(driver)/_layout.tsx</code>) — الويب حلّتها مسبقًا بفاصل ثابت 15 ثانية؛ التطبيق الآن يستخدم فاصلًا متذبذبًا 45-60 ثانية (تصميم مختلف قليلًا، مناسب لطبيعة كل منصّة، لكن نفس المبدأ المعماري).</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="mobileonly">
+  <h2 class="sec-title" style="border-color:var(--mob)">تفصيل كامل: أعطال كانت خاصّة بالتطبيق فقط (الويب لم تتأثّر لأنها لم تكن مصابة أصلًا)</h2>
+
+  <h3 class="item-title"><span class="tag mob">التطبيق فقط</span> التحصيل النقدي العادي — الويب كانت ترسل مفتاح منع التكرار بشكل صحيح دائمًا</h3>
+  <pre><span class="c-out">web/src/api/orders.ts:210-212</span>
+<span class="c-web">apiClient.post(`/orders/${orderId}/cash-collections`, body, {
+  headers: { "Idempotency-Key": idempotencyKey },</span>  <span class="c-out">← صحيح دائمًا؛ عطل التطبيق كان خاصًّا بخطأ في كود التطبيق نفسه فقط، لا علاقة له بالخادم أو الويب</span></pre>
+
+  <h3 class="item-title"><span class="tag mob">التطبيق فقط</span> لوحة العمليات تعرض حقولًا وهمية</h3>
+  <p>الويب كانت متّصلة بالحقول الصحيحة الفعلية طوال الوقت (<code>OpsKpiDashboard.tsx</code> يقرأ <code>today_revenue_minor</code> من <code>/operations/kpi</code> بشكل صحيح). شاشة العمليات في التطبيق كانت تقرأ من نقطة نهاية مختلفة تمامًا لا تحمل هذه الحقول إطلاقًا — عطل مُختَرَع بالكامل داخل كود التطبيق نفسه.</p>
+
+  <h3 class="item-title"><span class="tag mob">التطبيق فقط</span> رمز تسجيل الإشعارات غير الدائم + توحيد حالة الأحرف</h3>
+  <p>الويب لا تسجِّل رموز إشعارات فورية (Push) إطلاقًا في الممارسة الفعلية — لا يوجد أي استدعاء حقيقي لـ<code>/notifications/device-tokens</code> في كود الويب خارج ملفّات مخطّط OpenAPI المولَّدة تلقائيًّا. هذان الإصلاحان خاصّان بالتطبيق فعليًّا في التأثير العملي، رغم أن إصلاح الخادم (تطبيع حالة الأحرف) آمن ومفيد لأي عميل مستقبلي يُسجِّل منصّة "web" أيضًا.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="stillbroken">
+  <h2 class="sec-title crit">⚠ الأهمّ: عطل لا يزال موجودًا على الويب أيضًا، ولم يُصلَح هذه الجلسة</h2>
+  <div class="card blocker">
+    <div class="tag blocker">إفصاح كامل ومباشر</div>
+    <p style="margin:10px 0 0"><b>تسوية محفظة السائق ذات الخطوتين (إنشاء ثم إصدار رمز التحقّق) — نفس عيب التصميم موجود في كود الويب بالضبط، ولم يُلمَس إطلاقًا هذه الجلسة.</b> الإصلاح المُنفَّذ كان في <code>apps/mobile/src/app/(driver)/settlement.tsx</code> فقط — ملفّ تطبيق منفصل تمامًا عن كود الويب، فلا يوجد أي طريقة لإصلاح مشترك عبر الخادم هنا (المشكلة في منطق الواجهة نفسها، لا في الخادم).</p>
+  </div>
+  <pre><span class="c-out">web/src/pages/driver/DriverSettlementPage.tsx:97-113</span>
+<span class="c-web">const startSettlement = async () => {
+  setBusy(true);
+  try {
+    const { data: created } = await settlementApi.start(channel, undefined, coords?.lat, coords?.lng);
+    const { data: tk } = await settlementApi.token(created.id);  ← لو فشل هذا السطر تحديدًا
+    setTxn(created);
+    setCode(tk.short_code);
+  } catch (e) {
+    setError(extractError(e));  ← لا إعادة محاولة، ولا حتى setTxn(created) — المعاملة المُنشَأة فعليًّا على الخادم لا تظهر حتى محليًّا
+  } finally { setBusy(false); }
+};</span></pre>
+  <div class="insight blocker">
+    <h4>الأثر العملي على سائق يستخدم الويب</h4>
+    إن فشل استدعاء إصدار الرمز فقط (بعد نجاح إنشاء المعاملة)، تبقى معاملة "مسوَّدة" حقيقية على الخادم بلا رمز تحقّق أبدًا — تمامًا كما كان يحدث في التطبيق قبل الإصلاح. الفرق الوحيد: واجهة الويب حتى لا تُظهِر هذه المعاملة العالقة محليًّا (لأن <code>setTxn</code> لا يُستدعى إلا بعد نجاح الخطوة الثانية)، بينما استطلاع التطبيق الدوري للمعاملات كان سيكتشفها في النهاية كـ"معاملة جارية" بلا رمز.
+  </div>
+  <div class="fix-box"><span class="k">التوصية:</span> نفس نمط الإصلاح المُطبَّق في التطبيق (إعادة محاولة الخطوة الثانية + شفاء ذاتي عند اكتشاف مسوَّدة بلا رمز عند تحميل الصفحة) قابل للتطبيق حرفيًّا على <code>DriverSettlementPage.tsx</code> — لم يُنفَّذ لأنه خارج نطاق مهامّ هذه الجلسة المحدَّدة (التي اقتصرت على التطبيق).</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="gmv">
+  <h2 class="sec-title" style="border-color:var(--high)">⚠ تعارض جديد نتج عن هذه الجلسة: رقمان مختلفان لـ"مبيعات/إيرادات اليوم"</h2>
+  <p class="lead">هذا الاكتشاف تحديدًا ظهر فقط عند مقارنة كود الويب بما فُعِل في التطبيق — قبل هذه المقارنة لم يكن واضحًا أن هذا التعارض موجود.</p>
+  <table>
+    <tr><th></th><th>الرقم الموجود مسبقًا (يستخدمه الويب)</th><th>الرقم الجديد المُضاف هذه الجلسة (للتطبيق)</th></tr>
+    <tr><td>نقطة النهاية</td><td><code>/operations/kpi</code></td><td><code>/operations/live-kpis</code></td></tr>
+    <tr><td>الحقل</td><td><code>system.today_revenue_minor</code></td><td><code>today_gmv_minor</code></td></tr>
+    <tr><td>حدود "اليوم"</td><td>التقويم بتوقيت UTC</td><td>يوم العمل بتوقيت ليبيا المحلّي (+2)</td></tr>
+    <tr><td>ماذا يشمل</td><td>قيمة الأصناف فقط (بدون رسوم التوصيل) — مجموع <code>qty × unit_price_minor</code></td><td>الإجمالي + رسوم التوصيل (<code>total_minor + delivery_fee_minor</code>)</td></tr>
+    <tr><td>أساس التصفية الزمنية</td><td>تاريخ إنشاء الطلب (<code>created_at</code>)</td><td>يوم العمل المختوم وقت إنشاء الطلب (<code>business_day_id</code>)</td></tr>
+    <tr><td>مَن يعرضه</td><td><code>web/OpsKpiDashboard.tsx</code> — "إيرادات اليوم"</td><td><code>apps/mobile (ops)/home.tsx</code> — "مبيعات اليوم"</td></tr>
+  </table>
+  <div class="insight warn">
+    <h4>لماذا هذا يستحقّ الإفصاح رغم أنه ليس عطلًا فعليًّا</h4>
+    قبل هذه الجلسة، كان يوجد <b>تعريف واحد فقط</b> لـ"إيرادات اليوم" على مستوى المنصّة كاملة (المُستخدَم في الويب). شاشة العمليات في التطبيق كانت تقرأ من مكان خاطئ لا يحتوي أي رقم إطلاقًا (NaN)، لا رقمًا مختلفًا. بإضافة <code>today_gmv_minor</code> إلى نقطة نهاية أخرى بتعريف مختلف لحلّ عطل NaN في التطبيق، أصبح على المنصّة الآن <b>تعريفان مختلفان لنفس المفهوم تقريبًا</b>، قد يريان موظّف عمليات يفتح الويب والتطبيق في نفس اللحظة رقمَين مختلفَين لما يظنّه نفس الشيء.
+  </div>
+  <div class="fix-box"><span class="k">التوصية للمستقبل (لم تُنفَّذ الآن — قرار تصميم يحتاج توجيهك):</span> إمّا توحيد التعريف (جعل التطبيق يقرأ من <code>/operations/kpi</code> بدل إضافة حقل جديد)، أو إعادة تسمية الحقلَين بوضوح ليعكسا فعليًّا اختلاف تعريفَيهما (مثلًا "قيمة الأصناف" مقابل "إجمالي المعاملات") بدل الإيحاء بأنهما نفس الرقم.</div>
+</section>
+
+<!-- ============================================================ -->
+<section id="summary">
+  <h2 class="sec-title" style="border-color:var(--accent)">الخلاصة المباشرة لكل سؤال</h2>
+  <table>
+    <tr><th>السؤال</th><th>الإجابة المباشرة</th></tr>
+    <tr><td>1) متوافق في الأدوار الأربعة؟</td><td><b>نعم</b> — موجودة في الطرفَين، والويب أوسع في دور العمليات تحديدًا (تصميم منطقي، لا نقص)</td></tr>
+    <tr><td>2) يتغذّى كلاهما من نفس المكان؟</td><td><b>نعم، بالكامل</b> — نفس الخادم، نفس نقاط النهاية، لا طبقة وسيطة منفصلة لأي طرف</td></tr>
+    <tr><td>3) نفس السلوك؟</td><td><b>لقواعد العمل في الخادم: نعم دائمًا.</b> لسلوك الواجهة: كانت الويب أكثر نضجًا في 6 نقاط قبل هذه الجلسة — قُرِّبت المسافة في التطبيق هذه الجلسة، وبقيت نقطة واحدة (تسوية السائق ذات الخطوتين) لا تزال متفاوتة — الويب معطوبة فيها أيضًا وغير مُصلَحة</td></tr>
+    <tr><td>4) غُيِّر الباك إند لصالح التطبيق على حساب الويب؟</td><td><b>لا</b> — كل تعديل خادم كان في كود مشترك بلا تفريع؛ حيثما ينطبق، أفاد الويب تلقائيًّا (وأصلح أحيانًا أعطالًا موجودة في الويب لم تكن مكتشَفة). الاستثناء الوحيد: حقل إضافي جديد واحد (<code>today_gmv_minor</code>) خلق تعارض تعريف يستحقّ حلًّا لاحقًا، مفصَّل أعلاه بكل شفافية</td></tr>
+  </table>
+</section>
+
+<footer>
+  تقرير 493 — التوافق بين الويب والتطبيق: حقائق من الكود · تووا (Tawa) Libya Delivery Platform · 2026-07-15
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>

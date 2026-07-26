@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>تقرير فحص لوحة المزوّد — الأوراق والبلديات وأنواع النشاط والكود الميت</title>
+<style>
+  :root {
+    --green: #0e7a4f;
+    --green-soft: #e6f3ed;
+    --red: #b3261e;
+    --red-soft: #fde7e6;
+    --amber: #b86e00;
+    --amber-soft: #fff3df;
+    --gray: #5a5a5a;
+    --gray-soft: #f3f3f3;
+    --border: #d8d8d8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Noto Naskh Arabic", "Amiri", "Segoe UI", Tahoma, sans-serif;
+    max-width: 1080px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+    line-height: 1.85;
+    color: #1c1c1c;
+    background: #fafafa;
+  }
+  h1 { color: var(--green); border-bottom: 3px solid var(--green); padding-bottom: 0.5rem; }
+  h2 { color: var(--green); margin-top: 2.5rem; border-right: 4px solid var(--green); padding-right: 0.75rem; }
+  h3 { color: #224d3a; margin-top: 1.75rem; }
+  h4 { color: #333; margin-top: 1.25rem; margin-bottom: 0.4rem; }
+  .meta { color: var(--gray); font-size: 0.92rem; margin-bottom: 1.5rem; }
+  .badge {
+    display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px;
+    font-size: 0.82rem; font-weight: 700; vertical-align: middle;
+  }
+  .badge.critical { background: var(--red-soft); color: var(--red); }
+  .badge.high { background: var(--amber-soft); color: var(--amber); }
+  .badge.cosmetic { background: var(--gray-soft); color: var(--gray); }
+  .badge.ok { background: var(--green-soft); color: var(--green); }
+  .card {
+    background: white; border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.25rem 1.4rem; margin: 1rem 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .card.problem { border-right: 5px solid var(--red); }
+  .card.gap { border-right: 5px solid var(--amber); }
+  .card.fix { border-right: 5px solid var(--green); }
+  .card.q { border-right: 5px solid #1a73e8; background: #f5f9ff; }
+  code {
+    background: #f6f6f6; border: 1px solid #eaeaea; border-radius: 4px;
+    padding: 0.05rem 0.35rem; font-size: 0.92em; direction: ltr; display: inline-block;
+    font-family: "Fira Code", "JetBrains Mono", monospace;
+  }
+  pre {
+    background: #1e1e2e; color: #e6e6e6; padding: 0.9rem 1rem; border-radius: 8px;
+    overflow-x: auto; direction: ltr; font-family: "Fira Code", monospace;
+    font-size: 0.85rem; line-height: 1.55;
+  }
+  pre.diff .add { color: #98c379; }
+  pre.diff .del { color: #e06c75; }
+  pre.diff .ctx { color: #b0b0b0; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 0.75rem 0; background: white;
+    border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  }
+  th, td { border: 1px solid var(--border); padding: 0.55rem 0.75rem; text-align: right; vertical-align: top; }
+  th { background: var(--green-soft); color: var(--green); font-weight: 700; }
+  tr.bad td { background: #fff5f5; }
+  tr.ok td  { background: #f0faf4; }
+  .mockup {
+    font-family: "Fira Code", monospace; white-space: pre; direction: ltr;
+    background: #fafafa; border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.9rem 1rem; font-size: 0.78rem; line-height: 1.5; color: #333;
+    margin: 0.5rem 0;
+  }
+  .mockup-ar {
+    font-family: inherit; white-space: pre-line; direction: rtl;
+    background: #fafafa; border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.9rem 1rem; line-height: 1.7; color: #333;
+    margin: 0.5rem 0;
+  }
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;
+  }
+  .col-head { font-weight: 700; margin-bottom: 0.3rem; padding-bottom: 0.2rem; border-bottom: 1px solid var(--border); }
+  .col-head.bad { color: var(--red); border-color: var(--red); }
+  .col-head.ok  { color: var(--green); border-color: var(--green); }
+  ul.compact li { margin: 0.2rem 0; }
+  .toc { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; }
+  .toc a { color: var(--green); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  blockquote {
+    margin: 0.75rem 0; padding: 0.6rem 1rem;
+    border-right: 4px solid var(--gray); background: #f8f8f8; color: #444;
+  }
+  .file { font-family: "Fira Code", monospace; direction: ltr; display: inline-block; color: #224d3a; }
+</style>
+</head>
+<body>
+
+<h1>تقرير فحص لوحة المزوّد — الأوراق والبلديات وأنواع النشاط والكود الميت</h1>
+<div class="meta">
+  📁 <strong>المسار:</strong> <code>/home/a/Desktop/New Folder 10/</code> &nbsp;·&nbsp;
+  📅 <strong>التاريخ:</strong> 2026-05-26 &nbsp;·&nbsp;
+  ✍️ <strong>المنهج:</strong> قراءة كود حقيقية + استعلام قاعدة بيانات حيّ على staging &nbsp;·&nbsp;
+  ⛔ <strong>تنفيذ:</strong> <strong>لم يُعدَّل أي كود</strong> (حسب طلبك: «اسألني قبل أن تعدل»)
+</div>
+
+<div class="card">
+<h3>ملخّص تنفيذي — ماذا وجدت؟</h3>
+<ol>
+  <li><strong>رفع الأوراق <span class="badge critical">حرج</span> موجود لكنه مخفي عن المزوّد النشط.</strong>
+    البرمجة كاملة لـ <strong>7 أنواع وثائق</strong> (3 إلزامية: <strong>رخصة المنشأة، الشهادة الصحية، هوية المدير</strong> +
+    4 اختيارية: السجل التجاري، البطاقة الضريبية، إذن البلدية، أخرى) — لكن صفحة الرفع
+    تظهر فقط للمزوّد <code>PENDING</code>. بمجرّد قبوله (<code>ACTIVE</code>) تختفي. <strong>دليل حيّ:</strong> المزوّدان
+    التجريبيّان «كافيه كازا» و«مطعم القمبري» لديهما <strong>0 وثائق</strong> لأنهما زُرعا
+    <code>ACTIVE</code> مباشرة فتجاوزا البوّابة.</li>
+  <li><strong>المدينة/البلدية <span class="badge high">خلل تصميمي</span> قائمة مسطّحة 141 بلدية، بلا تجميع أبوي.</strong>
+    تظهر الآن في <em>datalist</em> أبجدي (طرابلس المركز / تاجوراء / سوق الجمعة … مبعثرة). طلبك:
+    اختيار هرمي «طرابلس» → بلديّاتها، «الزاوية» → بلديّاتها، «مصراتة» → بلديّاتها.</li>
+  <li><strong>أنواع النشاط <span class="badge high">3 أخطاء تسمية</span> في الواجهة فقط (الخلفية صحيحة).</strong>
+    «🛒 سوق / بقالة» (يجب إزالة «بقالة»)، «🥩 ملحمة» (يجب «محل بيع لحوم / قصاب / جزار»). «مخبوزات / حلويات»
+    تبقى. القيم البرمجية <code>market</code>/<code>butcher</code> لا تتغيّر (تبقى متوافقة مع الخلفية والبيانات الموجودة).</li>
+  <li><strong>أكواد ميتة / متروكة <span class="badge cosmetic">لا أثر فوريّ</span></strong>:
+    <code>VALID_PROVIDER_TYPES</code> في الخلفية يقبل قيمتين قديمتين <code>grocery</code> + <code>pharmacy</code> غير مكشوفتَين
+    في الواجهة (تبقيا «للتوافق مع صفوف قديمة»)؛ <code>ProviderOrders.tsx</code> يذكر تعليقاً أن
+    <code>/queue</code> و<code>/preparation</code> صارا تحويلاً (نُفّذ توحيد PROV-07 في المرحلة 396)؛ <code>ProviderSettings</code> فيه
+    تعليق «Legacy manual lat/lng» (إدخال يدوي احتياطي خلف <code>LocationPicker</code>) — كلها ليست أعطالاً
+    لكنها جدير ذكرها للمستقبل.</li>
+  <li><strong>OPS تُشاهد الوثائق ولكن المزوّد النشط لا يُحدّثها.</strong> <code>ControlPanelProviders</code> يستدعي
+    <code>operationsApi.listProviderDocuments(providerId)</code> فيرى المشغّل وثائق أي مزوّد — لكن المزوّد
+    النشط نفسه لا يملك واجهة رفع/استبدال/تجديد لوثيقة منتهية.</li>
+</ol>
+</div>
+
+<div class="toc">
+<strong>محتويات التقرير</strong>
+<ul class="compact">
+  <li><a href="#how">١. كيف فحصت — المنهجية والأدلّة</a></li>
+  <li><a href="#docs">٢. الأوراق المخفيّة عن المزوّد النشط <span class="badge critical">حرج</span></a></li>
+  <li><a href="#muni">٣. ترتيب المدن/البلديات هرمياً <span class="badge high">خلل تصميمي</span></a></li>
+  <li><a href="#types">٤. تصحيح أنواع النشاط <span class="badge high">3 تعديلات تسمية</span></a></li>
+  <li><a href="#dead">٥. أكواد ميتة وملاحظات إضافية <span class="badge cosmetic">معلوماتية</span></a></li>
+  <li><a href="#plan">٦. خطّة التعديلات المقترحة (لكلّ بند: قبل/بعد + ملفات + مخاطر)</a></li>
+  <li><a href="#ask">٧. أسئلة أحتاج جوابك قبل أن أبدأ التعديل</a></li>
+  <li><a href="#refs">ملحق: مراجع الكود الدقيقة</a></li>
+</ul>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="how">١. كيف فحصت — المنهجية والأدلّة</h2>
+<p>قرأتُ الكود مباشرة (لا أعتمد على ذاكرة)، ثم تحقّقت من السلوك حيّاً على قاعدة بيانات staging
+لإثبات الفجوات بأرقام:</p>
+<table>
+  <thead><tr><th>الفحص</th><th>الأمر/الملف</th><th>الناتج</th></tr></thead>
+  <tbody>
+    <tr><td>أنواع النشاط في الواجهة</td><td class="file">web/src/pages/customer/RegistrationPage.tsx:65–71</td><td>6 خيارات (3 منها بحاجة تسمية محسّنة)</td></tr>
+    <tr><td>أنواع النشاط في الخلفية</td><td class="file">backend/app/modules/identity/registration_router.py:109–114</td><td><code>{restaurant, cafe, market, bakery_sweets, butcher, other}</code> + قديمَان <code>grocery, pharmacy</code></td></tr>
+    <tr><td>صفحة رفع الأوراق</td><td class="file">web/src/pages/provider/ProviderPending.tsx:8–17</td><td>7 أنواع وثائق (3 إلزامية)</td></tr>
+    <tr><td>متى تظهر ProviderPending؟</td><td class="file">web/src/components/RoleHomeRedirect.tsx:32</td><td>فقط حين <code>roleStatus &ne; ACTIVE</code></td></tr>
+    <tr><td>هل ProviderSettings فيها صفحة وثائق؟</td><td class="file">web/src/pages/provider/ProviderSettings.tsx</td><td><strong>لا</strong> — 3 أقسام فقط: حساب، لغة، إشعارات</td></tr>
+    <tr><td>قائمة البلديات</td><td class="file">web/src/data/libyaMunicipalities.ts</td><td>قائمة <em>مسطّحة</em> أبجدية (141 بلدية) بلا تجميع</td></tr>
+    <tr><td>هل OPS تستطيع رؤية وثائق مزوّد؟</td><td class="file">web/src/pages/admin/ControlPanelProviders.tsx:101</td><td>نعم — <code>operationsApi.listProviderDocuments(id)</code></td></tr>
+    <tr><td>كم وثيقة لدى المزوّدَين التجريبيَّين على staging؟</td><td>استعلام مباشر على PG داخل الحاوية</td><td><strong>كافيه كازا → 0 · مطعم القمبري → 0</strong></td></tr>
+    <tr><td>السبب الجذري لِـ«0»</td><td>منطق التزرع <code>seed_provider_menus.py</code> + التزرع الأصلي</td><td>المزوّدان زُرعا <code>ACTIVE</code> فقفزا فوق بوّابة <code>ProviderPending</code></td></tr>
+  </tbody>
+</table>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="docs">٢. الأوراق المخفيّة عن المزوّد النشط <span class="badge critical">حرج</span></h2>
+
+<div class="card problem">
+<h3>الفجوة الحقيقية (لا تخمين)</h3>
+<p>الميزة <strong>مبنيّة بالكامل</strong> — لكن مرئيّة فقط للمزوّد ذي الحالة <code>PENDING</code>. فور قبوله
+<code>ACTIVE</code> يُحوَّل إلى <code>ProviderDashboard</code> الذي <strong>لا يحوي أي واجهة وثائق</strong>،
+و<code>ProviderSettings</code> أيضاً لا تحوي وثائق (3 أقسام فقط: الحساب/اللغة/الإشعارات).</p>
+
+<h4>كل المبنيّ مسبقاً (نقاط القوّة)</h4>
+<ul class="compact">
+<li><strong>الخلفية:</strong> <code>POST /providers/me/documents</code> و<code>GET /providers/me/documents</code>
+و<code>GET /providers/{providerId}/documents</code> + قبول/رفض من OPS عبر <code>operationsApi.approveDocument/rejectDocument</code>.</li>
+<li><strong>الواجهة:</strong> <code>ProviderPending.tsx</code> فيها نموذج رفع كامل، تحديد نوع الوثيقة، رفع
+ملف، عرض القائمة، حالة كل وثيقة (PENDING/APPROVED/REJECTED).</li>
+<li><strong>OPS:</strong> <code>ControlPanelProviders.tsx:101</code> يستدعي <code>listProviderDocuments(entityId)</code> فيرى المشغّل
+الوثائق لأي مزوّد (نشط أو لا).</li>
+</ul>
+
+<h4>الأنواع السبعة المعرَّفة (<code>ProviderPending.tsx:8–17</code>)</h4>
+<table>
+<thead><tr><th>الكود</th><th>الاسم العربي</th><th>إلزامي؟</th></tr></thead>
+<tbody>
+<tr class="bad"><td><code>ESTABLISHMENT_LICENSE</code></td><td>رخصة المنشأة</td><td>✅ نعم</td></tr>
+<tr class="bad"><td><code>HEALTH_CERTIFICATE</code></td><td>الشهادة الصحية</td><td>✅ نعم</td></tr>
+<tr class="bad"><td><code>MANAGER_ID</code></td><td>هوية مدير المنشأة (بطاقة/جواز/رخصة)</td><td>✅ نعم</td></tr>
+<tr><td><code>COMMERCIAL_REGISTER</code></td><td>السجل التجاري</td><td>اختياري</td></tr>
+<tr><td><code>TAX_CARD</code></td><td>البطاقة الضريبية</td><td>اختياري</td></tr>
+<tr><td><code>MUNICIPAL_PERMIT</code></td><td>إذن البلدية / تصريح النشاط</td><td>اختياري</td></tr>
+<tr><td><code>OTHER</code></td><td>أخرى</td><td>اختياري</td></tr>
+</tbody>
+</table>
+
+<h4>الدليل الحيّ (staging)</h4>
+<pre>$ docker exec tawa-backend-core-1 psql -tc "
+SELECT p.business_name, COUNT(pd.id) AS docs
+FROM providers p
+LEFT JOIN provider_documents pd ON pd.provider_id = p.id
+GROUP BY p.business_name;"
+
+   كافيه كازا       -> docs: 0
+   مطعم القمبري     -> docs: 0</pre>
+
+<h4>السبب الجذري في تدفّق التحويل (<code>RoleHomeRedirect.tsx:30–34</code>)</h4>
+<pre class="diff"><span class="ctx">if (user.role === "PROVIDER_ADMIN") {
+  if (user.roleStatus !== "ACTIVE") {
+    return </span>&lt;Navigate to=<span class="add">"/provider/pending"</span> replace /&gt;<span class="ctx">;  // ← هنا الرفع
+  }
+  return </span>&lt;Navigate to=<span class="del">"/provider-portal"</span> replace /&gt;<span class="ctx">;  // ← هنا لا توجد وثائق
+}</span></pre>
+</div>
+
+<div class="card fix">
+<h3>الإصلاح المقترح (إعادة كشف الميزة، بلا migration، بلا خلفية)</h3>
+<p>إضافة قسم «وثائق المنشأة» داخل <code>ProviderSettings.tsx</code> (تبويب أو بطاقة جديدة) يَستهلك
+نفس <code>operationsApi.getMyProviderDocuments()</code> و<code>uploadProviderDocument()</code> الموجودَتين أصلاً
+(لا API جديد).</p>
+
+<h4>المخطّط البصريّ المقترح لـ <code>ProviderSettings</code></h4>
+<div class="mockup-ar">┌─────────────────────────────────────────────────────────┐
+│  ⚙️ إعدادات الحساب                                       │
+├─────────────────────────────────────────────────────────┤
+│  🌐 إعدادات اللغة                       [ العربية ▾ ]  │
+│  🔔 تفضيلات الإشعارات                   [ تشغيل ▾ ]    │
+│  📍 موقع المنشأة                       [ تعديل ]      │
+│  🛵 تسعير التوصيل                       [ تعديل ]      │
+├─────────────────────────────────────────────────────────┤
+│  📄 وثائق المنشأة                                       │  ← قسم جديد
+│                                                         │
+│   • رخصة المنشأة            ✅ مقبولة (2026-05-20)     │
+│   • الشهادة الصحية          ✅ مقبولة (2026-05-20)     │
+│   • هوية مدير المنشأة       ⚠️ قيد المراجعة            │
+│   • السجل التجاري           — لم تُرفع                  │
+│   • البطاقة الضريبية        — لم تُرفع                  │
+│   • إذن البلدية             — لم تُرفع                  │
+│                                                         │
+│   [ نوع الوثيقة ▾ ] [ اختر ملفاً ] [ ⬆️ ارفع ]          │
+└─────────────────────────────────────────────────────────┘</div>
+
+<h4>ملفات يجب لمسها (واجهة فقط)</h4>
+<table>
+<thead><tr><th>الملف</th><th>التغيير</th><th>المخاطر</th></tr></thead>
+<tbody>
+<tr><td class="file">web/src/pages/provider/ProviderSettings.tsx</td><td>إضافة قسم «وثائق المنشأة» (إعادة استخدام منطق <code>ProviderPending</code>)</td><td>منخفضة — نسخ نمط مُختبَر</td></tr>
+<tr><td class="file">web/src/pages/provider/ProviderSettings.test.tsx</td><td>3 اختبارات: عرض قائمة الوثائق، رفع وثيقة، إظهار حالات APPROVED/PENDING/REJECTED</td><td>—</td></tr>
+<tr><td>اختياري: <span class="file">web/src/pages/provider/ProviderDashboard.tsx</span></td><td>«بطاقة تنبيه» إذا كانت وثيقة إلزامية مفقودة أو منتهية</td><td>منخفضة</td></tr>
+</tbody>
+</table>
+
+<h4>سؤال مفتوح — يتطلّب جوابك (انظر §٧)</h4>
+<ul class="compact">
+<li><strong>س-١:</strong> هل أُغلِق إنشاء طلبات جديدة للمزوّد النشط إن نقصت وثيقة إلزامية؟ (سياسة جديدة — قد تكسر المزوّدَين التجريبيَّين الحاليَّين بلا وثائق).</li>
+<li><strong>س-٢:</strong> هل تريد رفعاً «بصور» (يلتقط الكاميرا مباشرة في الهاتف) أم «ملف عادي» فقط؟</li>
+<li><strong>س-٣:</strong> هل أُضيف «تاريخ انتهاء الوثيقة» (الشهادة الصحية مثلاً تنتهي بعد سنة)؟ — يتطلّب migration.</li>
+</ul>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="muni">٣. ترتيب المدن/البلديات هرمياً <span class="badge high">خلل تصميمي</span></h2>
+
+<div class="card problem">
+<h3>الوضع الحالي (<code>web/src/data/libyaMunicipalities.ts</code>)</h3>
+<p>قائمة مسطّحة من <strong>141 بلدية</strong> (المصدر الرسمي 2026 — وزارة الحكم المحلي)، مرتّبة
+أبجدياً، تُعرض في <code>&lt;datalist&gt;</code> داخل حقل نصّي حرّ. النتيجة: عند البحث عن «طرابلس»
+يجد المستخدم «طرابلس المركز» وحدها، ولا يفهم أن «تاجوراء» و«سوق الجمعة» و«أبوسليم» جزء من
+«طرابلس الكبرى» مثلاً.</p>
+
+<div class="two-col">
+<div>
+<div class="col-head bad">الحالي (مسطّح)</div>
+<div class="mockup-ar">┌──────────────────────────┐
+│ المدينة / البلدية *      │
+│ [ ابحث أو اختر… ▾   ]    │
+│                          │
+│   أبوسليم                │  ← مبعثرة
+│   اجخرة                  │
+│   إجدابيا                │
+│   البريقة                │
+│   البيضاء                │
+│   الجميل                 │
+│   الزاوية                │
+│   الزاوية الجنوب         │  ← منطقياً ضمن «الزاوية»
+│   الزاوية الغرب          │  ← منطقياً ضمن «الزاوية»
+│   طرابلس المركز          │  ← هل تتبع «طرابلس»؟
+│   …                      │
+└──────────────────────────┘</div>
+</div>
+<div>
+<div class="col-head ok">المقترح (هرمي)</div>
+<div class="mockup-ar">┌──────────────────────────────────┐
+│ المنطقة / المدينة الكبرى *       │
+│ [ طرابلس               ▾  ]      │
+│ ─ طرابلس                          │
+│ ─ الزاوية                         │
+│ ─ مصراتة                          │
+│ ─ بنغازي                          │
+│ ─ سبها                            │
+│ ─ …                              │
+│                                  │
+│ البلدية *                        │
+│ [ تاجوراء               ▾  ]     │  ← يظهر بعد اختيار «طرابلس»
+│ ─ طرابلس المركز                  │
+│ ─ تاجوراء                        │
+│ ─ سوق الجمعة                     │
+│ ─ أبوسليم                        │
+│ ─ حي الأندلس                     │
+│ ─ جنزور                          │
+│ ─ قصر بن غشير                    │
+│ ─ …                              │
+└──────────────────────────────────┘</div>
+</div>
+</div>
+</div>
+
+<div class="card gap">
+<h3>قيد مهمّ على البيانات</h3>
+<p>التصنيف الرسمي الليبي 2026 (وزارة الحكم المحلي، 141 بلدية) <strong>مسطّح</strong> — أي
+لا يوجد «مدينة أمّ رسمية» تربط البلديات. التجميع «طرابلس → تاجوراء/جنزور/قصر بن غشير…» هو
+تقسيم <strong>إدارى/ثقافي/جغرافيّ مألوف</strong> لكن غير قانوني صريح.</p>
+<p>لذا أحتاج منك جواباً واضحاً:</p>
+<ul class="compact">
+<li><strong>س-٤:</strong> هل تُريد التجميع وفق التقسيم الجغرافي العُرفي (طرابلس الكبرى، الزاوية، مصراتة، بنغازي…)؟
+  أم وفق <strong>الشعبيّات القديمة</strong> (٢٢ شعبية قبل 2012)؟ أم تُملي عليّ التجميع بنفسك؟</li>
+<li><strong>س-٥:</strong> أنت ليبيّ. أيهما أوضح للمستخدم: <em>اختيار من قائمتين متتابعتَين</em> (مدينة ثم بلدية)
+  أم <em>قائمة واحدة موسومة بمجموعات</em> (HTML <code>&lt;optgroup&gt;</code>)؟</li>
+</ul>
+
+<h4>اقتراحي الأوّليّ للتجميع (يحتاج تأكيدك)</h4>
+<p>إن وافقت على «تقسيم جغرافي عُرفي»، سأبدأ بمسوّدة هكذا (الأمثلة من بياناتنا الفعليّة على staging):</p>
+<div class="mockup-ar">طرابلس الكبرى   →  طرابلس المركز · تاجوراء · سوق الجمعة · أبوسليم · حي الأندلس · جنزور · قصر بن غشير · عين زارة · سوق الخميس · جنوب المرقب
+الزاوية         →  الزاوية · الزاوية الجنوب · الزاوية الغرب · العجيلات · صبراتة · صرمان · الجميل · زلطن
+مصراتة          →  مصراتة · زليتن · الخمس · بني وليد · سوق الخميس
+بنغازي          →  بنغازي · المرج · سلوق · الأبيار · توكرة · قمينس
+الجبل الأخضر     →  البيضاء · شحات · المرج · القبة · الأبرق · درنة
+الجبل الغربي     →  غريان · يفرن · جادو · نالوت · الزنتان · ككلة · ترهونة
+الجنوب          →  سبها · أوباري · براك الشاطئ · مرزق · القطرون · الكفرة · غات · غدامس · الجفرة
+الساحل الشرقي    →  طبرق · إجدابيا · البريقة · أوجلة · أوجخرة · جالو · امساعد</div>
+<p><em>تنبيه:</em> هذه مسوّدة <strong>أنت يجب أن تراجعها وتصحّحها</strong> — لن ألمس الكود حتى تعطيني التجميع النهائي.
+بياناتنا تحوي مدناً غير شائعة (مثل «الفرجان»، «براك»، «أبوسليم» التي هي بلدية مستقلّة لكنها داخل طرابلس) —
+كلٌّ منها قرار جغرافي يحتاج عيناً ليبيّة.</p>
+
+<h4>الدليل الحيّ — أكثر المدن استخداماً في بياناتنا (places.json)</h4>
+<table>
+<thead><tr><th>المدينة</th><th>عدد الأماكن المسجّلة</th></tr></thead>
+<tbody>
+<tr><td>طرابلس المركز</td><td>123</td></tr>
+<tr><td>بنغازي</td><td>97</td></tr>
+<tr><td>مصراتة</td><td>59</td></tr>
+<tr><td>صبراتة</td><td>23</td></tr>
+<tr><td>حي الأندلس</td><td>19</td></tr>
+<tr><td>زليتن</td><td>15</td></tr>
+<tr><td>طبرق</td><td>15</td></tr>
+<tr><td>سبها</td><td>13</td></tr>
+<tr><td>الزاوية</td><td>8</td></tr>
+<tr><td>البيضاء</td><td>7</td></tr>
+<tr><td>(باقي 32 مدينة)</td><td>15 أو أقل لكلٍّ</td></tr>
+</tbody>
+</table>
+<p>إجماليّاً: 42 مدينة فريدة فيها أماكن، من أصل 141 بلدية رسمية.</p>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="types">٤. تصحيح أنواع النشاط <span class="badge high">3 تعديلات تسمية</span></h2>
+
+<div class="card problem">
+<h3>القائمة الحالية (<code>RegistrationPage.tsx:65–71</code>)</h3>
+<pre>const PROVIDER_TYPES = [
+  { value: "restaurant",    labelAr: "🍽️ مطعم / مأكولات" },
+  { value: "cafe",          labelAr: "☕ مقهى" },
+  { value: "market",        labelAr: "🛒 سوق / بقالة" },        // ❌ يجب تصحيح
+  { value: "bakery_sweets", labelAr: "🥐 مخبوزات / حلويات" },   // ✅ تبقى
+  { value: "butcher",       labelAr: "🥩 ملحمة" },              // ❌ يجب تصحيح
+  { value: "other",         labelAr: "أخرى" },
+];</pre>
+</div>
+
+<div class="card fix">
+<h3>التصحيح المقترح (واجهة فقط — قيم backend تبقى)</h3>
+<table>
+<thead><tr><th>القيمة (لا تتغيّر)</th><th>الحالي ❌</th><th>المقترح ✅</th></tr></thead>
+<tbody>
+<tr><td><code>restaurant</code></td><td>🍽️ مطعم / مأكولات</td><td>🍽️ مطعم / مأكولات (يبقى)</td></tr>
+<tr><td><code>cafe</code></td><td>☕ مقهى</td><td>☕ مقهى (يبقى)</td></tr>
+<tr class="bad"><td><code>market</code></td><td>🛒 سوق / بقالة</td><td><strong>🛒 سوق / محل</strong></td></tr>
+<tr class="ok"><td><code>bakery_sweets</code></td><td>🥐 مخبوزات / حلويات</td><td>🥐 مخبز وحلويات (مقبولة كما طلبت)</td></tr>
+<tr class="bad"><td><code>butcher</code></td><td>🥩 ملحمة</td><td><strong>🥩 محل بيع لحوم / قصاب / جزار</strong></td></tr>
+<tr><td><code>other</code></td><td>أخرى</td><td>أخرى (يبقى)</td></tr>
+</tbody>
+</table>
+
+<h4>لماذا لا أغيّر قيم backend؟</h4>
+<ul class="compact">
+<li>الخلفية تقبل القيم <code>{restaurant, cafe, market, bakery_sweets, butcher, other}</code> — هي مفاتيح فنيّة (إنجليزية).</li>
+<li>تغييرها يكسر بيانات المزوّدين الموجودين (<code>كافيه كازا</code> مزروع كـ<code>cafe</code>، <code>مطعم القمبري</code> كـ<code>restaurant</code>).</li>
+<li>يكفي تغيير <code>labelAr</code> فقط — وهذا التعديل <strong>صفر مخاطر</strong>.</li>
+</ul>
+
+<h4>سؤال طريف اكتشفته أثناء الفحص</h4>
+<p><strong>س-٦:</strong> الخلفية تحوي قيمتَين قديمتَين غير مكشوفتَين: <code>grocery</code> و<code>pharmacy</code>
+(تعليق الكود يقول «legacy types kept for backward compatibility with existing rows»).
+سؤال: هل لدينا أصلاً صفوف قديمة بهاتين القيمتين، أم نزيلهما من الخلفية أيضاً؟
+يمكنني التحقّق على staging بأمر <code>SELECT DISTINCT provider_type FROM providers</code>.</p>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="dead">٥. أكواد ميتة وملاحظات إضافية <span class="badge cosmetic">معلوماتية</span></h2>
+
+<div class="card gap">
+<h4>أ. <code>grocery</code> + <code>pharmacy</code> في <code>VALID_PROVIDER_TYPES</code></h4>
+<p>الخلفية (<code>registration_router.py:109–114</code>) تقبلهما لكن الواجهة لا تعرضهما. تعليق يبرّر:
+«kept for backward compatibility». إن لم تكن لدينا صفوف فعليّة بهما، نزيلهما (تنظيف).</p>
+
+<h4>ب. <code>/provider-portal/queue</code> و<code>/provider-portal/preparation</code></h4>
+<p>تعليق في <code>ProviderOrders.tsx</code> يقول:
+<em>«the /queue and /preparation routes still redirect here»</em>.
+أي المرحلة 396 (PROV-07) وحّدت 3 شاشات في واحدة، لكن المسارات القديمة بقيت تحويلاً.
+ليست خطأً — مجرّد دَين تقني.</p>
+
+<h4>ج. تعليقات «Legacy manual lat/lng» في <code>ProviderSettings.tsx</code></h4>
+<p>السطر: <em>«We still send the manual lat/lng inputs as fallback for older users»</em>.
+أي إدخال يدوي للإحداثيات احتياطي إذا لم يستخدم المزوّد <code>LocationPicker</code> الجديد.
+آمن، لكن يمكن إخفاؤه خلف زر «إعدادات متقدمة».</p>
+
+<h4>د. <code>staff</code> (موظف متجر) — تدفّق التسجيل</h4>
+<p>دور <code>staff</code> (PROVIDER_STAFF) موجود في <code>RegistrationPage</code>: يطلب <code>providerId</code>
+ويرتبط بمزوّد قائم. <strong>يعمل</strong> لكن لم أرَ صلاحياته كاملة في كل الشاشات (يقتصر مثلاً على
+«تحضير/جاهز» ولا يقبل/يرفض الطلبات — بقرار تصميمي).</p>
+
+<h4>ه. <code>ControlPanelProviders</code> — OPS يَرى وثائق المزوّد</h4>
+<p>السطر 101: <code>operationsApi.listProviderDocuments(entityId)</code>. هذا <strong>إيجابي</strong>:
+المشغّل قادر على رؤية وثائق أيّ مزوّد، وحتى لو فُتح القسم للمزوّد النشط نفسه (إصلاح §٢)،
+يبقى المشغّل صاحب الرأي النهائي في القبول/الرفض.</p>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="plan">٦. خطّة التعديلات المقترحة (تنفيذية)</h2>
+
+<table>
+<thead>
+<tr><th>#</th><th>البند</th><th>الملفات</th><th>migration؟</th><th>المخاطر</th><th>وقت تقريبي</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>١</td>
+  <td>تصحيح 3 تسميات أنواع النشاط</td>
+  <td class="file">RegistrationPage.tsx (3 سطور) + اختبار</td>
+  <td>لا</td>
+  <td><span class="badge ok">صفر</span></td>
+  <td>~10 دقائق</td>
+</tr>
+<tr>
+  <td>٢</td>
+  <td>قسم «وثائق المنشأة» في <code>ProviderSettings</code></td>
+  <td class="file">ProviderSettings.tsx + ProviderSettings.test.tsx</td>
+  <td>لا (إن لم نُضِف expiry_date)</td>
+  <td><span class="badge ok">منخفضة</span> (إعادة استخدام نمط مُختبَر)</td>
+  <td>~45 دقيقة</td>
+</tr>
+<tr>
+  <td>٣</td>
+  <td>اختيار مدينة/بلدية هرميّ</td>
+  <td class="file">libyaMunicipalities.ts (إعادة هيكلة) + RegistrationPage.tsx (واجهة) + 2 اختبار</td>
+  <td>لا</td>
+  <td><span class="badge high">متوسطة</span> — تعتمد على التجميع الذي تُقرّه</td>
+  <td>~90 دقيقة (بعد اعتماد التجميع)</td>
+</tr>
+<tr>
+  <td>٤<br/><em>(اختياري)</em></td>
+  <td>تنظيف <code>grocery</code>/<code>pharmacy</code> من backend</td>
+  <td class="file">registration_router.py + اختبار</td>
+  <td>لا (بعد التحقّق من غياب الصفوف)</td>
+  <td><span class="badge ok">منخفضة</span></td>
+  <td>~15 دقيقة</td>
+</tr>
+<tr>
+  <td>٥<br/><em>(اختياري)</em></td>
+  <td>بطاقة تنبيه في <code>ProviderDashboard</code> عند نقص وثيقة إلزامية</td>
+  <td class="file">ProviderDashboard.tsx + اختبار</td>
+  <td>لا</td>
+  <td><span class="badge ok">منخفضة</span></td>
+  <td>~30 دقيقة</td>
+</tr>
+</tbody>
+</table>
+
+<h4>القيود (CLAUDE.md للمنصّة)</h4>
+<ul class="compact">
+<li><strong>منطقة محظورة:</strong> <code>backend/app/modules/</code>, <code>backend/alembic/</code>, <code>contracts/</code>, <code>docker-compose.yml</code>.
+البنود ١/٢/٣/٥ كلها <strong>واجهة فقط</strong> ⇒ ضمن المسموح. البند ٤ يَلمس backend ⇒ يحتاج إذنك صراحةً
+(كأذونات سابقة في المراحل 414+).</li>
+<li><strong>FIN-COR:</strong> لا تغيير على <code>feature_flags.yaml</code>/<code>launch_gates.yaml</code> (SHAs محميّة).</li>
+<li><strong>قاعدة لا-commits:</strong> أنفّذ بدون git commit (نموذج المشروع).</li>
+</ul>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="ask">٧. أسئلة أحتاج جوابك قبل أن أبدأ التعديل</h2>
+
+<div class="card q">
+<ol>
+  <li><strong>س-١:</strong> هل أُغلق إنشاء طلبات جديدة على المزوّد النشط إذا نقصت وثيقة إلزامية؟<br/>
+    <em>أ. لا — تنبيه فقط (آمن، لا يكسر المزوّدَين التجريبيّين).</em><br/>
+    <em>ب. نعم — مَنع كامل (سياسة صارمة، تحتاج تعطيل العمل عن المزوّدَين الحاليَّين حتى يرفعا الوثائق).</em></li>
+
+  <li><strong>س-٢:</strong> رفع الوثيقة عبر <em>كاميرا الجوّال</em> فوراً، أم <em>اختيار ملف</em> فقط، أم الاثنان؟</li>
+
+  <li><strong>س-٣:</strong> هل أضيف حقل <em>تاريخ انتهاء الوثيقة</em>؟ (يفيد للشهادة الصحية والرخصة) — يحتاج
+    migration بسيط.</li>
+
+  <li><strong>س-٤ (التجميع الجغرافي):</strong> أيّ تقسيم نستخدم للمدن: الجغرافي العُرفي (المُقترح أعلاه)،
+    أم الشعبيّات القديمة، أم تُملي عليّ التجميع؟</li>
+
+  <li><strong>س-٥ (شكل القائمة):</strong> قائمتان متتابعتان (مدينة ثم بلدية) أم قائمة واحدة موسومة بمجموعات
+    (<code>&lt;optgroup&gt;</code>)؟</li>
+
+  <li><strong>س-٦ (grocery/pharmacy):</strong> هل أزيلهما من backend بعد التأكّد من غياب الصفوف؟ (أتأكّد قبل
+    الحذف بـ<code>SELECT DISTINCT provider_type FROM providers</code>).</li>
+
+  <li><strong>س-٧ (الترتيب):</strong> أبدأ بأيّ بند أوّلاً؟ التوصية: ١ (تسميات) ⇐ ٢ (وثائق) ⇐ ٣ (مدن هرمي). البندان
+    ٤/٥ اختياريّان حسب جوابك.</li>
+</ol>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="refs">ملحق: مراجع الكود الدقيقة (للتحقّق)</h2>
+
+<table>
+<thead><tr><th>الموضوع</th><th>الملف</th><th>السطور</th></tr></thead>
+<tbody>
+<tr><td>أنواع النشاط (الواجهة)</td><td class="file">web/src/pages/customer/RegistrationPage.tsx</td><td>65–71</td></tr>
+<tr><td>أنواع النشاط (الخلفية)</td><td class="file">backend/app/modules/identity/registration_router.py</td><td>109–114, 180–190</td></tr>
+<tr><td>صفحة الوثائق</td><td class="file">web/src/pages/provider/ProviderPending.tsx</td><td>8–17 (تعريف 7 أنواع) + 39–62 (رفع/قائمة)</td></tr>
+<tr><td>توجيه ProviderPending</td><td class="file">web/src/components/RoleHomeRedirect.tsx</td><td>30–34</td></tr>
+<tr><td>إعدادات المزوّد (بلا وثائق)</td><td class="file">web/src/pages/provider/ProviderSettings.tsx</td><td>366, 369, 372 (3 أقسام فقط)</td></tr>
+<tr><td>API الوثائق</td><td class="file">web/src/api/operations.ts</td><td>68–73 (upload + list)</td></tr>
+<tr><td>OPS يرى الوثائق</td><td class="file">web/src/pages/admin/ControlPanelProviders.tsx</td><td>101</td></tr>
+<tr><td>قائمة البلديات</td><td class="file">web/src/data/libyaMunicipalities.ts</td><td>كامل (141 مدخلاً)</td></tr>
+<tr><td>المصدر الرسمي للبلديّات 2026</td><td class="file">/home/a/Desktop/تووا-مخزون-الصور/municipalities_official_2026.json</td><td>141 بلدية (وزارة الحكم المحلي)</td></tr>
+<tr><td>الأماكن المزروعة</td><td class="file">/home/a/Desktop/تووا-مخزون-الصور/places.json</td><td>454 مكاناً، 42 مدينة فريدة</td></tr>
+<tr><td>التعليق على /queue و/preparation</td><td class="file">web/src/pages/provider/ProviderOrders.tsx</td><td>أوّل تعليق بـ * </td></tr>
+<tr><td>«Legacy manual lat/lng»</td><td class="file">web/src/pages/provider/ProviderSettings.tsx</td><td>تعليقان (بحث عن «Legacy»)</td></tr>
+</tbody>
+</table>
+
+<hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);" />
+<p style="text-align: center; color: var(--gray); font-size: 0.85rem;">
+انتظر جوابك على الأسئلة في §٧ قبل أيّ تعديل · صفحة فحص فقط · لا commits · لا تعديل
+</p>
+
+</body>
+</html>

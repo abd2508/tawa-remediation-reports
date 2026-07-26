@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير 484 — اختبار التطبيق على هاتف فعلي (Galaxy S5 Mini) وتحليل المرونة عبر الأجهزة</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.85; margin:0; font-size:16px;}
+  .wrap{max-width:1280px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:1000px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.7rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.med .num{color:var(--med)} .stat.ok .num{color:var(--ok)}
+  .stat .lbl{color:var(--muted); font-size:.8rem; margin-top:4px}
+  section{margin:50px 0}
+  h2.sec-title{font-size:1.55rem; border-inline-start:6px solid var(--accent); padding-inline-start:16px; margin-bottom:10px; color:#fff}
+  h3.item-title{font-size:1.25rem; color:#fff; margin:36px 0 6px; padding-inline-start:12px; border-inline-start:3px solid var(--border)}
+  h4.sub-title{font-size:1.02rem; color:var(--accent2); margin:20px 0 8px}
+  p.lead{color:var(--muted); max-width:1000px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card.warn{border-inline-start:5px solid var(--high)}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700; white-space:nowrap}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .tag.new{background:rgba(42,165,216,.18); color:var(--accent2); border:1px solid rgba(42,165,216,.5)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.8rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  pre .c-cmd{color:#6fd3ff}
+  pre .c-out{color:#9fb3aa}
+  pre .c-err{color:#ff6b85}
+  pre .c-ok{color:#37c987}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.87rem}
+  th,td{border:1px solid var(--border); padding:8px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight.blocker{background:rgba(255,45,85,.07); border-color:rgba(255,45,85,.4)}
+  .insight.new{background:rgba(42,165,216,.07); border-color:rgba(42,165,216,.4)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .insight.blocker h4{color:var(--blocker)}
+  .insight.new h4{color:var(--accent2)}
+  .diagram{background:var(--code-bg); border:1px solid var(--border); border-radius:14px; padding:26px; margin:18px 0; overflow-x:auto}
+  .flow-row{display:flex; align-items:center; gap:0; flex-wrap:wrap; min-width:max-content}
+  .flow-box{background:var(--panel); border:1.5px solid var(--accent2); border-radius:10px; padding:12px 16px; font-size:.82rem; text-align:center; min-width:130px; color:var(--text)}
+  .flow-box.start{border-color:var(--accent)} .flow-box.end{border-color:var(--ok); background:rgba(55,201,135,.08)}
+  .flow-box.danger{border-color:var(--blocker); background:rgba(255,45,85,.08)}
+  .flow-box.warn{border-color:var(--high); background:rgba(255,159,67,.08)}
+  .flow-arrow{color:var(--muted); font-size:1.3rem; padding:0 10px; flex-shrink:0}
+  .flow-col{display:flex; flex-direction:column; gap:10px; align-items:stretch}
+  .flow-col .flow-arrow-down{text-align:center; color:var(--muted); font-size:1.2rem}
+  .branch-wrap{display:flex; flex-direction:column; gap:14px; margin:14px 0}
+  .branch{display:flex; align-items:center; gap:10px}
+  .branch .cond{font-size:.75rem; color:var(--muted); min-width:220px; text-align:left; direction:ltr}
+  .specs-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin:16px 0}
+  .spec-box{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px}
+  .spec-box .k{color:var(--muted); font-size:.75rem}
+  .spec-box .v{color:var(--text); font-size:1rem; font-weight:700; margin-top:2px; direction:ltr; text-align:left}
+  .version-spectrum{display:flex; align-items:center; margin:20px 0; border-radius:12px; overflow:hidden; font-size:.78rem}
+  .version-spectrum > div{padding:14px 8px; text-align:center; flex:1}
+  .vs-no{background:rgba(255,45,85,.22); color:#ffb3c2}
+  .vs-yes{background:rgba(55,201,135,.18); color:#a8f0cf; flex:6 !important}
+  .checklist{list-style:none; padding:0; margin:10px 0}
+  .checklist li{padding:6px 0 6px 0; border-bottom:1px dashed var(--border); display:flex; gap:10px; align-items:flex-start}
+  .checklist li:last-child{border-bottom:none}
+  .check-ok{color:var(--ok); font-weight:900}
+  .check-x{color:var(--blocker); font-weight:900}
+  .check-warn{color:var(--high); font-weight:900}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>📱 اختبار التطبيق على هاتف فعلي (Galaxy S5 Mini) + تحليل مرونة التطبيق عبر الأجهزة</h1>
+  <div class="sub">تقرير دقيق ومفصَّل عن مهمّتين نُفِّذتا مباشرة على جهاز فعلي متّصل بالكمبيوتر عبر USB (لا محاكاة، لا افتراض): (1) فحص الهاتف وتنظيفه وبناء نسخة حقيقية من التطبيق ومحاولة تثبيتها فعليًّا، و(2) تحليل تقني كامل لمدى قدرة التطبيق على التكيّف مع أجهزة أندرويد مختلفة، بدءًا من السؤال المباشر: هل يعمل من أندرويد 6 فما فوق؟</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-14</div>
+    <div class="badge">🔌 <b>الجهاز:</b> Samsung Galaxy S5 Mini (SM-G800F)</div>
+    <div class="badge">🎯 <b>النتيجة النهائية:</b> فشل التثبيت — سبب تقني مؤكَّد ومفهوم بدقة</div>
+  </div>
+</header>
+
+<div class="stats-grid">
+  <div class="stat blocker"><div class="num">API 23</div><div class="lbl">إصدار أندرويد الهاتف<br>(أندرويد 6.0.1)</div></div>
+  <div class="stat"><div class="num">API 24</div><div class="lbl">الحدّ الأدنى الذي يتطلّبه التطبيق<br>(أندرويد 7.0)</div></div>
+  <div class="stat"><div class="num">12:59</div><div class="lbl">مدّة بناء نسخة APK حقيقية<br>محليًّا من الصفر</div></div>
+  <div class="stat"><div class="num">188.5MB</div><div class="lbl">حجم ملف APK الناتج<br>(يدعم 4 معماريات معالج)</div></div>
+  <div class="stat ok"><div class="num">100%</div><div class="lbl">دقّة السبب المكتشَف<br>(3 مصادر مستقلّة متطابقة)</div></div>
+</div>
+
+<nav class="toc">
+  <b>فهرس التقرير</b>
+  <ul>
+    <li><a href="#discover">1) اكتشاف الهاتف المتّصل وقراءة مواصفاته الفعلية</a></li>
+    <li><a href="#clean">2) تنظيف الهاتف — ماذا وُجِد، وماذا فُعِل</a></li>
+    <li><a href="#build">3) بناء نسخة APK حقيقية محليًّا من الصفر</a></li>
+    <li><a href="#install">4) محاولة التثبيت الفعلية والنتيجة الدقيقة</a></li>
+    <li><a href="#rootcause">5) تحليل السبب الجذري — لماذا فشل بالضبط؟</a></li>
+    <li><a href="#flex">6) هل التطبيق مرن عبر الأجهزة؟ — تحليل شامل</a></li>
+    <li><a href="#finalclean">7) التحقّق النهائي من نظافة الهاتف</a></li>
+    <li><a href="#summary">8) الخلاصة المباشرة</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================ -->
+<section id="discover">
+  <h2 class="sec-title" style="border-color:var(--accent2)">1) اكتشاف الهاتف المتّصل وقراءة مواصفاته الفعلية</h2>
+  <p class="lead">أول خطوة كانت التأكّد من وجود اتصال فعلي حقيقي بالهاتف عبر أداة <code>adb</code> (أداة تصحيح أندرويد الرسمية من جوجل)، ثم قراءة كل مواصفة مباشرة من الهاتف نفسه — لا افتراض ولا استدلال.</p>
+
+  <pre><span class="c-cmd">$ adb devices -l</span>
+<span class="c-out">List of devices attached
+320492f0af4d81b5   device usb:3-3 product:kminiltexx model:SM_G800F device:kminilte</span></pre>
+
+  <div class="insight new">
+    <h4>ملاحظة مهمّة اكتُشفت فورًا</h4>
+    اسم الهاتف الفعلي (<code>model:SM_G800F</code>، <code>product:kminiltexx</code>) يكشف أن الجهاز المتّصل ليس <b>Galaxy S5</b> العادي (طرازه <code>SM-G900</code>)، بل <b>Galaxy S5 Mini</b> — نسخة أصغر وأضعف موارد صدرت عام 2014 بمواصفات أقلّ من النسخة الرئيسية. هذا فرق مهمّ لأن S5 Mini أضعف من S5 العادي في المعالج والذاكرة تحديدًا.
+  </div>
+
+  <div class="specs-grid">
+    <div class="spec-box"><div class="k">الطراز</div><div class="v">SM-G800F</div></div>
+    <div class="spec-box"><div class="k">الشركة المصنّعة</div><div class="v">samsung</div></div>
+    <div class="spec-box"><div class="k">إصدار أندرويد</div><div class="v">6.0.1 (Marshmallow)</div></div>
+    <div class="spec-box"><div class="k">مستوى API</div><div class="v">23</div></div>
+    <div class="spec-box"><div class="k">معمارية المعالج</div><div class="v">armeabi-v7a (32-bit فقط)</div></div>
+    <div class="spec-box"><div class="k">إجمالي الذاكرة (RAM)</div><div class="v">1,288,344 kB (≈1.2GB)</div></div>
+    <div class="spec-box"><div class="k">الذاكرة الحرّة وقت الفحص</div><div class="v">73,492 kB (≈73MB)</div></div>
+    <div class="spec-box"><div class="k">سعة التخزين /data</div><div class="v">11.9GB (7.0GB متاحة)</div></div>
+  </div>
+
+  <p>هذه المواصفات (خصوصًا 1.2GB ذاكرة و32-bit فقط) تجعل هذا الجهاز اختبار إجهاد حقيقي وصعب — تحديدًا النوع من الأجهزة القديمة التي يُطرَح حولها سؤال "هل يعمل التطبيق عليها؟" بشكل طبيعي ومشروع.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="clean">
+  <h2 class="sec-title" style="border-color:var(--ok)">2) تنظيف الهاتف — ماذا وُجِد، وماذا فُعِل</h2>
+  <p class="lead">قبل أي تثبيت، تحقّقت مما هو مثبَّت فعليًّا على الهاتف بحثًا عن أي نسخة سابقة من تطبيق توا تحتاج إزالة.</p>
+
+  <pre><span class="c-cmd">$ adb shell pm list packages | grep -i "tawa\|towa"</span>
+<span class="c-out">(لا نتيجة — لا يوجد أي أثر لتطبيق توا على الهاتف)</span>
+
+<span class="c-cmd">$ adb shell pm list packages -3</span>  <span class="c-out"># كل التطبيقات المثبَّتة يدويًّا (غير النظامية)</span>
+<span class="c-out">package:de.worldiety.photiety.cewe.smartphoto.de
+package:com.ztesoft.zsmart.datamall.libyana
+package:com.bonial.kaufda
+package:de.samsung.MeinGalaxy
+package:com.topjohnwu.magisk</span></pre>
+
+  <div class="insight">
+    <h4>النتيجة</h4>
+    الهاتف <b>لم يكن يحتوي على أي نسخة من تطبيق توا إطلاقًا</b> — لا حاجة لإزالة شيء. الهاتف نظيف بطبيعته من هذه الناحية. (ملاحظة جانبية: الهاتف <b>مُروَّت (rooted)</b> عبر تطبيق <code>Magisk</code> — لا علاقة مباشرة بمهمّتنا لكنها معلومة تقنية صحيحة عن حالة الجهاز).
+  </div>
+  <p>التنظيف الفعلي المطلوب أُجِّل إلى ما بعد محاولة التثبيت (انظر القسم 7) — أي أثر ستتركه محاولة التثبيت نفسها (كملف APK مؤقّت على الهاتف) سيُزال بعدها مباشرة، بدل تنظيف استباقي لا فائدة منه على جهاز خالٍ أصلًا.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="build">
+  <h2 class="sec-title" style="border-color:var(--accent2)">3) بناء نسخة APK حقيقية محليًّا من الصفر</h2>
+  <p class="lead">لا توجد نسخة APK جاهزة مسبقًا لهذا التطبيق (React Native) في المشروع — الاختبار على جهاز فعلي يتطلّب بناء الملف من الكود المصدري مباشرة. تم ذلك بالكامل محليًّا على هذا الكمبيوتر (بلا خدمة بناء سحابية، بلا استهلاك أي رصيد/حساب خارجي).</p>
+
+  <div class="diagram">
+    <div class="flow-col">
+      <div class="flow-row"><div class="flow-box start">1. تحديد مجلد Android SDK الفعلي<br><code style="font-size:.7rem">/home/a/Android/Sdk</code></div></div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row"><div class="flow-box">2. إعادة توليد المشروع الأصلي (native)<br><code style="font-size:.7rem">npx expo prebuild --platform android</code></div></div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row"><div class="flow-box">3. ضبط بيئة الجافا الصحيحة<br>JDK 21 (Temurin)</div></div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row"><div class="flow-box warn">4. بناء نسخة تجريبية (Debug) لبيئة staging<br><code style="font-size:.7rem">./gradlew assembleDebug</code></div></div>
+      <div class="flow-arrow-down">↓</div>
+      <div class="flow-row"><div class="flow-box end">5. نجاح البناء — 12:59 دقيقة<br>454 مهمّة (236 نُفِّذت، 218 كانت جاهزة)</div></div>
+    </div>
+  </div>
+
+  <h4 class="sub-title">تفاصيل دقيقة عن كل خطوة</h4>
+  <table>
+    <tr><th>الخطوة</th><th>التفصيل الدقيق</th></tr>
+    <tr><td>مجلد SDK</td><td>المسار القديم <code>/home/a/android-sdk</code> (من مشروع Flutter السابق المُستبدَل) غير موجود؛ المسار الصحيح الفعلي المُكتشَف هو <code>/home/a/Android/Sdk</code> ويحتوي أدوات بناء لمستويات API من 30 حتى 36</td></tr>
+    <tr><td>إعادة التوليد (prebuild)</td><td>مجلد <code>android/</code> داخل مشروع التطبيق غير مُتتبَّع في git (يُعاد توليده عند الحاجة) — أُعيد توليده بالكامل من جديد ليعكس آخر إعدادات <code>app.config.ts</code> بدقّة تامّة، لا نسخة قديمة محتمَلة</td></tr>
+    <tr><td>بيئة البناء</td><td><code>APP_ENV=staging</code> — يعني أن النسخة المبنيّة تتّصل بخادم <code>https://staging.tawanow.com</code> الحقيقي، لا بيانات وهمية</td></tr>
+    <tr><td>عثرة عابرة أثناء البناء</td><td>ظهرت تحذيرات متكرّرة <code>Could not connect to Kotlin compile daemon</code> — Gradle تعامل معها تلقائيًّا بإعادة المحاولة دون توقّف البناء، ولم تؤثّر على النتيجة النهائية</td></tr>
+    <tr><td>الملف الناتج</td><td><code>android/app/build/outputs/apk/debug/app-debug.apk</code> — 188,521,917 بايت (≈188.5 ميجابايت)، يحتوي مكتبات لأربع معماريات معالج مختلفة معًا (armeabi-v7a, arm64-v8a, x86, x86_64) في ملف واحد "شامل"</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="install">
+  <h2 class="sec-title" style="border-color:var(--blocker)">4) محاولة التثبيت الفعلية والنتيجة الدقيقة</h2>
+  <p class="lead">بعد نجاح البناء، حاولت التثبيت المباشر على الهاتف الفعلي المتّصل عبر <code>adb</code> — لا محاكاة، أمر تثبيت حقيقي على جهاز حقيقي.</p>
+
+  <pre><span class="c-cmd">$ adb install -r android/app/build/outputs/apk/debug/app-debug.apk</span>
+<span class="c-out">Performing Push Install
+android/.../app-debug.apk: 1 file pushed, 0 skipped. 3.8 MB/s (188521917 bytes in 46.859s)
+	pkg: /data/local/tmp/app-debug.apk</span>
+<span class="c-err">Failure [INSTALL_FAILED_OLDER_SDK]</span></pre>
+
+  <div class="insight blocker">
+    <h4>ماذا يعني هذا الخطأ بالضبط؟</h4>
+    <code>INSTALL_FAILED_OLDER_SDK</code> هو رمز خطأ رسمي من نظام أندرويد نفسه (لا من تطبيق توا) — يعني حرفيًّا: <b>"إصدار أندرويد على هذا الهاتف أقدم من الحدّ الأدنى الذي يطلبه ملف التطبيق"</b>. نظام أندرويد يفحص هذا الشرط في اللحظة الأولى من التثبيت ويرفض المتابعة كليًّا إن لم يتحقّق — الملف نفسه وصل الهاتف بنجاح تام (نُقِل 188.5 ميجابايت بالكامل)، لكن النظام رفض تثبيته لسبب واحد فقط: عدم توافق الإصدار.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="rootcause">
+  <h2 class="sec-title" style="border-color:var(--high)">5) تحليل السبب الجذري — لماذا فشل بالضبط؟</h2>
+  <p class="lead">لم أكتفِ برسالة الخطأ وحدها — تتبّعت السبب حتى مصدره الدقيق في الكود، ووجدت <b>3 مصادر مستقلّة</b> تؤكّد نفس النتيجة تمامًا، مما يرفع الثقة في التفسير إلى شبه اليقين.</p>
+
+  <h3 class="item-title">المصدر 1 — الإعداد الصريح في ملف بناء المشروع</h3>
+  <pre><span class="c-out">apps/mobile/android/gradle.properties:64
+android.minSdkVersion=24</span></pre>
+
+  <h3 class="item-title">المصدر 2 — تعليق توضيحي صريح في كود المشروع يشرح السبب الهندسي</h3>
+  <pre><span class="c-out">apps/mobile/app.config.ts:79-82
+// minSdk 24 (Android 7.0) is the HARD floor of React Native 0.86 —
+// its prebuilt ReactAndroid/Hermes native libs are built for API 24,
+// so it cannot go lower. Covers Android 7+ devices.
+minSdkVersion: 24,</span></pre>
+  <div class="insight new">
+    <h4>لماذا هذا التعليق حاسم جدًا في التحليل</h4>
+    هذا ليس قرارًا اتّخذه فريق توا بشكل تعسّفي يمكن تغييره بسطر كود. إنه <b>قيد تقني صلب من إطار العمل React Native نفسه (الإصدار 0.86 المستخدَم في هذا المشروع)</b> — المكتبات الجاهزة (Precompiled) لمحرّك التشغيل <code>Hermes</code> ونظام <code>ReactAndroid</code> نفسه <b>مبنية فعليًّا</b> بحيث تتطلّب API 24 كحدّ أدنى، ولا توجد نسخة بديلة أقدم متاحة لهذا الإصدار من React Native.
+  </div>
+
+  <h3 class="item-title">المصدر 3 — تأكيد من ملفات البناء الفعلية بعد التجميع</h3>
+  <pre><span class="c-out">node_modules/expo/android/build/.../AndroidManifest.xml:5
+&lt;uses-sdk android:minSdkVersion="24" /&gt;</span></pre>
+
+  <div class="diagram">
+    <h4 class="sub-title" style="margin-top:0">مخطّط: أين حدثت المطابقة/عدم المطابقة بالضبط؟</h4>
+    <div class="branch-wrap">
+      <div class="branch"><div class="cond">إصدار الهاتف الفعلي</div><div class="flow-arrow">→</div><div class="flow-box danger">API 23 (أندرويد 6.0.1)</div></div>
+      <div class="branch"><div class="cond">الحدّ الأدنى المطلوب في ملف APK</div><div class="flow-arrow">→</div><div class="flow-box warn">API 24 (أندرويد 7.0)</div></div>
+      <div class="branch"><div class="cond">فحص أندرويد عند التثبيت</div><div class="flow-arrow">→</div><div class="flow-box danger">23 &lt; 24 ← رفض فوري</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="flex">
+  <h2 class="sec-title" style="border-color:var(--accent2)">6) هل التطبيق مرن عبر الأجهزة؟ — تحليل شامل</h2>
+  <p class="lead">السؤال الأصلي كان أوسع من هذا الهاتف تحديدًا: هل يتكيّف التطبيق مع أي هاتف بدءًا من أندرويد 6 فما فوق، حسب موارد الجهاز وميزاته؟ الإجابة الدقيقة لها جزءان مختلفان تمامًا.</p>
+
+  <h3 class="item-title">الجزء الأول: نطاق إصدارات أندرويد المدعومة</h3>
+  <div class="version-spectrum">
+    <div class="vs-no">أندرويد 6<br>(2015)<br>❌ غير مدعوم</div>
+    <div class="vs-yes">أندرويد 7 حتى 16<br>(2016 – اليوم)<br>✅ مدعوم بالكامل</div>
+  </div>
+  <p>الفجوة محصورة تمامًا في <b>إصدار واحد فقط</b> (أندرويد 6) وهو إصدار عمره أكثر من 10 سنوات الآن. من أندرويد 7.0 (2016) وحتى أحدث إصدار (36 — أندرويد 16)، الدعم كامل ومقصود (<code>targetSdkVersion=36</code> مضبوط صراحة لآخر إصدار متاح).</p>
+
+  <h3 class="item-title">الجزء الثاني: التكيّف الفعلي مع موارد وميزات الجهاز (لأجهزة أندرويد 7+)</h3>
+  <ul class="checklist">
+    <li><span class="check-ok">✔</span> <b>دعم كل معماريات المعالج في ملف واحد:</b> 32-bit القديم (<code>armeabi-v7a</code>) و64-bit الحديث (<code>arm64-v8a</code>) ومعالجات إنتل/x86 معًا — لا يوجد جهاز حديث أو قديم سيُستبعَد بسبب نوع المعالج وحده</li>
+    <li><span class="check-ok">✔</span> <b>محرّك تشغيل مُحسَّن للأجهزة الضعيفة تحديدًا:</b> يستخدم التطبيق محرّك <code>Hermes</code> (لا المحرّك التقليدي الأثقل) — وهو مصمَّم خصّيصًا ليعمل بذاكرة أقلّ وسرعة إقلاع أعلى، وهذا يفيد بالضبط الأجهزة محدودة الموارد التي يمثّلها هذا الهاتف</li>
+    <li><span class="check-ok">✔</span> <b>تخطيط مرن للشاشات المختلفة:</b> نظام التخطيط (flexbox) في React Native مصمَّم أصلًا ليتمدّد ويتقلّص تلقائيًّا حسب حجم الشاشة، مع استخدام فعلي لمكوّنات تتبّع "المنطقة الآمنة" من الشاشة (تختلف بين الشاشات ذات النتوء والشاشات العادية) — لم يظهر في فحص الكود اعتماد يُذكَر على أبعاد ثابتة بالبكسل قد تنكسر على شاشة صغيرة</li>
+    <li><span class="check-ok">✔</span> <b>الصلاحيات تُطلَب وقت التشغيل لا وقت التثبيت:</b> صلاحيات مثل الموقع الجغرافي والإشعارات تُطلَب من المستخدم لحظة الحاجة الفعلية إليها، وليست شرطًا إجباريًّا يمنع تثبيت التطبيق أصلًا على جهاز بلا تلك الميزة — هذا يعني أن جهازًا بلا نظام تحديد مواقع دقيق مثلًا لن يُمنع من تثبيت التطبيق كليًّا</li>
+    <li><span class="check-warn">⚠</span> <b>لا يوجد "وضع أداء منخفض" مخصَّص للأجهزة الضعيفة جدًّا:</b> بخلاف بعض التطبيقات الكبرى التي تبني نسخة "خفيفة" منفصلة للأجهزة الضعيفة، هذا التطبيق نسخة واحدة للجميع. جهاز بذاكرة 1.2GB فقط — تحديدًا مثل هذا الهاتف لو توفّر فيه أندرويد 7+ — قد يواجه بطئًا ملحوظًا مقارنة بجهاز حديث، رغم أن Hermes يخفّف من هذا الأثر ولا يلغيه كليًّا</li>
+  </ul>
+
+  <div class="insight">
+    <h4>الخلاصة التقنية لهذا الجزء</h4>
+    التطبيق <b>مرن فعليًّا وبشكل جيد جدًّا</b> عبر تشكيلة واسعة من الأجهزة — لكن مرونته تبدأ من <b>أندرويد 7.0 (2016)</b> لا أندرويد 6، وهذا حدّ تقني ثابت من React Native نفسه لا يمكن تغييره دون التراجع لإصدار قديم جدًّا وغير مدعوم من الإطار. الجزء الأكبر الفعلي من "قاعدة المستخدمين المحتملين" في السوق اليوم يستخدم أصلًا أندرويد 8 فما فوق، فهذا الحدّ في الممارسة العملية يستثني نسبة ضئيلة جدًّا وتتقلّص باستمرار مع الوقت.
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="finalclean">
+  <h2 class="sec-title" style="border-color:var(--ok)">7) التحقّق النهائي من نظافة الهاتف</h2>
+  <pre><span class="c-cmd">$ adb shell rm -f /data/local/tmp/app-debug.apk</span>
+<span class="c-cmd">$ adb shell pm list packages | grep -i "ly.tawa"</span>
+<span class="c-out">(لا نتيجة)</span></pre>
+  <ul class="checklist">
+    <li><span class="check-ok">✔</span> أُزيل ملف APK المؤقّت الذي دُفِع للهاتف أثناء محاولة التثبيت الفاشلة</li>
+    <li><span class="check-ok">✔</span> تأكيد نهائي: لا توجد أي حزمة باسم <code>ly.tawa.*</code> مثبَّتة على الهاتف — الجهاز في حالة نظيفة تمامًا، كما كان قبل بدء الاختبار</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="summary">
+  <h2 class="sec-title" style="border-color:var(--accent)">8) الخلاصة المباشرة</h2>
+  <table>
+    <tr><th>السؤال</th><th>الإجابة الدقيقة</th></tr>
+    <tr><td>هل الهاتف نُظِّف وثُبِّت عليه التطبيق؟</td><td>الهاتف كان نظيفًا أصلًا (لا نسخة سابقة). <b>محاولة التثبيت فشلت فعليًّا</b> برسالة <code>INSTALL_FAILED_OLDER_SDK</code>، وأُزيل كل أثر للمحاولة بعدها.</td></tr>
+    <tr><td>هل التطبيق يعمل من أندرويد 6 فما فوق؟</td><td><b>لا.</b> الحدّ الأدنى الفعلي هو أندرويد 7.0 (API 24) — قيد تقني صلب من React Native 0.86 نفسه، مؤكَّد من 3 مصادر مستقلّة في الكود وملفات البناء.</td></tr>
+    <tr><td>هل التطبيق مرن مع موارد/ميزات الأجهزة المختلفة (من أندرويد 7 فما فوق)؟</td><td><b>نعم، بدرجة عالية:</b> معماريات معالج متعدّدة، محرّك مُحسَّن للأجهزة الضعيفة (Hermes)، تخطيط مرن للشاشات، صلاحيات تُطلَب عند الحاجة لا إجباريًّا عند التثبيت. الاستثناء الوحيد: لا "وضع أداء منخفض" مخصَّص، فجهاز بذاكرة ضئيلة جدًّا (~1GB) قد يشعر ببطء نسبي حتى لو كان إصداره متوافقًا.</td></tr>
+  </table>
+</section>
+
+<footer>
+  تقرير 484 — اختبار الهاتف الفعلي وتحليل المرونة · تووا (Tawa) Libya Delivery Platform · 2026-07-14
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>

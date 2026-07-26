@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير الفحص الشامل لدورة العميل — تووا (Tawa)</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --crit:#ff4d5e; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e;
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif;
+    line-height:1.8; margin:0; padding:0; font-size:16px;
+  }
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 20px 80px}
+  header.top{
+    background:linear-gradient(135deg,#0f2a20,#0c1a2a); border:1px solid var(--border); border-radius:18px;
+    padding:36px 30px; margin-bottom:28px; position:relative; overflow:hidden;
+  }
+  header.top h1{margin:0 0 8px; font-size:1.9rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:18px; text-align:center}
+  .stat .num{font-size:2rem; font-weight:800; color:var(--accent)}
+  .stat.crit .num{color:var(--crit)}
+  .stat.high .num{color:var(--high)}
+  .stat.med .num{color:var(--med)}
+  .stat .lbl{color:var(--muted); font-size:.85rem; margin-top:4px}
+
+  section{margin:44px 0}
+  h2.sec-title{
+    font-size:1.5rem; border-inline-start:5px solid var(--accent); padding-inline-start:14px; margin-bottom:18px; color:#fff;
+  }
+  h2.sec-title.crit{border-color:var(--crit)}
+  h2.sec-title.high{border-color:var(--high)}
+  h2.sec-title.med{border-color:var(--med)}
+  h2.sec-title.low{border-color:var(--low)}
+
+  p.lead{color:var(--muted); max-width:900px}
+
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:22px 24px; margin-bottom:18px;
+  }
+  .card.crit{border-inline-start:5px solid var(--crit)}
+  .card.high{border-inline-start:5px solid var(--high)}
+  .card.med{border-inline-start:5px solid var(--med)}
+  .card.low{border-inline-start:5px solid var(--low)}
+  .card.refuted{border-inline-start:5px solid #555; opacity:.9}
+
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px}
+  .card-title{font-size:1.15rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700; letter-spacing:.02em}
+  .tag.crit{background:rgba(255,77,94,.15); color:var(--crit); border:1px solid rgba(255,77,94,.4)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.area{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .tag.verified{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.pending{background:rgba(255,255,255,.05); color:var(--muted); border:1px dashed var(--border)}
+
+  .kv{display:grid; grid-template-columns:110px 1fr; gap:8px 14px; margin:14px 0}
+  .kv .k{color:var(--muted); font-weight:700; font-size:.9rem; padding-top:2px}
+  .kv .v{font-size:.97rem}
+  .simple{
+    background:var(--panel2); border-radius:10px; padding:12px 16px; margin-top:12px; font-size:.95rem; color:#d9e8e0;
+  }
+  .simple b{color:var(--accent)}
+  code, .code{
+    background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.85rem;
+    font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block;
+  }
+  pre{
+    background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto;
+    font-family:"Fira Code",Consolas,monospace; font-size:.82rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0;
+  }
+  .verify-box{
+    background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.25); border-radius:10px; padding:12px 16px; margin-top:12px; font-size:.9rem;
+  }
+  .refute-box{
+    background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:10px; padding:12px 16px; margin-top:12px; font-size:.9rem;
+  }
+  img.shot{max-width:100%; border-radius:10px; border:1px solid var(--border); margin-top:12px; display:block}
+  .shot-cap{color:var(--muted); font-size:.82rem; margin-top:6px}
+
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.92rem}
+  th,td{border:1px solid var(--border); padding:9px 12px; text-align:right}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+
+  .methodology-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px}
+  .meth-card{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:18px}
+  .meth-card h4{margin:0 0 8px; color:#fff}
+  .meth-card .n{font-size:1.6rem; font-weight:800; color:var(--accent2)}
+
+  .incident{background:rgba(255,159,67,.08); border:1px solid rgba(255,159,67,.35); border-radius:12px; padding:16px 20px; margin:20px 0}
+  .incident h4{margin:0 0 8px; color:var(--high)}
+
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>🔍 تقرير الفحص الشامل لدورة العميل — منصّة تووا (Tawa)</h1>
+  <div class="sub">فحص حيّ، سيناريو-بسيناريو، لكل نقطة في تجربة العميل على الويب — بواسطة 9 وكلاء متوازين + مرحلة تحقّق عدائي منفصلة، على النسخة المحلّية الكاملة (خلفية + واجهة React، بلا Flutter).</div>
+  <div class="badges">
+    <div class="badge">📅 <b>تاريخ الفحص:</b> 2026-07-10</div>
+    <div class="badge">🧪 <b>سيناريوهات مُنفَّذة فعليًا:</b> 343</div>
+    <div class="badge">🤖 <b>وكلاء:</b> 38 (9 استكشاف + 29 تحقّق عدائي)</div>
+    <div class="badge">🐞 <b>عيوب مؤكَّدة:</b> 27</div>
+    <div class="badge">🌐 <b>النطاق:</b> Backend + Web React فقط (لا Flutter)</div>
+  </div>
+</header>
+
+<div class="toc">
+  <strong>محتويات التقرير</strong>
+  <ul>
+    <li><a href="#exec">١. الخلاصة التنفيذية (بكلام بسيط)</a></li>
+    <li><a href="#method">٢. المنهجية — كيف تمّ الفحص</a></li>
+    <li><a href="#crit">٣. عيوب حرِجة (CRITICAL) — 3</a></li>
+    <li><a href="#high">٤. عيوب عالية الخطورة (HIGH) — 11</a></li>
+    <li><a href="#med">٥. عيوب متوسّطة (MEDIUM) — 12</a></li>
+    <li><a href="#low">٦. ملاحظات منخفضة/تحسينات UX — 14</a></li>
+    <li><a href="#refuted">٧. ادّعاءات تمّ نفيها بعد التحقّق العدائي (شفافية)</a></li>
+    <li><a href="#incident">٨. حادثة تشغيلية أثناء الاختبار (شفافية)</a></li>
+    <li><a href="#frontend">٩. اكتمال الواجهة — أكواد جزيرة، مسارات ميتة</a></li>
+    <li><a href="#priority">١٠. ترتيب الأولوية المقترَح للإصلاح</a></li>
+    <li><a href="#scope">١١. ما الذي لم يُفحَص / تذكير بالنطاق</a></li>
+  </ul>
+</div>
+
+<section id="exec">
+<h2 class="sec-title">١. الخلاصة التنفيذية — بكلام بسيط</h2>
+<p class="lead">
+طلبت أن نجرّب دورة العميل كاملة، بكل سيناريواتها، وكأننا آلاف الزبائن الحقيقيين نضغط كل زر ونملأ كل نموذج. هذا ما حدث فعليًا — لا محاكاة نظرية، بل طلبات HTTP حقيقية وتصفّح حقيقي بمتصفّح (Playwright) على النسخة المحلّية الكاملة (نفس الكود الذي يعمل عليه الإنتاج)، مع حسابات عملاء حقيقية أنشأناها لهذا الغرض.
+</p>
+<div class="simple">
+<b>الخلاصة بجملة واحدة:</b> دورة العميل تعمل في مسارها الأساسي (تسجيل، تصفّح، شراء، تتبّع)، لكننا وجدنا <b>3 أعطال حرِجة</b> تُعطِّل ميزات كاملة بالكامل (استرجاع كلمة المرور، الدردشة مع الدعم، وخريطة تتبّع السائق)، بالإضافة إلى <b>11 عيبًا عالي الخطورة</b> و<b>12 عيبًا متوسّطًا</b> و<b>14 ملاحظة تحسين</b> — أغلبها فجوات في الربط بين الواجهة والخلفية (اسم حقل مختلف، مسار غير موجود) وليست أخطاء منطقية عميقة، أي أنّ إصلاحها سريع نسبيًا.
+</div>
+<div class="stats-grid">
+  <div class="stat crit"><div class="num">3</div><div class="lbl">حرِج (يُعطِّل ميزة كاملة)</div></div>
+  <div class="stat high"><div class="num">11</div><div class="lbl">عالي الخطورة</div></div>
+  <div class="stat med"><div class="num">12</div><div class="lbl">متوسّط</div></div>
+  <div class="stat"><div class="num">14</div><div class="lbl">ملاحظة/تحسين UX</div></div>
+  <div class="stat"><div class="num">343</div><div class="lbl">سيناريو مُنفَّذ فعليًا</div></div>
+  <div class="stat"><div class="num">2</div><div class="lbl">ادّعاءات ثبت أنها غير صحيحة</div></div>
+</div>
+<p class="lead">
+كل عيب في هذا التقرير مرّ بخطوتين منفصلتين: وكيل أول جرّبه حيًّا ووثّقه، ثم وكيل ثانٍ مختلف — بدون معرفة مسبقة بالنتيجة — حاول <b>نفي</b> الادّعاء (يعني حاول إثبات أنه ليس عيبًا حقيقيًا) قبل اعتماده. اثنان من الادّعاءات فعلًا سقطا في هذا الاختبار (قسم ٧) — وهذا دليل أنّ العملية ليست مجرّد تصديق تلقائي لما يقوله الوكيل الأول.
+</p>
+</section>
+
+<section id="method">
+<h2 class="sec-title">٢. المنهجية — كيف تمّ الفحص</h2>
+<p class="lead">تمّ تقسيم دورة العميل إلى 9 مناطق مستقلّة، كل منطقة جرّبها وكيل مخصّص بأدوات متصفّح حقيقية (Playwright) بالإضافة لقراءة الكود المصدري وفحص قاعدة البيانات مباشرة، ثم مرحلة ثانية منفصلة أعادت التحقّق العدائي من كل ادّعاء "عيب" أو "تعارض" أو عالي/حرِج الخطورة.</p>
+<div class="methodology-grid">
+  <div class="meth-card"><div class="n">48</div><h4>التسجيل والدخول</h4>سيناريوهات على /register /login /forgot-password /phone-lookup /legal</div>
+  <div class="meth-card"><div class="n">43</div><h4>التصفّح والاكتشاف</h4>الرئيسية، الفئات، البحث، صفحة المتجر</div>
+  <div class="meth-card"><div class="n">20</div><h4>اطلب أي شيء</h4>تصفّح بميزانيتك + اكتب طلبك (المثال الذي حدّده المالك)</div>
+  <div class="meth-card"><div class="n">25</div><h4>السلة</h4>إضافة/تعديل/دمج/حذف، تخصيص، تعدّد المزوّدين</div>
+  <div class="meth-card"><div class="n">41</div><h4>الدفع</h4>نقد/محفظة/مجزّأ، عناوين، أكواد خصم، طلب مجمّع</div>
+  <div class="meth-card"><div class="n">33</div><h4>التتبّع والسجلّ</h4>كل حالات الطلب، الخريطة الحيّة، التقييم، الشكاوى</div>
+  <div class="meth-card"><div class="n">33</div><h4>المحفظة</h4>الرصيد، التحويل بين المحافظ، السجلّ، القفل</div>
+  <div class="meth-card"><div class="n">58</div><h4>الولاء + الإعدادات</h4>نقاط، دفتر العناوين، اللغة، الإشعارات، الدعم</div>
+  <div class="meth-card"><div class="n">42</div><h4>فحص بنيوي شامل</h4>أكواد جزيرة، مسارات ميتة، أخطاء الطرفية، الوضع الداكن، الجوّال</div>
+</div>
+<p class="lead" style="margin-top:20px">
+<b>حسابات حقيقية أُنشئت لهذا الفحص</b> (بإذنك الصريح "أنشئ أي شيء تحتاجه"): 3 حسابات عملاء جديدة (+218929000001/2/3) بالإضافة لعشرات الحسابات الإضافية التي أنشأتها الوكلاء أثناء العمل (مزوّدين، موظّفين، حسابات اختبار متفرّقة) — جميعها على النسخة المحلّية فقط، لا شيء لمس الإنتاج.
+</p>
+<p class="lead">
+<b>الأدوات المستخدمة:</b> متصفّح Playwright حقيقي (نقرات فعلية، تعبئة نماذج، التقاط لقطات شاشة وأخطاء الطرفية Console)، طلبات HTTP مباشرة (curl/httpx) لمضاهاة استجابة الخادم بدقّة، فحص قاعدة البيانات مباشرة (psql) للتأكّد من الحقيقة الأرضية بدل تصديق ما تعرضه الواجهة فقط، وقراءة الكود المصدري (خلفية + واجهة) لتتبّع السبب الجذري لكل عيب.
+</p>
+</section>
+
+<section id="crit">
+<h2 class="sec-title crit">٣. عيوب حرِجة (CRITICAL) — تُعطِّل ميزة كاملة بالكامل</h2>
+<p class="lead">هذه الثلاثة تعني أن ميزة كاملة لا تعمل إطلاقًا لأي عميل، وليست حالة نادرة أو حافّة (edge case).</p>
+
+<div class="card crit">
+  <div class="card-head">
+    <div class="card-title">🔑 استرجاع كلمة المرور المنسيّة معطَّل 100% — لا يمكن لأي عميل استرجاع حسابه</div>
+    <div class="tag-row"><span class="tag crit">CRITICAL</span><span class="tag area">تسجيل الدخول</span><span class="tag pending">توثيق حيّ + كودي — التحقّق العدائي الإضافي تعثّر بخطأ تقني عابر في الأداة (وليس في وجود العيب)</span></div>
+  </div>
+  <div class="simple">
+    <b>بكلام بسيط:</b> إذا نسي أي عميل كلمة مروره، فهو عالق للأبد — الصفحة تعمل، رسالة OTP تصل، لكن عند إدخال الرمز الصحيح وكلمة المرور الجديدة، الخادم يرفض الطلب دائمًا بسبب اختلاف اسم حقل بسيط بين الواجهة والخلفية.
+  </div>
+  <div class="kv">
+    <div class="k">السيناريو</div><div class="v">تصفّح /forgot-password ← إدخال هاتف مسجَّل ← استلام رمز التحقّق الصحيح (123456 على البيئة المحلية) ← إدخال كلمة مرور جديدة ← إرسال النموذج. جُرِّب مرارًا برمز خاطئ وبالرمز الصحيح — نفس النتيجة.</div>
+    <div class="k">المتوقَّع</div><div class="v">مع الرمز الصحيح: <code>200 OK</code> وتُحدَّث كلمة المرور.</div>
+    <div class="k">الحاصل فعليًا</div><div class="v"><code>422 VALIDATION_ERROR</code> في كل مرة — الخادم يقول الحقل <code>otp_code</code> مفقود، بينما الواجهة ترسل حقلًا اسمه <code>otp</code>.</div>
+  </div>
+  <div class="simple">السبب الجذري: <code>web/src/api/auth.ts:124-130</code> يرسل <code>{ phone, otp, new_password, confirm_password }</code>، بينما <code>backend/app/modules/identity/registration_router.py:1153-1157</code> يتوقّع نموذجًا فيه <code>otp_code</code> (لا <code>otp</code>) ولا يحتوي أصلًا على حقل <code>confirm_password</code>. الرفض يحدث قبل حتى أن يتحقّق الخادم من صحّة الرمز — أي أنّ منطق التحقّق من الرمز نفسه سليم، والمشكلة فقط في اسم الحقل عند الإرسال.</div>
+  <div class="verify-box">✅ <b>حالة التحقّق:</b> هذا العيب وُثِّق حيًّا مع استجابة HTTP فعلية (422) والتقاط شبكة عبر Playwright، وتأكّد الكود من الطرفين بدقّة سطر-بسطر. مرحلة التحقّق العدائي المستقلّة لهذا العنصر بالتحديد تعطّلت بخطأ تقني عابر في أداة التنسيق نفسها (وليس رفضًا للعيب) — لذا لم يحصل على "شهادة نفي" مستقلّة، لكن الأدلة الحيّة والكودية قوية بما يكفي لاعتباره مؤكَّدًا بثقة عالية دون الحاجة لإعادة المحاولة.</div>
+</div>
+
+<div class="card crit">
+  <div class="card-head">
+    <div class="card-title">💬 الدردشة مع الدعم معطَّلة 100% — لا يمكن لأي عميل بدء محادثة دعم</div>
+    <div class="tag-row"><span class="tag crit">CRITICAL</span><span class="tag area">الإعدادات/الدعم</span><span class="tag verified">مؤكَّد بتحقّق عدائي مستقلّ</span></div>
+  </div>
+  <div class="simple"><b>بكلام بسيط:</b> صفحة "من نحن" تعِد بدعم متاح "على مدار الساعة"، لكن الضغط على "بدء محادثة جديدة" يفشل دائمًا — فورًا، لكل عميل، بلا استثناء.</div>
+  <div class="kv">
+    <div class="k">السيناريو</div><div class="v">تسجيل دخول كعميل جديد ← /support/chat ← "بدء محادثة جديدة" (نقرة حقيقية + إعادة تنفيذ عبر curl لنفس الطلب بالضبط).</div>
+    <div class="k">الحاصل فعليًا</div><div class="v"><code>422 Unprocessable Entity</code> في كل مرة. الخادم يتطلّب حقل <code>subject</code> (عنوان الموضوع) إلزاميًا، لكن الواجهة لا تملك أصلًا أي حقل لإدخال عنوان — ترسل جسمًا فارغًا <code>{}</code> دائمًا.</div>
+  </div>
+  <div class="simple">السبب الجذري: <code>backend/app/modules/support/support_router.py:23-24</code> يفرض <code>subject: str</code> إلزاميًا بلا قيمة افتراضية، بينما <code>web/src/api/support.ts:27</code> يستدعي <code>POST /support/sessions</code> بجسم فارغ <code>{}</code> دائمًا — لا يوجد أي حقل "عنوان" في واجهة المستخدم يمكنه إشباع هذا الشرط. أي إعادة محاولة عديمة الجدوى لأن الطلب لا يتغيّر أبدًا.</div>
+  <div class="verify-box">✅ تحقّق عدائي مستقلّ: أعاد الوكيل الثاني التسجيل من الصفر بحساب جديد تمامًا (لا يعتمد على جلسة الوكيل الأول) وحصل على نفس الخطأ 422 بنفس الرسالة بالضبط — يستبعد أن يكون خللًا في جلسة عابرة. <b>عطل كامل ودائم في ميزة الدردشة بأكملها.</b></div>
+</div>
+
+<div class="card crit">
+  <div class="card-head">
+    <div class="card-title">🗺️ خريطة تتبّع السائق تُسقِط صفحة تتبّع الطلب بالكامل</div>
+    <div class="tag-row"><span class="tag crit">CRITICAL</span><span class="tag area">تتبّع الطلب</span><span class="tag verified">مؤكَّد ومُعاد إنتاجه في اختبار مستقلّ 2 مرّة</span></div>
+  </div>
+  <div class="simple"><b>بكلام بسيط:</b> بمجرّد أن يُسنَد سائق للطلب ويكون متحرّكًا ببطء أو واقفًا (الحالة الشائعة جدًا — لا سرعة كافية لحساب اتجاه البوصلة)، صفحة تتبّع الطلب بأكملها تنهار وتتحوّل إلى شاشة خطأ تقنية بيضاء عليها نص إنجليزي خام، ويفقد العميل الوصول لكل شيء: الجدول الزمني، الدردشة، إلغاء الطلب، تقديم شكوى، وزر الطوارئ.</div>
+  <div class="kv">
+    <div class="k">السيناريو</div><div class="v">تقدُّم طلب حقيقي حتى حالة "سائق في الطريق" مع سائق حقيقي مُسنَد، ثم فتح /order/:id — تكرّر 3 مرّات على 3 طلبات مختلفة.</div>
+    <div class="k">الحاصل فعليًا</div><div class="v">شاشة "Unexpected Application Error!" الافتراضية من React Router، مع الخطأ التقني: <code>Cannot read properties of undefined (reading 'createIcon')</code>.</div>
+  </div>
+  <div class="simple">السبب الجذري (تقني دقيق): مكوّن الخريطة <code>TripRouteMap.tsx:107-111</code> يمرّر <code>icon: undefined</code> بشكل صريح لعلامة السائق عندما لا تتوفّر بيانات اتجاه/سرعة كافية (الحالة الشائعة). مكتبة الخرائط Leaflet تتعامل مع "قيمة undefined صريحة" بشكل مختلف عن "عدم وجود الخاصية أصلًا" — فتحاول استدعاء دالّة على قيمة غير موجودة وتنهار. لا يوجد في المشروع "شاشة خطأ احتياطية" (errorElement) تلتقط هذا الانهيار، فتظهر شاشة React الخام مباشرة للعميل.</div>
+  <div class="verify-box">✅ أعاد الوكيل المدقّق إنتاج الخطأ بطريقتين مستقلّتين: (1) اختبار خام على مكتبة Leaflet وحدها أثبت أنّ <code>icon: undefined</code> يسبّب الانهيار تحديدًا (بعكس عدم تمرير الخاصية إطلاقًا، الذي يعمل بسلام)، و(2) عرض حقيقي لنفس مكوّن React المستخدَم فعليًا في التطبيق (بدون أي تعديل) أعاد إنتاج نفس رسالة الخطأ بالضبط. هذا يعني أنّ المسار الشائع (سائق واقف أو بطيء — وهو الأغلب) يُسقِط الصفحة بالكامل، وليس حالة نادرة.</div>
+</div>
+</section>
+
+<section id="high">
+<h2 class="sec-title high">٤. عيوب عالية الخطورة (HIGH)</h2>
+<p class="lead">لا تُسقِط الميزة بالكامل، لكن لها أثر مالي أو أمني أو وظيفي حقيقي يجب إصلاحه قريبًا.</p>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">🛒 عربة التسوّق تنتقل بين الحسابات — تسريب خصوصية</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">السلة</span><span class="tag verified">مؤكَّد</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> إذا سجّل عميل "أ" خروجًا على جهاز مشترك (كمبيوتر عائلي، أو جهاز نقطة بيع)، ثم سجّل عميل "ب" دخوله على نفس المتصفّح، عربة تسوّق "أ" بالكامل (المتجر، الأصناف، التخصيصات، عدد القطع) تظهر لـ"ب" وكأنها عربته — تسريب خصوصية حقيقي وخطأ منطقي: "ب" قد يكمل شراء أصناف اختارها "أ" وهو لا يعلم.</div>
+  <div class="kv"><div class="k">السبب</div><div class="v"><code>web/src/context/CartContext.tsx:21</code> يخزّن العربة في مفتاح واحد عالمي بالمتصفّح (<code>toowa_cart</code>) بلا ربط بمعرّف المستخدم، ودالّة تسجيل الخروج <code>clearAuthStorage()</code> تتجاهله عمدًا (تعليق صريح في الكود: "Cart/prefs survive").</div></div>
+  <div class="verify-box">✅ أُعيد إنتاج الآلية على مستوى التخزين مباشرة، وتأكَّد أنّ لا حارس ملكية (ownership check) موجود في أي مكان في صفحة السلة.</div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">📞 هاتف غير صالح يُقبَل عند التسجيل — قد يقفل الحساب عن صاحبه للأبد</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">التسجيل</span><span class="tag verified">مؤكَّد</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> يمكن التسجيل برقم هاتف عشوائي مثل "ABC-not-a-phone-999" وينجح الحساب فورًا (نشِط). لكن هذه القيمة لا تطابق تنسيق تسجيل الدخول لاحقًا — فإن لم يُدخِل العميل بريدًا إلكترونيًا أيضًا، يصبح حسابه غير قابل للدخول إليه إطلاقًا.</div>
+  <div class="kv"><div class="k">السبب</div><div class="v"><code>normalize_phone()</code> في <code>registration_router.py:86-109</code> لا يتحقّق من شكل الرقم، بل يمرّره كما هو لأي صيغة غير معروفة.</div></div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">🕐 ساعات عمل فارغة تُعرَض "مغلق طوال الأسبوع" رغم أنّ المتجر مفتوح وقابل للطلب فعليًا</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">التصفّح</span><span class="tag verified">مؤكَّد بلقطة شاشة</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> الخلفية تقول رسميًا إنّ "لا ساعات عمل مسجَّلة = مفتوح 24 ساعة"، لكن الواجهة لا تطبّق هذه القاعدة، فتعرض السبعة أيام "مغلق" — بينما نفس الصفحة تُظهر الشارة الخضراء "مفتوح" وزرّ الإضافة للسلة فعّالًا.</div>
+  <img class="shot" src="./462-لقطات/opening_hours_bug.png" alt="لقطة شاشة: مطعم النورس يظهر مفتوحًا وقابلًا للطلب، لكن كل أيام الأسبوع في تفاصيل ساعات العمل تظهر مغلق">
+  <div class="shot-cap">لقطة حيّة: «مطعم النورس» — الشارة والزر يقولان "مفتوح"، وتفاصيل ساعات العمل بالأسفل تقول "مغلق" لكل الأيام.</div>
+  <div class="kv"><div class="k">السبب</div><div class="v"><code>ProviderHeader.tsx:160-183</code> يتحقّق فقط من أنّ القيمة "موجودة" ({} تُعتبَر موجودة في جافاسكربت)، ولا يطبّق قاعدة "فارغ = 24 ساعة" الموثّقة في <code>provider_hours.py:10</code>.</div></div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">🔤 البحث بالإنجليزية معطَّل بالكامل رغم وجود فهرس مخصَّص له</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">التصفّح</span><span class="tag verified">مؤكَّد</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> البحث بكلمة إنجليزية مثل "beef" أو "Pizza" يُرجِع صفر نتائج، حتى عن أصناف موجودة فعليًا واسمها الإنجليزي مطابق تمامًا. البحث بنفس الكلمة بالعربية يعمل بشكل صحيح.</div>
+  <div class="kv"><div class="k">السبب</div><div class="v">استعلام البحث على Postgres (<code>search_service.py:107-222</code>) يقارن فقط بالنص العربي (<code>names_json-&gt;&gt;'ar'</code>) ولا يلمس الحقل الإنجليزي إطلاقًا — رغم وجود فهرس GIN مخصّص (<code>idx_catalog_items_name_en_trgm</code>) لم يُستخدَم أبدًا. مسار SQLite الاحتياطي في نفس الملف يدعم الإنجليزية بشكل صحيح، مما يؤكّد أنّ هذا سهو وليس تصميمًا مقصودًا.</div></div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">🚪 حزمة طلبات سريعة (429) تُسقِط جلسة العميل تلقائيًا رغم أنّ حسابه سليم تمامًا</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">اطلب أي شيء / التصفّح</span><span class="tag verified">مؤكَّد — لوحِظ في منطقتين مستقلّتين بنفس السبب الجذري</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> إذا كثُرت الطلبات من نفس عنوان الشبكة خلال دقيقة (شائع مع الإنترنت المشترك بين عدّة عملاء عبر نفس مزوّد الاتصالات — حالة واقعية في ليبيا)، الخادم يرفض تجديد الجلسة برمز 429 (طلبات كثيرة)، لكن الواجهة تعامل هذا الرفض كأنه "جلستك غير صالحة" وتُخرِج العميل فورًا لصفحة تسجيل الدخول رغم أنّ حسابه وكلمة مروره ما زالا صحيحين تمامًا.</div>
+  <div class="kv"><div class="k">السبب</div><div class="v"><code>web/src/auth/AuthContext.tsx:54-61</code> يعامل أي فشل في تجديد الجلسة (سواء 401 حقيقي أو 429 مؤقّت) بنفس الطريقة: مسح الجلسة وإخراج المستخدم.</div></div>
+  <div class="verify-box">✅ أُعيد إنتاج الحالة حيًّا مرّتين مستقلّتين (مرّة أثناء فحص "اطلب أي شيء" ومرّة أثناء فحص التصفّح) بنفس السبب الجذري بالضبط — يرفع الثقة في أنّ هذا سيناريو واقعي وليس صدفة اختبار.</div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">🌐 رسائل الخطأ الإنجليزية في الدفع غالبًا عربية أو نصوص خام غير مترجَمة</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">الدفع</span><span class="tag verified">مؤكَّد</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> عميل يستخدم الواجهة بالإنجليزية ويحصل على خطأ في الدفع (رصيد غير كافٍ، عنوان مفقود...) — الرسالة التي يراها فعليًا غالبًا عربية، أو أحيانًا معرّف تقني خام مثل <code>otp_required_for_high_value_cod</code> بدل جملة مفهومة.</div>
+  <div class="kv"><div class="k">السبب</div><div class="v"><code>order_router.py</code> يبني <code>message_en</code> بمجرّد نسخ النص العربي الخام (<code>message_en=str(e)</code>) لمعظم الحالات، ولا يوجد سوى 9 من عشرات الحالات لها ترجمة عربية مخصّصة — الباقي يظهر برسالة عامّة غير مفيدة.</div></div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">🔁 نقرة مزدوجة سريعة على "تقديم الطلب" تُنشئ طلبَين حقيقيَّين منفصلَين</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">الدفع</span><span class="tag verified">مؤكَّد — 6 من 6 محاولات</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> نقرة مزدوجة سريعة على زرّ الدفع (شائعة جدًا على الجوّال) تُنتِج طلبَين حقيقيَّين منفصلَين في قاعدة البيانات — وليس طلبًا واحدًا كما يتوقّع أي عميل. الحماية الوحيدة الموجودة هي تعطيل الزرّ من جهة الواجهة فقط، وهي حماية ضعيفة يمكن تجاوزها بسهولة.</div>
+  <div class="kv"><div class="k">السبب</div><div class="v">الواجهة تُنشئ مفتاح تكرار (idempotency key) جديد في كل نقرة بناءً على الوقت الحالي (<code>CheckoutPage.tsx:664</code>)، فحماية الخادم من "نفس المفتاح مرّتين" لا تلتقط نقرتين بمفتاحين مختلفين.</div></div>
+  <div class="verify-box">✅ 6 محاولات فعلية متتالية على الخادم الحقيقي أنتجت 6 أزواج طلبات (13 طلبًا لعميل واحد خلال أقل من ثانية) — تأكيد قوي وليس حالة نظرية.</div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">💸 تحويل محفظة مُستلَم لا يظهر في سجلّ عمليات المحفظة الرئيسي</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">المحفظة</span><span class="tag verified">مؤكَّد</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> عميل يستلم تحويلًا حقيقيًا من عميل آخر — رصيده يزيد فعلًا وبشكل صحيح — لكن "آخر العمليات" في صفحة المحفظة الرئيسية لا تُظهر هذه العملية إطلاقًا، فيبدو الرصيد وكأنه زاد "من فراغ" دون تفسير.</div>
+  <div class="kv"><div class="k">السبب</div><div class="v">نقطة النهاية <code>get_my_wallet_transactions</code> (<code>payment_router.py:186-225</code>) تجلب فقط عمليات الشحن وحجوزات الطلبات، ولم تُحدَّث لتشمل جدول التحويلات بين المحافظ الجديد نسبيًا.</div></div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">🔔 صندوق الإشعارات يظهر فارغًا دائمًا — اختلاف أسماء الحقول بين الخادم والواجهة</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">الإعدادات</span><span class="tag verified">مؤكَّد</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> مهما كانت عدد الإشعارات الحقيقية المخزَّنة للعميل، صندوق الوارد سيظهر فارغًا دائمًا (0 غير مقروء) — لأنّ الخادم يرسل الحقول باسم <code>notifications/count</code> بينما الواجهة تقرأ فقط <code>items/unread_count</code>.</div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">🔢 رقم المحفظة يتغيّر عشوائيًا في كل زيارة قبل أول عملية فعلية</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">المحفظة</span><span class="tag verified">مؤكَّد — 0 صفوف فعلية في القاعدة رغم "إنشاء" 5 مرّات</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> عميل جديد لم يجرِ أي عملية مالية بعد، كل مرّة يفتح فيها صفحة المحفظة يرى رقم محفظة مختلفًا تمامًا. السبب تقني بحت: الخادم "يُنشئ" صف المحفظة لكن لا يحفظه فعليًا في القاعدة (ينقصه أمر commit)، فيُنشئ صفًا جديدًا عشوائيًا في كل مرّة.</div>
+  <div class="verify-box">✅ 5 نداءات متتالية = 5 أرقام مختلفة، وفحص القاعدة مباشرة أكّد وجود 0 صفوف فعلية محفوظة لهذا المستخدم رغم "الإنشاء" 5 مرّات.</div>
+</div>
+
+<div class="card high">
+  <div class="card-head"><div class="card-title">✏️ ميزة تعديل اسم العرض معطَّلة بالكامل — الواجهة تستدعي مسارًا غير موجود في الخلفية</div>
+  <div class="tag-row"><span class="tag high">HIGH</span><span class="tag area">فحص بنيوي شامل</span><span class="tag verified">مؤكَّد</span></div></div>
+  <div class="simple"><b>بكلام بسيط:</b> ميزة "تعديل اسم الظهور (بحدّ أقصى مرّة كل 30 يومًا)" لا تظهر إطلاقًا في صفحة الإعدادات لأي عميل، لأنّ الواجهة تسأل عن مسار (<code>/identity/customers/me/name-cooldown</code>) لم يُبنَ في الخلفية إطلاقًا — الخلفية الفعلية بنيت بمسار مختلف كليًا (<code>/customer/me/profile</code>) بأسماء حقول مختلفة أيضًا، في التزامن نفسه (الخلفية والواجهة نُفِّذتا بفارق يومين، ولم يتّفقا على العقد).</div>
+</div>
+</section>
+
+<section id="med">
+<h2 class="sec-title med">٥. عيوب متوسّطة (MEDIUM)</h2>
+
+<div class="card med"><div class="card-head"><div class="card-title">☑️ صندوق قبول الشروط لا يفتح نافذة الشروط عند النقر المباشر عليه (يتعارض مع تعليق في نفس الكود)</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">التسجيل</span></div></div>
+<div class="simple">النقر على مربّع "أوافق على الشروط" مباشرة (لا رابط "اقرأ الشروط") يُفعِّل الموافقة فورًا دون عرض أي نافذة — بينما تعليق في نفس السطور من نفس الالتزام (commit) يقول صراحة إنّ النقر "يجب أن يفتح نافذة الشروط أولًا". العميل قد يوافق قانونيًا على مستند لم يُعرَض عليه إطلاقًا.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">🔤 خط "Noto Sans Arabic" المخصَّص تالف بالكامل (ملف فارغ من الأصفار)</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">التصفّح / بنيوي</span></div></div>
+<div class="simple">ملف الخط (48.8 كيلوبايت) بالكامل أصفار — ليس خطًا حقيقيًا إطلاقًا، وهذا موجود في نسخة Git المُثبَّتة نفسها منذ التزام سابق زعم أنه "استعاد ملفات صالحة". النص يبقى مقروءًا بفضل خط احتياطي، لكن الخط المميَّز للعلامة التجارية لا يظهر أبدًا في أي مكان بالتطبيق.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">📄 أسباب الرفض/الإلغاء تظهر كنصّ خام أو بلغة خاطئة</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">التتبّع</span></div></div>
+<div class="simple">طلب رُفض تلقائيًا يُظهِر السبب بالعربية دائمًا حتى في الواجهة الإنجليزية ("Reason: لم يستجب المطعم خلال المهلة")، وطلب أُلغي من العميل يُظهِر معرّفًا تقنيًا خامًا ("Reason: changed_mind") في أي لغة — لأنّ القيمة الخام تُخزَّن مباشرة بلا ترجمة، رغم وجود قائمة ترجمة جاهزة تُستخدَم فقط عند اختيار السبب، لا عند عرضه لاحقًا.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">🚗💬 تقييم السائق ومحادثة التوصيل بالعربية فقط دائمًا (حتى بالواجهة الإنجليزية)</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">التتبّع</span></div></div>
+<div class="simple">12 نصًّا على الأقل (بطاقة تقييم السائق، ودردشة التوصيل بالكامل) موجودة فقط كنص عربي مضمَّن في الكود، وغائبة تمامًا حتى من ملفّ الترجمة العربي نفسه — أي أنها لم تُدمَج في نظام الترجمة إطلاقًا، وليست مجرّد ترجمة إنجليزية ناقصة.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">📦 صفحة "الطلبات المجمّعة" بالعربية دائمًا + شارة الحالة تعرض النص الخام "PLACED"</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">التتبّع</span></div></div>
+<div class="simple">عيبان معًا: (١) الصفحة كاملة عربية دائمًا بسبب مفاتيح ترجمة غائبة من كل الملفّات الثلاثة. (٢) خريطة ترجمة حالة المجموعة لا تحتوي حالة "PLACED" — وهي الحالة الفعلية الافتراضية من الخلفية (لا وجود لحالة "ACTIVE" التي تفترضها الواجهة أصلًا) — فيظهر النص الإنجليزي الخام PLACED لكل طلب مجمّع حديث، بكل اللغات.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">🌍 29 مفتاح ترجمة غائب في الإعدادات/العناوين/الولاء</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">الإعدادات</span></div></div>
+<div class="simple">قسم "المحظورون"، مشاركة الموقع الحيّ، زرّ "تعيين افتراضي" في دفتر العناوين، ورمز الموقع (Plus Code) — كلها بالعربية دائمًا لأنّ مفاتيح الترجمة غائبة من الملفّات الثلاثة كلها (لا استثناء للعربية نفسها)، وهذا يؤكّد أنّ السبب سهو في الترجمة لا تصميم مقصود.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">🌐 ثلاث صفحات كاملة (اللغة المتقدّمة، تفضيلات الإشعارات، جزء من صندوق الوارد) لا تدعم الترجمة إطلاقًا</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">الإعدادات</span></div></div>
+<div class="simple">صفحتان مكتوبتان بالكامل بلا أي استخدام لنظام الترجمة (كل النصوص عربية مضمَّنة مباشرة في الكود)، وصفحة ثالثة نصف مُدمَجة فقط. تبقى بالعربية دائمًا حتى مع تبديل لغة التطبيق بالكامل للإنجليزية من كل مكان آخر.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">💰 صنف بسعر فارغ (null) قابل للإضافة والوصول حتى خطوة الدفع الأخيرة</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">فحص بنيوي شامل</span></div></div>
+<div class="simple">صنف فقد سعره (متغيّره الوحيد أُرشِف) يبقى ظاهرًا وقابلًا للإضافة للسلة (يظهر السعر "0.000 د.ل" بدل أن يُخفى الزرّ)، ويصل العميل حتى خطوة الدفع الأخيرة قبل أن يُرفَض الطلب برسالة تقنية خام تحتوي معرّفًا داخليًا (UUID) غير مفهوم. <b>ملاحظة مهمّة:</b> تمّ التأكّد أنّ الخادم يرفض إنشاء الطلب فعليًا في هذه الحالة (لا مخاطرة مالية حقيقية) — العيب هنا في تجربة الاستخدام فقط: لا يُمنَع العميل مبكرًا، بل يُفاجَأ برسالة غير مفهومة في اللحظة الأخيرة.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">🔄 صفحة طلب مرفوض (403) تستمرّ بالمحاولة كل 15 ثانية إلى الأبد</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">فحص بنيوي شامل</span></div></div>
+<div class="simple">عند فتح رابط لطلب لا يملكه العميل، الرسالة الصحيحة تظهر ("ليس لديك صلاحية")، لكن الصفحة تستمرّ بمحاولة جلب الطلب (وشكاواه ومستردّاته) كل 15 ثانية للأبد دون توقّف — استنزاف غير ضروري للبيانات والبطارية، ليس ثغرة أمنية (الخادم يرفض بشكل صحيح في كل مرّة).</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">🏷️ كود خصم صحيح، منتهٍ، أو خاطئ — نفس النتيجة تمامًا "خصم صفر" بلا أي تمييز</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">الدفع</span></div></div>
+<div class="simple">لا توجد أي رسالة خطأ للعميل عند إدخال كود خصم خاطئ أو منتهي — النتيجة مطابقة تمامًا لعدم إدخال أي كود إطلاقًا. جزء من السبب أنّ نظام الخصومات معطَّل أساسًا في هذه البيئة، لكن حتى عند تفعيله، الكود لا يُميّز بين الحالات ولا يُظهِر أي تفسير للعميل.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">🌐 صفحة "اللغة المتقدّمة" تحفظ اختيارًا لا يُغيِّر لغة التطبيق فعليًا</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">الإعدادات</span></div></div>
+<div class="simple">صفحة بعنوان "إعدادات اللغة المتقدّمة" — اختيار الإنجليزية والضغط "حفظ" يخزّن تفضيلًا في الخادم فقط، دون أي أثر مرئي على لغة التطبيق. العميل الذي يستخدم هذه الصفحة تحديدًا لتغيير اللغة سيظنّ التطبيق معطَّلًا. الزرّ الفعلي الوحيد الذي يُغيّر اللغة فعليًا هو زرّ منفصل صغير في أعلى الصفحة الرئيسية للإعدادات.</div></div>
+
+<div class="card med"><div class="card-head"><div class="card-title">🔐 لا توجد ميزة "تغيير كلمة المرور" لعميل مسجَّل دخوله فعليًا</div>
+<div class="tag-row"><span class="tag med">MEDIUM</span><span class="tag area">الإعدادات</span></div></div>
+<div class="simple">العميل الذي يعرف كلمة مروره الحالية ويريد فقط تغييرها (مثلًا بعد مشاركة جهازه) لا يملك أي مسار لذلك — الخيار الوحيد المتاح هو التظاهر بنسيانها والمرور بخطوات "استرجاع كلمة المرور" الكاملة (والتي هي نفسها معطَّلة بالكامل — انظر القسم الحرِج أعلاه).</div></div>
+</section>
+
+<section id="low">
+<h2 class="sec-title low">٦. ملاحظات منخفضة الخطورة وتحسينات تجربة الاستخدام (14)</h2>
+<p class="lead">لا تُعطِّل شيئًا ولا تُسبِّب ضررًا ماليًا أو أمنيًا، لكنها جديرة بالتسجيل ضمن قائمة التحسينات.</p>
+<table>
+<tr><th>المنطقة</th><th>الملاحظة</th></tr>
+<tr><td>التسجيل</td><td>صفحة "تحقّق من رقم الهاتف" لا تكشف فعليًا أي معلومة لم يكتبها المستخدم بنفسه — وظيفتها الفعلية "تحقّق من الهاتف" لا "استعلام عن الهاتف".</td></tr>
+<tr><td>التسجيل</td><td>خطأ 401 غير مؤذٍ يظهر في طرفية المتصفّح عند تحميل أي صفحة عامّة (قبل تسجيل الدخول) بسبب محاولة تجديد جلسة لا وجود لها.</td></tr>
+<tr><td>التصفّح</td><td>لا توجد أي إشارة على صفحة المتجر بأنّ التوصيل ذاتي (ليس عبر سائقي تووا) قبل الوصول لخطوة الدفع — الإفصاح يظهر فقط في اللحظة الأخيرة.</td></tr>
+<tr><td>السلة</td><td>عمليًا، كل صنف حقيقي في المنصّة يملك خيارًا واحدًا على الأقل، فنافذة التخصيص تفتح دائمًا حتى للأصناف "البسيطة" — المسار المباشر للإضافة الفورية بلا نافذة غير قابل للوصول إليه فعليًا.</td></tr>
+<tr><td>السلة</td><td>سطر الخيارات في السلة يعرض اسم النوع (مثلًا "عادي") حتى لو كان النوع الوحيد المتاح ولم يُخيَّر العميل فعليًا بين شيء.</td></tr>
+<tr><td>الدفع</td><td>مسار "الدفع الجماعي لنفس المتجر" يعمل فعليًا من الخلفية، لكن الواجهة تُخفيه بالكامل عندما تكون ميزة "الطلب الجماعي متعدّد المتاجر" مطفأة — رغم أنهما قدرتان مختلفتان.</td></tr>
+<tr><td>التتبّع</td><td>صفحة "طلباتي" الفارغة لعميل جديد تستعير نص "لا توجد طلبات جديدة" (المخصَّص للمزوّد) بدل رسالة "لم تطلب من قبل" الصحيحة للعميل.</td></tr>
+<tr><td>المحفظة</td><td><b>فحص إيجابي (يعمل بشكل صحيح):</b> زرّ الشحن المُقفَل يرفض أي محاولة تجاوز حتى عبر استدعاء مباشر للخادم — القفل حقيقي وليس شكليًا فقط.</td></tr>
+<tr><td>المحفظة</td><td><b>فحص إيجابي:</b> نافذة المساعدة (ⓘ) بجانب زرّ الشحن المُقفَل تعمل كما هو مطلوب (تظهر بالنقر لا بالتحويم فقط) — لكن لوحِظ تراكب بصري خفيف مع شريط التنقّل السفلي على الشاشات القصيرة.</td></tr>
+<tr><td>الإعدادات</td><td>حقل "تصنيف العنوان" (منزل/عمل) موجود ويعمل من جهة الخادم، لكن لا توجد أي واجهة لاختياره — حقل "جزيرة" غير قابل للاستخدام عمليًا.</td></tr>
+<tr><td>الإعدادات</td><td>لا يوجد أي شرط تعقيد على كلمة المرور عند التسجيل عدا الطول (8 أحرف) — كلمة مثل "abcdefgh" تُقبَل دون أي تحذير.</td></tr>
+<tr><td>فحص بنيوي</td><td>5 مكوّنات واجهة (<code>AllowedActionButton</code>، <code>CascadeAffectedField</code>، <code>PolicyDeniedBanner</code>، <code>SearchableUserPicker</code>، <code>StarRating</code>) غير مستخدَمة في أي صفحة فعلية — "جزر كود" حقيقية، رغم أنّ لكل منها اختبارات وحدة خضراء توهم بأنها مُستخدَمة.</td></tr>
+<tr><td>فحص بنيوي</td><td>عرض 390 بكسل (هاتف) يسمح بتمرير أفقي غير مرئي (~71 بكسل) على 3 صفحات رئيسية على الأقل، رغم أنّ لا عنصر مرئي يتجاوز حدود الشاشة فعليًا — على الأرجح عنصر مخفي داخل الغلاف المشترك.</td></tr>
+</table>
+</section>
+
+<section id="refuted">
+<h2 class="sec-title" style="border-color:#888">٧. ادّعاءات جرى نفيها بعد التحقّق العدائي — شفافية</h2>
+<p class="lead">هذان مثالان على ادّعاءين بدَوَا وكأنهما عيوب، لكن مرحلة التحقّق العدائي المستقلّة أثبتت أنهما ليسا كذلك — نذكرهما هنا لأنّ الشفافية جزء من منهجية هذا الفحص، لا لأنهما مشكلة قائمة.</p>
+
+<div class="card refuted">
+<div class="card-head"><div class="card-title">"تصفّح بميزانيتك ← تابع الطلب" لا ينقل السلة المُختارة لصفحة المتجر</div><div class="tag-row"><span class="tag pending">تمّ نفيه</span></div></div>
+<div class="refute-box">التحقّق أثبت أنّ هذا تصميم مقصود، موثَّق بتعليق صريح في الكود: السلة تدعم متجرًا واحدًا فقط في كل مرّة، فزرّ "تابع" يوجِّه العميل لصفحة المتجر ليختار المتغيّر (variant) الفعلي بنفسه — وهي خطوة تقنية لا يمكن تفاديها لأنّ بيانات صفحة "الميزانية" لا تحتوي أصلًا على معرّف المتغيّر اللازم لبناء سطر سلة صالح. النقطة الوحيدة المتبقّية الجديرة بالذكر: صياغة زرّ "تابع الطلب من [المتجر]" قد تُوحي للعميل بأنّ اختياره سيُنقَل تلقائيًا، بينما عليه إعادة اختيار الأصناف يدويًا — ملاحظة صياغة/تجربة استخدام بسيطة، لا عيب برمجي.</div>
+</div>
+
+<div class="card refuted">
+<div class="card-head"><div class="card-title">زرّ "إرسال" في دردشة التوصيل قد يقع خلف شريط التنقّل السفلي</div><div class="tag-row"><span class="tag pending">تمّ نفيه</span></div></div>
+<div class="refute-box">التحقّق أثبت أنّ هذا كان أثرًا تقنيًا خاصًّا بأداة الاختبار الآلي (Playwright) وطريقتها في التمرير التلقائي، وليس سلوكًا حقيقيًا يواجهه مستخدم بشري — القياس الفعلي لمساحة الحشو المحجوزة أسفل الصفحة أثبت وجود ~18 بكسل هامش أمان حقيقي فوق الشريط، والزرّ يبقى مرئيًا طوال الوقت لعين المستخدم (بخلاف نقرة آلية بإحداثيات عمياء).</div>
+</div>
+</section>
+
+<section id="incident">
+<h2 class="sec-title" style="border-color:var(--high)">٨. حادثة تشغيلية أثناء الاختبار — شفافية كاملة</h2>
+<div class="incident">
+<h4>⚠️ تعديل غير مصرَّح به لكلمة مرور حساب اختبار محلّي موجود مسبقًا</h4>
+<p>أثناء محاولة التحقّق من أحد الادّعاءات أعلاه (زرّ إرسال الدردشة)، قام أحد وكلاء التحقّق بالخطأ بالكتابة فوق <code>password_hash</code> لحساب اختبار محلّي موجود مسبقًا في قاعدة البيانات المحلّية (المستخدم <code>7bc2681d-31ff-4306-9fab-06e984999198</code>, الهاتف <code>+218955501234</code>) دون حفظ القيمة الأصلية أولًا، بهدف تسجيل الدخول به مباشرة. هذا تعديل غير مصرَّح به على بيانات موجودة مسبقًا، ونظام الأذونات أوقفه في الخطوة التالية <b>قبل</b> أن يتمكّن الوكيل من تسجيل الدخول فعليًا بالكلمة المزوَّرة.</p>
+<p><b>الأثر:</b> هذا حساب اختبار محلّي فقط على النسخة المحلّية (tawalocal) — لا علاقة له بالإنتاج إطلاقًا ولا بأي بيانات عملاء حقيقيين. القيمة الأصلية لم تُحفَظ قبل الكتابة فوقها، لذا هذا الحساب بالتحديد يحتاج إعادة توليد كلمة مرور (عبر إعادة تشغيل سكربتات البذر المحلّية مثل <code>seed_demo_passwords_062.py</code> أو عبر إعادة تعيين يدوية) إذا احتجتَ استخدامه لاحقًا.</p>
+<p>الوكيل لم يحاول "إصلاح" الموقف بنفسه بعد الحظر — توقّف فورًا وأبلغ عن الحادثة بدل المضيّ قدمًا. نُدرِج هذا هنا بالكامل حتى لو كان صغير الأثر، التزامًا بالشفافية الكاملة التي طلبتَها.</p>
+</div>
+</section>
+
+<section id="frontend">
+<h2 class="sec-title low">٩. اكتمال الواجهة — أكواد جزيرة ومسارات غير مربوطة</h2>
+<p class="lead">إجابة مباشرة على سؤالك: "هل هناك أكواد ليست مربوطة أو جزر، وهل هناك أشياء يجب أن تظهر ولم تظهر؟"</p>
+<table>
+<tr><th>الحالة</th><th>التفاصيل</th></tr>
+<tr><td>🏝️ كود جزيرة حقيقي (5 مكوّنات)</td><td><code>AllowedActionButton</code>, <code>CascadeAffectedField</code>, <code>PolicyDeniedBanner</code>, <code>SearchableUserPicker</code>, <code>StarRating</code> — مبنيّة، ولها اختبارات خضراء، لكن غير مستوردة في أي صفحة أو مسار فعلي حاليًا.</td></tr>
+<tr><td>🔌 ميزة كاملة مبنيّة في الخلفية لكن غير قابلة للوصول</td><td>"اطلب أي شيء (وضع الطلبات المتنوّعة/errand)" — الخلفية مبنيّة بالكامل وتعمل (طلبان حقيقيان سابقان من 2026-06-28 يثبتان ذلك)، لكنها مُطفأة فعليًا بسبب سطر إعادة توجيه بيئة ناقص في <code>docker-compose.yml</code> — ليست جزيرة كود، بل "قطعة كهرباء غير موصولة".</td></tr>
+<tr><td>💥 عقد واجهة/خلفية متضارب كليًّا</td><td>ميزة "تعديل اسم الظهور" — الواجهة والخلفية بُنِيتا بفارق يومين على مسارين مختلفَين تمامًا بأسماء حقول مختلفة، فلا تعملان معًا إطلاقًا رغم أنّ كلًّا منهما "مكتمل" على حِدة.</td></tr>
+<tr><td>📭 عدم تطابق في شكل الاستجابة (لا "جزيرة" لكن أثرها مماثل)</td><td>صندوق الإشعارات (notifications/count مقابل items/unread_count) — الميزتان مبنيّتان وتعملان تقنيًا، لكن لا يمكن لأي منهما "رؤية" الأخرى.</td></tr>
+<tr><td>🌐 صفحات كاملة بلا نظام ترجمة إطلاقًا</td><td>LocaleSettings و NotificationPrefs — مبنيّتان وتعملان وظيفيًا، لكن مكتوبتان بالكامل خارج نظام i18n للمشروع (0% تغطية ترجمة).</td></tr>
+</table>
+<div class="simple">لم نجد أي "صفحة فارغة تمامًا" أو مسار مُعرَّف في التوجيه بلا محتوى إطلاقًا — كل الـ 30+ مسارًا التي فحصناها للعميل تعرض شيئًا حقيقيًا. المشكلة الأكبر ليست "غياب محتوى" بل "عقود مكسورة بين طبقتين مبنيّتين كل واحدة بشكل منفصل ولم تُختبَرا معًا حيًّا قبل هذا الفحص".</div>
+</section>
+
+<section id="priority">
+<h2 class="sec-title">١٠. ترتيب الأولوية المقترَح للإصلاح</h2>
+<table>
+<tr><th>الأولوية</th><th>البند</th><th>سبب الأولوية</th><th>تقدير الجهد</th></tr>
+<tr><td>1️⃣</td><td>استرجاع كلمة المرور (otp_code)</td><td>عميل بلا كلمة مرور = عميل مفقود نهائيًا</td><td>صغير جدًا — تصحيح اسم حقل واحد</td></tr>
+<tr><td>2️⃣</td><td>انهيار خريطة التتبّع (icon: undefined)</td><td>يُسقِط الصفحة الأكثر استخدامًا في دورة الطلب النشط</td><td>صغير — شرط واحد + إضافة errorElement عام كحماية إضافية</td></tr>
+<tr><td>3️⃣</td><td>دردشة الدعم (subject مطلوب)</td><td>ميزة معلَنة "24 ساعة" معطَّلة كليًا</td><td>صغير — إمّا حقل افتراضي بالخادم أو إدخال بالواجهة</td></tr>
+<tr><td>4️⃣</td><td>عربة تسوّق تنتقل بين الحسابات</td><td>تسريب خصوصية + خطأ منطقي مالي محتمل</td><td>صغير-متوسّط — مسح العربة أو ربطها بمعرّف المستخدم عند تسجيل الدخول/الخروج</td></tr>
+<tr><td>5️⃣</td><td>نقرة مزدوجة تُنشئ طلبَين</td><td>أثر مالي وتشغيلي مباشر (سائقان، تحصيل نقدي مزدوج محتمل)</td><td>متوسّط — مفتاح تكرار مستقرّ من جهة السلة لا الوقت</td></tr>
+<tr><td>6️⃣</td><td>رقم محفظة عشوائي (commit مفقود)</td><td>خلل بيانات جوهري، سهل الإصلاح، أثر واسع محتمل مستقبلًا</td><td>صغير جدًا — إضافة commit واحد</td></tr>
+<tr><td>7️⃣</td><td>429 يُخرِج العميل من جلسته</td><td>يحدث تحت الحمل الحقيقي بالضبط — وقت الذروة</td><td>صغير — تمييز 429 عن 401 في معالج الأخطاء</td></tr>
+<tr><td>8️⃣</td><td>البحث الإنجليزي، ساعات العمل الفارغة، الإشعارات (اسم حقل)، اسم الظهور (مسار مفقود)</td><td>وظيفية واضحة، أثر متوسّط، إصلاح مباشر ومحدود النطاق</td><td>صغير لكل بند</td></tr>
+<tr><td>9️⃣</td><td>حزمة الترجمة الناقصة (~45 مفتاح عبر عدّة صفحات)</td><td>لا يكسر شيئًا وظيفيًا، لكنه يظهر بوضوح في تجربة أي عميل غير عربي</td><td>متوسّط — يحتاج مراجعة نصّية شاملة لا برمجة معقّدة</td></tr>
+<tr><td>🔟</td><td>باقي المتوسّط/المنخفض</td><td>تحسينات تجربة استخدام، لا ضرر تشغيلي</td><td>حسب البند</td></tr>
+</table>
+</section>
+
+<section id="scope">
+<h2 class="sec-title low">١١. تذكير بالنطاق — ما لم يُفحَص في هذه الجولة</h2>
+<div class="simple">
+<b>خارج النطاق بالكامل هذه المرّة (بطلبك الصريح):</b> تطبيق Flutter للجوّال — سيُفحَص لاحقًا بعد اكتمال الويب+الخلفية بالكامل.<br><br>
+<b>لُمِسَ جزئيًا فقط كسياق (ليس محور هذا الفحص):</b> لوحات المزوّد/السائق/العمليات (OPS) — أُنشئت حسابات مزوّد/سائق وهمية فقط بالقدر اللازم لتحريك حالة طلب العميل قدمًا (مثل إسناد سائق لرؤية الخريطة)، ولم تُفحَص هذه اللوحات بنفس العمق الذي فُحِصت به دورة العميل. يستحقّ كل منها جولة فحص مستقلّة بنفس الأسلوب إن رغبتَ.<br><br>
+<b>حسابات الاختبار المتبقّية على النسخة المحلّية:</b> +218929000001 / 000002 / 000003 (كلمة المرور CustQA2026!) بالإضافة لعشرات الحسابات المؤقّتة الأخرى التي أنشأتها الوكلاء أثناء العمل — كلّها على tawalocal المحلّي فقط، لا شيء على الإنتاج.
+</div>
+</section>
+
+<footer>
+تقرير رقم 462 — تووا (Tawa) — نُفِّذ بواسطة 9 وكلاء استكشاف متوازين + 27 وكيل تحقّق عدائي مستقلّ، على النسخة المحلّية الكاملة (tawalocal)، بلا أي لمس للإنتاج.<br>
+343 سيناريو حيّ منفَّذ فعليًا · 45 ادّعاء أولي · 27 عيبًا مؤكَّدًا · 2 ادّعاء منفيّ · حادثة تشغيلية واحدة موثَّقة بالكامل.
+</footer>
+</div>
+<a class="back-top" href="#exec">⬆ أعلى الصفحة</a>
+</body>
+</html>

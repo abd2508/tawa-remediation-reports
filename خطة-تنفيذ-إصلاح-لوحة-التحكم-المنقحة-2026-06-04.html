@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>خطة تنفيذ إصلاح لوحة التحكّم — مبنيّة على تدقيق الكود — تووا 2026-06-04</title>
+<style>
+  :root{--bg:#0f1115;--card:#171a21;--card2:#1d212b;--txt:#e7ecf3;--muted:#9aa6b6;--line:#2a2f3a;
+    --accent:#5b9dff;--ok:#36d399;--warn:#fbbd23;--bad:#f87272;--purple:#b18bff;
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:'Segoe UI','Noto Sans Arabic',Tahoma,sans-serif;line-height:1.75;font-size:15px}
+  .wrap{max-width:1160px;margin:0 auto;padding:30px 22px 90px}
+  header.top{border-bottom:2px solid var(--line);padding-bottom:18px;margin-bottom:24px}
+  h1{font-size:24px;margin:0 0 8px}
+  h2{font-size:21px;margin:34px 0 12px;padding-right:11px;border-right:4px solid var(--accent)}
+  h3{font-size:17px;margin:20px 0 8px;color:#cdd7e4}
+  .sub{color:var(--muted);font-size:13.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:16px 19px;margin:13px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:11px;margin:14px 0}
+  .stat{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:13px}
+  .stat .n{font-size:23px;font-weight:800}.stat .l{color:var(--muted);font-size:11.5px;margin-top:3px}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.5px}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;vertical-align:top}
+  th{background:#10131a;color:#bcc7d6;font-weight:700}
+  code{font-family:var(--mono);font-size:11.5px;background:#0b0d12;border:1px solid var(--line);border-radius:5px;padding:1px 6px;direction:ltr;unicode-bidi:plaintext;display:inline-block}
+  pre{background:#0b0d12;border:1px solid var(--line);border-radius:8px;padding:11px 13px;overflow-x:auto;font-size:11.5px;direction:ltr;text-align:left;color:#cdd6e2;line-height:1.55}
+  pre .rm{color:#ff9b91}pre .add{color:#9be8b6}pre .c{color:#7fae97}
+  .b{display:inline-block;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .b-fe{background:rgba(54,211,153,.14);color:var(--ok)}
+  .b-be{background:rgba(248,114,114,.14);color:var(--bad)}
+  .b-p1{background:rgba(248,114,114,.16);color:var(--bad)}
+  .b-p2{background:rgba(251,189,35,.15);color:var(--warn)}
+  .b-p3{background:rgba(91,157,255,.13);color:var(--accent)}
+  .item{border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin:12px 0;background:var(--card2)}
+  .item .h{font-weight:800;font-size:15px;margin-bottom:4px}
+  .ev{background:#0b0d12;border-right:3px solid var(--accent);border-radius:7px;padding:8px 11px;margin:8px 0;font-size:12px}
+  .ev .t{color:var(--accent);font-weight:700;font-size:11px;margin-bottom:3px}
+  .ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}.muted{color:var(--muted)}.purple{color:var(--purple)}.acc{color:var(--accent)}
+  ul{margin:6px 0;padding-right:19px}li{margin:4px 0}
+  .gov{background:rgba(177,139,255,.07);border:1px solid rgba(177,139,255,.3);border-radius:10px;padding:13px 16px;margin:13px 0;font-size:13.5px}
+  .dec{background:rgba(251,189,35,.07);border:1px solid rgba(251,189,35,.3);border-radius:10px;padding:12px 15px;margin:12px 0;color:#f2dca0;font-size:13.5px}
+  footer{margin-top:42px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:12.5px}
+  .meta{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+  .meta b{color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>خطة تنفيذ إصلاح لوحة التحكّم — مبنيّة على تدقيق الكود الكامل</h1>
+  <div class="sub">المشروع: تووا (Toowa) · لوحة OPS (<code>/ops</code>) · المصدر: <code>/home/a/Desktop/APP/platform</code> · 2026-06-04 · <b>للمراجعة قبل التنفيذ — لا تعديل بعد.</b></div>
+  <div class="meta">
+    <span><b>الأساس:</b> دراسة 7 وكلاء (~75 لوحة) + إعادة تدقيق ذاتيّ من الكود</span>
+    <span><b>كلّ بند:</b> دليل <code>file:line</code> مُتحقَّق</span>
+    <span><b>النطاق:</b> غالبه <code>web/</code> (مسموح) · بنود خلفيّة محدودة (تحتاج إذنًا)</span>
+  </div>
+</header>
+
+<h2>0 · منهج التحقّق + ما تأكّد</h2>
+<div class="card">
+  <p>لم أثق بتقرير الوكلاء عمياءً — <b>أعدتُ التحقّق من كلّ بند قابل للتنفيذ من الكود مباشرةً</b>. النتيجة: كلّ العيوب الخمسة الحرجة + اليتيمان + ثغرة fail-open مؤكَّدة بدليل دقيق.</p>
+  <table>
+    <tr><th>الادّعاء</th><th>التحقّق من الكود</th><th>الحكم</th></tr>
+    <tr><td>Chargeback يحابي العميل دائمًا</td><td><code>OpsChargebackCenter.tsx:143</code> = <code>{decision:"FAVOR_CUSTOMER"}</code> ثابت · الباكند <code>chargeback_router.py:34</code> <code>VALID_DECISIONS={FAVOR_CUSTOMER,FAVOR_PROVIDER,SPLIT}</code></td><td class="bad">مؤكَّد</td></tr>
+    <tr><td>حقل ETA ميّت</td><td><code>dispatch.ts:21</code> يرسل <code>eta_minutes</code> · <code>dispatch_router.py:70-72</code> <code>CreateOfferRequest{order_id,driver_id}</code> فقط بلا <code>extra="forbid"</code> → يُتجاهَل</td><td class="bad">مؤكَّد</td></tr>
+    <tr><td>استرداد كبير بلا موافقة ثانية</td><td><code>refund_router.py:315</code> المسار موجود · <code>rg web/src</code> = صفر مرجع أماميّ</td><td class="bad">مؤكَّد</td></tr>
+    <tr><td>ZonePolygon بلا حارس دور</td><td><code>OpsZonePolygon.tsx</code> صفر <code>canManage/role</code> · الشقيقة <code>OpsZoneSuspensions.tsx:36</code> <code>canManage = role==="SUPER_ADMIN"</code></td><td class="bad">مؤكَّد</td></tr>
+    <tr><td>PayoutTiers minor خام + افتراضي ×10</td><td><code>OpsDriverPayoutTiers.tsx:33-34</code> <code>perKm="150",minFee="200"</code> · <code>:73-75 parseInt</code> خام · label «(minor)» · العرض <code>formatMoney</code></td><td class="bad">مؤكَّد</td></tr>
+    <tr><td>كودان يتيمان</td><td><code>identity-escalation</code>(operations_router:1069) · <code>compute-trust-scores</code>(:3912) — صفر مرجع أماميّ</td><td class="bad">مؤكَّد</td></tr>
+    <tr><td>fail-open في فلترة القائمة</td><td><code>opsAccess.ts:97</code> <code>if(!allowed) return true</code></td><td class="warn">مؤكَّد (آمن اليوم بحارس المسار)</td></tr>
+    <tr><td>شارة READ-ONLY كاذبة · بانر WalletCredit · ازدواج PUT</td><td><code>ControlPanelUsers.tsx:311</code> · <code>OpsWalletCredit.tsx:95</code> «10 د.ل (1000 درهم)» خطأ · <code>driver_cash_limit_router.py:42</code> PUT مكرّر</td><td class="warn">مؤكَّد</td></tr>
+  </table>
+  <div class="grid">
+    <div class="stat"><div class="n bad">5</div><div class="l">عيوب حرجة (موجة 1)</div></div>
+    <div class="stat"><div class="n warn">7</div><div class="l">أنماط ثقة/سلامة (موجة 2)</div></div>
+    <div class="stat"><div class="n acc">2</div><div class="l">يتيمان (موجة 3 — قرار)</div></div>
+    <div class="stat"><div class="n acc">5</div><div class="l">تنظيم/تنقّل (موجة 4)</div></div>
+    <div class="stat"><div class="n purple">2</div><div class="l">خلفيّ (موجة 5 — إذن)</div></div>
+  </div>
+  <div class="sub">شارات: <span class="b b-fe">FE = web/ مسموح</span> · <span class="b b-be">BE = منطقة محظورة تحتاج إذنًا</span></div>
+</div>
+
+<!-- WAVE 1 -->
+<h2>1 · الموجة الأولى — تصحيح حرج (web/ فقط) <span class="b b-p1">أولويّة قصوى</span></h2>
+
+<div class="item">
+  <div class="h">W1-1 · Chargeback: منتقي قرار بدل التثبيت <span class="b b-fe">FE</span></div>
+  <div class="ev"><div class="t">الدليل</div><code>OpsChargebackCenter.tsx:143</code> يرسل <code>FAVOR_CUSTOMER</code> دائمًا · الباكند يقبل الثلاثة.</div>
+  <b>التغيير:</b> إضافة <code>&lt;select&gt;</code> (محاباة عميل / محاباة مزوّد / تقسيم) + حقل ملاحظة اختياريّ، وتمرير <code>decision</code> المختار للـ<code>resolveDispute</code>.
+  <div class="meta"><span>المخاطرة: <b class="ok">منخفضة</b></span><span>الأثر: عدالة قرار المال</span><span>اختبار: 3 قرارات تصل صحيحة</span></div>
+</div>
+
+<div class="item">
+  <div class="h">W1-2 · DispatchOffer: معالجة حقل ETA الميّت <span class="b b-fe">FE</span> <span class="dec" style="padding:1px 7px;font-size:11px">قرار مطلوب</span></div>
+  <div class="ev"><div class="t">الدليل</div><code>OpsDispatchOffer.tsx:71,142,144</code> يرسل eta · <code>dispatch_router.py:70-72</code> لا يقبله → يُتجاهَل بصمت.</div>
+  <b>الخيار أ (موصى — FE):</b> حذف حقل ETA والإرسال (الباكند يحسب ETA بنفسه <code>dispatch_router.py:361</code>).<br>
+  <b>الخيار ب (BE — يحتاج إذنًا):</b> إضافة <code>eta_minutes</code> إلى <code>CreateOfferRequest</code> إن كان التجاوز اليدويّ مطلوبًا.
+  <div class="meta"><span>المخاطرة: <b class="ok">منخفضة</b></span><span>قرار: هل الـETA اليدويّ مطلوب؟</span></div>
+</div>
+
+<div class="item">
+  <div class="h">W1-3 · RefundCenter: زرّ «موافقة ثانية» <span class="b b-fe">FE</span></div>
+  <div class="ev"><div class="t">الدليل</div>المسار <code>refund_router.py:315</code> موجود · صفر استدعاء أماميّ → الاسترداد الكبير 422 بلا مخرج.</div>
+  <b>التغيير:</b> إضافة <code>refundApi.secondApprove(id)</code> + زرّ «موافقة ثانية (وكيل مختلف)» يظهر على الاستردادات بحالة تنتظر الموافقة الثانية؛ ربطه بالمسار القائم.
+  <div class="meta"><span>المخاطرة: <b class="ok">منخفضة</b></span><span>الأثر: إكمال maker-checker</span></div>
+</div>
+
+<div class="item">
+  <div class="h">W1-4 · ZonePolygon: حارس دور أماميّ <span class="b b-fe">FE</span></div>
+  <div class="ev"><div class="t">الدليل</div><code>OpsZonePolygon.tsx</code> بلا حارس · <code>OpsZoneSuspensions.tsx:36</code> النمط الصحيح.</div>
+  <b>التغيير:</b> نسخ نمط الشقيقة: <code>const canManage = user?.role === "SUPER_ADMIN"</code> → إخفاء نموذج الإنشاء/أزرار الإنهاء لغير-SUPER + إشعار «للقراءة فقط».
+  <div class="meta"><span>المخاطرة: <b class="ok">منخفضة</b></span><span>الأثر: إزالة أزرار ميّتة</span></div>
+</div>
+
+<div class="item">
+  <div class="h">W1-5 · DriverPayoutTiers: إدخال بالدينار + تصحيح الافتراضيّات <span class="b b-fe">FE</span></div>
+  <div class="ev"><div class="t">الدليل</div><code>:33-34</code> <code>perKm="150",minFee="200"</code> · <code>:73-75</code> <code>parseInt</code> خام مليم · label «(minor)».</div>
+<pre><span class="rm">- per_km_minor: parseInt(perKm,10)        // "150" = 0.150 د.ل/كم</span>
+<span class="add">+ per_km_minor: parseToMinor(perKm)       // "1.5" = 1500 مليم</span>
+<span class="c"># + تغيير الافتراضيّات للقيم القانونيّة (1.5/2) + label «(د.ل)» + خطوة 0.001</span></pre>
+  <div class="meta"><span>المخاطرة: <b class="warn">متوسطة</b> (تسعير أجور)</span><span>اختبار: 1.5→1500 · العرض يطابق</span></div>
+</div>
+
+<!-- WAVE 2 -->
+<h2>2 · الموجة الثانية — الثقة والسلامة (web/ فقط) <span class="b b-p2">عالية</span></h2>
+<div class="card">
+<table>
+  <tr><th>#</th><th>البند</th><th>الدليل</th><th>التغيير</th></tr>
+  <tr><td>W2-1</td><td>إزالة شارة «READ-ONLY» الكاذبة من 4 كونسولات قابلة للكتابة</td><td><code>ControlPanelUsers.tsx:311</code> (+Customers/Providers/Drivers)</td><td>حذف الشارة أو استبدالها بـ«إدارة»</td></tr>
+  <tr><td>W2-2</td><td>تصحيح بانر وحدة WalletCredit</td><td><code>OpsWalletCredit.tsx:95</code> «10 د.ل (1000 درهم)» — الصحيح 10000 درهم</td><td>«(10000 درهم)» أو حذف القوس</td></tr>
+  <tr><td>W2-3</td><td>تقييد SETTLE_PARTIAL لـPARTIAL_PAYMENT فقط</td><td><code>OpsCashExceptions.tsx:27</code> معروض لكل الصفوف</td><td>تصفية الخيار حسب <code>e.exception_code</code></td></tr>
+  <tr><td>W2-4</td><td>إظهار أخطاء الخادم بدل ابتلاعها — SupportCenter أولًا</td><td><code>OpsSupportCenter.tsx:39,50,86,99</code> <code>.catch(()=>{})</code></td><td>عرض رسالة الخطأ + عدم مسح نصّ الإرسال قبل النجاح</td></tr>
+  <tr><td>W2-5</td><td>إظهار أخطاء المالية (سبب 422 الحقيقيّ)</td><td>ManualJournal/Tax/Payroll تجمّع كلّ الأسباب في «تعذّر» واحدة</td><td>تمرير <code>err.message_ar</code> الخلفيّ</td></tr>
+  <tr><td>W2-6</td><td>تأكيدات على إجراءات مدمّرة بلا تأكيد</td><td>AIControls تعليق جماعيّ · AccountManagement إنشاء حساب · PosIntegrations تدوير مفتاح</td><td>إضافة حوار <code>useConfirm</code></td></tr>
+  <tr><td>W2-7</td><td>منتقي سائق بدل UUID + رفض وثيقة بسبب</td><td>DriverEmergencies UUID يدويّ · Onboarding <code>rejectDoc</code> بلا reason</td><td>منتقي + تمرير <code>{reason_code}</code> القائم</td></tr>
+</table>
+</div>
+
+<!-- WAVE 3 -->
+<h2>3 · الموجة الثالثة — كودان يتيمان (قرار المالك) <span class="b b-p2">قرار</span></h2>
+<div class="dec">
+  مساران خلفيّان موجودان بلا أيّ واجهة. <b>يحتاجان قرارك:</b> بناء واجهة (FE فقط — المساران موجودان) أم توثيق إزالتهما؟
+  <table style="margin-top:8px">
+    <tr><th>المسار</th><th>الوظيفة</th><th>الخيار</th></tr>
+    <tr><td><code>POST /operations/users/{id}/identity-escalation</code> (:1069)</td><td>تصعيد احتيال/هويّة</td><td>زرّ في OpsDriverControls/AIControls · أو إزالة</td></tr>
+    <tr><td><code>POST /operations/system/compute-trust-scores</code> (:3912)</td><td>إعادة حساب الثقة يدويًّا</td><td>زرّ في OpsAIControls · أو الاكتفاء بالمجدول</td></tr>
+  </table>
+</div>
+
+<!-- WAVE 4 -->
+<h2>4 · الموجة الرابعة — التنظيم والتنقّل (web/ فقط) <span class="b b-p3">متوسطة</span></h2>
+<div class="card">
+<table>
+  <tr><th>#</th><th>البند</th><th>التغيير</th></tr>
+  <tr><td>W4-1</td><td>سدّ fail-open: المسارات الماليّة التسعة غائبة عن <code>OPS_NAV_ACCESS</code></td><td>إضافتها لخريطة الوصول (<code>opsAccess.ts</code>) — تتحوّل الفلترة من fail-open إلى صريحة</td></tr>
+  <tr><td>W4-2</td><td>21 صفحة مخفيّة (مركز فقط)</td><td>قائمة فرعيّة قابلة للطيّ تحت «المالية» و«CP» بدل الاعتماد على المركز فقط</td></tr>
+  <tr><td>W4-3</td><td>تشتّت كونسولات الكيانات</td><td>توحيد عملاء/مزوّدون/سائقون في قسم «إدارة الكيانات»</td></tr>
+  <tr><td>W4-4</td><td>تصادم الأيقونات (🗺️/🚫/🧾 مكرّرة)</td><td>رموز مميّزة لكل لوحة</td></tr>
+  <tr><td>W4-5</td><td>ازدواج صيانة/طوارئ + شكاوى + توزيع</td><td>دمج أو تمييز واضح (أو توضيح أنّ الصيانة=الطوارئ نفس المفتاح)</td></tr>
+</table>
+</div>
+
+<!-- WAVE 5 -->
+<h2>5 · الموجة الخامسة — تنظيف خلفيّ (منطقة محظورة — تحتاج إذنًا) <span class="b b-be">BE</span></h2>
+<div class="gov">
+  <b>تتطلّب إذنًا صريحًا لتجاوز الـForbidden Zones (<code>backend/app/modules</code>) وقد تمسّ الاختبارات:</b>
+  <ul>
+    <li><b>W5-1 ازدواج مسار حدّ النقد:</b> <code>PUT /operations/drivers/{id}/cash-limit</code> (<code>driver_cash_limit_router.py:42</code>, body <code>{cash_limit_minor,cash_allowed}</code>) يكرّر <code>POST</code> (<code>operations_router.py:891</code>, body <code>{new_limit_minor,reason}</code>). الواجهة تستخدم POST الصحيح؛ الـPUT الميّت فخّ كامن → يُنصَح بإزالته بعد تأكيد عدم وجود مستدعٍ.</li>
+    <li><b>W5-2 (إن اختير الخيار ب لـW1-2):</b> إضافة <code>eta_minutes</code> إلى <code>CreateOfferRequest</code>.</li>
+  </ul>
+  <span class="muted">توصية: تأجيل الموجة 5 ما لم تأذن؛ الموجات 1–4 كلّها <code>web/</code> مسموحة وتغطّي العيوب الحقيقيّة.</span>
+</div>
+
+<!-- SEQUENCING -->
+<h2>6 · التسلسل والجهد</h2>
+<div class="card">
+<table>
+  <tr><th>الموجة</th><th>النطاق</th><th>المخاطرة</th><th>الجهد التقديريّ</th><th>الإذن</th></tr>
+  <tr><td>1 — تصحيح حرج (5 بنود)</td><td><span class="b b-fe">FE</span></td><td class="warn">منخفضة–متوسطة</td><td>~نصف يوم</td><td>«ابدأ» يكفي</td></tr>
+  <tr><td>2 — ثقة وسلامة (7 بنود)</td><td><span class="b b-fe">FE</span></td><td class="ok">منخفضة</td><td>~نصف يوم</td><td>«ابدأ» يكفي</td></tr>
+  <tr><td>3 — يتيمان</td><td><span class="b b-fe">FE</span></td><td class="ok">منخفضة</td><td>قصير</td><td>قرار المالك أولًا</td></tr>
+  <tr><td>4 — تنظيم/تنقّل (5 بنود)</td><td><span class="b b-fe">FE</span></td><td class="ok">منخفضة</td><td>~نصف يوم</td><td>«ابدأ» يكفي</td></tr>
+  <tr><td>5 — تنظيف خلفيّ</td><td><span class="b b-be">BE</span></td><td class="warn">متوسطة</td><td>قصير</td><td><b>إذن صريح + منطقة محظورة</b></td></tr>
+</table>
+</div>
+
+<!-- GOVERNANCE -->
+<h2>7 · الحوكمة وتعريف «تمّ»</h2>
+<div class="gov">
+  <ul>
+    <li>الموجات 1–4 كلّها داخل <code>web/</code> (غير محظورة) — قابلة للتنفيذ بإذن «ابدأ».</li>
+    <li>الموجة 5 تمسّ <code>backend/app/modules</code> (Forbidden Zone) — <b>لا تُبدأ إلا بإذن صريح.</b></li>
+    <li><b>FIN-COR غير متأثّر</b> — لا مساس بـ<code>contracts/</code> ولا أعلام مقفلة؛ أزرار المال تبقى محميّة (الإصلاحات تضيف حراسةً لا تنزعها).</li>
+    <li>قاعدة عدم الـcommit/النشر سارية — لا commit ولا نشر إلا بأمرك.</li>
+    <li><b>تعريف «تمّ» لكل بند:</b> typecheck 0 · lint 0 · build PASS · اختبار وقاية للسلوك المُصلَح · لا تراجع في الحزمة · لا مساس بمنطقة محظورة (إلا الموجة 5 بإذن).</li>
+  </ul>
+</div>
+
+<div class="dec">
+  <b>قرارات تنتظرك قبل التنفيذ:</b>
+  <ol style="margin:6px 0">
+    <li>W1-2 ETA: حذف الحقل (موصى) أم إضافته للباكند؟</li>
+    <li>الموجة 3 اليتيمان: بناء واجهة أم إزالة المسارين؟</li>
+    <li>الموجة 5 الخلفيّة: هل تأذن بمسّ الـForbidden Zone لإزالة الـPUT المكرّر؟</li>
+    <li>ترتيب التنفيذ: 1→2→4 ثمّ 3/5 بقرارك؟</li>
+  </ol>
+</div>
+
+<footer>
+  خطّة مبنيّة على إعادة تدقيق ذاتيّ من الكود الحيّ (rg/Read على <code>platform/</code>) لكلّ بند، بمراسٍ <code>file:line</code> مُتحقَّقة — لا ملفّات md ولا ذاكرة. مسودّة للمراجعة، لا تنفيذ بعد. 2026-06-04.
+</footer>
+
+</div>
+</body>
+</html>

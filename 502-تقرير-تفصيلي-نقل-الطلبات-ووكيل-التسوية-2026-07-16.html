@@ -1,0 +1,667 @@
+<title>502 — نقل الطلبات ووكيل التسوية النقدي</title>
+<style>
+  @font-face {
+    font-family: "TawaSys";
+    src: local("Segoe UI"), local("Tahoma"), local("Noto Sans Arabic"), local("Arial");
+  }
+
+  :root {
+    --bg: #eef1f3;
+    --surface: #ffffff;
+    --surface-2: #f5f7f9;
+    --text: #17222d;
+    --muted: #5b6b7a;
+    --border: #dbe2e8;
+    --accent: #a8790a;
+    --accent-soft: #fdf3df;
+    --accent2: #2f7d74;
+    --accent2-soft: #e6f3f1;
+    --ok: #1f8a4c;
+    --ok-soft: #e6f6ec;
+    --high: #c73037;
+    --high-soft: #fbe7e8;
+    --med: #b06a17;
+    --med-soft: #fbeedb;
+    --low: #5b6b7a;
+    --low-soft: #edf0f2;
+    --code-bg: #101820;
+    --code-text: #d7e2ea;
+    --shadow: 0 1px 2px rgba(20,30,40,.06), 0 6px 20px rgba(20,30,40,.06);
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0f1720;
+    --surface: #172230;
+    --surface-2: #1c2836;
+    --text: #e8edf3;
+    --muted: #93a4b5;
+    --border: #2a3849;
+    --accent: #d9ad4d;
+    --accent-soft: #2b2416;
+    --accent2: #55b6ab;
+    --accent2-soft: #142523;
+    --ok: #4cc179;
+    --ok-soft: #10281a;
+    --high: #f0666c;
+    --high-soft: #2c1517;
+    --med: #e0a655;
+    --med-soft: #2b2013;
+    --low: #93a4b5;
+    --low-soft: #1c2836;
+    --code-bg: #0a1017;
+    --code-text: #cfe0ea;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1720;
+      --surface: #172230;
+      --surface-2: #1c2836;
+      --text: #e8edf3;
+      --muted: #93a4b5;
+      --border: #2a3849;
+      --accent: #d9ad4d;
+      --accent-soft: #2b2416;
+      --accent2: #55b6ab;
+      --accent2-soft: #142523;
+      --ok: #4cc179;
+      --ok-soft: #10281a;
+      --high: #f0666c;
+      --high-soft: #2c1517;
+      --med: #e0a655;
+      --med-soft: #2b2013;
+      --low: #93a4b5;
+      --low-soft: #1c2836;
+      --code-bg: #0a1017;
+      --code-text: #cfe0ea;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  .report-root {
+    direction: rtl;
+    text-align: right;
+    font-family: "TawaSys", "Segoe UI", Tahoma, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.85;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 20px 80px;
+  }
+
+  .report-root code, .report-root .mono {
+    font-family: "Cascadia Code", "Consolas", "SFMono-Regular", Menlo, monospace;
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-size: .86em;
+  }
+
+  h1, h2, h3 { text-wrap: balance; font-weight: 800; margin: 0 0 .4em; }
+  h1 { font-size: clamp(1.6rem, 1.1rem + 2vw, 2.3rem); letter-spacing: -.01em; }
+  h2 { font-size: clamp(1.25rem, 1rem + 1vw, 1.6rem); margin-top: 0; }
+  h3 { font-size: 1.05rem; color: var(--accent2); }
+  p { margin: 0 0 1em; color: var(--text); }
+  .muted { color: var(--muted); }
+
+  /* ── Header ───────────────────────────────────────────────────── */
+  header.hero {
+    background: linear-gradient(155deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 30px 28px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--accent2);
+    background: var(--accent2-soft);
+    border: 1px solid var(--accent2);
+    border-radius: 999px;
+    padding: 4px 14px;
+    margin-bottom: 14px;
+  }
+  header.hero .lede { font-size: 1.05rem; color: var(--muted); max-width: 62ch; }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .stat b {
+    display: block;
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  .stat span { font-size: .78rem; color: var(--muted); }
+  .stat.ok b { color: var(--ok); }
+  .stat.high b { color: var(--high); }
+
+  /* ── Section shell ────────────────────────────────────────────── */
+  section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 26px 28px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow);
+  }
+  section > .section-num {
+    display: inline-block;
+    font-size: .74rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 3px 12px;
+    margin-bottom: 10px;
+  }
+
+  .callout {
+    background: var(--surface-2);
+    border-inline-start: 4px solid var(--accent2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: .96rem;
+  }
+  .callout.warn { border-inline-start-color: var(--med); }
+  .callout b.tag { color: var(--accent2); }
+  .callout.warn b.tag { color: var(--med); }
+
+  /* ── Flow diagram ─────────────────────────────────────────────── */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0;
+    margin: 20px 0;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+  .flow-step {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    min-width: 150px;
+    flex: 1 1 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .flow-step .who {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: var(--accent2);
+  }
+  .flow-step .what { font-size: .92rem; font-weight: 600; }
+  .flow-step .detail { font-size: .8rem; color: var(--muted); }
+  .flow-step.highlight { border-color: var(--accent); background: var(--accent-soft); }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 34px;
+    color: var(--muted);
+    font-size: 1.3rem;
+  }
+  @media (max-width: 640px) {
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); padding: 2px 0; }
+  }
+
+  /* ── Findings table ───────────────────────────────────────────── */
+  .finding {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    background: var(--surface-2);
+  }
+  .finding-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .sev {
+    font-size: .72rem;
+    font-weight: 800;
+    padding: 3px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .sev.high { background: var(--high-soft); color: var(--high); }
+  .sev.med  { background: var(--med-soft); color: var(--med); }
+  .sev.low  { background: var(--low-soft); color: var(--low); }
+  .finding h4 { margin: 0; font-size: 1rem; }
+  .finding .plain { font-size: .93rem; margin-top: 6px; }
+  .finding .fix {
+    margin-top: 10px;
+    font-size: .88rem;
+    background: var(--ok-soft);
+    color: var(--ok);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .finding .fix b { flex-shrink: 0; }
+
+  /* ── Deploy grid ──────────────────────────────────────────────── */
+  .deploy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+    margin: 18px 0;
+  }
+  .deploy-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    background: var(--surface-2);
+  }
+  .deploy-card .status {
+    font-size: .74rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .deploy-card.done .status { color: var(--ok); }
+  .deploy-card.skip .status { color: var(--muted); }
+  .deploy-card .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .deploy-card h4 { margin: 0 0 4px; font-size: .98rem; }
+  .deploy-card p { margin: 0; font-size: .82rem; color: var(--muted); }
+
+  /* ── Timeline ─────────────────────────────────────────────────── */
+  .timeline { position: relative; padding-inline-start: 26px; margin: 20px 0; }
+  .timeline::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 7px;
+    top: 6px; bottom: 6px;
+    width: 2px;
+    background: var(--border);
+  }
+  .t-item { position: relative; padding-bottom: 20px; }
+  .t-item:last-child { padding-bottom: 0; }
+  .t-item::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: -26px;
+    top: 4px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent2);
+    border: 3px solid var(--surface);
+    box-shadow: 0 0 0 1px var(--border);
+  }
+  .t-item.warn::before { background: var(--med); }
+  .t-item b { display: block; font-size: .93rem; }
+  .t-item span.time { font-size: .76rem; color: var(--muted); }
+  .t-item p { margin: 4px 0 0; font-size: .88rem; color: var(--muted); }
+
+  /* ── Misc ─────────────────────────────────────────────────────── */
+  table.simple { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .9rem; }
+  table.simple th, table.simple td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; }
+  table.simple th { background: var(--surface-2); font-weight: 700; }
+  ul.plain { margin: 0 0 1em; padding-inline-start: 22px; }
+  ul.plain li { margin-bottom: 6px; }
+  .pill { display:inline-block; background: var(--accent2-soft); color: var(--accent2); border-radius: 999px; padding: 2px 10px; font-size:.78rem; font-weight:700; }
+  footer { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 30px; }
+</style>
+
+<div class="report-root">
+
+<header class="hero">
+  <span class="eyebrow">تقرير 502 · متابعة تقرير R478-144</span>
+  <h1>نقل الطلبات بين الموظفين + وكيل التسوية النقدي</h1>
+  <p class="lede">
+    بعد إغلاق تقرير R478-144، طلب المالك المتابعة على النقطتين المؤجَّلتين:
+    «نقل الطلبات بين المزوّدين» و«وكيل التسوية». هذا التقرير يشرح — بلغة بسيطة —
+    ماذا بُني، ماذا وجدت المراجعة العدائية (codex) من مشاكل حقيقية، كيف عولجت كل واحدة،
+    وأين نُشر كل شيء فعليًا.
+  </p>
+  <div class="stat-row">
+    <div class="stat ok"><b>2</b><span>ميزتان جديدتان</span></div>
+    <div class="stat"><b>17</b><span>اختبارًا جديدًا</span></div>
+    <div class="stat high"><b>8</b><span>عيوب اكتشفتها codex</span></div>
+    <div class="stat ok"><b>8/8</b><span>عولجت جميعها</span></div>
+    <div class="stat ok"><b>3/4</b><span>أهداف نشر مُكتملة</span></div>
+    <div class="stat"><b>0</b><span>لمسة للإنتاج</span></div>
+  </div>
+</header>
+
+<!-- ================= السؤال التوضيحي ================= -->
+<section>
+  <span class="section-num">أولًا</span>
+  <h2>لحظة التوضيح: ماذا كان يقصد المالك فعلًا؟</h2>
+  <p>
+    عبارة «نقل الطلبات بين المزوّدين» كانت تحتمل معنيَين مختلفَين تمامًا في الكود، فتوقّفتُ
+    وسألتُ قبل التنفيذ بدل التخمين:
+  </p>
+  <div class="flow">
+    <div class="flow-step">
+      <span class="who">الاحتمال الأول (مرفوض)</span>
+      <span class="what">نقل الطلب لمتجر آخر</span>
+      <span class="detail">تغيير الأصناف والأسعار لمتجر مختلف تمامًا — لا توجد آلية كهذه في نظام حالات الطلب أصلًا، وبناؤها كان سيكون مشروعًا كبيرًا منفصلًا.</span>
+    </div>
+    <div class="flow-arrow">أو</div>
+    <div class="flow-step highlight">
+      <span class="who">الاحتمال الثاني (المُختار ✓)</span>
+      <span class="what">نقل الطلب بين موظفي نفس المتجر</span>
+      <span class="detail">فريق العمليات (OPS) يقدر يعيد توجيه طلب من موظف غير متاح لموظف آخر — بنفس المتجر، بلا مساس بالسعر أو الأصناف.</span>
+    </div>
+  </div>
+  <p class="muted">اختار المالك الاحتمال الثاني صراحةً — وهو ما وُصف بأنه «الخطة الأصليّة الموصى بها».</p>
+</section>
+
+<!-- ================= الميزة الأولى ================= -->
+<section>
+  <span class="section-num">ثانيًا</span>
+  <h2>الميزة الأولى: إعادة إسناد الطلب عبر حدود العمليات</h2>
+  <p>
+    <b>بلغة بسيطة:</b> تخيّل أن صاحب متجر مطعم غير متاح فجأة (سفر، عطل هاتف)، وطلب عميل عالق
+    عند موظف انتهت ورديّته. سابقًا، فقط صاحب المتجر نفسه يقدر يعيد توزيع الطلب بين موظفيه.
+    الآن، فريق العمليات في تووا يقدر يقوم بنفس العملية بالضبط، لأي متجر، عند الحاجة —
+    دون أي تعديل على تفاصيل الطلب المالية.
+  </p>
+
+  <h3>كيف اشتغلت الميزة تقنيًّا؟</h3>
+  <p>
+    بدل كتابة منطق جديد مكرَّر، استخرجتُ المنطق الحالي (قفل الصفّ، فحص الوردية والإيقاف،
+    فحص أن الطلب لم يصل لحالة نهائية، تحديث عدّادات التوزيع، تسجيل التدقيق) إلى ملف مشترك واحد
+    يستخدمه المساران معًا — فلا يوجد نسختان قد تنحرفان عن بعض مستقبلًا.
+  </p>
+  <div class="flow">
+    <div class="flow-step">
+      <span class="who">المسار القديم (موجود)</span>
+      <span class="what">صاحب المتجر</span>
+      <span class="detail">/providers/me/orders/{id}/assign</span>
+    </div>
+    <div class="flow-arrow">↘</div>
+    <div class="flow-step highlight">
+      <span class="who">المنطق المشترك (جديد)</span>
+      <span class="what">order_assignment_service.py</span>
+      <span class="detail">قفل الصفّ + فحص الوردية + فحص الحالة + تحديث العدّادات + تدقيق</span>
+    </div>
+    <div class="flow-arrow">↙</div>
+    <div class="flow-step">
+      <span class="who">المسار الجديد (اليوم)</span>
+      <span class="what">فريق العمليات</span>
+      <span class="detail">/operations/orders/{id}/assign-staff</span>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b class="tag">حماية إضافية:</b> إذا حاول فريق العمليات إسناد الطلب لموظّف موقوف أو خارج
+    الوردية، أو لموظّف لا ينتمي لنفس المتجر صاحب الطلب، يُرفض الطلب فورًا برسالة واضحة —
+    نفس الحماية التي كانت موجودة لصاحب المتجر بالضبط.
+  </div>
+
+  <h3>الاختبار</h3>
+  <p>
+    6 اختبارات جديدة تغطي: النجاح الطبيعي، تسجيل التدقيق (من قام بالتغيير ومتى)، رفض
+    موظف من متجر آخر، رفض من ليس لديه صلاحية عمليات، رفض موظف موقوف، ورفض طلب غير موجود.
+    مع الاختبارات القديمة لصاحب المتجر: <b>25 من 25 اختبارًا ناجح</b>.
+  </p>
+</section>
+
+<!-- ================= الميزة الثانية ================= -->
+<section>
+  <span class="section-num">ثالثًا</span>
+  <h2>الميزة الثانية: إيداع نقدي عبر وكيل التسوية</h2>
+  <p>
+    <b>بلغة بسيطة:</b> عميل يريد إضافة رصيد لمحفظته في التطبيق لكن ما عنده بطاقة أو دفع
+    إلكتروني — يذهب لوكيل تسوية معتمَد ويسلّمه نقدًا. الوكيل يطلب من النظام إضافة هذا المبلغ
+    لمحفظة العميل. لكن — وهذا المهمّ — <b>لا أحد يقدر يضيف رصيدًا لنفسه بمفرده</b>. يجب أن
+    يوافق موظّف عمليات مختلف على الطلب أولًا. هذا يسمى نظام «طالِب ومُوافِق» (Maker-Checker)،
+    وهو نفس النظام المستخدم أصلًا لإيداعات مكتب العمليات — لم أخترع نظامًا جديدًا للأموال، بل
+    وسّعتُ من يقدر يبدأ الطلب.
+  </p>
+
+  <div class="flow">
+    <div class="flow-step">
+      <span class="who">1. الزبون</span>
+      <span class="what">يسلّم نقدًا</span>
+      <span class="detail">لوكيل تسوية معتمَد ونشط</span>
+    </div>
+    <div class="flow-arrow">←</div>
+    <div class="flow-step highlight">
+      <span class="who">2. الوكيل (طالِب)</span>
+      <span class="what">يطلب إيداعًا</span>
+      <span class="detail">الطلب يبقى «معلَّق» — لا يتحرّك أي مبلغ بعد</span>
+    </div>
+    <div class="flow-arrow">←</div>
+    <div class="flow-step highlight">
+      <span class="who">3. موظّف عمليات آخر (مُوافِق)</span>
+      <span class="what">يوافق أو يرفض</span>
+      <span class="detail">يجب أن يكون شخصًا مختلفًا عن الوكيل نفسه</span>
+    </div>
+    <div class="flow-arrow">←</div>
+    <div class="flow-step">
+      <span class="who">4. محفظة الزبون</span>
+      <span class="what">الرصيد يُضاف فعليًا</span>
+      <span class="detail">مع قيد محاسبي مزدوج كامل</span>
+    </div>
+  </div>
+
+  <h3>الضوابط الثلاثة قبل قبول أي طلب</h3>
+  <table class="simple">
+    <tr><th>الضابط</th><th>الشرح البسيط</th></tr>
+    <tr><td>سقف لكل عملية</td><td>الوكيل لا يقدر يقبل مبلغًا ضخمًا دفعة واحدة تفوق حدّه المسموح.</td></tr>
+    <tr><td>سقف يومي للوكيل</td><td>مجموع ما يقبله الوكيل من نقد في اليوم الواحد له حدّ أقصى.</td></tr>
+    <tr><td>سقف يومي للزبون (المستفيد)</td><td>مجموع ما يستقبله زبون واحد من نقد عبر الوكلاء في اليوم له حدّ أقصى ثابت — بغضّ النظر عن أي وكيل يرسل الطلب.</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <b class="tag">الميزة مطفأة افتراضيًا:</b> بُنيت واختُبرت بالكامل، لكنها لا تعمل فعليًا في
+    أي بيئة حتى يُفعَّل علم إعدادات مخصَّص (<code>agent_cash_topup_enabled</code>) بقرار
+    صريح من المالك. هذا العلم منفصل تمامًا عن الأعلام المالية «المختومة» في
+    <code>contracts/feature_flags.yaml</code> ولم يُلمَس أي منها.
+  </div>
+</section>
+
+<!-- ================= مراجعة codex ================= -->
+<section>
+  <span class="section-num">رابعًا</span>
+  <h2>المراجعة العدائية: ماذا وجدت أداة codex؟</h2>
+  <p>
+    قبل أي نشر، شغّلتُ مراجعة مستقلة بأداة <span class="mono">codex</span> على كامل كود
+    ميزة الإيداع النقدي. النتيجة: <b>8 مشاكل حقيقية</b> — وليست ملاحظات أسلوبية. كل واحدة
+    منها عولجت وأُعيد اختبارها قبل أي نشر. هذا بالضبط سبب وجود مراجعة مستقلة: لأخطاء
+    لا يراها الشخص الذي كتب الكود بنفسه.
+  </p>
+
+  <div class="finding">
+    <div class="finding-head"><h4>سباق التزامن في الحدود اليومية</h4><span class="sev high">عالية</span></div>
+    <p class="plain">لو الوكيل نفسه أرسل عدّة طلبات في نفس اللحظة (مثلًا بضغط متكرّر على الزر)، كل الطلبات كانت تقرأ «المجموع حتى الآن» في نفس اللحظة قبل أن يُسجَّل أي منها — فتمرّ جميعها حتى لو مجموعها يتجاوز السقف اليومي.</p>
+    <div class="fix"><b>الحل:</b> قفل صفّ الوكيل وصفّ محفظة الزبون في قاعدة البيانات قبل حساب المجموع — فتُصطفّ الطلبات وتُحتسب بالترتيب الصحيح.</div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-head"><h4>لا حماية من التكرار (طلب مزدوج)</h4><span class="sev high">عالية</span></div>
+    <p class="plain">لو انقطع الاتصال والوكيل أعاد إرسال نفس الطلب (أو ضغط الزر مرّتين)، كان النظام ينشئ طلبَين منفصلَين لنفس النقد الذي استُلم مرّة واحدة — واحتمال موافقة الاثنين لاحقًا يعني إضافة رصيد مضاعف مقابل نقد واحد فقط.</p>
+    <div class="fix"><b>الحل:</b> نافذة زمنية (120 ثانية) تتعرّف تلقائيًا على طلب مطابق (نفس الوكيل، نفس الزبون، نفس المبلغ، نفس السبب) وتُعيد نفس الطلب الأصلي بدل إنشاء طلب جديد.</div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-head"><h4>وكيل «إلكتروني فقط» يقبل نقدًا فعليًا</h4><span class="sev high">عالية</span></div>
+    <p class="plain">بعض الوكلاء مُصرَّح لهم بالتحويلات الإلكترونية فقط (لا يتعاملون بنقد أصلًا)، لكن الكود لم يكن يتحقّق من ذلك — فكان أي وكيل، حتى «الإلكتروني فقط»، يقدر يقدّم طلب إيداع نقدي.</p>
+    <div class="fix"><b>الحل:</b> فحص صريح أن تفويض الوكيل يشمل قناة «نقد» قبل قبول أي طلب.</div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-head"><h4>إمكانية تمويل حساب موقوف أو محفظة مجمَّدة</h4><span class="sev high">عالية</span></div>
+    <p class="plain">لم يكن هناك أي فحص لحالة حساب الزبون المستفيد — فحتى لو كان حسابه موقوفًا بسبب مخالفة أو محفظته مجمَّدة من قبل العمليات، كان يمكن قبول طلب إيداع له.</p>
+    <div class="fix"><b>الحل:</b> استخدام نفس الفحص الموجود مسبقًا في كل عمليات المحفظة الأخرى بالنظام (يرفض أي حساب موقوف/محظور/محفظة مجمَّدة) قبل قبول الطلب.</div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-head"><h4>سقف الزبون كان يعتمد على «أي وكيل» يرسل الطلب</h4><span class="sev med">متوسطة</span></div>
+    <p class="plain">في التصميم الأوّلي، كان سقف ما يستقبله الزبون يوميًّا يُقارَن بحدّ الوكيل المُرسِل نفسه — فوكيل بصلاحية أعلى كان يقدر يستمر بتمويل زبون تجاوز سقفه فعلًا عبر وكيل آخر أقل صلاحية.</p>
+    <div class="fix"><b>الحل:</b> سقف الزبون أصبح ثابتًا (نفس القيمة العامة للنظام) بغضّ النظر عن أي وكيل يرسل الطلب.</div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-head"><h4>لا رابط صارم بين نوع الإيداع ووكيل التسوية في قاعدة البيانات</h4><span class="sev med">متوسطة</span></div>
+    <p class="plain">من الناحية التقنية البحتة، كان ممكنًا إنشاء سجلّ «إيداع نقدي» بلا وكيل مرتبط به، أو العكس — ما يجعل أي خطأ برمجي مستقبلي يُنتج سجلّات مالية لا يمكن تتبّعها بدقّة.</p>
+    <div class="fix"><b>الحل:</b> قيد صارم في قاعدة البيانات نفسها (وليس فقط في الكود) يمنع هذا التناقض نهائيًا، مهما كان مصدر الطلب.</div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-head"><h4>صفحة «طلباتي» تبقى ظاهرة حتى لو أُطفئت الميزة</h4><span class="sev low">منخفضة</span></div>
+    <p class="plain">صفحة عرض الطلبات السابقة للوكيل تبقى تعمل حتى عند إطفاء الميزة بالكامل.</p>
+    <div class="fix"><b>قرار مقصود لا خطأ:</b> إطفاء الميزة يمنع طلبات جديدة فقط؛ لا داعي لإخفاء سجلّ الطلبات السابقة عن الوكيل وقت مراجعة العمليات لها — وثّقنا هذا القرار صراحةً في الكود.</div>
+  </div>
+
+  <div class="callout warn">
+    <b class="tag">فجوة معروفة، مُوثَّقة عمدًا وغير مُصلَحة بعد:</b> لا توجد بعد آلية «تسوية» تُقفل
+    النقد بعد أن يسلّمه الوكيل فعليًّا لمقر العمليات — المبلغ يبقى «مستحقًّا» في السجلّات إلى
+    الأبد نظريًّا. هذه ميزة أكبر ومنفصلة (تشبه دورة التسوية الموجودة أصلًا لسائقي التوصيل)
+    تحتاج قرارًا صريحًا من المالك قبل بنائها. لهذا السبب — إضافة لأسباب أخرى — <b>الميزة تبقى
+    مطفأة</b> ولا يجوز تفعيلها في بيئة حقيقية قبل حسم هذه النقطة.
+  </div>
+</section>
+
+<!-- ================= الحادثة الجانبية ================= -->
+<section>
+  <span class="section-num">خامسًا</span>
+  <h2>حادثة عرضية أثناء التنفيذ — وكيف عولجت بشفافية كاملة</h2>
+  <p>
+    أثناء تطبيق تحديث قاعدة البيانات، وقع خطأ بسيط في اختيار «الشبكة» الداخلية الصحيحة
+    داخل الجهاز — ما أدّى لتطبيق التحديث (بالخطأ) على بيئة أخرى غير مُوثَّقة موجودة على نفس
+    الجهاز (اسمها الداخلي <code>platform</code>)، بدل بيئة الاختبار الرسمية
+    (<code>tawalocal</code>).
+  </p>
+  <div class="timeline">
+    <div class="t-item warn">
+      <b>اكتشاف الخطأ فورًا</b><span class="time">أثناء التنفيذ</span>
+      <p>لاحظتُ أن اسم «الشبكة» المستخدَمة لا يطابق الاسم الرسمي الموثَّق لبيئة الاختبار — توقّفتُ فورًا للتحقّق قبل أي خطوة أخرى.</p>
+    </div>
+    <div class="t-item warn">
+      <b>فحص الضرر بدقّة</b><span class="time">قبل أي إجراء إضافي</span>
+      <p>تأكّدتُ أن البيئة الأخرى تحتوي بيانات حقيقية (830 مستخدمًا فعليًّا) — والتغيير الذي وقع عليها كان إضافيًا فقط (عمود جديد فارغ، بلا حذف أو تعديل على أي بيانات موجودة). لا فقدان بيانات ولا ضرر فعلي.</p>
+    </div>
+    <div class="t-item">
+      <b>تصحيح المسار</b>
+      <p>طُبِّق التحديث الصحيح على الشبكة والبيئة الرسمية الصحيحة (tawalocal) بعد التأكّد من الاسم الدقيق.</p>
+    </div>
+  </div>
+  <p class="muted">هذه الحادثة تُذكر هنا بكامل الشفافية — تمامًا كما جرت العادة في تقارير سابقة لهذا المشروع — رغم أنها لم تُسبّب أي ضرر فعلي.</p>
+</section>
+
+<!-- ================= ملاحظة توثيقية ================= -->
+<section>
+  <span class="section-num">سادسًا</span>
+  <h2>تصحيح توثيقي — نُفِّذ بالفعل ✓</h2>
+  <p>
+    ملف التوثيق الرئيسي للمشروع (<code>CLAUDE.md</code>) كان يذكر أن «رأس» سلسلة تحديثات قاعدة
+    البيانات هو <code class="mono">f9a1b2c3d4e5</code>. تحقّقتُ مباشرة من الكود الفعلي، وتبيّن
+    أن هذا الرقم هو تحديث <b>قديم في منتصف السلسلة</b>، وليس الأحدث — الرأس الفعلي قبل هذا
+    العمل كان <code class="mono">ab34</code>، وأصبح الآن <code class="mono">ab36</code> بعد
+    إضافتَي هذا التقرير.
+  </p>
+  <div class="callout">
+    <b class="tag">تم التحديث:</b> صحّحتُ سطرَي «رأس قاعدة البيانات» في <code>CLAUDE.md</code>
+    (في قسم «Current Recovery State» وقسم «Current Migration Head») ليعكسا الرقم الصحيح
+    <code class="mono">ab36</code>، مع توضيح أن test1 وtest/.194 مؤكَّدان على هذا الرأس، بينما
+    الإنتاج لم يُلمَس ويبقى بحاجة نشر مُصرَّح به صراحةً من المالك ليلحق بالتحديثَين الجديدين.
+  </div>
+</section>
+
+<!-- ================= النشر ================= -->
+<section>
+  <span class="section-num">سابعًا</span>
+  <h2>أين نُشر هذا العمل؟</h2>
+  <div class="deploy-grid">
+    <div class="deploy-card done">
+      <div class="status"><span class="dot"></span>مكتمل ومُختبَر حيًّا</div>
+      <h4>test 1 (محلي)</h4>
+      <p>تحديث قاعدة البيانات طُبِّق، الصورة أُعيد بناؤها، الخدمة أُعيدت بصحّة جيّدة، الميزتان فُحصتا مباشرة.</p>
+    </div>
+    <div class="deploy-card done">
+      <div class="status"><span class="dot"></span>مكتمل ومُختبَر حيًّا</div>
+      <h4>test / .194 (خادم بعيد)</h4>
+      <p>نُقلت الصورة الجديدة وطُبِّق التحديث تلقائيًّا عند إعادة تشغيل الخدمة، وفُحصت الميزتان.</p>
+    </div>
+    <div class="deploy-card done">
+      <div class="status"><span class="dot"></span>مرفوع</div>
+      <h4>GitHub</h4>
+      <p>التزامان (commits) على فرع <span class="mono">fix/464-full-remediation-2026-07-10</span> — الأول للتنفيذ، والثاني لتنسيق تلقائي بلا تغيير منطقي.</p>
+    </div>
+    <div class="deploy-card skip">
+      <div class="status"><span class="dot"></span>لم يُلمَس عمدًا</div>
+      <h4>الإنتاج (tawanow.com)</h4>
+      <p>يتطلّب إذنًا صريحًا ومنفصلًا من المالك في كل مرّة — قاعدة ثابتة للمشروع لا استثناء لها هنا.</p>
+    </div>
+  </div>
+  <div class="callout">
+    <b class="tag">تحديث لاحق:</b> هذا العمل نُشر لاحقًا على الإنتاج أيضًا (تفصيله في تقرير
+    503)، ثم دُمج فرع <code>fix/464-full-remediation-2026-07-10</code> بكل التزاماته —
+    بما فيها هذا العمل — في طلب سحب واحد (PR #19) على فرع <code>master</code> الرسمي على
+    GitHub، وحُذف الفرع المؤقّت بعد التأكّد من اكتمال الدمج (تفصيله الكامل في تقرير 505).
+  </div>
+</section>
+
+<!-- ================= الاختبارات ================= -->
+<section>
+  <span class="section-num">ثامنًا</span>
+  <h2>حصيلة الاختبارات</h2>
+  <table class="simple">
+    <tr><th>المجموعة</th><th>النتيجة</th></tr>
+    <tr><td>اختبارات إعادة إسناد الطلب (قديمة + 6 جديدة)</td><td><span class="pill">25 / 25 ✓</span></td></tr>
+    <tr><td>اختبارات الإيداع النقدي (بعد إصلاحات codex)</td><td><span class="pill">11 / 11 ✓</span></td></tr>
+    <tr><td>الفحص الحارس (لا كلمة «wallet» داخل وحدة التسوية)</td><td><span class="pill">2 / 2 ✓</span></td></tr>
+    <tr><td>كامل مجموعة اختبارات النظام الخلفي</td><td><span class="pill">3597 / 3602 ✓</span></td></tr>
+    <tr><td>فحص سلامة العقود المالية المختومة (FIN-COR)</td><td><span class="pill">PASS ✓</span></td></tr>
+  </table>
+  <div class="callout warn">
+    <b class="tag">5 اختبارات فاشلة — غير مرتبطة بهذا العمل:</b> كلها في وحدة منفصلة تمامًا
+    (تعلّم آليّ لتقدير وقت التوصيل ETA). تحقّقتُ بخمس طرق مستقلّة أنها ليست ناتجة عن هذا
+    العمل: فشلها متكرّر حتى بمعزل عن أي تغيير، لا يوجد أي رابط برمجي بينها وبين الملفات التي
+    عُدِّلت هنا، تواريخ تعديلها لم تتغيّر، وطبيعة الفشل (بيانات تجريبية غير مهيَّأة) تدل على
+    مشكلة بيئة اختبار قديمة سابقة لهذا العمل. يُنصح بتتبّعها في مهمّة منفصلة.
+  </div>
+</section>
+
+<!-- ================= الخلاصة ================= -->
+<section>
+  <span class="section-num">تاسعًا</span>
+  <h2>الخلاصة — ماذا تبقّى؟</h2>
+  <ul class="plain">
+    <li><b>الميزتان جاهزتان ومنشورتان</b> على بيئتَي الاختبار — إعادة إسناد الطلب تعمل فعليًّا الآن، وإيداع الوكيل النقدي مبنيّ ومُختبَر لكنه مطفأ عمدًا.</li>
+    <li><b>قرار مطلوب من المالك قبل تفعيل الإيداع النقدي فعليًّا:</b> كيف تُقفل دورة تسوية النقد بعد تسليمه لمقر العمليات؟ (التفصيل في القسم الرابع أعلاه).</li>
+    <li><b>تحديث توثيقي بسيط مطلوب:</b> تصحيح سطر «رأس قاعدة البيانات» في <code>CLAUDE.md</code>.</li>
+    <li>الإنتاج الحقيقي لم يُلمَس؛ بانتظار تعليمات المالك للخطوة التالية.</li>
+  </ul>
+</section>
+
+<footer>تقرير 502 — تووا (Tawa) · 2026-07-16</footer>
+
+</div>

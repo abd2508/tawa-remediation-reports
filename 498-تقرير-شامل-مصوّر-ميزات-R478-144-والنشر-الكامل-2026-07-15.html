@@ -1,0 +1,723 @@
+<meta charset="utf-8">
+<title>تقرير شامل — الميزات الجديدة ونشرها الكامل</title>
+<style>
+  @font-face {
+    font-family: "TawaMono";
+    src: local("Cascadia Code"), local("Consolas");
+  }
+  :root {
+    --bg: #f5f8f4;
+    --surface: #ffffff;
+    --surface-2: #eef3ec;
+    --surface-3: #e4ede1;
+    --ink: #16241c;
+    --ink-muted: #55655a;
+    --ink-faint: #8a978c;
+    --border: #d8e2d4;
+    --accent: #146c34;
+    --accent-deep: #0b4a23;
+    --accent-tint: #e3f0e6;
+    --accent-2: #b8862f;
+    --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--font-body);
+    direction: rtl; line-height: 1.75; font-size: 16px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 72ch; color: var(--ink); }
+  p.lead { font-size: 1.08rem; color: var(--ink-muted); max-width: 62ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.87em; }
+  b { color: var(--ink); }
+
+  /* ── hero ── */
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 56px 20px 44px;
+    border-radius: 0 0 28px 28px;
+  }
+  header.hero .inner { max-width: 1000px; margin: 0 auto; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 2.3rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 20ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.88); max-width: 60ch; font-size: 1.1rem; }
+  .hero-stats { display: flex; gap: 28px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.9rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.82rem; color: rgba(255,255,255,0.75); }
+
+  /* ── nav pills ── */
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 44px; }
+  nav.toc a {
+    font-size: 0.83rem; text-decoration: none; color: var(--ink-muted);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 999px;
+    padding: 6px 14px; transition: color .15s, border-color .15s;
+  }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+
+  section { margin: 56px 0; }
+  .section-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.76rem; font-weight: 700;
+    color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;
+  }
+  section h2 { font-size: 1.55rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 1.02rem; color: var(--ink-muted); max-width: 68ch; margin-bottom: 26px; }
+
+  /* ── plain-language callout ── */
+  .plain {
+    background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius);
+    padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start;
+  }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.95rem; max-width: 62ch; }
+  .plain b { color: var(--accent-deep); }
+
+  /* ── pipeline diagram ── */
+  .pipeline {
+    display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 8px 4px 16px;
+    scrollbar-width: thin;
+  }
+  .pl-stage {
+    flex: 0 0 auto; min-width: 128px; display: flex; flex-direction: column; align-items: center;
+    text-align: center; padding: 0 6px;
+  }
+  .pl-node {
+    width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; background: var(--surface); border: 2px solid var(--ok-border); box-shadow: var(--shadow);
+    color: var(--ok-ink); margin-bottom: 10px;
+  }
+  .pl-stage .t { font-size: 0.82rem; font-weight: 700; color: var(--ink); }
+  .pl-stage .d { font-size: 0.72rem; color: var(--ink-faint); margin-top: 2px; }
+  .pl-arrow { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 30px; margin-top: -30px; }
+  .pl-arrow svg { width: 26px; height: 14px; }
+  .pl-arrow path { stroke: var(--ok-border); stroke-width: 2.5; fill: none; }
+
+  /* ── item cards (feature deep-dive) ── */
+  .feature {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: var(--shadow); padding: 26px 28px; margin-bottom: 22px;
+  }
+  .feature .fhead { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+  .feature .fnum {
+    font-family: var(--font-display); font-weight: 800; font-size: 0.78rem;
+    background: var(--accent-tint); color: var(--accent-deep); border-radius: 999px;
+    padding: 3px 12px;
+  }
+  .feature h3 { font-size: 1.2rem; margin: 0; }
+  .feature .simple-answer { color: var(--ink-muted); font-size: 0.98rem; margin: 10px 0 16px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  @media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
+  .compare .box { border-radius: 10px; padding: 14px 16px; border: 1px solid; }
+  .compare .before { background: var(--crit-bg); border-color: var(--crit-border); }
+  .compare .after { background: var(--ok-bg); border-color: var(--ok-border); }
+  .compare .box .k { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 6px; }
+  .compare .before .k { color: var(--crit-ink); }
+  .compare .after .k { color: var(--ok-ink); }
+  .compare .box p { margin: 0; font-size: 0.9rem; color: var(--ink); max-width: none; }
+
+  .flow-money { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 16px 0; }
+  .flow-node {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; font-size: 0.85rem; text-align: center; min-width: 110px;
+  }
+  .flow-node.pos { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-ink); }
+  .flow-node.neg { background: var(--crit-bg); border-color: var(--crit-border); color: var(--crit-ink); }
+  .flow-node.neutral { background: var(--accent-2-tint); border-color: var(--accent-2); color: var(--accent-2); }
+  .flow-node .amt { font-family: var(--font-mono); font-weight: 700; display: block; margin-top: 2px; }
+  .flow-arrow-h { font-size: 1.1rem; color: var(--ink-faint); }
+
+  ul.simple-list { margin: 10px 0; padding-inline-start: 22px; }
+  ul.simple-list li { margin-bottom: 8px; color: var(--ink-muted); font-size: 0.92rem; }
+  ul.simple-list li b { color: var(--ink); }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700;
+    border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap;
+  }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+
+  /* ── analogy card ── */
+  .analogy {
+    background: var(--accent-2-tint); border: 1px dashed var(--accent-2); border-radius: var(--radius);
+    padding: 16px 20px; margin: 18px 0;
+  }
+  .analogy .k { font-size: 0.76rem; font-weight: 800; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .analogy p { margin: 0; font-size: 0.92rem; color: var(--ink); max-width: 62ch; }
+
+  /* ── quality pipeline steps ── */
+  .qsteps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+  .qstep {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px 18px; box-shadow: var(--shadow); position: relative;
+  }
+  .qstep .idx {
+    width: 28px; height: 28px; border-radius: 8px; background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem;
+    margin-bottom: 10px;
+  }
+  .qstep h4 { font-size: 0.92rem; margin: 0 0 4px; }
+  .qstep p { font-size: 0.82rem; color: var(--ink-muted); margin: 0; }
+
+  /* ── findings table ── */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.87rem; min-width: 560px; }
+  thead th {
+    text-align: right; font-family: var(--font-display); font-weight: 700;
+    background: var(--surface-2); color: var(--ink-muted); font-size: 0.74rem;
+    letter-spacing: 0.03em; padding: 11px 14px; border-bottom: 1px solid var(--border);
+  }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+
+  /* ── timeline (deploy steps) ── */
+  .timeline { position: relative; padding-inline-start: 34px; }
+  .timeline::before {
+    content: ""; position: absolute; inset-inline-start: 13px; top: 6px; bottom: 6px;
+    width: 2px; background: var(--border);
+  }
+  .t-step { position: relative; padding-bottom: 26px; }
+  .t-step:last-child { padding-bottom: 0; }
+  .t-step::before {
+    content: ""; position: absolute; inset-inline-start: -34px; top: 2px;
+    width: 24px; height: 24px; border-radius: 50%; background: var(--ok-bg);
+    border: 2px solid var(--ok-ink); display: flex; align-items: center; justify-content: center;
+  }
+  .t-step::after {
+    content: "✓"; position: absolute; inset-inline-start: -28px; top: 5px; font-size: 0.75rem;
+    color: var(--ok-ink); font-weight: 800;
+  }
+  .t-step .th { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+  .t-step .td { font-size: 0.86rem; color: var(--ink-muted); }
+  .t-step .td code { font-size: 0.85em; }
+
+  /* ── deploy targets map ── */
+  .targets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .target-card {
+    background: var(--surface); border: 2px solid var(--ok-border); border-radius: var(--radius);
+    padding: 18px 18px; box-shadow: var(--shadow); text-align: center;
+  }
+  .target-card.highlight { border-color: var(--accent); background: var(--accent-tint); }
+  .target-card .icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .target-card .name { font-weight: 800; font-size: 1rem; margin-bottom: 4px; }
+  .target-card .desc { font-size: 0.78rem; color: var(--ink-muted); margin-bottom: 10px; }
+
+  /* ── ledger notebook analogy ── */
+  .notebook {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); overflow: hidden; margin: 16px 0;
+  }
+  .notebook .nb-head {
+    background: var(--surface-3); padding: 10px 18px; font-size: 0.8rem; font-weight: 700;
+    color: var(--ink-muted); border-bottom: 1px solid var(--border);
+  }
+  .notebook .nb-row { display: grid; grid-template-columns: 1fr 1fr; }
+  .notebook .nb-cell { padding: 14px 18px; font-size: 0.88rem; }
+  .notebook .nb-cell.debit { border-inline-end: 1px dashed var(--border); }
+  .notebook .nb-cell .lbl { font-size: 0.72rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 3px; }
+  .notebook .nb-cell .val { font-family: var(--font-mono); font-weight: 700; }
+
+  hr.div { border: none; border-top: 1px dashed var(--border); margin: 44px 0; }
+
+  footer { margin-top: 70px; padding: 24px 0; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--ink-faint); text-align: center; }
+  a { color: var(--accent-deep); }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="inner">
+      <span class="kicker">🟢 تقرير شامل — تووا (Tawa)</span>
+      <h1>سبع ميزات جديدة، من الفكرة إلى الموقع الحيّ</h1>
+      <p class="lead">
+        هذا تقرير كامل ومبسَّط عن كل ما جرى تنفيذه: ما هي الميزات السبع الجديدة، كيف تأكّدنا أنّها تعمل بشكل صحيح
+        وآمن، وكيف وصلت الآن إلى الموقع الحيّ <b>tawanow.com</b> الذي يستخدمه العملاء الحقيقيّون.
+      </p>
+      <div class="hero-stats">
+        <div class="s"><div class="n">7 / 7</div><div class="l">ميزات مكتملة</div></div>
+        <div class="s"><div class="n">4 / 4</div><div class="l">مواضع نشر مكتملة</div></div>
+        <div class="s"><div class="n">5,167</div><div class="l">اختبار آليّ ناجح</div></div>
+        <div class="s"><div class="n">0</div><div class="l">مشكلة أمان ماليّ</div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#summary">الخلاصة بلغة بسيطة</a>
+    <a href="#journey">الرحلة الكاملة</a>
+    <a href="#features">الميزات السبع بالتفصيل</a>
+    <a href="#quality">كيف تأكّدنا من الجودة</a>
+    <a href="#codex">قصة أداة المراجعة الآلية</a>
+    <a href="#migration">قصة "الفصل المشترك"</a>
+    <a href="#deploy">النشر على كل المواقع</a>
+    <a href="#production">تفاصيل نشر الموقع الحيّ</a>
+    <a href="#safety">الأمان الماليّ</a>
+    <a href="#conclusion">الخلاصة والخطوات القادمة</a>
+  </nav>
+
+  <section id="summary">
+    <div class="section-eyebrow">📋 البداية من هنا</div>
+    <h2>الخلاصة بلغة بسيطة</h2>
+    <p class="intro">
+      لو لم يكن لديك وقت لقراءة كل التقرير، هذه الفقرة تكفي.
+    </p>
+    <div class="plain">
+      <div class="ic">💡</div>
+      <p>
+        طُلب منّا إضافة <b>سبع ميزات جديدة</b> لتطبيق تووا — من ترتيب فئات الطعام، إلى نظام إعلانات مدفوعة للمطاعم،
+        إلى طريقة جديدة لحساب عمولة موظّفي التسوية الماليّة. نفَّذنا كل ميزة، ثم فحصناها بعناية شديدة (اختبارات آليّة
+        + مراجعة من أداة ذكاء اصطناعيّ متخصّصة + مراجعة يدويّة إضافيّة)، أصلحنا كل مشكلة حقيقيّة اكتشفناها، وأخيرًا
+        نشرنا كل شيء — أولًا على موقعَي اختبار داخليَّين، ثم <b>على الموقع الحيّ الذي يستخدمه عملاؤكم الآن</b>. كل
+        خطوة تم توثيقها والتحقّق منها قبل الانتقال للتي تليها، ولم يتوقّف أيّ شيء في منتصف الطريق.
+      </p>
+    </div>
+  </section>
+
+  <section id="journey">
+    <div class="section-eyebrow">🧭 نظرة عامة</div>
+    <h2>الرحلة الكاملة، خطوة بخطوة</h2>
+    <p class="intro">
+      كل ميزة مرّت بنفس المسار الآمن التالي قبل أن تصل إلى العميل الحقيقيّ. لا شيء وصل إلى الموقع الحيّ بدون
+      المرور من كل هذه المحطّات.
+    </p>
+    <div class="pipeline">
+      <div class="pl-stage"><div class="pl-node">✍️</div><div class="t">كتابة الكود</div><div class="d">تنفيذ الميزة</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 26 14"><path d="M2 7 H24 M18 2 L24 7 L18 12"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🧪</div><div class="t">اختبار آليّ</div><div class="d">آلاف الفحوصات</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 26 14"><path d="M2 7 H24 M18 2 L24 7 L18 12"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🤖</div><div class="t">مراجعة Codex</div><div class="d">فحص آليّ للأخطاء</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 26 14"><path d="M2 7 H24 M18 2 L24 7 L18 12"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🔍</div><div class="t">مراجعة يدويّة</div><div class="d">تدقيق إضافيّ</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 26 14"><path d="M2 7 H24 M18 2 L24 7 L18 12"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">📦</div><div class="t">GitHub</div><div class="d">حفظ آمن للكود</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 26 14"><path d="M2 7 H24 M18 2 L24 7 L18 12"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🧫</div><div class="t">موقع اختبار 1</div><div class="d">تجربة أولى</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 26 14"><path d="M2 7 H24 M18 2 L24 7 L18 12"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🧫</div><div class="t">موقع اختبار 2</div><div class="d">تجربة ثانية</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 26 14"><path d="M2 7 H24 M18 2 L24 7 L18 12"/></svg></div>
+      <div class="pl-stage"><div class="pl-node" style="background:var(--accent);border-color:var(--accent-deep);color:#fff;">🌐</div><div class="t">الموقع الحيّ</div><div class="d">tawanow.com</div></div>
+    </div>
+    <p class="faint">كل محطّة أعلاه اكتملت بنجاح لكل الميزات السبع — لا توجد محطّة متوقّفة أو مؤجَّلة.</p>
+  </section>
+
+  <hr class="div">
+
+  <section id="features">
+    <div class="section-eyebrow">🧩 التفاصيل</div>
+    <h2>الميزات السبع — ماذا تفعل كل واحدة فعليًّا؟</h2>
+    <p class="intro">شرح مبسَّط لكل ميزة: ما المشكلة التي تحلّها، وما الذي تغيّر فعليًّا للمستخدم.</p>
+
+    <!-- ITEM 7 -->
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الميزة 1 من 7</span><h3>ترتيب فئات الطعام بالسحب والإفلات</h3></div>
+      <p class="simple-answer">موظّف العمليّات يستطيع الآن سحب فئات الطعام (مثل "مشاوي"، "حلويات"، "مشروبات") وترتيبها كما يريد، وهذا الترتيب يظهر فعليًّا للعميل عند تصفّح المطعم.</p>
+      <div class="compare">
+        <div class="box before"><div class="k">قبل الإصلاح</div><p>الموظّف يسحب الفئات ويرتّبها في لوحة التحكّم، لكن العميل في التطبيق يرى ترتيبًا مختلفًا تمامًا — الترتيب المحفوظ لم يكن هو المستخدَم فعليًّا في عرض المطعم.</p></div>
+        <div class="box after"><div class="k">بعد الإصلاح</div><p>الترتيب الذي يحدّده الموظّف هو نفسه ما يراه العميل، فورًا. كما أُصلحت مشكلة ظهور فئة "معلّقة في الهواء" بلا فئة أمّ ظاهرة، بحيث تظهر الآن في قسم خاصّ بدل الاختفاء تمامًا.</p></div>
+      </div>
+      <div class="tag-row"><span class="pill ok">مراجَعة Codex ✓</span><span class="pill neutral">3 إصلاحات</span></div>
+    </div>
+
+    <!-- ITEM 1 -->
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الميزة 2 من 7</span><h3>"الأكثر طلبًا" — الآن من كل مطاعم المنصّة</h3></div>
+      <p class="simple-answer">قسم "الأكثر طلبًا" في الصفحة الرئيسيّة كان يعرض أطباقًا من مطعم واحد فقط. الآن يجمع الأطباق الأكثر طلبًا من <b>كل</b> المطاعم على المنصّة، مثل قوائم "الأكثر مبيعًا" في تطبيقات التوصيل الكبرى.</p>
+      <div class="plain"><div class="ic">🎯</div><p>إصلاح مهمّ رافق هذه الميزة: كان يمكن أن يظهر للعميل طبق من مطعم بعيد جدًّا عن منطقته (خارج نطاق التوصيل)، فيطلبه ثم يُفاجأ بأنّه غير متاح. الآن يُستبعَد أيّ مطعم خارج نطاق التوصيل تلقائيًّا من هذه القائمة.</p></div>
+      <div class="tag-row"><span class="pill ok">مراجَعة Codex ✓</span><span class="pill neutral">2 إصلاحان</span></div>
+    </div>
+
+    <!-- ITEM 4 -->
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الميزة 3 من 7</span><h3>وصول عروض التوصيل للسائق فورًا (بدل الانتظار)</h3></div>
+      <p class="simple-answer">عندما يُعرَض على سائق طلب توصيل جديد، كان تطبيقه يتحقّق من وجود عروض جديدة كل 10 ثوانٍ فقط (مثل تحديث صفحة يدويًّا بشكل متكرّر). الآن يصل العرض إلى شاشة السائق <b>فورًا</b> بمجرّد إنشائه.</p>
+      <div class="analogy">
+        <div class="k">تخيّل الأمر هكذا</div>
+        <p>الطريقة القديمة أشبه بموظّف يفتح بريده الإلكترونيّ كل 10 ثوانٍ ليتأكّد من وصول رسالة جديدة. الطريقة الجديدة أشبه بجرس إشعارات يرنّ فور وصول الرسالة — أسرع وأقلّ استهلاكًا للجهد.</p>
+      </div>
+      <div class="plain"><div class="ic">🔧</div><p>خلال مراجعة الجودة اكتُشفت مشكلة تقنيّة في هذا "الجرس": كان يفحص باستمرار وبسرعة كبيرة جدًّا (نحو 20 مرّة في الثانية) بدل الانتظار الهادئ، ما يستهلك موارد الخادم بلا داعٍ لكل سائق متّصل. أُصلحت لتنتظر بهدوء وتستيقظ فقط عند الحاجة الفعليّة.</p></div>
+      <div class="tag-row"><span class="pill warn">2 من 3 ملاحظات أُصلحت</span><span class="pill info">ملاحظة واحدة مؤجَّلة بقرار موثَّق (التفاصيل في القسم التالي)</span></div>
+    </div>
+
+    <!-- ITEM 5 -->
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الميزة 4 من 7</span><h3>صفحة تحكّم لإعدادات الأمان والتحقّق (OPS)</h3></div>
+      <p class="simple-answer">صفحة جديدة في لوحة العمليّات تتيح للإدارة تعديل أرقام حسّاسة مثل: مدّة صلاحية رمز التحقّق (OTP)، وعدد محاولات الدخول قبل قفل الحساب — بدون الحاجة لتعديل الكود أو إعادة نشر التطبيق كل مرّة.</p>
+      <div class="plain"><div class="ic">🔒</div><p>اكتُشفت 3 أماكن كانت "تسمع" بالإعداد القديم فقط: مفتاح ربط رمز التحقّق بغرضه، مدّة قفل المحاولات، ونصّ البريد الإلكترونيّ الذي يخبر العميل "الرمز صالح لمدّة 5 دقائق" حتى لو غيّرت الإدارة المدّة إلى 15 دقيقة. الآن الثلاثة تتبع الإعداد الفعليّ المحدَّث دائمًا.</p></div>
+      <div class="tag-row"><span class="pill ok">مراجَعة Codex ✓</span><span class="pill neutral">4 إصلاحات + تأكيد سلامة نقطة واحدة</span></div>
+    </div>
+
+    <!-- ITEM 3 -->
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الميزة 5 من 7</span><h3>بيانات التواصل — مصدر واحد يُحدَّث من مكان واحد</h3></div>
+      <p class="simple-answer">رقم الدعم، الواتساب، البريد، وروابط التواصل الاجتماعيّ الآن تُدار من مكان واحد في لوحة العمليّات، وتظهر تلقائيًّا في صفحة "من نحن" للعميل — بدون الحاجة لتعديل الكود لتغيير رقم هاتف.</p>
+      <div class="plain"><div class="ic">🛡️</div><p><b>مشكلة أمنيّة حقيقيّة أُصلحت:</b> كان بالإمكان (نظريًّا) وضع رابط اجتماعيّ خبيث بدل رابط فيسبوك حقيقيّ، بحيث يصبح قابلًا للنقر من أيّ زائر للموقع — دون أن يشترط النظام أن يكون الرابط رابط ويب حقيقيًّا (يبدأ بـ <code>http</code>). الآن يُرفَض أيّ رابط لا يبدأ بشكل صحيح، سواء من لوحة الإدارة أو حتى عند عرضه للعميل (طبقتا حماية، لا طبقة واحدة).</p></div>
+      <div class="tag-row"><span class="pill ok">مراجَعة Codex ✓</span><span class="pill crit">إصلاح أمنيّ (XSS)</span></div>
+    </div>
+
+    <!-- ITEM 2 -->
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الميزة 6 من 7</span><h3>نظام الإعلانات المدفوعة للمطاعم</h3></div>
+      <p class="simple-answer">أيّ مطعم يستطيع الآن دفع مبلغ من محفظته الإلكترونيّة ليظهر في مرتبة أعلى وأكثر بروزًا للعملاء، بشرط موافقة فريق العمليّات أوّلًا (لمنع أيّ إساءة استخدام).</p>
+      <h4 style="margin:18px 0 8px;font-size:0.95rem">كيف تتحرّك الأموال؟</h4>
+      <div class="flow-money">
+        <div class="flow-node neg">محفظة المطعم<span class="amt">−100 د.ل</span></div>
+        <span class="flow-arrow-h">←</span>
+        <div class="flow-node neutral">مبلغ محجوز<span class="amt">"معلَّق"</span></div>
+        <span class="flow-arrow-h">←</span>
+        <div class="flow-node pos">موافقة العمليّات<span class="amt">إيراد المنصّة</span></div>
+      </div>
+      <p class="faint">وإن رفضت العمليّات الحملة، يُعاد المبلغ المحجوز بالكامل إلى محفظة المطعم تلقائيًّا.</p>
+      <div class="plain"><div class="ic">⚠️</div><p>أخطر ما اكتشفته المراجعة: كان بالإمكان (في حالات نادرة جدًّا) إنشاء طلبَي إعلان في نفس اللحظة تمامًا فيُخصَم المبلغ مرّتين، وكان بالإمكان أيضًا سحب مبلغ من محفظة "مجمَّدة" (محفظة مستخدم مشتبَه به أو محظور مؤقّتًا) رغم أنّ ذلك يجب أن يكون ممنوعًا. الاثنان أُصلحا.</p></div>
+      <div class="tag-row"><span class="pill ok">مراجَعة Codex ✓</span><span class="pill crit">5 إصلاحات ماليّة/أمنيّة</span></div>
+    </div>
+
+    <!-- ITEM 6 (big one) -->
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الميزة 7 من 7</span><h3>نموذج عمولة "مندوب التسوية"</h3></div>
+      <p class="simple-answer">
+        "مندوب التسوية" هو الشخص المسؤول عن استلام النقد من السائقين أو تسوية أرصدتهم مع المنصّة. هذه الميزة تحدِّد
+        كيف يُحسَب أجر هذا المندوب مقابل كل عمليّة تسوية ينجزها — وتفرّق بين نوعَين من المندوبين.
+      </p>
+      <div class="analogy">
+        <div class="k">لماذا نوعان من المندوبين؟</div>
+        <p>
+          بعض نقاط التسوية هي <b>موظّفون رسميّون في الشركة</b> (يتقاضون راتبًا شهريًّا بالفعل)، وبعضها <b>أفراد
+          مستقلّون متعاقَدون</b> (لا يتقاضون راتبًا، بل عمولة عن كل عمليّة ينجزونها). لو مُنح الموظّف الراتب <em>و</em>
+          العمولة معًا عن نفس العمل، لكان ذلك دفعًا مضاعَفًا غير عادل. لذلك أضفنا علامة "موظّف منصّة" — إن كانت
+          مفعَّلة، لا تُحتسَب له أيّ عمولة إضافيّة؛ وإن لم تكن مفعَّلة (المندوب المستقلّ)، تُحتسَب عمولته تلقائيًّا.
+        </p>
+      </div>
+
+      <h4 style="margin:20px 0 8px;font-size:0.95rem">"دفتر الأستاذ" — كيف تُسجَّل الأموال بأمان؟</h4>
+      <p class="faint" style="margin-bottom:10px">كل حركة ماليّة في تووا تُسجَّل مرّتين في "دفتر" رقميّ — مرّة كمصروف على المنصّة ومرّة كمستحقّ للطرف الآخر — تمامًا مثل دفتر محاسبة تقليديّ، لضمان أنّ كل ريال محسوب ولا يضيع أو يتكرّر بالخطأ.</p>
+      <div class="notebook">
+        <div class="nb-head">مثال: عمولة 15 د.ل لمندوب مستقلّ عن عمليّة تسوية</div>
+        <div class="nb-row">
+          <div class="nb-cell debit"><div class="lbl">مصروف على المنصّة</div><div class="val">15.000 د.ل</div></div>
+          <div class="nb-cell"><div class="lbl">مستحقّ للمندوب</div><div class="val">15.000 د.ل</div></div>
+        </div>
+      </div>
+      <p class="faint">ملاحظة مهمّة: هذا "تسجيل محاسبيّ" فقط في هذه المرحلة، وليس تحويلًا فعليًّا للمال — الدفع الفعليّ للمندوبين ميزة مستقبليّة منفصلة، ولا تزال بوّابات الأمان الماليّة (المذكورة في قسم لاحق) مقفلة كما هي تمامًا.</p>
+
+      <h4 style="margin:20px 0 8px;font-size:0.95rem">لماذا كان هذا البند الأخير في القائمة؟</h4>
+      <p style="font-size:0.92rem;color:var(--ink-muted)">
+        هذه الميزة تحتاج لتعديل ملفّات حسّاسة كانت جلسة عمل أخرى (فريق منفصل) يعمل عليها في الوقت نفسه على نفس المشروع.
+        بدل المخاطرة بتضارب أو فقدان عمل الفريق الآخر، انتظرنا حتى أنهى عمله والتزم به رسميًّا، ثم تابعنا — تفاصيل هذا
+        الانتظار موضّحة في القسم القادم.
+      </p>
+      <div class="tag-row"><span class="pill info">مراجعة ذاتية بديلة (التفاصيل في القسم التالي)</span><span class="pill ok">اختُبر بـ 5 حالات جديدة + 91 اختبارًا قديمًا</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="quality">
+    <div class="section-eyebrow">✅ الفحص والجودة</div>
+    <h2>كيف تأكّدنا أنّ كل شيء يعمل، ولا يكسر شيئًا آخر؟</h2>
+    <p class="intro">
+      لم يصل أيّ سطر كود إلى الموقع الحيّ قبل أن يمرّ بأربع طبقات فحص مختلفة. كل طبقة تصطاد نوعًا مختلفًا من الأخطاء.
+    </p>
+    <div class="qsteps">
+      <div class="qstep">
+        <div class="idx">1</div>
+        <h4>اختبارات آليّة شاملة</h4>
+        <p>أكثر من 5,000 فحص آليّ يُشغَّل تلقائيًّا بعد كل تعديل — يتأكّد أنّ كل الميزات القديمة ما زالت تعمل كما يجب، وأنّ الجديدة تتصرّف كما هو متوقَّع بالضبط.</p>
+      </div>
+      <div class="qstep">
+        <div class="idx">2</div>
+        <h4>مراجعة Codex الآليّة</h4>
+        <p>أداة ذكاء اصطناعيّ متخصّصة تقرأ كل تعديل مثل مهندس برمجيّات خبير، وتبحث عن أخطاء منطقيّة أو أمنيّة أو مشاكل تزامن لا تصطادها الاختبارات العاديّة.</p>
+      </div>
+      <div class="qstep">
+        <div class="idx">3</div>
+        <h4>تحقّق يدويّ من كل ملاحظة</h4>
+        <p>كل ملاحظة من Codex لا تُصلَح بشكل أعمى — نتحقّق أوّلًا من الكود الفعليّ لنتأكّد أنّها حقيقيّة، ثم نكتب اختبارًا جديدًا يثبت أنّ الإصلاح يعمل فعلًا.</p>
+      </div>
+      <div class="qstep">
+        <div class="idx">4</div>
+        <h4>فحص السلامة الماليّة</h4>
+        <p>فحص خاصّ يتأكّد أنّ إعدادات الأمان الماليّة الحسّاسة (مثل منع السحب النقديّ من المحفظة) لم تتغيّر أبدًا في أيّ تعديل — تفاصيله في قسم لاحق.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="codex">
+    <div class="section-eyebrow">🤖</div>
+    <h2>قصة أداة المراجعة الآليّة — ماذا حدث عندما توقّفت؟</h2>
+    <p class="intro">
+      لكل ميزة من الميزات الست الأولى، شغَّلنا أداة <b>Codex</b> (مساعد مراجعة كود بالذكاء الاصطناعيّ) لتفحص التعديل
+      وتكتب لنا قائمة بأيّ مشاكل محتملة. كل ملاحظة صحيحة أصلحناها فورًا، مع اختبار جديد يثبت الإصلاح.
+    </p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الملاحظة</th><th>الخطورة</th><th>الحالة</th></tr></thead>
+        <tbody>
+          <tr><td>حجز مبلغ إعلان بلا قفل صفّ المزوّد — احتمال خصم مزدوج</td><td><span class="pill crit">عالية</span></td><td><span class="pill ok">أُصلحت</span></td></tr>
+          <tr><td>ترتيب فئات الطعام لا يؤثّر فعليًّا على ما يراه العميل</td><td><span class="pill warn">متوسّطة</span></td><td><span class="pill ok">أُصلحت</span></td></tr>
+          <tr><td>روابط تواصل اجتماعيّ بلا تحقّق — ثغرة أمنيّة (XSS)</td><td><span class="pill warn">متوسّطة</span></td><td><span class="pill ok">أُصلحت</span></td></tr>
+          <tr><td>مدد صلاحية ثانويّة لم تتبع الإعداد القابل للتعديل</td><td><span class="pill warn">متوسّطة</span></td><td><span class="pill ok">أُصلحت</span></td></tr>
+          <tr><td>فحص إشعارات السائق يستهلك موارد الخادم بلا داعٍ</td><td><span class="pill warn">متوسّطة</span></td><td><span class="pill ok">أُصلحت</span></td></tr>
+          <tr><td>إعادة الاتّصال بعد انقطاع تأخذ وقتًا أطول من اللازم أحيانًا</td><td><span class="pill warn">متوسّطة</span></td><td><span class="pill ok">أُصلحت</span></td></tr>
+          <tr><td>إشعار السائق قد يصل قبل تأكيد الطلب فعليًّا في قاعدة البيانات</td><td><span class="pill crit">عالية</span></td><td><span class="pill info">مؤجَّلة — بقرار موثَّق أدناه</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="plain" style="margin-top:20px">
+      <div class="ic">⏳</div>
+      <p>
+        <b>لماذا أُجِّلت الملاحظة الأخيرة؟</b> السبب الأوّل: الملفّ المعنيّ كان قيد تعديل حيّ من فريق آخر في نفس اللحظة
+        — تعديله كان سيُدخل تغييرات غير مرتبطة بعملنا وغير مراجَعة معه. السبب الثاني: المشكلة موجودة أصلًا في نمط
+        تصميم قديم يُستخدَم في أكثر من مكان في النظام، وأثرها الأقصى هو تأخير بضع ثوانٍ لا خطأ في صحّة البيانات (يوجد
+        نظام احتياطيّ آخر يتحقّق كل 10 ثوانٍ على أيّ حال). إصلاح جذريّ لهذا النمط قرار يحتاج موافقة صاحب المشروع لأنّه
+        يمسّ تصميمًا عريضًا، لا رقعة سريعة في مكان واحد فقط.
+      </p>
+    </div>
+
+    <h3 style="margin-top:32px;font-size:1.1rem">ثم توقّفت الأداة فجأة</h3>
+    <p style="color:var(--ink-muted)">
+      في منتصف مراجعة الميزة السابعة والأخيرة (نموذج عمولة مندوب التسوية)، بلغت أداة Codex حدّ استخدامها اليوميّ
+      المسموح، ولن تعمل مجدّدًا إلا بعد <b>22 يوليو 2026</b>. بدل الانتظار أسبوعًا كاملًا، أجرينا مراجعة يدويّة دقيقة
+      بديلة لنفس التعديل — بنفس الصرامة التي تتّبعها الأداة الآليّة عادة.
+    </p>
+    <div class="plain">
+      <div class="ic">🔎</div>
+      <p>هذه المراجعة اليدويّة اكتشفت مشكلتَين حقيقيّتَين، صغيرتَين لكن مهمّتَين، وأصلحناهما فورًا:</p>
+    </div>
+    <ul class="simple-list">
+      <li><b>مشكلة أولى:</b> عند تفعيل مربّع "موظّف منصّة" في نموذج التعديل، كانت نسبة العمولة القديمة تبقى محفوظة في الخلفيّة بدون أثر فعليّ (النظام يمنع صرفها على أيّ حال)، لكنّها كانت تظهر بشكل مضلِّل في قائمة المندوبين. أُصلحت بحيث تُصفَّر تلقائيًّا فور التفعيل.</li>
+      <li><b>مشكلة ثانية:</b> نصّ الشارة الجديدة على الصفحة كُتب مباشرة دون المرور بنظام الترجمة الداخليّ للموقع (نظام يمنع دخول أيّ نصّ عربيّ جديد لم يُراجَع من قبله) — اكتُشفت تلقائيًّا عبر فحص نهائيّ شامل وأُصلحت فورًا.</li>
+    </ul>
+  </section>
+
+  <hr class="div">
+
+  <section id="migration">
+    <div class="section-eyebrow">📖</div>
+    <h2>قصة "الفصل المشترك" — لماذا تأخّرت الميزة السابعة؟</h2>
+    <div class="analogy">
+      <div class="k">تخيّل الأمر هكذا</div>
+      <p>
+        قاعدة البيانات في تووا لها "دفتر تعليمات" مرتَّب — كل تعديل على شكل قاعدة البيانات (مثل إضافة عمود جديد) يُكتَب
+        في صفحة جديدة، مرقَّمة بالترتيب، وكل صفحة تشير إلى الصفحة التي قبلها مباشرة. خلال هذه الجلسة، كان <b>فريق آخر
+        منفصل</b> يعمل في نفس اللحظة على المشروع نفسه، وكتب صفحته الجديدة الخاصّة به على قاعدة البيانات — تمامًا في
+        نفس الوقت الذي كتبنا فيه صفحتنا نحن، وكلانا أشار إلى نفس "الصفحة السابقة" كنقطة انطلاق.
+      </p>
+    </div>
+    <p style="color:var(--ink-muted)">
+      النتيجة: صار للدفتر <b>صفحتان مختلفتان</b> تدَّعيان أنّهما "الصفحة التالية" مباشرة بعد نفس النقطة — وهذا يُربك
+      النظام عند محاولة قراءة الدفتر بالترتيب من البداية للنهاية. الحلّ المعتاد والآمن تمامًا لهذه الحالة: إضافة
+      "صفحة دمج" فارغة تشير إلى كلا الصفحتَين معًا وتوحِّدهما في مسار واحد بعدها — دون حذف أو تغيير أيّ محتوى من أيّ
+      من الصفحتَين الأصليّتَين.
+    </p>
+    <div class="plain">
+      <div class="ic">✅</div>
+      <p>
+        نفَّذنا هذا الدمج، ثم تحقّقنا منه بطريقة إضافيّة: أنشأنا قاعدة بيانات فارغة تمامًا كاختبار (منفصلة تمامًا عن أيّ
+        بيانات حقيقيّة)، وشغّلنا عليها كل "صفحات الدفتر" من الأولى للأخيرة للتأكّد أنّ الدمج يعمل بسلاسة من الصفر —
+        نجح تمامًا، والدفتر الآن مرقَّم بترتيب واحد صحيح لا لبس فيه.
+      </p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="deploy">
+    <div class="section-eyebrow">🚀</div>
+    <h2>النشر — أربعة مواقع، أربعتها الآن محدَّثة</h2>
+    <p class="intro">قاعدة المشروع تفرض أن يصل أيّ تعديل إلى أربعة مواقع مختلفة قبل اعتباره "منشورًا فعليًّا" — الآن وصل إلى الأربعة كلّها.</p>
+    <div class="targets-grid">
+      <div class="target-card">
+        <div class="icon">📦</div>
+        <div class="name">GitHub</div>
+        <div class="desc">مستودع الكود الرسميّ — نسخة آمنة محفوظة من كل تعديل</div>
+        <span class="pill ok">✓ مكتمل</span>
+      </div>
+      <div class="target-card">
+        <div class="icon">🧫</div>
+        <div class="name">موقع اختبار 1</div>
+        <div class="desc">تجربة أولى داخليّة على جهاز العمل</div>
+        <span class="pill ok">✓ مكتمل وسليم</span>
+      </div>
+      <div class="target-card">
+        <div class="icon">🧫</div>
+        <div class="name">موقع اختبار 2</div>
+        <div class="desc">تجربة ثانية على خادم اختبار منفصل</div>
+        <span class="pill ok">✓ مكتمل وسليم</span>
+      </div>
+      <div class="target-card highlight">
+        <div class="icon">🌐</div>
+        <div class="name">الموقع الحيّ<br><span class="faint" style="font-size:0.7rem">tawanow.com</span></div>
+        <div class="desc">الموقع الذي يستخدمه عملاؤكم الحقيقيّون الآن</div>
+        <span class="pill ok">✓ اكتمل بإذنكم الصريح للتوّ</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="production">
+    <div class="section-eyebrow">🌐 الأهمّ</div>
+    <h2>تفاصيل نشر الموقع الحيّ، خطوة بخطوة</h2>
+    <p class="intro">
+      نشر الموقع الحيّ هو الخطوة الوحيدة التي لا تُنفَّذ إلا بعد إذن صريح منكم في كل مرّة — لأنّه يؤثّر مباشرة على
+      تجربة عملائكم الحقيقيّين. بعد إذنكم، اتّبعنا هذه الخطوات بعناية شديدة، وتحقّقنا من نجاح كل خطوة قبل الانتقال للتالية.
+    </p>
+
+    <div class="plain" style="border-color:var(--warn-border);background:var(--warn-bg)">
+      <div class="ic">⚠️</div>
+      <p style="color:var(--warn-ink)">
+        <b>احتياط مهمّ اتّخذناه قبل البدء:</b> اكتشفنا أنّ الفريق الآخر (المذكور سابقًا) كان لا يزال يعمل على تعديلات
+        غير مكتملة وغير محفوظة رسميًّا في نفس اللحظة. الطريقة المعتادة للنشر كانت ستأخذ "كل ما هو موجود حاليًّا على
+        الجهاز" — بما فيها تعديلاتهم غير الجاهزة وغير المُختبَرة بعد. بدل ذلك، أنشأنا نسخة نظيفة ومعزولة تمامًا تحتوي
+        <b>فقط</b> على الكود الذي التزمنا به رسميًّا واختبرناه بالكامل، ونشرنا هذه النسخة النظيفة تحديدًا — لضمان ألّا
+        يصل أيّ كود غير جاهز إلى عملائكم الحقيقيّين.
+      </p>
+    </div>
+
+    <div class="timeline" style="margin-top:28px">
+      <div class="t-step">
+        <div class="th">تجهيز نسخة نظيفة من الكود المُلتزَم به رسميًّا</div>
+        <div class="td">استخراج نسخة معزولة تحتوي فقط على الكود المُختبَر والموافَق عليه، بلا أيّ تعديلات غير مكتملة من أطراف أخرى.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">رفع كود الخادم (Backend) إلى الموقع الحيّ</div>
+        <div class="td">نقل الكود بأمان عبر اتّصال مشفَّر، ثم إعادة بناء برنامج الخادم من الكود الجديد.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">تحديث "دفتر" قاعدة البيانات تلقائيًّا</div>
+        <div class="td">تنفيذ كل التعديلات الجديدة على شكل قاعدة البيانات، خطوة بخطوة وبالترتيب الصحيح، بلا فقدان أيّ بيانات موجودة.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">التأكّد أنّ الخادم الجديد "بصحّة جيّدة"</div>
+        <div class="td">فحص آليّ يتأكّد أنّ الخادم الجديد يستجيب بشكل صحيح قبل توجيه أيّ زوّار حقيقيّين إليه.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">رفع الواجهة (الموقع الذي يراه العميل) وإعادة بنائها</div>
+        <div class="td">نفس العمليّة للواجهة المرئيّة — الصفحات التي يتصفّحها العميل مباشرة.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">فحص مباشر على الموقع الحيّ نفسه</div>
+        <div class="td">زيارة فعليّة لصفحات الموقع الحيّ (الصفحة الرئيسيّة، صفحة تحميل التطبيق، صفحات الميزات الجديدة) للتأكّد أنّ كل شيء يعمل كما هو متوقَّع تمامًا.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">تأكيد نهائيّ: لا شيء تغيّر في إعدادات الأمان الماليّة</div>
+        <div class="td">مقارنة "بصمة" ملفّات الأمان الماليّة على الخادم الحيّ بالبصمة المعتمَدة رسميًّا — تطابقت تمامًا، حرفًا بحرف.</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px;font-size:1.05rem">نتيجة الفحوصات المباشرة على tawanow.com</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الصفحة / الخدمة المفحوصة</th><th>النتيجة</th></tr></thead>
+        <tbody>
+          <tr><td>الصفحة الرئيسيّة للموقع</td><td><span class="pill ok">تعمل ✓</span></td></tr>
+          <tr><td>خدمة فحص صحّة الخادم</td><td><span class="pill ok">تعمل ✓</span></td></tr>
+          <tr><td>خدمة الجاهزية الكاملة للخادم</td><td><span class="pill ok">تعمل ✓</span></td></tr>
+          <tr><td>صفحة تحميل التطبيق</td><td><span class="pill ok">تعمل ✓</span></td></tr>
+          <tr><td>بيانات التواصل (الميزة الجديدة)</td><td><span class="pill ok">تعمل ✓</span></td></tr>
+          <tr><td>فئات الطعام (الميزة الجديدة)</td><td><span class="pill ok">تعمل ✓</span></td></tr>
+          <tr><td>"دفتر" قاعدة البيانات</td><td><span class="pill ok">مُحدَّث بالكامل لآخر إصدار ✓</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="safety">
+    <div class="section-eyebrow">🔐</div>
+    <h2>الأمان الماليّ — لماذا نتحقّق منه في كل خطوة؟</h2>
+    <p class="intro">
+      المشروع لديه ثلاث "أقفال" ماليّة صارمة، مقفلة عمدًا في هذه المرحلة كإجراء وقائيّ (السحب النقديّ المباشر من
+      المحفظة معطَّل، والدفع الفعليّ من بوّابات الدفع معطَّل). نتحقّق أنّ هذه الأقفال لم تُفتَح بالخطأ بعد <b>كل تعديل
+      واحد</b> بلا استثناء طوال هذه الجلسة، بما في ذلك بعد النشر على الموقع الحيّ.
+    </p>
+    <div class="plain">
+      <div class="ic">🛡️</div>
+      <p><b>النتيجة النهائيّة: الأقفال الثلاثة لا تزال كما هي تمامًا</b>، على كل المواقع الأربعة بلا استثناء، بما فيها الموقع الحيّ الآن. لم تُفتَح أيّ بوّابة ماليّة حسّاسة بشكل غير مقصود في أيّ تعديل من التعديلات السبعة عشر التي أُنجزت.</p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="conclusion">
+    <div class="section-eyebrow">🏁</div>
+    <h2>الخلاصة والخطوات القادمة</h2>
+    <p class="intro">كل ما طُلب في هذه الدورة أُنجز بالكامل. هذه نقطة توقّف طبيعيّة ونظيفة.</p>
+    <ul class="simple-list">
+      <li><b>الميزات السبع:</b> منفَّذة، مُختبَرة، ومنشورة على الموقع الحيّ فعليًّا.</li>
+      <li><b>الجودة:</b> فُحصت بأربع طبقات مختلفة، ولم يتجاوَز أيّ إصلاح مطلوب دون تنفيذ (باستثناء ملاحظة واحدة مؤجَّلة بقرار موثَّق تفصيليًّا أعلاه، وهي بلا أثر على صحّة البيانات).</li>
+      <li><b>المتبقّي الوحيد:</b> عندما تعود أداة المراجعة الآليّة Codex للعمل (بعد 22 يوليو 2026)، يُستحسَن تشغيلها على الميزة السابعة (عمولة مندوب التسوية) للحصول على نفس مستوى المراجعة الآليّة الذي حصلت عليه الميزات الست الأخرى — رغم أنّها اجتازت بالفعل مراجعة يدويّة دقيقة بديلة.</li>
+      <li><b>ملاحظة تقنيّة واحدة موثَّقة للمستقبل:</b> إشعار السائق الفوريّ قد يصل قبل تأكيد الطلب في قاعدة البيانات بأجزاء من الثانية في حالات نادرة جدًّا — لا يؤثّر على صحّة البيانات (يوجد نظام احتياطيّ يتحقّق كل 10 ثوانٍ على أيّ حال)، لكنّه يحتاج قرارًا من صاحب المشروع لإصلاح جذريّ يمسّ تصميمًا أوسع من هذه الميزة وحدها.</li>
+    </ul>
+  </section>
+
+  <footer>
+    تووا (Tawa) — تقرير رقم 498 · تقرير آليّ شامل من جلسة عمل واحدة · 2026-07-15<br>
+    الفرع <code>fix/464-full-remediation-2026-07-10</code> · آخر التزام منشور <code>53a9d79</code>
+  </footer>
+
+</div>

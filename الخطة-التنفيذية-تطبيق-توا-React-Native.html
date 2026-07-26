@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>توا — الخطة التنفيذية المفصّلة (React Native + Expo)</title>
+<style>
+  :root{
+    --green:#0F8056;--green-d:#0b5f40;--green-l:#e6f4ee;
+    --amber:#d98a00;--amber-l:#fff6e5;--red:#c0392b;--red-l:#fdecea;
+    --blue:#1f6feb;--blue-l:#e8f0fe;--purple:#6d4aff;--purple-l:#efeaff;
+    --ink:#1c2430;--muted:#5b6776;--line:#e2e8ee;--bg:#f6f8fa;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Noto Sans Arabic",Tahoma,Arial,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.9;font-size:15.5px}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border-radius:22px;padding:38px 32px;margin-bottom:24px;box-shadow:0 12px 34px rgba(15,128,86,.28)}
+  header.hero h1{margin:0 0 8px;font-size:31px}
+  header.hero p{margin:4px 0;opacity:.96}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:5px 13px;border-radius:999px;font-size:13px;margin:7px 7px 0 0}
+  h2{font-size:23px;margin:40px 0 12px;padding-right:14px;border-right:6px solid var(--green);color:var(--green-d)}
+  h3{font-size:18px;color:var(--green-d);margin:22px 0 8px}
+  h4{font-size:15.5px;color:var(--ink);margin:14px 0 6px;font-weight:700}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin:14px 0;box-shadow:0 2px 12px rgba(20,30,50,.04)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;background:#fff;border-radius:12px;overflow:hidden;font-size:14px}
+  th,td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  tr:last-child td{border-bottom:none}
+  .ok{color:var(--green-d);font-weight:700}.warn{color:var(--amber);font-weight:700}.bad{color:var(--red);font-weight:700}
+  .tag{display:inline-block;padding:2px 8px;border-radius:7px;font-size:11.5px;font-weight:700}
+  .tag.g{background:var(--green-l);color:var(--green-d)}.tag.a{background:var(--amber-l);color:var(--amber)}.tag.r{background:var(--red-l);color:var(--red)}.tag.b{background:var(--blue-l);color:var(--blue)}.tag.p{background:var(--purple-l);color:var(--purple)}
+  code{background:#0f172a;color:#d7e3f4;padding:2px 6px;border-radius:6px;font-size:12.5px;font-family:Consolas,monospace;direction:ltr;display:inline-block}
+  pre{background:#0f172a;color:#d7e3f4;padding:14px 16px;border-radius:12px;overflow:auto;direction:ltr;text-align:left;font-size:12px;line-height:1.55;font-family:Consolas,monospace}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+  .kpi .n{font-size:22px;font-weight:800;color:var(--green-d)}.kpi .l{font-size:12px;color:var(--muted)}
+  .note{border-right:5px solid var(--blue);background:var(--blue-l);padding:12px 16px;border-radius:10px;margin:12px 0}
+  .note.amber{border-color:var(--amber);background:var(--amber-l)}.note.green{border-color:var(--green);background:var(--green-l)}.note.red{border-color:var(--red);background:var(--red-l)}
+  .svgbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin:14px 0;overflow:auto;text-align:center}
+  .small{font-size:12.5px;color:var(--muted)}.center{text-align:center}
+  ul,ol{margin:8px 0}li{margin:4px 0}
+  .toc a{color:var(--green-d);text-decoration:none}.toc li{margin:5px 0}
+  .swatch{display:inline-block;width:15px;height:15px;border-radius:4px;vertical-align:middle;margin-left:6px;border:1px solid #0002}
+  .scn td:first-child{font-weight:600;white-space:nowrap;color:var(--ink)}
+  .cat{background:var(--ink);color:#fff;border-radius:10px;padding:8px 14px;font-weight:700;margin:18px 0 4px;font-size:15px}
+  .count{background:#fff;color:var(--green-d);border-radius:999px;padding:1px 9px;font-size:12px;margin-right:8px}
+  .phasebar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  .phasebar .ph{flex:1;min-width:140px;border-radius:12px;padding:11px;color:#fff;text-align:center;font-weight:700;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🏗️ توا / Towa — الخطة التنفيذية المفصّلة لتطبيق الموبايل</h1>
+  <p>React Native + Expo + TypeScript — خطة تنفيذ دقيقة + محاكاة ذهنية لأكثر من 180 سيناريو قبل كتابة الكود.</p>
+  <p class="small" style="opacity:.9">2026-06-30 · بناءً على قراراتك المعتمدة · لا كود بعد — بانتظار موافقتك على الخطة</p>
+  <div>
+    <span class="pill">نسخة واحدة متكيّفة على كل الأجهزة</span>
+    <span class="pill">تحديث تلقائي بلا إزعاج (OTA)</span>
+    <span class="pill">أمان متعدّد الطبقات</span>
+    <span class="pill">استبدال Flutter بسلاسة على المتجر</span>
+  </div>
+</header>
+
+<div class="card toc">
+  <h3 style="margin-top:0">المحتويات</h3>
+  <ol>
+    <li><a href="#d">قراراتك المعتمدة + توجيهاتك (الأساس)</a></li>
+    <li><a href="#adapt">استراتيجية «النسخة الواحدة المتكيّفة» (بدل نسختين)</a></li>
+    <li><a href="#update">استراتيجية التحديث التلقائي متعدّد الطبقات</a></li>
+    <li><a href="#sec">الأمان العميق (Defense in Depth)</a></li>
+    <li><a href="#store">استبدال Flutter على المتجر بسلاسة</a></li>
+    <li><a href="#tree">بنية الملفات النهائية</a></li>
+    <li><a href="#plan">خارطة التنفيذ التفصيلية (المراحل + المهام + البوابات)</a></li>
+    <li><a href="#sim">المحاكاة الذهنية — أكثر من 180 سيناريو (الثغرات قبل حدوثها)</a></li>
+    <li><a href="#deliver">مخرجات المرحلة الأولى + إثبات النتائج</a></li>
+    <li><a href="#next">بعد موافقتك</a></li>
+  </ol>
+</div>
+
+<!-- ============ D ============ -->
+<h2 id="d">1) قراراتك المعتمدة + توجيهاتك</h2>
+<div class="card">
+  <table>
+    <tr><th>القرار</th><th>اختيارك</th><th>الأثر على الخطة</th></tr>
+    <tr><td>المسار الكبير</td><td class="ok">(أ) استبدال Flutter بـ React Native</td><td>RN يصبح تطبيق الموبايل الرسمي الوحيد؛ Flutter+الويب = مرجع ميزات.</td></tr>
+    <tr><td>مكان التطبيق</td><td class="ok">موافق</td><td><code>platform/apps/mobile</code></td></tr>
+    <tr><td>إدارة الحالة</td><td class="ok">Zustand (توصيتي)</td><td>حالة الواجهة بـ Zustand + حالة الخادم بـ TanStack Query.</td></tr>
+    <tr><td>أول منصّة</td><td class="ok">أندرويد أولاً</td><td>نبني ونثبّت أندرويد أولاً؛ iOS لاحقاً (نفس الكود).</td></tr>
+    <tr><td>الـ API</td><td class="ok">Mock أولاً ثم الحقيقي</td><td>طبقة محاكاة بنفس العقد، التبديل بإعداد واحد.</td></tr>
+    <tr><td>الهوية</td><td class="ok">الأخضر + الشعار الحالي</td><td>أخضر <code>#0F8056</code> + شعار توا.</td></tr>
+  </table>
+  <h4>توجيهاتك الإضافية (محور هذه الخطة)</h4>
+  <div class="grid2">
+    <div><ul>
+      <li><b>قوي · منظّم · مرتّب</b> بأحدث المستويات.</li>
+      <li><b>أمان عالٍ جداً</b> (قسم مخصّص بطبقات).</li>
+    </ul></div>
+    <div><ul>
+      <li><b>تحديث تلقائي قدر الإمكان</b> بلا إزعاج المستخدم بزيارة المتجر.</li>
+      <li><b>نسخة واحدة تتكيّف</b> مع نوع الجهاز وإمكانياته (الأفضل) — تعمل على كل الأجهزة.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ============ ADAPT ============ -->
+<h2 id="adapt">2) النسخة الواحدة المتكيّفة (أفضل من نسختين منفصلتين)</h2>
+<div class="card">
+  <p>بدل بناء «خفيفة» و«كاملة» كملفّين، نبني <b>تطبيقاً واحداً</b> يكتشف قدرات الجهاز عند الإقلاع ويضبط نفسه تلقائياً. هذا أفضل لأنه: تطبيق واحد للصيانة، تحديث واحد، وتجربة مثلى لكل جهاز دون أن يختار المستخدم نسخة.</p>
+  <div class="svgbox">
+  <svg width="980" height="300" viewBox="0 0 980 300" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans Arabic,Tahoma" font-size="13">
+    <rect x="30" y="20" width="250" height="120" rx="14" fill="#e8f0fe" stroke="#1f6feb" stroke-width="2"/>
+    <text x="155" y="44" text-anchor="middle" font-weight="bold" fill="#1f4fb0">عند الإقلاع: قياس الجهاز</text>
+    <text x="155" y="68" text-anchor="middle" font-size="12">الذاكرة (RAM)</text>
+    <text x="155" y="88" text-anchor="middle" font-size="12">فئة سنة المعالج</text>
+    <text x="155" y="108" text-anchor="middle" font-size="12">كثافة الشاشة + نوع الشبكة</text>
+    <text x="155" y="128" text-anchor="middle" font-size="11.5" fill="#5b6776">expo-device + netinfo</text>
+    <line x1="282" y1="80" x2="330" y2="80" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#ar)"/>
+    <rect x="335" y="40" width="180" height="80" rx="12" fill="#fff" stroke="#0F8056" stroke-width="2"/>
+    <text x="425" y="68" text-anchor="middle" font-weight="bold" fill="#0b5f40">ملف الأداء</text>
+    <text x="425" y="90" text-anchor="middle" font-size="12">LOW / MID / HIGH</text>
+    <text x="425" y="108" text-anchor="middle" font-size="11" fill="#5b6776">يُحفظ + قابل للتجاوز يدوياً</text>
+    <line x1="517" y1="80" x2="565" y2="80" stroke="#0F8056" stroke-width="2.5" marker-end="url(#ar2)"/>
+    <rect x="570" y="10" width="385" height="280" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="762" y="34" text-anchor="middle" font-weight="bold" fill="#0b5f40">يضبط تلقائياً:</text>
+    <text x="940" y="62" text-anchor="end" font-size="12.5">• جودة/دقّة الصور وعدد التحميل المتزامن</text>
+    <text x="940" y="86" text-anchor="end" font-size="12.5">• الرسوم المتحركة (تُخفَّف/تُطفأ على LOW)</text>
+    <text x="940" y="110" text-anchor="end" font-size="12.5">• نافذة القوائم (windowSize) + الـ skeleton</text>
+    <text x="940" y="134" text-anchor="end" font-size="12.5">• عمق الجلب المسبق (prefetch)</text>
+    <text x="940" y="158" text-anchor="end" font-size="12.5">• تفاصيل الخريطة والبلاطات</text>
+    <text x="940" y="182" text-anchor="end" font-size="12.5">• مدد الكاش + حدوده</text>
+    <text x="762" y="220" text-anchor="middle" font-size="12" fill="#5b6776">+ Google Play يقسّم الحزمة لكل جهاز</text>
+    <text x="762" y="242" text-anchor="middle" font-size="12" fill="#5b6776">(arm32 للقديم / arm64 للحديث) → تنزيل أصغر</text>
+    <text x="762" y="270" text-anchor="middle" font-size="12.5" fill="#0b5f40" font-weight="bold">النتيجة: ملف واحد يعمل على الجميع بأفضل أداء ممكن</text>
+    <defs>
+      <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#64748b"/></marker>
+      <marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0F8056"/></marker>
+    </defs>
+  </svg>
+  </div>
+  <table>
+    <tr><th>فئة الجهاز</th><th>المعيار التقريبي</th><th>السلوك</th></tr>
+    <tr><td><span class="tag r">LOW</span> ضعيف/قديم</td><td>RAM ≤ 2GB أو فئة سنة ≤ 2014</td><td>صور أقل جودة، بلا رسوم ثقيلة، قوائم بنافذة صغيرة، prefetch محدود، خريطة مبسّطة.</td></tr>
+    <tr><td><span class="tag a">MID</span> متوسط</td><td>RAM 2–4GB</td><td>توازن: جودة متوسطة، رسوم خفيفة.</td></tr>
+    <tr><td><span class="tag g">HIGH</span> قوي/حديث</td><td>RAM > 4GB</td><td>كل المؤثّرات، أعلى جودة صور، prefetch واسع.</td></tr>
+  </table>
+  <div class="note green"><b>خيار يدوي:</b> في الإعدادات «الوضع الخفيف» يجبر LOW يدوياً لمن يريد توفير البيانات/البطارية حتى على جهاز قوي. وهذا يغطّي طلبك تماماً: نسخة واحدة تتكيّف، مع إمكانية الاختيار اليدوي.</div>
+</div>
+
+<!-- ============ UPDATE ============ -->
+<h2 id="update">3) التحديث التلقائي متعدّد الطبقات (بلا إزعاج)</h2>
+<div class="card">
+  <p>هدفك: ألّا يضطر المستخدم للذهاب للمتجر كل مرة. الحل: ثلاث طبقات، الأغلبية الساحقة من التحديثات تتم <b>صامتة تماماً</b>.</p>
+  <div class="svgbox">
+  <svg width="980" height="250" viewBox="0 0 980 250" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans Arabic,Tahoma" font-size="12.5">
+    <rect x="20" y="100" width="150" height="60" rx="12" fill="#e6f4ee" stroke="#0F8056" stroke-width="2"/><text x="95" y="125" text-anchor="middle" font-weight="bold" fill="#0b5f40">فتح التطبيق</text><text x="95" y="144" text-anchor="middle">فحص التحديث</text>
+    <line x1="172" y1="130" x2="210" y2="130" stroke="#94a3b8" stroke-width="2" marker-end="url(#u)"/>
+    <rect x="212" y="105" width="170" height="50" rx="10" fill="#fff" stroke="#94a3b8" stroke-width="2"/><text x="297" y="135" text-anchor="middle" font-weight="bold">نوع التغيير؟</text>
+    <line x1="384" y1="118" x2="430" y2="50" stroke="#0F8056" stroke-width="2" marker-end="url(#u2)"/>
+    <line x1="384" y1="130" x2="430" y2="130" stroke="#1f6feb" stroke-width="2" marker-end="url(#u3)"/>
+    <line x1="384" y1="142" x2="430" y2="210" stroke="#c0392b" stroke-width="2" marker-end="url(#u4)"/>
+    <rect x="432" y="22" width="240" height="56" rx="10" fill="#e6f4ee" stroke="#0F8056" stroke-width="2"/><text x="552" y="44" text-anchor="middle" font-weight="bold" fill="#0b5f40">طبقة 1: OTA (EAS Update)</text><text x="552" y="64" text-anchor="middle" font-size="11.5">واجهة/منطق → تنزيل صامت + تطبيق تلقائي</text>
+    <rect x="432" y="104" width="240" height="52" rx="10" fill="#fff6e5" stroke="#d98a00" stroke-width="2"/><text x="552" y="126" text-anchor="middle" font-weight="bold" fill="#b06f00">طبقة 2: تحديث أصلي (نادر)</text><text x="552" y="145" text-anchor="middle" font-size="11.5">In-App Update (Play) شبه صامت</text>
+    <rect x="432" y="184" width="240" height="52" rx="10" fill="#fdecea" stroke="#c0392b" stroke-width="2"/><text x="552" y="206" text-anchor="middle" font-weight="bold" fill="#c0392b">طبقة 3: حرِج/أمني</text><text x="552" y="225" text-anchor="middle" font-size="11.5">شاشة تحديث إجبارية</text>
+    <line x1="674" y1="50" x2="720" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#u)"/>
+    <line x1="674" y1="130" x2="720" y2="130" stroke="#94a3b8" stroke-width="2" marker-end="url(#u)"/>
+    <rect x="722" y="105" width="230" height="50" rx="10" fill="#e8f0fe" stroke="#1f6feb" stroke-width="2"/><text x="837" y="127" text-anchor="middle" font-weight="bold" fill="#1f4fb0">المستخدم يكمل بسلاسة</text><text x="837" y="146" text-anchor="middle" font-size="11.5">بلا متجر · بلا انقطاع</text>
+    <defs>
+      <marker id="u" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#64748b"/></marker>
+      <marker id="u2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#0F8056"/></marker>
+      <marker id="u3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1f6feb"/></marker>
+      <marker id="u4" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#c0392b"/></marker>
+    </defs>
+  </svg>
+  </div>
+  <table>
+    <tr><th>الطبقة</th><th>تغطّي</th><th>تجربة المستخدم</th></tr>
+    <tr><td><b>1 — OTA (EAS Update)</b></td><td>~90%: تعديلات الواجهة، المنطق، إصلاح الأخطاء، النصوص.</td><td class="ok">صامتة تماماً: تنزيل بالخلفية + تطبيق عند الإقلاع التالي. <b>لا متجر.</b></td></tr>
+    <tr><td><b>2 — تحديث أصلي</b></td><td>تغيير مكتبات أصلية/إصدار Expo (نادر).</td><td>تلميح لطيف داخل التطبيق؛ على أندرويد عبر In-App Update شبه صامت.</td></tr>
+    <tr><td><b>3 — حرِج/أمني</b></td><td>ثغرة أمنية أو كسر توافق مع الخادم.</td><td>شاشة إجبارية (نادرة جداً).</td></tr>
+  </table>
+  <div class="note"><b>أمان التحديث:</b> نشر تدريجي (staged rollout) + قنوات (channels) + إمكانية <b>التراجع الفوري</b> لو ظهر خطأ في تحديث OTA + سياسة <code>runtimeVersion</code> تمنع تطبيق تحديث غير متوافق مع الجزء الأصلي.</div>
+</div>
+
+<!-- ============ SEC ============ -->
+<h2 id="sec">4) الأمان العميق (طبقات متراكبة)</h2>
+<div class="card">
+  <div class="svgbox">
+  <svg width="760" height="230" viewBox="0 0 760 230" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans Arabic,Tahoma" font-size="12.5">
+    <rect x="40" y="20" width="680" height="34" rx="8" fill="#fdecea" stroke="#c0392b"/><text x="380" y="42" text-anchor="middle" fill="#c0392b" font-weight="bold">النقل: HTTPS فقط + جذور شهادات محزومة + تثبيت اختياري</text>
+    <rect x="70" y="60" width="620" height="34" rx="8" fill="#fff6e5" stroke="#d98a00"/><text x="380" y="82" text-anchor="middle" fill="#b06f00" font-weight="bold">المصادقة: access قصير + refresh دوّار + ربط بالجهاز + TOTP + مهلة خمول</text>
+    <rect x="100" y="100" width="560" height="34" rx="8" fill="#e8f0fe" stroke="#1f6feb"/><text x="380" y="122" text-anchor="middle" fill="#1f4fb0" font-weight="bold">التخزين: SecureStore للرموز + MMKV مشفّر + لا أسرار في الحزمة</text>
+    <rect x="130" y="140" width="500" height="34" rx="8" fill="#efeaff" stroke="#6d4aff"/><text x="380" y="162" text-anchor="middle" fill="#5a36cc" font-weight="bold">سلامة التطبيق: كشف Root + Play Integrity + R8/Hermes + لا تصحيح</text>
+    <rect x="160" y="180" width="440" height="34" rx="8" fill="#e6f4ee" stroke="#0F8056"/><text x="380" y="202" text-anchor="middle" fill="#0b5f40" font-weight="bold">المدخلات/الخصوصية: تحقّق Zod + أقل صلاحيات + لا سجلّات حسّاسة</text>
+  </svg>
+  </div>
+  <table>
+    <tr><th>الطبقة</th><th>الإجراءات</th></tr>
+    <tr><td>النقل (Transport)</td><td>HTTPS إلزامي؛ <b>حزم ISRG Root X1 + جذر احتياطي داخل التطبيق</b> (درس الأجهزة القديمة) ليثق بالخادم دائماً؛ تثبيت شهادة (pinning) اختياري يُفعّله المشغّل؛ مهلة لكل طلب.</td></tr>
+    <tr><td>المصادقة</td><td>access token قصير العمر + <b>refresh دوّار مع mutex</b> (منع سباق التجديد)؛ ربط الجلسة بالجهاز (device_id)؛ دعم TOTP؛ مهلة الخمول من الخادم؛ تسجيل خروج يمسح كل شيء.</td></tr>
+    <tr><td>التخزين</td><td>الرموز في <b>SecureStore</b> (Keychain/Keystore)؛ الكاش في MMKV مشفّر؛ <b>صفر أسرار</b> في الحزمة (كلها عبر EAS Secrets/البيئة).</td></tr>
+    <tr><td>سلامة التطبيق</td><td>كشف Root/Jailbreak (تحذير)؛ Play Integrity (تحقّق من جهة الخادم — هيكل جاهز)؛ R8/Hermes bytecode؛ منع وضع التصحيح في الإصدار.</td></tr>
+    <tr><td>المدخلات/الخصوصية</td><td>تحقّق <b>Zod</b> لكل إدخال؛ أقل صلاحيات (موقع/إشعارات فقط عند الحاجة)؛ لا <code>console.log</code> في الإنتاج؛ منع لقطة الشاشة على الشاشات الحسّاسة (اختياري)؛ منع النسخ الاحتياطي لبيانات الجلسة.</td></tr>
+  </table>
+</div>
+
+<!-- ============ STORE ============ -->
+<h2 id="store">5) استبدال Flutter على المتجر بسلاسة</h2>
+<div class="card">
+  <p>بما أنك اخترت استبدال Flutter، يجب أن يحلّ تطبيق RN محلّه على Google Play <b>كتحديث للمستخدمين الحاليين</b>، لا كتطبيق جديد منفصل. الشرطان:</p>
+  <table>
+    <tr><th>العنصر</th><th>القيمة</th><th>لماذا</th></tr>
+    <tr><td>معرّف التطبيق</td><td class="ok"><code>ly.tawa.app</code> (نفس Flutter)</td><td>ليصل كتحديث لنفس القائمة على المتجر.</td></tr>
+    <tr><td>مفتاح التوقيع</td><td class="ok">نفس مفتاح <code>tawa-release.jks</code> (alias tawa-key، صالح حتى 2053)</td><td>المتجر يرفض التحديث إن اختلف مفتاح التوقيع.</td></tr>
+    <tr><td>versionCode</td><td>أعلى من إصدار Flutter الحالي</td><td>شرط المتجر لقبول التحديث.</td></tr>
+  </table>
+  <div class="note amber"><b>ملاحظة:</b> إن لم يكن تطبيق Flutter قد نُشر فعلاً على المتجر بعد، فالأمر أبسط — نبدأ نظيفاً بنفس المعرّف. لو كان منشوراً، نتبع الشرطين أعلاه ليكون «تحديثاً» سلساً. (سأؤكّد حالة النشر معك قبل البناء النهائي.)</div>
+</div>
+
+<!-- ============ TREE ============ -->
+<h2 id="tree">6) بنية الملفات النهائية</h2>
+<div class="card">
+<pre>platform/apps/mobile/
+├── app/                              # Expo Router — كل ملف = شاشة
+│   ├── _layout.tsx                   # الجذر: Providers + RTL + Theme + QueryClient
+│   ├── index.tsx                     # توجيه حسب حالة الجلسة
+│   ├── (onboarding)/                 # welcome · language · city · location-permission
+│   ├── (auth)/                       # phone · otp · register
+│   ├── (tabs)/                       # home · orders · wallet · account  (+ شريط سفلي)
+│   ├── restaurant/[id].tsx
+│   ├── cart/index.tsx
+│   ├── checkout/index.tsx
+│   └── orders/[id].tsx               # تتبّع + Timeline + خريطة
+├── src/
+│   ├── components/{ui,layout,business}/
+│   ├── features/{auth,restaurants,cart,checkout,orders,location,notifications}/
+│   ├── services/{api,storage,location,updates,security}/
+│   ├── hooks/                        # useProviders, useOrder, useCart...
+│   ├── lib/{money,errors,format,deviceTier,logger}/
+│   ├── theme/                        # tokens (colors, spacing, radius, type, shadows)
+│   ├── i18n/{ar,en}/
+│   ├── store/                        # session, cart, settings (Zustand + persist)
+│   ├── types/                        # request/response (مشتقّة من عقد الخادم)
+│   └── mocks/                        # ردود محاكاة بنفس الأنواع
+├── tests/                            # cart, status-map, error-normalize, validation, auth
+├── assets/                           # الشعار + الأيقونة (هوية توا)
+├── app.config.ts                     # Expo + env (API_MODE, BASE_URL) + plugins
+├── eas.json                          # ملفّات بناء/تحديث EAS
+├── .eslintrc / .prettierrc / tsconfig (strict)
+└── README.md</pre>
+</div>
+
+<!-- ============ PLAN ============ -->
+<h2 id="plan">7) خارطة التنفيذ التفصيلية</h2>
+<div class="card">
+  <div class="phasebar">
+    <div class="ph" style="background:#0F8056">م0: الأساسات</div>
+    <div class="ph" style="background:#1f6feb">م1: الشاشات الأساسية</div>
+    <div class="ph" style="background:#6d4aff">م2: الإنتاج + الخريطة</div>
+    <div class="ph" style="background:#d98a00">م3: إشعارات+offline+أداء</div>
+    <div class="ph" style="background:#c0392b">م4: النشر</div>
+  </div>
+
+  <h3>المرحلة 0 — الأساسات (لا شاشات بعد)</h3>
+  <table class="scn">
+    <tr><th>المهمة</th><th>المخرج</th></tr>
+    <tr><td>تهيئة المشروع</td><td>Expo + TS strict + Expo Router + Hermes/New Arch + EAS Dev Client.</td></tr>
+    <tr><td>الجودة</td><td>ESLint + Prettier + tsconfig strict + Jest/RNTL + scripts (lint/typecheck/test/format/start).</td></tr>
+    <tr><td>الثيم + RTL + i18n</td><td>design tokens + I18nManager RTL + i18next (ar/en).</td></tr>
+    <tr><td>البيئة</td><td>app.config: <code>API_MODE</code> (mock/real) + <code>BASE_URL</code> + EAS Secrets.</td></tr>
+    <tr><td>الشبكة</td><td>apiClient (رموز/مهلة/إعادة محاولة/تطبيع أخطاء) + جذور شهادات محزومة.</td></tr>
+    <tr><td>الحالة + الخادم</td><td>Zustand (session/cart/settings + persist) + TanStack QueryClient.</td></tr>
+    <tr><td>التخزين</td><td>SecureStore (رموز) + MMKV (كاش).</td></tr>
+    <tr><td>التكيّف + التحديث</td><td>deviceTier (LOW/MID/HIGH) + خدمة EAS Update (فحص/تنزيل/تطبيق).</td></tr>
+  </table>
+
+  <h3>المرحلة 1 — الشاشات الأساسية (ما ستراجعه وتجرّبه)</h3>
+  <table class="scn">
+    <tr><th>المجموعة</th><th>الشاشات</th></tr>
+    <tr><td>Onboarding</td><td>ترحيب · لغة · مدينة · صلاحية الموقع (بأدب).</td></tr>
+    <tr><td>المصادقة</td><td>هاتف · OTP · تسجيل · إدارة جلسة (مع Mock أولاً).</td></tr>
+    <tr><td>التصفّح</td><td>الرئيسية (بحث/أقسام/بانرات/قريب/الأكثر طلباً) · قائمة المتاجر (فلترة/ترتيب).</td></tr>
+    <tr><td>الطلب</td><td>تفاصيل المتجر · السلة · إتمام الطلب (هيكل وظيفي) · الطلبات (هيكل وظيفي) · الحساب.</td></tr>
+    <tr><td>الاختبارات</td><td>السلة · حالات الطلب · تطبيع الأخطاء · التحقّق · المصادقة + README.</td></tr>
+  </table>
+  <div class="note amber"><b>بوابة الجودة (إلزامية قبل أي مرحلة تالية):</b> ✅ typecheck · ✅ lint · ✅ tests · ✅ التطبيق يقلع فعلياً على جهاز/محاكي · ✅ لا بنية وهمية · ✅ لا استيراد مكسور. وأُرفق نتائج الأوامر الفعلية.</div>
+
+  <h3>المراحل 2–4 (بعد اعتماد م1)</h3>
+  <table class="scn">
+    <tr><td><b>م2</b></td><td>تبديل Mock→الحقيقي · العناوين والموقع/الخرائط · تتبّع حيّ (SSE) · المحفظة/الولاء/الدعم.</td></tr>
+    <tr><td><b>م3</b></td><td>إشعارات الدفع · متانة offline · تحسين أداء مُقاس · تفعيل OTA.</td></tr>
+    <tr><td><b>م4</b></td><td>EAS Build/Submit · Google Play (نفس معرّف/مفتاح Flutter) · iOS لاحقاً.</td></tr>
+  </table>
+</div>
+
+<!-- ============ SIM ============ -->
+<h2 id="sim">8) المحاكاة الذهنية — أكثر من 180 سيناريو</h2>
+<div class="card">
+  <p>هنا «نعيش» التطبيق ذهنياً <b>قبل بنائه</b>: ماذا يحدث أثناء البناء، وأثناء الاستخدام الحقيقي، في كل حالة متخيّلة — لنغلق الثغرات والتعارضات قبل أن تقع. لكل سيناريو: المتوقّع + المعالجة المخطّطة.</p>
+  <div class="grid3" style="margin-bottom:8px">
+    <div class="kpi"><div class="n">14</div><div class="l">فئة سيناريوهات</div></div>
+    <div class="kpi"><div class="n">180+</div><div class="l">سيناريو مُغطّى</div></div>
+    <div class="kpi"><div class="n">0</div><div class="l">ثغرة متروكة بلا خطة</div></div>
+  </div>
+
+  <div class="cat"><span class="count">A</span> أثناء البناء والإعداد (Build)</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة المخطّطة</th></tr>
+    <tr><td>مكتبة تحتاج كوداً أصلياً (MMKV/New Arch) لا تعمل في Expo Go</td><td>استخدام EAS Dev Client من اليوم الأول بدل Expo Go.</td></tr>
+    <tr><td>تعارض معرّف التطبيق مع Flutter على المتجر</td><td>إعادة استخدام <code>ly.tawa.app</code> + نفس مفتاح التوقيع → تحديث سلس.</td></tr>
+    <tr><td>اختلاف مفتاح التوقيع يرفضه المتجر</td><td>توقيع EAS بنفس <code>tawa-release.jks</code> (محفوظ كـ EAS credential).</td></tr>
+    <tr><td>الأجهزة القديمة لا تثق بشهادة الخادم</td><td>حزم ISRG Root X1 + جذر احتياطي داخل التطبيق.</td></tr>
+    <tr><td>RTL لا يُفعَّل إلا بعد إعادة تشغيل</td><td>ضبط I18nManager.forceRTL مبكراً + إعادة تحميل عند أول إقلاع فقط.</td></tr>
+    <tr><td>خط عربي ناقص يسبّب مربّعات</td><td>حزم خط عربي واضح ضمن assets واختباره.</td></tr>
+    <tr><td>versionCode غير متصاعد</td><td>تصعيد تلقائي عبر EAS (autoIncrement).</td></tr>
+    <tr><td>تسريب أسرار في الحزمة</td><td>كل المفاتيح عبر EAS Secrets/البيئة + فحص قبل البناء.</td></tr>
+    <tr><td>حجم الحزمة كبير</td><td>AAB + تقسيم Play لكل ABI + Hermes + تحسين الأصول.</td></tr>
+    <tr><td>مكتبة غير متوافقة مع New Architecture</td><td>فحص توافق كل مكتبة قبل تثبيتها؛ بديل عند الحاجة.</td></tr>
+    <tr><td>اختلاف runtimeVersion يكسر OTA</td><td>سياسة runtimeVersion مربوطة بالجزء الأصلي.</td></tr>
+    <tr><td>فشل بناء iOS بلا حساب Apple</td><td>تأجيل iOS؛ أندرويد أولاً (معتمد).</td></tr>
+    <tr><td>أدوات النظام تالفة (درس سابق: Gradle/NDK/CMake)</td><td>EAS Build سحابي يتجنّب اعتماد البيئة المحلية الهشّة.</td></tr>
+    <tr><td>اختلاف minSdk يستبعد أجهزة</td><td>minSdk 23 (أندرويد 6) لتغطية القديم.</td></tr>
+    <tr><td>كسر استيراد/نوع عند الدمج</td><td>بوابة typecheck+lint إلزامية قبل أي تسليم.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">B</span> المصادقة والجلسة</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>OTP لا يصل / تأخّر</td><td>عدّاد + زر «إعادة إرسال» بعد مهلة + رسالة واضحة.</td></tr>
+    <tr><td>OTP خاطئ</td><td>رسالة دقيقة + عدد محاولات محدود + قفل مؤقت.</td></tr>
+    <tr><td>تجاوز حدّ الطلبات (429)</td><td>رسالة «انتظر قليلاً» + backoff.</td></tr>
+    <tr><td>انتهاء access أثناء الاستخدام</td><td>تجديد تلقائي بـ refresh (شفّاف).</td></tr>
+    <tr><td>انتهاء refresh</td><td>مسح الجلسة + توجيه لتسجيل الدخول برسالة لطيفة.</td></tr>
+    <tr><td>سباق تجديد (طلبات متوازية تتلقّى 401)</td><td>mutex: تجديد واحد، والباقي ينتظر نتيجته.</td></tr>
+    <tr><td>حساب مفعّل TOTP</td><td>عرض رسالة/شاشة TOTP بدل الانهيار.</td></tr>
+    <tr><td>حساب موقوف/محظور</td><td>رسالة سبب واضحة + مسار دعم.</td></tr>
+    <tr><td>فشل الشبكة أثناء الدخول</td><td>إعادة محاولة + إبقاء المدخلات + رسالة «تحقّق من الإنترنت».</td></tr>
+    <tr><td>ضغط مزدوج على «دخول»</td><td>تعطيل الزر أثناء الإرسال + idempotency.</td></tr>
+    <tr><td>رابط عميق لشاشة محميّة وأنت خارج الجلسة</td><td>حفظ الوجهة + توجيه للدخول ثم العودة إليها.</td></tr>
+    <tr><td>هاتف بصيغة غير قياسية</td><td>تطبيع E.164 (+218) قبل الإرسال.</td></tr>
+    <tr><td>تسجيل برقم مستخدَم مسبقاً</td><td>رسالة 409 واضحة + اقتراح تسجيل الدخول.</td></tr>
+    <tr><td>كلمة مرور ضعيفة</td><td>تحقّق Zod فوري قبل الإرسال.</td></tr>
+    <tr><td>الدخول بشهادة لا يثق بها الجهاز</td><td>الجذور المحزومة تحلّها (درس اليوم).</td></tr>
+    <tr><td>الخروج لا يمسح كل البيانات</td><td>مسح SecureStore + الكاش + إعادة تعيين الحالة.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">C</span> التصفّح والصفحة الرئيسية</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>لا مزوّدين في المدينة المختارة</td><td>حالة فارغة محترمة + اقتراح تغيير المدينة.</td></tr>
+    <tr><td>رفض صلاحية الموقع</td><td>السماح باختيار المدينة يدوياً + متابعة طبيعية.</td></tr>
+    <tr><td>إنترنت بطيء</td><td>skeleton + عرض الكاش إن وُجد.</td></tr>
+    <tr><td>عرض البيانات دون اتصال</td><td>كاش القوائم الأساسية + شارة «غير متصل».</td></tr>
+    <tr><td>بحث بلا نتائج</td><td>حالة فارغة + اقتراحات.</td></tr>
+    <tr><td>مزوّد مغلق الآن</td><td>شارة «مغلق» + منع الطلب.</td></tr>
+    <tr><td>صورة بانر مفقودة</td><td>بديل/placeholder بلا كسر التخطيط.</td></tr>
+    <tr><td>قائمة طويلة جداً</td><td>FlashList + pagination + نافذة متكيّفة حسب الجهاز.</td></tr>
+    <tr><td>تغيير المدينة يعيد التحميل</td><td>إبطال كاش الاستعلامات المرتبطة بالمدينة.</td></tr>
+    <tr><td>نقر سريع متكرّر على عنصر</td><td>حماية من التنقّل المزدوج.</td></tr>
+    <tr><td>جهاز ضعيف يتلكّأ في التمرير</td><td>ملف LOW: تقليل الصور والرسوم.</td></tr>
+    <tr><td>اختلاف توقيت الخادم/الجهاز</td><td>الاعتماد على توقيت الخادم لحالات الفتح.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">D</span> تفاصيل المتجر والأصناف</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>صنف نفد من المخزون</td><td>تعطيله + شارة «غير متاح».</td></tr>
+    <tr><td>تغيّر السعر منذ الكاش</td><td>إعادة جلب عند الدخول + تأكيد السعر في السلة.</td></tr>
+    <tr><td>المتجر أُغلق بعد دخولك</td><td>تنبيه عند محاولة الإضافة/الطلب.</td></tr>
+    <tr><td>إضافات إلزامية غير مختارة</td><td>منع الإضافة حتى الاستيفاء.</td></tr>
+    <tr><td>حدّ أدنى للطلب</td><td>إظهار المتبقّي للوصول للحدّ.</td></tr>
+    <tr><td>ملاحظة طويلة جداً</td><td>حدّ أقصى + تحقّق.</td></tr>
+    <tr><td>صنف بلا سعر (خطأ بيانات)</td><td>إخفاء/تعطيل + إبلاغ صامت.</td></tr>
+    <tr><td>صور أصناف كثيرة على جهاز ضعيف</td><td>تحميل كسول + جودة LOW.</td></tr>
+    <tr><td>وصف/اسم بحقول فارغة (null)</td><td>قيم افتراضية آمنة.</td></tr>
+    <tr><td>اختيار خيارات متعدّدة معقّدة</td><td>حساب السعر لحظياً + تحقّق.</td></tr>
+    <tr><td>تذبذب الشبكة أثناء التحميل</td><td>إعادة محاولة + إبقاء ما حُمِّل.</td></tr>
+    <tr><td>RTL مع أرقام/أسعار لاتينية</td><td>عزل الاتجاه للأرقام داخل النص العربي.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">E</span> السلة</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>إضافة من مزوّدَين مختلفين</td><td>تحذير + خيار تفريغ السلة للبدء بمزوّد جديد.</td></tr>
+    <tr><td>كمية تتجاوز المتاح</td><td>منع + رسالة.</td></tr>
+    <tr><td>السلة فارغة عند الدفع</td><td>تعطيل المتابعة.</td></tr>
+    <tr><td>تقريب الفكّة (250 درهم)</td><td>تقريب النقد لأقرب ¼ دينار (منطق موحّد كالمنصّة).</td></tr>
+    <tr><td>تدوير العملة (mills) خاطئ</td><td>طبقة money موحّدة (÷1000/×1000، 3 خانات) + اختبارات.</td></tr>
+    <tr><td>السلة تُفقَد عند إغلاق التطبيق</td><td>حفظ في MMKV + استرجاع عند الإقلاع.</td></tr>
+    <tr><td>صنف لم يعد متاحاً عند العودة للسلة</td><td>إعادة تحقّق + إزالة مع إشعار.</td></tr>
+    <tr><td>تغيّر السعر بين السلة والدفع</td><td>إعادة تسعير + تأكيد قبل الإرسال.</td></tr>
+    <tr><td>تسجيل الخروج وفي السلة عناصر</td><td>قرار: حفظ السلة محلياً بلا ربطها بحساب (خصوصية).</td></tr>
+    <tr><td>كميات ضخمة</td><td>حدود معقولة + تحقّق.</td></tr>
+    <tr><td>حساب الإجمالي (فرعي+توصيل−خصم)</td><td>دالة نقية + اختبارات وحدة.</td></tr>
+    <tr><td>نقر سريع +/−</td><td>debounce + تحديث متفائل.</td></tr>
+    <tr><td>رسوم توصيل تتغيّر بالموقع</td><td>إعادة حسابها عند تغيير العنوان (كالمنصّة).</td></tr>
+    <tr><td>عرض/خصم منتهٍ</td><td>تحقّق عند الدفع + رسالة.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">F</span> إتمام الطلب (COD)</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>لا عنوان محفوظ</td><td>إجبار إضافة عنوان قبل المتابعة.</td></tr>
+    <tr><td>العنوان خارج نطاق التوصيل</td><td>رسالة واضحة + منع.</td></tr>
+    <tr><td>طريقة الدفع: نقدي فقط حالياً</td><td>COD افتراضي (الدفع الإلكتروني مقفل بالمنصّة).</td></tr>
+    <tr><td>«جهّز نقداً» بقيمة خاطئة</td><td>عرض الإجمالي المقرّب (سلعة+توصيل، فكّة 250).</td></tr>
+    <tr><td>ضغط مزدوج على «تأكيد»</td><td>تعطيل + <b>Idempotency-Key ثابت</b> للطلب.</td></tr>
+    <tr><td>انقطاع بعد الإرسال (هل أُنشئ الطلب؟)</td><td>مفتاح idempotency يمنع التكرار + مزامنة عند العودة.</td></tr>
+    <tr><td>الخادم أنشأ الطلب لكن الرد ضاع</td><td>إعادة الاستعلام بالـ idempotency/قائمة الطلبات قبل إعادة الإرسال.</td></tr>
+    <tr><td>طلب عالي القيمة (COD) يتطلّب OTP</td><td>تدفّق OTP قبل الإنشاء (كالمنصّة) ثم إعادة المحاولة.</td></tr>
+    <tr><td>دَين سابق غير مدفوع يمنع الطلب</td><td>رسالة + توجيه لتسوية الدَين (كالمنصّة).</td></tr>
+    <tr><td>تغيّر السعر/التوفّر لحظة التأكيد</td><td>422 → عرض الفرق + إعادة تأكيد.</td></tr>
+    <tr><td>التطبيق أُغلق أثناء الدفع</td><td>استرجاع الحالة + عدم فقدان السلة.</td></tr>
+    <tr><td>ملاحظات الطلب فارغة/طويلة</td><td>اختيارية + حدّ أقصى.</td></tr>
+    <tr><td>عنوان بلا إحداثيات</td><td>طلب تحديد على الخريطة أو معلم + هاتف.</td></tr>
+    <tr><td>فشل الشبكة قبل الإرسال</td><td>إبقاء كل المدخلات + إعادة محاولة.</td></tr>
+    <tr><td>المتجر أُغلق قبل التأكيد</td><td>منع + اقتراح بدائل.</td></tr>
+    <tr><td>تأكيد ناجح</td><td>شاشة نجاح + انتقال لتتبّع الطلب.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">G</span> الطلبات والتتبّع (SSE)</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>تحديث الحالة لحظياً</td><td>بثّ SSE (كالمنصّة) لتحديث الـ Timeline.</td></tr>
+    <tr><td>انقطاع SSE</td><td>تراجع تلقائي إلى polling دوري.</td></tr>
+    <tr><td>المزوّد رفض الطلب</td><td>إشعار + اقتراحات بديلة (كالمنصّة).</td></tr>
+    <tr><td>لا يوجد سائق</td><td>إشعار + خيار إلغاء واسترداد.</td></tr>
+    <tr><td>موقع السائق على الخريطة</td><td>تحديث حيّ + تراجع إلى آخر موقع معروف.</td></tr>
+    <tr><td>طلب عالق</td><td>عرض الحالة + مسار دعم/إلغاء.</td></tr>
+    <tr><td>تحويل الحالات (pending→delivered)</td><td>دالة status-map + اختبارات.</td></tr>
+    <tr><td>إلغاء بعد بدء التحضير</td><td>منطق الإلغاء حسب الحالة (كالمنصّة).</td></tr>
+    <tr><td>خريطة ثقيلة على جهاز ضعيف</td><td>ملف LOW: خريطة مبسّطة/تحديث أبطأ.</td></tr>
+    <tr><td>إشعار وصول الطلب</td><td>دفع + تحديث القائمة.</td></tr>
+    <tr><td>سجلّ طلبات طويل</td><td>pagination + كاش.</td></tr>
+    <tr><td>إعادة الطلب من السجل</td><td>إعادة بناء السلة (كالمنصّة) مع تحقّق توفّر.</td></tr>
+    <tr><td>توقيت غير متّسق</td><td>توقيت الخادم (Africa/Tripoli).</td></tr>
+    <tr><td>فتح تتبّع طلب لا يخصّك</td><td>تحقّق صلاحية من الخادم (403).</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">H</span> الشبكة والإنترنت الضعيف</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>وضع الطيران</td><td>شارة offline + تعطيل الإجراءات الشبكية + عرض الكاش.</td></tr>
+    <tr><td>Captive portal (شبكة تتطلّب تسجيل)</td><td>اكتشاف فشل غير متوقّع + رسالة + إعادة محاولة.</td></tr>
+    <tr><td>2G بطيء جداً</td><td>مهلات معقولة + skeleton + ملف LOW.</td></tr>
+    <tr><td>انتهاء مهلة الطلب</td><td>retry/backoff للأخطاء القابلة للإعادة فقط.</td></tr>
+    <tr><td>تذبذب أثناء عملية حسّاسة</td><td>idempotency + عدم فقدان البيانات.</td></tr>
+    <tr><td>عودة الاتصال</td><td>إعادة مزامنة + إفراغ صندوق الصادر.</td></tr>
+    <tr><td>DNS فاشل مؤقتاً</td><td>إعادة محاولة + رسالة واضحة.</td></tr>
+    <tr><td>رد ناقص/مقطوع</td><td>تطبيع خطأ + إعادة محاولة.</td></tr>
+    <tr><td>تبديل WiFi↔بيانات</td><td>إعادة المحاولة بسلاسة.</td></tr>
+    <tr><td>سباق طلبات متعدّدة</td><td>إلغاء الطلبات القديمة (AbortController).</td></tr>
+    <tr><td>كاش قديم بائت</td><td>سياسة staleTime + إعادة جلب بالخلفية.</td></tr>
+    <tr><td>الخادم في وضع صيانة (503)</td><td>شاشة صيانة لطيفة + إعادة محاولة.</td></tr>
+    <tr><td>الطلب يخرج لكن لا رد</td><td>تمييز «أُرسل/لم يُؤكَّد» + مزامنة.</td></tr>
+    <tr><td>بطّارية منخفضة/توفير</td><td>تقليل polling/التحديثات.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">I</span> التحديث الذاتي (OTA)</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>تحديث OTA متاح</td><td>تنزيل صامت بالخلفية + تطبيق عند الإقلاع التالي.</td></tr>
+    <tr><td>فشل تنزيل OTA</td><td>تجاهل بأمان + إعادة المحاولة لاحقاً (التطبيق يعمل).</td></tr>
+    <tr><td>تحديث OTA معطوب</td><td>تراجع فوري لقناة سابقة + نشر تدريجي يحدّ الأثر.</td></tr>
+    <tr><td>تغيير أصلي لا يغطّيه OTA</td><td>تلميح تحديث أصلي (In-App Update) شبه صامت.</td></tr>
+    <tr><td>كسر توافق مع الخادم</td><td>طبقة 3: شاشة تحديث إجبارية.</td></tr>
+    <tr><td>OTA غير متوافق مع الجزء الأصلي</td><td>runtimeVersion يمنع تطبيقه.</td></tr>
+    <tr><td>تطبيق التحديث أثناء استخدام نشط</td><td>تأجيل التطبيق للإقلاع التالي (بلا مقاطعة).</td></tr>
+    <tr><td>إنترنت ضعيف وقت الفحص</td><td>fail-open: لا يعطّل الإقلاع.</td></tr>
+    <tr><td>جهاز قديم لا يدعم ميزة جديدة</td><td>تدرّج الميزات + التكيّف.</td></tr>
+    <tr><td>مستخدم على إصدار قديم جداً</td><td>فحص /version/check + توجيه مناسب.</td></tr>
+    <tr><td>اختبار التحديث قبل النشر</td><td>قناة preview + اختبار داخلي.</td></tr>
+    <tr><td>تتبّع أعطال ما بعد التحديث</td><td>Crashlytics/Sentry + قدرة تراجع.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">J</span> الأمان</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>محاولة سرقة الرموز</td><td>SecureStore + لا نسخ احتياطي للجلسة.</td></tr>
+    <tr><td>جهاز مهكّر (Root)</td><td>كشف + تحذير + Play Integrity من جهة الخادم.</td></tr>
+    <tr><td>التقاط شاشة لمعلومات حسّاسة</td><td>منع لقطة الشاشة على الشاشات الحسّاسة (اختياري).</td></tr>
+    <tr><td>اعتراض الشبكة (MITM)</td><td>HTTPS + جذور محزومة + تثبيت اختياري.</td></tr>
+    <tr><td>حقن عبر رابط عميق</td><td>تحقّق صارم من معاملات الروابط.</td></tr>
+    <tr><td>أسرار في الكود</td><td>صفر أسرار؛ كلها بيئة/EAS Secrets.</td></tr>
+    <tr><td>تسريب عبر السجلّات</td><td>لا <code>console.log</code> في الإنتاج؛ تنقية الحسّاس.</td></tr>
+    <tr><td>إعادة تشغيل هجوم (replay)</td><td>idempotency + nonce حيث يلزم.</td></tr>
+    <tr><td>جلسة خاملة طويلة</td><td>مهلة خمول من الخادم + تجديد محكوم.</td></tr>
+    <tr><td>وصول بدور خاطئ</td><td>التطبيق للعميل فقط؛ الخادم يفرض الصلاحيات.</td></tr>
+    <tr><td>حافظة (clipboard) حسّاسة</td><td>عدم وضع أسرار في الحافظة.</td></tr>
+    <tr><td>نسخة تصحيح في الإنتاج</td><td>منع debuggable + R8/Hermes.</td></tr>
+    <tr><td>هجوم على نقطة OTP</td><td>حدّ محاولات + قفل + رسائل غير كاشفة.</td></tr>
+    <tr><td>بيانات حسّاسة في الكاش</td><td>تشفير MMKV + عدم كاش الحسّاس.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">K</span> تكيّف الجهاز والأداء</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>جهاز 1GB RAM</td><td>ملف LOW: تقليل كل شيء تلقائياً.</td></tr>
+    <tr><td>جهاز رائد قوي</td><td>ملف HIGH: أعلى جودة وتجربة.</td></tr>
+    <tr><td>المستخدم يريد توفير البيانات</td><td>«الوضع الخفيف» اليدوي في الإعدادات.</td></tr>
+    <tr><td>إعادة رسم غير ضرورية</td><td>memoization عند الحاجة + selectors.</td></tr>
+    <tr><td>قوائم ضخمة</td><td>FlashList + نافذة متكيّفة.</td></tr>
+    <tr><td>صور ثقيلة</td><td>downscale + cachePolicy + تحميل متزامن محدود على LOW.</td></tr>
+    <tr><td>رسوم متحركة تتلكّأ</td><td>تخفيف/إطفاء على LOW.</td></tr>
+    <tr><td>ذاكرة منخفضة → قتل التطبيق</td><td>استرجاع الحالة عند العودة.</td></tr>
+    <tr><td>تدفّق بيانات ضخم دفعة واحدة</td><td>pagination + جلب تدريجي.</td></tr>
+    <tr><td>قياس الأداء فعلياً</td><td>قياس قبل/بعد لتأكيد التحسين (لا تخمين).</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">L</span> اللغة و RTL</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>تبديل اللغة</td><td>تطبيق فوري + إعادة تحميل عند تغيير الاتجاه.</td></tr>
+    <tr><td>أرقام/هاتف لاتينية داخل نص عربي</td><td>عزل الاتجاه (bidi) لمنع التشويش.</td></tr>
+    <tr><td>تنسيق التواريخ</td><td>توقيت/لغة موحّدة (Africa/Tripoli).</td></tr>
+    <tr><td>تنسيق العملة «د.ل»</td><td>دالة موحّدة (3 خانات، mills).</td></tr>
+    <tr><td>نص إنجليزي ناقص</td><td>fallback للعربية + فحص تطابق المفاتيح.</td></tr>
+    <tr><td>اتجاه الأيقونات/الأسهم في RTL</td><td>قلب الاتجاهية تلقائياً.</td></tr>
+    <tr><td>نص طويل يكسر التخطيط</td><td>قصّ/التفاف + اختبار RTL.</td></tr>
+    <tr><td>إدخال مختلط (عربي/أرقام)</td><td>محاذاة صحيحة + تحقّق.</td></tr>
+    <tr><td>ترجمة حرفية ركيكة</td><td>صياغة عربية طبيعية (لا ترجمة آلية).</td></tr>
+    <tr><td>تذكّر اختيار اللغة</td><td>حفظ في MMKV.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">M</span> الأخطاء والحالات الحدّية</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>401 / 403 / 404 / 409 / 422 / 429 / 500 / 503 / 426</td><td>خريطة أخطاء عربية واضحة لكل رمز (دون تفاصيل تقنية).</td></tr>
+    <tr><td>رد JSON تالف</td><td>تطبيع خطأ + رسالة عامة آمنة.</td></tr>
+    <tr><td>حقول مفقودة (null)</td><td>قيم افتراضية + حماية من الانهيار.</td></tr>
+    <tr><td>أسماء/نصوص طويلة جداً</td><td>قصّ + التفاف.</td></tr>
+    <tr><td>صور مفقودة</td><td>placeholder.</td></tr>
+    <tr><td>قيم مالية غير متوقّعة</td><td>تحقّق + حدود.</td></tr>
+    <tr><td>تنقّل مزدوج سريع</td><td>حماية التنقّل.</td></tr>
+    <tr><td>طفرات متزامنة (mutations)</td><td>إلغاء/ترتيب + تحديث متفائل محكوم.</td></tr>
+    <tr><td>انهيار غير متوقّع</td><td>Error Boundary + شاشة خطأ ودّية + تتبّع.</td></tr>
+    <tr><td>كاش يعيد بيانات بائتة</td><td>إبطال ذكي + إعادة جلب.</td></tr>
+    <tr><td>قيم زمنية بمناطق مختلفة</td><td>توحيد على الخادم.</td></tr>
+    <tr><td>إدخال حقن نصّي</td><td>تحقّق Zod + ترميز.</td></tr>
+    <tr><td>طلب كبير جداً</td><td>حدود معقولة.</td></tr>
+    <tr><td>رسالة خطأ تكشف داخلياً</td><td>إخفاء التفاصيل عن المستخدم.</td></tr>
+  </table>
+
+  <div class="cat"><span class="count">N</span> دورة حياة التطبيق والصلاحيات</div>
+  <table class="scn"><tr><th>السيناريو</th><th>المعالجة</th></tr>
+    <tr><td>التطبيق إلى الخلفية أثناء الدفع</td><td>حفظ الحالة + استرجاعها.</td></tr>
+    <tr><td>قتل التطبيق واستعادته</td><td>استرجاع الجلسة/السلة من التخزين.</td></tr>
+    <tr><td>رفض صلاحية الموقع</td><td>اختيار مدينة يدوياً + شرح الفائدة.</td></tr>
+    <tr><td>حظر الصلاحية نهائياً</td><td>توجيه لإعدادات النظام بلطف.</td></tr>
+    <tr><td>رفض صلاحية الإشعارات</td><td>متابعة طبيعية + إمكانية التفعيل لاحقاً.</td></tr>
+    <tr><td>فتح من إشعار/رابط عميق</td><td>توجيه للشاشة الصحيحة + تحقّق الجلسة.</td></tr>
+    <tr><td>دوران الشاشة/تغيّر الحجم</td><td>تخطيط مرن.</td></tr>
+    <tr><td>تغيّر حجم الخط بالنظام</td><td>دعم تكبير الخط دون كسر.</td></tr>
+    <tr><td>الوضع الداكن (لاحقاً)</td><td>tokens تدعم التوسعة.</td></tr>
+    <tr><td>إعادة الإقلاع بعد تحديث OTA</td><td>تطبيق سلس + الحفاظ على الحالة.</td></tr>
+  </table>
+</div>
+
+<!-- ============ DELIVER ============ -->
+<h2 id="deliver">9) مخرجات المرحلة الأولى + إثبات النتائج</h2>
+<div class="card">
+  <p>في نهاية المرحلة 1 أسلّمك تطبيقاً يعمل فعلياً + تقريراً نهائياً يحتوي:</p>
+  <ul>
+    <li>ماذا بنيت + الملفات المهمة.</li>
+    <li>كيف تشغّل التطبيق + كيف تبني أندرويد + كيف تبدّل Mock↔الحقيقي.</li>
+    <li>ما لم يكتمل + المخاطر المتبقية + المرحلة التالية.</li>
+    <li><b>نتائج الأوامر الفعلية</b> (بإثبات، لا ادّعاء): <code>install</code> · <code>typecheck</code> · <code>lint</code> · <code>test</code> · <code>start/build</code>.</li>
+  </ul>
+  <div class="note green">لن أعلن «كل شيء يعمل» دون لصق نتائج الفحوصات. وبوابة الجودة تمنع الانتقال لأي مرحلة قبل نجاح typecheck/lint/test وإقلاع التطبيق فعلياً.</div>
+</div>
+
+<!-- ============ NEXT ============ -->
+<h2 id="next">10) بعد موافقتك</h2>
+<div class="card">
+  <p>هذه الخطة جاهزة للتنفيذ. ما أحتاجه منك:</p>
+  <ol>
+    <li><b>اعتماد الخطة</b> كما هي، أو ملاحظاتك عليها.</li>
+    <li><b>تأكيد واحد فقط:</b> هل تطبيق Flutter <u>منشور فعلاً</u> على Google Play الآن؟ (يحدّد إن كان البناء «تحديثاً» أم بداية نظيفة بنفس المعرّف).</li>
+  </ol>
+  <p>بمجرّد موافقتك، أبدأ <b>المرحلة 0 + 1</b> بالكامل، ثم أسلّمك التطبيق العامل + تقرير النتائج الفعلية. لن أكتب أي كود قبل موافقتك.</p>
+</div>
+
+<p class="center small" style="margin:30px 0 10px">— الخطة التنفيذية المفصّلة · توا / Towa · 2026-06-30 · (بانتظار اعتمادك — لا كود بعد) —</p>
+
+</div>
+</body>
+</html>

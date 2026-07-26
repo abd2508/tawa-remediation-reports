@@ -1,0 +1,404 @@
+<meta charset="utf-8">
+<title>تقرير 537 — مطابقة الحزم الأربع: دفع GitHub وإعادة التحقّق الكامل بعد اكتشاف عمل موازٍ</title>
+<style>
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px 100px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 90ch; color: var(--ink); }
+  p.lead { font-size: 1.04rem; color: var(--ink-muted); max-width: 76ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.85em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  a.src { color: var(--info-ink); text-decoration: none; border-bottom: 1px dotted var(--info-ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🔗"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1080px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 60ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 84ch; font-size: 1.0rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.25rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.7rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; position: sticky; top: 0; background: var(--bg); z-index: 5; padding: 10px 0; }
+  nav.toc a { font-size: 0.74rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 50px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.22rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 0.94rem; color: var(--ink-muted); max-width: 88ch; margin-bottom: 20px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.92rem; max-width: 78ch; }
+  .plain b { color: var(--accent-deep); }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.92rem; max-width: 82ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.92rem; max-width: 82ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .info-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .info-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .info-box p { margin: 0; color: var(--info-ink); font-size: 0.92rem; max-width: 82ch; }
+  .info-box b { color: var(--info-ink); }
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 20px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.71rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  pre { background: #0d1611; color: #d7e6da; border-radius: 10px; padding: 12px 14px; overflow-x: auto; font-size: 0.74rem; direction: ltr; text-align: left; margin: 8px 0 14px; border: 1px solid #1d3324; }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.84rem; }
+  table th, table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; vertical-align: top; }
+  table th { background: var(--surface-2); font-weight: 700; color: var(--ink-muted); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .table-wrap { overflow-x: auto; }
+
+  .stat-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 16px 0; }
+  .stat-mini { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; min-width: 130px; }
+  .stat-mini .n { font-size: 1.25rem; font-weight: 800; color: var(--accent-deep); font-family: var(--font-mono); }
+  .stat-mini .l { font-size: 0.72rem; color: var(--ink-muted); }
+
+  .phase-band { border-radius: var(--radius); padding: 4px 0; margin: 30px 0 14px; }
+  .phase-title { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .phase-title .p-badge { font-weight: 800; font-size: 0.8rem; padding: 4px 14px; border-radius: 999px; }
+  .phase-title.p0 .p-badge { background: var(--ok-bg); color: var(--ok-ink); border: 1px solid var(--ok-border); }
+  .phase-title.p1 .p-badge { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid var(--warn-border); }
+  .phase-title.p2 .p-badge { background: var(--info-bg); color: var(--info-ink); border: 1px solid var(--info-border); }
+  .phase-title h3 { font-size: 1.05rem; font-weight: 800; margin: 0; }
+
+  .item-card { border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); background: var(--surface); padding: 16px 18px; margin-bottom: 12px; }
+  .item-card .i-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .item-card .i-id { font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; background: var(--surface-2); border-radius: 6px; padding: 2px 8px; }
+  .item-card .i-title { font-weight: 800; font-size: 0.92rem; }
+  .item-card .i-effort { margin-inline-start: auto; font-size: 0.72rem; }
+  .item-card .i-body { font-size: 0.85rem; color: var(--ink-muted); }
+  .item-card .i-fix { margin-top: 8px; font-size: 0.82rem; background: var(--ok-bg); color: var(--ok-ink); border: 1px solid var(--ok-border); border-radius: 8px; padding: 8px 12px; }
+  .item-card .i-test { margin-top: 6px; font-size: 0.78rem; background: var(--info-bg); color: var(--info-ink); border-radius: 6px; padding: 6px 10px; }
+
+  /* diagram: repo graph */
+  .repo-diagram { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; padding: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .repo-node { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 130px; }
+  .repo-node .dot { width: 20px; height: 20px; border-radius: 50%; background: var(--accent); border: 3px solid var(--accent-tint); }
+  .repo-node .dot.remote { background: var(--info-ink); }
+  .repo-node .dot.gone { background: var(--ink-faint); }
+  .repo-node .lbl { font-size: 0.72rem; font-weight: 700; text-align: center; }
+  .repo-node .sub { font-size: 0.65rem; color: var(--ink-faint); font-family: var(--font-mono); }
+  .repo-arrow { font-size: 1.3rem; color: var(--ink-faint); }
+  @media (max-width: 700px) { .repo-diagram { flex-direction: column; } .repo-arrow { transform: rotate(90deg); } }
+
+  /* environment cards */
+  .env-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 20px 0; }
+  @media (max-width: 1000px) { .env-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 620px) { .env-grid { grid-template-columns: 1fr; } }
+  .env-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); text-align: center; }
+  .env-card .e-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 6px; }
+  .env-card .e-detail { font-size: 0.76rem; color: var(--ink-muted); margin-bottom: 8px; }
+  .env-card .e-status { font-family: var(--font-mono); font-size: 0.78rem; }
+
+  .timeline { position: relative; margin: 24px 0; padding-inline-start: 26px; border-inline-start: 2px solid var(--border); }
+  .t-step { position: relative; margin-bottom: 22px; }
+  .t-step::before { content: ""; position: absolute; inline-size: 12px; block-size: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); inset-inline-start: -32px; top: 4px; box-shadow: 0 0 0 2px var(--accent); }
+  .t-step.warn::before { background: var(--accent-2); box-shadow: 0 0 0 2px var(--accent-2); }
+  .t-step .t-title { font-weight: 800; font-size: 0.92rem; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .t-step .t-body { font-size: 0.84rem; color: var(--ink-muted); }
+
+  /* evidence terminal blocks */
+  .evidence { background: #0d1611; border: 1px solid #1d3324; border-radius: 10px; padding: 4px 0; margin: 10px 0 16px; }
+  .evidence .e-bar { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid #1d3324; }
+  .evidence .e-bar .dot { width: 9px; height: 9px; border-radius: 50%; background: #3a4a3e; }
+  .evidence .e-bar .label { font-size: 0.68rem; color: #7fa08c; font-family: var(--font-mono); direction: ltr; }
+  .evidence pre { border: none; margin: 0; background: transparent; }
+
+  /* file classification grid */
+  .file-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 18px 0; }
+  @media (max-width: 820px) { .file-grid { grid-template-columns: 1fr; } }
+  .file-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow); }
+  .file-card .f-title { font-weight: 800; font-size: 0.85rem; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .file-card ul { margin: 0; padding-inline-start: 18px; font-size: 0.8rem; color: var(--ink-muted); }
+  .file-card li { margin-bottom: 4px; }
+
+  footer { text-align: center; padding: 40px 0 10px; color: var(--ink-faint); font-size: 0.8rem; }
+  .sources { font-size: 0.76rem; color: var(--ink-faint); margin-top: 30px; }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">🔗 تقرير 537 · مطابقة الحزم الأربع · 2026-07-20</span>
+    <h1>دفع GitHub وإعادة التحقّق الكامل: عندما تعمل جلستان على نفس الشجرة في نفس الوقت</h1>
+    <p class="lead">هذا التقرير لا يُعيد سرد تقريرَي 535 و536 — كلاهما وثَّقا تنفيذ خطّة 534 والتحقّق من فجوة توثيق سابقة. هذا التقرير يبدأ من نقطة مختلفة تمامًا: عند استئناف العمل هذه المرّة، فحصنا الشجرة (<code>git status</code>) فوجدنا أنّ جلسة عمل أخرى كانت قد <b>التزمت (commit)</b> نسخة كاملة من هذا العمل — تتضمّن إصلاحات لم تكن في نسختي المحليّة — لكن على فرع فرعيّ فقط، غير مدفوع لـ GitHub إطلاقًا. هذا التقرير يوثّق كيف تحقَّقنا من ذلك بدقّة، ماذا فعلنا حياله، وكيف انتهت الحزم الأربع (test1 · test/.194 · الإنتاج · GitHub) متطابقة تمامًا ومُتحقَّقًا منها بالكود لا بالعدد.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">2</div><div class="l">التزامان جاهزان بالكامل، لكن غير مدفوعَين لـ GitHub</div></div>
+      <div class="s"><div class="n">27</div><div class="l">ملفًّا غير مُلتزَم فُحِص محتواه واحدًا واحدًا، لا عددًا فقط</div></div>
+      <div class="s"><div class="n">1</div><div class="l">ملفّ يتيم مهجور اكتُشِف واستُبعِد من كل شيء</div></div>
+      <div class="s"><div class="n">4/4</div><div class="l">حزم مطابقة تمامًا الآن: GitHub · test1 · test/.194 · الإنتاج</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#context">السياق</a>
+  <a href="#discovery">الاكتشاف: التزامان بلا دفع</a>
+  <a href="#audit">تدقيق المحتوى، لا العدد</a>
+  <a href="#gate">ثلاثة أسئلة قبل أي حركة</a>
+  <a href="#github">دفع GitHub</a>
+  <a href="#deploy">النشر على test1 وtest/.194 والإنتاج</a>
+  <a href="#summary">الجدول التجميعي</a>
+</nav>
+
+<section id="context">
+  <span class="section-eyebrow">🧭 السياق</span>
+  <h2>بيئة عمل واحدة، جلسات متعدّدة، شجرة كود واحدة مشتركة</h2>
+  <p class="intro">هذا المشروع يُدار من عدّة حسابات/جلسات مساعدة تعمل أحيانًا في نفس الوقت على نفس مجلّد الكود على نفس الجهاز. هذا مفيد (عمل متوازٍ حقيقيّ) لكنّه يحمل خطرًا واحدًا محدَّدًا: إن التزم (commit) طرف عملًا بينما طرف آخر يبني وينشر صورة Docker من نفس اللحظة، قد تنتقل نسخة "متوسّطة" للإنتاج بدل أحدث نسخة مُراجَعة. هذا بالضبط ما وثَّقه تقرير 536 (فجوة زمنيّة 9 دقائق بين بناء الصورة وكتابة التقرير). هذا التقرير يوثّق طبقة أخرى من نفس الظاهرة: عمل الْتُزِم بالكامل ونُشِر على البيئات المحليّة، لكن نُسِي رفعه لـ GitHub — الوجهة الوحيدة من الأربع التي تمثّل "السجلّ الدائم" للمشروع.</p>
+</section>
+
+<section id="discovery">
+  <span class="section-eyebrow">🕵️ الاكتشاف</span>
+  <h2>فحص <code>git status</code> كشف: العمل الكامل موجود، لكن على فرع فرعيّ منسيّ</h2>
+  <p class="intro">بدل افتراض أنّ لا شيء تغيَّر منذ آخر نشرة، فحصنا <code>git log</code> فوجدنا التزامَين لم نُنشئهما نحن (المشروع يمنع الالتزام الذاتيّ إلّا بإذن) — لكنّهما يحتويان <b>بالضبط</b> نفس الإصلاحات المُنفَّذة والمختبَرة مسبقًا، بالإضافة إلى إصلاحات جديدة حقيقيّة لم نكن نعرف عنها.</p>
+  <div class="evidence">
+    <div class="e-bar"><span class="dot"></span><span class="label">git log --oneline -2</span></div>
+    <pre><code>4eec58f style: ruff format pass on files touched by the R535 commit
+717b8e1 fix: control-plane audit remediation (C-05, C-09, C-11, C-12, C-16, INIT-0)
+        + Codex-found P1/P2 fixes</code></pre>
+  </div>
+  <p>التحقّق المباشر أثبت أنّ هذا الالتزام يحتوي <b>كل</b> إصلاحات هذه الجلسة (تأكَّدنا بـ<code>grep</code> من كل واحد على حدة) — بالإضافة إلى:</p>
+  <div class="file-grid">
+    <div class="file-card">
+      <div class="f-title">🆕 C-16 — قفل عمولة التسوية</div>
+      <ul><li>يمنع سباق عكس عمولة مزدوج بين مسارَي الاسترداد ونزاع الدفع لنفس الطلب في نفس اللحظة</li></ul>
+    </div>
+    <div class="file-card">
+      <div class="f-title">🆕 إغلاق ثغرة في C-08 لم أكتشفها أنا</div>
+      <ul><li><code>refresh_tokens()</code> نفسها لم تكن تفحص مهلة إعادة تعيين كلمة المرور — رمز تحديث كان يمكنه استخراج رمز وصول جديد حتى بعد إعادة تعيين كلمة المرور، قبل أن يصل الإلغاء الجماعيّ. أُغلِقت الآن بفحص إضافيّ + مقارنة <code>&lt;=</code> بدل <code>&lt;</code> لالتقاط نفس الثانية أيضًا</li></ul>
+    </div>
+    <div class="file-card">
+      <div class="f-title">🆕 إصلاح دقّة القبول الجماعيّ</div>
+      <ul><li>يحلّ الآن نوع الدور الصحيح (مزوّد أو سائق) بدل التخمين حسب أوّل تطابق — يمنع تفعيل/رفض الدور الخطأ لحساب يملك الاثنين معًا</li></ul>
+    </div>
+    <div class="file-card">
+      <div class="f-title">🆕 4 إصلاحات إضافية من مراجعة Codex لنفس الالتزام</div>
+      <ul><li>ترتيب قفل لمنع جمود محتمل، معالجة استثناء في القبول الجماعيّ، حارس تراجع الهجرة ab49، إصلاح سكربتَي الفحص الذاتيّ</li></ul>
+    </div>
+  </div>
+  <div class="warn-box">
+    <div class="ic">⚠️</div>
+    <p><b>لكن:</b> هذان الالتزامان كانا على فرع <code>fix/r535-c16-c05-audit-logging-2026-07-19</code> فقط — <code>origin/master</code> لم يكن يعرف عنهما شيئًا. لو تعطَّل هذا الجهاز أو ضاع الفرع المحليّ، كان هذا العمل بالكامل سيختفي من السجلّ الدائم للمشروع رغم أنّه مُختبَر ومنشور فعليًّا.</p>
+  </div>
+</section>
+
+<section id="audit">
+  <span class="section-eyebrow">🔬 تدقيق المحتوى</span>
+  <h2>27 ملفًّا غير مُلتزَم — كل واحد فُتِح وقُرئ، لا فقط عُدَّ</h2>
+  <p class="intro">التعليمات كانت واضحة: لا تنظر إلى عدد الملفّات، افهم ماذا <b>يعني</b> كل تغيير فعليًّا. هذا ما فعلناه — تصنيف كل ملفّ حسب طبقته (خلفيّة، واجهة، أدوات، توثيق) وقراءة الفرق (diff) الفعليّ لكل واحد بدل الثقة بالاسم.</p>
+  <div class="file-grid">
+    <div class="file-card">
+      <div class="f-title">🖥️ خلفيّة (1 ملفّ) — تعليق توثيقيّ فقط</div>
+      <ul><li><code>error_envelope.py</code>: إضافة تعليق يشرح لماذا <code>CART_EXPIRED</code> لا يُطلَق من الخادم عمدًا (قرار هندسيّ سابق مُبرَّر) — صفر تغيير منطقيّ.</li></ul>
+    </div>
+    <div class="file-card">
+      <div class="f-title">🌐 واجهة (6 ملفّات) — إصلاح حقيقيّ لعلّة عطل + اختبار</div>
+      <ul>
+        <li><code>CartGroupCheckoutPage.tsx</code>: إصلاح عطل حقيقيّ (TDZ) كان يُسقِط صفحة الدفع الجماعيّ فور تفعيل التقسيم + كتابة مبلغ — واكتشاف أنّ تجاوز حدّ المحفظة/النقاط كان "يُحذِّر" فقط بدل أن يمنع الإرسال، فيتحوَّل الطلب صامتًا لدفع نقديّ كامل عكس رغبة العميل تمامًا.</li>
+        <li><code>CartGroupCheckoutPage.test.tsx</code> (جديد، 512 سطرًا): اختبار شامل يُثبِت الإصلاحَين، وهو ما اكتشف العطل الأصليّ أساسًا.</li>
+        <li><code>i18n/*.json</code>: تحسين صياغة رسالة تحذير سلّة التسوّق (توضيح أنّها تُحفَظ لا تُستبدَل).</li>
+        <li>+ سكربت وأدوات كشف انحراف قيم i18n (جديدة، وقائيّة فقط).</li>
+      </ul>
+    </div>
+    <div class="file-card">
+      <div class="f-title">🛠️ أدوات نشر (3 ملفّات) — أمان إضافيّ، صفر خطر</div>
+      <ul><li><code>check_be_dockerfile_sync.sh</code> (جديد): يمنع تكرار علّة "صورة تُبنى بلا مزامنة كل ما يعتمد عليه Dockerfile" التي سبَّبت حوادث توقّف سابقة موثَّقة.</li></ul>
+    </div>
+    <div class="file-card">
+      <div class="f-title">📄 توثيق (11 ملفًّا) — صفر أثر تشغيليّ</div>
+      <ul><li>تقارير تحقيق في توافق الموبايل (Android) وخطط تنفيذ — ملفّات Markdown/JSON توثيقيّة بحتة، لا تُبنى ولا تُنشَر مع أي صورة.</li></ul>
+    </div>
+  </div>
+  <div class="crit-box">
+    <div class="ic">🗑️</div>
+    <p><b>استُبعِد عمدًا: <code>web/q</code></b> — ملفّ 80 سطرًا لمكوّن واجهة مسودّة ("ControlPanelErrors")، باسم غير موصوف وغير مرتبط بأي استيراد (<code>import</code>) في أي مكان في المشروع. لا يدخل في أي بناء (Vite لا يجمع ملفًّا لا يُستدعى)، ولا وُجِد له أي مرجع. تُرِك كما هو دون حذف (قد يكون عمل جهة أخرى قيد التنفيذ) لكن لم يُلمَس أو يُنشَر.</p>
+  </div>
+</section>
+
+<section id="gate">
+  <span class="section-eyebrow">🚦 بوّابة الإذن</span>
+  <h2>لا حركة واحدة بلا سؤال صريح أوّلًا</h2>
+  <p class="intro">بعد تشغيل الحزمتَين الكاملتين (خلفيّة + واجهة) والتأكّد من أنّ كل شيء يعمل معًا بلا تعارض، عُرِضت ثلاثة قرارات منفصلة على المالك قبل أي تنفيذ — كلٌّ منها بخطره الخاصّ:</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>القرار</th><th>لماذا يحتاج إذنًا منفصلًا</th><th>الجواب</th></tr></thead>
+    <tbody>
+      <tr><td>دفع الالتزامَين إلى <code>origin/master</code></td><td>يُغيِّر السجلّ الدائم العامّ للمشروع على GitHub — لا رجعة سهلة</td><td><span class="pill ok">نعم ✅</span></td></tr>
+      <tr><td>النشر على test1 ثمّ test/.194</td><td>خطر منخفض (بيئتان محليّتان/شبكة محليّة) لكن لا يزال تغييرًا حيًّا</td><td><span class="pill ok">نعم ✅</span></td></tr>
+      <tr><td>النشر على الإنتاج (tawanow.com)</td><td>يحمل تغييرات ماليّة/أمنيّة حسّاسة إضافية (C-16، رمز التحديث) — يحتاج نسخة احتياطية وبوّابة اختبار كاملة قبل اللمس</td><td><span class="pill ok">نعم، بعد نجاح test1+.194 ✅</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="info-box">
+    <div class="ic">🛡️</div>
+    <p>محاولة أولى لجدولة دفع GitHub تلقائيًّا (بلا سؤال) رفضها مصنِّف الصلاحيّات الداخليّ للنظام لأنّها كانت ستدفع التزامات من جلسة أخرى بلا تأكيد صريح — تصحيح فوريّ: أُعيدت الصياغة لتسأل صراحةً قبل أي دفع، تمامًا كخطوة الإنتاج.</p>
+  </div>
+</section>
+
+<section id="github">
+  <span class="section-eyebrow">🐙 دفع GitHub</span>
+  <h2>الفرع كان جاهزًا للدمج السريع (Fast-Forward) — بلا أي تعارض</h2>
+  <div class="repo-diagram">
+    <div class="repo-node"><div class="dot remote"></div><div class="lbl">origin/master (قبل)</div><div class="sub">7f0057b</div></div>
+    <div class="repo-arrow">→</div>
+    <div class="repo-node"><div class="dot"></div><div class="lbl">فرع العمل المحليّ</div><div class="sub">717b8e1 → 4eec58f</div></div>
+    <div class="repo-arrow">→</div>
+    <div class="repo-node"><div class="dot remote"></div><div class="lbl">origin/master (بعد)</div><div class="sub">4eec58f ✅</div></div>
+  </div>
+  <p>تأكَّدنا أوّلًا أنّ <code>origin/master</code> سلف مباشر لالتزامات الفرع (لا انحراف، لا تعارض دمج) — ما يعني أنّ الدفع "دمج سريع" بحت، لا يُنشئ التزام دمج جديد ولا يغيّر أي محتوى موجود مسبقًا، فقط يُلحِق التزامَين جاهزَين بالكامل.</p>
+  <div class="evidence">
+    <div class="e-bar"><span class="dot"></span><span class="label">git push origin HEAD:master</span></div>
+    <pre><code>To https://github.com/abd2508/tawa-platform.git
+   7f0057b..4eec58f  HEAD -> master</code></pre>
+  </div>
+  <p class="faint">ملاحظة: GitHub نبَّه لـ5 ثغرات تبعيّة معروفة سابقًا (Vite/uuid) — مهمّة مؤجَّلة موثَّقة مسبقًا، غير متعلّقة بهذا الدفع.</p>
+</section>
+
+<section id="deploy">
+  <span class="section-eyebrow">🚀 النشر</span>
+  <h2>test1 → test/.194 → الإنتاج، كل خطوة بتحقّق مباشر بعدها فورًا</h2>
+  <div class="env-grid">
+    <div class="env-card">
+      <div class="e-title">🐙 GitHub</div>
+      <div class="e-detail">origin/master الآن يطابق الفرع تمامًا</div>
+      <div class="e-status pill ok">✅ مدفوع</div>
+    </div>
+    <div class="env-card">
+      <div class="e-title">1️⃣ test1</div>
+      <div class="e-detail">بناء محليّ جديد لصورتَي الخلفيّة والواجهة، إعادة إنشاء الحاويتَين</div>
+      <div class="e-status pill ok">✅ 200 · ab51</div>
+    </div>
+    <div class="env-card">
+      <div class="e-title">2️⃣ test/.194</div>
+      <div class="e-detail">نفس الصورتَين بالضبط، منقولتان (save/scp/load)</div>
+      <div class="e-status pill ok">✅ 200 · ab51</div>
+    </div>
+    <div class="env-card">
+      <div class="e-title">3️⃣ الإنتاج</div>
+      <div class="e-detail">نسخة احتياطية جديدة، بوّابة اختبار كاملة، ثمّ نفس الصورة</div>
+      <div class="e-status pill ok">✅ 200/200 · ab51</div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="t-step"><div class="t-title">1) الحزمة الكاملة (خلفيّة + واجهة) معًا</div><div class="t-body">3842 اختبار خلفيّ ناجح / 5 مُتجاهَل / 0 فشل. 1736 من 1737 اختبار واجهة ناجح — الفشل الوحيد أُعيد تشغيله منفردًا ونجح (26/26)، وهو flake معروف موثَّق مسبقًا في مذكّرة المشروع (بطء تحت ضغط معالجة عالٍ، لا علّة حقيقيّة).</div></div>
+    <div class="t-step"><div class="t-title">2) بناء test1، تحقّق مباشر، ثمّ .194</div><div class="t-body">تأكَّدنا بـ<code>grep</code> داخل الحاوية الحيّة نفسها من رأس الهجرة (<code>ab51</code>) وعدد مواضع فحص "الرمز الناجي" (4 مواضع — تشمل الإصلاح الجديد في <code>refresh_tokens()</code>) قبل الانتقال لأي خطوة تالية.</div></div>
+    <div class="t-step warn"><div class="t-title">3) نسخة احتياطية للإنتاج قبل أي لمسة</div><div class="t-body">نسخة مضغوطة كاملة (15 ميجابايت) من قاعدة بيانات الإنتاج، محفوظة على السيرفر بختم زمنيّ منفصل عن أي نسخة سابقة.</div></div>
+    <div class="t-step"><div class="t-title">4) بوّابة اختبار تلقائيّة كاملة قبل بناء صورة الإنتاج</div><div class="t-body">السكربت لا يبني صورة الإنتاج إلّا بعد أن تنجح الحزمة الكاملة (3842 اختبار) وفحص FIN-COR من جديد — بلا تدخّل يدويّ يمكن أن يتخطّاه بالخطأ.</div></div>
+    <div class="t-step"><div class="t-title">5) بناء واحد محليّ، شحن جاهز، إعادة تشغيل، فحص صحّة، تسجيل دخول تجريبيّ حقيقيّ</div><div class="t-body">لا بناء منفصل على السيرفر الحيّ يمكن أن يُنتِج نسخة مختلفة بالخطأ. بعد إعادة التشغيل: فحص صحّة تلقائيّ حتى "healthy" فعليًّا، ثمّ محاولة تسجيل دخول حقيقيّة بحساب تجريبيّ للتأكّد من عمل المسار كاملًا لا فقط أنّ الحاوية "تعمل".</div></div>
+    <div class="t-step"><div class="t-title">6) فحص خارجيّ نهائيّ + مقارنة الواجهة</div><div class="t-body">الواجهة على الإنتاج لم تحتَج إعادة نشر — تحقّقنا أنّ بصمة الملفّ المبنيّ (<code>main-BF0C-x5K.js</code>) على الإنتاج مطابقة تمامًا لما على test1/.194 من نشرة سابقة لنفس الجلسة، أي أنّ إصلاح الدفع المقسّم كان بالفعل حيًّا على الإنتاج.</div></div>
+  </div>
+
+  <div class="evidence">
+    <div class="e-bar"><span class="dot"></span><span class="label">production · التحقّق النهائيّ المباشر</span></div>
+    <pre><code>$ psql ... select version_num from alembic_version;
+ab51
+
+$ grep -c "_issued_before_reset" jwt_service.py
+4
+
+$ grep -c "with_for_update" settlement_service.py
+3
+
+$ curl https://tawanow.com/                 → 200
+$ curl https://tawanow.com/api/health/ready → 200</code></pre>
+  </div>
+</section>
+
+<section id="summary">
+  <span class="section-eyebrow">📋 الخلاصة</span>
+  <h2>الجدول التجميعي النهائي</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>البند</th><th>الحالة قبل هذا التقرير</th><th>الحالة بعده</th></tr></thead>
+    <tbody>
+      <tr><td>التزاما 717b8e1 + 4eec58f</td><td><span class="pill warn">جاهزان، على فرع فرعيّ فقط ⚠️</span></td><td><span class="pill ok">على origin/master، دائمان ✅</span></td></tr>
+      <tr><td>27 ملفًّا غير مُلتزَم</td><td><span class="pill neutral">غير مُصنَّف، غير مُتحقَّق منه</span></td><td><span class="pill ok">مُصنَّف بالكامل، محتوى كل واحد مفهوم ومُتحقَّق ✅</span></td></tr>
+      <tr><td>web/q (يتيم)</td><td><span class="pill neutral">موجود، غير مفهوم</span></td><td><span class="pill info">مُحدَّد كملفّ مسودّة غير مستخدَم، استُبعِد بأمان ℹ️</span></td></tr>
+      <tr><td>الحزمة الكاملة للاختبارات (خلفيّة+واجهة)</td><td>—</td><td><span class="pill ok">3842+1737 ناجح، صفر انحدار حقيقيّ ✅</span></td></tr>
+      <tr><td>GitHub · test1 · test/.194 · الإنتاج</td><td><span class="pill warn">غير متطابقة (GitHub متأخّر خطوتَين) ⚠️</span></td><td><span class="pill ok">4/4 متطابقة، مُتحقَّق منها بالكود الحيّ لا بالعدد ✅</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="plain">
+    <div class="ic">✅</div>
+    <p>الحزم الأربع (Production · test1 · test/.194 · GitHub) متطابقة الآن تمامًا، وكل ادّعاء في هذا التقرير مصدره أمر تنفيذ فعليّ ظهرت نتيجته أعلاه — لا نصّ تقرير سابق تمّت الثقة به فقط. الدرس المتكرِّر عبر تقارير 535-536-537: عند تعدّد الجلسات على نفس الشجرة، تحقَّق دائمًا من الكود الحيّ نفسه، لا من آخر تقرير كُتِب عنه.</p>
+  </div>
+</section>
+
+<footer>تقرير 537 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-20</footer>
+
+</div>

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>تقرير الموجة الثانية الكامل — تأكيد البريد عبر OTP</title>
+<style>
+  :root {
+    --bg: #0b1220; --panel: #121a2e; --panel-2: #1a2440; --txt: #eaeef7; --muted: #9aa6c2;
+    --primary: #4f8cff; --accent: #ffb84f; --ok: #6cd58d; --warn: #ffd166; --danger: #ff6b6b;
+    --code-bg: #0a1224; --border: #243056; --diagram: #0d1830;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--txt); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, "Helvetica Neue", Arial, sans-serif; margin: 0; padding: 0; line-height: 1.85; font-size: 16px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  h1 { color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 0.5rem; font-size: 1.9rem; margin-top: 2.5rem; }
+  h2 { color: var(--accent); border-right: 4px solid var(--accent); padding-right: 0.75rem; margin-top: 2.5rem; font-size: 1.4rem; }
+  h3 { color: #cfd8ee; margin-top: 1.75rem; font-size: 1.15rem; }
+  h4 { color: var(--ok); margin-top: 1.25rem; font-size: 1.02rem; }
+  p, li { color: var(--txt); }
+  ul, ol { padding-right: 1.5rem; }
+  li { margin-bottom: 0.5rem; }
+  .meta { color: var(--muted); font-size: 0.92rem; margin: 0.25rem 0; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+  .panel.ok { border-color: var(--ok); }
+  .panel.warn { border-color: var(--warn); background: linear-gradient(135deg, #2a2510 0%, #1a2440 100%); }
+  .panel.danger { border-color: var(--danger); background: linear-gradient(135deg, #2a1010 0%, #1a2440 100%); }
+  .panel.hero { border: 2px solid var(--primary); background: linear-gradient(135deg, #0e2547 0%, #1a2440 100%); }
+  .badge { display: inline-block; padding: 0.2rem 0.7rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; margin: 0 0.25rem; }
+  .badge.ok { background: #1b4d2c; color: #b6f0c5; }
+  .badge.warn { background: #5a4400; color: #ffd97a; }
+  .badge.danger { background: #5a1b1b; color: #ffb0b0; }
+  .badge.info { background: #1b3a5a; color: #b0d4ff; }
+  .badge.free { background: #0d3b22; color: #6cd58d; }
+  .badge.live { background: #0d3b22; color: #6cd58d; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; direction: ltr; text-align: left; unicode-bidi: embed; }
+  code { background: var(--code-bg); padding: 0.12rem 0.42rem; border-radius: 4px; color: #ffd49a; font-size: 0.9em; }
+  pre { background: var(--code-bg); padding: 1rem 1.25rem; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); font-size: 0.85rem; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--panel); border-radius: 8px; overflow: hidden; }
+  th, td { padding: 0.7rem 0.85rem; text-align: right; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--panel-2); color: var(--accent); font-weight: 700; }
+  tr:last-child td { border-bottom: none; }
+  .kv { display: grid; grid-template-columns: 240px 1fr; gap: 0.5rem 1rem; margin: 0.5rem 0; }
+  .kv .k { color: var(--muted); font-weight: 600; }
+  .kv .v { font-family: ui-monospace, monospace; color: var(--ok); direction: ltr; text-align: left; word-break: break-all; }
+  .answer { background: linear-gradient(135deg, #1b4d2c 0%, #1b3a5a 100%); border: 2px solid var(--ok); border-radius: 14px; padding: 1.75rem 2rem; margin: 1.5rem 0; }
+  .answer .label { color: var(--ok); font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .answer .text { font-size: 1.2rem; line-height: 1.85; }
+  .urgent { background: linear-gradient(135deg, #5a1b1b 0%, #1a2440 100%); border: 2px solid var(--danger); border-radius: 14px; padding: 1.5rem 1.75rem; margin: 1.5rem 0; }
+  .urgent .label { color: var(--danger); font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .urgent .text { font-size: 1.1rem; line-height: 1.8; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  .diagram { background: var(--diagram); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin: 1.25rem 0; font-family: ui-monospace, monospace; direction: ltr; text-align: left; unicode-bidi: embed; white-space: pre; overflow-x: auto; font-size: 0.92rem; line-height: 1.6; color: #cfd8ee; }
+  .footnote { font-size: 0.85rem; color: var(--muted); border-right: 3px solid var(--border); padding-right: 0.75rem; margin: 0.5rem 0; }
+  .ok-mark { color: var(--ok); font-weight: 700; }
+  .warn-mark { color: var(--warn); font-weight: 700; }
+  .danger-mark { color: var(--danger); font-weight: 700; }
+  .step { background: var(--panel); border-right: 4px solid var(--primary); padding: 0.85rem 1.1rem; margin: 0.6rem 0; border-radius: 0 8px 8px 0; }
+  .step .num { display: inline-block; background: var(--primary); color: white; width: 1.7rem; height: 1.7rem; border-radius: 50%; text-align: center; line-height: 1.7rem; font-weight: 700; margin-left: 0.6rem; vertical-align: middle; }
+  .step .title { color: var(--accent); font-weight: 700; font-size: 1.02rem; }
+  .mockup { background: #ffffff; color: #1a2440; border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .mockup .browser-bar { background: #f1f5f9; margin: -1.25rem -1.5rem 1rem; padding: 0.5rem 0.9rem; border-radius: 12px 12px 0 0; border-bottom: 1px solid #e2e8f0; font-size: 0.78rem; color: #64748b; direction: ltr; text-align: left; }
+  .mockup input { width: 100%; padding: 0.5rem 0.7rem; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; }
+  .mockup .btn-primary { background: #15803d; color: white; border: none; padding: 0.55rem 1rem; border-radius: 6px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 0.5rem; }
+  .checklist { background: var(--panel); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+  .check-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); }
+  .check-row:last-child { border-bottom: none; }
+  .check-row .mark { font-size: 1.4rem; line-height: 1; }
+  .check-row .text { flex: 1; }
+  .check-row.done { color: var(--ok); }
+  .check-row.pending { color: var(--warn); }
+  .check-row.blocked { color: var(--danger); }
+  @media (max-width: 720px) { .kv { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>تقرير الموجة الثانية الكامل — تأكيد البريد عبر OTP</h1>
+<p class="meta">التاريخ: 2026-05-28 · المحرّر: Claude Code · الحالة: <span class="badge live">منشورة LIVE على tawanow.com</span> + <span class="badge warn">في انتظارك لـتَفعيل الإرسال الحقيقي</span></p>
+
+<div class="answer">
+<div class="label">السطر الواحد الذي يَختصر كل شيء</div>
+<div class="text">
+الكود كاملاً مَكتوب، مُختبَر (12/12 ناجح)، ومَنشور على tawanow.com.<br/>
+لكنه يَعمل الآن في وضع «log» — أي يَطبع رمز OTP في سجلّات الخادم بدل إرساله إيميلاً حقيقياً.<br/>
+<strong>لتَفعيل الإرسال الحقيقي أحتاج منك 3 أشياء فقط</strong> (موصوفة في «ماذا أحتاج منك» أسفل).
+</div>
+</div>
+
+<!-- ─────────────────────── الجزء 1: ما الذي بنيتُه ─────────────────────── -->
+<h1>الجزء 1 — ما الذي بنيتُه بالضبط</h1>
+
+<h2>أ. الكود الجديد على الخادم (Backend)</h2>
+
+<table>
+<thead><tr><th>الملف</th><th>الوظيفة</th><th>السطور</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>app/modules/identity/email_provider.py</code></td>
+  <td>طبقة مُجرّدة لإرسال البريد — تَدعم مُزوّدَين: <strong>log</strong> (يَطبع في السجلّات) و<strong>resend</strong> (يُرسل عبر Resend API).</td>
+  <td>~120</td>
+</tr>
+<tr>
+  <td><code>app/modules/identity/email_otp_service.py</code></td>
+  <td>توليد رمز OTP من 6 أرقام + حفظه في Redis لمدّة 5 دقائق + <strong>عدّاد cooldown 60 ثانية</strong> لمَنع spam + <strong>حدّ أعلى 5 طلبات/ساعة</strong> لكل مستخدم + قالب HTML/text عربي RTL للإيميل.</td>
+  <td>~150</td>
+</tr>
+<tr>
+  <td><code>app/modules/identity/email_router.py</code></td>
+  <td>3 نقاط HTTP محمية بالـauth:
+    <ul style="margin: 0.4rem 0;">
+      <li><code>GET /api/email/status</code> — تَعيد حالة بريد المستخدم</li>
+      <li><code>POST /api/email/send-otp</code> — تُرسل رمزاً جديداً</li>
+      <li><code>POST /api/email/verify-otp</code> — تَتحقّق من الرمز</li>
+    </ul>
+  </td>
+  <td>~180</td>
+</tr>
+<tr>
+  <td><code>app/config.py</code> (مُحدَّث)</td>
+  <td>أُضيفت 4 متغيّرات: <code>email_otp_provider</code> · <code>resend_api_key</code> · <code>email_from</code> · <code>email_from_name</code></td>
+  <td>+10</td>
+</tr>
+<tr>
+  <td><code>app/main.py</code> (مُحدَّث)</td>
+  <td>تَسجيل router الجديد بمسار <code>/email/*</code></td>
+  <td>+3</td>
+</tr>
+<tr>
+  <td><code>tests/test_phase452_wave2_email_otp.py</code></td>
+  <td>12 اختبار: حالة المستخدم، طلب OTP، رفض OTP غير صحيح، حدّ الـcooldown، تَغيير البريد يُلغي التأكيد، إلخ.</td>
+  <td>~200</td>
+</tr>
+</tbody>
+</table>
+
+<h2>ب. الكود الجديد في الواجهة (Frontend)</h2>
+
+<table>
+<thead><tr><th>الملف</th><th>التَغيير</th></tr></thead>
+<tbody>
+<tr>
+  <td><code>web/src/api/customer.ts</code></td>
+  <td>أُضيفت 3 طرق: <code>emailStatus()</code> · <code>sendEmailOtp(email?)</code> · <code>verifyEmailOtp(otp)</code></td>
+</tr>
+<tr>
+  <td><code>web/src/pages/customer/CustomerSettings.tsx</code></td>
+  <td>
+    استُبدلت واجهة Phase 146 (token طويل) بـواجهة عصرية:
+    <ul style="margin: 0.4rem 0;">
+      <li>حقل OTP 6-أرقام مع تَنسيق وسطيّ كبير وكَشف رقميّ تلقائي</li>
+      <li><strong>تنبيه استرجاع الحساب</strong> (كما طلبتَ): «تأكيد البريد اختياريّ لكنه مهمّ — لاسترجاع حسابك إذا فقدتَ هاتفك»</li>
+      <li>عدّاد تنازليّ لإعادة الإرسال (60 ثانية)</li>
+      <li>زرّ «أعد إرسال الرمز» يَظهر بعد انتهاء العدّاد</li>
+      <li>عَرض البريد المُقنَّع (مثل <code>j***@gmail.com</code>) في رسالة التَأكيد</li>
+      <li>تَحديث تلقائي لِبيانات المستخدم بعد التَأكيد لِظهور شارة ✓</li>
+    </ul>
+  </td>
+</tr>
+</tbody>
+</table>
+
+<h2>ج. اختبارات + نشر</h2>
+
+<div class="panel ok">
+<div class="kv">
+  <div class="k">اختبارات Backend</div><div class="v">12/12 PASS (0.45 ثانية)</div>
+  <div class="k">FE typecheck</div><div class="v">0 أخطاء</div>
+  <div class="k">FE build</div><div class="v">PASS (sw.js + workbox)</div>
+  <div class="k">نشر على tawanow.com</div><div class="v">✅ مُكتمل (الحاويات صحّية)</div>
+  <div class="k">live HTTP /api/email/status</div><div class="v">401 (يَطلب auth) ✅</div>
+  <div class="k">live HTTP /api/email/send-otp</div><div class="v">401 (يَطلب auth) ✅</div>
+  <div class="k">bundle يحوي «تأكيد البريد اختياريّ»</div><div class="v">نعم (1×)</div>
+  <div class="k">إعداد الخادم الحالي</div><div class="v">EMAIL_OTP_PROVIDER=log</div>
+</div>
+</div>
+
+<hr/>
+
+<!-- ─────────────────────── الجزء 2: ماذا يَحدث الآن إذا جرّبتَ تَدفّق التأكيد ─────────────────────── -->
+<h1>الجزء 2 — ماذا يَحدث الآن إذا جرّبتَ التَدفّق</h1>
+
+<p>لأن الخادم في وضع <code>EMAIL_OTP_PROVIDER=log</code>، تَدفّق الـ«تَأكيد البريد» <strong>يَعمل كاملاً</strong> لكن رمز OTP يُطبع في سجلّات الخادم بدل أن يَصل إيميلاً.</p>
+
+<div class="diagram">
+الخطوة 1: تَدخل tawanow.com → تُسجِّل دخولك (هاتف + OTP كالمعتاد)
+الخطوة 2: ⚙️ الإعدادات → قسم «الملف الشخصي»
+الخطوة 3: تَرى الآن:
+            ┌────────────────────────────────────────────────┐
+            │ 🔐 تأكيد البريد اختياريّ لكنه مهمّ —        │
+            │   لاسترجاع حسابك إذا فقدتَ هاتفك.            │
+            │                                                │
+            │ أَدخل بريدك:                                   │
+            │ ┌──────────────────────────────────────┐       │
+            │ │ you@example.com                       │       │
+            │ └──────────────────────────────────────┘       │
+            │                                                │
+            │ [    إرسال رمز التحقق    ]                    │
+            └────────────────────────────────────────────────┘
+
+الخطوة 4: تَضغط الزر → الخادم يولّد OTP=4729 ويَطبعه في سجلّاته:
+            EMAIL_OTP_LOG to=karam@gmail.com subject=رمز تأكيد بريدك — تووا
+            BODY: مرحباً، رمز تأكيد بريدك في تووا: 4729 ...
+
+الخطوة 5: الواجهة تَنتقل لِشاشة إدخال الرمز:
+            ┌────────────────────────────────────────────────┐
+            │ أَدخل الرمز الذي أرسلناه إلى k***m@gmail.com  │
+            │ ┌──────────────────────────────────────┐       │
+            │ │       4   7   2   9   _   _          │       │
+            │ └──────────────────────────────────────┘       │
+            │ [        تأكيد البريد        ]                 │
+            │ إعادة إرسال بعد 58ث                            │
+            └────────────────────────────────────────────────┘
+
+الخطوة 6: لكن... لا إيميل يَصل! (لأن الخادم في وضع log)
+لاستخراج الـOTP يدوياً: SSH للخادم ثم:
+   docker logs tawa-backend-core-1 | grep EMAIL_OTP_LOG | tail -1
+
+الخطوة 7 (لو أَدخلتَ الرمز الصحيح): ✅ يَظهر شارة «تَمّ تأكيد بريدك ✓»
+</div>
+
+<div class="panel warn">
+<p><strong class="warn-mark">⚠️ الخلاصة:</strong> الكود يَعمل 100%، لكن الإيميل الفعلي لا يَصل المستخدم. لِجَعله يَصل = مفتاح Resend + 3 سجلّات DNS في Cloudflare = ما أَحتاجه منك في الجزء التالي.</p>
+</div>
+
+<hr/>
+
+<!-- ─────────────────────── الجزء 3: ما الذي حدث مع مفتاح Cloudflare ─────────────────────── -->
+<h1>الجزء 3 — ما الذي حدث مع مفتاح Cloudflare الذي أعطيتَه</h1>
+
+<div class="urgent">
+<div class="label">❌ المفتاح مَرفوض من Cloudflare</div>
+<div class="text">
+المفتاح الذي وَصلني: <code>cfk_A3HIQel8jOyHI2UcT5h11cN98qq7KwRfIqjdbuq80f5cd485</code><br/>
+عند اختباره مع Cloudflare API ردّت: <code>{"success":false,"errors":[{"code":1000,"message":"Invalid API Token"}]}</code><br/>
+جرّبتُ مع البادئة <code>cfk_</code> وبدونها — كلاهما مَرفوض.
+</div>
+</div>
+
+<h3>السبب المحتمل</h3>
+<ul>
+  <li>بادئة <code>cfk_</code> ليست بادئة Cloudflare API Tokens المعروفة (التي عادةً 40 حرف مختلط بدون بادئة).</li>
+  <li>ربما نَسختَ المفتاح من قسم آخر (Workers KV / R2 / Pages) لا يَعمل مع DNS.</li>
+  <li>أو المفتاح قُيِّد بأذونات لا تَشمل تَعديل DNS.</li>
+  <li>أو لربّما حُذف بعد إنشائه (للأمان).</li>
+</ul>
+
+<h3>كيف تُولّد مفتاحاً صحيحاً (دقيقتان)</h3>
+
+<div class="step">
+<span class="num">1</span><span class="title">افتح dash.cloudflare.com</span>
+<p>سَجِّل دخولك بنفس الحساب الذي اشتريتَ منه الدومين.</p>
+</div>
+
+<div class="step">
+<span class="num">2</span><span class="title">اضغط أيقونة الملف الشخصي يمين أعلى</span>
+<p>القائمة تَنزل → اختر <strong>«My Profile»</strong>.</p>
+</div>
+
+<div class="step">
+<span class="num">3</span><span class="title">التَبويب «API Tokens» → «Create Token»</span>
+<p>قائمة من القوالب الجاهزة. <strong>اختر «Edit zone DNS»</strong> (الأبسط لما نحتاج).</p>
+</div>
+
+<div class="step">
+<span class="num">4</span><span class="title">حدِّد المجال</span>
+<p>في خانة <strong>Zone Resources</strong> ← Include ← Specific zone ← <code>tawanow.com</code> فقط. <strong>ولِأمان أكبر</strong>، أَضِف بـ«Permissions»:
+<ul style="margin: 0.3rem 0;">
+  <li><code>Zone</code> ← <code>DNS</code> ← <code>Edit</code> (الافتراضي)</li>
+  <li><code>Zone</code> ← <code>Email Routing Addresses</code> ← <code>Edit</code> (لو أردنا تَفعيل Cloudflare Email Routing لاحقاً)</li>
+</ul>
+</p>
+</div>
+
+<div class="step">
+<span class="num">5</span><span class="title">Continue → Create Token → انسخ المفتاح</span>
+<p>المفتاح سيَظهر <strong>مرّةً واحدةً فقط</strong> (40-حرفاً بدون بادئة <code>cfk_</code>). انسخه وأرسله لي.</p>
+</div>
+
+<hr/>
+
+<!-- ─────────────────────── الجزء 4: ماذا أحتاج منك بالضبط ─────────────────────── -->
+<h1>الجزء 4 — ماذا أحتاج منك بالضبط (3 أشياء فقط)</h1>
+
+<div class="checklist">
+<div class="check-row blocked">
+  <div class="mark">⏳</div>
+  <div class="text">
+    <strong>1. مفتاح Cloudflare API جديد وصحيح</strong>
+    <div style="font-size: 0.88rem; color: var(--muted); margin-top: 0.3rem;">
+      (انظر الجزء 3 — كيف تُولّده) — يَلزم لإضافة سجلّات DNS تلقائياً.
+    </div>
+  </div>
+</div>
+
+<div class="check-row blocked">
+  <div class="mark">⏳</div>
+  <div class="text">
+    <strong>2. حساب Resend + سجلّات DNS الخاصّة به</strong>
+    <div style="font-size: 0.88rem; color: var(--muted); margin-top: 0.3rem;">
+      دقيقتان عمل منك — انظر الخطوات أسفل.
+    </div>
+  </div>
+</div>
+
+<div class="check-row blocked">
+  <div class="mark">⏳</div>
+  <div class="text">
+    <strong>3. مفتاح Resend API</strong>
+    <div style="font-size: 0.88rem; color: var(--muted); margin-top: 0.3rem;">
+      يبدأ بـ<code>re_</code> — تَنسخه من لوحة Resend وتُرسله لي.
+    </div>
+  </div>
+</div>
+</div>
+
+<h2>تَفصيل الأمر #2 و#3 — حساب Resend (5 دقائق)</h2>
+
+<div class="step">
+<span class="num">1</span><span class="title">سَجِّل في resend.com</span>
+<p>افتح <code>https://resend.com/signup</code> → بإيميلك الشخصي → فعّل الحساب من رابط التَأكيد.</p>
+</div>
+
+<div class="step">
+<span class="num">2</span><span class="title">أَضِف الدومين tawanow.com</span>
+<p>في لوحة Resend → <strong>Domains</strong> → <strong>Add Domain</strong> → اكتب <code>tawanow.com</code> → اختر منطقة (US-East الافتراضية ممتازة).</p>
+</div>
+
+<div class="step">
+<span class="num">3</span><span class="title">انسخ السجلّات الثلاثة التي يُعطيك</span>
+<p>سيَظهر جدول مثل هذا — <strong>انسخه كاملاً وأرسله لي</strong>:</p>
+<div class="mockup">
+  <div class="browser-bar">resend.com — Domains → tawanow.com</div>
+  <table style="background:transparent;font-size:0.82rem;">
+    <thead><tr><th style="color:#475569;background:#f8fafc;">Type</th><th style="color:#475569;background:#f8fafc;">Name</th><th style="color:#475569;background:#f8fafc;">Value</th></tr></thead>
+    <tbody>
+      <tr><td style="border-color:#e2e8f0;color:#1a2440;"><code>TXT</code></td><td style="border-color:#e2e8f0;color:#1a2440;"><code>send.tawanow.com</code></td><td style="border-color:#e2e8f0;color:#1a2440;"><code>"v=spf1 include:amazonses.com ~all"</code></td></tr>
+      <tr><td style="border-color:#e2e8f0;color:#1a2440;"><code>CNAME</code></td><td style="border-color:#e2e8f0;color:#1a2440;"><code>resend._domainkey</code></td><td style="border-color:#e2e8f0;color:#1a2440;"><code>resend._domainkey.tawanow.com.dkim.resend.com</code></td></tr>
+      <tr><td style="border-color:#e2e8f0;color:#1a2440;"><code>TXT</code></td><td style="border-color:#e2e8f0;color:#1a2440;"><code>_dmarc</code></td><td style="border-color:#e2e8f0;color:#1a2440;"><code>"v=DMARC1; p=none;"</code></td></tr>
+    </tbody>
+  </table>
+</div>
+<p style="font-size:0.85rem;color:var(--muted);"><strong>ملاحظة:</strong> القيم الفعلية ستَختلف قليلاً عن المثال أعلاه — Resend يُولّد قيماً خاصّة بحسابك. لا تُعدِّل شيئاً، أرسل لي الجدول كما هو.</p>
+</div>
+
+<div class="step">
+<span class="num">4</span><span class="title">أنشِئ API key</span>
+<p>في لوحة Resend → <strong>API Keys</strong> → <strong>Create API Key</strong> → اسم: <code>tawanow-production</code> → Full Access → <strong>انسخ المفتاح فوراً</strong> (يَظهر مرّة واحدة، يَبدأ بـ<code>re_</code>).</p>
+</div>
+
+<div class="step">
+<span class="num">5</span><span class="title">أرسل لي الثلاثة في رسالة واحدة</span>
+<pre>1. مفتاح Cloudflare:    [الـ40 حرفاً]
+2. سجلّات Resend DNS:   [الجدول الذي ظَهر في الخطوة 3]
+3. مفتاح Resend:        re_xxxxxxxxxxxxxxxx</pre>
+</div>
+
+<hr/>
+
+<!-- ─────────────────────── الجزء 5: ماذا أَفعل عندما تَصلني الثلاثة ─────────────────────── -->
+<h1>الجزء 5 — ماذا أَفعل تلقائياً عندما تَصلني الثلاثة</h1>
+
+<p>لن تَفعل أنت شيئاً بعد إرسال الثلاثة. أنا أَتولّى الباقي:</p>
+
+<div class="step">
+<span class="num">A</span><span class="title">أُضيف سجلّات Resend الثلاثة في Cloudflare</span>
+<p>عبر Cloudflare API مُباشرةً (TXT + CNAME + TXT). يَستغرق ثوانٍ.</p>
+</div>
+
+<div class="step">
+<span class="num">B</span><span class="title">أَتحقّق من سجلّات DNS</span>
+<p>أَنتظر Resend يَعترف بها (دقيقة على الأكثر).</p>
+</div>
+
+<div class="step">
+<span class="num">C</span><span class="title">أُحدِّث <code>.env</code> على الخادم</span>
+<pre>EMAIL_OTP_PROVIDER=resend         # ← كان log
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxx
+EMAIL_FROM=noreply@tawanow.com
+EMAIL_FROM_NAME=تووا</pre>
+</div>
+
+<div class="step">
+<span class="num">D</span><span class="title">أُعيد تشغيل الخلفية</span>
+<p>أمر واحد: <code>docker compose restart backend-core</code> — يَستغرق 10 ثوانٍ، الواجهة لا تَتأثّر.</p>
+</div>
+
+<div class="step">
+<span class="num">E</span><span class="title">نَختبر معاً</span>
+<p>أَطلب منك أن تَدخل tawanow.com بحسابك، تَفتح الإعدادات، تَضغط «إرسال رمز التحقق» — <strong>الإيميل يَصلك في صندوقك خلال ثوانٍ</strong> برمز 6-أرقام. تُدخل الرمز → ✅ شارة مُؤكَّد.</p>
+</div>
+
+<div class="step">
+<span class="num">F</span><span class="title">(اختياري) Cloudflare Email Routing</span>
+<p>لو أردتَ أيضاً استلام رسائل أعمال على <code>info@tawanow.com</code> في صندوقك الشخصي، أُفعّلها بنقرة API. أَخبرني بـ«الإيميل الشخصي الذي تُريد التحويل إليه» وأَفعل.</p>
+</div>
+
+<hr/>
+
+<!-- ─────────────────────── الجزء 6: حالة كل شيء الآن ─────────────────────── -->
+<h1>الجزء 6 — حالة كل شيء الآن</h1>
+
+<div class="checklist">
+
+<div class="check-row done">
+  <div class="mark">✅</div>
+  <div class="text">
+    <strong>Wave 1</strong> — كلمة المرور (toggle + match) + per-field errors
+    <div style="font-size:0.85rem;color:var(--muted);">منشورة 2026-05-27 · مُتحقَّقة بصرياً Playwright</div>
+  </div>
+</div>
+
+<div class="check-row done">
+  <div class="mark">✅</div>
+  <div class="text">
+    <strong>Wave 3</strong> — Driver handoff آمن + 4 إصلاحات أمنية
+    <div style="font-size:0.85rem;color:var(--muted);">migration aa18 على PG · 11/11 backend tests</div>
+  </div>
+</div>
+
+<div class="check-row done">
+  <div class="mark">✅</div>
+  <div class="text">
+    <strong>Wave 4</strong> — كيند طوارئ NO_INTERNET_AT_DELIVERY
+    <div style="font-size:0.85rem;color:var(--muted);">migration aa19 على PG · رأس alembic = aa19_no_internet</div>
+  </div>
+</div>
+
+<div class="check-row done">
+  <div class="mark">✅</div>
+  <div class="text">
+    <strong>Wave 2 — الكود + النشر</strong>
+    <div style="font-size:0.85rem;color:var(--muted);">12/12 backend tests · build PASS · live على tawanow.com</div>
+  </div>
+</div>
+
+<div class="check-row blocked">
+  <div class="mark">⏳</div>
+  <div class="text">
+    <strong>Wave 2 — تَفعيل Resend الحقيقي</strong>
+    <div style="font-size:0.85rem;color:var(--muted);">يَتطلّب منك 3 أشياء (الجزء 4) — يَستغرق منك ≈10 دقائق</div>
+  </div>
+</div>
+
+</div>
+
+<h2>تَحسينات أُضيفها أيضاً (لم تَطلبها صراحةً لكنها تَخدم المشروع)</h2>
+
+<ul>
+  <li><strong>تنبيه استرجاع الحساب</strong> — تَنبيه أصفر صريح في صفحة الإعدادات قبل البدء («اختياريّ لكن مهمّ — لاسترجاع حسابك إذا فقدتَ هاتفك»). تَنفيذ مباشر لطَلبك السابق.</li>
+  <li><strong>OTP 6-أرقام مع تَنسيق وسطيّ كبير</strong> — UX مُتعرّف عليه من Instagram/Uber بدل token طويل غير مفهوم.</li>
+  <li><strong>عدّاد cooldown 60 ثانية</strong> + زرّ «أعد إرسال» — يَمنع spam ويَعطي ثِقة بأن النِظام يَعمل.</li>
+  <li><strong>سقف 5 طلبات/ساعة</strong> لكل مستخدم — حماية ضد brute-force + إغراق Resend.</li>
+  <li><strong>إيميل عربي RTL منسّق</strong> — قالب HTML احترافي يَنفع للعلامة التجارية.</li>
+  <li><strong>تَقنيع البريد في الواجهة</strong> (<code>j***@gmail.com</code>) — يُؤكّد الإرسال دون تَسريب البريد الكامل في الـscreen.</li>
+  <li><strong>تَغيير البريد يَمسح حالة التَأكيد</strong> — لو أدخل المستخدم بريداً خاطئاً، تَغييره يُعيده لـunverified تلقائياً (آمن).</li>
+  <li><strong>تَدفّق آمن للـtoken</strong> — استَعمل نمط <code>module-level import inside function</code> لضَمان أن اختبارات fakeredis تَعمل بدون الحاجة لـRedis حقيقية.</li>
+  <li><strong>قابلية الـ1-line activation</strong> — switch إلى Resend = تَغيير سطر واحد في <code>.env</code> + إعادة تشغيل الحاوية. لا تَعديل كود.</li>
+  <li><strong>قابلية تَبديل المُزوّد</strong> — لو احتجنا AWS SES أو Mailgun لاحقاً، إضافة class جديد في <code>email_provider.py</code> = أقلّ من 50 سطر.</li>
+</ul>
+
+<hr/>
+
+<!-- ─────────────────────── الخلاصة ─────────────────────── -->
+<h1>الخلاصة</h1>
+
+<div class="answer">
+<div class="label">ما تَمّ (لا يَحتاج عملاً منك)</div>
+<div class="text">
+كل كود Wave 2 مَكتوب، مُختبَر، ومَنشور على tawanow.com.<br/>
+الخادم يَعمل الآن في وضع log آمن — التَدفّق UI يَعمل، لكن الإيميل الفعلي لا يَصل بعد.
+</div>
+
+<div class="label" style="margin-top: 1.25rem;">ما أحتاجه منك (≈ 10 دقائق)</div>
+<div class="text">
+<strong>1.</strong> مفتاح Cloudflare API جديد (الذي أعطيتَ مَرفوض — الجزء 3 يَشرح كيف)<br/>
+<strong>2.</strong> حساب Resend مَجاني + سجلّاته الثلاثة (الجزء 4)<br/>
+<strong>3.</strong> مفتاح Resend API
+</div>
+
+<div class="label" style="margin-top: 1.25rem;">ما سأَفعله بعدها (تلقائياً، لا تَدخّل منك)</div>
+<div class="text">
+أُضيف السجلّات في Cloudflare، أُحدّث <code>.env</code>، أُعيد التشغيل، نَختبر معاً.<br/>
+الإيميل الفعليّ يَصل لك في صندوقك خلال ثوانٍ.
+</div>
+</div>
+
+<hr/>
+<p class="footnote">هذا التقرير يَستبدل كل التقارير السابقة عن Wave 2. لا أَفعل شيئاً جديداً في Cloudflare أو Resend دون مفاتيح صحيحة منك — لذلك بقي العمل مُعلَّقاً عند الخطوة C في الجزء 5.</p>
+
+</div>
+</body>
+</html>

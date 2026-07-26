@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تووا · التشخيص الحقيقي العميق — لماذا لا تظهر التحديثات</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ground: #F4F7F5;
+  --card: #FFFFFF;
+  --brand: #16653B;
+  --brand-dark: #0D3D22;
+  --brand-light: #E6F4EC;
+  --ink: #1A271F;
+  --mid: #3D5E48;
+  --muted: #6B8C74;
+  --line: #C8DDD1;
+  --red: #8B1A1A;
+  --red-bg: #FBE8E8;
+  --red-border: #D08080;
+  --amber: #7A3D00;
+  --amber-bg: #FEF3E6;
+  --amber-border: #D4913A;
+  --blue: #1A3F6F;
+  --blue-bg: #E8F0FA;
+  --blue-border: #7AABE0;
+  --purple: #4A1A6F;
+  --purple-bg: #F0E8FA;
+  --purple-border: #A87AE0;
+  --code: #EDF3EF;
+}
+body { background: var(--ground); color: var(--ink); font-family: Tahoma,'Segoe UI','Noto Sans Arabic',Arial,sans-serif; font-size:16px; line-height:1.8; direction:rtl; }
+.wrap { max-width:940px; margin:0 auto; padding-bottom:80px; }
+
+/* HERO */
+.hero { background: var(--brand-dark); color:#E0EFE7; padding:54px 54px 48px; margin-bottom:54px; }
+.hero-eye { font-size:0.7rem; letter-spacing:.14em; text-transform:uppercase; color:#7BB898; margin-bottom:14px; }
+.hero-title { font-size:2rem; font-weight:700; color:#fff; line-height:1.2; margin-bottom:12px; }
+.hero-sub { font-size:0.9375rem; color:#A8CCBA; margin-bottom:34px; line-height:1.65; }
+.hero-findings { display:grid; grid-template-columns:repeat(3,1fr); gap:0; border-top:1px solid rgba(255,255,255,.1); padding-top:28px; }
+.hf { padding:0 20px 0 0; border-left:1px solid rgba(255,255,255,.08); }
+.hf:last-child { border-left:none; }
+.hf-num { font-size:2rem; font-weight:700; line-height:1; margin-bottom:4px; }
+.hf-lbl { font-size:0.75rem; color:#8EC4A2; line-height:1.4; }
+.num-red { color:#FF9090; }
+.num-amber { color:#FFD090; }
+.num-ok { color:#5DCFA0; }
+
+/* SECTIONS */
+.sec { padding:0 54px; margin-bottom:48px; }
+.rule { display:flex; align-items:center; gap:16px; margin-bottom:30px; padding:0 54px; }
+.chip { color:#fff; font-size:0.7rem; font-weight:700; letter-spacing:.06em; padding:4px 14px; white-space:nowrap; flex-shrink:0; text-transform:uppercase; }
+.chip-red { background:var(--red); }
+.chip-amber { background:var(--amber); }
+.chip-blue { background:var(--blue); }
+.chip-purple { background:var(--purple); }
+.chip-ok { background:var(--brand); }
+.chip-dark { background:var(--brand-dark); }
+.rule-line { flex:1; height:1px; background:var(--brand); opacity:.25; }
+h2 { font-size:1.1rem; font-weight:700; color:var(--brand-dark); margin-bottom:12px; }
+h3 { font-size:0.9375rem; font-weight:700; color:var(--ink); margin-bottom:8px; }
+p { margin-bottom:14px; color:var(--mid); font-size:0.9375rem; line-height:1.75; }
+p:last-child { margin-bottom:0; }
+
+/* ANALOGY */
+.analogy { background:var(--blue-bg); border:1px solid var(--blue-border); border-right:4px solid var(--blue); padding:18px 20px; margin-bottom:22px; }
+.analogy-lbl { font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--blue); margin-bottom:6px; }
+.analogy-body { font-size:.9375rem; color:var(--ink); line-height:1.7; }
+
+/* FINDING CARDS */
+.finding { background:var(--card); border:1px solid var(--line); display:flex; gap:16px; padding:18px 20px; margin-bottom:12px; }
+.finding-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; font-size:.875rem; font-weight:700; font-family:'Courier New',monospace; flex-shrink:0; color:#fff; }
+.fi-red { background:var(--red); }
+.fi-amber { background:var(--amber); }
+.fi-ok { background:var(--brand); }
+.fi-blue { background:var(--blue); }
+.fi-purple { background:var(--purple); }
+.finding-body {}
+.finding-title { font-size:.975rem; font-weight:700; color:var(--ink); margin-bottom:4px; line-height:1.3; }
+.finding-desc { font-size:.8375rem; color:var(--mid); line-height:1.7; }
+.ev { display:inline-block; font-family:'Courier New',monospace; font-size:.7rem; background:var(--code); color:var(--brand-dark); padding:1px 7px; margin-top:5px; border-right:2px solid var(--brand); direction:ltr; }
+
+/* PAIRS */
+.pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
+.pair-before { background:var(--red-bg); border:1px solid var(--red-border); border-top:3px solid var(--red); padding:16px 18px; }
+.pair-after { background:var(--brand-light); border:1px solid #9FD3B3; border-top:3px solid var(--brand); padding:16px 18px; }
+.pair-lbl { font-size:.67rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:5px; }
+.pair-before .pair-lbl { color:var(--red); }
+.pair-after .pair-lbl { color:var(--brand); }
+.pair-title { font-size:.9375rem; font-weight:700; margin-bottom:7px; line-height:1.35; }
+.pair-before .pair-title { color:var(--red); }
+.pair-after .pair-title { color:var(--brand-dark); }
+.pair-body { font-size:.8125rem; color:var(--mid); line-height:1.7; }
+
+/* FLOW TERMINAL */
+.flow { background:var(--brand-dark); color:#A8CCBA; font-family:'Courier New',monospace; font-size:.77rem; padding:22px 26px; line-height:1.65; direction:ltr; text-align:left; overflow-x:auto; margin-bottom:20px; }
+.flow .ok { color:#5DCFA0; }
+.flow .bad { color:#FF9090; }
+.flow .warn { color:#FFD090; }
+.flow .hi { color:#FFFFFF; font-weight:bold; }
+.flow .dim { color:#4E7A5E; }
+.flow .pur { color:#D0A8FF; }
+
+/* CODE */
+.code-block { background:#0D2018; color:#A8CCBA; font-family:'Courier New',monospace; font-size:.77rem; padding:20px 24px; line-height:1.65; overflow-x:auto; direction:ltr; text-align:left; margin-bottom:20px; }
+.code-block .add { color:#5DCFA0; }
+.code-block .cmt { color:#4A7A5A; font-style:italic; }
+.code-block .key { color:#FFD090; }
+
+/* INFO / WARN BOXES */
+.info-box { background:var(--brand-light); border-right:4px solid var(--brand); padding:14px 18px; margin-bottom:20px; font-size:.875rem; color:var(--mid); line-height:1.7; }
+.warn-box { background:var(--amber-bg); border-right:4px solid var(--amber-border); padding:14px 18px; margin-bottom:20px; font-size:.875rem; color:var(--mid); line-height:1.7; }
+.red-box { background:var(--red-bg); border-right:4px solid var(--red-border); padding:14px 18px; margin-bottom:20px; font-size:.875rem; color:var(--mid); line-height:1.7; }
+.info-box strong,.warn-box strong,.red-box strong { color:var(--ink); }
+
+/* TABLE */
+.tbl { width:100%; border-collapse:collapse; margin-bottom:20px; font-size:.8375rem; overflow-x:auto; }
+.tbl th { background:var(--brand-dark); color:#E0EFE7; padding:9px 13px; text-align:right; font-size:.775rem; }
+.tbl td { padding:9px 13px; border-bottom:1px solid var(--line); color:var(--mid); vertical-align:top; }
+.tbl tr:nth-child(even) td { background:var(--code); }
+.badge { display:inline-block; font-size:.67rem; font-weight:700; padding:2px 7px; font-family:'Courier New',monospace; }
+.b-red { background:var(--red-bg); color:var(--red); border:1px solid var(--red-border); }
+.b-amber { background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber-border); }
+.b-ok { background:var(--brand-light); color:var(--brand); border:1px solid #9FD3B3; }
+.b-blue { background:var(--blue-bg); color:var(--blue); border:1px solid var(--blue-border); }
+
+/* PLAN STEPS */
+.plan-steps { counter-reset:ps; margin-bottom:24px; }
+.ps { display:flex; gap:16px; padding:14px 0; border-bottom:1px solid var(--line); }
+.ps:last-child { border-bottom:none; }
+.ps-num { width:32px; height:32px; background:var(--brand); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:700; flex-shrink:0; font-family:'Courier New',monospace; }
+.ps-body {}
+.ps-title { font-size:.9375rem; font-weight:700; color:var(--ink); margin-bottom:4px; }
+.ps-desc { font-size:.8125rem; color:var(--mid); line-height:1.7; }
+
+/* FEATURE MATRIX */
+.matrix { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:24px; }
+.mx-card { padding:14px 16px; border:1px solid var(--line); background:var(--card); }
+.mx-card.built { border-top:3px solid var(--brand); }
+.mx-card.missing { border-top:3px solid var(--red); }
+.mx-card.partial { border-top:3px solid var(--amber); }
+.mx-label { font-size:.67rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:5px; }
+.mx-card.built .mx-label { color:var(--brand); }
+.mx-card.missing .mx-label { color:var(--red); }
+.mx-card.partial .mx-label { color:var(--amber); }
+.mx-name { font-size:.875rem; font-weight:700; color:var(--ink); margin-bottom:4px; line-height:1.35; }
+.mx-note { font-size:.78rem; color:var(--muted); line-height:1.5; }
+
+code,.mono { font-family:'Courier New',monospace; font-size:.84em; background:var(--code); padding:1px 5px; color:var(--brand-dark); direction:ltr; display:inline-block; }
+
+@media(max-width:700px){
+  .hero,.sec,.rule{padding-right:24px;padding-left:24px;}
+  .pair,.matrix,.hero-findings{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="wrap" dir="rtl" lang="ar">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eye">تووا · تقرير تشخيص عميق — فحص طبقة بطبقة</div>
+  <div class="hero-title">لماذا لا تظهر التحديثات؟<br>الإجابة الحقيقية بعد الفحص الكامل</div>
+  <div class="hero-sub">فحص شامل: كود المصدر · الـ bundle المنشور · Docker images التاريخية · قاعدة البيانات · Cloudflare · Service Worker<br>
+  تاريخ الفحص: ٥ يوليو ٢٠٢٦ — <strong style="color:#FFD090">3 أسباب جذرية مختلفة تماماً عن التقرير الأول</strong></div>
+  <div class="hero-findings">
+    <div class="hf"><div class="hf-num num-red">3</div><div class="hf-lbl">أسباب جذرية<br>مختلفة ومتداخلة</div></div>
+    <div class="hf"><div class="hf-num num-amber">0</div><div class="hf-lbl">واجهات مستخدم<br>بُنيت في الخطة السباعية</div></div>
+    <div class="hf"><div class="hf-num num-ok">ab20</div><div class="hf-lbl">رأس قاعدة البيانات<br>في الإنتاج ✓ محدَّث</div></div>
+  </div>
+</div>
+
+<!-- THE BIG REVELATION -->
+<div class="rule"><div class="chip chip-red">الاكتشاف الأول — الأكثر أهمية</div><div class="rule-line"></div></div>
+<div class="sec">
+  <h2>الخطة السباعية بُنيت للخادم فقط — لا واجهات مرئية</h2>
+
+  <div class="analogy">
+    <div class="analogy-lbl">تشبيه بسيط</div>
+    <div class="analogy-body">
+      تخيّل مطعماً طلب <strong>تجديد المطبخ الداخلي كاملاً</strong>: تبديل الأفران، وتنظيم الثلاجات، وتحسين ترتيب العمل.
+      كل هذا التجديد حدث فعلاً ✓ — لكن الزبائن لا يرون المطبخ!
+      <br><br>
+      ما يراه الزبون هو <strong>الواجهة (القائمة، الطلب، التوصيل)</strong> — وهذه لم تتغيّر بعد.
+      <br><br>
+      الخطة السباعية = تجديد المطبخ. الواجهة للزبون = لم تُبنَ بعد.
+    </div>
+  </div>
+
+  <h2>دليل تقني مباشر</h2>
+  <div class="flow">
+<span class="hi">$ git diff --name-only 83edc35..350bdfe -- web/</span>
+<span class="dim">(لا نتائج — لا ملف واحد في مجلد web/ تغيّر)</span>
+
+<span class="warn">النتيجة:</span> <span class="bad">٠ ملف frontend تغيّر في الخطة السباعية</span>
+الـ 73 ملف التي تغيّرت كلها في backend/ فقط:
+  - 9 هجرات قاعدة البيانات (ab12 → ab20) ✓
+  - 64 ملف Python (APIs, models, tests) ✓
+  - 0 ملف React/TypeScript/HTML ✗
+
+<span class="hi">$ grep -l "offShift\|nameChange\|staffEval\|WISMO\|archiveNotif" web/dist/assets/main-COA-qDtF.js</span>
+<span class="bad">no output — لا يوجد أي من هذه الميزات في bundle المنشور</span>
+
+<span class="hi">$ grep -l "pauseState\|social_link\|ProviderPauseControl" web/dist/assets/main-COA-qDtF.js</span>
+<span class="ok">main-COA-qDtF.js — هذه الميزات موجودة (من موجات 2.4/3/4/5)</span>
+  </div>
+
+  <h2>ماذا أنجزت الخطة السباعية فعلاً؟</h2>
+  <div style="overflow-x:auto;">
+    <table class="tbl">
+      <thead><tr><th>المرحلة</th><th>ما بُني</th><th>هل هناك واجهة؟</th><th>ما يراه المستخدم</th></tr></thead>
+      <tbody>
+        <tr><td>P1 — بث الحالة SSE</td><td>Backend يرسل حدث عند كل تغيير للحالة</td><td><span class="badge b-amber">جزئي</span></td><td>Frontend يستقبل لكن لا يعرض شيئاً جديداً</td></tr>
+        <tr><td>P2 — تنظيف الأسعار</td><td>إصلاح عرض الأرقام العشرية في API</td><td><span class="badge b-red">لا</span></td><td>تغيير دقيق في الأرقام — لا يُلاحَظ بسهولة</td></tr>
+        <tr><td>P3 — إيقاف الأصناف (OPS)</td><td>API جديد للإيقاف + عمود DB</td><td><span class="badge b-red">لا</span></td><td>لا واجهة لـOPS لإيقاف الأصناف</td></tr>
+        <tr><td>P4 — صلاحيات الأصناف</td><td>تسمية permission في DB</td><td><span class="badge b-red">لا</span></td><td>تغيير داخلي — لا أثر مرئي</td></tr>
+        <tr><td>P5/P14/P15/P16 — السلة المتعددة</td><td>Backend cart groups logic</td><td><span class="badge b-red">لا</span></td><td>لا واجهة تعرض المتاجر المتعددة في سلة واحدة</td></tr>
+        <tr><td>P6 — إيقاف الوردية</td><td>API للموظف ليوقف نفسه + cascade</td><td><span class="badge b-red">لا</span></td><td>لا زر في واجهة الموظف</td></tr>
+        <tr><td>P7 — تتالي الإيقاف</td><td>منطق auto-stop للمتجر</td><td><span class="badge b-red">لا</span></td><td>يحدث تلقائياً — لكن لا إشعار مرئي للمالك</td></tr>
+        <tr><td>P8 — أرشيف الإشعارات</td><td>عمود archived_at + API</td><td><span class="badge b-red">لا</span></td><td>لا زر أرشفة في جرس الإشعارات</td></tr>
+        <tr><td>P1/WISMO — تنبيه تأخر السائق</td><td>Backend يرسل إشعار عند التأخر</td><td><span class="badge b-amber">جزئي</span></td><td>الإشعار يُرسل لكن لا عرض مخصص له في الواجهة</td></tr>
+        <tr><td>P11a — اسم الزبون</td><td>قيد 30 يوم + API</td><td><span class="badge b-red">لا</span></td><td>لا حقل تعديل اسم في ملف الزبون</td></tr>
+        <tr><td>P11b — طلب تغيير الاسم</td><td>جدول name_change_requests + API</td><td><span class="badge b-red">لا</span></td><td>لا نموذج طلب للمزوّد/السائق — لا واجهة OPS للموافقة</td></tr>
+        <tr><td>P17 — كود الإحالة</td><td>Backend + كود موجود في frontend سابقاً</td><td><span class="badge b-ok">نعم</span></td><td>موجود مسبقاً</td></tr>
+        <tr><td>P18 — تقييم الموظفين</td><td>جدول staff_evaluations + API</td><td><span class="badge b-red">لا</span></td><td>لا نموذج تقييم في لوحة المالك</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="red-box">
+    <strong>الخلاصة الصريحة:</strong> من 18 ميزة في الخطة السباعية، <strong>16 ميزة بُني لها backend فقط بدون frontend</strong>. المستخدم لا يرى هذه الميزات ببساطة لأن الواجهات لم تُبنَ بعد. ليست مشكلة نشر ولا مشكلة تخزين — هي مشكلة عمل غير مكتمل.
+  </div>
+</div>
+
+<!-- WHAT IS ACTUALLY VISIBLE -->
+<div class="rule"><div class="chip chip-ok">الاكتشاف الثاني — ما موجود فعلاً</div><div class="rule-line"></div></div>
+<div class="sec">
+  <h2>الميزات المنشورة الموجودة في bundle — لكنها مقيّدة بتسجيل الدخول</h2>
+
+  <div class="analogy">
+    <div class="analogy-lbl">لماذا لا يراها المستخدم؟</div>
+    <div class="analogy-body">
+      هذه الميزات موجودة في الكود المنشور على السيرفر ✓<br>
+      لكنها مخفية خلف <strong>تسجيل الدخول بدور معين</strong>.<br>
+      مثل: صفحة "إعدادات المتجر" لا تظهر إلا لمن سجّل دخول كمزوّد — الزبون لا يراها أبداً.
+    </div>
+  </div>
+
+  <div class="matrix">
+    <div class="mx-card built">
+      <div class="mx-label">موجود ✓</div>
+      <div class="mx-name">زر الإيقاف المؤقت للمزوّد</div>
+      <div class="mx-note">يظهر فقط في: لوحة المزوّد (تسجيل دخول كمزوّد) ← القسم العلوي من الصفحة</div>
+    </div>
+    <div class="mx-card built">
+      <div class="mx-label">موجود ✓</div>
+      <div class="mx-name">شارة الحالة في الشريط العلوي</div>
+      <div class="mx-note">يظهر فقط في: أي صفحة للمزوّد (نقطة ملوّنة في رأس الصفحة)</div>
+    </div>
+    <div class="mx-card built">
+      <div class="mx-label">موجود ✓</div>
+      <div class="mx-name">روابط التواصل الاجتماعي</div>
+      <div class="mx-note">تُدخَل في: الإعدادات ← المزوّد فقط. تظهر لـ: الزبون في تبويب "عن المتجر"</div>
+    </div>
+    <div class="mx-card built">
+      <div class="mx-label">موجود ✓</div>
+      <div class="mx-name">السجل الزمني للطلبات</div>
+      <div class="mx-note">يظهر في: تاريخ الطلبات ← المزوّد فقط. يعرض اسم السائق (بعد إصلاح الـ JOIN)</div>
+    </div>
+    <div class="mx-card built">
+      <div class="mx-label">موجود ✓</div>
+      <div class="mx-name">تنبيه التوصيل الذاتي في السلة</div>
+      <div class="mx-note">يظهر لـ: الزبون عند الدفع في متجر يعمل بالتوصيل الذاتي</div>
+    </div>
+    <div class="mx-card built">
+      <div class="mx-label">موجود ✓</div>
+      <div class="mx-name">نافذة تخصيص الصنف</div>
+      <div class="mx-note">يظهر لـ: الزبون عند اختيار صنف يحتوي variants أو خيارات حذف مكونات</div>
+    </div>
+    <div class="mx-card partial">
+      <div class="mx-label">جزئي ⚠</div>
+      <div class="mx-name">تحديثات الدفع في السلة</div>
+      <div class="mx-note">تحسينات في CheckoutPage (split payment, tip) تظهر عند الدفع — تحتاج تسجيل دخول كزبون + طلب نشط</div>
+    </div>
+    <div class="mx-card missing">
+      <div class="mx-label">غير موجود ✗</div>
+      <div class="mx-name">زر وردية الموظف (off-shift)</div>
+      <div class="mx-note">Backend جاهز، لا frontend. P6 من الخطة السباعية</div>
+    </div>
+    <div class="mx-card missing">
+      <div class="mx-label">غير موجود ✗</div>
+      <div class="mx-name">أرشيف الإشعارات</div>
+      <div class="mx-note">Backend جاهز، لا frontend. P8 من الخطة السباعية</div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICE WORKER ISSUE -->
+<div class="rule"><div class="chip chip-amber">الاكتشاف الثالث — مشكلة Service Worker حقيقية</div><div class="rule-line"></div></div>
+<div class="sec">
+  <h2>المستخدم الذي سبق وزار الموقع قد يرى نسخة قديمة</h2>
+
+  <div class="analogy">
+    <div class="analogy-lbl">تشبيه بسيط</div>
+    <div class="analogy-body">
+      تخيّل أن لديك <strong>موظف استقبال يحفظ نسخة قديمة من القائمة</strong> ويعطيها لكل زبون.
+      حتى لو المطبخ غيّر القائمة، الموظف يعطي النسخة القديمة.<br><br>
+      لكي يحدّث الموظف نسخته، يجب أن يلاحظ أن الملف الأصلي تغيّر.
+      مشكلتنا: <strong>Cloudflare يعطيه الملف القديم لمدة ٤ ساعات</strong> → الموظف لا يعلم بالتغيير.
+    </div>
+  </div>
+
+  <h2>ما اكتشفناه من Docker images التاريخية</h2>
+  <div class="flow">
+<span class="hi">تاريخ تطور bundle عبر Docker images:</span>
+
+<span class="dim">tawa-web-frontend:pre-20260701</span>  →  <span class="pur">main-Cp5kBI2c.js</span>  sw-revision: <span class="warn">57b8ac40</span>
+<span class="dim">tawa-web-frontend:ab01/prev     </span>  →  <span class="pur">main-DqYK_yyY.js</span>  sw-revision: <span class="warn">84db7a4b</span>
+<span class="dim">tawa-web-frontend:latest (الآن)</span>  →  <span class="ok">main-COA-qDtF.js</span>  sw-revision: <span class="ok">a5c616c1</span>
+
+<span class="hi">الخلاصة:</span>
+<span class="ok">✓</span> كل deploy غيّر bundle hash وsw.js — المتصفح يُفترض أن يكتشف التحديث
+<span class="bad">✗</span> لكن sw.js مخزَّن في Cloudflare ٤ ساعات — يتأخر الاكتشاف
+<span class="bad">✗</span> المستخدم يرى نسخة قديمة حتى ٤ ساعات بعد كل deploy
+
+<span class="hi">الحالة الآن (بعد ٢٤+ ساعة من آخر deploy):</span>
+<span class="ok">✓</span> Cloudflare يخدم sw.js الصحيح الآن (التحديث وصل بعد ٤ ساعات)
+<span class="ok">✓</span> DB الإنتاج على ab20_staff_evaluation ← كل المهجرات طُبِّقت
+<span class="warn">⚠</span> مستخدم فتح الموقع للمرة الأولى اليوم → يرى النسخة الجديدة (بعد SW يتثبّت)
+<span class="warn">⚠</span> مستخدم لديه tab مفتوحة منذ أمس → قد يرى نسخة قديمة حتى يضغط زر التحديث
+  </div>
+
+  <h2>لماذا مشكلة Cloudflare لا تزال موجودة؟ (للمستقبل)</h2>
+  <div class="pair">
+    <div class="pair-before">
+      <div class="pair-lbl">المشكلة الهيكلية</div>
+      <div class="pair-title">كل deploy جديد يعاني من ٤ ساعات تأخير</div>
+      <div class="pair-body">
+        nginx.conf لا يقول لـ Cloudflare "sw.js لا يُخزَّن".<br>
+        Cloudflare يطبّق افتراضيه: ٤ ساعات لملفات JS.<br>
+        كل مرة تُنشر ميزة جديدة → ٤ ساعات قبل أن يراها أي مستخدم.
+      </div>
+    </div>
+    <div class="pair-after">
+      <div class="pair-lbl">الحل الهيكلي</div>
+      <div class="pair-title">إضافة ٣ أسطر في nginx.conf تحل للأبد</div>
+      <div class="pair-body">
+        <code>location = /sw.js { Cache-Control: no-store }</code><br>
+        <code>location = /index.html { Cache-Control: no-cache }</code><br>
+        <code>location /assets/ { Cache-Control: immutable }</code><br>
+        النتيجة: التحديث يصل خلال ٦٠ ثانية من النشر.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WHAT USER SEES NOW -->
+<div class="rule"><div class="chip chip-blue">الاكتشاف الرابع — ماذا ترى الآن فعلاً على tawanow.com</div><div class="rule-line"></div></div>
+<div class="sec">
+  <div style="overflow-x:auto;">
+    <table class="tbl">
+      <thead><tr><th>ما تبحث عنه</th><th>هل هو في bundle?</th><th>أين تجده؟</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <tr><td>زر "إيقاف مؤقت" للمزوّد</td><td><span class="badge b-ok">موجود</span></td><td>سجّل دخول كمزوّد ← اللوحة الرئيسية أعلى الصفحة</td><td><span class="badge b-ok">يعمل ✓</span></td></tr>
+        <tr><td>نقطة ملوّنة لحالة المتجر</td><td><span class="badge b-ok">موجود</span></td><td>سجّل دخول كمزوّد ← الشريط العلوي يمين</td><td><span class="badge b-ok">يعمل ✓</span></td></tr>
+        <tr><td>روابط التواصل الاجتماعي</td><td><span class="badge b-ok">موجود</span></td><td>مزوّد ← الإعدادات ← قسم "التواصل الاجتماعي"</td><td><span class="badge b-ok">يعمل ✓</span></td></tr>
+        <tr><td>السجل الزمني للطلبات</td><td><span class="badge b-ok">موجود</span></td><td>مزوّد ← تاريخ الطلبات ← افتح أي طلب</td><td><span class="badge b-ok">يعمل ✓</span></td></tr>
+        <tr><td>تنبيه التوصيل الذاتي</td><td><span class="badge b-ok">موجود</span></td><td>زبون ← اختر متجر self-delivery ← ابدأ الطلب</td><td><span class="badge b-ok">يعمل ✓</span></td></tr>
+        <tr><td>زر وردية الموظف (off-shift)</td><td><span class="badge b-red">غير موجود</span></td><td>—</td><td><span class="badge b-red">لم يُبنَ بعد</span></td></tr>
+        <tr><td>أرشيف الإشعارات</td><td><span class="badge b-red">غير موجود</span></td><td>—</td><td><span class="badge b-red">لم يُبنَ بعد</span></td></tr>
+        <tr><td>طلب تغيير الاسم</td><td><span class="badge b-red">غير موجود</span></td><td>—</td><td><span class="badge b-red">لم يُبنَ بعد</span></td></tr>
+        <tr><td>تقييم الموظفين</td><td><span class="badge b-red">غير موجود</span></td><td>—</td><td><span class="badge b-red">لم يُبنَ بعد</span></td></tr>
+        <tr><td>إيقاف الأصناف من OPS</td><td><span class="badge b-red">غير موجود</span></td><td>—</td><td><span class="badge b-red">لم يُبنَ بعد</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- THE EXECUTION PLAN -->
+<div class="rule"><div class="chip chip-dark">الخطة التنفيذية الكاملة — بالترتيب</div><div class="rule-line"></div></div>
+<div class="sec">
+  <h2>المرحلة الأولى: إصلاح آلية التحديث (nginx + Cloudflare)</h2>
+  <p>هذا لا يُضيف ميزات — لكنه يضمن أن أي ميزة تُضاف في المستقبل تصل للمستخدم خلال ٦٠ ثانية لا ٤ ساعات.</p>
+
+  <div class="code-block">
+<span class="cmt"># 1. تعديل web/nginx.conf — إضافة 3 قواعد</span>
+<span class="key">location = /sw.js {</span>
+<span class="add">    add_header Cache-Control "no-store, no-cache, must-revalidate, max-age=0" always;</span>
+<span class="add">    add_header Pragma "no-cache" always;</span>
+<span class="add">    try_files $uri =404;</span>
+<span class="key">}</span>
+<span class="key">location = /index.html {</span>
+<span class="add">    add_header Cache-Control "no-cache, must-revalidate" always;</span>
+<span class="add">    try_files $uri =404;</span>
+<span class="key">}</span>
+<span class="key">location /assets/ {</span>
+<span class="add">    add_header Cache-Control "public, max-age=31536000, immutable" always;</span>
+<span class="add">    try_files $uri =404;</span>
+<span class="key">}</span>
+
+<span class="cmt"># 2. إعادة بناء ونشر الـ dist على الخوادم الأربعة</span>
+<span class="cmt"># 3. Cloudflare → Cache → Custom Purge → /sw.js</span>
+  </div>
+
+  <div class="warn-box">
+    <strong>ملاحظة مهمة:</strong> هذا الإصلاح لوحده <strong>لن يظهر للمستخدم أي ميزة جديدة</strong>. يُصلح فقط آلية التحديث للمستقبل. لرؤية ميزات جديدة، يجب بناء الواجهات (المرحلة الثانية).
+  </div>
+
+  <h2>المرحلة الثانية: بناء الواجهات المفقودة للخطة السباعية</h2>
+  <p>هذه هي العمل الحقيقي الذي يُظهر الميزات للمستخدم. مُرتَّبة حسب الأولوية والتأثير:</p>
+
+  <div class="plan-steps">
+    <div class="ps">
+      <div class="ps-num">١</div>
+      <div class="ps-body">
+        <div class="ps-title">زر وردية الموظف (Off-Shift Toggle) — P6</div>
+        <div class="ps-desc">
+          <strong>أين:</strong> لوحة الموظف في المزوّد — زر "أنا في إجازة / عودة للعمل"<br>
+          <strong>Backend جاهز:</strong> <code>POST /providers/me/staff/me/off-shift</code> و <code>DELETE</code> لإلغاء الإجازة<br>
+          <strong>التأثير:</strong> عند إيقاف آخر موظف → المتجر يتوقف تلقائياً + إشعار للمالك<br>
+          <strong>المهجرة:</strong> ab15 (is_off_shift, off_shift_since) ✓ في قاعدة البيانات
+        </div>
+      </div>
+    </div>
+    <div class="ps">
+      <div class="ps-num">٢</div>
+      <div class="ps-body">
+        <div class="ps-title">أرشيف الإشعارات — P8</div>
+        <div class="ps-desc">
+          <strong>أين:</strong> قائمة الإشعارات (جرس الإشعارات) — أيقونة أرشفة بجانب كل إشعار<br>
+          <strong>Backend جاهز:</strong> <code>PATCH /notifications/{id}/archive</code><br>
+          <strong>التأثير:</strong> الجرس يبقى نظيفاً — الإشعارات المقروءة تُخفى<br>
+          <strong>المهجرة:</strong> ab16 (archived_at) ✓ في قاعدة البيانات
+        </div>
+      </div>
+    </div>
+    <div class="ps">
+      <div class="ps-num">٣</div>
+      <div class="ps-body">
+        <div class="ps-title">عدد الموظفين النشطين للمزوّد — P13</div>
+        <div class="ps-desc">
+          <strong>أين:</strong> لوحة المزوّد — بطاقة صغيرة تعرض عدد الموظفين النشطين<br>
+          <strong>Backend جاهز:</strong> <code>GET /providers/me/staff/active-count</code><br>
+          <strong>التأثير:</strong> المالك يرى فوراً كم موظف يعمل الآن — يُحدَّث عبر SSE
+        </div>
+      </div>
+    </div>
+    <div class="ps">
+      <div class="ps-num">٤</div>
+      <div class="ps-body">
+        <div class="ps-title">إيقاف الأصناف من لوحة OPS — P3</div>
+        <div class="ps-desc">
+          <strong>أين:</strong> لوحة OPS ← قسم الكتالوج — زر "إيقاف لأسباب جودة/سلامة"<br>
+          <strong>Backend جاهز:</strong> <code>POST /ops/catalog/{id}/pause</code><br>
+          <strong>التأثير:</strong> OPS يوقف أي صنف من أي متجر بشكل مستقل عن المزوّد<br>
+          <strong>المهجرة:</strong> ab14 (ops_paused_at/reason/by) ✓ في قاعدة البيانات
+        </div>
+      </div>
+    </div>
+    <div class="ps">
+      <div class="ps-num">٥</div>
+      <div class="ps-body">
+        <div class="ps-title">تغيير اسم الزبون — P11a</div>
+        <div class="ps-desc">
+          <strong>أين:</strong> ملف الزبون (Profile) — حقل تعديل الاسم مع بيان "يمكن التغيير مرة كل ٣٠ يوماً"<br>
+          <strong>Backend جاهز:</strong> <code>PATCH /users/me/display-name</code><br>
+          <strong>المهجرة:</strong> ab18 (display_name_updated_at) ✓
+        </div>
+      </div>
+    </div>
+    <div class="ps">
+      <div class="ps-num">٦</div>
+      <div class="ps-body">
+        <div class="ps-title">طلب تغيير الاسم للمزوّد/السائق + موافقة OPS — P11b</div>
+        <div class="ps-desc">
+          <strong>أين (المزوّد):</strong> الإعدادات ← طلب تغيير الاسم (يذهب لـOPS للموافقة)<br>
+          <strong>أين (OPS):</strong> لوحة OPS ← طلبات تغيير الأسماء ← موافقة/رفض<br>
+          <strong>Backend جاهز:</strong> جدول name_change_requests + API كامل<br>
+          <strong>المهجرة:</strong> ab19 ✓
+        </div>
+      </div>
+    </div>
+    <div class="ps">
+      <div class="ps-num">٧</div>
+      <div class="ps-body">
+        <div class="ps-title">تقييم الموظفين — P18</div>
+        <div class="ps-desc">
+          <strong>أين:</strong> لوحة المالك ← قسم الموظفين ← نموذج تقييم دوري<br>
+          <strong>Backend جاهز:</strong> <code>POST /providers/me/staff/{id}/evaluate</code><br>
+          <strong>المهجرة:</strong> ab20 ✓
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>المرحلة الثالثة: تفعيل فوري للمستخدمين الحاليين</h2>
+  <div class="plan-steps">
+    <div class="ps">
+      <div class="ps-num">A</div>
+      <div class="ps-body">
+        <div class="ps-title">مسح مخزن Cloudflare فوراً</div>
+        <div class="ps-desc">
+          cloudflare.com ← Caching ← Cache Purge ← Custom Purge<br>
+          أدخل: <code>/sw.js</code> و <code>/index.html</code> و <code>/manifest.webmanifest</code><br>
+          يجعل كل مستخدم يحصل على sw.js الصحيح فوراً بدون انتظار ٤ ساعات
+        </div>
+      </div>
+    </div>
+    <div class="ps">
+      <div class="ps-num">B</div>
+      <div class="ps-body">
+        <div class="ps-title">تعليمات للمستخدم الحالي (قبل الإصلاح)</div>
+        <div class="ps-desc">
+          لرؤية الميزات الموجودة الآن:<br>
+          <strong>Windows/Linux:</strong> <code>Ctrl + Shift + R</code><br>
+          <strong>Mac:</strong> <code>Cmd + Shift + R</code><br>
+          أو: F12 → Application → Service Workers → Unregister → أعد التحميل
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY TABLE -->
+<div class="rule"><div class="chip chip-ok">الملخص النهائي</div><div class="rule-line"></div></div>
+<div class="sec">
+  <div style="overflow-x:auto;">
+    <table class="tbl">
+      <thead><tr><th>السبب</th><th>التأثير</th><th>الحل</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>الخطة السباعية = backend only</strong><br>٠ واجهات مستخدم بُنيت</td>
+          <td>المستخدم لا يرى الميزات الجديدة لأنها ببساطة غير موجودة في الواجهة</td>
+          <td>بناء ٧ واجهات React مفقودة (الخطوات ١→٧ أعلاه)</td>
+          <td><span class="badge b-red">حرج — هذا هو العمل الرئيسي</span></td>
+        </tr>
+        <tr>
+          <td><strong>الميزات الموجودة تحتاج تسجيل دخول</strong><br>بدور معين (مزوّد/زبون)</td>
+          <td>المستخدم يظن لا يوجد جديد لأنه يبحث في المكان الخطأ</td>
+          <td>توجيه للمكان الصحيح (راجع جدول "أين تجده" أعلاه)</td>
+          <td><span class="badge b-amber">متوسط — تثقيف/توجيه</span></td>
+        </tr>
+        <tr>
+          <td><strong>Cloudflare يخزّن sw.js ٤ ساعات</strong><br>nginx لا يعطي تعليمات صريحة</td>
+          <td>كل deploy جديد في المستقبل → تأخر ٤ ساعات</td>
+          <td>إضافة Cache-Control في nginx.conf + Cloudflare Bypass Rule</td>
+          <td><span class="badge b-amber">متوسط — يُصلح قبل الـ deploy القادم</span></td>
+        </tr>
+        <tr>
+          <td><strong>Service Worker يخدم نسخة قديمة</strong><br>لمستخدمين لديهم tab مفتوحة</td>
+          <td>بعض المستخدمين يرون نسخة قبل آخر deploy</td>
+          <td>Ctrl+Shift+R للمستخدم الآن + الإصلاح الهيكلي للمستقبل</td>
+          <td><span class="badge b-blue">منخفض — يحل بنفسه بعد ٤ ساعات</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box">
+    <strong>الخلاصة بجملة واحدة:</strong> التحديثات منشورة ومشغّلة على الخادم — المشكلة أن الخطة السباعية بنت البنية التحتية للخادم دون بناء واجهات المستخدم المقابلة. الحل هو بناء ٧ واجهات React + إصلاح nginx.
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="padding:24px 54px; border-top:1px solid var(--line); color:var(--muted); font-size:.78rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; direction:ltr;">
+  <span style="direction:rtl;">تووا · تشخيص عميق للتحديثات · ٥ يوليو ٢٠٢٦</span>
+  <span style="font-family:'Courier New',monospace;">bundle: main-COA-qDtF.js · DB: ab20 ✓ · missing-UI: 7 components</span>
+</div>
+
+</div>
+</body>
+</html>

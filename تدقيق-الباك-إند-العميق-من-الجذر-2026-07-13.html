@@ -1,0 +1,437 @@
+<title>تدقيق الباك إند العميق — 86 ألف سطر، 7 عمليّات تحقيق مستقلّة</title>
+<style>
+  :root{
+    --bg:#170a1f; --bg2:#210d2c; --line:#f3e9fb; --line-dim:#c79ee0; --muted:#b599c9;
+    --panel:rgba(255,255,255,.045); --panel-strong:rgba(255,255,255,.08); --panel-border:rgba(243,233,251,.16);
+    --grid-line:rgba(243,233,251,.055);
+    --sev-critical:#ff3860; --sev-high:#ff9f43; --sev-med:#f5d76e; --sev-low:#6fd3ff; --sev-ok:#3ddc97; --sev-root:#c792ea;
+    --font-mono: ui-monospace,"Cascadia Code","SFMono-Regular",Consolas,monospace;
+    --font-ar: "IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f8f3fb; --bg2:#f0e7f6; --line:#2a1338; --line-dim:#6b3f8c; --muted:#6b5a7a;
+      --panel:rgba(42,19,56,.035); --panel-strong:rgba(42,19,56,.06); --panel-border:rgba(42,19,56,.16); --grid-line:rgba(42,19,56,.06);
+      --sev-critical:#c81e45; --sev-high:#b4620c; --sev-med:#8a6f06; --sev-low:#1372a6; --sev-ok:#1c8a5f; --sev-root:#7c3fa6;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#170a1f; --bg2:#210d2c; --line:#f3e9fb; --line-dim:#c79ee0; --muted:#b599c9;
+    --panel:rgba(255,255,255,.045); --panel-strong:rgba(255,255,255,.08); --panel-border:rgba(243,233,251,.16);
+    --grid-line:rgba(243,233,251,.055);
+    --sev-critical:#ff3860; --sev-high:#ff9f43; --sev-med:#f5d76e; --sev-low:#6fd3ff; --sev-ok:#3ddc97; --sev-root:#c792ea;
+  }
+  :root[data-theme="light"]{
+    --bg:#f8f3fb; --bg2:#f0e7f6; --line:#2a1338; --line-dim:#6b3f8c; --muted:#6b5a7a;
+    --panel:rgba(42,19,56,.035); --panel-strong:rgba(42,19,56,.06); --panel-border:rgba(42,19,56,.16); --grid-line:rgba(42,19,56,.06);
+    --sev-critical:#c81e45; --sev-high:#b4620c; --sev-med:#8a6f06; --sev-low:#1372a6; --sev-ok:#1c8a5f; --sev-root:#7c3fa6;
+  }
+  *{box-sizing:border-box}
+  .bp-root{
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid-line) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(90deg, var(--grid-line) 0 1px, transparent 1px 34px);
+    color:var(--line); font-family:var(--font-ar); direction:rtl; line-height:1.85;
+    padding:26px 14px 90px; font-size:16px;
+  }
+  .bp-root, .bp-root *{ text-wrap: pretty; }
+  .sheet-wrap{max-width:1260px; margin:0 auto}
+  a{color:var(--line-dim)}
+  h1,h2,h3,h4{text-wrap:balance; color:var(--line); font-family:var(--font-ar)}
+  .frame{position:relative; border:1px solid var(--panel-border); border-radius:2px; background:var(--panel)}
+  .corner{position:absolute; width:20px; height:20px; pointer-events:none}
+  .corner::before,.corner::after{content:"";position:absolute;background:var(--line-dim)}
+  .c-tl{top:-1px;left:-1px} .c-tl::before{top:0;left:0;width:100%;height:2px} .c-tl::after{top:0;left:0;width:2px;height:100%}
+  .c-tr{top:-1px;right:-1px} .c-tr::before{top:0;right:0;width:100%;height:2px} .c-tr::after{top:0;right:0;width:2px;height:100%}
+  .c-bl{bottom:-1px;left:-1px} .c-bl::before{bottom:0;left:0;width:100%;height:2px} .c-bl::after{bottom:0;left:0;width:2px;height:100%}
+  .c-br{bottom:-1px;right:-1px} .c-br::before{bottom:0;right:0;width:100%;height:2px} .c-br::after{bottom:0;right:0;width:2px;height:100%}
+
+  .gov-banner{background:linear-gradient(135deg, rgba(255,56,96,.16), rgba(255,56,96,.04)); border:2px solid var(--sev-critical); border-radius:8px; padding:20px 24px; margin-bottom:26px}
+  .gov-banner .gt{font-family:var(--font-mono); font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--sev-critical); font-weight:800; margin-bottom:7px}
+  .gov-banner p{margin:5px 0; font-size:.9rem; color:var(--line)}
+  .gov-banner code{background:var(--bg2); border:1px solid var(--panel-border); padding:1px 6px; border-radius:4px; font-family:var(--font-mono); direction:ltr; display:inline-block}
+
+  header.title-block{padding:28px 26px 20px; margin-bottom:22px}
+  .eyebrow{font-family:var(--font-mono); font-size:.7rem; letter-spacing:.13em; color:var(--line-dim); text-transform:uppercase}
+  header.title-block h1{font-size:clamp(1.3rem,3vw,1.9rem); margin:8px 0 10px; font-weight:800}
+  header.title-block .lede{color:var(--muted); max-width:840px; font-size:.97rem}
+  .stampbox{margin-top:18px; display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:1px; background:var(--panel-border); border:1px solid var(--panel-border)}
+  .stampbox .cell{background:var(--bg); padding:9px 12px}
+  .stampbox .cell .k{font-family:var(--font-mono); font-size:.6rem; letter-spacing:.05em; color:var(--line-dim); text-transform:uppercase}
+  .stampbox .cell .v{font-weight:700; margin-top:3px; font-size:.8rem}
+
+  .index{padding:16px 22px; margin-bottom:30px}
+  .index .eyebrow{margin-bottom:8px; display:block}
+  .index ol{margin:0; padding-inline-start:1.3em; columns:2; column-gap:30px}
+  .index li{margin-bottom:6px; break-inside:avoid; font-size:.84rem}
+  @media (max-width:640px){.index ol{columns:1}}
+
+  section.sheet{margin:0 0 44px}
+  .sheet-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; border-bottom:1px solid var(--panel-border); padding-bottom:9px; flex-wrap:wrap}
+  .sheet-num{font-family:var(--font-mono); font-size:.72rem; color:var(--line-dim); border:1px solid var(--panel-border); border-radius:3px; padding:2px 8px; white-space:nowrap}
+  .sheet-head h2{font-size:1.22rem; margin:0}
+  p.lede{color:var(--muted); max-width:860px; font-size:.94rem}
+
+  .stamp{display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:.62rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:2px 8px; border-radius:3px; border:1.5px solid currentColor; white-space:nowrap}
+  .sev-critical{color:var(--sev-critical); transform:rotate(-2deg)}
+  .sev-high{color:var(--sev-high)} .sev-med{color:var(--sev-med)} .sev-low{color:var(--sev-low)}
+  .sev-ok{color:var(--sev-ok)} .sev-root{color:var(--sev-root)}
+
+  .legend{display:flex; flex-wrap:wrap; gap:8px 14px; margin:13px 0 4px; font-size:.8rem; color:var(--muted); align-items:center}
+  .legend b{color:var(--line)}
+
+  .card{background:var(--panel); border:1px solid var(--panel-border); border-radius:6px; padding:18px 20px; margin-bottom:14px}
+  .card.critical{border-inline-start:4px solid var(--sev-critical)}
+  .card.high{border-inline-start:4px solid var(--sev-high)}
+  .card.root{border-inline-start:4px solid var(--sev-root); background:rgba(199,146,234,.05)}
+  .card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:8px}
+  .card-head h3{margin:0; font-size:1rem; font-weight:700}
+  .card p{margin:7px 0 0; font-size:.9rem}
+  code{font-family:var(--font-mono); font-size:.78rem; background:var(--bg2); border:1px solid var(--panel-border); border-radius:4px; padding:1px 6px; direction:ltr; unicode-bidi:isolate; display:inline-block; color:var(--line-dim)}
+  .path{font-family:var(--font-mono); font-size:.73rem; color:var(--sev-ok); direction:ltr; unicode-bidi:isolate; display:inline-block}
+
+  .subblock{margin-top:11px; padding-top:10px; border-top:1px dashed var(--panel-border)}
+  .subblock .lbl{font-family:var(--font-mono); font-size:.64rem; letter-spacing:.06em; text-transform:uppercase; color:var(--line-dim); margin-bottom:6px; display:flex; align-items:center; gap:8px}
+  .subblock.plain .lbl{color:var(--sev-root)} .subblock.evidence .lbl{color:var(--sev-ok)} .subblock.fix .lbl{color:var(--sev-high)}
+  .subblock p{font-size:.87rem; color:var(--muted); margin:0}
+
+  .diagram{background:var(--bg2); border:1px solid var(--panel-border); border-radius:6px; padding:20px; margin:16px 0; overflow-x:auto}
+  .diagram-cap{font-family:var(--font-mono); font-size:.67rem; color:var(--line-dim); letter-spacing:.05em; text-transform:uppercase; margin-bottom:13px}
+  .flow{display:flex; flex-direction:column; gap:0}
+  .flow-step{display:flex; gap:13px; align-items:flex-start}
+  .flow-dot-col{display:flex; flex-direction:column; align-items:center; width:24px}
+  .flow-dot{width:11px; height:11px; border-radius:50%; border:2px solid var(--line-dim); background:var(--bg2); flex:none}
+  .flow-dot.bad{border-color:var(--sev-critical); background:var(--sev-critical)}
+  .flow-dot.ok{border-color:var(--sev-ok); background:var(--sev-ok)}
+  .flow-line{width:2px; flex:1; background:var(--line-dim); min-height:24px}
+  .flow-line.cut{background:repeating-linear-gradient(180deg, var(--sev-critical) 0 4px, transparent 4px 8px)}
+  .flow-body{padding-bottom:19px; flex:1}
+  .flow-body .t{font-weight:700; font-size:.89rem}
+  .flow-body .d{color:var(--muted); font-size:.82rem; margin-top:2px}
+  .flow-body .amt{font-family:var(--font-mono); font-size:.78rem; color:var(--sev-high); margin-top:5px; direction:ltr; display:inline-block}
+  .flow-body .broke{display:inline-flex; align-items:center; gap:6px; margin-top:7px; font-family:var(--font-mono); font-size:.7rem; color:var(--sev-critical); border:1px dashed var(--sev-critical); border-radius:4px; padding:3px 8px}
+
+  .gap-table-wrap{overflow-x:auto}
+  table{width:100%; border-collapse:collapse; font-size:.82rem}
+  th,td{border-bottom:1px solid var(--panel-border); padding:8px 10px; text-align:right; vertical-align:top}
+  th{color:var(--line-dim); font-family:var(--font-mono); font-size:.63rem; text-transform:uppercase; letter-spacing:.03em; font-weight:600}
+  td.ev{font-family:var(--font-mono); font-size:.7rem; color:var(--sev-ok); direction:ltr; text-align:right; unicode-bidi:isolate}
+  tr:last-child td{border-bottom:none}
+
+  details.module{border:1px solid var(--panel-border); border-radius:6px; margin-bottom:9px; background:var(--panel)}
+  details.module summary{cursor:pointer; padding:12px 17px; font-weight:700; display:flex; justify-content:space-between; align-items:center; gap:10px; list-style:none; font-size:.94rem}
+  details.module summary::-webkit-details-marker{display:none}
+  details.module summary .cnt{font-family:var(--font-mono); font-size:.66rem; color:var(--muted); font-weight:400}
+  details.module[open] summary{border-bottom:1px solid var(--panel-border)}
+  details.module .inner{padding:14px 17px}
+
+  .note-block{border:1px dashed var(--panel-border); border-radius:6px; padding:14px 18px; margin:12px 0; font-size:.85rem; color:var(--muted)}
+  .note-block.ok{border-color:var(--sev-ok)} .note-block.warn{border-color:var(--sev-high)} .note-block.root{border-color:var(--sev-root)}
+  .note-block b{color:var(--line)}
+
+  .sevbar{display:flex; height:22px; border-radius:4px; overflow:hidden; margin:14px 0 8px; border:1px solid var(--panel-border)}
+  .sevbar span{display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:.68rem; font-weight:700; color:#0a0510}
+  .sevbar .critical{background:var(--sev-critical)} .sevbar .high{background:var(--sev-high)} .sevbar .med{background:var(--sev-med)} .sevbar .low{background:var(--sev-low)}
+
+  footer.colophon{margin-top:46px; padding-top:16px; border-top:1px solid var(--panel-border); font-size:.78rem; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-family:var(--font-mono)}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+</style>
+
+<div class="bp-root">
+<div class="sheet-wrap">
+
+  <div class="gov-banner frame">
+    <div class="gt">قيد حوكميّ — ينطبق على كل ما في هذه الوثيقة</div>
+    <p>كل ملفّ مذكور هنا داخل <code>backend/app/modules/</code> — مُدرَج صراحة ضمن "المناطق المحظورة" في حوكمة المشروع (CLAUDE.md). هذه وثيقة تشخيص، لا إذن تعديل. لا يُلمَس أيّ سطر كود بلا إذن تشغيليّ صريح من المشغّل.</p>
+  </div>
+
+  <header class="title-block frame">
+    <span class="corner c-tl"></span><span class="corner c-tr"></span><span class="corner c-bl"></span><span class="corner c-br"></span>
+    <span class="eyebrow">تدقيق باك إند مستقلّ من الجذر — لا نقل عن تقارير سابقة</span>
+    <h1>تدقيق الباك إند العميق: 44 عيبًا في منطق الخادم نفسه، عبر 86 ألف سطر</h1>
+    <p class="lede">كل الوثائق السابقة في هذه السلسلة ركّزت على تكامل الجوّال مع الخادم (تطابق أسماء الحقول والمسارات). هذه الوثيقة مختلفة جذريًّا: <b>سبع عمليّات تحقيق مستقلّة متوازية</b> (ستّة وكلاء تحقيق متخصّصون + Codex CLI) قرأت كل ملفّ في أهمّ ثماني وحدات بالباك إند — سطرًا سطرًا، لا بحثًا سطحيًّا — بحثًا عن أعطاب <b>حقيقيّة في منطق الخادم نفسه</b>: سباقات، ثغرات صلاحيّات، أخطاء محاسبيّة، تجاوزات أمنيّة. النتيجة: اكتشاف أنّ <b>النظام الماليّ لا يُصفّي قيوده المحاسبيّة عبر دورة حياة الطلب الكاملة</b> — أخطر اكتشاف في كل هذه السلسلة حتى الآن.</p>
+    <div class="stampbox">
+      <div class="cell"><div class="k">حجم الكود المُدقَّق</div><div class="v">86,000 سطر</div></div>
+      <div class="cell"><div class="k">الوحدات المُغطّاة</div><div class="v">8 وحدات رئيسيّة</div></div>
+      <div class="cell"><div class="k">عمليّات تحقيق مستقلّة</div><div class="v">7 (6 وكلاء + Codex)</div></div>
+      <div class="cell"><div class="k">إجماليّ الاكتشافات</div><div class="v">44 عيبًا</div></div>
+      <div class="cell"><div class="k">حرِج (CRITICAL)</div><div class="v">3</div></div>
+      <div class="cell"><div class="k">عالي (HIGH)</div><div class="v">9</div></div>
+    </div>
+    <div class="sevbar">
+      <span class="critical" style="width:7%">3</span>
+      <span class="high" style="width:20%">9</span>
+      <span class="med" style="width:41%">18</span>
+      <span class="low" style="width:32%">14</span>
+    </div>
+  </header>
+
+  <nav class="index frame">
+    <span class="eyebrow">فهرس الخطة</span>
+    <ol>
+      <li><a href="#s01">منهجيّة هذا التدقيق</a></li>
+      <li><a href="#s02">الاكتشاف الأكبر: النظام لا يُصفّي قيوده الماليّة</a></li>
+      <li><a href="#s03">نمط متكرّر: نقص قفل الصفّ في 6 وظائف ماليّة</a></li>
+      <li><a href="#s04">أرباح السائق لا تصل لدفتر الأستاذ العامّ</a></li>
+      <li><a href="#s05">أربع ثغرات أمنيّة عالية مستقلّة</a></li>
+      <li><a href="#s06">باقي الاكتشافات حسب الوحدة</a></li>
+      <li><a href="#s07">ما هو سليم فعلًا — بالدليل</a></li>
+      <li><a href="#s08">خطة الإصلاح المُرتَّبة حسب الجذر لا العدد</a></li>
+      <li><a href="#s09">حدود هذا التدقيق</a></li>
+    </ol>
+  </nav>
+
+  <div class="legend">
+    <span><b>مفاتيح القراءة:</b></span>
+    <span class="stamp sev-critical">CRITICAL</span> <span>مال حقيقيّ يُفقَد أو يُضاعَف الآن</span>
+    <span class="stamp sev-high">HIGH</span> <span>ثغرة استغلال حقيقيّة أو خطأ محاسبيّ مؤكَّد</span>
+    <span class="stamp sev-root">جذر مشترك</span> <span>نمط واحد يُفسِّر عدّة اكتشافات معًا</span>
+  </div>
+
+  <!-- ============ S01 ============ -->
+  <section class="sheet" id="s01">
+    <div class="sheet-head"><span class="sheet-num">SHEET 01</span><h2>منهجيّة هذا التدقيق</h2></div>
+    <p class="lede">بعد ملاحظة أنّ الجولات السابقة لم تدرس الباك إند بعمق كافٍ، خُصِّصت هذه الجولة بالكامل لذلك — بلا أيّ ربط بأعطاب الجوّال المعروفة سابقًا:</p>
+    <div class="card">
+      <p><b>ستّة وكلاء تحقيق متخصّصون</b> عمل كل واحد منهم بمعزل عن الآخرين على وحدة مختلفة، بتكليف صريح: "لا تتحقّق من ادّعاءات سابقة، ابحث عمّا لم يفحصه أحد من قبل" — الماليّة والتسوية والمكافآت، المحافظ والدفع، التوزيع (تعيين السائقين)، الطلبات (آلة الحالة)، الهويّة والدخول، المزوّدون والكتالوج، بالإضافة لوحدات الامتثال الأصغر (احتيال، توثيق، شؤون قانونيّة).</p>
+      <p><b>Codex CLI (أداة OpenAI المستقلّة)</b> نُفِّذت بمهمّة مختلفة تمامًا: تتبّع تدفّق المال الفعليّ عبر النظام كاملًا — من إنشاء الطلب حتى تسوية السائق — عبر ثلاثة سيناريوهات حقيقيّة، بدل فحص ملفّ واحد بمعزل عن غيره. هذا النوع من التتبّع الأفقيّ عبر عدّة وحدات هو بالضبط ما لا يستطيع أيّ وكيل مُخصَّص لوحدة واحدة رؤيته.</p>
+    </div>
+  </section>
+
+  <!-- ============ S02 : THE BIG STORY ============ -->
+  <section class="sheet" id="s02">
+    <div class="sheet-head"><span class="sheet-num">SHEET 02</span><h2>الاكتشاف الأكبر: النظام لا يُصفّي قيوده الماليّة عبر دورة حياة الطلب</h2><span class="stamp sev-critical">CRITICAL</span></div>
+    <p class="lede">بلغة بسيطة: تخيّل دفتر حسابات فيه صفحة لكل مرحلة من مراحل الطلب — "نقد بيد السائق"، "مستحقّ للمزوّد"، "دفعناه فعليًّا". كل صفحة على حدة مضبوطة حسابيًّا (المدين = الدائن). لكن حين ينتقل المال من صفحة لأخرى، <b>الصفحة القديمة لا تُقفَل</b> — فيبدو الأمر وكأنّ المال موجود في مكانَين في آن واحد.</p>
+
+    <div class="diagram">
+      <div class="diagram-cap">مثال حقيقيّ (من التحقّق المباشر) — طلب نقديّ بقيمة 100,000 + رسوم توصيل 10,000</div>
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-dot-col"><div class="flow-dot ok"></div><div class="flow-line"></div></div>
+          <div class="flow-body"><div class="t">1 — السائق يُسلِّم الطلب ويُحصِّل النقد</div><div class="d">يُفتَح حساب "نقد قيد النقل مع السائق" ويُقفَل حساب "مستحقّات الطلب" — قيد صحيح ومتوازن.</div><div class="amt">CASH_IN_TRANSIT +110,000 / ORDER_RECEIVABLE +100,000</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot-col"><div class="flow-dot bad"></div><div class="flow-line cut"></div></div>
+          <div class="flow-body"><div class="t">2 — تُعتمَد تسوية المزوّد</div><div class="d">يُفتَح حساب جديد "مستحقّ للمزوّد" — لكن حسابَي الخطوة الأولى ("نقد قيد النقل"، "مستحقّات الطلب") <b>لا يُقفَلان</b>. المبلغ الآن مسجَّل في مكانَين معًا.</div><div class="broke">لا تصفية — القيد الأصليّ يبقى مفتوحًا</div></div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-dot-col"><div class="flow-dot bad"></div></div>
+          <div class="flow-body"><div class="t">3 — يُدفَع المزوّد فعليًّا</div><div class="d">تُعلَّم التسوية "مدفوعة" — لكن حساب "مستحقّ للمزوّد" نفسه لا يُخفَّض أبدًا. من الناحية المحاسبيّة، المزوّد لا يزال "مستحقًّا له" نفس المبلغ إلى الأبد.</div></div>
+        </div>
+      </div>
+      <p style="margin-top:14px; color:var(--muted); font-size:.86rem"><b>الأثر العمليّ:</b> أيّ محاولة مستقبليّة لمطابقة "كم نقدًا يجب أن يكون بحوزة كل سائق" أو "كم يستحقّ كل مزوّد فعليًّا الآن" ستُعطي أرقامًا متضخّمة أو غير موثوقة — لأنّ الحسابات القديمة لا تُقفَل أبدًا. هذا ليس خطأ في قيد واحد، بل غياب لخطوة "التصفية" بالكامل من التصميم.</p>
+    </div>
+
+    <div class="card critical">
+      <div class="card-head"><h3>الاسترجاع (Refund) لا يُلغي التزامات المزوّد أو السائق أو عمولة المنصّة</h3><span class="stamp sev-critical">CRITICAL</span></div>
+      <div class="subblock plain"><div class="lbl">◆ بلغة بسيطة</div><p>عميل استرجع مبلغ طلبه بالكامل — يُعاد المبلغ لمحفظته بشكل صحيح. لكن: المزوّد الذي سُلِّمت له تسويته على هذا الطلب لا تزال قائمة كأنّ شيئًا لم يحدث؛ عمولة المنصّة المُحتسَبة على نفس البيع لا تزال مُسجَّلة كإيراد؛ وأرباح السائق من هذا الطلب لا تُلمَس. عمليًّا: المنصّة استرجعت مالًا للعميل، لكنّها لا تزال "تدفع" للمزوّد والسائق ولا تزال "تحسب" عمولة على بيع أُلغي فعليًّا.</p></div>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div><p><code>record_refund()</code> (<span class="path">payments/ledger_service.py:445-468</span>) يُخفِّض التزام الاسترجاع ويُعيد المبلغ للمحفظة فقط — بلا أيّ لمسة لحسابات "مستحقّات الطلب"/"إيراد المنصّة"/"مستحقّ المزوّد". آليّة عكس العمولة موجودة لكن كمسار منفصل تمامًا (<span class="path">finance/commission_config_router.py:181-190</span>) لا يستدعيه مسار الاسترجاع أبدًا — يعتمد على أن يتذكّر موظّف تشغيل تشغيله يدويًّا.</p></div>
+    </div>
+
+    <div class="card critical">
+      <div class="card-head"><h3>منازعات الدفع المصرفيّ (Chargeback) لا تُنشئ أيّ قيد ماليّ إطلاقًا اليوم</h3><span class="stamp sev-critical">CRITICAL</span></div>
+      <div class="subblock plain"><div class="lbl">◆ بلغة بسيطة</div><p>حين يفتح حامل بطاقة نزاعًا مصرفيًّا (يدّعي أنّه لم يوافق على الدفع)، النظام يُسجِّل "طلب نزاع" فقط — لا حجز مبلغ، لا عكس تسوية، لا إشعار مزوّد أو سائق. المزوّد يبقى يظنّ أنّه قُبِض ثمن البضاعة، بينما البنك قد يسحب المبلغ من المنصّة فعليًّا لاحقًا.</p></div>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div><p><span class="path">finance/chargeback_router.py:302-364</span> — إنشاء وتحديث حالة الحالة يُغيِّران حقولًا على سجلّ <code>ChargebackCase</code> فقط؛ صفر استدعاء لأيّ دالّة محاسبيّة في كامل الملفّ.</p></div>
+    </div>
+
+    <div class="note-block warn"><b>هذا الاكتشاف يفسِّر منطقيًّا نتائج جزئيّة سابقة</b> كانت قد ظهرت كملاحظات معزولة في مراجعات سابقة (مثل "لا تحذير من ازدواج الاحتساب" في شاشة تسوية السائق على الجوّال) — الآن اتّضح أنّها أعراض ظاهرة لهذا الغياب الأعمق في تصميم الخادم نفسه، لا أعطابًا مستقلّة.</div>
+  </section>
+
+  <!-- ============ S03 : ROW LOCK PATTERN ============ -->
+  <section class="sheet" id="s03">
+    <div class="sheet-head"><span class="sheet-num">SHEET 03</span><h2>نمط متكرّر: نقص قفل الصفّ في ستّ وظائف ماليّة مختلفة</h2><span class="stamp sev-root">جذر مشترك</span></div>
+    <p class="lede">بلغة بسيطة: حين يقرأ الخادم رصيدًا ثم يكتب قيمة جديدة بناءً عليه، يجب أن "يُقفَل" هذا الصفّ في قاعدة البيانات أثناء العمليّة — وإلّا فطلبان متزامنان (ضغطتان سريعتان، أو إعادة محاولة تلقائيّة) قد يقرآن نفس الرصيد القديم معًا، ويكتب كلاهما نتيجة مبنيّة عليه، فتضيع إحدى العمليّتَين تمامًا. هذا بالضبط النمط المكتشَف بشكل متكرّر عبر ست دوالّ مختلفة تمامًا، في وحدتَين مختلفتَين — أوضح إشارة على أنّ هذا ليس خطأً فرديًّا بل ثغرة في نمط برمجيّ متّبع لم يُطبَّق بشكل متّسق:</p>
+    <div class="gap-table-wrap"><table>
+      <tr><th>الوظيفة</th><th>الموقع</th><th>الخطورة</th><th>السيناريو المحدَّد</th></tr>
+      <tr><td>معالجة "عدم ظهور العميل"</td><td class="ev">finance/no_show_service.py:44</td><td><span class="stamp sev-critical">CRITICAL</span></td><td>ضغطتان متزامنتان من موظّف العمليّات → تسوية مزدوجة كاملة للمزوّد على نفس الطلب</td></tr>
+      <tr><td>اعتماد دورة رواتب</td><td class="ev">finance/payroll_service.py:62</td><td><span class="stamp sev-high">HIGH</span></td><td>اعتماد متزامن → قيد رواتب مضاعَف</td></tr>
+      <tr><td>تسوية دفع نقديّ جزئيّ</td><td class="ev">finance/partial_payment_service.py:46</td><td><span class="stamp sev-high">HIGH</span></td><td>تسوية استثناء نقديّ مزدوجة + دين عميل مزدوج</td></tr>
+      <tr><td>شحن رصيد المحفظة</td><td class="ev">payments/wallet_service.py:183-185</td><td><span class="stamp sev-high">HIGH</span></td><td>شحنتان متزامنتان لنفس المحفظة → فقدان إحداهما فعليًّا (كامنة خلف علم إيقاف حاليًّا)</td></tr>
+      <tr><td>التحقّق من رمز PIN المحفظة</td><td class="ev">payments/wallet_security_router.py:104-118</td><td><span class="stamp sev-med">MED</span></td><td>محاولات متوازية تتجاوز حدّ القفل بعد 5 محاولات فعليًّا</td></tr>
+      <tr><td>تأكيد تسليم النقد للوكيل</td><td class="ev">finance/cash_risk_router.py:126</td><td><span class="stamp sev-low">LOW</span></td><td>تأكيد مزدوج (يعتمد على حماية لاحقة كخطّ دفاع ثانٍ فقط)</td></tr>
+    </table></div>
+    <div class="note-block root"><b>لماذا هذا "جذر مشترك" لا 6 إصلاحات منفصلة:</b> كل الوظائف الست تحتاج بالضبط نفس التصحيح (<code>SELECT ... FOR UPDATE</code> قبل القراءة، وإعادة التحقّق من الحالة تحت القفل) — وهو النمط المُستخدَم بالفعل بشكل صحيح في وظائف مجاورة أخرى في نفس الوحدات (مثل <code>settlement_service.approve_settlement</code> و<code>spend_from_wallet</code>). هذا يعني أنّ الإصلاح دفعة عمل واحدة متجانسة (نفس السطر البرمجيّ يُضاف 6 مرّات في 6 أماكن)، لا ستّة تحقيقات منفصلة.</div>
+  </section>
+
+  <!-- ============ S04 : DRIVER GL GAP ============ -->
+  <section class="sheet" id="s04">
+    <div class="sheet-head"><span class="sheet-num">SHEET 04</span><h2>أرباح السائق الأساسيّة لا تصل أبدًا لدفتر الأستاذ العامّ</h2><span class="stamp sev-root">جذر مشترك</span></div>
+    <p class="lede">بلغة بسيطة: كل عمليّة ماليّة تخصّ السائق (مكافأة، غرامة تخلٍّ) تُسجَّل في "دفتر الحسابات الرسميّ" للمنصّة (Ledger) — إلّا الأرباح الأساسيّة نفسها من كل طلب يوصله، والتي تُسجَّل فقط في دفتر جانبيّ منفصل. هذا يُنتج ثلاث مشاكل حقيقيّة مترابطة:</p>
+
+    <div class="card high">
+      <div class="card-head"><h3>غرامة تخلّي السائق تُحتسَب في الدفتر الرسميّ، لكنّها لا تُخصَم فعليًّا من مستحقّاته</h3><span class="stamp sev-high">HIGH</span></div>
+      <div class="subblock plain"><div class="lbl">◆ بلغة بسيطة</div><p>سائق تخلّى عن طلب بعد قبوله يُغرَّم — الغرامة تُسجَّل رسميًّا كإيراد للمنصّة في الدفتر العامّ. لكن حين تُحسَب أرباح السائق اليوميّة الفعليّة (لتحديد كم يُسلِّم نقدًا وكم يستلم)، حساب الأرباح <b>يتجاهل</b> هذه الغرامة تمامًا لأنّه يقرأ فقط سجلّات من نوع "أرباح" لا "تعديلات". النتيجة: الغرامة "محسوبة" دفتريًّا لكن "غير محصَّلة" عمليًّا من السائق أبدًا.</p></div>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div><p><span class="path">dispatch/driver_abandonment_service.py:164-170</span> يكتب الغرامة كسطر سالب بنوع <code>ADJUSTMENT</code>؛ لكن كل مكان يُجمِّع أرباح السائق (<span class="path">driver_settlement_router.py:111-113</span>، <span class="path">earnings_claim.py:38</span>، <span class="path">driver_payout_service.py:191-224</span>) يُصفّي فقط سجلّات <code>EARNING</code>.</p></div>
+    </div>
+
+    <div class="card high">
+      <div class="card-head"><h3>أرباح الطلبات غير النقديّة (محفظة/بطاقة) قد تُفقَد نهائيًّا في الأيّام كثيفة الدفع الإلكترونيّ</h3><span class="stamp sev-high">HIGH</span></div>
+      <div class="subblock plain"><div class="lbl">◆ بلغة بسيطة</div><p>يوم عمل السائق فيه أغلب الطلبات دُفعت بالمحفظة لا نقدًا. التسوية اليوميّة تحسب "ما يسلّمه السائق = النقد بيده ناقص أرباحه"، وحين تكون الأرباح أكبر من النقد المُحصَّل (يوم دفع إلكترونيّ)، الصيغة تتوقّف عند صفر — لكنّ النظام يُعلِّم كل الأرباح "مُسوّاة" رغم ذلك، بلا أيّ آليّة تدفع للسائق الفرق المتبقّي له لاحقًا. هذا المبلغ يختفي فعليًّا.</p></div>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div><p><span class="path">driver_settlement_router.py:137</span> — <code>net_handover = max(cash − earn, 0)</code> — بينما <span class="path">earnings_claim.py:31-53</span> يُعلِّم <b>كل</b> سجلّات الأرباح غير المُسوّاة "مُسوّاة" بصرف النظر عن كفاية النقد لتغطيتها.</p></div>
+    </div>
+
+    <div class="note-block root"><b>الجذر المشترك:</b> السطر الواحد المفقود هو: عند تسجيل ربح السائق الأساسيّ (<span class="path">driver_payout_service.py:145-165</span>)، لا يُكتَب أيّ قيد مقابل في دفتر الأستاذ العامّ — فقط في الدفتر الجانبيّ. إضافة هذا القيد الواحد المفقود تجعل الدفترين متّسقَين، ويحلّ الحالتَين أعلاه معًا من مصدر واحد. <b>ملاحظة إيجابيّة مهمّة:</b> التحقّق المباشر أثبت أنّه <b>لا يوجد</b> ازدواج فعليّ في دفع نفس الطلب مرّتين (مفتاح التسوية يمنع ذلك بإحكام) — المشكلة تنسيق بين دفترَين، لا ازدواج دفع.</div>
+  </section>
+
+  <!-- ============ S05 : STANDALONE HIGH SECURITY ============ -->
+  <section class="sheet" id="s05">
+    <div class="sheet-head"><span class="sheet-num">SHEET 05</span><h2>أربع ثغرات أمنيّة/امتثال عالية مستقلّة</h2></div>
+
+    <div class="card high">
+      <div class="card-head"><h3>المصادقة الثنائيّة (TOTP) قابلة للكسر بالقوّة الغاشمة — لا حدّ محاولات على العامل الثانويّ القويّ</h3><span class="stamp sev-high">HIGH</span></div>
+      <div class="subblock plain"><div class="lbl">◆ بلغة بسيطة</div><p>رمز الهاتف (OTP) العاديّ محميّ: 5 محاولات فقط ثم قفل. لكن رمز المصادقة الثنائيّة (TOTP) — وهو الحماية "القويّة" المفترَضة — بلا أيّ حدّ محاولات إطلاقًا. مهاجم يملك كلمة المرور فقط (سُرِقت مثلًا) يمكنه تجربة كل الاحتمالات الممكنة لرمز التحقّق الثنائيّ عبر عناوين IP مختلفة دون أن يُوقَف، ويدخل الحساب بالكامل رغم تفعيل الحماية الإضافية.</p></div>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div><p><span class="path">identity/auth_router.py:1153</span> — لا عدّاد فشل، لا قفل. مسار طلب رمز الهاتف المجاور (<span class="path">otp_service.py:200-234</span>) يملك 5 محاولات كحدّ أقصى — تضارب واضح بين معياريّ الحماية لنفس النوع من الأكواد.</p></div>
+    </div>
+
+    <div class="card high">
+      <div class="card-head"><h3>صنف رفضه فريق الإشراف يمكن إعادة نشره بلا مراجعة جديدة إطلاقًا</h3><span class="stamp sev-high">HIGH</span></div>
+      <div class="subblock plain"><div class="lbl">◆ بلغة بسيطة</div><p>مزوّد نُشر له صنف "مرفوض" من فريق الإشراف (مثلًا: صورة مخالفة، وصف مضلِّل). يمكنه ببساطة تبديل حالة الصنف إلى "متوقّف مؤقّتًا" ثم إعادته إلى "منشور" — والكود يخلط بين "رُوجِعت هذه الحالة يومًا" و"وُوفِق عليها"، فيسمح بالنشر مباشرة بلا عرضها على المشرف مجدَّدًا.</p></div>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div><p><span class="path">catalog/catalog_router.py:738-748</span> يتحقّق من <code>item.reviewed_at is not None</code> فقط؛ لكن الرفض نفسه (<span class="path">catalog_moderation_router.py:224</span>) يضبط <code>reviewed_at</code> أيضًا — فيصبح "الرفض" نفسه شرط تجاوز المراجعة القادمة.</p></div>
+    </div>
+
+    <div class="card high">
+      <div class="card-head"><h3>توقيع عقد الانضمام الإلكترونيّ لا يُطلَب مجدَّدًا عند تحديث نسخة الشروط</h3><span class="stamp sev-high">HIGH</span></div>
+      <div class="subblock plain"><div class="lbl">◆ بلغة بسيطة</div><p>سائق أو مزوّد وقّع نسخة قديمة من عقد الانضمام. حين تُحدَّث الشروط لاحقًا (نسخة جديدة)، النظام لا يطلب توقيعًا جديدًا أبدًا — يبقى مصرَّحًا له بالعمل تحت الشروط القديمة إلى الأبد، رغم أنّ توثيق المشروع نفسه يذكر صراحة أنّ "إعادة الموافقة" جزء من التصميم المقصود.</p></div>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div><p><span class="path">legal/legal_router.py:467</span> يتحقّق فقط من غياب توقيع "قيد الانتظار"، لا من مطابقة نسخة التوقيع الموجود مع النسخة النشطة الحاليّة. مسار موافقة العميل المجاور (<span class="path">:324</span>) يقوم بهذا التحقّق بشكل صحيح — عدم اتّساق بين المسارَين.</p></div>
+    </div>
+
+    <div class="card high">
+      <div class="card-head"><h3>تسعير الطلب يتجاهل حالة بعض إضافات الصنف — إضافات مخفيّة/نافدة قابلة للتطبيق</h3><span class="stamp sev-high">HIGH</span></div>
+      <div class="subblock plain"><div class="lbl">◆ بلغة بسيطة</div><p>حين يُخفي مزوّد إضافة (نفدت، أو أوقفها) دون حذفها بالكامل، الشاشة الظاهرة للعميل تُخفيها بشكل صحيح. لكن حساب السعر النهائيّ عند إتمام الطلب لا يتحقّق من هذه الحالة — فإن استطاع العميل تمرير معرّف الإضافة المخفيّة بطريقة ما (طلب مُعدَّل يدويًّا)، يُطبَّق سعرها فعليًّا، بما في ذلك أيّ إضافة بسعر سالب (خصم أوقفه المزوّد) يخفِّض السعر النهائيّ دون علم المزوّد.</p></div>
+      <div class="subblock evidence"><div class="lbl">◆ الدليل</div><p><span class="path">catalog/catalog_service.py:212-234</span> — الاستعلام المستخدَم فعليًّا في مسار الطلب الحيّ لا يُصفّي بحسب حالة الإضافة؛ نسخة أكثر صرامة موجودة فعلًا في <span class="path">modifier_validator.py:77-80</span> لكنّها <b>غير مُستدعاة من مسار الطلب الحقيقيّ إطلاقًا</b> — كود صحيح مكتوب، لكن غير موصول.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ S06 : REMAINING BY MODULE ============ -->
+  <section class="sheet" id="s06">
+    <div class="sheet-head"><span class="sheet-num">SHEET 06</span><h2>باقي الاكتشافات — 30 بندًا حسب الوحدة</h2></div>
+    <p class="lede">كل بند هنا حقيقيّ ومؤكَّد بدليل مباشر، لكن بأثر أضيق من الأقسام أعلاه — بلا حاجة لشرح مطوَّل لكل واحد:</p>
+
+    <details class="module" open>
+      <summary>الماليّة والتسوية (Finance) <span class="cnt">6 بنود إضافية</span></summary>
+      <div class="inner gap-table-wrap"><table>
+        <tr><th>#</th><th>الوصف</th><th>الخطورة</th><th>الموقع</th></tr>
+        <tr><td>1</td><td>تسوية دفع مُجزَّأ (SPLIT): قيد يسحب من حساب "محجوز بالمحفظة" أكثر ممّا حُجِز فعليًّا فيه — يصبح الحساب سالبًا صامتًا</td><td><span class="stamp sev-high">HIGH</span></td><td class="ev">no_show_service.py:94 · ledger_service.py:281</td></tr>
+        <tr><td>2</td><td>ضمانة عدم تكرار التسوية تعتمد على قيد قاعدة بيانات (migration aa10) غير مُطبَّق على القاعدة الحيّة حاليًّا</td><td><span class="stamp sev-med">MED</span></td><td class="ev">settlement_router.py:143،301</td></tr>
+        <tr><td>3</td><td>عكس قيد يدويّ يمكن تكراره مرّتين عند طلبَين متزامنَين (لا قفل)</td><td><span class="stamp sev-med">MED</span></td><td class="ev">manual_journal_router.py:163</td></tr>
+        <tr><td>4</td><td>إنشاء قيد يدويّ بلا أيّ مفتاح منع تكرار — إعادة محاولة الشبكة تُضاعف القيد</td><td><span class="stamp sev-med">MED</span></td><td class="ev">manual_journal_router.py:48</td></tr>
+        <tr><td>5</td><td>حساب الضريبة يستخدم فاصلة عائمة (float) بدل عدد صحيح، باتّجاه تقريب مختلف عن بقيّة النظام</td><td><span class="stamp sev-med">MED</span></td><td class="ev">tax_service.py:18</td></tr>
+        <tr><td>6</td><td>استرجاع مدفوع بنقاط الولاء فقط ينهار بخطأ خادم 500 ولا يكتمل أبدًا</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">refund_router.py:341-393</td></tr>
+      </table></div>
+    </details>
+
+    <details class="module">
+      <summary>المحافظ والدفع (Payments) <span class="cnt">4 بنود إضافية</span></summary>
+      <div class="inner gap-table-wrap"><table>
+        <tr><th>#</th><th>الوصف</th><th>الخطورة</th><th>الموقع</th></tr>
+        <tr><td>1</td><td>سقف التحويلات الواردة اليوميّ (حماية غسل أموال) قابل للتجاوز بمُرسِلين متعدّدين متزامنين لنفس المستلِم</td><td><span class="stamp sev-med">MED</span></td><td class="ev">transfer_service.py:185-194</td></tr>
+        <tr><td>2</td><td>رمز التحقّق الإضافيّ للتحويلات الكبيرة لا يُستهلَك ذرّيًّا — رمز واحد قد يُصرِّح بأكثر من تحويل كبير قبل حذفه</td><td><span class="stamp sev-med">MED</span></td><td class="ev">transfer_router.py:238-291</td></tr>
+        <tr><td>3</td><td>مفتاح فكّ تكرار إشعارات الدفع الخارجيّة (webhook) مبنيّ على الوقت والتجزئة لا معرّف الحدث الأصليّ من مزوّد الدفع — كامن، غير مُستغَلّ حاليًّا لأنّ لا تحصيل فعليّ مربوط بعد</td><td><span class="stamp sev-med">MED</span></td><td class="ev">webhook_verifier.py:73</td></tr>
+        <tr><td>4</td><td>رمز شحن المحفظة (لا التحويل) يُحذَف قبل نجاح العمليّة فعليًّا — فشل لاحقًا يُهدر الرمز بلا داعٍ</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">payment_router.py:518-544</td></tr>
+      </table></div>
+    </details>
+
+    <details class="module">
+      <summary>التوزيع (Dispatch) <span class="cnt">2 بند إضافي</span></summary>
+      <div class="inner gap-table-wrap"><table>
+        <tr><th>#</th><th>الوصف</th><th>الخطورة</th><th>الموقع</th></tr>
+        <tr><td>1</td><td>قبول عرض متزامن من سائقَين (حالة نادرة، محميّة فعليًّا من التكرار) يُعيد خطأ خادم 500 بدل رسالة "أُخِذ العرض" الواضحة</td><td><span class="stamp sev-med">MED</span></td><td class="ev">dispatch_router.py:~702</td></tr>
+        <tr><td>2</td><td>تسجيل ربح السائق بلا حماية تكرار خاصّة به (يعتمد على حماية غير مباشرة فقط)</td><td><span class="stamp sev-med">MED</span></td><td class="ev">driver_payout_service.py (credit_driver_earning)</td></tr>
+      </table></div>
+    </details>
+
+    <details class="module">
+      <summary>الهويّة والدخول (Identity) <span class="cnt">3 بنود إضافية</span></summary>
+      <div class="inner gap-table-wrap"><table>
+        <tr><th>#</th><th>الوصف</th><th>الخطورة</th><th>الموقع</th></tr>
+        <tr><td>1</td><td>تحقّق رمز البريد الإلكترونيّ بلا حدّ محاولات — يمكن انتحال حالة "بريد موثَّق" لعنوان غير مملوك فعليًّا</td><td><span class="stamp sev-med">MED</span></td><td class="ev">email_otp_service.py:90-104</td></tr>
+        <tr><td>2</td><td>"حذف" الحساب لا يمسح الاسم المعروض (display_name) — يبقى ظاهرًا رغم اكتمال إجراء المسح المفترَض</td><td><span class="stamp sev-med">MED</span></td><td class="ev">anonymization.py:64-72</td></tr>
+        <tr><td>3</td><td>رمز تفعيل البريد الإلكترونيّ (مسار قديم) يُكتَب صراحة في سجلّات النظام النصّيّة</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">registration_router.py:1264</td></tr>
+      </table></div>
+    </details>
+
+    <details class="module">
+      <summary>الطلبات (Orders) <span class="cnt">6 بنود إضافية</span></summary>
+      <div class="inner gap-table-wrap"><table>
+        <tr><th>#</th><th>الوصف</th><th>الخطورة</th><th>الموقع</th></tr>
+        <tr><td>1</td><td>سائق حصل على عرض منتهي/مرفوض (لم يُقبَل فعليًّا) يمكنه قراءة قائمة تقييمات طلب ليس له</td><td><span class="stamp sev-med">MED</span></td><td class="ev">order_router.py:1282-1294</td></tr>
+        <tr><td>2</td><td>مفتاح منع التكرار لا يشمل طريقة الدفع المُجزَّأة أو كود الخصم — إعادة استخدام نفس المفتاح ببيانات مختلفة تُعيد الطلب القديم صامتًا</td><td><span class="stamp sev-med">MED</span></td><td class="ev">idempotency.py:15-59</td></tr>
+        <tr><td>3</td><td>انتقال "جاهز للاستلام ← تسليم" مسموح بنيويًّا لأيّ نوع طلب في طبقة آلة الحالة، والحماية الفعليّة موجودة فقط في طبقة أعلى (لا خطر حاليّ، لكن هشّ لمستقبل الكود)</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">state_transitions.py:108</td></tr>
+        <tr><td>4</td><td>إلغاء بسبب "لا سائق متاح" (خطأ منصّة) يُسجَّل بنفس حالة "ألغى العميل" — يُشوِّه مقاييس الإلغاء</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">stale_no_driver_service.py:74-82</td></tr>
+        <tr><td>5</td><td>معالجة تعارض القبول/انتهاء المهلة قد تُعيد إرسال إشعارات مكرَّرة (لا تعارض بيانات فعليّ، إزعاج فقط)</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">accept_timeout_service.py:84-141</td></tr>
+        <tr><td>6</td><td>فلتر كلمات الدفع الخارجيّ/أرقام الهواتف في ملاحظات الطلب سهل التحايل عليه (تباعد الأحرف)</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">notes_filter.py:11-63</td></tr>
+      </table></div>
+    </details>
+
+    <details class="module">
+      <summary>المزوّدون (Providers) <span class="cnt">3 بنود إضافية</span></summary>
+      <div class="inner gap-table-wrap"><table>
+        <tr><th>#</th><th>الوصف</th><th>الخطورة</th><th>الموقع</th></tr>
+        <tr><td>1</td><td>وثيقة امتثال منتهية أو مرفوضة لا تمنع المزوّد من الاستمرار في قبول الطلبات (الإيقاف التلقائيّ اختياريّ ومُعطَّل افتراضيًّا)</td><td><span class="stamp sev-med">MED</span></td><td class="ev">document_warning_service.py:109،150-163</td></tr>
+        <tr><td>2</td><td>مقارنة ساعات العمل تعتمد على توقيت الخادم الخام إن فشل تحميل المنطقة الزمنيّة — طلب قد يُقبَل أو يُرفَض خطأً حول منتصف الليل</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">provider_hours.py:92-99</td></tr>
+        <tr><td>3</td><td>ساعات عمل عابرة لمنتصف الليل (مثل 20:00-02:00) غير قابلة للتخزين أصلًا في النموذج الحاليّ</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">provider_hours.py:68-69</td></tr>
+      </table></div>
+    </details>
+
+    <details class="module">
+      <summary>الامتثال (Fraud/KYC/Legal) <span class="cnt">3 بنود إضافية</span></summary>
+      <div class="inner gap-table-wrap"><table>
+        <tr><th>#</th><th>الوصف</th><th>الخطورة</th><th>الموقع</th></tr>
+        <tr><td>1</td><td>توقيع العقد الإلكترونيّ يُسجِّل عنوان IP الخاصّ بالخادم الوسيط (proxy) لا عنوان الموقِّع الفعليّ — يُضعف قوّة الإثبات القانونيّ للتوقيع</td><td><span class="stamp sev-med">MED</span></td><td class="ev">legal_router.py:461 (مقابل :189،389 الصحيحة)</td></tr>
+        <tr><td>2</td><td>شركاء نشطون بلا أيّ سجلّ عقد موقَّع يُسمَح لهم بالعمل افتراضيًّا (قرار تشغيليّ موثَّق، قابل للإغلاق بإعداد)</td><td><span class="stamp sev-med">MED</span></td><td class="ev">legal_router.py:485-501</td></tr>
+        <tr><td>3</td><td>بيانات اعتماد احتياطيّة ضعيفة مكتوبة في الكود لخدمة تخزين وثائق التوثيق (KYC) — تُستخدَم فقط إن غاب متغيّر البيئة</td><td><span class="stamp sev-low">LOW</span></td><td class="ev">kyc/local_doc_adapter.py:29-30</td></tr>
+      </table></div>
+    </details>
+  </section>
+
+  <!-- ============ S07 : WHAT'S SOLID ============ -->
+  <section class="sheet" id="s07">
+    <div class="sheet-head"><span class="sheet-num">SHEET 07</span><h2>ما هو سليم فعلًا — بالدليل، لا افتراضًا</h2></div>
+    <p class="lede">بنفس دقّة الإبلاغ عن الأعطاب: هذه الأجزاء فُحصت بعمق وتبيّن أنّها مصمَّمة بشكل صحيح، ويجب الحفاظ عليها كما هي:</p>
+    <div class="note-block ok">
+      <b>الهويّة والدخول:</b> توقيع JWT مثبَّت على خوارزميّة واحدة (بلا ثغرة "خوارزميّة none")، انتهاء الصلاحيّة يُفرَض فعليًّا في كل تحقّق، رموز التجديد أحاديّة الاستخدام مع كشف إعادة الاستخدام وإبطال العائلة كاملة. كلمات المرور بخوارزميّة bcrypt صحيحة. WebAuthn محميّ من إعادة التشغيل. لا ثغرات IDOR عبر الوحدة كاملة. ملفّات تعريف الارتباط بأعلام أمان صحيحة.<br><br>
+      <b>المحافظ والدفع:</b> تحقّق توقيع إشعارات PSP صحيح تمامًا (HMAC + مقارنة ثابتة الزمن + نافذة زمنيّة). رموز QR للتحويل محميّة بالكامل من إعادة التشغيل. تحويلات الند للند ذرّيّة فعليًّا (خصم ودائع في نفس المعاملة). لا ثغرات IDOR على أيّ نقطة نهاية للمحفظة. بوّابة التحقّق من جهة الاتّصال مُطبَّقة باتّساق على كل نقاط الشحن/التحويل/تغيير الرمز.<br><br>
+      <b>التوزيع:</b> ازدواج تعيين نفس الطلب لسائقَين محميّ فعليًّا بأربع طبقات دفاع متراكبة (قفل الطلب، قفل العرض، قفل تفاؤليّ على مستوى قاعدة البيانات، وقيد تفرّد جزئيّ). لا ازدواج دفع فعليّ لنفس التوصيلة. تسوية النقد مع السائقين محميّة بإحكام (ختم تسوية + قفل صفّ متّسق عبر كل نقاط الاستدعاء).<br><br>
+      <b>الطلبات:</b> آلة الحالة سليمة بنيويًّا — كل حالة غير نهائيّة تملك مسارًا لحالة نهائيّة، ولا حالة نهائيّة قابلة لإعادة الانتقال. سباق "قبول مقابل انتهاء المهلة" محميّ فعليًّا بالقفل التفاؤليّ على مستوى قاعدة البيانات. التقييمات "العمياء" (كل طرف لا يرى تقييم الآخر قبل تقديم تقييمه) مُطبَّقة بشكل صحيح تمامًا. التسعير يُعاد احتسابه من الخادم دائمًا، لا يُؤخَذ من العميل أبدًا.<br><br>
+      <b>المزوّدون والكتالوج:</b> عزل بيانات كل مزوّد عن الآخر محكم (لا تسريب صلاحيّات عبر تلاعب بمعرّف المزوّد). حظر الطلبات وقت الإغلاق/الإيقاف مُطبَّق بعدّة طبقات متزامنة.
+    </div>
+  </section>
+
+  <!-- ============ S08 : ROADMAP ============ -->
+  <section class="sheet" id="s08">
+    <div class="sheet-head"><span class="sheet-num">SHEET 08</span><h2>خطة الإصلاح — مُرتَّبة حسب الجذر المشترك، لا العدّ الخام</h2></div>
+    <div class="card root">
+      <h3 style="margin:0 0 8px">دفعة 1 — تصفية القيود الماليّة عبر دورة حياة الطلب (الأخطر)</h3>
+      <p>تصميم مخطّط تصفية موحَّد لحسابات "نقد قيد النقل"، "مستحقّات الطلب"، "الضمان المؤقّت"، "مستحقّ المزوّد" عبر نقاط: اعتماد التسوية، دفع المزوّد، الاسترجاع، منازعة الدفع — قبل أيّ إصلاح آخر في هذه القائمة، لأنّه الأساس الذي تُبنى عليه كل عمليّات المطابقة الماليّة المستقبليّة.</p>
+    </div>
+    <div class="card root">
+      <h3 style="margin:0 0 8px">دفعة 2 — سطر واحد، ست وظائف: إضافة قفل الصفّ المفقود</h3>
+      <p>نفس نمط <code>SELECT ... FOR UPDATE</code> يُطبَّق على الوظائف الست المذكورة في القسم 03 — عمل متجانس بسيط، أثر أمنيّ عالٍ.</p>
+    </div>
+    <div class="card root">
+      <h3 style="margin:0 0 8px">دفعة 3 — توحيد دفتر أرباح السائق مع دفتر الأستاذ العامّ</h3>
+      <p>إضافة القيد المقابل المفقود عند تسجيل الربح الأساسيّ — يحلّ مشكلتَي الغرامة غير المُحصَّلة والأرباح غير النقديّة الضائعة معًا.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 8px">دفعة 4 — الثغرات الأمنيّة المستقلّة الأربع</h3>
+      <p>حدّ محاولات TOTP، إصلاح تسلسل حالة الإشراف على الكتالوج، ربط فحص نسخة العقد القانونيّ، إضافة فلتر حالة الإضافة عند التسعير — أربعة إصلاحات مستقلّة، يمكن توزيعها على عدّة مطوّرين بالتوازي.</p>
+    </div>
+    <div class="note-block">باقي الـ30 بندًا (القسم 06) — دفعات لاحقة حسب سعة الفريق، مُرتَّبة داخليًّا بالخطورة ضمن كل وحدة.</div>
+  </section>
+
+  <!-- ============ S09 : LIMITS ============ -->
+  <section class="sheet" id="s09">
+    <div class="sheet-head"><span class="sheet-num">SHEET 09</span><h2>حدود هذا التدقيق</h2></div>
+    <div class="note-block warn">
+      كل الاكتشافات هنا من قراءة كود ثابتة (static) — لا تشغيل فعليّ لقاعدة بيانات، لا اختبار حِمل متزامن حقيقيّ يُثبِت السباقات عمليًّا (رغم أنّ آليّة كل سباق مُشتقّة من قراءة الكود مباشرة لا تخمينًا). بعض النتائج "كامنة" خلف أعلام تفعيل مُغلَقة حاليًّا (شحن المحفظة، التحويل بين المستخدمين) — لا خطر تشغيليّ فوريّ منها اليوم، لكنّها ستُصبح خطرًا حقيقيًّا فور فكّ الختم دون إصلاح مسبَق. لم تُفحَص وحدات أصغر أو أقلّ خطورة ماليًّا (الإخطارات، الولاء، العروض الترويجيّة، البحث الجغرافيّ) في هذه الجولة — قد تستحقّ جولة تدقيق منفصلة لاحقًا إن دعت الحاجة.
+    </div>
+  </section>
+
+  <footer class="colophon">
+    <span>تدقيق باك إند مستقلّ — 2026-07-13 — 7 عمليّات تحقيق متوازية عبر 86,000 سطر</span>
+    <span>الحالة: تشخيص فقط — بانتظار إذن تشغيليّ صريح قبل أيّ تعديل</span>
+  </footer>
+
+</div>
+</div>

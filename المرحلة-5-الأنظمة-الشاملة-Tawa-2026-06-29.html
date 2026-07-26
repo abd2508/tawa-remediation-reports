@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المرحلة ٥ — الأنظمة الشاملة | تتبّع شامل لمنصّة تووا</title>
+<style>
+  :root{--green:#1b7f4b;--green-d:#0f5f36;--ink:#16241d;--muted:#5b6b62;--bg:#f6f9f6;--card:#fff;--line:#dfe9e2;--soft:#eef6f0;--warn:#b8860b;--warn-bg:#fff7e6;--bad:#b3261e;--bad-bg:#fdecea;--ok:#1b7f4b;--ok-bg:#e9f6ef;--info:#1366b8;--info-bg:#e9f2fb}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.85}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f766e,#0a4d48);color:#fff;border-radius:18px;padding:34px 30px;box-shadow:0 10px 30px rgba(10,77,72,.25)}
+  header.hero h1{margin:0 0 6px;font-size:2rem}header.hero p{margin:4px 0;opacity:.95}
+  .chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:5px 12px;border-radius:999px;font-size:.82rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin:18px 0;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+  h2{color:var(--green-d);border-right:5px solid var(--green);padding-right:12px;margin-top:6px;font-size:1.4rem}
+  h3{color:var(--ink);font-size:1.12rem;margin-bottom:6px}
+  .lead{background:var(--soft);border-radius:12px;padding:16px 18px;border:1px dashed var(--line)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.9rem;background:#fff}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:var(--soft);color:var(--green-d)}
+  code{background:#eef3ef;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-family:Consolas,monospace;font-size:.82rem;direction:ltr;display:inline-block}
+  .sev{font-weight:700;border-radius:6px;padding:2px 8px;font-size:.78rem;white-space:nowrap}
+  .s-ok{background:var(--ok-bg);color:var(--ok)}.s-info{background:var(--info-bg);color:var(--info)}
+  .s-low{background:var(--warn-bg);color:var(--warn)}.s-med{background:#ffeede;color:#c25a00}.s-high{background:var(--bad-bg);color:var(--bad)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:740px){.grid{grid-template-columns:1fr}}
+  .note{font-size:.85rem;color:var(--muted)}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:center;margin:12px 0}
+  .step{background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:.78rem;font-weight:600;text-align:center}
+  .arrow{color:var(--green);font-weight:900}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap;margin:10px 0}
+  .kpi div{flex:1;min-width:120px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .kpi b{display:block;font-size:1.6rem;color:var(--green-d)}
+  .eq{background:#0a4d48;color:#eafff8;border-radius:12px;padding:14px 18px;text-align:center;font-size:1.1rem;direction:ltr;font-family:Consolas,monospace}
+  footer{color:var(--muted);font-size:.82rem;text-align:center;padding:24px}
+  .tag{font-size:.72rem;background:#eef3ef;border:1px solid var(--line);border-radius:5px;padding:1px 5px;direction:ltr;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>المرحلة ٥ — الأنظمة الشاملة 🔧</h1>
+  <p>الأساسات التي تخدم كل الأدوار: الهويّة، المال (الدفتر)، آلة حالة الطلب، التوزيع، البثّ اللحظي، الإشعارات، الهجرات، الأمن</p>
+  <p class="note" style="color:#d3f5ee">تقرير ٥ من ٥ · ٢٩ يونيو ٢٠٢٦ · مبني على <code>jwt_service</code> · <code>ledger_service</code> · <code>state_transitions</code> · <code>sse/*</code></p>
+  <div class="chips">
+    <span class="chip">~٤٠ حالة للطلب</span>
+    <span class="chip">قيد مزدوج مفروض (DR=CR)</span>
+    <span class="chip">JWT + إبطال jti + خمول</span>
+    <span class="chip">١٥١ هجرة · رأس واحد</span>
+    <span class="chip">٣ قنوات بثّ SSE</span>
+  </div>
+</header>
+
+<div class="card lead">
+  <h3>📖 اقرأ هذا أولاً — بلغة بسيطة</h3>
+  <p>المراحل ١–٤ تتبّعت «المستخدمين». هذه المرحلة تتبّع «الهيكل العظمي» الذي يقف تحتهم جميعاً: كيف يُتحقَّق من الهويّة؟ كيف يُحفظ المال متوازناً؟ كيف ينتقل الطلب من حالة لأخرى دون قفزات غير مشروعة؟ كيف تصل التحديثات لحظياً؟</p>
+  <p>الخلاصة: <strong>الأساسات متينة ومبنية على مبادئ محاسبية وأمنية صحيحة</strong> — قيد مزدوج مفروض بالكود، آلة حالة صارمة، رموز دخول قابلة للإبطال الفوري، وهجرات قاعدة بيانات بسلسلة واحدة نظيفة.</p>
+</div>
+
+<div class="card">
+  <h2>🔐 ١) الهويّة والصلاحيات (Auth + ABAC)</h2>
+  <div class="grid">
+    <div>
+      <h3>رمز الدخول (JWT)</h3>
+      <p>يحمل: المستخدم + الدور + معرّف الجهاز + <code>jti</code> (معرّف فريد للرمز). التحديث (refresh) يُدوِّر الرمز ويُبطِل القديم؛ الخروج يُضيف <code>jti</code> لقائمة المُبطَلة (<code>revoked:{jti}</code>) — <strong>إبطال فوري</strong>.</p>
+    </div>
+    <div>
+      <h3>انتهاء الخمول</h3>
+      <p>علامة نشاط منزلقة (<code>activity:{user}:{device}</code>): جلسة عمليّات خاملة ٣٠ دقيقة تُرفَض على الخادم (<code>TokenIdleTimeout</code> يرث <code>TokenRevoked</code> ⇒ كل معالج يرفض المُبطَل يرفض الخامل تلقائياً — دفاع بطبقات).</p>
+    </div>
+  </div>
+  <p><strong>ABAC (التحكّم حسب العلاقة):</strong> لا يكفي «أنت سائق» — بل «هل هذا الطلب مُسنَد إليك؟». رصدنا تطبيقه في: بثّ تتبّع الطلب (العميل/السائق/المتجر يرون مجموعات أحداث مختلفة)، فتح استثناء النقد (السائق المُسنَد فقط)، التحقّق من الاستلام (المتجر المالك للطلب فقط) — وكلّه موحّد عبر <code>get_provider_for_user</code> للموظّفين (الموجة ٣).</p>
+</div>
+
+<div class="card">
+  <h2>💵 ٢) النظام المالي — القيد المزدوج المفروض</h2>
+  <p>كل حدث مالي يُنتِج «قيد يومية» متوازناً. الدالة <code>LedgerService.post_journal</code> ترفض أي قيد غير سليم بالكود نفسه:</p>
+  <div class="eq">Σ Debit (مدين) === Σ Credit (دائن) &nbsp;⟺&nbsp; وإلّا → LedgerImbalanceError</div>
+  <table>
+    <tr><th>القاعدة المفروضة</th><th>الخطأ عند الكسر</th></tr>
+    <tr><td>مجموع المدين = مجموع الدائن</td><td><code>Journal imbalanced: DR=… CR=…</code></td></tr>
+    <tr><td>لا مبالغ سالبة</td><td><code>amounts must be non-negative</code></td></tr>
+    <tr><td>إجمالي القيد > صفر</td><td><code>total must be greater than zero</code></td></tr>
+    <tr><td>لا قيد في فترة محاسبية مقفلة</td><td><code>PeriodLockedError</code></td></tr>
+  </table>
+  <p class="note">هذا يعني أن المال «لا يضيع ولا يُخلَق من العدم» على مستوى الكود — لا على مستوى المراجعة اليدوية فقط. القيود تغذّي تقارير الأرباح والميزان (P&L + trial balance).</p>
+</div>
+
+<div class="card">
+  <h2>🔄 ٣) آلة حالة الطلب (~٤٠ حالة)</h2>
+  <p>الطلب لا «يقفز» بين الحالات؛ كل انتقال مسموح مُعرَّف صراحةً في <code>state_transitions.py</code>. مثال المسار السعيد:</p>
+  <div class="flow">
+    <span class="step">PENDING_PAYMENT / SCHEDULED</span><span class="arrow">←</span>
+    <span class="step">AWAITING_PROVIDER_ACCEPTANCE</span><span class="arrow">←</span>
+    <span class="step">ACCEPTED_BY_PROVIDER</span><span class="arrow">←</span>
+    <span class="step">IN_PREPARATION</span><span class="arrow">←</span>
+    <span class="step">READY_FOR_PICKUP</span><span class="arrow">←</span>
+    <span class="step">DRIVER_AT_PROVIDER</span><span class="arrow">←</span>
+    <span class="step">PICKED_UP</span><span class="arrow">←</span>
+    <span class="step">EN_ROUTE</span><span class="arrow">←</span>
+    <span class="step">ARRIVED_AT_DESTINATION</span><span class="arrow">←</span>
+    <span class="step">DELIVERED</span>
+  </div>
+  <p class="note">مسارات فرعية: الجدولة (SCHEDULED)، نفاد صنف (PARTIALLY_UNAVAILABLE…SUBSTITUTION)، الفشل (DELIVERY_FAILED / NO_DRIVER_ESCALATION)، النزاع (DISPUTED → RESOLVED_IN_FAVOR_OF_*)، الإرجاع (RETURN_INITIATED → RETURNED). <strong>الإلغاء محصور</strong> بـ <code>CANCELLABLE_STATES</code> (وبعد وصول السائق للمتجر = العمليّات فقط).</p>
+  <p><strong>التحكّم بالتزامن:</strong> كل انتقال محميّ بنسخة متفائلة (optimistic version) — ضغطتان متزامنتان لا تُفسِدان الحالة.</p>
+</div>
+
+<div class="card">
+  <h2>📡 ٤) التوزيع والبثّ اللحظي</h2>
+  <div class="grid">
+    <div>
+      <h3>خوارزمية التوزيع</h3>
+      <p>اختيار أقرب سائق مؤهَّل عبر Redis GEOSEARCH (مع احتياطي haversine دقيق)، نافذة قبول قابلة للضبط، وخوارزمية تجميع طلبات (config-gated، تُفعَّل بعد اختبار الحِمل). بوابات الأهليّة (سقف النقد/الحظر) في المرحلة ٣.</p>
+    </div>
+    <div>
+      <h3>البثّ (SSE) — ٣ قنوات</h3>
+      <p>تتبّع الطلب (per-order) · طابور المتجر (provider) · خريطة الأسطول (fleet). كلها عبر Redis pub/sub + نبضة كل ٣٠ث + مصادقة بتذكرة + ABAC لتصفية الأحداث حسب الدور (المتجر لا يرى موقع السائق).</p>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🔔 ٥) الإشعارات + 🗃️ ٦) الهجرات + 🛡️ ٧) الأمن</h2>
+  <table>
+    <tr><th>النظام</th><th>الحالة المرصودة</th></tr>
+    <tr><td>الإشعارات</td><td>متعدّد القنوات: FCM v1 (push) · SMS · بريد · داخل التطبيق. <strong>fail-open</strong> — فشل الإشعار لا يُعطّل العملية الأساسية (التوزيع/الطلب). قوالب من قاعدة البيانات مع احتياطي.</td></tr>
+    <tr><td>هجرات قاعدة البيانات</td><td><strong>١٥١ هجرة بسلسلة واحدة ورأس واحد</strong> (<code>ab01_wave0_cash_exc_open_uq</code> — هجرة الموجة ٠ من هذه الجلسة). لا رؤوس متعدّدة (لا تعارض). كل هجرات الجلسة مُتحقَّق منها صعوداً ونزولاً على PostgreSQL.</td></tr>
+    <tr><td>الأمن</td><td>إبطال رمز فوري + خمول، تطبيع الإدخال، حدود معدّل (rate limiting)، رؤوس أمان (CSP/Permissions-Policy)، سياج جغرافي مضادّ للتزوير (المرحلة ٣)، عزل المتاجر (المرحلة ٢)، FIN-COR (المرحلة ٤).</td></tr>
+  </table>
+  <div class="kpi">
+    <div><b>١٥١</b>هجرة · رأس واحد</div>
+    <div><b>DR=CR</b>قيد مفروض بالكود</div>
+    <div><b>~٤٠</b>حالة طلب مضبوطة</div>
+    <div><b>fail-open</b>الإشعارات لا تُعطّل</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>🔭 ملاحظات وملاحظات دقّة</h2>
+  <table>
+    <tr><th>#</th><th>الملاحظة</th><th>التقييم</th></tr>
+    <tr><td>C5-OBS-01</td><td>القيد المزدوج مفروض بالكود (DR=CR + لا سالب + قفل فترة) — سلامة مالية على مستوى المحرّك لا المراجعة.</td><td><span class="sev s-ok">قوّة حرجة</span></td></tr>
+    <tr><td>C5-OBS-02</td><td>آلة حالة صريحة + نسخة متفائلة — لا قفزات حالة ولا تلف عند التزامن.</td><td><span class="sev s-ok">قوّة</span></td></tr>
+    <tr><td>C5-OBS-03</td><td>إبطال الرمز الفوري + انتهاء الخمول على الخادم (لا يُلتَفّ عليه من العميل).</td><td><span class="sev s-ok">قوّة</span></td></tr>
+    <tr><td>C5-OBS-04</td><td>هجرة واحدة برأس واحد عبر ١٥١ ملفاً — انضباط ممتاز يمنع تعارض المخطّطات.</td><td><span class="sev s-ok">قوّة</span></td></tr>
+    <tr><td>C5-OBS-05</td><td>الإشعارات fail-open: صحيح (لا تُسقِط الطلب)، لكنه يعني أن فشل إشعار قد يمرّ صامتاً — يُنصَح بلوحة مراقبة لمعدّل فشل التسليم (مُعالَج جزئياً عبر سجلّات التسليم).</td><td><span class="sev s-info">معلومة</span></td></tr>
+    <tr><td>C5-OBS-06</td><td>تطابق صلاحيات الواجهة/الخادم يحتاج حراسة مستمرة عند كل صفحة جديدة (دَين صيانة، لا خلل حالي).</td><td><span class="sev s-low">منخفض</span></td></tr>
+  </table>
+</div>
+
+<footer>
+  تقرير تتبّع منصّة تووا — المرحلة ٥ من ٥ (الأنظمة الشاملة) · ٢٩ يونيو ٢٠٢٦<br>
+  مبني على: <code>jwt_service.py</code> · <code>ledger_service.py</code> · <code>state_transitions.py</code> · <code>sse/*</code> · alembic (١٥١ هجرة)<br>
+  ⬅ يليه: التقرير النهائي المجمّع (المراحل ١–٥ في ملفّ واحد)
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خريطة تنفيذية دقيقة — فحص عميق بالكود + أبحاث تقنية حديثة</title>
+<style>
+  :root{
+    --bg:#eef1ec; --bg-raised:#ffffff; --bg-sunken:#e4e8e1;
+    --ink:#171f26; --ink-muted:#52606b; --line:rgba(23,31,38,.14);
+    --accent:#1f7a6c; --accent-ink:#0f4e44; --accent-soft:rgba(31,122,108,.10);
+    --good:#2f7d4f; --good-bg:rgba(47,125,79,.12);
+    --bad:#b14428; --bad-bg:rgba(177,68,40,.12);
+    --warn:#a6741c; --warn-bg:rgba(166,116,28,.13);
+    --refer:#5b5fa6; --refer-bg:rgba(91,95,166,.11);
+    --info:#2f6690; --info-bg:rgba(47,102,144,.11);
+    --build:#8a4b9e; --build-bg:rgba(138,75,158,.12);
+    --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Courier New", monospace;
+    --sans: "Segoe UI", "Noto Kufi Arabic", "Dubai", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#10151c; --bg-raised:#161d26; --bg-sunken:#0b0f14;
+      --ink:#e8ebe6; --ink-muted:#9aa7af; --line:rgba(232,235,230,.16);
+      --accent:#57c7b3; --accent-ink:#8fe0d2; --accent-soft:rgba(87,199,179,.14);
+      --good:#4fbf7a; --good-bg:rgba(79,191,122,.14);
+      --bad:#e2704f; --bad-bg:rgba(226,112,79,.16);
+      --warn:#e3b356; --warn-bg:rgba(227,179,86,.16);
+      --refer:#a3a6e8; --refer-bg:rgba(163,166,232,.16);
+      --info:#7fb7e0; --info-bg:rgba(127,183,224,.16);
+      --build:#c48ad6; --build-bg:rgba(196,138,214,.16);
+    }
+  }
+  :root[data-theme="dark"]{ --bg:#10151c; --bg-raised:#161d26; --bg-sunken:#0b0f14; --ink:#e8ebe6; --ink-muted:#9aa7af; --line:rgba(232,235,230,.16); --accent:#57c7b3; --accent-ink:#8fe0d2; --accent-soft:rgba(87,199,179,.14); --good:#4fbf7a; --good-bg:rgba(79,191,122,.14); --bad:#e2704f; --bad-bg:rgba(226,112,79,.16); --warn:#e3b356; --warn-bg:rgba(227,179,86,.16); --refer:#a3a6e8; --refer-bg:rgba(163,166,232,.16); --info:#7fb7e0; --info-bg:rgba(127,183,224,.16); --build:#c48ad6; --build-bg:rgba(196,138,214,.16); }
+  :root[data-theme="light"]{ --bg:#eef1ec; --bg-raised:#ffffff; --bg-sunken:#e4e8e1; --ink:#171f26; --ink-muted:#52606b; --line:rgba(23,31,38,.14); --accent:#1f7a6c; --accent-ink:#0f4e44; --accent-soft:rgba(31,122,108,.10); --good:#2f7d4f; --good-bg:rgba(47,125,79,.12); --bad:#b14428; --bad-bg:rgba(177,68,40,.12); --warn:#a6741c; --warn-bg:rgba(166,116,28,.13); --refer:#5b5fa6; --refer-bg:rgba(91,95,166,.11); --info:#2f6690; --info-bg:rgba(47,102,144,.11); --build:#8a4b9e; --build-bg:rgba(138,75,158,.12); }
+
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .doc{direction:rtl; text-align:right; font-family:var(--sans); background:var(--bg); color:var(--ink); line-height:1.75; font-size:17px; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 1.5rem;}
+  h1,h2,h3,h4{text-wrap:balance; font-weight:800;}
+  p{max-width:76ch; color:var(--ink);}
+  a{color:var(--accent-ink);}
+  code{font-family:var(--mono); font-size:.88em; background:var(--bg-sunken); padding:.05em .4em; border-radius:3px;}
+  .num{font-variant-numeric:tabular-nums; font-family:var(--mono);}
+
+  .masthead{background:linear-gradient(180deg,var(--bg-sunken),var(--bg) 85%); border-bottom:1px solid var(--line); padding:3.2rem 0 2.2rem;}
+  .eyebrow{font-family:var(--mono); font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-ink); font-weight:700; margin:0 0 .9rem;}
+  .title{font-size:2.05rem; line-height:1.2; margin:0 0 .5rem;}
+  .subtitle{font-size:1.06rem; color:var(--ink-muted); margin:0 0 1.5rem; max-width:74ch; font-weight:500;}
+  .meta-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-bottom:1.3rem;}
+  .meta-cell{background:var(--bg-raised); padding:.8rem 1rem;}
+  .meta-k{font-size:.68rem; color:var(--ink-muted); text-transform:uppercase; letter-spacing:.07em; font-family:var(--mono); margin-bottom:.25rem;}
+  .meta-v{font-size:.92rem; font-weight:700;}
+  .verdict-band{display:flex; align-items:center; gap:1.1rem; flex-wrap:wrap; background:var(--accent-soft); border:1px solid var(--accent); border-radius:8px; padding:1rem 1.3rem; margin-top:1.2rem;}
+  .verdict-score{font-family:var(--mono); font-weight:800; font-size:1.35rem; color:var(--accent-ink); line-height:1.25; white-space:nowrap;}
+  .verdict-score small{font-size:.85rem; font-weight:600; color:var(--ink-muted);}
+  .verdict-text{font-size:.94rem; margin:0; max-width:62ch;}
+  .verdict-text b{color:var(--accent-ink);}
+
+  .toc{background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:1.1rem 1.4rem; margin:2rem 0; font-size:.9rem;}
+  .toc h4{margin:0 0 .6rem; font-size:.8rem; text-transform:uppercase; letter-spacing:.07em; color:var(--ink-muted);}
+  .toc ol{columns:2; column-gap:2rem; margin:0; padding-inline-start:1.2rem;}
+  .toc li{break-inside:avoid; margin-bottom:.3rem;}
+  .toc a{text-decoration:none; color:var(--ink);}
+  .toc a:hover{color:var(--accent-ink); text-decoration:underline;}
+
+  section{padding:2.4rem 0;}
+  section + section{border-top:1px solid var(--line);}
+  .sec-head{display:flex; align-items:baseline; gap:.7rem; margin-bottom:.3rem;}
+  .sec-no{font-family:var(--mono); color:var(--accent); font-weight:800;}
+  .sec-title{font-size:1.4rem; margin:0;}
+  .sec-intro{color:var(--ink-muted); margin:.2rem 0 1.4rem; max-width:78ch;}
+  h3.sub{font-size:1.04rem; margin:1.6rem 0 .6rem;}
+  h4.subsub{font-size:.94rem; margin:1.1rem 0 .4rem; color:var(--accent-ink);}
+
+  .tag{display:inline-flex; align-items:center; gap:.3em; padding:.15em .58em; border-radius:4px; font-size:.71rem; font-weight:700; white-space:nowrap;}
+  .chip{display:inline-flex; align-items:center; padding:.16em .6em; border-radius:4px; font-size:.71rem; font-weight:700; white-space:nowrap;}
+  .chip-bad{background:var(--bad-bg); color:var(--bad);}
+  .chip-warn{background:var(--warn-bg); color:var(--warn);}
+  .chip-good{background:var(--good-bg); color:var(--good);}
+  .chip-info{background:var(--info-bg); color:var(--info);}
+  .chip-build{background:var(--build-bg); color:var(--build);}
+  .chip-refer{background:var(--refer-bg); color:var(--refer);}
+
+  .plain{background:var(--accent-soft); border-radius:6px; padding:.85rem 1.1rem; margin:.9rem 0; font-size:.91rem;}
+  .plain b{color:var(--accent-ink);}
+  .plain .lbl{font-family:var(--mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.07em; color:var(--accent-ink); font-weight:800; display:block; margin-bottom:.35rem;}
+  .card{background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:1.25rem 1.4rem; margin-bottom:1rem;}
+  .card-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem;}
+
+  .scroll-x{overflow-x:auto; margin:1rem 0;}
+  table.grid{width:100%; border-collapse:collapse; font-size:.83rem; min-width:640px;}
+  table.grid th, table.grid td{border:1px solid var(--line); padding:.5rem .6rem; text-align:right; vertical-align:top;}
+  table.grid th{background:var(--bg-sunken); font-size:.74rem;}
+  table.grid td:first-child, table.grid th:first-child{font-weight:700;}
+  .mark-yes{color:var(--good); font-weight:800;} .mark-no{color:var(--bad); font-weight:800;} .mark-part{color:var(--warn); font-weight:800;}
+
+  .bars{display:flex; flex-direction:column; gap:.75rem; margin:1.1rem 0;}
+  .bar-row{display:grid; grid-template-columns:190px 1fr 60px; align-items:center; gap:.7rem;}
+  .bar-label{font-size:.85rem;}
+  .bar-track{background:var(--bg-sunken); border-radius:5px; height:9px; overflow:hidden; border:1px solid var(--line);}
+  .bar-fill{height:100%; border-radius:5px 0 0 5px;}
+  .bar-val{font-family:var(--mono); font-size:.82rem; text-align:left; font-weight:700; color:var(--accent-ink);}
+
+  .finding{background:var(--bg-raised); border:1px solid var(--line); border-inline-start:5px solid var(--warn); border-radius:8px; padding:1.15rem 1.35rem; margin-bottom:1.05rem;}
+  .sev-bad{border-inline-start-color:var(--bad) !important;}
+  .sev-info{border-inline-start-color:var(--info) !important;}
+  .sev-good{border-inline-start-color:var(--good) !important;}
+  .sev-build{border-inline-start-color:var(--build) !important;}
+  .f-head{display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.5rem;}
+  .f-id{font-family:var(--mono); font-weight:800; color:var(--ink-muted); font-size:.78rem;}
+  .f-title{font-size:.98rem; margin:0; flex:1 1 auto; min-width:200px;}
+  .f-block{margin-top:.7rem;} .f-block h5{margin:0 0 .25rem; font-size:.71rem; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-muted);} .f-block p{margin:0; max-width:none; font-size:.9rem;}
+  .f-block ul{margin:.2rem 0 0; padding-inline-start:1.2rem; font-size:.89rem;}
+  .f-meta{display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.6rem; font-size:.76rem; color:var(--ink-muted);}
+  .f-meta span{background:var(--bg-sunken); border-radius:4px; padding:.15em .55em;}
+
+  .state-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:.9rem; margin:1rem 0;}
+  @media(max-width:640px){.state-grid{grid-template-columns:1fr;}}
+  .state-box{border-radius:7px; padding:1rem 1.1rem;}
+  .state-box.defined{border:2px solid var(--good); background:var(--good-bg);}
+  .state-box.undefined{border:2px dashed var(--bad); background:var(--bad-bg);}
+  .state-box.mixed{border:2px dashed var(--warn); background:var(--warn-bg);}
+  .state-box h5{margin:0 0 .5rem; font-size:.92rem;}
+  .state-box ul{margin:0; padding-inline-start:1.1rem; font-size:.85rem;}
+  .state-box li{margin-bottom:.35rem;}
+
+  .phase{background:var(--bg-raised); border:1px solid var(--line); border-radius:10px; margin-bottom:1.1rem; overflow:hidden;}
+  .phase-head{display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; padding:.9rem 1.2rem; background:var(--bg-sunken); border-bottom:1px solid var(--line);}
+  .phase-no{font-family:var(--mono); font-weight:800; color:var(--accent-ink); font-size:1rem; background:var(--accent-soft); border-radius:50%; width:2rem; height:2rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .phase-title{font-size:1.02rem; margin:0; flex:1 1 auto;}
+  .phase-hours{font-family:var(--mono); font-size:.82rem; font-weight:800; color:var(--accent-ink); white-space:nowrap;}
+  .phase-body{padding:1rem 1.2rem;}
+  .phase-body ul{margin:0; padding-inline-start:1.2rem; font-size:.9rem;}
+  .phase-body li{margin-bottom:.5rem;}
+  .phase-body li b{color:var(--ink);}
+
+  footer{padding:2.5rem 0 4rem; text-align:center; color:var(--ink-muted); font-size:.82rem;}
+  details.domain{margin-bottom:.7rem;}
+  details.domain > summary{cursor:pointer; list-style:none; display:flex; align-items:center; gap:.6rem; background:var(--bg-raised); border:1px solid var(--line); border-radius:8px; padding:.75rem 1.1rem; font-weight:700; font-size:.94rem;}
+  details.domain > summary::-webkit-details-marker{display:none;}
+  details.domain > summary::before{content:"▸"; color:var(--accent); transition:transform .15s;}
+  details.domain[open] > summary::before{transform:rotate(90deg);}
+  details.domain[open] > summary{border-bottom-left-radius:0; border-bottom-right-radius:0;}
+  details.domain .domain-body{border:1px solid var(--line); border-top:none; border-radius:0 0 8px 8px; padding:1.1rem 1.3rem; background:var(--bg-sunken);}
+  .domain-count{margin-inline-start:auto; font-family:var(--mono); font-size:.76rem; color:var(--ink-muted); font-weight:600;}
+</style>
+</head>
+<body>
+<div class="doc">
+
+<div class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">تووا · فحص عميق بالكود + خريطة تنفيذية + أبحاث تقنية حديثة</p>
+    <h1 class="title">من نتائج الاختبار الحيّ إلى خريطة تنفيذ دقيقة — كل نتيجة أُعيد فحصها بالكود مباشرة</h1>
+    <p class="subtitle">هذا التقرير لا يعيد سرد تقرير 555 — بل يعود لكل نتيجة من الـ26 فيه، يتحقّق منها بقراءة الكود الفعليّ سطرًا سطرًا، يصحّح ما كان غير دقيقًا فيها، ثم يبني خريطة تنفيذية مرتّبة بالأولوية: أين إصلاح صغير، أين بناء مكوّن جديد، وأين يجب انتظار قرارك أوّلًا.</p>
+    <div class="meta-grid">
+      <div class="meta-cell"><div class="meta-k">التاريخ</div><div class="meta-v">2026-07-24</div></div>
+      <div class="meta-cell"><div class="meta-k">وكلاء الفحص العميق</div><div class="meta-v num">4</div></div>
+      <div class="meta-cell"><div class="meta-k">وكلاء البحث التقني</div><div class="meta-v num">2</div></div>
+      <div class="meta-cell"><div class="meta-k">استدعاءات أدوات فعليّة</div><div class="meta-v num">293</div></div>
+      <div class="meta-cell"><div class="meta-k">نتائج مُعاد فحصها</div><div class="meta-v num">26</div></div>
+      <div class="meta-cell"><div class="meta-k">نتائج إضافية اكتُشِفت</div><div class="meta-v num">6</div></div>
+      <div class="meta-cell"><div class="meta-k">ساعات التنفيذ المقدَّرة</div><div class="meta-v num">~68-90</div></div>
+      <div class="meta-cell"><div class="meta-k">مراحل الخطّة</div><div class="meta-v num">7</div></div>
+    </div>
+    <div class="verdict-band">
+      <div class="verdict-score">26 نتيجة صُحِّحت بدقّة<br><small>4 منها تبيّن أنّها أخفّ أو أبسط ممّا ظُنّ</small></div>
+      <p class="verdict-text">الفحص العميق أكّد معظم نتائج تقرير 555، لكنّه أيضًا <b>صحّح</b> عدّة نقاط مهمّة: نتيجة F-01 (كود الخصم) مُصلَحة فعلًا ومدموجة في master؛ نتيجة F-02 (إفراغ السلّة) <b>لم تتكرّر</b> في قراءة الكود — الكود سليم ظاهريًّا؛ نظام تتبّع الطلب الحيّ (SSE) أكمل بنيةً ممّا ظُنّ — الفجوة الفعليّة هي نطاق تفعيل ضيّق فقط، لا إعادة بناء. كل هذا موثَّق أدناه بدقّة سطر-بسطر.</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h4>محتويات التقرير</h4>
+  <ol>
+    <li><a href="#s0">ملخّص بلغة بسيطة</a></li>
+    <li><a href="#s1">المنهجيّة والتصحيحات المهمّة</a></li>
+    <li><a href="#s2">لوحة القيادة: التوزيع والحالة</a></li>
+    <li><a href="#s3">سجلّ الإصلاحات — الهويّة والحساب</a></li>
+    <li><a href="#s4">سجلّ الإصلاحات — التصفّح والطلب</a></li>
+    <li><a href="#s5">سجلّ الإصلاحات — دورة حياة الطلب</a></li>
+    <li><a href="#s6">سجلّ الإصلاحات — المحفظة والولاء</a></li>
+    <li><a href="#s7">أنماط معماريّة متقاطعة</a></li>
+    <li><a href="#s8">أبحاث التقنيات الحديثة (2025-2026)</a></li>
+    <li><a href="#s9">قرار مسجَّل: الرياكت حصريًّا، لا فلَتر</a></li>
+    <li><a href="#s10">الخريطة التنفيذية — 7 مراحل</a></li>
+  </ol>
+</nav>
+
+<section id="s0">
+  <div class="sec-head"><span class="sec-no">00</span><h2 class="sec-title">ملخّص بلغة بسيطة</h2></div>
+  <div class="plain">
+    <span class="lbl">ماذا فعلنا</span>
+    طلبتَ فحصًا عميقًا جدًّا للكود بناءً على تقرير الاختبار الحيّ السابق (555)، ثم خطّة تنفيذ دقيقة، مع بحث في أحدث التقنيات العالميّة. نفّذنا ذلك عبر 4 "وكلاء" فحص مستقلّين — كلٌّ منهم أعاد قراءة الكود الحقيقيّ لمجموعة من النتائج (لا الاعتماد على التقرير القديم كمصدر وحيد)، مع تتبّع كل سطر إلى مصدره الفعليّ. بالتوازي، وكيلان آخران بحثا في الإنترنت عن أحدث الحلول العالميّة (2025-2026) لمشاكل مشابهة: الترجمة، التتبّع الحيّ، أكواد الخصم، توثيق السائقين، وحلّ النزاعات.
+  </div>
+  <div class="plain">
+    <span class="lbl">أهمّ ما تغيّر عن التقرير السابق</span>
+    الفحص العميق لم يكن مجرّد "تأكيد" — بل صحّح أمورًا حقيقيّة: بعض النتائج تبيّن أنّها أخفّ ممّا ظُنّ (مثل نظام التتبّع الحيّ، الذي تبيّن أنّه مبنيّ بالكامل تقريبًا، والفجوة فقط في "نطاق تفعيله" لا إعادة بنائه)، وبعضها أعمق ممّا ظُنّ (خطأ رسائل اللغة العربيّة موجود في 65 موضعًا لا 43)، وواحدة لم تتكرّر إطلاقًا عند قراءة الكود (زرّ إفراغ السلّة يبدو سليمًا في الكود — قد تحتاج إعادة اختبار حيّ لا إصلاح كود).
+  </div>
+  <div class="plain">
+    <span class="lbl">ما التالي</span>
+    قسم "الخريطة التنفيذية" في نهاية هذا التقرير (§10) يرتّب كل هذا في 7 مراحل عمليّة: إصلاحات سريعة أوّلًا، ثم إصلاحات أكبر، ثم بناء مكوّنات جديدة تمنع تكرار نفس نمط الخطأ مستقبلًا، ثم بنود تحتاج موافقتك الصريحة قبل تنفيذها، ثم بنود تحتاج إعادة اختبار حيّ قبل الحكم عليها.
+  </div>
+</section>
+
+<section id="s1">
+  <div class="sec-head"><span class="sec-no">01</span><h2 class="sec-title">المنهجيّة والتصحيحات المهمّة</h2></div>
+  <p class="sec-intro">كل ادّعاء أدناه مبنيّ على قراءة كود مباشرة (اسم ملفّ + رقم سطر)، لا استنتاجًا من تقرير سابق.</p>
+  <div class="card-grid">
+    <div class="card">
+      <h4 style="margin-top:0">4 وكلاء فحص كود، بالتوازي</h4>
+      <p style="font-size:.9rem">كلٌّ منهم أُعطي نصّ النتيجة الأصليّة كاملًا من تقرير 555، وطُلِب منه العودة للكود مباشرة: تأكيد وجودها، رقم السطر الدقيق، تتبّع السبب الجذريّ الكامل، واقتراح إصلاح دقيق — مع تصنيف صريح: هل هذا "إصلاح" في كود موجود أم "بناء" لمكوّن/آليّة جديدة.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">2 وكلاء بحث تقنيّ، بالتوازي</h4>
+      <p style="font-size:.9rem">بحثا فعليًّا في الإنترنت (لا معرفة مُدرَّبة سابقًا فقط) عن حلول 2025-2026 حقيقيّة قابلة للتبنّي — أدوات مسمّاة، لا نصائح عامّة — لمشاكل الترجمة، التتبّع الحيّ، أكواد الخصم، توثيق السائقين، وواجهة حلّ النزاعات.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">تصحيح تشغيليّ اكتُشِف أثناء الفحص</h4>
+      <p style="font-size:.9rem">فرع الإصلاح <code>fix/promo-code-silent-failure-r555</code> كان لا يزال محرَّرًا محليًّا رغم دمجه على GitHub — <code>master</code> المحليّ كان متأخّرًا بمرحلتين. تمّ اكتشاف هذا أثناء تدقيق مجال "التصفّح والطلب"، وأُصلِح فورًا (<code>git fetch</code> + <code>fast-forward</code>) — <code>master</code> المحليّ الآن مطابق تمامًا لـ<code>origin/master</code> (commit <code>2e96594</code>).</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">لا اختراع، لا تخمين</h4>
+      <p style="font-size:.9rem">حيث لم يستطع وكيل تأكيد نتيجة (مثل F-02 وF-26)، قال ذلك صراحة بدل اختلاق سبب جذريّ غير موجود. هذا موثَّق بوضوح في كل بطاقة نتيجة أدناه عبر وسم "الحالة".</p>
+    </div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="sec-head"><span class="sec-no">02</span><h2 class="sec-title">لوحة القيادة: التوزيع والحالة</h2></div>
+  <div class="bars">
+    <div class="bar-row"><span class="bar-label">مؤكَّدة كما هي</span><div class="bar-track"><div class="bar-fill" style="width:65%; background:var(--warn)"></div></div><span class="bar-val">19</span></div>
+    <div class="bar-row"><span class="bar-label">مؤكَّدة لكن مصحَّحة</span><div class="bar-track"><div class="bar-fill" style="width:31%; background:var(--info)"></div></div><span class="bar-val">9</span></div>
+    <div class="bar-row"><span class="bar-label">مُصلَحة بالفعل</span><div class="bar-track"><div class="bar-fill" style="width:3%; background:var(--good)"></div></div><span class="bar-val">1</span></div>
+    <div class="bar-row"><span class="bar-label">لم تتكرّر بالكود</span><div class="bar-track"><div class="bar-fill" style="width:6%; background:var(--bad)"></div></div><span class="bar-val">2</span></div>
+    <div class="bar-row"><span class="bar-label">نتائج إضافية جديدة</span><div class="bar-track"><div class="bar-fill" style="width:19%; background:var(--build)"></div></div><span class="bar-val">6</span></div>
+  </div>
+  <div class="scroll-x"><table class="grid">
+    <thead><tr><th>المجال</th><th>نتائج مؤكَّدة</th><th>إصلاح (Fix)</th><th>بناء (Build)</th><th>يحتاج موافقة</th><th>يحتاج فحصًا حيًّا</th><th>الساعات المقدَّرة</th></tr></thead>
+    <tbody>
+      <tr><td>الهويّة والحساب</td><td class="num">12+1إضافي</td><td class="num">11</td><td class="num">1 (المُصادِق الخامس)</td><td class="num">2</td><td class="num">0</td><td class="num">~27-35</td></tr>
+      <tr><td>التصفّح والطلب</td><td class="num">6</td><td class="num">5</td><td class="num">1</td><td class="num">0</td><td class="num">1</td><td class="num">~7-11</td></tr>
+      <tr><td>دورة حياة الطلب</td><td class="num">7+1إضافي</td><td class="num">6</td><td class="num">2</td><td class="num">0</td><td class="num">1</td><td class="num">~10-15</td></tr>
+      <tr><td>المحفظة والولاء</td><td class="num">2</td><td class="num">2</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">~1-3</td></tr>
+    </tbody>
+  </table></div>
+  <p style="font-size:.85rem; color:var(--ink-muted)">"يحتاج فحصًا حيًّا" = نتيجة لم يستطع الفحص الساكن للكود تأكيدها أو نفيها (F-02، F-26)، ولا نظام التتبّع الحيّ على الإنتاج فعليًّا — القراءة الساكنة للكود لا تكفي وحدها للحكم عليها.</p>
+</section>
+
+<section id="s3">
+  <div class="sec-head"><span class="sec-no">03</span><h2 class="sec-title">سجلّ الإصلاحات — الهويّة والحساب</h2></div>
+  <p class="sec-intro">12 نتيجة أصليّة + نتيجة إضافيّة (F-03ب) + فجوة بنيويّة في منظومة اختبارات الترجمة (المُصادِق الخامس).</p>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية</span><span class="f-id">F-03</span><h4 class="f-title">رسائل الخلفيّة تُفضِّل العربيّة دائمًا — العدد الفعليّ 65 موضعًا في 29 ملفًّا، لا 43</h4></div>
+    <div class="f-block"><h5>بلغة بسيطة</h5><p>هذه المشكلة أوسع ممّا ظُنّ. تأكيد دقيق بالـ<code>grep</code>: <code>web/src/hooks/useFieldErrors.ts</code>، <code>LoginPage.tsx</code>، <code>AddressBook.tsx</code>، <code>RegistrationPage.tsx</code>، <code>PhoneLookupPage.tsx</code>، <code>ForgotPasswordPage.tsx</code>، <code>CartGroupCheckoutPage.tsx</code>، وغيرها.</p></div>
+    <div class="f-block"><h5>الإصلاح الدقيق</h5><p>يوجد نمط صحيح جاهز فعلًا في <code>web/src/components/ErrorMessage.tsx:9-11</code> (<code>i18n.language.startsWith("ar") ? message_ar : message_en</code>) لكنّه غير مُستخدَم في أغلب الـ65 موضعًا. الحلّ: استخراج هذا المنطق إلى دالّة مشتركة <code>resolveErrorMessage()</code> في <code>api/client.ts</code>، ثمّ استبدال كل الاستدعاءات الـ65 بها. <code>useFieldErrors.ts</code> يحتاج معاملة خاصّة (hook لا مكوّن) يتقبّل اللغة كوسيط.</p></div>
+    <div class="f-block"><h5>نتيجة إضافيّة مرتبطة</h5><p><b>F-03ب</b>: <code>useFieldErrors.ts</code> نفسه يحوي <code>translatePydanticMessage()</code> يُنتِج نصوصًا عربيّة ثابتة لأخطاء التحقّق 422 (اسم مستخدم/كلمة مرور/بريد/هاتف) — نمط مختلف بنيويًّا عن مشكلة F-03 (لا يعتمد على envelope إطلاقًا)، يؤثّر على نفس نماذج التسجيل/نسيان كلمة المرور، ويحتاج إصلاحًا منفصلًا.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>4-6 ساعات</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-07</span><h4 class="f-title">أداة اختيار الموقع (LocationPicker) — السبب الحقيقيّ مختلف: مفاتيح ترجمة مفقودة، لا نصّ ثابت</h4></div>
+    <div class="f-block"><h5>تصحيح</h5><p>الكود نفسه <b>يستخدم</b> <code>t()</code> بشكل صحيح في كل مكان — المشكلة أنّ كل مفاتيح <code>location.*</code> (نحو 15 مفتاحًا) غائبة تمامًا من ملفّات الترجمة الثلاثة، فيسقط النظام دومًا إلى النصّ العربيّ الاحتياطيّ، حتى في العربيّة نفسها (بالصدفة لا بالترجمة الحقيقيّة).</p></div>
+    <div class="f-block"><h5>الإصلاح</h5><p>إضافة ~15 مفتاح <code>location.*</code> الناقصة لملفّات ar/en/fr.json فقط — لا تغيير كود مطلوب.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>~2 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-08</span><h4 class="f-title">فشل صامت لتحديد العنوان من الخريطة — <code>.catch(() => {})</code> فارغ تمامًا</h4></div>
+    <div class="f-block"><p>الخلفيّة (<code>geo_router.py</code>) تفشل عمدًا (تصميم موثَّق) عندما لا يوجد Nominatim مُفعَّل. لكن الواجهة (<code>LocationPicker.tsx:139</code>) تبتلع الخطأ 404 كليًّا بلا أي رسالة. الإصلاح: عرض تنبيه بسيط "تعذّر تحديد العنوان تلقائيًّا — أدخله يدويًّا" في نفس الـ<code>catch</code>.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>~1 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-09</span><h4 class="f-title">لا تحقّق من صيغة الهاتف عند التسجيل — التحقّق الوحيد هو <code>.strip()</code></h4></div>
+    <div class="f-block"><p>مؤكَّد: <code>RegisterBody.phone_strip</code> (<code>registration_router.py:325-328</code>) لا يفعل شيئًا سوى إزالة الفراغات، بعكس محقِّقَي البريد واسم المستخدم في نفس الكلاس اللذين يستخدمان تعابير نمطيّة حقيقيّة. الإصلاح: محقِّق حقيقيّ يتحقّق من الصيغة الليبيّة (<code>+218</code> + 9 أرقام)، مع الانتباه لعدم كسر رقم الهاتف الوهميّ <code>+000...</code> المُستخدَم للعملاء بلا هاتف.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>2-3 ساعات</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-10</span><h4 class="f-title">إخفاء الهاتف عند حذف الحساب يكشف الرقم بالكامل للأرقام القصيرة</h4></div>
+    <div class="f-block"><p>مؤكَّد بدقّة: <code>account_deletion_router.py:146</code> يأخذ أوّل 5 خانات مهما كان طول الرقم — للرقم القصير هذا يعني كشفًا كاملًا. النمط الآمن موجود فعلًا في <code>auth_router.py:645</code> (كشف آخر 4 خانات فقط). الإصلاح: استخدام نفس النمط الآمن (ويُفضَّل توحيدهما في <code>pii_masking.py</code> الموجود مسبقًا).</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>1-1.5 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-good">
+    <div class="f-head"><span class="chip chip-good">إصلاح رخيص</span><span class="f-id">F-11</span><h4 class="f-title">لا شارة إشعارات على الجرس — كل البنية التحتيّة جاهزة، فقط لم تُربَط</h4></div>
+    <div class="f-block"><p>الـAPI الخلفيّ (<code>GET /notifications/unread-count</code>) موجود ومُختبَر، ودالّة العميل (<code>notificationsApi.unreadCount()</code>) موجودة، ونمط استخدام حيّ يعمل بالفعل في <code>NotificationInbox.tsx:220-222</code>. المطلوب فقط: نسخ نفس نمط <code>useQuery</code> إلى <code>Layout.tsx</code> وعرض شارة كما تُعرَض شارة السلّة المجاورة تمامًا.</p></div>
+    <div class="f-meta"><span>إصلاح رخيص جدًّا</span><span>1-2 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-12</span><h4 class="f-title">مفتاح اللغة السريع لا يحفظ على الحساب</h4></div>
+    <div class="f-block"><p>مؤكَّد: <code>Layout.tsx:56-61</code>'s <code>switchLang()</code> يُغيّر i18next فقط (يبقى محفوظًا محليًّا عبر localStorage لكن لا يُزامَن مع الخادم). الإصلاح: إضافة استدعاء <code>localeApi.set(next)</code> (غير حاجب) داخل نفس الدالّة.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>~1 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-13</span><h4 class="f-title">كتل نصّية غير مُترجَمة — 7 من 8 نقاط مؤكَّدة، ونقطة واحدة تصحيح: مصفوفة الإشعارات مُترجَمة فعلًا</h4></div>
+    <div class="f-block"><h5>تصحيح مهمّ</h5><p>مصفوفة تفضيلات الإشعارات (<code>NotificationPreferences.tsx</code>/<code>CategoryPushPreferences.tsx</code>) في مسار العميل <b>مُترجَمة بالفعل بشكل صحيح</b> — تأكَّد وجود كل المفاتيح في الملفّات الثلاثة. هذا يناقض تقرير 555 لهذه النقطة تحديدًا (لم يُفحَص مسار السائق المشابه).</p></div>
+    <div class="f-block"><h5>المؤكَّد فعليًّا (7 نقاط)</h5><ul>
+      <li><code>PasswordInput.tsx:147-148</code> — نصّ ثابت حرفيًّا، لا <code>t()</code> إطلاقًا (يظهر بكل حقل كلمة مرور بالتطبيق)</li>
+      <li>قسم اسم الظهور بالإعدادات — 6 مفاتيح <code>customer.*</code> غائبة من الملفّات الثلاثة</li>
+      <li>مشاركة الموقع الحيّ — مفتاح واحد غائب (رغم وجود مفتاح مشابه بجانبه!)</li>
+      <li>قائمة المحظورين — مفتاحان غائبان</li>
+      <li>دفتر العناوين — 7 مفاتيح غائبة بالكامل (الشارة الافتراضيّة، رمز الموقع، حوار الحذف)</li>
+      <li>مركز الشؤون القانونيّة — كل الـ12 مفتاحًا لواجهة الصفحة غائبة (المحتوى نفسه سليم)</li>
+      <li><code>LocaleSettings.tsx</code> — 3 نصوص ثابتة حرفيًّا (بما فيها زرّ "حفظ" نفسه!)</li>
+    </ul></div>
+    <div class="f-meta"><span>إصلاح</span><span>6-8 ساعات</span><span>ثقة: عالية (7/8)، تصحيح صريح لنقطة واحدة</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-19</span><h4 class="f-title">ملفّ الخطّ العربيّ تالف بالكامل — لا نسخة بديلة صالحة في المستودع كلّه</h4></div>
+    <div class="f-block"><p>تأكَّد بايتيًّا: 48,840 بايت صفريّة تمامًا، بلا رأس <code>wOF2</code> صالح. بحث شامل في المستودع كلّه (<code>node_modules</code>، النسخ الاحتياطيّة، أرشيف الـzip، تطبيقات الجوّال) <b>لم يجد أي نسخة بديلة صالحة محليًّا</b> — يجب جلب الخطّ الصحيح (Noto Sans Arabic Variable) من مصدره الرسميّ (Google Fonts) مطابقًا لنطاق الوزن 400-700 المُعلَن في <code>@font-face</code>.</p></div>
+    <div class="f-meta"><span>إصلاح (يحتاج مصدرًا خارجيًّا)</span><span>0.5-1 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة</span><span class="f-id">F-22</span><h4 class="f-title">ترجمة الصفحة الرئيسيّة المكسورة — السبب الجذريّ في ملفّ الترجمة نفسه، لا الكود فقط</h4></div>
+    <div class="f-block"><h5>تصحيح دقيق</h5><p>الجملة نفسها مقطوعة منتصف الكلمة داخل <code>ar.json:3296</code> نفسه (لا فقط في الـdefaultValue بالكود)، ثمّ نصّ عربيّ خام يُلحَق خارج <code>t()</code> في JSX — وهذا النصّ الخام يظهر في <b>كل لغة</b> (حتى الإنجليزيّة تنتهي بذيل عربيّ غريب). الإصلاح: إكمال الجملة كاملة في الملفّات الثلاثة كنصّ واحد، وحذف السطر الملحق من JSX نهائيًّا.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>~0.5 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة</span><span class="f-id">F-23</span><h4 class="f-title">عكس <code>aria-pressed</code> على زرّ الوضع الداكن — مُكرَّر في 3 ملفّات، لا واحد</h4></div>
+    <div class="f-block"><p>نفس العلّة حرفيًّا موجودة أيضًا في <code>DriverSettings.tsx:441-446</code> و<code>ProviderSettings.tsx:1221-1226</code>. الإصلاح الأدقّ (وسم الحالة لا الفعل) يُغيِّر نصّ الزرّ المرئيّ — وهذا يستوجب <b>موافقة صريحة</b> قبل التنفيذ حسب سياسة المشروع (لا تغيير نصوص مرئيّة دون طلب صريح).</p></div>
+    <div class="f-meta"><span>إصلاح — يحتاج موافقة (تغيير نصّ مرئيّ)</span><span>~1 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة، كود ميت</span><span class="f-id">F-24</span><h4 class="f-title"><code>default_address_id</code> عمود ميت فعليًّا — لكن حذفه يعبر منطقة ممنوعة (alembic)</h4></div>
+    <div class="f-block"><p>مؤكَّد ميت تمامًا (لا قارئ حقيقيّ آخر). حذفه يحتاج هجرة Alembic — وهي منطقة ممنوعة التعديل صراحة في <code>CLAUDE.md</code> بلا إذن تشغيليّ صريح.</p></div>
+    <div class="f-meta"><span>إصلاح/حذف — يحتاج إذنًا (منطقة ممنوعة)</span><span>~2 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-build">
+    <div class="f-head"><span class="chip chip-build">فجوة بنيويّة</span><span class="f-id">مُصادِق-5</span><h4 class="f-title">اختبارات i18n الأربعة الحاليّة لا تكتشف "مفتاح <code>t()</code> غير موجود بأي ملفّ" — وهذا هو السبب الحقيقيّ خلف أغلب F-07/F-13</h4></div>
+    <div class="f-block"><p>فُحِصت الاختبارات الأربعة الموجودة سطرًا بسطر: اثنان يكتشفان فقط نصًّا عربيًّا/أجنبيًّا حرفيًّا <b>خارج</b> <code>t()</code> — أي مفتاح داخل <code>t()</code> غير مرئيّ لهما بتصميمهما. اختبار التطابق يتحقّق فقط أنّ الملفّات الثلاثة متطابقة المفاتيح فيما بينها — مفتاح غائب من الثلاثة معًا (∅=∅=∅) ينجح بلا مشكلة! المطلوب: مُصادِق خامس يفحص كل استدعاء <code>t("...")</code> فعليًّا في الشجرة ويتأكّد من وجوده في الملفّات، بنفس نمط الجزء الموجود مسبقًا بـ<code>nav-keys-present.test.ts</code> لكن مُعمَّمًا على الشجرة كاملة (مع لقطة تراكميّة "grandfathering" كي لا يفشل فورًا على الرصيد الحاليّ).</p></div>
+    <div class="f-meta"><span>بناء (اختبار جديد)</span><span>4-6 ساعات</span><span>ثقة: عالية</span></div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="sec-head"><span class="sec-no">04</span><h2 class="sec-title">سجلّ الإصلاحات — التصفّح والطلب</h2></div>
+  <p class="sec-intro">تأكيد إصلاح F-01 + 5 نتائج، إحداها لم تتكرّر بالكود.</p>
+
+  <div class="finding sev-good">
+    <div class="f-head"><span class="chip chip-good">مُصلَحة ✓</span><span class="f-id">F-01</span><h4 class="f-title">كود الخصم الصامت — الإصلاح مؤكَّد صحيحًا ومدموجًا في master، لكن بقيت فجوة واحدة تستحقّ الإغلاق</h4></div>
+    <div class="f-block"><h5>تأكيد</h5><p>كل من <code>promotions_service.py</code>، <code>order_service.py::quote_promotion</code>، <code>CheckoutPage.tsx</code>، وملفّات الترجمة الثلاثة — قُرِئت مباشرة وتأكَّدت صحيحة تمامًا، مدموجة فعليًّا في <code>master</code> (commit <code>2e96594</code>، تأكَّد بعد مزامنة الفرع المحليّ).</p></div>
+    <div class="f-block"><h5>فجوة متبقّية تستحقّ الإغلاق</h5><p><b>خصم ناجح (سواء تلقائيّ أو بكود صحيح) يختفي تمامًا بعد إتمام الطلب</b> — لا <code>discount_minor</code> ولا <code>promotion_id</code> يظهران في استجابة قائمة/تفاصيل الطلب (<code>OrderSummary</code>/<code>_serialize_order</code>) رغم وجودهما فعليًّا على صفّ الطلب في قاعدة البيانات. عميل خُصِم له لا يرى "وفّرتَ X" في أي مكان بعد الشراء. هذه فجوة تجربة حقيقيّة تستحقّ الإغلاق (خلافًا لحالة الكود الفاشل بعد الطلب، وهي أولويّة منخفضة عمدًا لأنّ المعاينة تشرح السبب أصلًا قبل الإرسال).</p></div>
+    <div class="f-meta"><span>إصلاح إضافيّ (فجوة جديدة)</span><span>2-3 ساعات</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية — لم تتكرّر بالكود</span><span class="f-id">F-02</span><h4 class="f-title">زرّ "إفراغ السلّة" — الكود الساكن يبدو سليمًا تمامًا؛ يحتاج إعادة اختبار حيّ لا إصلاح كود</h4></div>
+    <div class="f-block"><p>تتبُّع كامل لـ<code>CartPage.tsx</code> و<code>CartContext.tsx</code> يُظهِر تدفّقًا صحيحًا تمامًا: الزرّ يُفعِّل حالة تأكيد، التأكيد يستدعي دالّة المسح الصحيحة، الـreducer يُصفِّر الحالة بشكل صحيح، والحفظ في localStorage يعمل. الكود لم يتغيّر منذ commit إصلاح سابق (2026-07-10) يسبق تاريخ اكتشاف هذا العيب حيًّا. <b>التوصية: لا تُصلِح كودًا يبدو سليمًا — أعِد الاختبار الحيّ أوّلًا</b> (قد تكون مشكلة تزامن/hydration عابرة، أو خطأ في تحديد أي زرّ بالضبط تمّ اختباره).</p></div>
+    <div class="f-meta"><span>يحتاج فحصًا حيًّا أوّلًا</span><span>—</span><span>ثقة: متوسّطة (الكود سليم، السبب الحقيقيّ غير مؤكَّد)</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-14</span><h4 class="f-title">عنصر بمتغيّر مؤرشَف يظهر بسعر صفر — ولا يوجد فحص "قابليّة شراء" مشترك في 4 مواضع مختلفة</h4></div>
+    <div class="f-block"><h5>السبب الجذريّ الدقيق</h5><p><code>catalog_router.py::_price()</code> تُعيد <code>None</code> عند غياب متغيّر نشِط، لكن العنصر لا يُستبعَد من القائمة — التصفية على السعر مفقودة، لا على وجود المتغيّر.</p></div>
+    <div class="f-block"><h5>سؤال البنية المطروح صراحةً — الجواب: لا يوجد فحص موحَّد</h5><p>وُجِدت 4 تطبيقات مستقلّة متباينة لنفس فكرة "هل هذا العنصر قابل للشراء": قائمة الكتالوج، <code>order_service.py::_representative_price_minor</code>، <code>catalog_service.py::get_item_with_availability</code>، والفحص الداخليّ بواجهة تفاصيل المزوّد. الخلفيّة تصدّ الطلب في النهاية بشكل صحيح (422)، لكن بعد فوات الأوان بصريًّا.</p></div>
+    <div class="f-block"><h5>خطّتا عمل منفصلتان</h5><ul><li><b>إصلاح فوريّ (ضيّق):</b> فلترة القائمة على <code>_price(item) is not None</code> — سطر واحد تقريبًا.</li><li><b>بناء لاحق (معماريّ):</b> دالّة <code>is_item_purchasable()</code> واحدة تُستخدَم في الأماكن الأربعة معًا — نطاق أكبر، يستحقّ جدولة منفصلة.</li></ul></div>
+    <div class="f-meta"><span>إصلاح فوريّ + بناء لاحق</span><span>1 ساعة / 1-2 يوم</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-15</span><h4 class="f-title">بحث الأصناف — البنية موجودة فعلًا وتعمل؛ الفجوة الحقيقيّة أضيق: مربّع البحث الرئيسيّ فقط لا يستخدمها أثناء الكتابة</h4></div>
+    <div class="f-block"><p>تصحيح: <code>catalog_search_router.py</code> محرّك بحث أصناف كامل وناضج (تطبيع عربيّ، استبعاد غير المتاح) موجود فعلًا، وصفحة <code>/search</code> تستخدمه بنجاح مع تبويبَي "أصناف"/"مطاعم". الفجوة الحقيقيّة: الصفحة الرئيسيّة (<code>HomePage.tsx</code>) أثناء الكتابة (قبل الضغط Enter) تستدعي محرّك المزوّدين فقط وتعرض "لا يوجد مزوّدون متاحون" بشكل مثبِّط — رغم أنّ الضغط على Enter كان سيجد الصنف فعليًّا. الإصلاح: توسيع فلتر الصفحة الرئيسيّة الحيّ ليستدعي محرّك الأصناف أيضًا بالتوازي، بنفس النمط المستخدَم فعلًا في <code>SearchResultsPage.tsx</code>.</p></div>
+    <div class="f-meta"><span>إصلاح (إعادة استخدام كود موجود)</span><span>2-4 ساعات</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-16</span><h4 class="f-title">تخطّي الإنجليزيّة لصالح الفرنسيّة — نفس العلّة حرفيًّا مكرَّرة في ملفّ ثانٍ</h4></div>
+    <div class="f-block"><p>مؤكَّد بدقّة في <code>Layout.tsx:57</code>. <b>نتيجة إضافيّة:</b> نفس السلسلة الشرطيّة حرفيًّا موجودة أيضًا في <code>CustomerSettings.tsx:158</code> — إصلاح ملفّ واحد فقط يترك الثاني معطوبًا. الإصلاح الصحيح: تطبيع اللغة (<code>i18n.language.split("-")[0]</code>) في كليهما، ويُفضَّل استخراج دالّة مشتركة <code>nextLanguage()</code> لمنع تكرار ثالث مستقبلًا. <b>ملاحظة ثانويّة:</b> 9+ ملفّات أخرى تستخدم مقارنة صارمة مشابهة لتنسيق التاريخ/العملة — إصلاح مركزيّ في <code>i18n/config.ts</code> (<code>load: "languageOnly"</code>) يحلّ الجميع دفعة واحدة.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>1 ساعة (+2 للإصلاح المركزيّ)</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-17</span><h4 class="f-title">نصّ "أعطِ السائق" في طلب استلام ذاتيّ — نصف المشكلة مُصلَح فعلًا؛ النصف الآخر في شاشة مختلفة</h4></div>
+    <div class="f-block"><p>تصحيح: نصّ رمز التسليم (<code>HandoffCodeCard.tsx</code>) <b>عُمِّم فعلًا</b> في ملفّات الترجمة الحاليّة (لا يذكر "السائق" حصرًا). النصّ المكسور الباقي فعليًّا في مكان مختلف: شاشة نجاح الطلب مباشرة (<code>CheckoutPage.tsx</code>، قسم "جهّز النقد للسائق") — لا يتحقّق من نوع التسليم إطلاقًا. الإصلاح: شرط <code>fulfillmentType !== "SELF_PICKUP"</code> + مفتاح ترجمة جديد للاستلام الذاتيّ.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>~1 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="sec-head"><span class="sec-no">05</span><h2 class="sec-title">سجلّ الإصلاحات — دورة حياة الطلب</h2></div>
+  <p class="sec-intro">7 نتائج + نتيجة إضافيّة + تصحيح جوهريّ لموضوع SSE بأكمله.</p>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية</span><span class="f-id">F-04</span><h4 class="f-title">مأزق تسجيل السائقين — السبب الجذريّ: عمود جديد أُضيف لميزة لم تُبنَ قطّ، والآليّة القديمة بقيت الفعليّة</h4></div>
+    <div class="f-block"><h5>التتبّع الكامل</h5><p>هجرة <code>ab22</code> (2026-07-08) أضافت <code>Driver.vehicle_plate</code> + <code>docs_grace_until</code> بنيّة "فترة سماح" لم تُبنَ إطلاقًا (تأكَّد: <code>docs_grace_until</code> لا يُقرَأ في أي مكان بالكود). الآليّة الأقدم (<code>DriverVehicleProfile.plate_number</code>) بقيت الفعليّة في كل مكان: التسجيل، اعتماد OPS، وبوّابة الموافقة.</p></div>
+    <div class="f-block"><h5>نتيجة إضافيّة: العيب مرئيّ للسائق نفسه فورًا، لا فقط عند الموافقة</h5><p>حتى شاشة "حالة جاهزيّتي" الخاصّة بالسائق (<code>GET /drivers/me/status</code>) تقرأ العمود الصحيح <code>plate_number</code> — فيرى السائق قائمة "الناقص" لا تزال تذكر اللوحة رغم أنّه أدخلها للتوّ، مباشرة، لا فقط عند رفض الموافقة لاحقًا.</p></div>
+    <div class="f-block"><h5>الإصلاح الموصى به (الأقلّ خطرًا)</h5><p>إعادة توجيه مسار الخدمة الذاتيّة (الكتابة والقراءة) ليستهدف <code>DriverVehicleProfile.plate_number</code> مع إعادة استخدام تعبير التحقّق من صيغة اللوحة الموجود فعلًا بمسار التسجيل. <b>عدم</b> قلب بوّابة الاعتماد لتقرأ العمود الآخر — فهو فارغ لكل سائق مُوافَق عليه مسبقًا، وقلبه سيكسر سائقين حاليّين دون هجرة تعبئة بيانات.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>1-2 ساعة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">عالية</span><span class="f-id">F-05</span><h4 class="f-title">استثناءات النقد الصامتة — الآليّة الحقيقيّة موجودة جاهزة، فقط لم تُربَط؛ وتوضيح: OPS ليس أعمى بالكامل</h4></div>
+    <div class="f-block"><h5>تدقيق ثلاثيّ الجوانب كما طُلِب</h5><ul>
+      <li><b>هل حلّ الاستثناء يُحرِّك حالة الطلب؟</b> لا، تأكَّد بالقراءة المباشرة — صفر أثر على الطلب لكل قرارات الحلّ الممكنة لهذا النوع تحديدًا.</li>
+      <li><b>استعلام "الطلبات العالقة":</b> قائمة ثابتة من 4 حالات فقط، بلا أي ربط بجدول استثناءات النقد.</li>
+      <li><b>آليّة إشعار حيّ جاهزة؟</b> نعم — <code>publish_order_event()</code> (Redis pub/sub) موجودة فعلًا وتُستخدَم لأحداث مشابهة (اقتراب السائق) — إضافة حدث جديد "فُتِح استثناء نقديّ" أمر بسيط.</li>
+    </ul></div>
+    <div class="f-block"><h5>توضيح مهمّ (تعديل الحكم)</h5><p>يوجد مسار سعيد مصمَّم: السائق يستطيع "إنهاء التسليم تحت المراجعة" بعد فتح الاستثناء، وهذا ينقل الطلب لحالة <b>مرصودة فعلًا</b> ضمن الطلبات العالقة. الفجوة الحقيقيّة تظهر فقط إذا تخلّى السائق عن الإجراء (أغلق التطبيق، ارتباك) — عندئذٍ يبقى الطلب عالقًا فعلًا وغير مرئيّ للطرفين، بالضبط كما وُصِف.</p></div>
+    <div class="f-block"><h5>الإصلاح — 3 خطوات صغيرة + بند بناء اختياريّ أكبر</h5><ul>
+      <li>ربط استعلام الطلبات العالقة باستثناءات النقد المفتوحة (سطور محدودة)</li>
+      <li>نشر حدث "cash_exception_opened" + معالج جبهة أماميّة (البنية جاهزة)</li>
+      <li>توسيع نطاق تفعيل بثّ التتبّع الحيّ ليشمل هذه الحالة (نفس التغيير المطلوب لموضوع SSE أدناه)</li>
+      <li><b>بناء اختياريّ أكبر</b>: منح حلّ "إعادة الجدولة" مسارًا حقيقيًّا لإعادة الإرسال للسائقين — تغيير في دلالة التوزيع، يستحقّ جدولة منفصلة.</li>
+    </ul></div>
+    <div class="f-meta"><span>إصلاح (3 بنود) + بناء اختياريّ (بند رابع)</span><span>4-6 ساعات + يوم إضافيّ</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-good">
+    <div class="f-head"><span class="chip chip-good">إصلاح رخيص جدًّا</span><span class="f-id">F-06</span><h4 class="f-title">تعارض رسالتَي الإلغاء — سطر واحد فقط</h4></div>
+    <div class="f-block"><p>مؤكَّد بدقّة: شرط رفض الإلغاء العامّ ينسى استبعاد حالة "لا سائق متاح" تحديدًا رغم وجود زرّ إلغاء مخصَّص يعمل بشكل صحيح لهذه الحالة تمامًا. الإصلاح: إضافة شرط استبعاد واحد.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>15-30 دقيقة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-18</span><h4 class="f-title">نافذة تقييم مكرَّرة — مؤكَّد فعليًّا مكوّنان منفصلان تمامًا، لا خطأ حالة مشترك</h4></div>
+    <div class="f-block"><p>مؤكَّد: <code>ThreeLayerRating.tsx</code> (سجلّ الطلبات) لا يفحص رمز الحالة إطلاقًا عند الفشل — أي فشل (409 أو انقطاع فعليّ) يُنتِج نفس رسالة "تحقّق من الاتّصال". المكوّن الآخر (<code>OrderTrackingPage.tsx</code>) يتحقّق من 409 صراحة ويتعامل معه كنجاح. الإصلاح: (1) نسخ نفس فحص 409 لـ<code>ThreeLayerRating</code>، (2) إخفاء زرّ "تقييم" أصلًا في سجلّ الطلبات على الطلبات المُقيَّمة مسبقًا (جلب حالة التقييم، كما تفعل الصفحة الأخرى فعلًا).</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>2-3 ساعات</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-good">
+    <div class="f-head"><span class="chip chip-good">إصلاح رخيص</span><span class="f-id">F-20</span><h4 class="f-title">سجلّ الطلبات يعرض السعر الفرعيّ — الخلفيّة تُعيد الرقم الصحيح فعلًا؛ الخطأ في الواجهة فقط</h4></div>
+    <div class="f-block"><p>الخلفيّة تستخدم نفس دالّة التسلسل لصفحتَي القائمة والتفاصيل معًا، وتتضمّن الحقل الصحيح (<code>cash_due_minor</code>) بالفعل. الواجهة فقط تقرأ الحقل الخطأ (<code>total_minor</code>) في سجلّ الطلبات، بينما صفحة التتبّع تقرأ الحقل الصحيح بنفس الصيغة الحسابيّة المطلوبة تمامًا. الإصلاح: سطر واحد، إعادة استخدام نفس الصيغة الموجودة فعلًا.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>30-60 دقيقة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">منخفضة</span><span class="f-id">F-25</span><h4 class="f-title">ارتداد أيقونة الخطوة عند الرفض — سببان متراكبان، إصلاح محدود النطاق عمدًا</h4></div>
+    <div class="f-block"><p>مؤكَّد: حالة "مرفوض من المزوّد" غير موجودة في قائمة تسلسل الحالات فتُعيد فهرسًا سالبًا، وشرط "حالة فاشلة طرفيّة" يجبر كل الخطوات على غير مكتملة. الإصلاح المقترح مقصور عمدًا على هذه الحالة فقط (لأنّها الحالة الوحيدة ذات نقطة فشل حتميّة معروفة سلفًا — "دائمًا يتوقّف عند الخطوة صفر") — لا يُمدَّد للحالات الأخرى (إلغاء/فشل تسليم) لأنّها قد تفشل عند أي نقطة والمكوّن لا يملك بيانات تاريخيّة كافية.</p></div>
+    <div class="f-meta"><span>إصلاح محدود النطاق عمدًا</span><span>30-45 دقيقة</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-bad">
+    <div class="f-head"><span class="chip chip-bad">لم تتكرّر بالكود</span><span class="f-id">F-26</span><h4 class="f-title">قيمة موعد الجدولة المشوَّهة — على الأرجح ليست عيبًا برمجيًّا إطلاقًا</h4></div>
+    <div class="f-block"><p>تتبُّع كامل لكل مسار كتابة لحقل موعد الجدولة — كلّها سليمة (المتصفّح نفسه يكتب القيمة بصيغة قياسيّة). التفسير الأرجح: حقل <code>&lt;input type="datetime-local"&gt;</code> يعرض بصريًّا بصيغة نظام التشغيل/اللغة المحليّة للمتصفّح (مثال: "07/25/2026 02:00PM" على Chrome بلغة en-US) — سلوك متصفّح خارج تحكّم الكود، لا عيبًا فيه. التوصية: إغلاق هذه النتيجة، أو إعادة رصدها حيًّا بأدوات المطوّر مفتوحة لالتقاط نصّ تحذير console الحرفيّ إن أراد المالك تأكيدًا نهائيًّا.</p></div>
+    <div class="f-meta"><span>يحتاج فحصًا حيًّا للتأكيد النهائيّ فقط</span><span>~1 ساعة (رصد فقط)</span><span>ثقة: متوسّطة-عالية أنّه ليس عيبًا</span></div>
+  </div>
+
+  <div class="finding sev-build">
+    <div class="f-head"><span class="chip chip-build">تصحيح جوهريّ</span><span class="f-id">SSE</span><h4 class="f-title">تتبّع الطلب الحيّ — البنية مكتملة تقريبًا! الفجوة الحقيقيّة "نطاق تفعيل ضيّق" فقط، لا إعادة بناء</h4></div>
+    <div class="f-block"><h5>هذا هو أهمّ تصحيح في التقرير كلّه</h5><p>تقرير 555 وصف الآليّة بأنّها "خاملة/نصف مبنيّة". الفحص العميق للكود يُظهِر عكس ذلك تمامًا: <code>useOrderTrackingStream.ts</code> hook كامل (فتح/إغلاق/استقبال/إعادة اتّصال) وهو <b>مربوط فعلًا</b> بصفحة التتبّع؛ الخلفيّة (<code>sse/order_tracking.py</code>) نظام ناضج بالكامل (ABAC، Redis pub/sub، إعادة تشغيل الأحداث الفائتة، heartbeat)؛ حتى إعداد nginx <b>مُصلَح فعلًا</b> مسبقًا بتعليق يوثّق عطلًا سابقًا حُلَّ.</p></div>
+    <div class="f-block"><h5>الفجوة الفعليّة الوحيدة</h5><p>شرط التفعيل (<code>enabled: showMap</code>) مقصور على 4 حالات "سائق نشِط" فقط — لا يشمل <code>ARRIVED_AT_DESTINATION</code> ولا <code>NO_DRIVER_ESCALATION</code>، أي بالضبط الحالتين اللتين تدور حولهما نتائج هذا التقرير الأخرى (F-05، F-06). هذا يفسّر "التذكرة موجودة بلا بثّ حيّ لاحق" تمامًا: التذكرة أُخِذت مبكرًا أثناء حالة نشِطة، ثمّ انتقل الطلب لحالة خارج النطاق فأُغلِق الاتّصال — سلوك متوقَّع حسب النطاق الحاليّ، لا عطلًا.</p></div>
+    <div class="f-block"><h5>ما لم يُتحقَّق منه (بصراحة)</h5><p>هذا فحص كود ساكن فقط — لا فتح متصفّح ولا تتبّع شبكة حيّ. سؤال تقرير 519 السابق ("هل SSE يعمل فعليًّا على الإنتاج؟") يبقى <b>مفتوحًا وغير محسوم</b> — يحتاج فحصًا حيًّا منفصلًا، لا قراءة كود إضافيّة.</p></div>
+    <div class="f-meta"><span>إصلاح (توسيع نطاق تفعيل فقط)</span><span>مشمول ضمن ساعات F-05 (4-6)</span><span>ثقة: عالية على الكود؛ متوسّطة على السلوك الحيّ بالإنتاج</span></div>
+  </div>
+</section>
+
+<section id="s6">
+  <div class="sec-head"><span class="sec-no">06</span><h2 class="sec-title">سجلّ الإصلاحات — المحفظة والولاء</h2></div>
+  <p class="sec-intro">نتيجة واحدة + مراجعة اتّساق أوسع أثبتت أنّها ليست نمطًا نظاميًّا + نتيجة إضافيّة حقيقيّة.</p>
+
+  <div class="finding">
+    <div class="f-head"><span class="chip chip-warn">متوسّطة</span><span class="f-id">F-21</span><h4 class="f-title">مكافأة الإحالة بلا توضيح — إصلاح مقصور على ملفّ واحد؛ نمط الحلّ موجود بالفعل في نفس الملفّ</h4></div>
+    <div class="f-block"><p>مؤكَّد بدقّة، مع تصحيح: نقاط الولاء المستخدَمة كطريقة دفع بالدفع ليست مقيَّدة فعليًّا بنفس علم <code>production_payment_enabled</code> (علم منفصل نشِط فعليًّا). الإصلاح: نصّ توضيح بسيط تحت مكافأة الإحالة، بإعادة استخدام <b>نفس أسلوب وصياغة</b> "تراكم النقاط، الاستبدال قريبًا" الموجود فعلًا في نفس الملفّ (<code>LoyaltyPage.tsx</code>) لسيناريو مشابه — لا حاجة لاختراع أسلوب جديد.</p></div>
+    <div class="f-block"><h5>مراجعة الاتّساق الأوسع (كما طُلِب) — الخلاصة: ليست نمطًا نظاميًّا</h5><p>فُحِصت كل الميزات المقيَّدة بأعلام "الدفع الحقيقيّ" الأخرى (شحن المحفظة، الدفع بالبطاقة، تذكير الإكراميّة، إعادة توجيه المحفظة الناقصة) — <b>كلّها بالفعل تُفصِح بصدق</b> عن كونها غير متاحة بعد. مكافأة الإحالة هي الاستثناء الوحيد لأنّها الوحيدة التي تعرض حالة من صفّ قاعدة بيانات مباشرة بلا أي فحص علم مصاحب. القرار: إصلاح مستهدَف لملفّ واحد، لا بناء مكوّن مشترك جديد.</p></div>
+    <div class="f-meta"><span>إصلاح</span><span>1-3 ساعات</span><span>ثقة: عالية</span></div>
+  </div>
+
+  <div class="finding sev-info">
+    <div class="f-head"><span class="chip chip-info">نتيجة إضافيّة</span><span class="f-id">دفتري-1</span><h4 class="f-title">حارس اتّساق دفتر المحفظة سيُنتِج فارقًا دائمًا متزايدًا مع نموّ الإحالات — قبل أي تنبيه مستقبليّ</h4></div>
+    <div class="f-block"><p><code>reconciliation_service.py::check_wallet_ledger_invariant</code> يقارن مجموع حسابات دفتر "محفظة العميل" بمجموع أرصدة المحافظ الفعليّة، متوقّعًا تساويًا. لكن قيد مكافأة الإحالة يُرحَّل لنفس عائلة الحسابات هذه <b>دون</b> تحريك الرصيد الفعليّ إطلاقًا (بعكس مكافأة السائق المشابهة، التي تُرحَّل لعائلة حسابات مختلفة تمامًا خارج نطاق هذا الحارس). هذا سيُنتِج فارقًا يتراكم دائمًا مع كل إحالة، تعليق الحارس نفسه يقول "لا تُفعِّل كتنبيه حيّ إلّا بعد أن تُصحَّح البيانات القديمة أوّلًا" — يستحقّ تذكيرًا صريحًا قبل ربط هذا التشخيص بأي تنبيه ماليّ حقيقيّ مستقبلًا.</p></div>
+    <div class="f-meta"><span>ملاحظة — لا فعل مطلوب الآن</span><span>—</span><span>ثقة: عالية</span></div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="sec-head"><span class="sec-no">07</span><h2 class="sec-title">أنماط معماريّة متقاطعة</h2></div>
+  <p class="sec-intro">حين يتكرّر نفس الخلل في أماكن مستقلّة فحصها وكلاء مختلفون بلا تنسيق مسبق، فهذا دليل على نمط بنيويّ، لا حادثة معزولة.</p>
+  <div class="card-grid">
+    <div class="card">
+      <h4 style="margin-top:0">لا حرّاس اختبار لمفاتيح <code>t()</code> المفقودة</h4>
+      <p style="font-size:.9rem">السبب الجذريّ الفعليّ خلف أغلب F-07/F-13 (لا نصوصًا ثابتة، بل مفاتيح ترجمة غائبة من الملفّات الثلاثة معًا) — اختبارات i18n الأربعة الحاليّة عمياء تمامًا عن هذا النمط تحديدًا رغم كونها أدقّ نمط عيب متكرّر بهذا التقرير. المُصادِق الخامس (§3) يغلق هذه الفجوة بنيويًّا.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">لا فحص "قابليّة شراء" أو "قابليّة إلغاء" موحَّد</h4>
+      <p style="font-size:.9rem">F-14 (4 تطبيقات متباينة لنفس فحص توفّر العنصر) وF-05/F-06 (لا استعلام "طلب يحتاج انتباهًا" عامّ يشمل كل أنواع الاستثناءات) — كلاهما نفس النمط: منطق حرج مكرَّر يدويًّا في أكثر من موضع بدل دالّة/جدول واحد مشترك.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">نمط "الفشل الصامت" يتكرّر بلا ترابط ظاهريّ</h4>
+      <p style="font-size:.9rem">F-08 (فشل صامت لتحديد العنوان)، F-05 (استثناء نقديّ صامت)، وحتى فجوة الفشل السابقة في كود الخصم (المُصلَحة اليوم) — نفس الفلسفة: <code>catch</code> فارغ أو استجابة موحَّدة بلا سبب. يستحقّ مراجعة شاملة لكل نقاط <code>.catch(() => {})</code> الفارغة عبر الشجرة، لا إصلاح كل حالة بمعزل.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">نظام SSE أفضل ممّا ظُنّ — الدرس: تحقّق بالكود قبل الحكم "غير مكتمل"</h4>
+      <p style="font-size:.9rem">أهمّ تصحيح بهذا التقرير: ما بدا "نصف مبنيّ" في اختبار حيّ واحد كان في الحقيقة نظامًا مكتمل البنية بنطاق تفعيل ضيّق فقط. يستحقّ هذا أن يكون قاعدة عامّة: أي "نتيجة معماريّة" من اختبار حيّ تُفحَص بالكود قبل أن تُصنَّف كإعادة بناء.</p>
+    </div>
+  </div>
+</section>
+
+<section id="s8">
+  <div class="sec-head"><span class="sec-no">08</span><h2 class="sec-title">أبحاث التقنيات الحديثة (2025-2026)</h2></div>
+  <p class="sec-intro">بحث فعليّ بالإنترنت، لا معرفة سابقة فقط — أدوات مسمّاة، مرتّبة بالملاءمة والجهد، لا نصائح عامّة.</p>
+
+  <h3 class="sub">الترجمة (i18n) — لا تُغيِّر المكتبة، استبدل الأدوات المخصَّصة بأدوات رسميّة</h3>
+  <div class="scroll-x"><table class="grid">
+    <thead><tr><th>التوصية</th><th>الملاءمة</th><th>الجهد</th></tr></thead>
+    <tbody>
+      <tr><td><b>i18next-cli</b> الرسميّة (extract/sync/types)</td><td>عالية — تستبدل 3 من سكربتات الفحص المخصَّصة الحاليّة بأداة رسميّة مُصانة</td><td>منخفض</td></tr>
+      <tr><td><b>eslint-plugin-i18next</b></td><td>عالية — تستبدل الماسح المخصَّص بقاعدة lint قياسيّة</td><td>منخفض</td></tr>
+      <tr><td>نمط النوع المُغلَّف (opaque type) + قاعدة ESLint <code>no-restricted-properties</code></td><td>عالية جدًّا لمشكلة F-03 تحديدًا (منع الوصول المباشر لـ<code>message_ar</code>/<code>message_en</code> خارج المُحلِّل الموحَّد)</td><td>متوسّط</td></tr>
+      <tr><td>الاستضافة الذاتيّة لـ<b>Tolgee</b> (منصّة ترجمة كاملة، Apache 2.0، Docker رسميّ)</td><td>متوسّطة — يغني عن السكربتات لكنّه استثمار بنية جديدة، وأنسب من الخيارات الأجنبيّة المدفوعة نظرًا لتفضيل الاستقلاليّة عن SaaS خارجيّ</td><td>متوسّط</td></tr>
+      <tr><td>الانتقال إلى Lingui/Paraglide بدل i18next</td><td><span class="chip chip-bad">مرفوضة</span> — لا تحلّ فئة الخطأ الفعليّة (نصّ ثابت خارج <code>t()</code> بالكامل)، تكلفة انتقال بلا فائدة حقيقيّة</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="sub">التتبّع الحيّ — أكمل ما هو مبنيّ فعلًا، لا تبنِ من جديد</h3>
+  <div class="scroll-x"><table class="grid">
+    <thead><tr><th>التوصية</th><th>الملاءمة</th><th>الجهد</th></tr></thead>
+    <tbody>
+      <tr><td>توسيع نطاق تفعيل الاتّصال الحيّ (SSE) الحاليّ ليشمل كل الحالات غير النهائيّة</td><td>عالية جدًّا — البنية بأكملها (Redis pub/sub، ABAC، nginx) مبنيّة ومختبَرة فعلًا</td><td>منخفض</td></tr>
+      <tr><td><b>@microsoft/fetch-event-source</b> بدل نمط "تذكرة برابط URL"</td><td>متوسّطة — يُزيل خطر تسرّب التذكرة عبر سجلّات الخادم؛ تحسين أمنيّ لا وظيفيّ عاجل</td><td>منخفض</td></tr>
+      <tr><td>دمج كل أنواع الأحداث في اتّصال SSE واحد بأسماء <code>event:</code> مميَّزة</td><td>متوسّطة — يمنع تضخّم عدد الاتّصالات مستقبلًا</td><td>منخفض</td></tr>
+      <tr><td><b>react-native-sse</b> لتطبيق الجوّال (React Native) مستقبلًا</td><td>مرتبطة بقرار الرياكت الحصريّ (§9) — إن أُريد نفس تجربة التتبّع الحيّ على الجوّال لاحقًا</td><td>منخفض</td></tr>
+      <tr><td>التحوّل لـWebSockets أو خدمة مُدارة (Ably/Pusher)</td><td><span class="chip chip-bad">مرفوضة حاليًّا</span> — Redis موجود فعلًا بالبنية، لا فائدة تكلفة/جهد إضافيّة عند هذا الحجم</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="sub">محرّك أكواد الخصم — أبقِ النظام الداخليّ، وسِّع تصنيف الأسباب فقط</h3>
+  <div class="scroll-x"><table class="grid">
+    <thead><tr><th>التوصية</th><th>الملاءمة</th><th>الجهد</th></tr></thead>
+    <tbody>
+      <tr><td>توسيع أكواد الأسباب المُضافة اليوم (F-01) لتطابق تصنيف Stripe/Voucherify (إضافة <code>PER_CUSTOMER_LIMIT_EXHAUSTED</code>، <code>CODE_NOT_APPROVED</code> ككود مستقلّ)</td><td>عالية — إضافة رخيصة جدًّا على آليّة اليوم نفسها</td><td>ضئيل</td></tr>
+      <tr><td>جدول ترجمة "كود سبب → نصّ مفهوم" لفريق الدعم/العمليّات (نمط Talon.One)</td><td>متوسّطة — يفصل الرمز الداخليّ عن الرسالة الظاهرة</td><td>منخفض</td></tr>
+      <tr><td>الانتقال لـStripe Coupons/PromotionCodes كمصدر وحيد للخصومات</td><td><span class="chip chip-bad">مرفوضة</span> — لا تُعبِّر عن مفاهيم السوق الخاصّة بتووا (خصم بمزوّد محدَّد، توصيل مجّانيّ، اعتماد OPS)</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 class="sub">توثيق السائقين وحلّ النزاعات</h3>
+  <div class="scroll-x"><table class="grid">
+    <thead><tr><th>التوصية</th><th>الملاءمة</th><th>الجهد</th></tr></thead>
+    <tbody>
+      <tr><td>إصلاح خلل نموذج البيانات (F-04) أوّلًا — لا بائع توثيق يمنع هذا النوع من الأعطال</td><td>عالية جدًّا — هذا هو العيب الفعليّ، لا فجوة أداة</td><td>منخفض</td></tr>
+      <tr><td>جدول/عرض "يحتاج انتباهًا" عامّ يجمع كل أنواع الاستثناءات (بدل استعلام منفصل لكل نوع)</td><td>عالية جدًّا — يمنع تكرار عيب F-05 (نوع استثناء غير مرصود) بنيويًّا للأبد</td><td>متوسّط</td></tr>
+      <tr><td>تبنّي منطق آلة حالة صريحة (نمط XState) لتدفّق تسجيل السائق مستقبلًا</td><td>متوسّطة — انضباط تصميميّ يمنع تكرار "حقل يُكتَب في مكان، يُقرَأ من مكان آخر"</td><td>متوسّط (تصميميّ لا فوريّ)</td></tr>
+      <tr><td>اعتماد وثائق آليّ (Persona/Veriff/IDMerit — الأخيرة تغطّي ليبيا صراحة)</td><td>منخفضة حاليًّا — المراجعة اليدويّة لا تزال مناسبة لحجم تووا الحاليّ؛ تُعاد الدراسة عند نموّ حجم التسجيل ليصبح عنق زجاجة تشغيليّ</td><td>—</td></tr>
+      <tr><td>إشعار حيّ فوريّ للعميل عند فتح استثناء دفع نقديّ (نمط DoorDash/Uber Eats — تواصل مضمون، لا بالضرورة آليّ بالكامل)</td><td>عالية — الحدّ الأدنى المطلوب: حالة نهائيّة أو معلَّقة واضحة، أبدًا تجميد صامت</td><td>منخفض (مشمول بإصلاح F-05)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s9">
+  <div class="sec-head"><span class="sec-no">09</span><h2 class="sec-title">قرار مسجَّل: الرياكت حصريًّا، لا فلَتر (Flutter)</h2></div>
+  <div class="plain">
+    <span class="lbl">تسجيل صريح بطلب المالك (2026-07-24)</span>
+    أُعيد تأكيد قرار 2026-07-18 صراحةً أثناء تكليف هذا الفحص: تطوير الجوّال حصريًّا عبر <b>React Native</b> (<code>apps/mobile/</code>). تطبيق <b>Flutter</b> (<code>mobile_app/</code>) مجمَّد كليًّا — لا عمل ميزات، لا إصلاحات، لا بناء ضدّه. هذا القرار مُسجَّل الآن في <code>CLAUDE.md</code> وفي الذاكرة المشروعيّة، ولا يحتاج أي عمل هندسيّ في هذه الخريطة أو ما بعدها أن يتطرّق لـFlutter دون إذن صريح جديد ومعاكس.
+  </div>
+</section>
+
+<section id="s10">
+  <div class="sec-head"><span class="sec-no">10</span><h2 class="sec-title">الخريطة التنفيذية — 7 مراحل</h2></div>
+  <p class="sec-intro">مرتّبة بالتبعيّة والمخاطرة، لا بترتيب الاكتشاف. كل مرحلة تذكر بالضبط: أين إصلاح، أين بناء، وأين قرار ينتظر موافقتك.</p>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-no">0</span><h4 class="phase-title">انتصارات سريعة — إصلاحات دقائق-ساعة، بلا حاجة لموافقة</h4><span class="phase-hours num">~5 ساعات</span></div>
+    <div class="phase-body"><ul>
+      <li><b>F-06</b> (15-30د) — سطر استبعاد واحد يحلّ تعارض رسالتَي الإلغاء.</li>
+      <li><b>F-25</b> (30-45د) — خريطة استثناء محدودة النطاق لأيقونة الخطوة عند الرفض.</li>
+      <li><b>F-22</b> (30د) — إكمال جملة تعليمات التنزيل في 3 ملفّات + حذف السطر الملحق.</li>
+      <li><b>F-20</b> (30-60د) — إصلاح سطر واحد لعرض المبلغ الكامل في سجلّ الطلبات.</li>
+      <li><b>F-12</b> (1س) — ربط مفتاح اللغة السريع بحفظ الحساب.</li>
+      <li><b>F-08</b> (1س) — رسالة تنبيه بسيطة عند فشل تحديد العنوان تلقائيًّا.</li>
+    </ul></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-no">1</span><h4 class="phase-title">إصلاحات جوهريّة عالية الأولويّة — تحتاج تركيزًا واختبارًا أعمق</h4><span class="phase-hours num">~14-19 ساعة</span></div>
+    <div class="phase-body"><ul>
+      <li><b>F-04</b> (1-2س) — إعادة توجيه كتابة لوحة السائق للحقل الصحيح، مع إعادة استخدام تعبير التحقّق الموجود.</li>
+      <li><b>F-11</b> (1-2س) — ربط شارة الإشعارات غير المقروءة (كل البنية جاهزة).</li>
+      <li><b>F-14</b> — الجزء الضيّق فقط (1س): فلترة عناصر بلا متغيّر نشِط من القائمة.</li>
+      <li><b>F-17</b> (1س) — شرط نوع التسليم على نصّ "جهّز النقد للسائق" بشاشة النجاح.</li>
+      <li><b>F-16</b> (1س) — تطبيع اللغة في كلا الملفّين معًا (Layout.tsx وCustomerSettings.tsx).</li>
+      <li><b>F-18</b> (2-3س) — فحص 409 + إخفاء زرّ التقييم المكرَّر على الطلبات المُقيَّمة.</li>
+      <li><b>F-10</b> (1-1.5س) — توحيد إخفاء رقم الهاتف على النمط الآمن.</li>
+      <li><b>F-09</b> (2-3س) — محقِّق صيغة هاتف حقيقيّ، خلفيّة وواجهة معًا.</li>
+      <li><b>F-01ب</b> (2-3س) — إظهار الخصم الناجح بعد إتمام الطلب (حقول موجودة على الصفّ فعلًا، تحتاج تسلسلًا فقط).</li>
+    </ul></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-no">2</span><h4 class="phase-title">دفعة معالجة الترجمة (i18n) — الأكبر حجمًا، الأعلى تكرارًا كنمط</h4><span class="phase-hours num">~17-23 ساعة</span></div>
+    <div class="phase-body"><ul>
+      <li><b>F-03 + F-03ب</b> (4-6س) — استخراج <code>resolveErrorMessage()</code> مشترك، استبدال 65 موضعًا + معالجة <code>useFieldErrors.ts</code> بمنطقها الخاصّ.</li>
+      <li><b>F-07</b> (2س) — إضافة ~15 مفتاح ترجمة مفقود لأداة اختيار الموقع.</li>
+      <li><b>F-13</b> (6-8س) — ~28 مفتاح مفقود عبر الإعدادات/دفتر العناوين/الشؤون القانونيّة + تحويل ~6 نصوص ثابتة لـ<code>t()</code>.</li>
+      <li><b>F-19</b> (0.5-1س) — استبدال ملفّ الخطّ التالف بنسخة رسميّة صحيحة (يحتاج جلبًا خارجيًّا).</li>
+      <li><b>المُصادِق الخامس</b> (4-6س) — اختبار جديد يكتشف مفاتيح <code>t()</code> المفقودة من كل الملفّات معًا — يمنع تكرار F-07/F-13 مستقبلًا.</li>
+      <li>تبنّي <b>i18next-cli</b> و<b>eslint-plugin-i18next</b> (من §8) كخطوة موازية تُبسِّط الصيانة طويلة المدى.</li>
+    </ul></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-no">3</span><h4 class="phase-title">توسيع نطاق التتبّع الحيّ — وصل نقاط جاهزة، لا إعادة بناء</h4><span class="phase-hours num">~4-6 ساعات</span></div>
+    <div class="phase-body"><ul>
+      <li><b>F-05</b> بنود 1-3 (مشمولة هنا): ربط استثناءات النقد باستعلام الطلبات العالقة، نشر حدث "فُتِح استثناء" حيّ، وتوسيع شرط تفعيل بثّ SSE ليشمل <code>ARRIVED_AT_DESTINATION</code> و<code>NO_DRIVER_ESCALATION</code>.</li>
+      <li>هذا التوسيع نفسه يحلّ نتيجة SSE المُصحَّحة في §5 — تغيير واحد يخدم هدفين.</li>
+    </ul></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-no">4</span><h4 class="phase-title">أعمال بناء معماريّة — مكوّنات/آليّات جديدة تمنع تكرار نمط الخطأ</h4><span class="phase-hours num">~1.5-3 أيام</span></div>
+    <div class="phase-body"><ul>
+      <li><b>دالّة "قابليّة الشراء" موحَّدة</b> (من F-14، 1-2 يوم) — تستبدل 4 تطبيقات متباينة بمصدر حقيقة واحد للقائمة والسلّة والدفع.</li>
+      <li><b>جدول/عرض "يحتاج انتباهًا" عامّ</b> (من F-05 + بحث §8، ~1-2 يوم) — يجعل ظهور أي نوع استثناء مستقبليّ في لوحة العمليّات تلقائيًّا، لا يدويًّا لكل نوع.</li>
+      <li><b>إعادة إرسال حقيقيّة بعد حلّ "إعادة الجدولة"</b> (بند F-05 الرابع، اختياريّ، +يوم) — يغيّر دلالة التوزيع، يستحقّ نطاقًا مستقلًّا.</li>
+      <li>توسيع تصنيف أسباب فشل كود الخصم (من §8، ساعات قليلة) — إضافة صغيرة على آليّة اليوم.</li>
+    </ul></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-no">5</span><h4 class="phase-title">بنود تنتظر موافقتك الصريحة قبل أي تنفيذ</h4><span class="phase-hours num">~3 ساعات تنفيذ، معلَّقة</span></div>
+    <div class="phase-body"><ul>
+      <li><b>F-23</b> (1س) — يغيّر نصّ زرّ الوضع الداكن المرئيّ في 3 ملفّات — يحتاج إذنًا صريحًا حسب سياسة "لا تغيير نصوص مرئيّة دون طلب".</li>
+      <li><b>F-24</b> (2س) — حذف عمود ميت يعبر منطقة Alembic الممنوعة تعديلها بلا إذن تشغيليّ صريح.</li>
+    </ul></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-no">6</span><h4 class="phase-title">بنود تحتاج فحصًا حيًّا قبل الحكم — لا تُصلَح كودًا لم يثبت وجود عيب فيه</h4><span class="phase-hours num">~2 ساعة رصد</span></div>
+    <div class="phase-body"><ul>
+      <li><b>F-02</b> — الكود الساكن سليم تمامًا؛ أعِد اختبار زرّ إفراغ السلّة حيًّا بمتصفّح حقيقيّ قبل أي تعديل كود.</li>
+      <li><b>F-26</b> — على الأرجح ليس عيبًا (سلوك متصفّح لا كود)؛ أغلقه أو أعد رصده بأدوات مطوّر مفتوحة لالتقاط نصّ التحذير الحرفيّ.</li>
+      <li><b>سلوك SSE على الإنتاج الحيّ</b> — سؤال تقرير 519 يبقى مفتوحًا؛ يحتاج فحص شبكة حيًّا بمتصفّح على الإنتاج، لا قراءة كود إضافيّة.</li>
+    </ul></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><span class="phase-no">7</span><h4 class="phase-title">تبنّي تقنيّ مستقبليّ اختياريّ — لا إلحاح، يُجدوَل عند التوسّع</h4><span class="phase-hours num">غير مُقدَّر (تخطيط لاحق)</span></div>
+    <div class="phase-body"><ul>
+      <li>استضافة ذاتيّة لمنصّة ترجمة كاملة (Tolgee) إن كبر فريق الترجمة.</li>
+      <li><code>@microsoft/fetch-event-source</code> بدل نمط "تذكرة برابط URL" — تحسين أمنيّ منخفض الإلحاح.</li>
+      <li><code>react-native-sse</code> لموازاة تجربة التتبّع الحيّ على تطبيق الرياكت-نيتف الجوّال مستقبلًا.</li>
+      <li>إعادة تقييم بائع توثيق آليّ للسائقين (Persona/Veriff/IDMerit) فقط إذا أصبح حجم تسجيل السائقين عنق زجاجة تشغيليّ فعليّ.</li>
+      <li>آلة حالة صريحة (XState أو مكافئ) كنظام انضباط لأي تدفّق تسجيل متعدّد الخطوات جديد مستقبلًا.</li>
+    </ul></div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>تووا — تقرير 556 · فحص عميق بالكود لكل نتيجة من تقرير 555 (4 وكلاء مستقلّون، قراءة مباشرة سطرًا-بسطر) + بحث تقنيّ حديث فعليّ (وكيلان، 2025-2026) + خريطة تنفيذية بـ7 مراحل. لا استنتاج بلا مصدر — كل رقم سطر وكل اقتراح إصلاح هنا مُتحقَّق منه مباشرة في الكود، لا مُستنسَخًا من التقرير السابق.<br>
+    التقرير المرجعيّ السابق: 555 (الاختبار الحيّ الأصليّ). الفرع المُدمَج: <code>fix/promo-code-silent-failure-r555</code> (commit <code>2e96594</code>، مُتحقَّق مزامنته محليًّا).</p>
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

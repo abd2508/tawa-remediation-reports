@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير عميق — التسوية والعمولة وعكسها</title>
+<style>
+  :root{
+    --green:#0a7d3c; --green-d:#075c2b; --amber:#b8860b; --amber-bg:#fff7e6;
+    --red:#b4232a; --red-d:#7d1418; --red-bg:#fdecec; --blue:#1565c0; --blue-bg:#e8f1fb;
+    --purple:#6a1b9a; --teal:#00695c; --teal-d:#004d40; --teal-bg:#e0f2f1;
+    --ink:#1b2430; --mut:#5b6573; --line:#e2e6ea; --bg:#f4f6f8; --card:#fff;
+    --ok:#0a7d3c; --ok-bg:#e7f5ec; --ink2:#0f1924;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Noto Naskh Arabic",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.8;font-size:15.5px}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,var(--teal-d),#022019);color:#fff;border-radius:18px;padding:38px 32px;margin-bottom:24px;box-shadow:0 8px 26px rgba(0,77,64,.3)}
+  header.hero h1{margin:0 0 8px;font-size:30px}
+  header.hero .sub{opacity:.95;font-size:16.5px;max-width:840px}
+  header.hero .meta{margin-top:14px;font-size:13px;opacity:.9;border-top:1px solid rgba(255,255,255,.25);padding-top:12px}
+  h2{color:var(--teal-d);border-bottom:3px solid var(--teal);padding-bottom:8px;margin-top:44px;font-size:23px}
+  h3{color:var(--ink);margin-top:28px;font-size:19px;border-right:5px solid var(--teal);padding-right:10px}
+  h4{color:var(--teal-d);margin:16px 0 6px;font-size:16.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+  .note{border-radius:12px;padding:13px 17px;margin:13px 0;font-size:14.5px}
+  .note.info{background:var(--blue-bg);border-right:5px solid var(--blue)}
+  .note.warn{background:var(--amber-bg);border-right:5px solid var(--amber)}
+  .note.risk{background:var(--red-bg);border-right:5px solid var(--red)}
+  .note.ok{background:var(--ok-bg);border-right:5px solid var(--ok)}
+  .note.key{background:var(--teal-bg);border-right:5px solid var(--teal)}
+  table{width:100%;border-collapse:collapse;margin:13px 0;font-size:13.5px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:var(--teal-d);color:#fff;font-weight:600}
+  tr:nth-child(even) td{background:#fafbfc}
+  code{background:#eef2f5;border:1px solid #dde3e8;border-radius:5px;padding:1px 6px;font-size:12.5px;direction:ltr;display:inline-block;color:#0d47a1}
+  .pill{display:inline-block;border-radius:14px;padding:2px 9px;font-size:11.5px;font-weight:700;color:#fff}
+  .pill.err{background:var(--red)} .pill.race{background:var(--purple)} .pill.guard{background:var(--green)}
+  .pill.edge{background:var(--amber)} .pill.line{background:#455a64;direction:ltr} .pill.dr{background:var(--red)} .pill.cr{background:var(--green)}
+  ul.clean{padding-right:20px} ul.clean li{margin:6px 0}
+  .toc{columns:2;column-gap:24px}
+  .toc a{display:block;color:var(--teal-d);text-decoration:none;padding:4px 0;font-size:14.5px;border-bottom:1px dashed var(--line)}
+  .toc a:hover{color:var(--amber)}
+  .codebox{background:var(--ink2);color:#cdd9e5;border-radius:11px;padding:14px 16px;margin:12px 0;font-family:"Consolas","Courier New",monospace;direction:ltr;font-size:12.8px;overflow-x:auto;line-height:1.55}
+  .codebox .k{color:#c792ea} .codebox .s{color:#c3e88d} .codebox .c{color:#637777} .codebox .e{color:#ff8a80} .codebox .n{color:#82aaff} .codebox .g{color:#80cbc4}
+  .ledger{background:var(--ink2);color:#d6e2ee;border-radius:11px;padding:14px 16px;margin:12px 0;font-family:"Consolas",monospace;direction:ltr;font-size:13px;overflow-x:auto;line-height:1.6}
+  .ledger .dr{color:#ff8a80} .ledger .cr{color:#80cbc4} .ledger .c{color:#90a4ae}
+  .seq{counter-reset:s;margin:14px 0}
+  .seq .row{display:flex;gap:12px;align-items:flex-start;margin:8px 0}
+  .seq .row::before{counter-increment:s;content:counter(s);flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--teal-d);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .seq .row .b{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;flex:1;font-size:14px}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:center;margin:16px 0}
+  .step{background:#fff;border:2px solid var(--teal);border-radius:11px;padding:8px 12px;font-size:13px;font-weight:600;min-width:88px;text-align:center}
+  .step.start{background:var(--teal);color:#fff} .step.end{background:var(--ok);color:#fff;border-color:var(--ok)} .step.stop{border-color:var(--red);background:var(--red-bg)}
+  .arrow{color:var(--teal);font-size:20px;font-weight:800}
+  .tag{font-size:11px;color:var(--mut);background:#eef2f5;border-radius:5px;padding:1px 6px;direction:ltr;display:inline-block}
+  footer{margin-top:46px;text-align:center;color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>💰 التقرير العميق — التسوية والعمولة وعكسها</h1>
+  <div class="sub">تتبّع سطر-بسطر لـ<code>settlement_service.py (350 سطر)</code> + <code>provider_commission.py</code> + مسار التسوية التلقائية عند التسليم: توليد، موافقة، صرف، وعكس العمولة — بكل فروعه وحالاته الحرجة وقيوده المحاسبية.</div>
+  <div class="meta">ملحق تعميقي #2 · المصدر: قراءة فعلية لـ<code>settlement_service.py</code> · <code>core/provider_commission.py</code> · <code>dispatch_service._create_delivery_settlement</code> · <code>settlement_router (batch)</code></div>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:4px">📘 الفكرة الكبرى: «تسويتان» لا واحدة</h3>
+  <p>أول التباس يجب حسمه: في المنصة <b>خدمتا تسوية منفصلتان عمداً</b> تحملان نفس الاسم:</p>
+  <table>
+    <tr><th>الخدمة</th><th>المسار</th><th>المعنى</th></tr>
+    <tr><td><b>تسوية المالية (هذا التقرير)</b></td><td><code>finance/settlement_service.py</code></td><td>ما تدين به المنصة <b>للمزوّد</b> (صافي البيع) — قيود دفتر، PENDING→APPROVED→PAID</td></tr>
+    <tr><td>تسوية عهدة السائق/الوكيل</td><td><code>settlement/service.py</code></td><td>النقد الذي حصّله <b>السائق</b> وتسليمه للوكيل — حضانة نقدية</td></tr>
+  </table>
+  <div class="note warn">⚠️ نفس الكلمة، نطاقان مختلفان. التعليق في الكود (سطر 7–10) يحذّر صراحةً: <span class="tag">Same word, different scope — they are intentionally separate</span>. هذا التقرير عن <b>تسوية المزوّد المالية</b>.</div>
+</div>
+
+<h2 id="toc">🗂️ الفهرس</h2>
+<div class="card toc">
+  <a href="#lifecycle">① دورة حياة التسوية الكاملة</a>
+  <a href="#commission">② حساب العمولة — 3 أنواع وحدود القصّ</a>
+  <a href="#auto">③ التوليد التلقائي عند التسليم (CRIT-02)</a>
+  <a href="#generate">④ generate_settlement — البنية وأسطر التفصيل</a>
+  <a href="#approve">⑤ approve_settlement — قفل + فرعا BONUS/العادي</a>
+  <a href="#pay">⑥ pay_settlement — الأقفال وفحوص الحجز</a>
+  <a href="#reverse">⑦ عكس العمولة — أدقّ دالة وأكثرها فروعاً</a>
+  <a href="#batch">⑧ التوليد الدفعي وحالات التخطّي</a>
+  <a href="#races">⑨ سباقات التزامن وحمايتها</a>
+  <a href="#scenarios">⑩ مصفوفة «ماذا لو» للتسوية</a>
+  <a href="#gaps">⑪ فجوات/مخاطر مرصودة</a>
+</div>
+
+<!-- 1 -->
+<h2 id="lifecycle">① دورة حياة التسوية الكاملة</h2>
+<div class="flow">
+  <div class="step start">التسليم<br><span style="font-size:11px;color:#666">DELIVERED</span></div><span class="arrow">←</span>
+  <div class="step">generate<br><span style="font-size:11px;color:#666">PENDING</span></div><span class="arrow">←</span>
+  <div class="step">approve<br><span style="font-size:11px;color:#666">قيود الدفتر</span></div><span class="arrow">←</span>
+  <div class="step stop">pay<br><span style="font-size:11px;color:#666">مختوم 422</span></div>
+</div>
+<div class="flow">
+  <span style="font-size:13px;color:#666">مسار جانبي عند الاسترداد:</span>
+  <div class="step">PENDING/APPROVED</div><span class="arrow">←</span>
+  <div class="step stop">reverse_commission<br><span style="font-size:11px;color:#666">عكس العمولة</span></div>
+</div>
+<p>دالتان تُنشئان التسوية: <b>المسار التلقائي</b> عند تسليم الطلب (<code>_create_delivery_settlement</code>)، و<b>المسار الدفعي</b> اليدوي في المالية (<code>generate-batch</code>). كلاهما يمرّ عبر نفس <code>generate_settlement</code> ونفس حاسبة العمولة — هذا التوحيد جوهري (سنرى لماذا في القسم ③).</p>
+
+<!-- 2 -->
+<h2 id="commission">② حساب العمولة — 3 أنواع وحدود القصّ</h2>
+<div class="card">
+  <p><code>resolve_provider_commission</code> (سطر 75) يحسب عمولة طلب واحد. يبحث أولاً عن <b>إعداد خاص بالمزوّد</b>، وإلا العام الافتراضي. ثلاثة أنواع:</p>
+  <table>
+    <tr><th>النوع</th><th>الحساب</th><th>السطر</th></tr>
+    <tr><td><code>PERCENT</code></td><td><code>(gross × bps) // 10000</code></td><td>58</td></tr>
+    <tr><td><code>FIXED</code></td><td>مبلغ ثابت</td><td>48</td></tr>
+    <tr><td><code>TIERED</code></td><td>شريحة حسب قيمة الطلب → bps أو ثابت للشريحة</td><td>49–56</td></tr>
+  </table>
+  <h4>دالة القصّ <code>_clamp_fee</code> (سطر 26) — حيث تختبئ السلامة</h4>
+  <div class="codebox">
+<span class="k">def</span> <span class="n">_clamp_fee</span>(fee, *, order_total_minor, min_fee, max_fee):<br>
+&nbsp;&nbsp;fee = <span class="n">max</span>(fee, min_fee <span class="k">or</span> 0)        <span class="c"># 1) لا أقل من الحد الأدنى</span><br>
+&nbsp;&nbsp;<span class="k">if</span> max_fee <span class="k">and</span> max_fee &gt; 0: fee = <span class="n">min</span>(fee, max_fee)  <span class="c"># 2) لا أكثر من الأقصى</span><br>
+&nbsp;&nbsp;fee = <span class="n">min</span>(fee, order_total_minor)  <span class="c"># 3) لا تتجاوز إجمالي الطلب أبداً</span><br>
+&nbsp;&nbsp;<span class="k">return</span> <span class="n">max</span>(fee, 0)             <span class="c"># 4) لا سالب أبداً</span>
+  </div>
+  <div class="note key">🔑 <b>أربعة قيود متراكبة:</b> العمولة محصورة بين حدّ أدنى وأقصى، و<b>لا تتجاوز قيمة الطلب نفسها</b> (سطر 30 — وإلا لكان صافي المزوّد سالباً!)، و<b>لا تكون سالبة</b>. هذه الحدود الأربعة تحمي من أي إعداد خاطئ (مثلاً نسبة 200% أو ثابت أكبر من الطلب). مستوى دفاع يصعب رؤيته في القراءة العريضة.</div>
+  <div class="note info">💡 <b>العمولة على البضاعة فقط:</b> تُحسب على <code>order.total_minor</code> (المجموع الفرعي للبضاعة)، <b>لا</b> على رسم التوصيل. الرسم إيراد كامل للمنصة عبر مسار منفصل.</div>
+</div>
+
+<!-- 3 -->
+<h2 id="auto">③ التوليد التلقائي عند التسليم — قصة CRIT-02</h2>
+<div class="card">
+  <p><code>_create_delivery_settlement</code> (سطر 1568 في dispatch_service) يُستدعى عند تسليم الطلب. هنا يقع أهم درس مالي في المشروع:</p>
+  <div class="note risk">🔎 <b>الخطأ التاريخي (CRIT-02، موثّق سطر 1572–1577):</b> كان هذا المسار التلقائي يكتب <code>fees_minor=0</code> ولا يكتب سطر <code>PLATFORM_FEE</code>. وبما أن الدفعة المالية <b>تتخطّى</b> أي طلب له تسوية مسبقاً، فمسار العمولة الصحيح <b>لم يكن يعمل أبداً</b> → <span style="color:var(--red);font-weight:700">المنصة كانت تكسب صفر عمولة على كل طلب مُسلَّم</span>، وعكس الاسترداد (الذي يقرأ سطر PLATFORM_FEE) لم يجد عمولة ليعكسها. الإصلاح: توجيه المسار التلقائي عبر <b>نفس</b> الحاسبة و<code>generate_settlement</code> التي تستخدمها الدفعة.</div>
+  <h4>الفروع الدفاعية في هذه الدالة (بالترتيب)</h4>
+  <table>
+    <tr><th>#</th><th>الفرع</th><th>السطر</th><th>لماذا؟</th></tr>
+    <tr><td>1</td><td>مزوّد مأمورية؟ → تخطّي التسوية العادية + تسوية مأمورية خاصة</td><td>~1582</td><td><b>D4:</b> «مزوّد» المأمورية هو المنصة نفسها → تسوية = ائتمان للمنصة لنفسها (self-dealing) + عمولة على تحويل داخلي → يشوّه الأرباح. لكن يجب تصفية الميزانية المحتجزة وإلا تعلق للأبد</td></tr>
+    <tr><td>2</td><td>تسوية موجودة؟ → عودة فوراً</td><td>~1640</td><td><b>A5:</b> idempotent — المسار التلقائي والدفعة (أو إعادة إثبات تسليم) قد ينشئان تسويتين → ائتمان مزدوج للمزوّد</td></tr>
+    <tr><td>3</td><td>الفترة المحاسبية مقفلة؟ → تخطّي + تحذير</td><td>~1648</td><td><b>A9:</b> لا تُسجَّل قيود في فترة مغلقة (المسار اليدوي يحرس هذا؛ التلقائي كان يتجاوزه)</td></tr>
+    <tr><td>4</td><td>حساب العمولة عبر الحاسبة الكنسية</td><td>1652</td><td>توحيد مع الدفعة</td></tr>
+    <tr><td>5</td><td><code>generate_settlement(fees=fee, net=total−fee)</code></td><td>1656</td><td>كتابة التسوية الصحيحة</td></tr>
+  </table>
+  <div class="note key">🔑 <b>تسوية المأمورية الخاصة (سطر 1604–1632):</b> المأمورية ليس لها مزوّد طرف-ثالث، لكن الميزانية المحتجزة في <code>ORDER_RECEIVABLE</code> يجب تصفيتها: تعويض «المنفِّذ» (الذي دفع ثمن البضاعة نقداً) + الاعتراف برسم المنصة + <b>تحرير الميزانية غير المستخدمة</b> (الفرق بين الميزانية والتكلفة الفعلية). كل هذا <b>best-effort</b> (لا يكسر التسليم لو تعثّر الدفتر)، و<b>خامل</b> حتى تُفعَّل المأمورية. مستوى تفصيل عميق.</div>
+</div>
+
+<!-- 4 -->
+<h2 id="generate">④ generate_settlement — البنية وأسطر التفصيل</h2>
+<div class="card">
+  <p>(سطر 27) لا يكتب قيود دفتر بعد — فقط ينشئ سجل <code>PENDING</code> + <b>أسطر تفصيل</b> توضّح التركيب:</p>
+  <table>
+    <tr><th>سطر التفصيل</th><th>القيمة</th><th>الإشارة</th></tr>
+    <tr><td><code>ORDER_GROSS</code></td><td>+gross</td><td>موجب (قيمة الطلب)</td></tr>
+    <tr><td><code>PLATFORM_FEE</code></td><td>−fees</td><td><b>سالب</b> (يُخصم من المزوّد)</td></tr>
+    <tr><td><code>TAX</code></td><td>−tax</td><td>سالب (حجز ضريبي)</td></tr>
+  </table>
+  <div class="note info">💡 <code>net = gross − fees − tax</code> (سطر 40). أسطر التفصيل بإشاراتها تجعل <b>مجموعها = الصافي</b>، فأي قارئ يفهم من أين جاء الصافي. وهذه الأسطر هي ما يقرأه <b>عكس العمولة</b> لاحقاً (سطر PLATFORM_FEE تحديداً).</div>
+</div>
+
+<!-- 5 -->
+<h2 id="approve">⑤ approve_settlement — قفل + فرعا BONUS/العادي</h2>
+<div class="card">
+  <div class="seq">
+    <div class="row"><div class="b"><b>قفل صف التسوية</b> <code>with_for_update()</code> (سطر 103) — <span class="tag">FIN-2</span>: يمنع موافقتين متزامنتين من تجاوز فحص الحالة وتسجيل القيد مرتين</div></div>
+    <div class="row"><div class="b">غير موجودة؟ → <span class="pill err">404</span> (سطر 108)</div></div>
+    <div class="row"><div class="b">ليست <code>PENDING</code>؟ → <span class="pill err">422</span> (سطر 110) — يُعاد قراءتها تحت القفل</div></div>
+    <div class="row"><div class="b">تفرّع حسب <code>payment_method</code>: BONUS أم عادي</div></div>
+  </div>
+  <h4>الفرع العادي (سطر 147) — القيد المتوازن</h4>
+  <div class="ledger">
+<span class="dr">DR  PLATFORM_ESCROW   (net + fees + tax)</span>   <span class="c"># الأصل يُخصم كامل ما يحتجزه</span><br>
+<span class="cr">    CR  PROVIDER_PAYABLE_{id}   net</span>          <span class="c"># خصم: المنصة تدين بالصافي للمزوّد</span><br>
+<span class="cr">    CR  PLATFORM_REVENUE        fees</span>         <span class="c"># العمولة = إيراد</span><br>
+<span class="cr">    CR  TAX_PAYABLE             tax</span>          <span class="c"># فقط إن وُجدت ضريبة</span>
+  </div>
+  <h4>فرع BONUS (سطر 113) — مختلف جوهرياً</h4>
+  <div class="ledger">
+<span class="dr">DR  PLATFORM_BONUS_EXPENSE   net</span>   <span class="c"># مكافأة = مصروف منصة</span><br>
+<span class="cr">    CR  PROVIDER_PAYABLE_{id}   net</span>   <span class="c"># تُضاف لما يُدين للمزوّد</span>
+  </div>
+  <div class="note key">🔑 <b>لماذا فرعان؟</b> (التعليق سطر 114–117): المكافأة ليست سحباً من حضانة نقد عميل (لا يوجد نقد عميل أصلاً)، بل <b>مصروف على المنصة</b>. لو سُجِّلت كـ<code>DR PLATFORM_ESCROW</code> لكانت تضخّم أصلاً لم يُموَّل قطّ وتُسقط التكلفة من قائمة الأرباح. هذا تمييز محاسبي ناضج: نفس الفعل (موافقة)، قيدان مختلفان حسب مصدر المال.</div>
+  <div class="note warn">⚠️ <b>إعادة التسمية ج-2 (سطر 125–128):</b> كان الحساب اسمه <code>PROVIDER_RECEIVABLE</code> (مدين) وهو خطأ تسمية — المنصة <b>تدين</b> للمزوّد، فهو <code>PROVIDER_PAYABLE</code> (خصم/LIABILITY). تغيير اسم فقط؛ النوع لم يتغيّر فالتقارير (المجمّعة حسب النوع) لم تتأثّر.</div>
+</div>
+
+<!-- 6 -->
+<h2 id="pay">⑥ pay_settlement — الأقفال وفحوص الحجز</h2>
+<div class="card">
+  <div class="seq">
+    <div class="row"><div class="b"><b>قفل صف</b> <code>with_for_update()</code> (سطر 199) — <span class="tag">FIN-3</span>: يمنع صرفين متزامنين من سكّ مرجعَي دفع و«PAID مرتين» (دفع مزدوج عند استبدال PSP الوهمي بحقيقي)</div></div>
+    <div class="row"><div class="b">ليست <code>APPROVED</code>؟ → <span class="pill err">422</span> (سطر 206)</div></div>
+    <div class="row"><div class="b"><b>فحص حجز #1 — نزاع:</b> نزاع على الطلب بحالة <code>OPEN</code> أو <code>UNDER_REVIEW</code>؟ → <span class="pill err">422</span> (سطر 212–232)</div></div>
+    <div class="row"><div class="b"><b>فحص حجز #2 — تباين نقد:</b> المستفيد سائق وله <code>CashHandover</code> بحالة <code>DISCREPANCY</code>؟ → <span class="pill err">422</span> (سطر 235–252)</div></div>
+    <div class="row"><div class="b">PSP وهمي: <code>payout_reference = "MOCK-PSP-..."</code> + <code>state="PAID"</code> (سطر 255)</div></div>
+  </div>
+  <div class="note key">🔑 <b>دقّة فحص النزاع (سطر 208–211 — H2):</b> النزاع الذي انتقل من <code>OPEN</code> إلى <code>UNDER_REVIEW</code> <b>لا يزال غير محلول</b> — الصرف أثناء المراجعة يُفشل الغرض من الحجز. لذا يُحجَب على <b>كلتا</b> الحالتين غير النهائيتين؛ فقط <code>RESOLVED</code> (الحالة النهائية الوحيدة) يحرّر الحجز. لو فُحِص <code>OPEN</code> فقط لتسرّب الصرف عبر <code>UNDER_REVIEW</code> — احتمال غير مباشر مُغلَق.</div>
+  <div class="note risk">🛑 <b>الصرف الفعلي مختوم:</b> (سطر 254) — PSP وهمي حتى <code>GATE_PAYMENT_SANDBOX</code>. الدالة تعمل كاملة (أقفال، فحوص، تغيير حالة) لكن لا مال حقيقي يخرج. والأقفال مُهيّأة مسبقاً لليوم الذي يُستبدل فيه الوهمي بحقيقي.</div>
+</div>
+
+<!-- 7 -->
+<h2 id="reverse">⑦ عكس العمولة — أدقّ دالة وأكثرها فروعاً</h2>
+<div class="card">
+  <p><code>reverse_commission_for_order</code> (سطر 262) تُستدعى <b>عند استرداد الطلب</b> (من <code>commission_config_router</code> سطر 189): المنصة لا يجوز أن تحتفظ بعمولتها على بيع مُرتجَع. هذه الدالة مليئة بالفروع الذكية:</p>
+  <div class="seq">
+    <div class="row"><div class="b">جمع تسويات الطلب بحالة <code>PENDING</code> أو <code>APPROVED</code> فقط (سطر 272–283) — <b>PAID مستثناة</b></div></div>
+    <div class="row"><div class="b"><b>idempotent:</b> هل يوجد سطر <code>COMMISSION_REVERSAL</code> مسبقاً؟ → تخطّي (سطر 297)</div></div>
+    <div class="row"><div class="b">اقرأ العمولة من سطر <code>PLATFORM_FEE</code>؛ إن كانت ≤0 → تخطّي (سطر 300–303)</div></div>
+    <div class="row"><div class="b">اكتب سطر عكس <b>موجب</b> (الصافي يرتفع ثانية) + صفّر <code>fees_minor</code> + ارفع <code>net_minor</code> (سطر 304–315)</div></div>
+    <div class="row"><div class="b"><b>إن كانت APPROVED (الدفتر سُجِّل):</b> اكتب القيد العكسي (سطر 316–346)</div></div>
+  </div>
+  <h4>القيد العكسي (سطر 329)</h4>
+  <div class="ledger">
+<span class="dr">DR  PLATFORM_REVENUE        fee</span>   <span class="c"># المنصة تتنازل عن عمولتها</span><br>
+<span class="cr">    CR  PROVIDER_PAYABLE_{id}  fee</span>   <span class="c"># صارت مستحقة للمزوّد</span>
+  </div>
+  <div class="note key">🔑 <b>ثلاث حالات مختلفة للتسوية، ثلاث معالجات:</b>
+  <ul class="clean">
+    <li><span class="pill" style="background:#999">PENDING</span> → تعديل الأسطر والأرقام فقط (لم تُسجَّل قيود بعد) — لا قيد عكسي.</li>
+    <li><span class="pill guard">APPROVED</span> → تعديل الأرقام <b>+ قيد عكسي</b> (لأن قيد الموافقة سُجِّل الإيراد).</li>
+    <li><span class="pill err">PAID</span> → <b>تُترَك تماماً</b> + تُبلَّغ كـ«skipped» ليعالجها المشغّل يدوياً (الصرف نُفِّذ فعلاً، لا يمكن التراجع آلياً).</li>
+  </ul></div>
+  <div class="note warn">⚠️ <b>تصحيح تاريخي مزدوج في هذه الدالة:</b>
+  <ul class="clean">
+  <li><b>FIN-01/04 (سطر 318–323):</b> كان العكس يخصم <code>PLATFORM_ESCROW</code> — صحيح فقط عندما لم تكن الموافقة تسجّل إيراداً. الآن بعد أن صارت الموافقة تُضيف لـ<code>PLATFORM_REVENUE</code>، يجب أن يخصم العكس <b>الإيراد</b> ثانية.</li>
+  <li><b>FIN-4 (سطر 324–328):</b> كان هذا السطر «الشارد» الوحيد لا يزال يستخدم <code>PROVIDER_RECEIVABLE</code> القديم، فيشطر دفتر المزوّد الفرعي عبر رمزين. التصحيح وحّده مع <code>PROVIDER_PAYABLE</code>. كلاهما LIABILITY → ميزان المراجعة كان يتوازن دائماً، لكن التصحيح وحّد الدفتر الفرعي لكل كيان.</li>
+  </ul></div>
+  <div class="note info">💡 <b>idempotent بالكامل:</b> استدعاء العكس مرتين على نفس الطلب لا يضاعف شيئاً — السطر الثاني يكتشف <code>COMMISSION_REVERSAL</code> موجوداً ويتخطّى. آمن للاستدعاء المتكرر (إعادة محاولة استرداد).</div>
+</div>
+
+<!-- 8 -->
+<h2 id="batch">⑧ التوليد الدفعي وحالات التخطّي</h2>
+<div class="card">
+  <p><code>generate-batch</code> (settlement_router سطر 195) يولّد تسويات لكل الطلبات المُسلَّمة بلا تسوية. حالات التخطّي الفعلية:</p>
+  <table>
+    <tr><th>يتخطّى</th><th>السطر</th><th>لماذا؟</th></tr>
+    <tr><td>طلب له تسوية مسبقاً (<code>not_(exists)</code>)</td><td>219</td><td>تجنّب الازدواج (يطابق حارس A5 التلقائي)</td></tr>
+    <tr><td>استلام ذاتي + نقدي (<code>SELF_PICKUP & CASH</code>)</td><td>221–226</td><td>يُسوّى وقت التأكيد (المزوّد جمع النقد بنفسه) → عمولة وهمية لو سُوِّي ثانية</td></tr>
+  </table>
+  <div class="note key">🔑 <b>عزل الفشل بـsavepoint (سطر 244):</b> كل طلب في الدفعة يُحاط بنقطة حفظ. لو رفع أحدها <code>IntegrityError</code> (سباق: تسوية أُنشئت للتوّ في مكان آخر)، تتراجع نقطة الحفظ <b>لذلك الطلب فقط</b> ويُتخطّى، <b>دون أن تنهار الدفعة كلها</b>. هذا تصميم ناضج لمعالجة دفعية: فشل عنصر لا يُسقط الباقي.</div>
+  <div class="note info">💡 <b>التماثل المقصود:</b> حارس «تخطّي الاستلام الذاتي النقدي» موجود في <b>المسارين</b> (التلقائي والدفعي) — التعليق سطر 226 يقول صراحةً <span class="tag">The auto path already skips it; the batch must too</span>. أي تباين بين المسارين = ثغرة عمولة.</div>
+</div>
+
+<!-- 9 -->
+<h2 id="races">⑨ سباقات التزامن وحمايتها</h2>
+<table>
+  <tr><th>السباق</th><th>الاحتمال</th><th>الدفاع</th><th>السطر</th></tr>
+  <tr><td>موافقتان متزامنتان</td><td>قيد موافقة مزدوج (إيراد مضاعف)</td><td>قفل صف + state==PENDING تحت القفل</td><td>103 <span class="tag">FIN-2</span></td></tr>
+  <tr><td>صرفان متزامنان</td><td>مرجعا دفع + دفع مزدوج</td><td>قفل صف + state==APPROVED</td><td>199 <span class="tag">FIN-3</span></td></tr>
+  <tr><td>تسوية تلقائية + دفعية لنفس الطلب</td><td>ائتمان مزدوج للمزوّد</td><td>A5 (تلقائي) + not_(exists) (دفعة) + savepoint</td><td>1640 / 219 / 244</td></tr>
+  <tr><td>عكس مزدوج للعمولة</td><td>عكس مضاعف</td><td>كشف سطر COMMISSION_REVERSAL</td><td>297</td></tr>
+  <tr><td>صرف أثناء نزاع تحت المراجعة</td><td>تسرّب الصرف عبر UNDER_REVIEW</td><td>فحص الحالتين معاً</td><td>218 <span class="tag">H2</span></td></tr>
+  <tr><td>قيد في فترة محاسبية مغلقة</td><td>تشويه فترة مقفلة</td><td>is_period_locked</td><td>1648 <span class="tag">A9</span></td></tr>
+</table>
+
+<!-- 10 -->
+<h2 id="scenarios">⑩ مصفوفة «ماذا لو» للتسوية</h2>
+<table>
+  <tr><th>ماذا لو…</th><th>الاحتمال غير المباشر</th><th>الدفاع الفعلي</th></tr>
+  <tr><td>طلب مأمورية وصل للتسوية</td><td>المنصة تُسوّي مع نفسها (self-dealing)</td><td>is_errand_provider → تخطّي + تسوية مأمورية خاصة تصفّي الميزانية</td></tr>
+  <tr><td>إعداد عمولة 200% بالخطأ</td><td>صافي مزوّد سالب</td><td>_clamp_fee: لا تتجاوز إجمالي الطلب</td></tr>
+  <tr><td>استرداد طلب لم تُسجَّل عمولته بعد (PENDING)</td><td>عكس قيد غير موجود</td><td>يعدّل الأرقام فقط، بلا قيد عكسي</td></tr>
+  <tr><td>استرداد طلب صُرِف فعلاً (PAID)</td><td>محاولة تراجع عن صرف نُفِّذ</td><td>يُترَك + يُبلَّغ skipped للمشغّل</td></tr>
+  <tr><td>استرداد مكرّر (إعادة محاولة)</td><td>عكس مضاعف</td><td>idempotent عبر كشف سطر العكس</td></tr>
+  <tr><td>تسليم طلب في فترة محاسبية مغلقة</td><td>قيد في فترة مقفلة</td><td>A9 → تخطّي + تحذير</td></tr>
+  <tr><td>تسوية مكافأة (BONUS)</td><td>تضخيم أصل غير مموّل</td><td>فرع منفصل: مصروف لا حضانة</td></tr>
+  <tr><td>استلام ذاتي نقدي في الدفعة</td><td>عمولة وهمية مزدوجة</td><td>تخطّي في المسارين</td></tr>
+  <tr><td>عنصر واحد يفشل في دفعة كبيرة</td><td>انهيار الدفعة كلها</td><td>savepoint لكل عنصر</td></tr>
+  <tr><td>صرف لسائق عليه تباين نقدي</td><td>صرف رغم عجز نقدي</td><td>فحص CashHandover DISCREPANCY</td></tr>
+</table>
+
+<!-- 11 -->
+<h2 id="gaps">⑪ فجوات/مخاطر مرصودة (للتحقّق، ليست أحكاماً)</h2>
+<div class="note risk">🔎 <b>من قراءة الكود الفعلي:</b>
+<ul class="clean">
+<li><b>approve يثق بـ<code>net_minor</code>/<code>fees_minor</code> المخزّنة:</b> القيد يُبنى من أرقام التسوية المحفوظة وقت التوليد. إن عُدِّل صف التسوية بين التوليد والموافقة بطريقة لا تمرّ عبر الدوال (تعديل مباشر/هجرة بيانات)، قد ينحرف القيد. الحماية الحالية: لا مسار كتابة آخر، لكن يستحق يقظة.</li>
+<li><b>عكس PAID يدوي:</b> استرداد طلب صُرِف فعلاً يُبلَّغ «skipped» ويُترَك للمشغّل — صحيح (لا يمكن التراجع آلياً عن صرف)، لكنه يعني أن استرداداً بعد الصرف يحتاج تدخّلاً بشرياً مضموناً، وإلا تبقى عمولة على بيع مُرتجَع.</li>
+<li><b>الأقفال على PostgreSQL فقط:</b> كل حماية السباق هنا (<code>with_for_update</code>) بلا أثر على SQLite. السيناريوهات المتزامنة للتسوية يجب أن تُختبر على PG لا في اختبارات الوحدة على SQLite.</li>
+<li><b>تباين نقد السائق يحجب صرفه كاملاً:</b> أي تباين واحد (<code>DISCREPANCY</code>) يحجب كل تسويات السائق، لا تسوية الطلب المعني فقط. سياسة صارمة مقصودة، لكن قد تحجب صرفاً مستحقاً عن طلبات سليمة حتى يُحَلّ التباين.</li>
+<li><b>تسوية المأمورية best-effort:</b> لو تعثّر دفترها (سطر 1632) تُسجَّل تحذيراً ولا تكسر التسليم — لكن هذا يعني احتمال تصفية ميزانية غير مكتملة تحتاج رصداً عبر السجلّات.</li>
+</ul></div>
+<div class="note ok">✅ <b>الحكم الناضج:</b> مسار التسوية يُظهر <b>وعياً محاسبياً عالياً</b>: حاسبة عمولة موحّدة بين المسارين مع قصّ رباعي، تمييز محاسبي بين الحضانة والمصروف (العادي مقابل BONUS)، أقفال صفوف على نقاط الموافقة والصرف، فحوص حجز مزدوجة (نزاع + تباين)، عكس عمولة idempotent بثلاث معالجات حسب الحالة، وعزل فشل دفعي بـsavepoint. وكل تصحيح يحمل وسماً تاريخياً (CRIT-02, FIN-01/04, FIN-2/3/4, A5/A9, ج-2, H2, D4) يوثّق ثغرة أُغلِقت — دليل على تطوّر تراكمي لا تصميم متعجّل.</div>
+
+<footer>
+  التقرير العميق #2 — التسوية والعمولة وعكسها · منصة تووا/Tawa<br>
+  أُعِدّ بقراءة سطر-بسطر لـ<code>settlement_service.py</code> + <code>provider_commission.py</code> + مسار التسليم التلقائي · كل بند مُثبَت برقم سطر ووسم تاريخي
+</footer>
+
+</div>
+</body>
+</html>

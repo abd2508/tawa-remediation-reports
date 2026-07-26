@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>494 — الخطة التنفيذية الدقيقة: محاكاة ذهنية شاملة لكل بند مؤجَّل</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+      --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+      --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+      --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+      --code-bg:#0f1018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+    --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+    --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+    --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+    --code-bg:#0f1018;
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI","Tahoma","Geeza Pro","Noto Naskh Arabic",sans-serif;
+    line-height:1.75; margin:0; padding:0; font-size:16px;
+  }
+  .wrap{max-width:1200px; margin:0 auto; padding:28px 20px 90px;}
+  header.hero{
+    background:linear-gradient(135deg,var(--accent),#2563eb);
+    color:#fff; border-radius:18px; padding:36px 28px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+  }
+  header.hero h1{margin:0 0 10px; font-size:1.6rem; line-height:1.55; text-wrap:balance;}
+  header.hero p{margin:0; opacity:.95; font-size:1.02rem;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+  .meta-chip{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:6px 14px; border-radius:999px; font-size:.85rem;}
+
+  h2{font-size:1.32rem; margin:50px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px;}
+  h3{font-size:1.1rem; margin:28px 0 10px; color:var(--accent);}
+  h4{font-size:1rem; margin:16px 0 8px;}
+  .lead{color:var(--sub); font-size:1rem; margin-bottom:16px;}
+
+  .tbl-wrap{overflow-x:auto; border-radius:12px; border:1px solid var(--border); margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:.87rem;}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{background:var(--code-bg); font-size:.8rem; color:var(--sub);}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--code-bg); padding:2px 6px; border-radius:6px; font-size:.85em; direction:ltr; display:inline-block; unicode-bidi:embed;}
+
+  .badge{display:inline-block; padding:3px 10px; border-radius:999px; font-size:.72rem; font-weight:700; white-space:nowrap;}
+  .badge.done{background:var(--green-bg); color:var(--green);}
+  .badge.new{background:var(--red-bg); color:var(--red);}
+  .badge.info{background:var(--blue-bg); color:var(--blue);}
+  .badge.warn{background:var(--amber-bg); color:var(--amber);}
+  .badge.skip{background:var(--gray-bg); color:var(--gray);}
+  .badge.purple{background:var(--purple-bg); color:var(--purple);}
+
+  .simple{background:var(--blue-bg); border-inline-start:4px solid var(--blue); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.96rem;}
+  .simple b{color:var(--blue);}
+  .risk{background:var(--red-bg); border-inline-start:4px solid var(--red); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .risk b{color:var(--red);}
+  .safe{background:var(--green-bg); border-inline-start:4px solid var(--green); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .safe b{color:var(--green);}
+  .fix{background:var(--amber-bg); border-inline-start:4px solid var(--amber); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .fix b{color:var(--amber);}
+  .found{background:var(--purple-bg); border-inline-start:4px solid var(--purple); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .found b{color:var(--purple);}
+  .tech{background:var(--purple-bg); border-inline-start:4px solid var(--purple); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .tech b{color:var(--purple);}
+
+  .item{border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:20px; background:var(--card);}
+  .item.hot{border:2px solid var(--red);}
+  .item.blocked{border:2px dashed var(--amber);}
+  .item-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+  .item-head h3{margin:0; font-size:1.1rem; color:var(--text);}
+  .src{color:var(--sub); font-size:.76rem; margin-top:8px; padding-top:8px; border-top:1px dashed var(--border);}
+  .src b{color:var(--text);}
+  .quote{background:var(--code-bg); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:.85rem; border-inline-start:3px solid var(--accent);}
+  .verify{background:var(--code-bg); border-radius:8px; padding:8px 12px; margin:6px 0; font-size:.82rem; border-inline-start:3px solid var(--green);}
+  .verify.bad{border-inline-start-color:var(--red);}
+  .verify b{color:var(--green);}
+  .verify.bad b{color:var(--red);}
+
+  .verdict-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:18px 0;}
+  .stat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center;}
+  .stat .num{font-size:1.7rem; font-weight:800;}
+  .stat .lbl{color:var(--sub); font-size:.78rem; margin-top:4px;}
+  .stat.green .num{color:var(--green);}
+  .stat.red .num{color:var(--red);}
+  .stat.blue .num{color:var(--blue);}
+  .stat.amber .num{color:var(--amber);}
+  .stat.purple .num{color:var(--purple);}
+
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:10px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.88rem;}
+  .toc ol{margin:6px 0; padding-inline-start:22px; columns:2; column-gap:24px;}
+  @media (max-width:640px){ .toc ol{columns:1;} }
+
+  .timeline{position:relative; margin:24px 0; padding-inline-start:26px;}
+  .timeline::before{content:""; position:absolute; inset-inline-start:8px; top:6px; bottom:6px; width:2px; background:var(--border);}
+  .tl-item{position:relative; margin-bottom:18px; padding-inline-start:14px;}
+  .tl-item::before{content:""; position:absolute; inset-inline-start:-26px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--card); box-shadow:0 0 0 2px var(--accent);}
+  .tl-item.hot::before{background:var(--red); box-shadow:0 0 0 2px var(--red);}
+  .tl-item .tl-date{font-size:.76rem; color:var(--sub); font-weight:700;}
+  .tl-item .tl-title{font-weight:700; margin:2px 0 4px;}
+  .tl-item .tl-body{font-size:.86rem; color:var(--sub);}
+
+  .flow{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:16px 0; font-size:.82rem;}
+  .flow .step{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 12px; text-align:center; flex:1; min-width:130px;}
+  .flow .arrow{color:var(--sub); font-size:1.1rem; flex-shrink:0;}
+  .flow .step.ok{border-color:var(--green); background:var(--green-bg);}
+  .flow .step.stop{border-color:var(--red); background:var(--red-bg);}
+  .flow .step.warn{border-color:var(--amber); background:var(--amber-bg);}
+  @media (max-width:760px){ .flow{flex-direction:column;} .flow .arrow{transform:rotate(90deg);} }
+
+  .before-after{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;}
+  @media (max-width:700px){ .before-after{grid-template-columns:1fr;} }
+  .ba-box{border-radius:12px; padding:14px 16px; font-size:.88rem;}
+  .ba-box.before{background:var(--red-bg); border:1px solid var(--red);}
+  .ba-box.after{background:var(--green-bg); border:1px solid var(--green);}
+  .ba-box .ba-label{font-weight:800; font-size:.78rem; margin-bottom:6px;}
+  .ba-box.before .ba-label{color:var(--red);}
+  .ba-box.after .ba-label{color:var(--green);}
+
+  .status-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; margin:16px 0;}
+  .status-card{border:1px solid var(--border); border-radius:12px; padding:14px 16px; background:var(--card); border-top:4px solid var(--gray);}
+  .status-card.pending{border-top-color:var(--amber);}
+  .status-card.resolved{border-top-color:var(--green);}
+  .status-card.hot{border-top-color:var(--red);}
+  .status-card .sc-title{font-weight:700; font-size:.92rem; margin-bottom:4px;}
+  .status-card .sc-note{font-size:.8rem; color:var(--sub);}
+
+  ul.clean{margin:8px 0; padding-inline-start:22px;}
+  ul.clean li{margin-bottom:6px;}
+  footer{color:var(--sub); font-size:.82rem; text-align:center; margin-top:50px; padding-top:20px; border-top:1px solid var(--border);}
+
+  .opt-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin:14px 0;}
+  .opt-card{border:1px solid var(--border); border-radius:12px; padding:14px 16px; background:var(--code-bg);}
+  .opt-card.reco{border:2px solid var(--green);}
+  .opt-card .opt-title{font-weight:800; font-size:.9rem; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:6px;}
+  .opt-card ul{margin:6px 0; padding-inline-start:18px; font-size:.83rem;}
+  .opt-card ul li{margin-bottom:4px;}
+
+  .seq-num{display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-weight:800; font-size:.8rem; flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>494 — الخطة التنفيذية الدقيقة: محاكاة ذهنية شاملة لكل بند مؤجَّل عمداً</h1>
+  <p>تحويل تقرير الحصر العميق (493 وما قبله) إلى خطة عمل قابلة للتنفيذ — بعد محاكاة ذهنية لِما سيحدث <b>أثناء</b> كل إصلاح/بناء، وما سيحدث <b>أثناء العمل الفعلي على المستودع</b> في اللحظة نفسها، مع تتبّع الجذور والأعراض الجانبية بعد كل خطوة وحلّها ضمن الخطة نفسها.</p>
+  <div class="meta-row">
+    <span class="meta-chip">📅 2026-07-15</span>
+    <span class="meta-chip">📄 مصدر: تقرير الحصر العميق النهائي + 493</span>
+    <span class="meta-chip">🧠 محاكاة أثناء البناء + أثناء العمل لكل بند</span>
+    <span class="meta-chip">✅ لا تنفيذ فعلي — خطة فقط، بلا لمس Git</span>
+  </div>
+</header>
+
+<div class="toc">
+  <b>فهرس الخطة</b>
+  <ol>
+    <li><a href="#collision">المخاطرة المحورية: تصادم حي على شجرة Git الآن</a></li>
+    <li><a href="#method">كيف تُقرأ كل بطاقة في هذه الخطة</a></li>
+    <li><a href="#a1">أ-1: توحيد شجرة الالتزام (Git) — واقع أكبر مما ورد سابقاً</a></li>
+    <li><a href="#a2">أ-2: تسمية PROVIDER_PAYABLE مقابل DRIVER_PAYABLE</a></li>
+    <li><a href="#a3">أ-3: مصير 5 وحدات كود خاملة</a></li>
+    <li><a href="#a4">أ-4: مهلة إعادة تصنيف السائق (300 ثانية)</a></li>
+    <li><a href="#a5">أ-5: إكمال/إزالة اللغة الإنجليزية في الجوّال</a></li>
+    <li><a href="#a6">أ-6: فجوة إعادة المحاولة في تسوية السائق على الويب</a></li>
+    <li><a href="#a7">أ-7: رقما "إيرادات اليوم" المتعارضان</a></li>
+    <li><a href="#b1">ب-1: الإرسال الذرّي الافتراضي للإشعارات</a></li>
+    <li><a href="#b2">ب-2: سياسة محاسبة الدفع الجزئي/المختلط</a></li>
+    <li><a href="#b3">ب-3: سياسة إبطال الجلسة عند الخروج بلا اتصال</a></li>
+    <li><a href="#b4">ب-4: قناة دفع إلكترونية لأرباح السائق غير النقدية</a></li>
+    <li><a href="#c1">ج-1: دعم هواوي الكامل (HMS)</a></li>
+    <li><a href="#c2">ج-2: تتبّع موقع السائق في الخلفية</a></li>
+    <li><a href="#sequence">الترتيب الزمني الموصى به للتنفيذ</a></li>
+  </ol>
+</div>
+
+<h2 id="collision">🔴 المخاطرة المحورية — تصادم حيّ على شجرة Git الآن، هذه اللحظة</h2>
+<p class="lead">هذا هو أهم عنصر في كل الخطة. أي محاكاة لـ"ماذا يحدث أثناء العمل" يجب أن تبدأ من هنا، لأن هذه المخاطرة تتفوّق حالياً على كل بند آخر.</p>
+
+<div class="simple">
+  <b>بلغة بسيطة:</b> جلسة أخرى من Claude (حساب مختلف) تعمل على نفس نسخة الكود على القرص، في نفس اللحظة التي أكتب فيها هذه الخطة. هي لم تُثبّت (commit) عملها بعد. فتحتُ الطرفية الآن (وقت كتابة هذا القسم) ووجدتُ أن الفجوة الموصوفة في التقرير السابق ("ملفّان ناقصان فقط") أصبحت متجاوَزة بالفعل — الآن هناك تغييرات غير مُثبَّتة في <b>7 ملفات باك-إند جوهرية</b> (نحو 1980 سطراً) و<b>11 ملف جوّال</b> و<b>6 ملفات جوّال جديدة</b> بالكامل، لم تُدمَج بعد في أي التزام Git.
+</div>
+
+<div class="verdict-grid">
+  <div class="stat red"><div class="num">7</div><div class="lbl">ملفات باك-إند جوهرية معدَّلة بلا التزام</div></div>
+  <div class="stat red"><div class="num">~1980</div><div class="lbl">سطر باك-إند متغيّر غير مُثبَّت</div></div>
+  <div class="stat amber"><div class="num">11</div><div class="lbl">ملف جوّال معدَّل بلا التزام</div></div>
+  <div class="stat amber"><div class="num">6</div><div class="lbl">ملف جوّال جديد كلياً غير متتبَّع</div></div>
+  <div class="stat blue"><div class="num">9</div><div class="lbl">تقارير جديدة (485–493) لم أكن أعرف بها عند كتابة تقرير الحصر</div></div>
+</div>
+
+<h3>الدليل الحرفي (فحصتُه بالأمر <code>git status --short</code> و<code>git diff --stat</code> مباشرة قبل كتابة هذا القسم)</h3>
+<div class="tbl-wrap"><table>
+<thead><tr><th>الملف</th><th>الوحدة</th><th>حجم التغيير غير المُثبَّت</th><th>يتقاطع مع أي بند في هذه الخطة؟</th></tr></thead>
+<tbody>
+<tr><td><code>order_service.py</code></td><td>الطلبات</td><td>361+ / 105−</td><td><span class="badge warn">نعم — ب-2 (الدفع الجزئي)</span></td></tr>
+<tr><td><code>operations_router.py</code></td><td>غرفة التحكم</td><td>569+ / 178−</td><td><span class="badge warn">نعم — أ-7 (رقما الإيرادات)</span></td></tr>
+<tr><td><code>dispatch_service.py</code></td><td>التوزيع</td><td>289+ / 58−</td><td><span class="badge warn">نعم — ب-4 (قناة الدفع غير النقدي)</span></td></tr>
+<tr><td><code>notification_service.py</code></td><td>الإشعارات</td><td>88+ / 19−</td><td><span class="badge warn">نعم — ب-1 (الإرسال الذرّي)</span></td></tr>
+<tr><td><code>jwt_service.py</code></td><td>الهوية</td><td>72+ / 17−</td><td><span class="badge warn">نعم — ب-3 (إبطال الجلسة)</span></td></tr>
+<tr><td><code>cash_exception_router.py</code></td><td>الاستثناءات النقدية</td><td>57+ / 6−</td><td><span class="badge warn">نعم — ب-4</span></td></tr>
+<tr><td><code>notification_router.py</code></td><td>الإشعارات</td><td>22+ / 5−</td><td><span class="badge warn">نعم — ب-1</span></td></tr>
+<tr><td><code>presence_service.py</code>, <code>settlement/service.py</code>, <code>ledger_service.py</code>, <code>config.py</code></td><td>الحضور/التسوية/الدفتر</td><td><b>لا يوجد أي تغيير</b> (تحقّقتُ بـ<code>git diff --stat</code>)</td><td><span class="badge done">لا — آمنة للتخطيط عليها الآن (أ-2، أ-4)</span></td></tr>
+</tbody>
+</table></div>
+
+<div class="risk">
+  <b>لماذا هذا يبطل جزءاً من التقرير السابق فوراً؟</b> البند رقم 1 في قائمة "12) القائمة النهائية" بالتقرير السابق قال: "الالتزام بملفَّين ناقصين لإغلاق فجوة البناء النظيف". هذا كان دقيقاً <b>عند كتابته</b>. لكنه الآن وصف حالة تجاوزها الزمن — الجلسة الأخرى واصلت العمل، وأنتجت تقارير 490 → 491 → 492 → <b>493</b> (الأخير وُلد بعد أن بدأتُ كتابة تقرير الحصر العميق بدقائق). فتحويل بند "التزام ملفَّين" إلى خطة تنفيذ الآن سيكون تخطيطاً لواقع لم يعد موجوداً.
+</div>
+
+<h3>محاكاة: ماذا يحدث <b>أثناء العمل</b> (بمعنى: أثناء وجود جلستين تعملان على نفس الشجرة في اللحظة نفسها)؟</h3>
+<div class="flow">
+  <div class="step warn">أنا أو الجلسة الأخرى تُشغّل <code>git add -A</code></div>
+  <div class="arrow">→</div>
+  <div class="step stop">يلتقط تلقائياً كل تعديلات الطرف الآخر غير المكتملة</div>
+  <div class="arrow">→</div>
+  <div class="step stop">التزام واحد يخلط عملَين غير مرتبطين، أحدهما غير مختبَر بعد</div>
+  <div class="arrow">→</div>
+  <div class="step warn">سجل Git يصبح مضلِّلاً: من فعل ماذا؟</div>
+</div>
+<p class="lead">هذا التسلسل <b>وقع فعلاً مرتين</b> سابقاً في نفس هذه الجلسة (راجع: حادثة R478-486 التي استدعت إخطار الجلسة الأخرى عبر الذاكرة المشتركة، وحادثة `git add -A` الثانية التي التقطت 16 ملفاً غير مرتبط). هذا ليس سيناريو افتراضياً — هذا نمط متكرر مُوثَّق من نفس المحادثة.</p>
+
+<h3>الحل المُدرَج ضمن هذه الخطة (وليس توصية منفصلة)</h3>
+<div class="fix">
+  <b>بروتوكول تنسيق إلزامي قبل أي التزام Git من أي جلسة:</b>
+  <ol style="margin:8px 0; padding-inline-start:20px;">
+    <li><code>git status --short</code> أولاً دائماً — لا <code>git add -A</code> مباشرة أبداً.</li>
+    <li>تصنيف كل ملف: "أنا عدّلته الآن" مقابل "موجود مسبقاً ولا علاقة لي به" — بمطابقة القائمة أعلاه.</li>
+    <li>الالتزام بالاسم الصريح لكل ملف: <code>git add path/to/file1 path/to/file2</code> — أبداً <code>-A</code> أو <code>.</code> على شجرة مشتركة نشطة.</li>
+    <li>قبل أي بند من هذه الخطة يلمس أحد الملفات السبعة أعلاه (ب-1 إلى ب-4)، يجب التحقق أولاً هل التزمت الجلسة الأخرى عملها — وإلا فالتنفيذ يُبنى فوق كود قيد التغيير، مما يعني أن أي اختبار "ناجح" الآن قد ينهار بعد أن تُثبِّت الجلسة الأخرى نسختها.</li>
+  </ol>
+</div>
+
+<h2 id="method">📖 كيف تُقرأ كل بطاقة في هذه الخطة</h2>
+<div class="simple">
+  كل بند أدناه مقسَّم بنفس الطريقة: <b>الجذر</b> (أين المشكلة في الكود بالضبط) ← <b>الإصلاح المقترح</b> (+ أحدث تقنية مناسبة إن وُجدت) ← <b>محاكاة أثناء البناء/التحديث</b> (ماذا يحدث لحظة تطبيق الإصلاح وتشغيل الاختبارات والبناء) ← <b>محاكاة أثناء العمل</b> (ماذا يحدث إذا كان النظام يستقبل طلبات حقيقية، أو جلسة أخرى تعمل، في نفس اللحظة) ← <b>الأعراض الجانبية بعد الإصلاح وبعد البناء</b>، كل عرض مقروناً بحلّه داخل الجدول نفسه — لا عرض بلا حل.
+  البنود مقسَّمة لثلاث مجموعات: <b>(أ) قابلة للتنفيذ الآن</b> لأن ملفاتها مستقرة، <b>(ب) محجوبة مؤقتاً</b> لأن ملفاتها قيد تعديل حي من الجلسة الأخرى فلا يوجد أساس ثابت لبناء إصلاح عليه، <b>(ج) قرارات استراتيجية بحتة</b> لا علاقة لها بأي كود متغيّر.
+</div>
+
+<!-- ============ PART A ============ -->
+<h2>🟢 القسم أ — بنود قابلة للتنفيذ الآن (ملفاتها مستقرة، تحقّقتُ بـ<code>git diff --stat</code>)</h2>
+
+<div class="item" id="a1">
+<div class="item-head"><h3>أ-1: توحيد شجرة الالتزام — الواقع أكبر من "ملفَّين"</h3><span class="badge new">عاجل — يمنع أي استنساخ نظيف من البناء</span></div>
+<p><b>الجذر:</b> تقرير 492 وثّق ملفَّين يتيمين (<code>RoleHomeMenu.tsx</code>, <code>driverOfferStream.ts</code>) كآخر عنصر متبقٍّ. لكن الواقع الحالي (مذكور في قسم "المخاطرة المحورية" أعلاه) أكبر بكثير: 18 ملفاً معدَّلاً + 6 ملفات جديدة + 9 تقارير جديدة، جميعها غير مُثبَّتة، تخص جلسة عمل لا تزال جارية.</p>
+<div class="quote">لا يوجد أمر Git واحد آمن الآن — لأن التعديلات ليست "ملفّي" ولا حتى "ملفّان معروفان"، بل مزيج حيّ من عمل جلسة أخرى لم تنتهِ.</div>
+<div class="fix"><b>الإصلاح المقترح:</b> لا التزام الآن من هذه الجلسة إطلاقاً. الخطوة الصحيحة الوحيدة: <b>سؤال المُشغِّل</b> — هل الجلسة الأخرى انتهت من دورة العمل الحالية؟ إن كان الجواب نعم، ينفّذ <i>صاحب ذلك العمل</i> (أو من يُخوَّل صراحة) التزاماً واحداً يضم كل التعديلات ذات الصلة بدفعة "توافق الويب/الجوّال" (تقارير 485-493)، مع رسالة التزام تُلخّص السلسلة الكاملة، لا التزامات مبعثرة لكل ملف.</div>
+<h4>محاكاة أثناء التنفيذ (Build-time)</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>تنفيذ <code>git add -A</code> الآن دون تصنيف</td><td>يلتقط كل الـ27+ ملفاً بما فيها عمل غير مختبر من الجلسة الأخرى، والتزام واحد يصبح غير قابل للمراجعة أو التراجع الجزئي</td><td>ممنوع — استخدام <code>git status --short</code> ثم إضافة صريحة بالاسم فقط، وفق البروتوكول في قسم "المخاطرة المحورية"</td></tr>
+<tr><td>B2</td><td>الالتزام الآن يشمل تقارير 485-493 (ملفات Markdown كبيرة) مع كود لم يُختبر بعد</td><td>سجل Git يصبح ثقيلاً وغير منطقي: تقرير "خطة" ملتزَم مع كود "لم يُنفَّذ الجزء الموصوف فيه بعد" في نفس اللحظة</td><td>فصل الالتزام لدفعتين: (1) الكود بعد اكتمال اختباره، (2) التقارير كالتزام توثيقي منفصل يتبعها</td></tr>
+<tr><td>B3</td><td>تشغيل مجموعة الاختبارات الكاملة الآن على شجرة غير مُثبَّتة</td><td>النتيجة صحيحة تقنياً لكنها تصف حالة عابرة — أي تعديل إضافي من الجلسة الأخرى بعد قراءة النتيجة يُبطلها فوراً</td><td>إعادة تشغيل الاختبارات <i>مباشرة قبل</i> أي التزام فعلي، لا الاعتماد على نتيجة سابقة</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل (Runtime / تعدد الجلسات)</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>الجلسة الأخرى تعدّل أحد الملفات السبعة بينما هذه الجلسة تقرأها للتخطيط</td><td>لا ضرر — القراءة لا تتعارض مع الكتابة على مستوى نظام الملفات، لكن أي استنتاج "الملف كذا" قد يصبح قديماً خلال دقائق</td><td>كل استنتاج في هذه الخطة مؤرَّخ بلحظة الفحص (مذكور أعلاه)؛ أي تنفيذ لاحق يجب أن يُعيد التحقق أولاً لا أن يثق بالخطة وحدها</td></tr>
+<tr><td>R2</td><td>الجلستان تحاولان الالتزام على نفس الفرع في نفس الدقيقة</td><td>Git نفسه يمنع فقدان البيانات (لا يوجد تراكب فعلي لأن كل جلسة تعمل بشكل تسلسلي)، لكن التزامين متتاليين قد يتعارضا منطقياً حتى لو لم يتعارضا نصياً</td><td>تنسيق بشري: المُشغِّل يقرر أي جلسة تلتزم أولاً</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد الإصلاح</h4>
+<ul class="clean">
+<li><b>عرض:</b> بعد الالتزام، أي استنساخ جديد (clone) للمشروع سيبني بنجاح لأول مرة منذ بدء دفعة 485-493 — لكن هذا يكشف فوراً ما إذا كانت اختبارات الويب المقابلة (راجع أ-6 أدناه: فجوة الويب في التسوية) ستفشل لأنها لم تُلمَس. <b>الحل:</b> تشغيل <code>npm test</code> و<code>pytest</code> كاملين بعد الالتزام مباشرة كخطوة تحقق نهائية، لا افتراض أن نجاح ما قبل الالتزام يكفي.</li>
+</ul>
+<div class="src"><b>المصدر:</b> <code>git status --short</code> و<code>git diff --stat</code> مباشرة، 2026-07-15 (تحقّقتُه بنفسي وقت كتابة هذه الخطة)</div>
+</div>
+
+<div class="item" id="a2">
+<div class="item-head"><h3>أ-2: تسمية PROVIDER_PAYABLE مقابل DRIVER_PAYABLE</h3><span class="badge warn">جلسة مخصَّصة موصى بها</span></div>
+<p><b>الجذر:</b> <code>backend/app/modules/settlement/service.py:434</code> لا يزال يُنشئ تسويات بـ<code>beneficiary_type="DRIVER"</code>، بينما مسارات أحدث في <code>backend/app/modules/payments/ledger_service.py</code> (الأسطر 631, 663, 682, 711) تستخدم حسابات <code>DRIVER_PAYABLE_{driver_id}</code>. النظامان يتعايشان بتسميتين مختلفتين لنفس المفهوم المحاسبي. <b>ملفان غير متأثرَين بالتصادم الحي الآن</b> (تحقّق أعلاه).</p>
+<div class="fix"><b>الإصلاح المقترح:</b> ليس إعادة تسمية شاملة (خطر انحراف في العقود المالية FIN-COR)، بل طبقة توحيد قراءة (view/alias) في تقارير المحاسبة تُطبّع الاسمين إلى مفهوم واحد للعرض، مع ترك التخزين الفعلي كما هو حتى قرار هجرة كامل لاحقاً.</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> بدل تعديل الجداول مباشرة، استخدام <i>SQL view</i> أحادي القراءة (Postgres) للحسابين معاً بعمود <code>normalized_beneficiary_type</code> — نمط شائع حديثاً في أنظمة المحاسبة المزدوجة القيد للتعامل مع ديون تسمية قديمة دون مخاطرة الهجرة الحية.</div>
+<h4>محاكاة أثناء التنفيذ</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>إضافة migration جديدة لإنشاء الـview</td><td>Alembic head الحالي <code>aa15_order_messages</code> — أي migration جديدة تصبح <code>aa16</code>، تحتاج تحققاً upgrade+downgrade على PostgreSQL فعلي لا SQLite</td><td>اتباع نفس نمط aa01-aa15 الموثَّق (اختبار ثنائي الاتجاه قبل القبول)</td></tr>
+<tr><td>B2</td><td>تشغيل اختبارات FIN-COR بعد الإضافة</td><td>لا تأثير متوقَّع لأن hash الملفَّين المحميَّين (feature_flags.yaml, launch_gates.yaml) لا علاقة له بمخطط قاعدة البيانات</td><td>لا حاجة — تأكيد فقط</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>تسوية جارية فعلياً (سائق يقبض أرباحه) أثناء تطبيق الـview</td><td>لا قفل على الجدول الأصلي لأن الـview قراءة فقط؛ لا تأثير على معاملات الكتابة الحية</td><td>لا حاجة لنافذة صيانة</td></tr>
+<tr><td>R2</td><td>تقرير محاسبي يُشغَّل يدوياً في نفس اللحظة عبر الاسم القديم مباشرة (وليس الـview)</td><td>يستمر بإظهار الانقسام القديم — الإصلاح لا يعالج الاستعلامات المكتوبة يدوياً خارج الطبقة الجديدة</td><td>توثيق داخلي: كل استعلام محاسبي جديد يجب أن يمر عبر الـview الموحَّد، لا الجدول مباشرة</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد البناء</h4>
+<ul class="clean">
+<li><b>عرض:</b> فريق المحاسبة (أو المُشغِّل) قد يرى الآن <i>ثلاثة</i> تمثيلات لنفس المفهوم مؤقتاً: DRIVER القديم، DRIVER_PAYABLE_{id} الجديد، والعمود الموحَّد في الـview — ارتباك أكبر قبل أن يقل. <b>الحل:</b> توثيق واضح في تقرير التسليم يشرح أن الـview هو "مصدر الحقيقة للعرض" حصراً، والحقلان الأصليان "تخزين تاريخي" فقط، مع خطة هجرة كاملة كبند منفصل لاحق بعد موافقة المُشغِّل.</li>
+</ul>
+<div class="src"><b>المصدر:</b> <code>settlement/service.py:434</code>, <code>ledger_service.py:631,663,682,711</code> — تحقّق مباشر بـ<code>grep</code>، 2026-07-15، الملفان مستقران (بلا تعديل حي)</div>
+</div>
+
+<div class="item" id="a3">
+<div class="item-head"><h3>أ-3: مصير 5 وحدات كود خاملة تماماً</h3><span class="badge warn">حذف أم توصيل؟ — قرار منتج</span></div>
+<p><b>الجذر:</b> تحقّق مباشر بـ<code>grep -rl</code> (2026-07-15) أكّد أن <code>donations_controller.py</code>, <code>home_kitchens_controller.py</code>, <code>plate_match_service.py</code>, <code>soft_launch_guard.py</code>, <code>payment_adapter.py</code> لا تملك أي مرجع خارجي — صفر استدعاء من أي راوتر مسجَّل. <b>لا واحد منها ضمن التعديلات الحية الآن</b>.</p>
+<div class="opt-grid">
+  <div class="opt-card reco"><div class="opt-title">الخيار 1: الحذف الكامل <span class="badge done">موصى به</span></div>
+    <ul><li>يزيل ~5 ملفات ميتة من مساحة الصيانة والفحص الأمني</li><li>لا خطر لأن صفر استدعاء يعني صفر أثر وظيفي عند الحذف</li><li>يتطلب فقط تأكيد Git history يحفظها لو احتيج إليها لاحقاً (لا حذف من التاريخ، حذف من الشجرة الحية فقط)</li></ul>
+  </div>
+  <div class="opt-card"><div class="opt-title">الخيار 2: التوصيل الفعلي</div>
+    <ul><li>يتطلب قرار منتج مسبق لكل وحدة على حدة (هل "التبرعات" ميزة مطلوبة الآن؟)</li><li>تكلفة أعلى بكثير من الحذف، ولا مبرر واضح حالياً من أي تقرير سابق</li></ul>
+  </div>
+  <div class="opt-card"><div class="opt-title">الخيار 3: الإبقاء الخامل كما هو</div>
+    <ul><li>الأسوأ — يراكم دَين تقني بلا فائدة، ويربك أي مراجعة أمنية مستقبلية ("لماذا هذا الكود هنا ولا يُستدعى؟")</li></ul>
+  </div>
+</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> قبل الحذف، تشغيل أداة تحليل ميت-الكود الثابت (مثل <code>vulture</code> لبايثون، موجودة أصلاً في نظام أدوات مشاريع بايثون الحديثة) للتأكد أن التحليل اليدوي بـ<code>grep</code> لم يفوّت مرجعاً ديناميكياً (مثل تحميل عبر <code>importlib</code> أو تسجيل عبر decorator غير مباشر).</div>
+<h4>محاكاة أثناء التنفيذ (لسيناريو الحذف)</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>حذف الملفات ثم تشغيل <code>pytest</code> الكامل</td><td>أي اختبار يستورد هذه الوحدات مباشرة (حتى لو الوحدة نفسها غير مستدعاة إنتاجياً) سيفشل بـ ImportError</td><td>فحص <code>backend/tests/</code> أولاً بـ<code>grep</code> عن استيراد مباشر لهذه الملفات؛ حذف أي اختبار يخصها حصرياً أو نقله لأرشيف</td></tr>
+<tr><td>B2</td><td>حذف <code>payment_adapter.py</code> تحديداً</td><td>الاسم يوحي بأنه قد يكون نقطة تمديد مستقبلية لبوابات دفع أخرى — الحذف قد يبدو "رجوعاً" لو كانت هناك خطة دفع غير معلنة</td><td>التأكيد الصريح من المُشغِّل تحديداً لهذا الملف قبل حذفه، منفصلاً عن البقية</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>مستخدم إنتاجي يستدعي مساراً كان يعتمد ضمنياً على أحد هذه الملفات (رغم "صفر مرجع" في التحليل الساكن)</td><td>لا يوجد دليل بذلك من أي تقرير حتى الآن — لكن هذا هو بالضبط سبب استخدام أداة تحليل ديناميكي إضافية لا الاكتفاء بـ<code>grep</code></td><td>مراقبة السجلات (logs) لمدة أسبوع بعد الحذف في بيئة الاختبار الداخلي قبل اعتباره نهائياً في الإنتاج</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد الحذف</h4>
+<ul class="clean">
+<li><b>عرض:</b> تقليل عدد الملفات قد يُغيّر أرقام تغطية الاختبار (coverage %) ظاهرياً للأفضل دون تحسّن حقيقي في الجودة — مجرد قسمة على مقام أصغر. <b>الحل:</b> ذكر هذا صراحة في تقرير التسليم حتى لا يُقرأ كتحسّن جودة وهمي.</li>
+</ul>
+<div class="src"><b>المصدر:</b> <code>grep -rl</code> مباشر عبر كل الوحدات، 2026-07-15، صفر تعديل حي على أي من الملفات الخمسة</div>
+</div>
+
+<div class="item" id="a4">
+<div class="item-head"><h3>أ-4: مهلة إعادة تصنيف السائق كغير متاح (300 ثانية)</h3><span class="badge warn">قرار تشغيلي بسيط</span></div>
+<p><b>الجذر:</b> <code>backend/app/config.py:575</code> — <code>driver_presence_timeout_seconds: int = 300</code>. الميزة مبنية بحارس أمان صريح (P1-D في <code>presence_service.py</code>): إن كانت القيمة ≤ 0 فالميزة معطَّلة تماماً (سلوك حالي محفوظ). يوجد أيضاً استعلام معاينة للأثر قبل التفعيل: <code>presence_stats()</code> للقراءة فقط، يُظهر كم سائقاً <i>سيُعاد تصنيفه</i> عند مهلة معيّنة دون تنفيذ فعلي.</p>
+<div class="safe"><b>هذا أبسط بند في القائمة كلها:</b> التغيير هو قيمة بيئة واحدة (<code>DRIVER_PRESENCE_TIMEOUT_SECONDS</code>)، لا كود. الملفات الثلاثة المعنية (<code>presence_service.py</code>, <code>location_router.py</code>, <code>config.py</code>) مستقرة تماماً الآن (صفر تعديل حي).</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> بدل تغيير متغيّر بيئة يتطلب إعادة نشر كاملة، ربط هذه القيمة بنظام <code>contracts/feature_flags.yaml</code> الموجود أصلاً كي يصبح قيمة "ساخنة" قابلة للتعديل من لوحة عمليات دون إعادة تشغيل الحاوية — نمط "hot-reload config" شائع في أنظمة التوزيع الحديثة، ويستفيد من بنية تحتية موجودة أصلاً بدل بناء جديدة.</div>
+<h4>محاكاة أثناء التطبيق</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>تفعيل المهلة مباشرة بقيمة 300 دون معاينة أولاً</td><td>عدد غير معروف من السائقين "المتاحين" حالياً لكن الفعليين غائبين (تطبيق مغلق/بطارية منتهية) يُعاد تصنيفهم دفعة واحدة</td><td>تشغيل <code>presence_stats()</code> أولاً في بيئة الإنتاج (قراءة فقط، بلا أثر) لمعرفة الحجم قبل التفعيل الفعلي</td></tr>
+<tr><td>B2</td><td>القيمة تُضبط منخفضة جداً (مثلاً 60 ثانية) بالخطأ</td><td>سائقون متصلون فعلياً لكن بتقطّع شبكة عادي (نفق، مبنى) يُعاد تصنيفهم زوراً، فيفقدون عروض توصيل صالحة</td><td>حد أدنى آمن موصى به 300+ ثانية (القيمة الافتراضية نفسها موضوعة بعناية لهذا السبب حسب التعليق الموثّق في الكود)</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>ساعة ذروة، مئات السائقين متصلين، المهلة تُفعَّل للمرة الأولى</td><td>مهمة الجرف (reap) تعمل دورياً وتستثني صراحة أي سائق ضمن عرض توصيل نشط (busy) — موثَّق كحارس P1-B</td><td>لا حاجة لإصلاح إضافي — الحارس موجود ومُختبر أصلاً</td></tr>
+<tr><td>R2</td><td>سائق يفتح التطبيق ثانية بعد إعادة تصنيفه تلقائياً كغير متاح</td><td>يحتاج لإعادة تفعيل حالة "متاح" يدوياً من التطبيق — هذا سلوك متوقَّع ومطلوب (نفس منطق "استيقظ وأعلن نفسك")</td><td>التأكد أن شاشة السائق تعرض رسالة واضحة "أُعِدتَ تصنيفك كغير متاح لعدم النشاط، اضغط لتصبح متاحاً" بدل صمت مربك</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد التفعيل</h4>
+<ul class="clean">
+<li><b>عرض:</b> انخفاض ظاهري مفاجئ في "عدد السائقين المتاحين" على لوحة العمليات فور التفعيل — قد يُقرأ خطأً كأزمة نقص سائقين بينما هو تصحيح لعدّ كان مبالَغاً فيه أصلاً. <b>الحل:</b> إخطار فريق العمليات مسبقاً بالرقم المتوقَّع (من <code>presence_stats()</code>) حتى لا يُفاجَأوا.</li>
+</ul>
+<div class="src"><b>المصدر:</b> <code>config.py:574-575</code>, <code>presence_service.py:1-60</code> — قراءة مباشرة، 2026-07-15</div>
+</div>
+
+<div class="item" id="a5">
+<div class="item-head"><h3>أ-5: إكمال أو إزالة دعم اللغة الإنجليزية في الجوّال</h3><span class="badge warn">قرار نطاق ترجمة</span></div>
+<p><b>الجذر:</b> أعدتُ العدّ الآن مباشرة: 59 ملف شاشة في <code>apps/mobile/src/app/</code>، منها <b>15</b> فقط تستخدم <code>useTranslation</code> (كان 14 في التقرير السابق — إضافة شاشة واحدة منذ ذلك الحين، على الأرجح <code>+not-found.tsx</code> الجديدة من الجلسة الأخرى). ملفات الترجمة نفسها (<code>en.ts</code> 95 سطراً، <code>ar.ts</code> 93 سطراً) <b>غير متأثرة</b> بالتعديلات الحية، وتحققتُ أن الشاشات الثلاث المعدَّلة حياً حالياً (تخطيط السائق، التسوية، الرحلة) لا تستخدم <code>useTranslation</code> بعد — فلا تصادم.</p>
+<div class="opt-grid">
+  <div class="opt-card"><div class="opt-title">الخيار 1: إكمال الترجمة لكل الشاشات الـ44 المتبقية</div>
+    <ul><li>يفتح السوق لغير الناطقين بالعربية فعلياً بدل وعد جزئي مربك</li><li>تكلفة: عمل ترجمة + مراجعة لغوية لكل شاشة، ليس تقنياً معقَّداً لكنه كبير الحجم</li></ul>
+  </div>
+  <div class="opt-card reco"><div class="opt-title">الخيار 2: إزالة زر تبديل اللغة مؤقتاً <span class="badge done">أسرع وأصدق</span></div>
+    <ul><li>لا تجربة "نصف مترجمة" مربكة للمستخدم — إما عربي كامل الآن، أو ثنائي اللغة لاحقاً حين يكتمل</li><li>الكود التحتي (i18n) يبقى كما هو، فقط تعطيل الخيار من واجهة الإعدادات حتى يكتمل</li></ul>
+  </div>
+</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> إن اختير إكمال الترجمة، استخدام أداة استخراج مفاتيح آلية (مثل <code>i18next-parser</code>) لفحص كل الشاشات الـ44 المتبقية وتوليد قائمة نصوص عربية مكشوفة (hard-coded) تلقائياً، بدل مراجعة يدوية شاشة-شاشة — يقلل خطر تفويت نص.</div>
+<h4>محاكاة أثناء التنفيذ (لسيناريو الإكمال)</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>ترجمة الشاشات الثلاث المعدَّلة حياً الآن (تخطيط السائق، التسوية، الرحلة) قبل أن تلتزم الجلسة الأخرى نسختها</td><td>تعارض دمج (merge conflict) شبه مؤكد — كلا الجلستين تعدّلان نفس الأسطر لأسباب مختلفة</td><td>تأجيل ترجمة هذه الشاشات الثلاث تحديداً لِما بعد التزام الجلسة الأخرى (اتساق مع بروتوكول التصادم في القسم الأول)</td></tr>
+<tr><td>B2</td><td>ترجمة الـ41 شاشة الأخرى غير المتأثرة بالتصادم</td><td>آمنة تماماً للبدء فوراً بالتوازي مع أي عمل آخر</td><td>لا حاجة لإصلاح — يمكن البدء الآن</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>مستخدم يبدّل اللغة للإنجليزية في منتصف استخدام شاشة لم تُترجم بعد</td><td>يرى مزيجاً من نصوص إنجليزية ومفاتيح ترجمة خام أو نص عربي متبقٍّ — تجربة مستخدم سيئة ومربكة</td><td>هذا بالضبط سبب اختيار "الخيار 2" (إخفاء الزر) كحل مؤقت آمن حتى تكتمل التغطية 100%</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد الإكمال</h4>
+<ul class="clean">
+<li><b>عرض:</b> زيادة حجم حزمة التطبيق (bundle) قليلاً بمفاتيح ترجمة إضافية — ضئيل عملياً لكن يُذكر في تقرير القياس بعد البناء. <b>الحل:</b> لا فعل مطلوب — الفرق مهمل (كيلوبايتات قليلة) ولا يستدعي تحسيناً إضافياً.</li>
+</ul>
+<div class="src"><b>المصدر:</b> عدّ مباشر بـ<code>find</code> و<code>grep -c</code>، 2026-07-15: 59 شاشة، 15 تستخدم useTranslation</div>
+</div>
+
+<div class="item" id="a6">
+<div class="item-head"><h3>أ-6: فجوة إعادة المحاولة في تسوية السائق — الويب أيضاً</h3><span class="badge new">اكتشاف من تقرير 493</span><span class="badge purple">محدَّث — مدموج مع تحليل الجلسة الأخرى المستقل</span></div>
+<div class="found"><b>تحديث مصدره تقاطع مستقل:</b> بينما كانت هذه الخطة تُكتب، أنتجت الجلسة الأخرى تقريرها الخاص برقم 494 أيضاً (<code>app_report/494_EXECUTION_PLAN_493_GAPS.md</code> + نسخة HTML مطابقة في نفس مجلد NewFile10) مركّزاً حصراً على فجوتَي تقرير 493. قراءتها الكاملة لملف <code>DriverSettlementPage.tsx</code> كانت أعمق من الوصف الأولي هنا — وجدت جذرين منفصلين لا جذراً واحداً. الفقرات التالية مدموجة من كلا المصدرين.</div>
+<p><b>الجذر (بعد الدمج — جذران منفصلان لا جذر واحد):</b></p>
+<ul class="clean">
+<li><b>الجذر 1 — لا يوجد اكتشاف عند تحميل الصفحة أصلاً:</b> حالة <code>txn</code> تبدأ <code>null</code>؛ المكان الوحيد الذي يستدعي <code>settlementApi.myTransactions()</code> هو تأثير الاستطلاع الدوري (poll) كل 4 ثوانٍ، وهو نفسه مشروط بأن تكون <code>txn</code> صحيحة (truthy) مسبقاً. تحديث الصفحة، إغلاق التبويب، أو فتحها من جهاز آخر يفقد كل رؤية للمعاملة النشطة — حتى بلا أي فشل شبكة على الإطلاق. هذا أعمق من "فجوة إعادة محاولة" فقط.</li>
+<li><b>الجذر 2 — لا إعادة محاولة على استدعاء الرمز الثاني:</b> <code>web/src/pages/driver/DriverSettlementPage.tsx:97-113</code> — نفس ما وصفه تقرير 493 أصلاً: دالة <code>startSettlement()</code> تملك تسلسل "إنشاء ثم إصدار رمز، بلا إعادة محاولة"، ولو فشل استدعاء الرمز بعد إنشاء المعاملة، الواجهة لا تُحدِّث حتى حالة <code>txn</code> المحلية.</li>
+</ul>
+<div class="quote">تفصيل إضافي حاسم للتصميم: <code>_serialize()</code> في <code>party_router.py</code> لا يُعيد أبداً حقل <code>token</code> الموقَّع (فقط <code>short_code</code>) — عمداً، لتقليل تسرّب البيانات الحساسة. هذا يعني أن استرجاع معاملة نشطة عند تحميل الصفحة يتطلب <b>دائماً</b> إعادة استدعاء <code>/token</code> بغض النظر، وهذا آمن (الخدمة تعيد استخدام <code>short_code</code> نفسه، فقط تُصدر رمزاً موقَّعاً و<code>expires_at</code> جديدين). النتيجة: آلية واحدة موحَّدة تغلق الجذرين معاً، لا إصلاحان منفصلان.</div>
+<div class="fix"><b>الإصلاح المقترح (التصميم الموحَّد):</b>
+<ul class="clean">
+<li>تأثير تحميل جديد: جلب <code>myTransactions()</code>، إيجاد أول سجل بحالة DRAFT/AGENT_VERIFIED (القائمة أصلاً الأحدث-أولاً من الخادم)، وضبط <code>txn</code> إن وُجد — فشل صامت، يجب ألا يحجب الشاشة الأساسية (الرصيد، زر "بدء تسوية جديدة").</li>
+<li>تبسيط <code>startSettlement()</code>: تستدعي <code>start()</code> فقط، وتضبط <code>txn</code> فوراً عند النجاح.</li>
+<li>تأثير موحَّد جديد مرتبط بـ<code>txn</code>: إن كانت الحالة DRAFT/AGENT_VERIFIED ولا يوجد <code>token</code> محلي بعد، استدعاء <code>/token</code> بإعادة محاولة محدودة (3 محاولات، بنفس نمط التراجع المستخدم أصلاً في إصلاح الجوّال المكافئ — لتناسق عبر المنصتين).</li>
+</ul>
+نفس نمط "إعادة المحاولة + الشفاء الذاتي" المطبَّق على <code>(driver)/settlement.tsx</code> في الجوّال (أحد الملفات الحية الآن) يبقى المرجع الأساسي لسلوك إعادة المحاولة، لكن آلية الاكتشاف عند التحميل (الجذر 1) ميزة إضافية لا مقابل مباشر لها في الجوّال — لأن الجوّال يحتفظ بحالته محلياً بين الجلسات بطريقة لا تملكها صفحة ويب تُحمَّل من جديد كل مرة.</div>
+<h4>محاكاة أثناء التنفيذ</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>نسخ نمط إعادة المحاولة من الجوّال دون انتظار التزامه أولاً</td><td>الإصلاح على الجوّال (<code>(driver)/settlement.tsx</code>) لا يزال في التعديلات الحية غير المُثبَّتة — نسخ نمط من كود لم يستقر بعد يعني قد يتغيّر شكله قبل الالتزام</td><td>انتظار التزام نسخة الجوّال أولاً (يتبع ترتيب "أ-1")، ثم نقل النمط المُثبَّت فعلياً للويب، لا نسخة عابرة</td></tr>
+<tr><td>B2</td><td>تطبيق الإصلاح على الويب فقط دون اختبار e2e لصفحة التسوية</td><td>خطر كسر مسار مالي حساس (تسوية أرباح السائق) بلا تغطية اختبار كافية</td><td>إضافة اختبار Vitest/E2E جديد يحاكي فشل استدعاء الرمز عمداً، يتحقق من ظهور حالة <code>txn</code> محلياً حتى عند الفشل</td></tr>
+<tr><td>B3</td><td>إضافة تأثير التحميل الجديد (الجذر 1) دون تحديث اختبار الصفحة الحالي</td><td>ملف <code>DriverSettlementPage.test.tsx</code> الحالي يستخدم مساعد <code>startSettlement()</code> الذي يفترض عدم وجود جلب عند التحميل — التأثير الجديد يستدعي <code>GET /settlement/me/transactions</code> عند كل تحميل الآن، وبلا محاكاة (mock) افتراضية لقائمة فارغة، يصطدم طلب MSW غير معالَج فيكسر الاختبار القائم فوراً عند أول تشغيل لاحق</td><td>إضافة محاكاة افتراضية بقائمة فارغة لهذا المسار في إعداد الاختبار قبل دمج الإصلاح — مذكورة صراحة هنا لتُعالَج ضمن نفس التغيير لا كمفاجأة لاحقة في CI</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>سائق يستخدم تسوية الويب (عبر متصفح) في لحظة انقطاع شبكة قصير أثناء إصدار الرمز</td><td>حالياً: المعاملة تُنشأ في الباك-إند لكن الواجهة لا تعكس ذلك — السائق قد يعيد الضغط ظاناً أن شيئاً لم يحدث، فيُنشئ معاملة مكررة</td><td>الإصلاح المقترح يمنع هذا تحديداً عبر تتبّع حالة <code>txn</code> المحلية + قفل الزر أثناء إعادة المحاولة التلقائية</td></tr>
+<tr><td>R2</td><td>سائق يغلق التبويب عن طريق الخطأ قبل ظهور رمز الاستلام، ثم يعيد فتح الصفحة لاحقاً (أو من جهاز آخر)</td><td>بدون الجذر-1 مُصلَحاً: لا رؤية إطلاقاً للمعاملة القائمة، السائق يظن أنه لم يبدأ تسوية أصلاً — خطر معاملة مكررة أعلى من R1 لأنه انقطاع كامل لا لحظي</td><td>تأثير التحميل الجديد (الجذر 1) يستعيد المعاملة تلقائياً من <code>myTransactions()</code> عند أي فتح جديد للصفحة</td></tr>
+<tr><td>R3</td><td>السائق يفتح صفحة التسوية على تبويبين في نفس اللحظة (مثلاً جوّال + حاسوب)</td><td>كلا التبويبين يكتشفان نفس معاملة DRAFT عبر التأثير الجديد؛ استدعاء <code>/token</code> آمن من كليهما لأنه يعيد استخدام <code>short_code</code> نفسه — لا تعارض ولا معاملة مزدوجة</td><td>لا حاجة لإصلاح إضافي — الخدمة مصمَّمة أصلاً لتحمّل هذا التكرار بأمان</td></tr>
+<tr><td>R4</td><td>الاكتشاف يحدث بينما حالة المعاملة أصبحت بالفعل AGENT_VERIFIED (وليست DRAFT)</td><td>إعادة إصدار الرمز الموقَّع لا تغيّر حالة المعاملة نفسها — آمن</td><td>لا حاجة لإصلاح إضافي</td></tr>
+<tr><td>R5</td><td>استدعاء الاكتشاف الجديد عند التحميل يفشل بسبب الشبكة (لا علاقة له بالجذر 2)</td><td>يجب أن يتدهور بصمت ولا يحجب الشاشة الأساسية (الرصيد، زر البدء)</td><td>الفشل الصامت مصمَّم ضمن التأثير الجديد نفسه — الشاشة الأساسية تبقى تعمل دائماً حتى لو فشل الاكتشاف</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد الإصلاح</h4>
+<ul class="clean">
+<li><b>عرض:</b> استدعاء شبكة إضافي خفيف واحد عند كل تحميل لصفحة التسوية (محدود، مفهرَس، حد 50 سجلاً — مهمل عملياً). <b>الحل:</b> لا فعل إضافي مطلوب — الحمل مهمل، يُذكر فقط للشفافية في تقرير القياس بعد البناء.</li>
+<li><b>عرض:</b> اختبار <code>DriverSettlementPage.test.tsx</code> الحالي ينكسر فوراً عند أول تشغيل بعد الدمج ما لم يُحدَّث (راجع B3 أعلاه). <b>الحل:</b> تحديث ملف الاختبار ضمن نفس التغيير، لا كمتابعة لاحقة منفصلة.</li>
+<li><b>عرض:</b> بعد الإصلاح، الويب والجوّال يتطابقان في سلوك إعادة المحاولة — لكن هذا يعني أيضاً أن أي عيب مستقبلي يُكتشف في نمط "الإنشاء ثم الإصدار" سيؤثر على المنصتين معاً حرفياً بنفس الطريقة. <b>الحل:</b> توثيق أن أي تعديل لهذا النمط في أحد المنصتين يستوجب مراجعة الآخر.</li>
+<li><b>عرض:</b> لا تغييرات باك-إند مطلوبة إطلاقاً — إصلاح عميل-ويب بحت يعيد استخدام نقاط نهاية صحيحة أصلاً. <b>الحل:</b> لا فعل إضافي — يُذكر فقط لأنه يبسّط التنفيذ (لا خطر تعارض مع أي من الملفات السبعة الحيّة في الباك-إند).</li>
+</ul>
+<div class="src"><b>المصدر (مرجع متقاطع من تقريرين مستقلّين — كلاهما يُبقيان قائمَين كمرجعين منفصلَين، هذا القسم دمج تحليلي بينهما لا استبدال):</b><br>
+① تقرير 493، قسم "⚠ Still broken on web too" — نقلته حرفياً، الجذر 2 والسطور 97-113.<br>
+② <code>app_report/494_EXECUTION_PLAN_493_GAPS.md</code> (الجلسة الأخرى، أُنتج بالتوازي مع كتابة هذه الخطة) + نسخته المرئية <code>494-خطة-تنفيذية-دقيقة-إصلاح-فجوتَي-تقرير-493-2026-07-15.html</code> في نفس مجلد NewFile10 — مصدر الجذر 1، تفصيل <code>party_router.py</code>، والتصميم الموحَّد المقترح.</div>
+</div>
+
+<div class="item" id="a7">
+<div class="item-head"><h3>أ-7: رقما "إيرادات اليوم" المتعارضان</h3><span class="badge new">اكتشاف جديد من تقرير 493</span><span class="badge warn">يتقاطع مع ملف حي (operations_router.py)</span></div>
+<p><b>الجذر:</b> قبل هذه الدفعة كان هناك رقم واحد لـ"إيرادات اليوم": <code>system.today_revenue_minor</code> من <code>/operations/kpi</code> (قيمة السلع فقط، حدود يوم UTC). هذه الدورة أضافت حقلاً جديداً <code>today_gmv_minor</code> إلى نقطة نهاية مختلفة (<code>/operations/live-kpis</code>)، بتعريف مختلف (سلع + رسوم توصيل، حدود يوم ليبي محلي عبر <code>business_day_id</code>). النتيجة: رقمان مختلفان لنفس الاسم الظاهري على شاشتين مختلفتين.</p>
+<div class="risk"><b>لماذا هذا البند خاص:</b> <code>operations_router.py</code> هو أحد الملفات السبعة قيد التعديل الحي الآن (569+ / 178− سطراً) — أي إصلاح لهذا البند <b>يجب</b> أن ينتظر استقرار ذلك الملف، وإلا فأي تعديل يُبنى فوق نسخة ستتغيّر قريباً.</div>
+<div class="opt-grid">
+  <div class="opt-card"><div class="opt-title">الخيار 1: توجيه الجوّال لاستخدام <code>/operations/kpi</code> بدل الحقل الجديد</div>
+    <ul><li>يعيد التوحيد فوراً لرقم واحد فقط</li><li>لكنه يفقد تحسين "حدود اليوم الليبي المحلي" الذي أُضيف عمداً هذه الدورة (كان يحل مشكلة توقيت أخرى)</li></ul>
+  </div>
+  <div class="opt-card reco"><div class="opt-title">الخيار 2: إعادة تسمية الحقلين ليعكسا ما يقيسانه فعلياً <span class="badge done">الأدق</span></div>
+    <ul><li><code>today_revenue_minor</code> (UTC، سلع فقط) → <code>goods_revenue_utc_minor</code></li><li><code>today_gmv_minor</code> (محلي، سلع+توصيل) → <code>gmv_local_day_minor</code></li><li>لا فقدان لأي معلومة، فقط وضوح تسمية يمنع الالتباس مستقبلاً</li></ul>
+  </div>
+</div>
+<h4>محاكاة أثناء التنفيذ</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>إعادة التسمية تُطبَّق الآن بينما الجلسة الأخرى لا تزال تعدّل <code>operations_router.py</code></td><td>تعارض دمج شبه مؤكد على نفس دوال الاستجابة (response schemas)</td><td>الانتظار حتى التزام الجلسة الأخرى لهذا الملف تحديداً (يتبع بروتوكول القسم الأول)، ثم تطبيق إعادة التسمية كتعديل منفصل لاحق</td></tr>
+<tr><td>B2</td><td>إعادة تسمية حقل JSON في استجابة API يستهلكها الجوّال والويب معاً</td><td>أي عميل (جوّال/ويب) يقرأ الاسم القديم مباشرة سيتلقى <code>undefined</code>/<code>null</code> بعد النشر فوراً — كسر توافقي (breaking change)</td><td>نشر الحقلين معاً لفترة انتقالية (القديم + الجديد كلاهما موجود)، ثم إزالة القديم بعد تأكد تحديث كل العملاء (الجوّال والويب)</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>موظف عمليات يقارن الرقمين في نفس اللحظة على شاشتين مفتوحتين (لوحة الويب + تطبيق الجوّال) قبل الإصلاح</td><td>يرى قيمتين مختلفتين لنفس التسمية الظاهرية "إيرادات اليوم" فيفقد الثقة في دقة النظام — هذا هو الضرر التشغيلي الحقيقي المباشر الآن، وليس افتراضياً</td><td>حتى قبل إعادة التسمية الكاملة، إضافة تلميح نصي (tooltip) فوري على الشاشتين يوضح التعريف الدقيق لكل رقم — إصلاح شفهي سريع لا يمس الكود الحي المتعارض</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد الإصلاح</h4>
+<ul class="clean">
+<li><b>عرض:</b> بعد التوحيد النهائي، أي تقرير محاسبي أو لوحة معلومات تاريخية استخدمت الاسم القديم في استعلامات محفوظة (saved queries) تنكسر بصمت. <b>الحل:</b> جرد أي استعلامات SQL محفوظة أو تقارير آلية مجدولة تشير للاسم القديم قبل الإزالة النهائية، ضمن الفترة الانتقالية بند B2 أعلاه.</li>
+</ul>
+<div class="src"><b>المصدر:</b> تقرير 493، قسم "⚠ New minor inconsistency introduced this session" — نُقل حرفياً</div>
+</div>
+
+<!-- ============ PART B ============ -->
+<h2>🟡 القسم ب — قرارات محجوبة مؤقتاً (ملفاتها قيد تعديل حي الآن من الجلسة الأخرى)</h2>
+<div class="risk">لكل بند هنا: لا يوجد أساس ثابت لبناء إصلاح فوقه الآن. المعروض أدناه <b>خيارات تصميم</b> مع محاكاة نتائج كل خيار — لا مسار تنفيذ واحد مؤكَّد — لأن اختيار التصميم بحد ذاته قرار لم يُتخذ بعد، ولأن الملفات المعنية تتغيّر هذه اللحظة.</div>
+
+<div class="item blocked" id="b1">
+<div class="item-head"><h3>ب-1: الإرسال الذرّي الافتراضي للإشعارات</h3><span class="badge warn">محجوب — notification_service.py قيد تعديل حي (88+/19−)</span></div>
+<p><b>الجذر:</b> "الإرسال الذرّي" الكامل للإشعارات موجود في الكود لكنه ليس السلوك الافتراضي. تفعيله افتراضياً قرار بأثر عام على كل مسار إشعار في النظام.</p>
+<div class="opt-grid">
+  <div class="opt-card"><div class="opt-title">الخيار 1: تفعيل فوري افتراضي للجميع</div>
+    <ul><li>أبسط، لكن أثر فوري واسع غير قابل للتراجع السريع لو ظهرت مشكلة أداء</li></ul>
+  </div>
+  <div class="opt-card reco"><div class="opt-title">الخيار 2: تفعيل تدريجي عبر feature flag <span class="badge done">أأمن</span></div>
+    <ul><li>يستخدم نظام <code>contracts/feature_flags.yaml</code> الموجود أصلاً لتفعيل تدريجي لفئة مستخدمين محدودة أولاً</li><li>يسمح بالتراجع الفوري لو ظهر أثر جانبي على الأداء أو معدل نجاح التسليم</li></ul>
+  </div>
+</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> نمط "outbox + إعادة محاولة مع تراجع أُسّي (exponential backoff)" لضمان تسليم الإشعار حتى عند فشل مزود الإشعارات مؤقتاً، مع طابور رسائل ميتة (dead-letter) للحالات التي تفشل تكراراً — نمط معياري حديث لأنظمة الإشعارات الموثوقة بدل إعادة محاولة بسيطة فورية فقط.</div>
+<h4>محاكاة أثناء التنفيذ (بافتراض اختيار الخيار 2)</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>محاولة إضافة feature flag الآن بينما <code>notification_service.py</code> يتغيّر تحته حياً</td><td>أي سطر يُضاف قد يتعارض مباشرة مع تعديلات الجلسة الأخرى على نفس الدالة</td><td>ممنوع البدء قبل معرفة ماهية تعديلات الجلسة الأخرى على هذا الملف تحديداً — قد تكون هي نفسها جزءاً من تحسين الإرسال الذرّي! يجب فحص محتوى diff أولاً لا افتراض التعارض التلقائي فقط</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>تفعيل الإرسال الذرّي افتراضياً في ساعة ذروة طلبات (مئات الإشعارات/الدقيقة)</td><td>الإرسال الذرّي عادة أبطأ (ينتظر تأكيد كل خطوة) من الإرسال غير الذرّي (fire-and-forget) — خطر تراكم طابور</td><td>قياس زمن استجابة الإرسال الذرّي تحت حمل مماثل للذروة في بيئة الاختبار الداخلي قبل التفعيل الافتراضي في الإنتاج</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية المتوقعة بعد التفعيل</h4>
+<ul class="clean"><li><b>عرض:</b> زيادة زمن استجابة أي مسار API يُطلق إشعاراً بشكل متزامن (synchronous) ضمن نفس الطلب. <b>الحل:</b> التأكد أن إطلاق الإشعار غير متزامن (async/queued) دائماً بحيث لا يُبطئ استجابة الطلب الأصلي للمستخدم حتى مع الإرسال الذرّي الداخلي.</li></ul>
+<div class="src"><b>ملاحظة حالة:</b> لا يمكن تحديد جذر دقيق بسطر كود لأن الملف يتغيّر الآن — إعادة التحقق إلزامية بعد التزام الجلسة الأخرى</div>
+</div>
+
+<div class="item blocked" id="b2">
+<div class="item-head"><h3>ب-2: سياسة محاسبة الدفع الجزئي/المختلط</h3><span class="badge warn">محجوب — order_service.py قيد تعديل حي (361+/105−، أكبر ملف متأثر)</span></div>
+<p><b>الجذر:</b> طلبات بدفع مختلط (محفظة + نقد) تحتاج سياسة محاسبية واضحة لكيفية تقسيم/تسجيل كل جزء في دفتر الأستاذ المزدوج القيد.</p>
+<div class="opt-grid">
+  <div class="opt-card"><div class="opt-title">الخيار 1: تقسيم نسبي تلقائي</div><ul><li>كل جزء من الدفع يُسجَّل بنسبته الفعلية عبر حسابات PLATFORM_ESCROW/PROVIDER_PAYABLE</li><li>الأدق محاسبياً لكن الأعقد برمجياً</li></ul></div>
+  <div class="opt-card"><div class="opt-title">الخيار 2: أولوية قناة واحدة (المحفظة أولاً حتى الاستنفاد)</div><ul><li>أبسط تنفيذاً، لكن يفقد دقة تتبّع "أي جزء أتى من أين" في التقارير المالية</li></ul></div>
+</div>
+<div class="risk"><b>لماذا هذا البند حسّاس بشكل خاص للتصادم الحي:</b> <code>order_service.py</code> هو أكبر ملف متأثر بالتعديلات الحية الآن (466 سطراً متغيّراً إجمالاً). أي منطق محاسبي جديد يُضاف الآن سيتصادم مع الأرجح أكبر تعديل جارٍ في كامل هذه الدفعة.</div>
+<h4>محاكاة أثناء التنفيذ</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>البدء بتصميم منطق التقسيم النسبي الآن</td><td>احتمال إعادة عمل كامل بعد التزام الجلسة الأخرى إذا لمست نفس الدوال (حساب المجاميع، معالجة الدفع)</td><td>الانتظار الصارم حتى الالتزام + قراءة الـdiff النهائي أولاً لمعرفة هل عالج جزءاً من هذه المشكلة أصلاً قبل تصميم أي شيء جديد</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>طلب دفع مختلط حقيقي يُعالَج في لحظة اختبار المنطق الجديد على بيئة تشارك نفس قاعدة البيانات</td><td>خطر تسجيل قيد محاسبي خاطئ على معاملة مالية حقيقية إذا اختُبر المنطق الجديد دون عزل بيئي كامل</td><td>أي اختبار لمنطق محاسبي جديد يجب أن يُشغَّل بقفل صفوف (<code>with_for_update</code>، النمط المعتمد أصلاً في هذا المشروع لكل إصلاح مالي سابق) وعلى بيئة معزولة أولاً، لا الإنتاج مباشرة</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد أي تنفيذ</h4>
+<ul class="clean"><li><b>عرض:</b> أي تغيير في منطق تقسيم الدفع يغيّر أرقام التسويات التاريخية إذا أُعيد احتسابها بأثر رجعي. <b>الحل:</b> المنطق الجديد يُطبَّق على الطلبات الجديدة فقط من تاريخ التفعيل فصاعداً — لا إعادة احتساب تاريخي بلا قرار منفصل صريح من المُشغِّل، لأن ذلك يمس عقود FIN-COR المالية المحمية.</li></ul>
+<div class="src"><b>ملاحظة حالة:</b> جذر دقيق غير محدَّد لأن الملف يتغيّر الآن (أكبر تعديل حي في كل الدفعة) — إعادة التحقق إلزامية</div>
+</div>
+
+<div class="item blocked" id="b3">
+<div class="item-head"><h3>ب-3: سياسة إبطال الجلسة عند تسجيل الخروج بلا اتصال إنترنت</h3><span class="badge warn">محجوب — jwt_service.py قيد تعديل حي (72+/17−)</span></div>
+<p><b>الجذر:</b> إن سجّل مستخدم الخروج بينما جهازه دون اتصال، يجب تحديد: هل يُبطَل رمز الدخول (JWT/refresh token) فور استعادة الاتصال، أم فوراً لحظة الطلب المحلي، أم يُترَك لينتهي طبيعياً بانتهاء صلاحيته؟</p>
+<div class="opt-grid">
+  <div class="opt-card"><div class="opt-title">الخيار 1: إبطال فوري محلي + قائمة سوداء مركزية عند أول اتصال</div><ul><li>أكثر أماناً — يمنع استخدام الجلسة من جهاز مسروق حتى دون اتصال فوري</li><li>يتطلب بنية "قائمة سوداء" (denylist) للرموز الملغاة قبل انتهاء صلاحيتها الطبيعية</li></ul></div>
+  <div class="opt-card"><div class="opt-title">الخيار 2: الاعتماد على انتهاء الصلاحية الطبيعية فقط</div><ul><li>أبسط، لا بنية إضافية</li><li>نافذة خطر: الجلسة تبقى صالحة تقنياً على الخادم حتى انتهاء مدتها رغم "تسجيل الخروج" الظاهري على الجهاز</li></ul></div>
+</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> نمط "دوران رمز التحديث مع كشف إعادة الاستخدام" (refresh-token rotation with reuse detection) — معيار حديث شائع في أنظمة JWT: كل استخدام لرمز التحديث يُصدر رمزاً جديداً ويُبطل القديم، وأي محاولة استخدام رمز مُبطَل سابقاً (كما يحدث في سيناريو "خروج بلا اتصال ثم استخدام الرمز القديم من جهاز آخر") تُبطل السلسلة كاملة فوراً كإشارة اختراق محتمل.</div>
+<h4>محاكاة أثناء التنفيذ</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>تعديل <code>jwt_service.py</code> الآن لإضافة قائمة سوداء</td><td>تعارض مباشر محتمل — الملف نفسه (72+/17−) قد يكون الجلسة الأخرى تعدّل بالفعل منطق إصدار/تدقيق الرموز</td><td>الانتظار + فحص diff الجلسة الأخرى؛ إن كانت تعديلاتها متعلقة بنفس المنطق، التنسيق المباشر معها أولى من البناء المتوازي</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>مستخدم يسجّل الخروج بلا اتصال، ثم رمزه القديم يُستخدَم من جهاز آخر بعد ساعات (فقدان/سرقة)</td><td>بالخيار 2 (الوضع الحالي المفترض): الجلسة تبقى صالحة حتى انتهاء صلاحيتها الطبيعية — نافذة خطر أمني حقيقية</td><td>هذا بالضبط المبرر لاختيار الخيار 1 + نمط "كشف إعادة الاستخدام" أعلاه كحل جذري لا ترقيعي</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد أي تنفيذ</h4>
+<ul class="clean"><li><b>عرض:</b> قائمة سوداء مركزية تعني فحص إضافي (استعلام Redis أو DB) على كل طلب مُوثَّق — أثر أداء صغير لكنه يتراكم عند حجم طلبات كبير. <b>الحل:</b> تخزين القائمة السوداء في Redis (موجود أصلاً في البنية التحتية) بمهلة صلاحية (TTL) مطابقة لعمر الرمز الأقصى، بحيث تبقى صغيرة الحجم دائماً ولا تنمو بلا حدود.</li></ul>
+<div class="src"><b>ملاحظة حالة:</b> جذر دقيق غير محدَّد لأن الملف يتغيّر الآن — إعادة التحقق إلزامية</div>
+</div>
+
+<div class="item blocked" id="b4">
+<div class="item-head"><h3>ب-4: قناة دفع إلكترونية لأرباح السائق غير النقدية في أيام الذروة</h3><span class="badge warn">محجوب — dispatch_service.py (289+/58−) وcash_exception_router.py (57+/6−) قيد تعديل حي</span></div>
+<p><b>الجذر:</b> في أيام الذروة يتراكم نقد لدى السائقين (تحصيل COD) أسرع من دورة التسوية العادية، ولا توجد قناة سريعة لتحويل جزء من الأرباح إلكترونياً دون انتظار التسوية الدورية الكاملة.</p>
+<div class="opt-grid">
+  <div class="opt-card"><div class="opt-title">الخيار 1: تسوية جزئية عند-الطلب (on-demand partial settlement)</div><ul><li>السائق يطلب تحويل جزء من رصيده المستحق يدوياً في أي وقت</li><li>يتطلب منطق قفل تزامن دقيق (نفس نمط <code>with_for_update</code> المعتمد) لمنع سحب مزدوج</li></ul></div>
+  <div class="opt-card"><div class="opt-title">الخيار 2: تسوية تلقائية عند عتبة مبلغ محدَّدة</div><ul><li>لا حاجة لطلب يدوي — النظام يُطلق تحويلاً تلقائياً عند تجاوز رصيد السائق حداً معيّناً</li><li>أبسط لتجربة السائق، لكن يتطلب مراقبة تكلفة معاملات التحويل المتكررة</li></ul></div>
+</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> تكامل مع مزود مدفوعات محلي ليبي يدعم تحويلات فورية (instant payout rails) بدل التحويل البنكي التقليدي البطيء — يقلل زمن الوصول الفعلي للسائق من أيام لدقائق، وهو الاتجاه الحديث في تطبيقات التوصيل العالمية (نمط "earned wage access" / الدفع الفوري للأرباح المكتسبة).</div>
+<h4>محاكاة أثناء التنفيذ</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>بناء قناة الدفع الجديدة فوق <code>cash_exception_router.py</code> الحالي بينما هو قيد تعديل حي</td><td>خطر تصادم مباشر لأن هذا الملف تحديداً هو الأقرب منطقياً لمكان إضافة قناة كهذه — احتمال كبير أن الجلسة الأخرى تعمل على مشكلة ذات صلة فعلياً</td><td>فحص محتوى diff هذا الملف تحديداً أولاً بمجرد توفره — قد يكون جزءاً من نفس الحل جارياً بالفعل</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>سائقان يطلبان تحويلاً جزئياً من نفس الرصيد المستحق في نفس اللحظة (يوم ذروة، حمل مرتفع)</td><td>دون قفل صفوف صارم: خطر سحب مزدوج فعلي لنفس المبلغ (double-spend) — عيب مالي حرج من فئة الأخطاء التي أُصلحت سابقاً في هذا المشروع (23-عيب، FIN-D2)</td><td>استخدام <code>with_for_update()</code> إلزامياً على صف رصيد السائق قبل أي عملية سحب جزئي، تماماً كنمط الإصلاحات المالية السابقة الموثَّقة</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد أي تنفيذ</h4>
+<ul class="clean"><li><b>عرض:</b> قناة دفع فورية جديدة تعني سطح هجوم مالي جديداً (رسوم احتيال، طلبات وهمية لتوليد "أرباح" وهمية للسحب الفوري). <b>الحل:</b> ربط أي تحويل جزئي بحد أقصى يومي + مطابقة إلزامية مع سجل التوصيلات الفعلية المؤكَّدة قبل الإفراج عن أي مبلغ، لا الثقة برصيد معروض فقط.</li></ul>
+<div class="src"><b>ملاحظة حالة:</b> جذر دقيق غير محدَّد — هذا بند تصميم منتج جديد بالكامل، لا إصلاح عيب قائم؛ الملفات المرتبطة منطقياً به قيد تعديل حي الآن</div>
+</div>
+
+<!-- ============ PART C ============ -->
+<h2>🔵 القسم ج — قرارات استراتيجية بحتة (لا علاقة لها بأي كود متغيّر الآن)</h2>
+
+<div class="item" id="c1">
+<div class="item-head"><h3>ج-1: دعم هواوي الكامل (HMS)</h3><span class="badge warn">قرار عمل استراتيجي</span></div>
+<p><b>الجذر:</b> تحقّقتُ الآن مباشرة — المرجع الوحيد لكلمة "هواوي/HMS" في كامل كود الجوّال هو تعليق توثيقي واحد في <code>apps/mobile/src/services/push.ts:26</code> يقول إن القرار معلَّق، لا يوجد أي تنفيذ فعلي أو بداية عمل. الملف <b>غير متأثر</b> بالتعديلات الحية حول هذا الموضوع تحديداً.</p>
+<div class="opt-grid">
+  <div class="opt-card"><div class="opt-title">الخيار 1: تجاهل هواوي كلياً الآن</div><ul><li>يوفّر جهد حساب مطوّر جديد وتوزيع منفصل بالكامل</li><li>يفقد شريحة مستخدمين حقيقية في السوق الليبي (أجهزة هواوي بلا خدمات جوجل شائعة نسبياً)</li></ul></div>
+  <div class="opt-card"><div class="opt-title">الخيار 2: دعم كامل عبر AppGallery + HMS Core</div><ul><li>يتطلب حساب مطوّر هواوي منفصل، واستبدال Firebase Cloud Messaging بـHMS Push Kit لمسار الإشعارات على هذه الفئة من الأجهزة تحديداً</li><li>مسار توزيع وتحديث منفصل بالكامل عن Google Play — عبء صيانة مضاعف دائم</li></ul></div>
+</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> إن اختير الدعم، مكتبة <code>react-native-hms-push</code> الحديثة تتكامل مع نفس طبقة تجريد الإشعارات المستخدمة أصلاً في <code>push.ts</code> بأقل تعديل بنيوي — تصميم "موفّر إشعارات متعدد" (multi-provider notification abstraction) بدل فرع كود منفصل كامل لكل منصة.</div>
+<h4>محاكاة أثناء التنفيذ (لو اختير الدعم)</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>إضافة HMS SDK لمشروع Android دون حساب مطوّر هواوي فعلي بعد</td><td>البناء يفشل أو يُنتج حزمة لا يمكن توزيعها فعلياً على AppGallery بلا اعتماد الحساب أولاً</td><td>الحصول على حساب مطوّر هواوي واعتماد الشركة أولاً كخطوة صفر، قبل أي سطر كود</td></tr>
+<tr><td>B2</td><td>دمج HMS Push Kit بجانب Firebase الحالي</td><td>يحتاج منطق اكتشاف وقت التشغيل (runtime) لتحديد أي مزود إشعارات متاح على الجهاز الفعلي (خدمات جوجل أم لا)، وإلا فبعض الأجهزة لن تستقبل أي إشعار على الإطلاق</td><td>استخدام مكتبة الكشف القياسية (<code>react-native-device-info</code> أو ما يعادلها) للتفريق بين نوعي الأجهزة عند بدء التطبيق</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>مستخدم بجهاز هواوي حديث (بلا خدمات جوجل) يحاول تثبيت النسخة الحالية اليوم دون أي تغيير</td><td>لا إشعارات push تصله إطلاقاً — فجوة موجودة الآن فعلياً، مستمرة بغض النظر عن هذه الخطة حتى يُتخذ القرار</td><td>لا حل فوري متاح دون القرار الاستراتيجي نفسه؛ هذا هو بالضبط سبب إدراج البند كقرار عاجل نسبياً رغم كونه استراتيجياً لا تقنياً بحتاً</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد أي تنفيذ (لو اختير الدعم)</h4>
+<ul class="clean"><li><b>عرض:</b> عبء اختبار مضاعف دائم — كل ميزة إشعارات جديدة مستقبلاً يجب اختبارها على مساري Firebase وHMS معاً. <b>الحل:</b> توثيق هذا العبء صراحة في قرار الاعتماد نفسه حتى يكون القرار مبنياً على التكلفة الكاملة طويلة المدى لا الإطلاق الأولي فقط.</li></ul>
+<div class="src"><b>المصدر:</b> <code>apps/mobile/src/services/push.ts:26</code> — تحقّق مباشر، 2026-07-15، لا تنفيذ قائم</div>
+</div>
+
+<div class="item" id="c2">
+<div class="item-head"><h3>ج-2: تتبّع موقع السائق في الخلفية أثناء التوصيل</h3><span class="badge warn">قرار خصوصية/سياسة متجر</span></div>
+<p><b>الجذر:</b> تحقّقتُ الآن — <code>expo-location</code> (الإصدار 57.0.2) مثبَّت ومستخدَم فعلياً في <code>apps/mobile/src/lib/location.ts</code>، لكن الاستخدام الحالي أمامي فقط (foreground) أثناء فتح التطبيق. لا استدعاء لـ<code>startLocationUpdatesAsync</code> (واجهة التتبّع الخلفي في Expo) في أي مكان بالكود.</p>
+<div class="opt-grid">
+  <div class="opt-card"><div class="opt-title">الخيار 1: البقاء على التتبّع الأمامي فقط</div><ul><li>لا حاجة لإذن "الموقع دائماً" الحسّاس من نظامَي iOS/Android</li><li>يفقد دقة تتبّع السائق إذا انتقل التطبيق للخلفية أثناء التوصيل (شاشة مقفلة، تطبيق آخر مفتوح)</li></ul></div>
+  <div class="opt-card"><div class="opt-title">الخيار 2: تتبّع خلفي أثناء توصيل نشط فقط (لا دائم)</div><ul><li>تفعيل التتبّع الخلفي حصرياً بين "قبول الطلب" و"تسليمه"، إيقافه تلقائياً بعده</li><li>يقلل حساسية طلب الإذن مقارنة بـ"دائماً"، لكن يتطلب لا يزال إذناً من فئة الخلفية</li></ul></div>
+</div>
+<div class="tech"><b>أحدث تقنية مناسبة:</b> واجهة <code>Location.startLocationUpdatesAsync</code> في Expo SDK الحديث (مع <code>foregroundService</code> على أندرويد لإشعار دائم شفاف يوضح للمستخدم أن التتبّع نشط — متطلَّب سياسة متاجر التطبيقات الحديثة لأي تتبّع خلفي) هي المسار المعياري الحالي، بدل أي حل مخصَّص. تفعيلها محصوراً بنافذة التوصيل النشطة (الخيار 2) يقلل الحاجة لإذن "دائماً" الأكثر حساسية إلى إذن "أثناء الاستخدام + خدمة أمامية مؤقتة"، وهو الأكثر قبولاً في مراجعات متاجر التطبيقات حديثاً.</div>
+<h4>محاكاة أثناء التنفيذ (لو اختير الخيار 2)</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>B1</td><td>إضافة إذن الموقع الخلفي في <code>app.config.ts</code> وإعادة البناء</td><td>iOS يتطلب نص تبرير مخصَّص (<code>NSLocationAlwaysAndWhenInUseUsageDescription</code>) وإلا يرفض Apple التطبيق عند المراجعة</td><td>كتابة نص تبرير واضح يشرح أن التتبّع محصور بمهمة توصيل نشطة فقط، متوافق مع سياسة Apple لعام 2026</td></tr>
+<tr><td>B2</td><td>البناء على أندرويد بدون <code>foregroundService</code> مُعرَّف</td><td>نظام أندرويد الحديث يقتل خدمة التتبّع الخلفية بصمت بعد دقائق قليلة من انتقال التطبيق للخلفية — تتبّع يبدو يعمل في الاختبار القصير لكنه يفشل صامتاً في الاستخدام الحقيقي الطويل</td><td>تعريف <code>foregroundService</code> صريح مع إشعار دائم مرئي للمستخدم، وفق متطلبات Android 14+ الإلزامية لأي خدمة موقع خلفية</td></tr>
+</tbody></table></div>
+<h4>محاكاة أثناء العمل</h4>
+<div class="tbl-wrap"><table><thead><tr><th>#</th><th>السيناريو</th><th>ماذا يحدث</th><th>الحل المُدرَج</th></tr></thead><tbody>
+<tr><td>R1</td><td>سائق يرفض إذن الموقع الخلفي عند أول طلب</td><td>التطبيق يجب أن يستمر بالعمل بالتتبّع الأمامي القديم كحد أدنى — لا يجوز أن يمنع الرفض استخدام التطبيق كلياً</td><td>تصميم التدهور اللطيف (graceful degradation): رفض الإذن الخلفي = عودة لسلوك اليوم الحالي فقط، لا حجب الوظيفة</td></tr>
+<tr><td>R2</td><td>بطارية جهاز السائق تنخفض بسرعة ملحوظة بعد التفعيل بسبب التتبّع المستمر أثناء نوبة عمل طويلة</td><td>شكاوى سائقين متوقَّعة إن لم يُضبط تردد التحديث بعناية</td><td>ضبط <code>timeInterval</code> و<code>distanceInterval</code> بقيم متوازنة (مثال: كل 15-30 ثانية أو كل 50 متراً، أيهما أولاً) بدل تحديث مستمر دقيق غير ضروري لهذا الاستخدام</td></tr>
+</tbody></table></div>
+<h4>الأعراض الجانبية بعد أي تنفيذ</h4>
+<ul class="clean"><li><b>عرض:</b> إشعار دائم "التطبيق يتتبّع موقعك" أثناء كل توصيل قد يُقلق بعض السائقين رغم أنه إلزامي من نظام التشغيل نفسه لا اختيار من التطبيق. <b>الحل:</b> نص الإشعار نفسه يُصاغ بوضوح يشرح الغرض ("مطلوب لتتبّع رحلة التوصيل الحالية") بدل نص افتراضي مبهم من النظام.</li></ul>
+<div class="src"><b>المصدر:</b> <code>apps/mobile/src/lib/location.ts</code>, <code>apps/mobile/package.json:23</code> — تحقّق مباشر، 2026-07-15، الملف غير متأثر بأي تعديل حي</div>
+</div>
+
+<!-- ============ SEQUENCE ============ -->
+<h2 id="sequence">🗺️ الترتيب الزمني الموصى به للتنفيذ</h2>
+<p class="lead">الترتيب هنا ليس أولوية أهمية فقط، بل أولوية <b>اعتماد فعلي</b> — كل خطوة تتحقق من شرط سابق قبل أن تبدأ التالية، بما يحترم قيد "لا تنفيذ فوق ملف متغيّر حياً".</p>
+
+<div class="timeline">
+  <div class="tl-item hot">
+    <div class="tl-date">الخطوة 0 — قبل أي شيء آخر</div>
+    <div class="tl-title">التحقق: هل انتهت الجلسة الأخرى من دورة عملها والتزمت؟</div>
+    <div class="tl-body">تشغيل <code>git status --short</code> و<code>git log --oneline -3</code>. إن ظهر التزام جديد يضم الملفات السبعة، فالبنود ب-1 إلى ب-4 تنتقل فوراً من "محجوب" إلى "قابل للتخطيط التفصيلي" — يُعاد فحص جذورها بدقة كما فُعل لبنود القسم أ.</div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-date">الخطوة 1 — بنود مستقلة تماماً، تبدأ فوراً بالتوازي</div>
+    <div class="tl-title">أ-3 (الوحدات الخاملة)، أ-4 (مهلة إعادة التصنيف)، أ-5 الجزء الآمن (41 شاشة ترجمة غير متأثرة)</div>
+    <div class="tl-body">صفر تعارض مع أي عمل حي حالياً أو مستقبلي قريب — يمكن البدء بها هذه اللحظة دون انتظار أي شيء.</div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-date">الخطوة 2 — بعد التزام الجلسة الأخرى مباشرة</div>
+    <div class="tl-title">أ-1 (تنظيف شجرة الالتزام) ثم أ-6 (فجوة الويب) ثم أ-7 (توحيد رقمَي الإيرادات)</div>
+    <div class="tl-body">هذه الثلاثة تعتمد فعلياً على استقرار الملفات السبعة أولاً — لا قيمة لتخطيطها بتفصيل أعمق قبل ذلك.</div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-date">الخطوة 3 — بعد اتخاذ قرارات المُشغِّل</div>
+    <div class="tl-title">ب-1 إلى ب-4 (السياسات) وج-1، ج-2 (الاستراتيجية)</div>
+    <div class="tl-body">لا تنفيذ ممكن بدون اختيار أحد الخيارات المعروضة لكل بند أولاً من المُشغِّل — هذه الخطة أعدّت الخيارات ومحاكاة نتائجها، لا القرار نفسه.</div>
+  </div>
+  <div class="tl-item">
+    <div class="tl-date">الخطوة 4 — بعد اكتمال أي تنفيذ</div>
+    <div class="tl-title">أ-2 (تسمية PROVIDER_PAYABLE) كجلسة مخصَّصة منفصلة</div>
+    <div class="tl-body">وُضعت أخيراً عمداً — تمس نظام محاسبة حساس (FIN-COR) ولا داعي لتشغيلها بالتوازي مع أي عمل آخر نشط على نفس منطقة الكود.</div>
+  </div>
+</div>
+
+<h2>الخلاصة بلغة بسيطة</h2>
+<div class="simple">
+هذه الخطة لا تطلب تنفيذ أي شيء الآن. أهم اكتشاف فيها هو أن شجرة الكود <b>تتغيّر هذه اللحظة</b> من جلسة أخرى بحجم أكبر بكثير مما وصفه آخر تقرير — فأي محاولة "إصلاح" فورية بلا تحقق أولاً ستُبنى على أرض تتزحزح تحتها. لذلك فُصلت البنود لثلاث فئات صادقة: ما يمكن تنفيذه الآن بأمان (7 بنود، أ-1 إلى أ-7)، ما يجب انتظار استقراره أولاً (4 بنود، ب-1 إلى ب-4، مع خيارات جاهزة لحظة الاستقرار)، وما هو قرار عمل بحت لا علاقة له بالكود المتغيّر (بندان، ج-1 وج-2). لكل بند: من أين المشكلة بالضبط، ماذا سيحدث فعلياً أثناء تطبيق الحل وأثناء التشغيل الحقيقي، وما الحل الجاهز لكل عرض جانبي متوقَّع — لا وعود عامة.
+</div>
+
+<footer>
+  تقرير 494 — خطة تنفيذية مبنية على تقرير الحصر العميق (493) + تحقق مباشر إضافي من حالة Git والكود وقت كتابة هذه الخطة، 2026-07-15 · لا تنفيذ فعلي تم — خطة ومحاكاة فقط، بانتظار قرار المُشغِّل لكل بند سياسة/استراتيجية.
+</footer>
+
+</div>
+</body>
+</html>

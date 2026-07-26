@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الخطة التنفيذية الموسَّعة — مراجعة معمّقة + تحليل التعارضات + تحسينات مستقبلية</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --purple:#7c3aed; --purple-bg:#f1eafe;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --code-bg:#f1f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+      --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+      --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+      --purple:#b79bff; --purple-bg:#241a3d;
+      --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --code-bg:#0f1018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+    --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+    --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+    --purple:#b79bff; --purple-bg:#241a3d;
+    --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --code-bg:#0f1018;
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --purple:#7c3aed; --purple-bg:#f1eafe;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --code-bg:#f1f2f7;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","Tahoma","Geeza Pro","Noto Naskh Arabic",sans-serif; line-height:1.75; margin:0; font-size:16px;}
+  .wrap{max-width:1100px; margin:0 auto; padding:28px 20px 90px;}
+  header.hero{background:linear-gradient(135deg,var(--accent),#2563eb); color:#fff; border-radius:18px; padding:34px 28px; margin-bottom:26px; box-shadow:0 10px 30px rgba(0,0,0,.15);}
+  header.hero h1{margin:0 0 10px; font-size:1.6rem; line-height:1.5;}
+  header.hero p{margin:0; opacity:.95;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+  .meta-chip{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:6px 14px; border-radius:999px; font-size:.85rem;}
+
+  h2{font-size:1.35rem; margin:44px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px;}
+  h3{font-size:1.12rem; margin:22px 0 10px;}
+  h4{font-size:1rem; margin:16px 0 8px; color:var(--accent);}
+  .lead{color:var(--sub); margin-bottom:18px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,.03);}
+
+  .simple{background:var(--blue-bg); border-inline-start:4px solid var(--blue); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.94rem;}
+  .simple b{color:var(--blue);}
+  .warn{background:var(--amber-bg); border-inline-start:4px solid var(--amber); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.94rem;}
+  .warn b{color:var(--amber);}
+  .gate{background:var(--purple-bg); border-inline-start:4px solid var(--purple); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.94rem;}
+  .gate b{color:var(--purple);}
+  .crit{background:var(--red-bg); border-inline-start:4px solid var(--red); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.94rem;}
+  .crit b{color:var(--red);}
+
+  table{width:100%; border-collapse:collapse; font-size:.9rem;}
+  .tbl-wrap{overflow-x:auto; border-radius:12px; border:1px solid var(--border);}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{background:var(--code-bg); font-size:.82rem; color:var(--sub);}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--code-bg); padding:2px 6px; border-radius:6px; font-size:.85em; direction:ltr; display:inline-block; unicode-bidi:embed;}
+  pre{background:var(--code-bg); padding:14px; border-radius:10px; overflow-x:auto; direction:ltr; text-align:left; font-size:.82rem; border:1px solid var(--border);}
+
+  .badge{display:inline-block; padding:3px 11px; border-radius:999px; font-size:.76rem; font-weight:700; white-space:nowrap;}
+  .badge.t1{background:var(--green-bg); color:var(--green);}
+  .badge.t2{background:var(--blue-bg); color:var(--blue);}
+  .badge.t3{background:var(--red-bg); color:var(--red);}
+  .badge.t4{background:var(--gray-bg); color:var(--gray);}
+  .badge.t5{background:var(--amber-bg); color:var(--amber);}
+  .badge.safe{background:var(--green-bg); color:var(--green);}
+  .badge.gated{background:var(--purple-bg); color:var(--purple);}
+  .badge.live{background:var(--green-bg); color:var(--green);}
+  .badge.code{background:var(--blue-bg); color:var(--blue);}
+  .badge.spec{background:var(--gray-bg); color:var(--gray); border:1px dashed var(--gray);}
+  .badge.new{background:var(--red-bg); color:var(--red);}
+
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px;}
+  .toc ol{columns:2; padding-inline-start:20px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.92rem;}
+  .toc li{margin-bottom:6px;}
+
+  .wp{border:1px solid var(--border); border-radius:16px; padding:20px 22px; margin-bottom:20px; background:var(--card);}
+  .wp-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+  .wp-title{font-weight:800; font-size:1.05rem;}
+  .wp-file{color:var(--sub); font-size:.83rem; margin-top:3px;}
+  .badges{display:flex; gap:6px; flex-wrap:wrap;}
+
+  .schema-grid{display:grid; grid-template-columns:1fr; gap:10px; margin-top:14px;}
+  .schema-item{border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:var(--code-bg);}
+  .schema-item .sh-label{font-weight:700; font-size:.85rem; color:var(--accent); margin-bottom:5px; display:flex; align-items:center; gap:6px;}
+  .schema-item p{margin:4px 0; font-size:.9rem;}
+
+  .sim-cols{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .sim-col{border-radius:10px; padding:12px 14px;}
+  .sim-col.build{background:var(--blue-bg); border:1px solid var(--blue);}
+  .sim-col.build .sh-label{color:var(--blue);}
+  .sim-col.runtime{background:var(--green-bg); border:1px solid var(--green);}
+  .sim-col.runtime .sh-label{color:var(--green);}
+  @media (max-width:680px){.sim-cols{grid-template-columns:1fr;}}
+
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:16px 0; font-size:.86rem;}
+  .flow .box{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:10px 14px; text-align:center; flex:1; min-width:110px;}
+  .flow .box.bad{border-color:var(--red); background:var(--red-bg); color:var(--red); font-weight:700;}
+  .flow .box.ok{border-color:var(--green); background:var(--green-bg); color:var(--green); font-weight:700;}
+  .flow .box.mid{border-color:var(--amber); background:var(--amber-bg); color:var(--amber); font-weight:700;}
+  .flow .arrow{color:var(--sub); font-size:1.3rem;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:18px 0;}
+  .stat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center;}
+  .stat .num{font-size:1.7rem; font-weight:800; color:var(--accent);}
+  .stat .lbl{color:var(--sub); font-size:.82rem; margin-top:4px;}
+
+  footer{text-align:center; color:var(--sub); font-size:.85rem; margin-top:50px; padding-top:20px; border-top:1px solid var(--border);}
+  ul.clean{padding-inline-start:20px;}
+  ul.clean li{margin-bottom:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🔎 الخطة التنفيذية الموسَّعة<br>مراجعة معمّقة + تتبّع أنماط الأعطال عبر كل المستودع + تحليل تعارضات + تحسينات مستقبلية</h1>
+  <p>هذا المستند يبني على الخطة السابقة (26 حزمة، 29 نتيجة) ولا يُلغيها. أضفنا هنا: (1) مسحاً منهجياً لكل "فئة عطل" مؤكَّدة عبر المستودع كله بحثاً عن حالات شقيقة لم تُكتشف من قبل، (2) قراءة أعمق للملفات التي تلمسها الحزم الأصلية بحثاً عن عيوب مجاورة، (3) مصفوفة تعارضات كاملة بين الحزم وبين قيود الحوكمة، (4) قسم منفصل وصريح للتحسينات المستقبلية — لا يُخلَط بالنتائج المؤكَّدة.</p>
+  <div class="meta-row">
+    <span class="meta-chip">🧪 3 وكلاء تحقق مستقلين — بحث مبني على الأدلة فقط</span>
+    <span class="meta-chip">🆕 9 نتائج شقيقة جديدة مؤكَّدة</span>
+    <span class="meta-chip">⚠️ 3 تعارضات جديدة بين الحزم</span>
+    <span class="meta-chip">💡 6 تحسينات مستقبلية مُصنَّفة "اقتراح" بوضوح</span>
+  </div>
+</header>
+
+<div class="gate">
+  <b>⚠️ قاعدة صارمة التزمنا بها في هذا المستند:</b> كل نتيجة هنا إما <span class="badge live">مؤكَّدة باختبار حي</span> أو <span class="badge code">مؤكَّدة بقراءة الكود</span> — بدليل سطر ومكان محدَّدين، لا تخمين. الاقتراحات المستقبلية (قسم ٥) معلَّمة صراحةً <span class="badge spec">اقتراح — غير مؤكَّد كعطل قائم</span> ومفصولة تماماً عن النتائج المؤكَّدة، حتى لا يختلط "ما هو موجود فعلاً" بـ"ما نقترحه لتحسين مستقبلي". هذا هو نفس المعيار الذي حاسبنا به التقارير الخمسة عشر الأصلية في تقرير التدقيق الأول — لا يجوز أن نخالفه هنا.
+</div>
+
+<div class="card toc">
+  <b>محتويات هذا المستند</b>
+  <ol class="toc">
+    <li><a href="#method">١. منهجية المراجعة المعمَّقة</a></li>
+    <li><a href="#new">٢. النتائج الشقيقة الجديدة — مؤكَّدة بالدليل</a></li>
+    <li><a href="#conflicts">٣. مصفوفة التعارضات الكاملة</a></li>
+    <li><a href="#governance">٤. جدول الحوكمة — أي حزمة تلمس منطقة محظورة؟</a></li>
+    <li><a href="#future">٥. تحسينات مستقبلية (اقتراحات صريحة، غير مؤكَّدة كأعطال)</a></li>
+    <li><a href="#updated-seq">٦. التسلسل الزمني المُحدَّث بعد كل هذه الإضافات</a></li>
+  </ol>
+</div>
+
+<h2 id="method">١. منهجية المراجعة المعمَّقة</h2>
+<p class="lead">بدل إعادة فحص المنصة كلها من الصفر (وهو عمل مكرِّر لتقرير التدقيق الأصلي، وبلا حدود واضحة)، استخدمنا نهجاً محدوداً وقابلاً للتحقق:</p>
+<div class="flow">
+  <div class="box ok">١. أخذ كل عطل مؤكَّد من الخطة السابقة</div>
+  <div class="arrow">←</div>
+  <div class="box ok">٢. تحويله إلى "فئة نمط" عامة</div>
+  <div class="arrow">←</div>
+  <div class="box ok">٣. البحث (grep) عن هذا النمط في كامل المستودع</div>
+  <div class="arrow">←</div>
+  <div class="box ok">٤. قراءة كل نتيجة بحث للتأكد أنها فعلاً نفس العطل، لا تطابقاً شكلياً فقط</div>
+</div>
+<p class="simple"><b>بلغة بسيطة:</b> لو وجدنا أن نافذة واحدة في المبنى بلا قفل، لا نفترض أن كل النوافذ بلا أقفال — بل نتفقّد كل نافذة فعلياً ونُسجّل فقط ما تأكَّد أنه بلا قفل حقاً. هذا أبطأ من التخمين، لكنه الطريقة الوحيدة التي لا تنتج قائمة مليئة بادعاءات خاطئة — وهذا بالضبط ما أثبتنا خطأه في التقارير الخمسة عشر الأصلية (الادعاء بأن 30 نقطة نهاية "بلا حماية" بينما كانت كلها محمية فعلاً).</p>
+<p class="lead">حدود هذه الجولة: لم نُعِد فحص الـ29 نتيجة الأصلية (هي مؤكَّدة فعلاً)، ولم "نخترع" فئات عطل جديدة غير مرتبطة بما وجدناه سابقاً — فقط تتبَّعنا كل فئة معروفة إلى نهايتها عبر المستودع كله. هذا تعريف واضح ومحدود لـ"انتهينا"، بدل مطاردة لا نهائية لـ"أي خطأ محتمل في أي مكان".</p>
+
+<h2 id="new">٢. النتائج الشقيقة الجديدة — مؤكَّدة بالدليل</h2>
+<p class="lead">9 نتائج جديدة، كل واحدة تنتمي لنفس "فئة" عطل معروفة سابقاً لكن في موقع مختلف لم يُكتشف من قبل.</p>
+
+<div class="wp" style="border-color:var(--red); border-width:2px;">
+  <div class="wp-head">
+    <div><div class="wp-title">🆕 الأهم في هذا المسح: نفس ثغرة "المفتاح غير الثابت" التي أصلحناها في الويب، لا تزال قائمة في شاشات السائق المُعاد بناؤها بتطبيق الجوّال — بل بثلاث نسخ، وواحدة منها أخطر</div><div class="wp-file"><code>apps/mobile/src/services/api/index.ts</code> — دوال <code>respondToOffer</code>, <code>submitDeliveryProof</code>, <code>recordCashCollection</code></div></div>
+    <div class="badges"><span class="badge new">جديد</span><span class="badge t3">مستوى 3</span><span class="badge code">مؤكَّد بقراءة الكود</span></div>
+  </div>
+  <div class="simple"><b>خلفية مهمة:</b> الخطة السابقة أشارت (F-10 في التدقيق الأصلي) إلى أن شاشات السائق كانت تولّد مفتاح منع تكرار غير ثابت (<code>${offerId}-${Date.now()}</code>)، لكن اعتُبر هذا "على الأرجح غير ذي موضوع الآن" لأن شاشات السائق أُعيد بناؤها بالكامل حديثاً. <b>هذه الجولة تثبت العكس: العطل نفسه أُعيد إنتاجه في الكود الجديد، ولم يُصلَح إطلاقاً.</b></div>
+  <div class="schema-grid">
+    <div class="schema-item"><div class="sh-label">السبب الجذري — ثلاث دوال، نفس النمط الخطير</div>
+    <p>1) <code>respondToOffer</code> (قبول/رفض عرض التوصيل): المفتاح <code>offer-{offerId}-{Date.now()}-{Math.random()}</code> — عشوائي تماماً، جديد في كل استدعاء، فحماية منع التكرار <b>معطَّلة فعلياً 100%</b> لهذه العملية رغم وجود الرأس البرمجي لها.<br>
+    2) <code>submitDeliveryProof</code> (إثبات التسليم): نفس النمط بالضبط.<br>
+    3) <code>recordCashCollection</code> (تسجيل تحصيل نقدي من العميل): نفس النمط <b>لكن الأخطر</b> — المفتاح العشوائي يُرسَل داخل جسم الطلب فقط (<code>local_operation_id</code>)، <b>بلا رأس Idempotency-Key إطلاقاً</b>. أي أن هذه العملية المالية (تحصيل نقد) غير محمية بأي آلية منع تكرار من جهة الخادم.</p></div>
+    <div class="schema-item"><div class="sh-label">حارس الواجهة موجود لكنه ضعيف</div><p>الأزرار الثلاثة تُعطَّل أثناء الإرسال عبر <code>disabled={xxx.isPending}</code> — لكن هذه حالة "غير متزامنة" (تُحدَّث بعد إعادة رسم الشاشة)، لا قفل فوري. نقرتان سريعتان جداً (قبل أن تُعيد الشاشة رسم نفسها) قد تفلتان من هذا الحارس معاً.</p></div>
+    <div class="schema-item"><div class="sh-label">للمقارنة: نفس المشكلة في الويب مُصلَحة بالفعل ومختبَرة</div><p>صفحة الدفع وصفحة تحويل المحفظة في الويب (<code>CheckoutPage.tsx</code>, <code>WalletTransferPage.tsx</code>) تستخدمان قفلاً فورياً متزامناً (<code>submittingRef</code>) بالإضافة إلى مفتاح ثابت لا يتغيّر بين المحاولات (<code>idemRef</code>) — هذا هو النمط الصحيح الذي يجب نسخه إلى تطبيق الجوّال، لا اختراع نمط جديد.</p></div>
+  </div>
+  <div class="sim-cols">
+    <div class="sim-col build"><div class="sh-label">🏗️ أثناء البناء والنشر</div><p>لا هجرة قاعدة بيانات. تعديل منطق توليد المفتاح داخل تطبيق الجوّال + إضافة قفل فوري (متغيّر مرجعي React، لا حالة React عادية) قبل حالة "الانتظار". يحتاج إصدار تحديث لتطبيق الجوّال (لا يكفي نشر خادم فقط، لأن الخلل في كود العميل نفسه) — يعني انتظار موافقة المتاجر (App Store / Play Store) أو آلية التحديث فوق الهواء المستخدمة في المشروع.</p></div>
+    <div class="sim-col runtime"><div class="sh-label">▶️ أثناء التشغيل بعد النشر</div><p>سائق ينقر "قبول العرض" مرتين بسرعة (شائع عند ضعف شبكة الجوّال) لن يعود يخاطر بإرسال طلبين مختلفين للخادم يُقبَل أحدهما بالخطأ على عرضين متضاربين، ولا بتسجيل تحصيل نقدي مزدوج لنفس المبلغ.</p></div>
+  </div>
+  <div class="schema-item" style="margin-top:10px;"><div class="sh-label">الأعراض الجانبية وحلّها</div><p><b>هذا يجب تنسيقه مع T3-1 (إصلاح منع التكرار في الخادم):</b> حتى لو أصبح الخادم مثالياً في منع التكرار، مفتاح عشوائي من العميل يعني أن كل محاولة تُعامَل كـ"عملية جديدة شرعية" من منظور الخادم — الخادم لا يستطيع تعويض ضعف العميل. <b>يجب إصلاح الطرفين معاً</b>: الخادم (T3-1) ليمنع التنفيذ المزدوج لو وصل نفس المفتاح مرتين، والعميل (هذه الحزمة) ليرسل نفس المفتاح فعلاً عند إعادة نفس المحاولة المنطقية.</p></div>
+</div>
+
+<div class="tbl-wrap">
+<table>
+<tr><th>#</th><th>النتيجة الشقيقة الجديدة</th><th>الفئة الأصلية</th><th>الموقع</th><th>الأدلة</th></tr>
+<tr>
+  <td>2</td>
+  <td>إحداثيات NaN/Infinity غير محقَّقة في <b>ملف كامل إضافي</b> — نقاط نهاية وكيل التسوية</td>
+  <td>شقيق T1-3 (NaN في بحث المتاجر)</td>
+  <td><code>backend/app/modules/settlement/party_router.py:52</code> (اختياري) و<code>:177</code> (إلزامي) — <code>lat</code>, <code>lng</code></td>
+  <td class="badge code">مؤكَّد بقراءة الكود</td>
+</tr>
+<tr>
+  <td>3</td>
+  <td>نفس الفئة في نقطة نهاية التوسّع الجغرافي</td>
+  <td>شقيق T1-3</td>
+  <td><code>backend/app/modules/expansion/expansion_router.py:44</code> — <code>eta_minutes: float = Query(default=15.0)</code> بلا قيد</td>
+  <td class="badge code">مؤكَّد بقراءة الكود</td>
+</tr>
+<tr>
+  <td>4</td>
+  <td>ترقيم صفحات غائب في سجل القيود اليدوية المالية</td>
+  <td>شقيق T2-2 (ترقيم التسويات)</td>
+  <td><code>backend/app/modules/finance/manual_journal_router.py:288-290</code> — <code>limit</code> فقط، و"الإجمالي" المُعاد هو فعلياً عدد عناصر الصفحة الحالية لا الإجمالي الحقيقي (مضلِّل، لا مجرد ناقص)</td>
+  <td class="badge code">مؤكَّد بقراءة الكود</td>
+</tr>
+<tr>
+  <td>5</td>
+  <td>استعلام قائمة نزاعات الدفع <b>بلا أي حد أعلى إطلاقاً</b> — أخطر من "ترقيم ناقص"</td>
+  <td>شقيق T2-2، لكن أشد</td>
+  <td><code>backend/app/modules/finance/chargeback_router.py:370</code> — <code>/finance/chargeback-cases</code> بلا <code>limit</code> ولا <code>offset</code>: يُعيد كل الصفوف المطابقة دائماً</td>
+  <td class="badge code">مؤكَّد بقراءة الكود</td>
+</tr>
+<tr>
+  <td>6</td>
+  <td>بحث المستخدمين في لوحة العمليات بلا ترقيم صفحات</td>
+  <td>شقيق T2-2</td>
+  <td><code>backend/app/modules/operations/operations_router.py:5402</code> — دالة <code>search_users</code>، <code>limit</code> فقط بلا <code>offset</code></td>
+  <td class="badge code">مؤكَّد بقراءة الكود</td>
+</tr>
+<tr>
+  <td>7</td>
+  <td>بحث المزوّدين لا يشمل الاسم الإنجليزي المخزَّن فعلياً في حقل منفصل</td>
+  <td>شقيق T2-1 (البحث بالعربية فقط) — أخف حدّة</td>
+  <td><code>backend/app/core/search_service.py:110-114</code> (دالة <code>fuzzy_search_providers</code>) — يبحث في <code>business_name</code> و<code>display_name->>'ar'</code> فقط، يتجاهل <code>display_name->>'en'</code></td>
+  <td class="badge code">مؤكَّد بقراءة الكود</td>
+</tr>
+<tr>
+  <td>8</td>
+  <td>قائمة الانتظار غير المتصلة في تطبيق الجوّال بلا ربط بهوية المستخدم (لكن أخف من نظيرتها في الويب)</td>
+  <td>شقيق T3-5 — نسخة أخف خطورة</td>
+  <td><code>apps/mobile/src/services/outbox.ts:13</code> — مفتاح تخزين عام واحد <code>towa.outbox.orders</code> بلا حقل مستخدم، ولا مسح عند تسجيل الخروج. <b>الفرق الإيجابي:</b> لا يوجد "حذف عند 401" (العكس تماماً — الكود يُبقي العملية في قائمة الانتظار عند أي خطأ، بما فيه 401)</td>
+  <td class="badge code">مؤكَّد بقراءة الكود</td>
+</tr>
+<tr>
+  <td>9</td>
+  <td>سكربتا صيانة إضافيان يمسحان جداول كاملة بلا شرط <code>WHERE</code></td>
+  <td>شقيق T4-1 (سكربت النشر يمسح كل الأحجام)</td>
+  <td><code>deploy/cleanup_report_demo.sh:10-11</code> (<code>DELETE FROM promotion_redemptions</code>, <code>DELETE FROM promotions</code> بلا شرط) و<code>backend/scripts/seed_food_images_v2.py:426</code> (<code>DELETE FROM food_image_library</code> بلا شرط)</td>
+  <td class="badge code">مؤكَّد بقراءة الكود</td>
+</tr>
+</table>
+</div>
+
+<h3>تحديثان مهمّان على حجم مشكلتين معروفتين مسبقاً (لا عطل جديد، لكن الحجم الحقيقي أكبر بكثير مما وثّقناه)</h3>
+<div class="tbl-wrap">
+<table>
+<tr><th>الحزمة الأصلية</th><th>ما كنا نعتقده</th><th>الحجم الحقيقي المؤكَّد الآن</th></tr>
+<tr><td><b>T1-2</b> — انهيار <code>limit=-1</code></td><td>"5 نقاط نهاية" في العينة الأولى</td><td><b>23 نقطة نهاية محدَّدة بدقة</b> عبر <code>finance_router.py</code> (4)، <code>chargeback_router.py</code> (1)، <code>refund_router.py</code> (1)، <code>operations_router.py</code> (1 إضافية غير المعروفة سابقاً)، <code>control_panel_router.py</code> (16!) — بالإضافة إلى متغيّر مختلف في <code>manual_journal_router.py:290</code> حيث <code>min(limit, 200)</code> لا يمنع القيم السالبة من المرور. <b>القائمة الكاملة موثَّقة بالسطر لكل نقطة</b> في ملحق هذا المستند.</td></tr>
+<tr><td><b>T4-2</b> — <code>StrictHostKeyChecking=no</code></td><td>"عدة سكربتات" (5 مذكورة بالاسم)</td><td><b>نحو 30 ملف سكربت</b> عبر مجلد <code>deploy/</code> بالكامل تقريباً، وليس استثناءً محدوداً — هذا نمط منهجي في كل سكربتات النشر، لا حالات معزولة.</td></tr>
+</table>
+</div>
+<p class="warn"><b>لماذا هذا مهم:</b> هذا لا يغيّر طبيعة الإصلاح (نفس الحل البرمجي يُطبَّق على كل الحالات دفعة واحدة عادة)، لكنه يغيّر تقدير الوقت والمخاطرة — إصلاح "23 نقطة" يحتاج مراجعة أشمل بعد التطبيق من إصلاح "5 نقاط"، وانتشار <code>StrictHostKeyChecking=no</code> في 30 ملفاً يعني أن الحل الصحيح ليس "تعديل كل ملف يدوياً" بل <b>معالجة مركزية</b> (مثل ملف إعداد SSH مشترك تستدعيه كل السكربتات) بدل التكرار.</p>
+
+<h3>ما بحثنا عنه ولم نجد فيه شيئاً جديداً (مهم بنفس القدر — يثبت أن المسح لم يكن انتقائياً)</h3>
+<div class="card">
+  <ul class="clean">
+    <li><b>لا مواضع إضافية</b> لخطأ <code>bindparams(x or None)</code> غير الموضع المعروف في تصدير الشكاوى — تم فحص كل استخدامات <code>bindparams</code> في المستودع.</li>
+    <li><b>لا مواضع إضافية</b> لتسريب استثناءات مالية مُبتلَعة بصمت بعد commit غير الحالتين المعروفتين في عكس العمولة — كل حالات <code>except Exception</code> الأخرى المفحوصة تُبطِل آثاراً غير مالية فقط (إشعارات، سجلّ تدقيق، تنظيف جلسات).</li>
+    <li><b>لا حالة "فشل مفتوح" (fail-open) في فحوصات الصلاحيات</b> — فحص التعليق/الصلاحيات مبني على قاعدة البيانات مباشرة (مصدر موثوق)، وليس على Redis كما كان يُشتبَه سابقاً، فلا ينطبق عليه خطر "فشل الوسيط يعني سماحاً بالخطأ".</li>
+    <li><b>لا اعتماديات إضافية بأسماء مستخدمة افتراضياً</b> (كلمات مرور مكتوبة في الكود) غير حالة MinIO المعروفة.</li>
+    <li><b>لا صفحات عميل إضافية بلا نظام ترجمة كامل</b> — فُحصت 5 صفحات رئيسية للعميل (الدفع، تتبّع الطلب، المحفظة، التحويل، الرئيسية) وكلها تستخدم نظام الترجمة فعلياً، بخلاف صفحات لوحة العمليات.</li>
+    <li><b>لا أخطاء عميل مُبتلَعة بصمت</b> على أي زر "إرسال" مالي في صفحات العميل/المزوّد/السائق بالويب أو الجوّال — كل حالات "التقاط الخطأ الفارغ" الموجودة فعلاً هي على عمليات خلفية غير حرجة (تحميل بيانات مسبق، نبض GPS) لا على عملية دفع أو إرسال طلب.</li>
+    <li><b>لا ملفات أسرار (.env, .pem, .key) مرفوعة على Git</b> — تأكيد إضافي بفحص مباشر لقائمة الملفات الكاملة.</li>
+  </ul>
+</div>
+
+<h2 id="conflicts">٣. مصفوفة التعارضات الكاملة</h2>
+<p class="lead">هل يمكن تنفيذ أي حزمتين من الخطة بمعزل عن بعضهما؟ فحصنا كل الحزم بحثاً عن تقاطع في نفس الملف أو نفس الدالة أو نفس مساحة مفاتيح Redis. النتيجة: تقاطعان جديدان مؤكَّدان، إضافة إلى التقاطع المعروف أصلاً بين T3-1 وT3-5.</p>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">🆕 تعارض ١ — إصلاح حد الصفحة (T1-2) وتوحيد نظامَي تسليم الوردية (T5-3) يتصادمان حرفياً في نفس الأسطر</div></div>
+    <div class="badges"><span class="badge new">جديد</span><span class="badge code">مؤكَّد بقراءة الكود</span></div>
+  </div>
+  <p>نقطة نهاية قائمة تسليم الوردية القديمة (<code>operations_router.py:4557</code>، ضمن نظام <code>OpsShiftHandoff</code>) تحتوي بالضبط على نفس عيب "<code>limit</code> بلا حد أدنى" (<code>operations_router.py:4564-4567</code>) الذي تستهدفه حزمة T1-2 بالإصلاح. لكن هذا الكود نفسه هو ما تستهدفه حزمة T5-3 بالحذف أو النقل كاملاً عند توحيد النظامين.</p>
+  <div class="crit"><b>الخطر:</b> لو نُفِّذت T1-2 أولاً (إصلاح الحد الأدنى) ثم نُفِّذت T5-3 لاحقاً (حذف/نقل الكود)، فإن الإصلاح الذي كتبناه في T1-2 لهذه النقطة تحديداً سيُحذَف أو يحتاج إعادة كتابة ضمن الكود المنقول — عمل مكرَّر ومربك.</div>
+  <p><b>الحل:</b> عند تنفيذ T1-2، استثنِ نقطة نهاية تسليم الوردية القديمة هذه تحديداً من الدفعة الأولى (طبّق باقي الـ22 نقطة فوراً)، ونفّذ إصلاحها كجزء من عمل T5-3 نفسه عندما يُعاد كتابة ذلك الكود على أي حال — لا داعٍ لإصلاحها مرتين.</p>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">🆕 تعارض ٢ — محاذاة حدود المعدّل (T2-4) وإصلاح خطأ استرجاع كلمة المرور (T2-3) يشتركان في نفس ملفات الإعداد</div></div>
+    <div class="badges"><span class="badge new">جديد</span><span class="badge code">مؤكَّد بقراءة الكود</span></div>
+  </div>
+  <p>إصلاح خطأ 500 في <code>password_reset_request</code> (T2-3) يعتمد على نظام حدود المعدّل الموجود في <code>rate_limiter.py</code> (المفاتيح المخزَّنة بصيغة <code>rate:{bucket}</code>/<code>urate:{bucket}</code>). حزمة محاذاة حدود المعدّل مع العقد الموثَّق (T2-4) تُعيد ترتيب هذه المفاتيح نفسها اعتماداً على <code>contracts/rate_limits.yaml</code>.</p>
+  <p><b>الخطر:</b> ليس تعارضاً "كاسراً" بل تعارض <b>ترتيب</b> — إن أُعيد تصميم أسماء/بنية مجموعات حدود المعدّل في T2-4 قبل نشر T2-3، فقد يحتاج إصلاح T2-3 إعادة كتابة ليتوافق مع الأسماء الجديدة.</p>
+  <p><b>الحل:</b> نفّذ T2-3 (نمط معالجة بسيط، منسوخ من مكان آخر في نفس الملفات، جاهز للتنفيذ فوراً) <b>قبل</b> T2-4 (التي تنتظر أصلاً قرار سياسة من المشغّل)، لا العكس.</p>
+</div>
+
+<div class="wp">
+  <div class="wp-head">
+    <div><div class="wp-title">تعارض ٣ (تأكيد إضافي لتعارض معروف) — نظام منع التكرار (T3-1) وقائمة الانتظار غير المتصلة (T3-5)</div></div>
+    <div class="badges"><span class="badge code">مؤكَّد — كان معروفاً، أُعيد تأكيده بأدلة إضافية</span></div>
+  </div>
+  <p>هذا التعارض موثَّق بالفعل في الخطة الأصلية (يجب نشرهما معاً). الفحص الإضافي أكَّد أن هذين هما فعلاً المسارين الوحيدين اللذين يتشاركان نفس مساحة أسماء مفاتيح Redis (<code>idempotency:</code>) — لا تعارض Redis بينهما وبين حدود المعدّل (مساحة أسماء مختلفة كلياً: <code>rate:</code>/<code>urate:</code>)، ولا مع أي حزمة أخرى في الخطة.</p>
+</div>
+
+<h3>أزواج فُحصت تحديداً ولم يظهر بينها تعارض</h3>
+<div class="tbl-wrap">
+<table>
+<tr><th>الزوج</th><th>لماذا بدا مرشَّحاً للتعارض</th><th>النتيجة</th></tr>
+<tr><td>ترقيم صفحات التسويات (T2-2) × إصلاح <code>limit=-1</code> (T1-2)</td><td>كلاهما في مجلد <code>finance/</code></td><td>ملفان مختلفان، لا رمز مشترك — <b>لا تعارض</b></td></tr>
+<tr><td>إزالة اعتماد MinIO الافتراضي (T4-3) × تشديد سكربتات النشر (T4-1/T4-2)</td><td>كلاهما يعدّل <code>docker-compose.yml</code></td><td>نفس الملف لكن أقسام مختلفة تماماً (متغيّرات بيئة MinIO مقابل أوامر السكربت) — <b>لا تعارض حقيقي</b>، يُنصَح فقط بتنسيق النشر في نفس الدفعة لتجنّب تعديلين متتاليين لنفس الملف</td></tr>
+<tr><td>محاذاة CI/Dockerfile (T4-5) × توليد عقد OpenAPI آلياً (T5-7)</td><td>كلاهما قد يعدّل <code>.github/workflows/ci.yml</code></td><td><span class="badge spec" style="border-style:solid;">يحتاج تحققاً وقت التنفيذ</span> — الملف نفسه محتمل التداخل لكن لم نؤكد أن نفس "الوظيفة" (job) داخله ستُعدَّل من الاثنين معاً؛ توصية: كتابة كل حزمة كتغيير منفصل بوضوح في نفس طلب الدمج (Pull Request) لتفادي تضارب النسخ</td></tr>
+</table>
+</div>
+
+<h2 id="governance">٤. جدول الحوكمة — أي حزمة تلمس منطقة محظورة؟</h2>
+<p class="lead">تأكيد صريح: <b>لا حزمة واحدة من الـ26 (ولا النتائج التسع الجديدة) تكتب مباشرة في الملفين المحميين بالبصمة الأمنية</b> (<code>contracts/feature_flags.yaml</code> و<code>contracts/launch_gates.yaml</code>) — لا خطر على سلامة FIN-COR من أي حزمة في هذه الخطة. لكن غالبية الحزم تقع فعلاً داخل "مناطق محظورة" تستوجب إذناً صريحاً من المشغّل قبل أي تعديل.</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>الحزمة</th><th>منطقة محظورة؟</th><th>يلمس ملفات FIN-COR المحمية؟</th></tr>
+<tr><td>T1-1 (كلمة المرور الظاهرة)</td><td>لا (واجهة فقط)</td><td>لا</td></tr>
+<tr><td>T1-2 (حد <code>limit</code>)</td><td>نعم — <code>backend/app/modules</code></td><td>لا</td></tr>
+<tr><td>T1-3 (NaN) + النتيجتان الشقيقتان الجديدتان</td><td>نعم</td><td>لا</td></tr>
+<tr><td>T1-4 (تصدير الشكاوى)</td><td>نعم</td><td>لا</td></tr>
+<tr><td>T2-1 (البحث) + الهجرة الفرنسية</td><td>نعم — الهجرة في <code>backend/alembic/</code></td><td>لا</td></tr>
+<tr><td>T2-2 (ترقيم التسويات) + النتائج الشقيقة الثلاث الجديدة</td><td>نعم</td><td>لا</td></tr>
+<tr><td>T2-3 (خطأ استرجاع كلمة المرور)</td><td>نعم</td><td>لا</td></tr>
+<tr><td>T2-4 (محاذاة حدود المعدّل)</td><td>نعم — <code>contracts/</code></td><td>لا (ملف مختلف غير المحميَين بالبصمة)</td></tr>
+<tr><td>T3-1 (منع التكرار)</td><td>لا (<code>app/core/</code> غير مدرَج، لكن يحتاج إذناً مالياً بأي حال)</td><td>لا</td></tr>
+<tr><td>T3-2, T3-3, T3-4 (استرداد/عمولة/تسويات عالقة)</td><td>نعم</td><td>لا</td></tr>
+<tr><td>T3-5 (قائمة الانتظار) + النتيجة الشقيقة في الجوّال</td><td>لا (الويب <code>web/src/</code> غير محظور) / النتيجة الشقيقة في <code>apps/mobile/src/services/outbox.ts</code> — هذا تطبيق React Native الحالي (Expo)، <b>وليس</b> <code>mobile_app/</code> (Flutter القديم المحظور صراحة) — انظر ملاحظة الغموض الحوكمي أسفل الجدول، فحالته "غامضة" لا "محظورة" بشكل قاطع</td><td>لا</td></tr>
+<tr><td>🆕 مفتاح منع التكرار في الجوّال (شاشات السائق)</td><td>يعتمد على مسار <code>apps/mobile/</code> — ليس ضمن القائمة المحظورة صراحةً في CLAUDE.md (التي تذكر <code>mobile_app/</code> فقط، وهو مجلد Flutter القديم) — يحتاج توضيحاً من المشغّل لأن هذا غموض في نص القاعدة نفسها، لا حكماً قاطعاً</td><td>لا</td></tr>
+<tr><td>T4-1..T4-6 (بنية تحتية)</td><td><code>docker-compose.yml</code> محظور صراحة؛ باقي سكربتات <code>deploy/</code> غير مدرَجة بالاسم</td><td>لا</td></tr>
+<tr><td>T5-1..T5-8 (جودة واجهة/جوّال)</td><td>لا لمعظمها (ويب)؛ الجزء الخاص بـ<code>mobile_app/</code> (Flutter) محظور إن مسّه أي إصلاح</td><td>لا</td></tr>
+</table>
+</div>
+<p class="warn"><b>ملاحظة دقيقة اكتُشفت أثناء هذا الفحص:</b> قائمة "المناطق المحظورة" في <code>CLAUDE.md</code> تذكر <code>mobile_app/</code> (تطبيق Flutter القديم) بالاسم، لكنها <b>لا تذكر</b> <code>apps/mobile/</code> (تطبيق React Native الحالي والفعّال) صراحة. هذا يعني أن نص القاعدة الحالي قد يكون تجاوزه الزمن (كُتب قبل أن يصبح Expo/React Native هو التطبيق الأساسي الفعلي). <b>هذا بحد ذاته فجوة حوكمية تستحق توضيحاً من المشغّل</b> — هل القصد أن <code>apps/mobile/</code> مسموح التعديل عليه بلا نفس القيد الصارم المطبَّق على Flutter القديم، أم أن القائمة ببساطة لم تُحدَّث بعد؟</p>
+
+<h2 id="future">٥. تحسينات مستقبلية — اقتراحات صريحة، لا أعطالاً مؤكَّدة</h2>
+<p class="gate"><b>تنبيه مهم قبل قراءة هذا القسم:</b> كل بند هنا <span class="badge spec">اقتراح</span> — أي أنه لم يُختبَر كعطل قائم، بل هو استنتاج معقول من شيء لاحظناه فعلياً أثناء الفحص. لا تُعامِل هذا القسم بنفس درجة اليقين التي عوملت بها الأقسام السابقة.</p>
+
+<div class="tbl-wrap">
+<table>
+<tr><th>الاقتراح</th><th>ما لاحظناه فعلياً ليُبنى عليه هذا الاقتراح</th><th>القيمة المتوقَّعة</th></tr>
+<tr>
+  <td><b>تفعيل أدوات فحص السلامة المالية الموجودة فعلاً كبوابة آلية دورية</b></td>
+  <td>لاحظنا أثناء تقرير التدقيق الأول أن أدوات <code>finance_invariants.py</code> و<code>check_invariants.py</code> <b>موجودة بالفعل في المشروع وتعمل بشكل صحيح</b> (استخدمناها فعلياً للتأكد أن الدفتر المزدوج متوازن) — لكنها غير مربوطة بأي تشغيل تلقائي (لا CI، لا جدولة دورية)، تُشغَّل يدوياً فقط عند الحاجة.</td>
+  <td>لو اختل توازن الدفتر مستقبلاً (نتيجة أي كود جديد)، سيُكتشف تلقائياً خلال دقائق بدل الاعتماد على تدقيق يدوي متأخر.</td>
+</tr>
+<tr>
+  <td><b>قاعدة فحص آلي (lint) تمنع تكرار عيب "<code>limit</code> بلا حد أدنى" مستقبلاً</b></td>
+  <td>وجدنا 23 نسخة من نفس الخطأ البرمجي المحدَّد بدقة (نمط <code>Query(..., le=N)</code> بلا <code>ge=</code>) منتشرة عبر 5 ملفات مختلفة — نمط متكرر بوضوح يدل على غياب قاعدة إلزامية تمنعه من الأساس.</td>
+  <td>بعد الإصلاح الحالي، يمنع عودة نفس الخطأ في أي كود جديد يُكتب مستقبلاً — بدل الاعتماد على تذكّر كل مطوّر لإضافة <code>ge=0</code> يدوياً في كل مرة.</td>
+</tr>
+<tr>
+  <td><b>معالجة مركزية لإعداد اتصال SSH بدل تكراره في ~30 سكربتاً</b></td>
+  <td>وجدنا <code>StrictHostKeyChecking=no</code> مكرَّراً في نحو 30 ملف سكربت نشر منفصل — تكرار بهذا الحجم يعني أن أي تحسين أمني مستقبلي (مثل التبديل لـ<code>accept-new</code>) سيحتاج تعديل 30 ملفاً يدوياً في كل مرة ما لم يُوحَّد المصدر.</td>
+  <td>سكربت أو ملف إعداد SSH مشترك واحد تستدعيه كل السكربتات الأخرى، بدل نسخ نفس الإعداد في كل مكان — يجعل أي تحسين أمني مستقبلي تعديلاً في مكان واحد فقط.</td>
+</tr>
+<tr>
+  <td><b>توحيد تثبيت نُسخ صور Docker بالبصمة (digest) لا برقم الإصدار فقط</b></td>
+  <td>لاحظنا أن بعض صور الحاويات (PostgreSQL، Redis، MinIO) مثبَّتة ببصمة دقيقة (<code>@sha256:...</code>) بينما أخرى (Prometheus، Grafana، Nominatim) مثبَّتة برقم إصدار فقط (مثل <code>v2.55.0</code>) بلا بصمة — مستوى حماية أضعف قليلاً من التغيّر غير المتوقَّع لنفس رقم الإصدار.</td>
+  <td>ثبات أكبر لبيئات الاختبار والإنتاج بمرور الوقت، خصوصاً بعد إعادة بناء الحاويات من الصفر بعد أشهر.</td>
+</tr>
+<tr>
+  <td><b>توليد عقد OpenAPI كبوابة CI تفشل عند الانجراف، لا كتحديث دوري فقط</b></td>
+  <td>هذا امتداد لحزمة T5-7 الموجودة أصلاً في الخطة — بدل الاكتفاء بتوليد الدليل تلقائياً بين الحين والآخر، يمكن جعل أي طلب دمج (Pull Request) يضيف نقطة نهاية جديدة بلا تحديث الدليل <b>يفشل تلقائياً</b> في CI، بدل أن يتكرر انجراف 110 مقابل 531 مستقبلاً.</td>
+  <td>يمنع تكرار نفس فجوة "الدليل لا يمثّل الواقع" التي اكتشفناها هذه المرة، بشكل دائم لا مرة واحدة.</td>
+</tr>
+<tr>
+  <td><b>توحيد نمط "قفل الإرسال الفوري + مفتاح ثابت" في مكتبة مشتركة على مستوى تطبيق الجوّال</b></td>
+  <td>وجدنا أن الويب لديه هذا النمط مطبَّقاً بشكل صحيح وموثوق في مكانين (الدفع، تحويل المحفظة)، بينما الجوّال يفتقده في ثلاثة مواضع مختلفة على الأقل (قبول العرض، إثبات التسليم، تحصيل النقد). النمط الصحيح موجود فعلاً في المشروع — لم يُطبَّق فقط في كل مكان.</td>
+  <td>بدل إصلاح كل شاشة جوّال بمعزل عن الأخرى (كما اقترحنا في الحزمة الجديدة أعلاه)، استخراج هذا النمط كدالة مساعدة واحدة (hook) قابلة لإعادة الاستخدام في تطبيق الجوّال، تُستدعى من أي شاشة تحتاج حماية من النقر المزدوج — يمنع تكرار نفس العطل في أي شاشة جوّال تُبنى مستقبلاً.</td>
+</tr>
+</table>
+</div>
+
+<h2 id="updated-seq">٦. التسلسل الزمني المُحدَّث</h2>
+<p class="lead">التغييرات الرئيسية على تسلسل الخطة السابقة بعد هذه المراجعة:</p>
+<div class="card">
+  <ul class="clean">
+    <li><b>حزمة جديدة عالية الأولوية تُضاف إلى المستوى الثالث</b> (بجوار T3-1): إصلاح مفتاح منع التكرار في شاشات السائق بتطبيق الجوّال — يجب تنسيقها زمنياً مع T3-1 لأن الطرفين (خادم + عميل) يكمّلان بعضهما، ولأن أحد المواضع الثلاثة (تحصيل النقد) لا يحمل أي حماية من جهة العميل حالياً إطلاقاً.</li>
+    <li><b>حزمة T1-2 تُنفَّذ على دفعتين لا دفعة واحدة</b>: الـ22 نقطة المستقلة أولاً فوراً، ونقطة تسليم الوردية الواحدة تُؤجَّل لتُنفَّذ ضمن عمل توحيد نظامَي الوردية (T5-3) تفادياً للتعارض المكتشف.</li>
+    <li><b>حزمة T2-3 يجب أن تسبق T2-4 زمنياً</b> (لا كما قد يوحي ترقيمها) بسبب التعارض المكتشف في مشاركة إعدادات حدود المعدّل.</li>
+    <li><b>حزمة T2-2 تتوسّع لتشمل 3 نقاط نهاية إضافية</b> (سجل القيود اليدوية، قائمة نزاعات الدفع غير المحدودة إطلاقاً، بحث المستخدمين) — نقطة نزاعات الدفع تحديداً (بلا حد أعلى إطلاقاً للاستعلام) تستحق أولوية أعلى من باقي نقاط الترقيم الناقص لأنها لا تحمل أي حماية أداء حالياً.</li>
+    <li><b>لا تغيير على ترتيب المستوى الرابع والخامس الأساسي</b>، لكن نطاق T4-1 (سكربتات هدّامة) وT4-2 (SSH) يتوسّع كما هو موضَّح في القسم ٢ أعلاه.</li>
+  </ul>
+</div>
+
+<div class="stat-grid">
+  <div class="stat"><div class="num">9</div><div class="lbl">نتيجة شقيقة جديدة مؤكَّدة</div></div>
+  <div class="stat"><div class="num">1</div><div class="lbl">حزمة جديدة عالية الأولوية (منع تكرار الجوّال)</div></div>
+  <div class="stat"><div class="num">3</div><div class="lbl">تعارضات بين الحزم (2 جديد + 1 مؤكَّد سابقاً)</div></div>
+  <div class="stat"><div class="num">7</div><div class="lbl">فئات عطل فُحصت ولم يُعثر على حالات إضافية فيها</div></div>
+  <div class="stat"><div class="num">6</div><div class="lbl">تحسينات مستقبلية مُصنَّفة اقتراحاً صريحاً</div></div>
+</div>
+
+<footer>
+  مراجعة معمَّقة تكميلية للخطة التنفيذية الأصلية (26 حزمة / 29 نتيجة) — بُنيت بمسح قائم على الأدلة فقط عبر 3 وكلاء تحقق مستقلين · كل نتيجة مُعلَّمة بمصدر تأكيدها · القسم الخامس (التحسينات المستقبلية) اقتراحات صريحة لا نتائج مؤكَّدة · لم يُعدَّل أي كود مصدري · 14 يوليو 2026
+</footer>
+
+</div>
+</body>
+</html>

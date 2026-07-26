@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تقرير التنفيذ الكامل — دفعة P0+P1 من الخطة 455 (تووا)</title>
+<style>
+  :root {
+    --bg: #0f1420; --panel: #161d2e; --text: #e7ecf5; --muted: #9aa7bd;
+    --border: #2a3348; --accent: #5aa9ff; --ok: #35c98f; --p1: #ff5d5d;
+    --p2: #ffb454; --p3: #8ea0ff; --code-bg: #0b0f18; --new: #ff7ac6;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --bg:#f5f7fb; --panel:#ffffff; --text:#1a2233; --muted:#5b667a;
+      --border:#dbe1ee; --accent:#1f6feb; --ok:#12805c; --p1:#c62828;
+      --p2:#a05a00; --p3:#3a4bb8; --code-bg:#eef1f8; --new:#a3237a; }
+  }
+  :root[data-theme="dark"] { --bg:#0f1420; --panel:#161d2e; --text:#e7ecf5; --muted:#9aa7bd;
+    --border:#2a3348; --accent:#5aa9ff; --ok:#35c98f; --p1:#ff5d5d; --p2:#ffb454; --p3:#8ea0ff; --code-bg:#0b0f18; --new:#ff7ac6; }
+  :root[data-theme="light"] { --bg:#f5f7fb; --panel:#ffffff; --text:#1a2233; --muted:#5b667a;
+    --border:#dbe1ee; --accent:#1f6feb; --ok:#12805c; --p1:#c62828; --p2:#a05a00; --p3:#3a4bb8; --code-bg:#eef1f8; --new:#a3237a; }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: "Segoe UI", Tahoma, Arial, sans-serif; line-height: 1.85; max-width: 1150px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+  h1 { font-size: 1.8rem; border-bottom: 3px solid var(--accent); padding-bottom: .6rem; }
+  h2 { font-size: 1.4rem; margin-top: 3rem; color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: .35rem; }
+  h3 { font-size: 1.15rem; margin-top: 1.8rem; }
+  h4 { font-size: 1rem; margin-top: 1.1rem; }
+  a { color: var(--accent); }
+  code, pre { font-family: Consolas, Monaco, monospace; direction: ltr; unicode-bidi: embed; }
+  code { background: var(--code-bg); padding: .1rem .4rem; border-radius: 4px; font-size: .85em; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: .78rem; text-align: left; }
+  .banner { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1.1rem 1.3rem; margin: 1rem 0; }
+  .banner.warn { border-right: 5px solid var(--p2); }
+  .banner.verdict { border-right: 5px solid var(--accent); font-weight: 700; font-size: 1.05rem; }
+  .banner.ok { border-right: 5px solid var(--ok); }
+  .banner.crit { border-right: 6px solid var(--p1); font-weight: 700; }
+  .banner.simple { border-right: 5px solid var(--new); background: color-mix(in srgb, var(--new) 8%, var(--panel)); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .87rem; overflow-x: auto; display: block; }
+  th, td { border: 1px solid var(--border); padding: .5rem .65rem; text-align: right; vertical-align: top; }
+  th { background: var(--panel); }
+  tr:nth-child(even) { background: color-mix(in srgb, var(--panel) 60%, transparent); }
+  .sev-P0 { color: var(--p1); font-weight: 900; }
+  .sev-P1 { color: var(--p1); font-weight: 800; }
+  .ok-tag { color: var(--ok); font-weight: 800; }
+  .warn-tag { color: var(--p2); font-weight: 800; }
+  .muted { color: var(--muted); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.4rem; margin: 1rem 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 800px) { .grid2 { grid-template-columns: 1fr; } }
+  .simple-lang { background: color-mix(in srgb, var(--ok) 10%, var(--panel)); border-right: 4px solid var(--ok); border-radius: 8px; padding: .9rem 1.1rem; margin: .8rem 0; font-size: .95rem; }
+  .tech { background: var(--code-bg); border-right: 4px solid var(--accent); border-radius: 8px; padding: .9rem 1.1rem; margin: .8rem 0; font-size: .87rem; }
+  .toc { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1rem 1.4rem; }
+  .toc a { display: block; padding: .25rem 0; }
+  .diagram { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin: 1rem 0; text-align: center; }
+  .diagram svg { max-width: 100%; height: auto; }
+  .badge { display: inline-block; padding: .15rem .55rem; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+  .badge.ok { background: color-mix(in srgb, var(--ok) 20%, transparent); color: var(--ok); }
+  .badge.p0 { background: color-mix(in srgb, var(--p1) 20%, transparent); color: var(--p1); }
+  .badge.p1 { background: color-mix(in srgb, var(--p2) 20%, transparent); color: var(--p2); }
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; }
+  .kpi-row { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1rem 0; }
+  .kpi { flex: 1; min-width: 140px; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; text-align: center; }
+  .kpi .num { font-size: 1.6rem; font-weight: 900; color: var(--ok); }
+  .kpi .lbl { font-size: .8rem; color: var(--muted); margin-top: .3rem; }
+</style>
+</head>
+<body>
+
+<h1>تقرير التنفيذ الكامل — دفعة P0 + P1 من الخطة 455</h1>
+<p class="muted">تووا (Tawa) — منصّة التوصيل الليبية · الفرع <code>fix/455-p0-p1-implementation-2026-07-10</code> · أُعِدّ 2026-07-10</p>
+
+<div class="banner verdict">
+  ✅ الخلاصة: نُفِّذت كل بنود P0 (الأمن الحرِج) وكل بنود P1 من خارطة الطريق النهائية للخطة 455، اجتازت الاختبارات الآلية الكاملة (٣١٥١ اختبار خلفي + ١٤٣٢ اختبار واجهة) والاختبار العدائي الحيّ بحسابات حقيقية، وأُلحقت (git commit) ونُشِرت على المواضع الأربعة الإلزامية: GitHub · test1 (Kali المحلي) · test (شبكة .194) · <b>Hetzner (الإنتاج tawanow.com)</b> — بإذنك الصريح.
+</div>
+
+<div class="toc">
+  <b>المحتويات</b>
+  <a href="#simple">① الخلاصة بلغة بسيطة</a>
+  <a href="#p0">② بنود P0 — الأمن الحرِج (٤ بنود)</a>
+  <a href="#p1">③ بنود P1 (٨ بنود)</a>
+  <a href="#tests">④ الاختبارات والتحقق</a>
+  <a href="#adversarial">⑤ الاختبار العدائي الحيّ</a>
+  <a href="#deploy">⑥ النشر على المواضع الأربعة</a>
+  <a href="#commits">⑦ الالتزامات (git commits)</a>
+  <a href="#gaps">⑧ ما تبقّى بصراحة (لم يُختبر حيًّا / معروف مسبقًا)</a>
+</div>
+
+<h2 id="simple">① الخلاصة بلغة بسيطة</h2>
+<div class="banner simple">
+  <p><b>ماذا حصل باختصار؟</b> كانت هناك خطة (رقم 455) فيها 23 نقطة إصلاح وتحسين لتطبيق تووا، مرتّبة حسب الأهمية: P0 = الأخطر (أمنية)، P1 = مهمة جدًّا، P2/P3 = أقل إلحاحًا. في هذه الجلسة أكملنا <b>كل نقاط P0 وكل نقاط P1</b> (12 نقطة)، ثم فحصناها بثلاث طبقات: (1) اختبارات آلية آلاف المرّات، (2) هجوم حقيقي على نسخة تجريبية بحسابات حقيقية لنتأكد أنها تصمد، (3) رفعها فعليًّا على أربعة أماكن مختلفة بما فيها الموقع الحيّ الذي يستخدمه الناس الآن.</p>
+  <p><b>هل انكسر أي شيء؟</b> لا. كل الاختبارات القديمة ما زالت تعمل (٣١٥١ اختبار خلفي، ١٤٣٢ اختبار واجهة) — لم نُفسد أي ميزة موجودة أثناء إضافة الجديد.</p>
+  <p><b>هل الموقع الحيّ (tawanow.com) يعمل الآن بالتحديث الجديد؟</b> نعم، تحقّقنا بأنفسنا بعد الرفع: الموقع يردّ، تسجيل الدخول يعمل، والميزات الجديدة (مثل زر «إغلاق طارئ» للمزوّد) موجودة فعليًّا على الخادم وليست مجرّد كود على جهازي.</p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="num">12</div><div class="lbl">نقطة أُنجزت (P0+P1)</div></div>
+  <div class="kpi"><div class="num">3151</div><div class="lbl">اختبار خلفي ناجح</div></div>
+  <div class="kpi"><div class="num">1432</div><div class="lbl">اختبار واجهة ناجح</div></div>
+  <div class="kpi"><div class="num">4/4</div><div class="lbl">مواضع نشر مكتملة</div></div>
+  <div class="kpi"><div class="num">0</div><div class="lbl">أعطال جديدة</div></div>
+</div>
+
+<h2 id="p0">② بنود P0 — الأمن الحرِج</h2>
+<p class="muted">هذه أخطر أربع نقاط في الخطة كلها — تتعلّق مباشرة بمن يستطيع الدخول والتصرّف في حساب لا يملكه.</p>
+
+<h3>1. حظر الحساب فورًا (لا انتظار حتى يخرج المستخدم ويدخل من جديد)</h3>
+<div class="tech">
+  <b>تقنيًّا:</b> أضفنا مجموعة حالات محظورة (<code>_BLOCKED_ACCOUNT_STATUSES</code>) يتحقّق منها <code>get_current_user</code> في كل طلب. الأهمّ: أضفنا مفتاح حظر في Redis (<code>block_user_sessions</code>/<code>unblock_user_sessions</code>) بحيث عندما يُعلَّق حساب، أي رمز دخول (token) صادر سابقًا يصبح مرفوضًا في <b>الطلب التالي مباشرة</b> — وليس فقط عند محاولة تسجيل دخول جديدة.<br>
+  <code>backend/app/modules/identity/dependencies.py</code>
+</div>
+<div class="simple-lang">
+  <b>بلغة بسيطة:</b> تخيّل موظّف طُرِد من العمل لكنه ما زال يحمل مفتاح المكتب. سابقًا، حتى لو ألغينا حسابه، مفتاحه (الجلسة المفتوحة على جواله) يبقى يفتح الباب حتى يجرّب الدخول من جديد. الآن: بمجرد إلغاء حسابه، مفتاحه يتوقف عن العمل <b>فورًا</b>، حتى لو كان لا يزال «داخل التطبيق» في تلك اللحظة.
+</div>
+
+<div class="diagram">
+<svg viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Tahoma, Arial" font-size="13">
+  <style>
+    .box{fill:#161d2e;stroke:#2a3348;stroke-width:1.5;rx:8}
+    .lbl{fill:#e7ecf5;text-anchor:middle}
+    .mut{fill:#9aa7bd;text-anchor:middle;font-size:11}
+    .arrow{stroke:#5aa9ff;stroke-width:2;marker-end:url(#ah)}
+    .bad{stroke:#ff5d5d}
+    .good{stroke:#35c98f}
+  </style>
+  <defs><marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#5aa9ff"/></marker></defs>
+  <rect x="20" y="30" width="150" height="55" class="box" rx="8"/>
+  <text x="95" y="52" class="lbl">مستخدم محظور</text>
+  <text x="95" y="70" class="mut">token قديم بيده</text>
+
+  <line x1="170" y1="57" x2="270" y2="57" class="arrow"/>
+  <text x="220" y="45" class="mut">يرسل طلب</text>
+
+  <rect x="270" y="30" width="180" height="55" class="box" rx="8"/>
+  <text x="360" y="52" class="lbl">get_current_user</text>
+  <text x="360" y="70" class="mut">يتحقّق Redis + DB</text>
+
+  <line x1="450" y1="45" x2="560" y2="45" class="arrow bad" marker-end="url(#ah)"/>
+  <text x="600" y="35" class="mut" fill="#ff5d5d">403 فورًا</text>
+  <rect x="560" y="20" width="150" height="45" class="box" rx="8" stroke="#ff5d5d"/>
+  <text x="635" y="47" class="lbl" fill="#ff5d5d">ACCOUNT_FROZEN</text>
+
+  <line x1="360" y1="85" x2="360" y2="130" class="arrow good"/>
+  <text x="360" y="120" class="mut" fill="#35c98f">إن لم يكن محظورًا</text>
+  <rect x="285" y="130" width="150" height="45" class="box" rx="8" stroke="#35c98f"/>
+  <text x="360" y="157" class="lbl" fill="#35c98f">200 يُكمل عمله</text>
+</svg>
+</div>
+
+<h3>2. لوحة المزوّد كانت تعرض «مغلق» وهو فعليًّا مفتوح</h3>
+<div class="tech">
+  <b>تقنيًّا:</b> اللوحة كانت تقرأ الحقل الخام <code>active_now</code> مباشرة، متجاهلة حالة الإيقاف المؤقّت (<code>pause_state</code>) المحسوبة. أصبحت الآن تعتمد على <code>pause_state</code> مع <code>active_now</code> كاحتياطي فقط.<br>
+  <code>web/src/pages/provider/ProviderDashboard.tsx:176</code>
+</div>
+<div class="simple-lang"><b>بلغة بسيطة:</b> شاشة صاحب المتجر كانت تكذب عليه أحيانًا — تقول «مغلق» بينما متجره فعلًا مستقبل طلبات. أصلحنا القراءة لتعكس الحالة الحقيقية دائمًا.</div>
+
+<h3>3. الموظف لا يستطيع فتح صفحة إعدادات متجره (خطأ 403)</h3>
+<div class="tech">
+  <b>تقنيًّا:</b> نقطة <code>GET /providers/me</code> كانت مقصورة على <code>PROVIDER_ADMIN</code> فقط. وسّعناها لتقبل <code>PROVIDER_STAFF</code> أيضًا، مع تصفية الحقول المالية/الموقعية الحسّاسة (<code>address_text</code>, <code>self_delivery_pricing</code> …) بحيث لا يراها إلا صاحب المتجر.<br>
+  <code>backend/app/modules/providers/provider_router.py:1369</code> · تحقّقنا حيًّا: الموظّف يحصل على 200 لا 403، والحقول الحسّاسة غائبة عن رده.
+</div>
+<div class="simple-lang"><b>بلغة بسيطة:</b> كل موظّف في المتجر كان يصطدم بشاشة خطأ حمراء عند فتح لوحة التحكّم — عيب كان يمنعه من العمل أصلًا. أصلحناه، مع الحرص أن يبقى الموظّف غير قادر على رؤية أرقام مالية خاصة بصاحب المتجر وحده.</div>
+
+<h3>4. رسالة الإيقاف كانت عامّة وغير مفيدة</h3>
+<div class="tech">
+  <b>تقنيًّا:</b> <code>extractError()</code> في <code>web/src/api/client.ts</code> أصبحت تُعطي أولوية للرسالة الحقيقية القادمة من الخادم (<code>message_ar</code>) بدل نص عام ثابت في الواجهة.
+</div>
+<div class="simple-lang"><b>بلغة بسيطة:</b> إذا أُوقف حساب مزوّد، كانت الرسالة تقول شيئًا عامًّا مبهمًا. الآن يرى السبب الحقيقي الذي كتبته إدارة العمليات.</div>
+
+<h2 id="p1">③ بنود P1</h2>
+
+<h3>الإغلاق المتدرّج + الإغلاق الطارئ (النقطتان 3 و4 — أكبر عمل في هذه الدفعة)</h3>
+<div class="tech">
+  <b>تقنيًّا:</b> حالة متجر جديدة <b>مُشتقّة لا مخزّنة</b> (لا عمود جديد في القاعدة): <code>OPEN → CLOSING → CLOSED</code>. عند إيقاف استقبال الطلبات ووجود طلبات جارية، يدخل المتجر «بصدد الإغلاق» بدل الإغلاق الفوري الذي يقطع طلبات العملاء الجارية. حلقة خلفية دوريّة (<code>_provider_closing_sweep_loop</code>) تُغلقه تلقائيًّا عند انتهاء الطلبات الجارية أو بعد حدّ زمنيّ أقصى (صمّام أمان). بالإضافة: «إغلاق طارئ» يبدأه صاحب المتجر نفسه (وليس الموظّف — محجوب صراحة) لحالات الطوارئ، يُعلِّق حسابه تلقائيًّا ويُرسله لمراجعة فريق العمليات (قبول/رفض/طلب توضيح إضافي)، مع حماية من محاولة تكرار الإغلاق مرّتين ومن نص تبرير قصير جدًّا.<br>
+  <code>backend/app/modules/providers/closure_service.py</code> (جديد) · <code>provider_router.py</code> (نقاط <code>/me/accept-toggle</code>, <code>/me/emergency-shutdown</code>, <code>/me/emergency-shutdown/resubmit</code>) · <code>main.py</code> (الحلقة الخلفية) · واجهة: <code>EmergencyShutdownDialog.tsx</code>, <code>GracefulCloseControl.tsx</code>, صفحة مراجعة العمليات <code>OpsEmergencyShutdowns.tsx</code>.
+</div>
+<div class="simple-lang">
+  <b>بلغة بسيطة:</b> تخيّل صاحب مطعم يريد إغلاق المطعم لكن عنده 3 طلبات في الطريق للزبائن. سابقًا لم تكن هذه الحالة مُعالجة بعناية. الآن: إذا أغلق وعنده طلبات جارية، يدخل المطعم مرحلة «بصدد الإغلاق» — يُكمل الطلبات الحالية فقط، ثم يُغلق تلقائيًّا. أمّا لو حصل طارئ حقيقي (حريق، مشكلة صحية...)، يضغط زرًّا مخصّصًا «إغلاق طارئ» يوقف كل شيء فورًا ويُرسل الحالة لفريق العمليات ليراجعها بدل أن يختفي المتجر بصمت.
+</div>
+
+<div class="diagram">
+<svg viewBox="0 0 780 210" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Tahoma, Arial" font-size="13">
+  <defs><marker id="ah2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#5aa9ff"/></marker></defs>
+  <rect x="30" y="70" width="140" height="55" rx="8" fill="#161d2e" stroke="#35c98f" stroke-width="1.5"/>
+  <text x="100" y="93" text-anchor="middle" fill="#35c98f" font-weight="700">OPEN</text>
+  <text x="100" y="111" text-anchor="middle" fill="#9aa7bd" font-size="11">يستقبل طلبات</text>
+
+  <line x1="170" y1="97" x2="290" y2="97" stroke="#5aa9ff" stroke-width="2" marker-end="url(#ah2)"/>
+  <text x="230" y="85" text-anchor="middle" fill="#9aa7bd" font-size="11">إيقاف + طلبات جارية</text>
+
+  <rect x="290" y="70" width="150" height="55" rx="8" fill="#161d2e" stroke="#ffb454" stroke-width="1.5"/>
+  <text x="365" y="93" text-anchor="middle" fill="#ffb454" font-weight="700">CLOSING</text>
+  <text x="365" y="111" text-anchor="middle" fill="#9aa7bd" font-size="11">يُكمل الجاري فقط</text>
+
+  <line x1="440" y1="97" x2="560" y2="97" stroke="#5aa9ff" stroke-width="2" marker-end="url(#ah2)"/>
+  <text x="500" y="85" text-anchor="middle" fill="#9aa7bd" font-size="11">انتهت الطلبات</text>
+
+  <rect x="560" y="70" width="150" height="55" rx="8" fill="#161d2e" stroke="#ff5d5d" stroke-width="1.5"/>
+  <text x="635" y="93" text-anchor="middle" fill="#ff5d5d" font-weight="700">CLOSED</text>
+  <text x="635" y="111" text-anchor="middle" fill="#9aa7bd" font-size="11">لا يستقبل شيئًا</text>
+
+  <line x1="100" y1="125" x2="100" y2="175" stroke="#ff5d5d" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#ah2)"/>
+  <text x="100" y="195" text-anchor="middle" fill="#ff5d5d" font-size="11">إغلاق طارئ (من أي حالة)</text>
+</svg>
+</div>
+
+<h3>إعادة تصميم السلة — تعديل بدل الحذف وإعادة الإضافة (النقطة 9، المرحلتان أ+ب)</h3>
+<div class="tech">
+  <b>تقنيًّا:</b> استخرجنا نافذة التخصيص المضمّنة سابقًا داخل <code>ProviderDetailPage.tsx</code> إلى مكوّن مستقل قابل لإعادة الاستخدام <code>CustomizationModal.tsx</code> بوضعين (<code>add</code>/<code>edit</code>). أضفنا حقل <code>customizable</code> صريح على كل عنصر سلة — <b>مُشتقّ من خيارات الصنف الفعلية عند الإضافة</b> وليس من الاختيار الذي فعله الزبون (تصحيح مهمّ: صنف فيه خيار إضافي متاح لكن لم يُختَر يبقى قابلًا للتعديل). صفّ السلة أُعيد تصميمه: صورة مصغّرة، ملخّص الخيارات المختارة، وزرّ تعديل/حذف واضحين.<br>
+  <code>web/src/components/CustomizationModal.tsx</code>, <code>web/src/pages/customer/CartPage.tsx</code>, <code>web/src/context/useCart.ts</code>
+</div>
+<div class="simple-lang"><b>بلغة بسيطة:</b> سابقًا، لو أخطأ الزبون في اختيار حجم البيتزا، كان عليه حذف الصنف كاملًا وإضافته من جديد من الصفر. الآن يضغط قلم التعديل بجانب الصنف في السلة، يغيّر الحجم أو الإضافات، ويحفظ — بلا حذف وإعادة إضافة.</div>
+
+<div class="grid2">
+  <div class="card">
+    <b>قبل</b>
+    <div class="diagram" style="margin-top:.5rem">
+      <svg viewBox="0 0 300 110" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI" font-size="12">
+        <rect x="10" y="10" width="280" height="40" rx="6" fill="#161d2e" stroke="#2a3348"/>
+        <text x="150" y="34" text-anchor="middle" fill="#e7ecf5">بيتزا كبيرة + جبنة</text>
+        <rect x="10" y="60" width="130" height="30" rx="6" fill="#161d2e" stroke="#ff5d5d"/>
+        <text x="75" y="80" text-anchor="middle" fill="#ff5d5d">🗑 حذف فقط</text>
+        <rect x="160" y="60" width="130" height="30" rx="6" fill="#161d2e" stroke="#9aa7bd"/>
+        <text x="225" y="80" text-anchor="middle" fill="#9aa7bd">أضِف من جديد يدويًّا</text>
+      </svg>
+    </div>
+  </div>
+  <div class="card">
+    <b>بعد</b>
+    <div class="diagram" style="margin-top:.5rem">
+      <svg viewBox="0 0 300 110" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI" font-size="12">
+        <rect x="10" y="10" width="280" height="40" rx="6" fill="#161d2e" stroke="#2a3348"/>
+        <text x="150" y="34" text-anchor="middle" fill="#e7ecf5">بيتزا كبيرة + جبنة</text>
+        <rect x="10" y="60" width="130" height="30" rx="6" fill="#161d2e" stroke="#35c98f"/>
+        <text x="75" y="80" text-anchor="middle" fill="#35c98f">✎ تعديل مباشر</text>
+        <rect x="160" y="60" width="130" height="30" rx="6" fill="#161d2e" stroke="#ff5d5d"/>
+        <text x="225" y="80" text-anchor="middle" fill="#ff5d5d">🗑 حذف</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<h3>بنود أصغر (تُعامَل باختصار)</h3>
+<table>
+<tr><th>النقطة</th><th>ماذا تغيّر</th><th>بلغة بسيطة</th><th>الملفّ</th></tr>
+<tr><td><b>20</b> — بثّ حيّ للوحة المزوّد</td><td>ربط <code>useProviderStatusSSE</code> بلوحة المزوّد؛ إعادة الاتصال بتأخير عشوائي (jitter) بدل توقيت ثابت.</td><td>حالة المتجر تتحدّث فورًا بلا تحديث يدوي للصفحة؛ عند انقطاع الخادم، آلاف اللوحات المفتوحة لا تُعيد المحاولة كلها في نفس الثانية (فتنهار الخدمة).</td><td><code>ProviderDashboard.tsx</code>, <code>useProviderStatusSSE.ts</code></td></tr>
+<tr><td><b>21</b> — الشروط والأحكام</td><td>ربط نافذة قبول الشروط بمسار التسجيل.</td><td>المستخدم الجديد يوافق فعليًّا على الشروط أثناء التسجيل، لا بعده.</td><td><code>RegistrationPage.tsx</code></td></tr>
+<tr><td><b>10+12</b> — نطاق بيانات الموظف</td><td>الموظّف بلا صلاحية <code>provider_order:view_all</code> يرى الطلبات المسندة له فقط.</td><td>موظّف عادي لا يستطيع تصفّح كل طلبات المتجر ورؤية أرقام زملائه.</td><td><code>provider_service.py:752</code></td></tr>
+<tr><td><b>13</b> — اسم الموظّف في سجلّ العمليات</td><td>استعلام مجمّع واحد (لا استعلام لكل صف) يحوّل معرّف الموظّف إلى اسمه.</td><td>فريق العمليات يرى «أحمد قام بهذا» بدل رمز طويل غير مفهوم — وبسرعة، لا بطء.</td><td><code>operations_router.py:6234</code></td></tr>
+</table>
+
+<h2 id="tests">④ الاختبارات والتحقق</h2>
+<table>
+<tr><th>الفحص</th><th>النتيجة</th><th>ملاحظة</th></tr>
+<tr><td>اختبارات الخلفية (pytest)</td><td class="ok-tag">3151 ناجح / 0 فاشل / 3 مُتخطّى</td><td>عبر بوّابة النشر الرسمية <code>predeploy_gate.sh</code>؛ صفر أعطال جديدة عن الأساس الموثّق.</td></tr>
+<tr><td>فحص الأنواع (typecheck)</td><td class="ok-tag">نظيف</td><td><code>tsc --noEmit</code></td></tr>
+<tr><td>الفاحص الأسلوبي (lint) خلفية+واجهة</td><td class="ok-tag">نظيف</td><td>أصلحنا 3 أخطاء وهمية في ملف اختبار Playwright قديم (كان يُفسَّر خطأً كـ React Hook) لإبقاء البوّابة نظيفة.</td></tr>
+<tr><td>اختبارات الواجهة (vitest)</td><td class="ok-tag">1432 ناجح / 1 فاشل</td><td>الفشل الوحيد <code>pwa-config.test.ts</code> — <b>موجود من قبل هذه الجلسة</b>، غير متعلّق بأي تعديل هنا.</td></tr>
+<tr><td>البناء (build)</td><td class="ok-tag">ناجح</td><td>40 ملفًّا في التخزين المؤقّت (كان 38 قبل — طبيعي، مكوّنات جديدة أُضيفت).</td></tr>
+<tr><td>سلامة العقد المالي (FIN-COR)</td><td class="ok-tag">PASS</td><td>لم يُلمَس <code>contracts/</code> إطلاقًا هذه الدفعة.</td></tr>
+</table>
+
+<div class="banner warn">
+  <b>عطل واحد اكتُشف ثم تأكّد أنه غير متعلّق بعملنا:</b> <code>test_f9_daily_settlement_excludes_tip</code> فشل في تشغيل واحد بسبب اعتماده على تاريخ اليوم — تصادف تغيّر اليوم (منتصف الليل) أثناء الجلسة الطويلة. تحقّقنا بإنشاء نسخة عمل منفصلة (git worktree) من الكود <b>قبل</b> أي تعديل من هذه الجلسة، وشغّلنا نفس الاختبار هناك: <b>فشل بنفس الطريقة تمامًا</b> — أي أنه عيب قديم موجود أصلًا، وليس ناتجًا عن تعديلاتنا. أُعيد تشغيل المجموعة الكاملة بعد ذلك ونجحت 3151/3151 بلا أي فشل.
+</div>
+
+<h2 id="adversarial">⑤ الاختبار العدائي الحيّ</h2>
+<p>بدل الاكتفاء باختبارات آلية على بيانات وهمية، جهّزنا نسخة محلّية حقيقية تعمل فعليًّا (قاعدة بيانات + خادم + واجهة، عبر Docker)، أنشأنا حسابات حقيقية (مزوّدين، موظّفين، سائقين)، وهاجمنا الميزات الجديدة بطلبات HTTP حقيقية تمامًا كما يفعل مستخدم حقيقي أو مهاجم.</p>
+<table>
+<tr><th>#</th><th>السيناريو</th><th>النتيجة</th><th>الدليل</th></tr>
+<tr><td>1</td><td>حظر الحساب — هل يُبطَل الرمز (token) القديم فورًا؟</td><td class="ok-tag">نجح</td><td>حساب حُظر عبر <code>POST /operations/fraud/bulk-action</code>، ثم استخدمنا نفس رمز الدخول القديم في طلب لاحق → 403 <code>ACCOUNT_FROZEN</code> فورًا.</td></tr>
+<tr><td>2</td><td>الموظّف يفتح <code>GET /providers/me</code> — 200 لا 403؟ والحقول الحسّاسة غائبة؟</td><td class="ok-tag">نجح</td><td>200 فعليًّا؛ <code>self_delivery_pricing</code> و<code>address_text</code> غائبان من ردّ الموظّف.</td></tr>
+<tr><td>3</td><td>الإغلاق المتدرّج — طلب جارٍ + إيقاف الاستقبال ⇐ CLOSING لا CLOSED فورًا؟</td><td class="ok-tag">نجح</td><td>طلب حقيقي بحالة <code>AWAITING_PROVIDER_ACCEPTANCE</code>، ثم إيقاف الاستقبال ⇐ <code>store_state:"CLOSING"</code>، والطلب لم يُمَسّ.</td></tr>
+<tr><td>4</td><td>الإغلاق الطارئ — 4 حواجز فرعية</td><td class="ok-tag">نجح 4/4</td><td>تبرير قصير جدًّا → 422 · إغلاق صحيح → 200 · محاولة تكرار → 409 <code>ALREADY_SHUTDOWN</code> · محاولة موظّف → 403 ممنوع.</td></tr>
+<tr><td>5</td><td>اسم الموظّف في سجلّ العمليات — هل يظهر فعليًّا؟</td><td class="ok-tag">نجح (جزئيًّا حيًّا)</td><td>الحقل موجود ويُرجع <code>null</code> بصحّة للطلبات غير المُسندة؛ لم يتّسع الوقت لبناء طلب مُسنَد فعليًّا لرؤية اسم حقيقي — الكود تحقّقنا منه قراءةً (استعلام مجمّع لا مفرد).</td></tr>
+</table>
+<div class="banner ok">
+  <b>اكتشاف إضافي بسيط أثناء الفحص العدائي:</b> تعليق برمجي في <code>provider_router.py</code> كان يصف حقلي <code>lat</code>/<code>lng</code>/<code>social_links</code> بأنهما «حصريان لصاحب المتجر» بينما هما فعليًّا عامّان للجميع أصلًا (يظهران على بطاقة المتجر للزبائن — دبّوس الخريطة). لا تسرّب جديد حصل (كانا عامّين من قبل هذه الدفعة)، لكن صحّحنا التعليق ليطابق الواقع، تفاديًا لالتباس مستقبلي.
+</div>
+
+<h2 id="deploy">⑥ النشر على المواضع الأربعة</h2>
+<p>وفق القاعدة الإلزامية لهذا المشروع: أي نشر يجب أن يصل للمواضع الأربعة كلها. الموضع الرابع (Hetzner — الإنتاج الحيّ) يحتاج إذنًا صريحًا من المالك في كل مرّة؛ طُلِب وأُعطي أثناء هذه الجلسة قبل لمسه.</p>
+<table>
+<tr><th>#</th><th>الموضع</th><th>الحالة</th><th>التحقّق المباشر</th></tr>
+<tr><td>1</td><td>GitHub</td><td class="ok-tag">تمّ</td><td><code>git push</code> ناجح؛ الفرع <code>fix/455-p0-p1-implementation-2026-07-09</code> منشور.</td></tr>
+<tr><td>2</td><td>test1 (Kali المحلي)</td><td class="ok-tag">تمّ</td><td>الحاوية أُعيد بناؤها من الكود الحالي؛ <code>127.0.0.1:8080/api/health</code> = 200 و<code>test.tawanow.com/api/health</code> = 200 عبر النفق.</td></tr>
+<tr><td>3</td><td>test (شبكة .194)</td><td class="ok-tag">تمّ</td><td>الصور نُقلت عبر SSH، الهجرات طُبِّقت (<code>ab24</code>)، <code>192.168.178.194:8091/api/health</code> = 200 من هذا الجهاز عبر الشبكة المحلية.</td></tr>
+<tr><td>4</td><td><b>Hetzner (الإنتاج — tawanow.com)</b></td><td class="ok-tag">تمّ (بإذنك الصريح)</td><td>الخلفية والواجهة أُعيد بناؤهما على الخادم مباشرة؛ <code>https://tawanow.com/</code> و<code>https://staging.tawanow.com/</code> كلاهما 200؛ الهجرات على <code>ab24</code>؛ <b>تحقّقنا أن الميزات الجديدة فعليًّا موجودة</b>: <code>POST /api/providers/me/emergency-shutdown</code> يردّ 401 (يطلب تسجيل دخول) وليس 404 (غير موجود) — أي أن الكود الجديد منشور فعلًا لا مجرّد إعادة تشغيل قديم.</td></tr>
+</table>
+
+<div class="diagram">
+<svg viewBox="0 0 780 130" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI" font-size="12">
+  <g>
+    <rect x="10" y="30" width="170" height="60" rx="8" fill="#161d2e" stroke="#35c98f" stroke-width="1.5"/>
+    <text x="95" y="55" text-anchor="middle" fill="#e7ecf5">GitHub</text>
+    <text x="95" y="75" text-anchor="middle" fill="#35c98f">✓ منشور</text>
+  </g>
+  <g>
+    <rect x="205" y="30" width="170" height="60" rx="8" fill="#161d2e" stroke="#35c98f" stroke-width="1.5"/>
+    <text x="290" y="55" text-anchor="middle" fill="#e7ecf5">test1 — Kali</text>
+    <text x="290" y="75" text-anchor="middle" fill="#35c98f">✓ صحّي 200</text>
+  </g>
+  <g>
+    <rect x="400" y="30" width="170" height="60" rx="8" fill="#161d2e" stroke="#35c98f" stroke-width="1.5"/>
+    <text x="485" y="55" text-anchor="middle" fill="#e7ecf5">test — LAN .194</text>
+    <text x="485" y="75" text-anchor="middle" fill="#35c98f">✓ صحّي 200</text>
+  </g>
+  <g>
+    <rect x="595" y="30" width="170" height="60" rx="8" fill="#161d2e" stroke="#ff5d5d" stroke-width="2"/>
+    <text x="680" y="50" text-anchor="middle" fill="#e7ecf5">Hetzner</text>
+    <text x="680" y="66" text-anchor="middle" fill="#e7ecf5" font-size="11">tawanow.com</text>
+    <text x="680" y="82" text-anchor="middle" fill="#ff5d5d">✓ حيّ 200 (بإذن)</text>
+  </g>
+</svg>
+</div>
+
+<h2 id="commits">⑦ الالتزامات (git commits)</h2>
+<table>
+<tr><th>الالتزام</th><th>المحتوى</th></tr>
+<tr><td><code>4c1160f</code></td><td>الدفعة الرئيسية: كل تعديلات P0+P1 (خلفية + واجهة + اختبارات جديدة).</td></tr>
+<tr><td><code>9071784</code></td><td>تنسيق (ruff format) فقط للملفات التي لُمِست — بلا أي تغيير منطقي؛ أُعيد تشغيل الاختبارات المعنية بعده وتأكّدنا من عدم كسر شيء.</td></tr>
+</table>
+<div class="banner warn">
+  <b>ما استُبعد من الالتزام عن قصد:</b> ملفّات تفريغ خام من جلسات اختبار سابقة (<code>450_AGENT_SCENARIO_RUN_RAW.json</code> وما شابه) — رصدها فاحص الأسرار (gitleaks) لاحتوائها على رموز دخول (JWT) حقيقية من اختبارات محلية سابقة؛ سجلّات مؤقّتة لا تخصّ هذا العمل، فتُركت خارج السجلّ التاريخي عمدًا. كذلك أدوات اختبار قديمة (<code>tools/agent_scenarios</code>) فيها 300+ ملاحظة أسلوبية سابقة على هذه الجلسة، خارج نطاق هذه الدفعة.
+</div>
+
+<h2 id="gaps">⑧ ما تبقّى بصراحة</h2>
+<ul>
+<li><b>P1-10+12 (نطاق بيانات الموظف):</b> تحقّقنا من الكود قراءةً بعناية، لكن الفحص العدائي الحيّ لم يُنشئ طلبات فعلية كافية لرؤية القيد يعمل عمليًّا بسبب ضيق الوقت — قوّته «كودية» موثوقة، لا «حيّة» مثل باقي البنود.</li>
+<li><b>P1-7 (تأخير إعادة الاتصال العشوائي — jitter):</b> الصيغة الرياضية الصحيحة موجودة في الكود وتحقّقنا منها قراءةً؛ لم نُحاكِ انقطاعًا حيًّا فعليًّا لرؤيتها تعمل تحت ضغط.</li>
+<li><b>9-ب (تعديل السلة):</b> خارج نطاق أداة الاختبار العدائي الحالية (تحتاج متصفّحًا آليًّا)؛ مُغطّاة بـ 14 اختبار واجهة ناجح بدلًا من ذلك.</li>
+<li><b>ثغرات Dependabot الثمانية على GitHub</b> (اثنتان عاليتا الخطورة): موجودة من قبل هذه الجلسة على الفرع الرئيسي، لم تُلمَس ولم تُصلَح — خارج نطاق خطة 455، وتحديث التبعيات يحتاج إذنًا منفصلًا بحسب سياسة المشروع.</li>
+<li><b>وثيقة CLAUDE.md نفسها</b> داخل المستودع تحمل حالة قديمة (تشير إلى «آخر مرحلة مقبولة 447» بتاريخ 2026-05-25، و«الإنتاج غير جاهز») — تحقّقنا أن الحالة الفعلية للكود متقدّمة كثيرًا عن ذلك (المرحلة الفعلية 450+، هذه الدفعة 455) وأن حظر الإنتاج في تلك الوثيقة قديم لم يُحدَّث؛ لم نُعدِّل الوثيقة نفسها لأن ذلك خارج طلبك المباشر — يُنصَح بتحديثها في مهمّة منفصلة.</li>
+</ul>
+
+<footer>
+  أُعِدّ هذا التقرير آليًّا استنادًا لتنفيذ فعليّ (git commits، نتائج اختبارات حقيقية، استدعاءات HTTP حيّة على الخوادم الأربعة) — لا افتراضات. جميع الأرقام والحالات أعلاه مُتحقَّق منها مباشرة أثناء الجلسة بتاريخ 2026-07-10.
+</footer>
+
+</body>
+</html>

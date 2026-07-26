@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>547 — تحقّق دقيق من اكتمال الخطّة: حقائق من الكود مباشرة، لا من الوثائق</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2540; --text:#e8ecf7; --muted:#9aa5c0;
+    --line:#2a3350; --accent:#5b8cff;
+    --done:#1f7a4d; --done-bg:#123425; --done-fg:#7be3ab;
+    --not:#9b2c2c; --not-bg:#3a1414; --not-fg:#ff8f8f;
+    --auth:#7a3fc9; --auth-bg:#241a3a; --auth-fg:#c9a8f5;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef1fa; --text:#1a2030; --muted:#5a6480;
+      --line:#dbe0ee; --accent:#2a5fd8;
+      --done:#0f6a3a; --done-bg:#e5f6ec; --done-fg:#0f6a3a;
+      --not:#a12727; --not-bg:#fbe6e6; --not-fg:#a12727;
+      --auth:#7a3fc9; --auth-bg:#f1e8fb; --auth-fg:#5c2c96;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","Cairo","Tahoma",sans-serif; line-height:1.75; margin:0; padding:0 0 60px 0;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+  header.hero{background:linear-gradient(160deg, var(--panel2), var(--bg)); border-bottom:1px solid var(--line); padding:48px 0 36px 0; margin-bottom:32px;}
+  h1{font-size:1.85rem; margin:0 0 10px 0;}
+  h1 .num{color:var(--accent); font-weight:800;}
+  .sub{color:var(--muted); font-size:1.05rem; max-width:920px;}
+  h2{font-size:1.4rem; margin:44px 0 16px 0; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  h4{font-size:1rem; margin:18px 0 6px 0;}
+  p{margin:0 0 14px 0;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:18px;}
+  .item-card{background:var(--panel); border:1px solid var(--line); border-inline-start:5px solid var(--accent); border-radius:10px; padding:18px 22px; margin-bottom:16px;}
+  .item-card.not{border-inline-start-color:var(--not);}
+  .item-card.done{border-inline-start-color:var(--done);}
+  .item-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:8px;}
+  .item-id{font-weight:800; color:var(--accent); font-size:1.05rem;}
+  .badge{display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.8rem; font-weight:700; white-space:nowrap;}
+  .b-not{background:var(--not-bg); color:var(--not-fg); border:1px solid var(--not);}
+  .b-done{background:var(--done-bg); color:var(--done-fg); border:1px solid var(--done);}
+  .b-auth{background:var(--auth-bg); color:var(--auth-fg); border:1px solid var(--auth);}
+  .evid{margin:10px 0; padding:10px 14px; border-radius:8px; background:var(--panel2); font-size:0.9rem;}
+  .evid .k{font-weight:700; color:var(--accent); display:block; margin-bottom:4px;}
+  code{background:var(--panel2); padding:1px 6px; border-radius:5px; font-size:0.88em; direction:ltr; display:inline-block;}
+  pre{background:#0a0e17; color:#d7e0f5; border:1px solid var(--line); border-radius:10px; padding:14px 16px; overflow-x:auto; font-size:0.8rem; direction:ltr; text-align:left; margin:10px 0;}
+  pre code{background:none; padding:0;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:20px 0;}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center;}
+  .stat .n{font-size:1.9rem; font-weight:800; color:var(--accent);}
+  .stat .n.ok{color:var(--done-fg);}
+  .stat .n.bad{color:var(--not-fg);}
+  .stat .l{color:var(--muted); font-size:0.85rem; margin-top:4px;}
+  .callout{border-inline-start:5px solid var(--accent); background:var(--panel2); border-radius:10px; padding:16px 20px; margin:16px 0;}
+  .callout.not{border-color:var(--not); background:var(--not-bg);}
+  .callout.done{border-color:var(--done);}
+  .toc{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px 24px;}
+  .toc a{color:var(--text); text-decoration:none; display:block; padding:5px 0; border-bottom:1px dashed var(--line);}
+  .toc a:last-child{border-bottom:none;}
+  .toc a:hover{color:var(--accent);}
+  footer{color:var(--muted); text-align:center; font-size:0.85rem; margin-top:60px; padding-top:24px; border-top:1px solid var(--line);}
+  .kicker{color:var(--accent); font-weight:800; font-size:0.85rem; letter-spacing:0.04em; margin-bottom:6px;}
+
+  /* progress bar */
+  .prog-wrap{margin:22px 0;}
+  .prog-bar{display:flex; height:38px; border-radius:10px; overflow:hidden; border:1px solid var(--line);}
+  .prog-seg{display:flex; align-items:center; justify-content:center; font-size:0.82rem; font-weight:800; color:#fff;}
+  .seg-done{background:var(--done);}
+  .seg-not{background:var(--not);}
+  .prog-legend{display:flex; gap:20px; margin-top:10px; font-size:0.85rem; color:var(--muted);}
+  .dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-inline-end:6px;}
+
+  /* matrix grid */
+  .matrix{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; margin:20px 0;}
+  .mcell{border-radius:10px; padding:14px; border:1px solid var(--line); font-size:0.85rem;}
+  .mcell.done{background:var(--done-bg); border-color:var(--done); color:var(--done-fg);}
+  .mcell.not{background:var(--not-bg); border-color:var(--not); color:var(--not-fg);}
+  .mcell .mid{font-weight:800; display:block; margin-bottom:4px;}
+
+  /* file->code flow diagram */
+  .flow{display:flex; flex-wrap:wrap; align-items:center; gap:0; margin:18px 0; direction:ltr;}
+  .fnode{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:10px 14px; font-size:0.82rem; direction:rtl; text-align:center;}
+  .fnode.not{border-color:var(--not); color:var(--not-fg);}
+  .farrow{padding:0 10px; color:var(--accent); font-size:1.1rem;}
+  @media (max-width:700px){ .flow{flex-direction:column; align-items:stretch;} }
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">تقرير 547 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-21 · تحقّق مباشر من الكود، لا من التقارير</div>
+  <h1><span class="num">547</span> — هل اكتملت الخطّة التنفيذيّة بالكامل؟ حقائق من الكود مباشرة</h1>
+  <p class="sub">
+    هذا التقرير يجيب على سؤال واحد ومحدَّد: هل اكتملت خطّة التدقيق (تقارير 538 حتى 546) بالكامل؟ الإجابة هنا <strong>ليست
+    مبنيّة على أي تقرير أو ملفّ Markdown سابق</strong> — كل بند أدناه تحقَّق منه بقراءة الكود المصدريّ الفعليّ وتنفيذ أوامر بحث
+    (grep) مباشرة في هذه الجلسة، مع اقتباس السطر بالضبط ومساره الكامل. الجواب المباشر: <strong>لا، لم تكتمل بالكامل</strong> —
+    توجد 6 بنود مؤكَّدة غير منفَّذة في الكود، بالإضافة إلى الجوّال/Flutter المستبعدَين عمدًا بتعليمات صريحة.
+  </p>
+</div></header>
+
+<div class="wrap">
+
+<div class="card toc">
+  <strong>فهرس سريع</strong>
+  <a href="#verdict">① الجواب المباشر بالأرقام</a>
+  <a href="#method">② منهجيّة التحقّق — لماذا هذه حقائق لا استنتاجات</a>
+  <a href="#gaps">③ البنود الستّة المؤكَّد أنها غير منفَّذة — دليل كود لكلّ بند</a>
+  <a href="#matrix">④ خريطة الخطّة الكاملة — رسم توضيحيّ</a>
+  <a href="#done">⑤ ما تحقَّق فعلًا من إنجازه ونشره (للمقارنة)</a>
+  <a href="#verdict2">⑥ الخلاصة النهائيّة</a>
+</div>
+
+<div id="verdict"></div>
+<h2>① الجواب المباشر بالأرقام</h2>
+<div class="stat-grid">
+  <div class="stat"><div class="n bad">لا</div><div class="l">هل اكتملت الخطّة بالكامل؟</div></div>
+  <div class="stat"><div class="n bad">6</div><div class="l">بنود مؤكَّدة غير منفَّذة — بدليل كود مباشر، ليس استنتاجًا</div></div>
+  <div class="stat"><div class="n ok">12</div><div class="l">التزام (commit) منفَّذ ومنشور فعلًا على المواضع الأربعة (تقرير 546)</div></div>
+  <div class="stat"><div class="n">2</div><div class="l">مستبعَدان بتعليمات صريحة (الجوّال + Flutter) — ليسا "نقصًا"، بل قرار نطاق</div></div>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-bar">
+    <div class="prog-seg seg-done" style="flex:12">منفَّذ ومنشور</div>
+    <div class="prog-seg seg-not" style="flex:6">غير منفَّذ (مؤكَّد بالكود)</div>
+  </div>
+  <div class="prog-legend">
+    <span><span class="dot" style="background:var(--done)"></span> منفَّذ ومتحقَّق منه بالكود + منشور على المواضع الأربعة</span>
+    <span><span class="dot" style="background:var(--not)"></span> غير منفَّذ — تحقَّقتُ من غيابه في الكود بالضبط هذه الجلسة</span>
+  </div>
+</div>
+
+<div class="callout not">
+  <strong>الفرق بين "غير مكتمل" و"خطأ":</strong> كل بند من الستّة أدناه استُبعِد بقرار نطاق واعٍ وموثَّق مسبقًا في التقارير
+  السابقة (بعضها يحتاج قرار تصميم أمنيّ لا يمكن اتّخاذه بالنيابة عن المشغِّل، وبعضها يحتاج نافذة مراقبة زمنيّة حقيقيّة قبل
+  التشديد). لكن حرفيًّا، بالسؤال المطروح "هل اكتملت الخطّة بالكامل؟" — الجواب الدقيق المبنيّ على الكود نفسه هو <strong>لا</strong>.
+</div>
+
+<div id="method"></div>
+<h2>② منهجيّة التحقّق — لماذا هذه حقائق لا استنتاجات</h2>
+<p>لكل بند من الستّة، نُفِّذ فحص مباشر من نوعَين فقط — لا نصّ تقرير، لا ملخّص، لا ذاكرة من جلسات سابقة:</p>
+<div class="flow">
+  <div class="fnode">grep على الكود الفعليّ<br><span style="color:var(--muted)">بحث عن أسماء الدوال/الأنماط المتوقَّعة</span></div>
+  <div class="farrow">←</div>
+  <div class="fnode">قراءة الدالّة كاملة<br><span style="color:var(--muted)">لا الاكتفاء بالعنوان أو التعليق</span></div>
+  <div class="farrow">←</div>
+  <div class="fnode not">الحكم من السلوك الفعليّ<br><span style="color:var(--muted)">ماذا تُنفِّذ الدالّة فعلًا، سطرًا سطرًا</span></div>
+</div>
+
+<div id="gaps"></div>
+<h2>③ البنود الستّة المؤكَّد أنها غير منفَّذة — دليل كود لكلّ بند</h2>
+
+<div class="item-card not">
+  <div class="item-head"><span class="item-id">D-26</span><span class="badge b-not">❌ غير منفَّذ — تحذير فقط</span></div>
+  <h4>الادّعاء المطلوب تحقيقه: هل رُفِض الإنفاذ الصارم لموافقة الاسترجاع الثانية بعد التنفيذ؟</h4>
+  <div class="evid">
+    <span class="k">الملفّ والسطر:</span> <code>backend/app/modules/finance/refund_router.py:632-636</code>
+  </div>
+  <pre><code>logging.getLogger(__name__).warning(
+    "D26_SECOND_APPROVE_AFTER_EXECUTION refund_id=%s state=%s actor=%s "
+    "— second approval recorded after the refund already executed; "
+    "this will be REJECTED in a future release (D-26)",
+    refund_id, refund.state, user.user_id,
+)</code></pre>
+  <p><strong>الحقيقة:</strong> الكود نفسه يصرِّح بلسانه أنه غير مكتمل — عبارة <code>"will be REJECTED in a future release"</code>
+  داخل نص التحذير نفسه. لا يوجد أي <code>raise HTTPException</code> يمنع هذه الحالة اليوم؛ فقط سجلّ تحذير + تنبيه (أُضيف هذه
+  الجلسة، لكنه لا يزال تحذيرًا لا رفضًا).</p>
+</div>
+
+<div class="item-card not">
+  <div class="item-head"><span class="item-id">D-29</span><span class="badge b-not">❌ غير منفَّذ — لا أثر ماليّ حقيقيّ</span></div>
+  <h4>الادّعاء المطلوب تحقيقه: هل يحرِّك حسم نزاع الدفع أي رصيد أو قيد ماليّ فعليّ؟</h4>
+  <div class="evid">
+    <span class="k">الملفّ والدالّة:</span> <code>backend/app/modules/finance/chargeback_router.py</code>، دالّة <code>finance_resolve_dispute</code> (قُرِئت كاملة سطرًا سطرًا)
+  </div>
+  <pre><code>dispute.state = "RESOLVED"
+dispute.decision_note = f"decision={body.decision}" + (...)
+dispute.decided_by = user.user_id
+dispute.freeze_level = "NONE"
+dispute.updated_at = datetime.now(timezone.utc)
+await audit_logger.log(AuditEvent(action="financial_dispute.resolved", ...))
+await db.commit()</code></pre>
+  <p><strong>الحقيقة:</strong> هذه هي كامل الدالّة فعليًّا — تغيير حالة + ملاحظة نصّية + سجلّ تدقيق. <strong>لا يوجد أي استدعاء
+  لإنشاء قيد يدويّ، لا تحريك محفظة، لا استرداد، ولا أي تأثير حسابيّ</strong> بناءً على القرار الفعليّ
+  (<code>FAVOR_CUSTOMER</code>/<code>FAVOR_PROVIDER</code>/<code>SPLIT</code>). النزاع "يُحسَم" شكليًّا فقط.</p>
+</div>
+
+<div class="item-card not">
+  <div class="item-head"><span class="item-id">D-09</span><span class="badge b-not">❌ غير منفَّذ — لا يزال role-based بالكامل</span></div>
+  <h4>الادّعاء المطلوب تحقيقه: هل رُحِّلت الصلاحيّات من فحص أدوار (role) إلى فحص صلاحيّات دقيقة (permission) عبر الملفّات الـ84؟</h4>
+  <div class="evid">
+    <span class="k">دليل مباشر:</span> نفس أداة A3 المبنيّة هذه الجلسة (<code>_ai_tools/bin/permission_ratchet_baseline.json</code>) تُسجِّل <strong>84 ملفًّا</strong> و<strong>494 نقطة استدعاء</strong> لـ<code>require_role(...)</code> — وهذا بالضبط النمط القديم الذي كان يُفترَض ترحيله، لا نمط جديد.
+  </div>
+  <p><strong>الحقيقة:</strong> بُنيت بوّابة CI هذه الجلسة (A3) لحماية النمط <strong>الحاليّ</strong> (role-based) من التراجع
+  المستقبليّ — أي أن القرار كان حماية الوضع الراهن، لا استبداله. الترحيل الفعليّ إلى نظام صلاحيّات دقيقة لم يبدأ.</p>
+</div>
+
+<div class="item-card not">
+  <div class="item-head"><span class="item-id">D-45</span><span class="badge b-not">❌ غير منفَّذ — صفر سطر كود</span></div>
+  <h4>الادّعاء المطلوب تحقيقه: هل يوجد تشفير مغلَّف (Envelope Encryption) عبر KMS؟</h4>
+  <div class="evid">
+    <span class="k">الأمر المنفَّذ حرفيًّا:</span> <code>grep -rln "envelope.*encrypt\|KMS\|kms_" backend/app --include="*.py"</code>
+  </div>
+  <pre><code>(لا نتيجة — صفر مطابقة في كامل شجرة backend/app)</code></pre>
+  <p><strong>الحقيقة:</strong> لا يوجد أي ملفّ، دالّة، أو حتى تعليق يذكر KMS أو تشفيرًا مغلَّفًا في كامل الخلفيّة. هذا البند لم يُمَسّ إطلاقًا.</p>
+</div>
+
+<div class="item-card not">
+  <div class="item-head"><span class="item-id">INIT-3(b)</span><span class="badge b-not">❌ غير منفَّذ — لا يوجد زرّ اختيار شخصيّة</span></div>
+  <h4>الادّعاء المطلوب تحقيقه: هل توجد شاشة/زرّ لاختيار الشخصيّة (عميل/مزوّد/سائق) عند تسجيل الدخول؟</h4>
+  <div class="evid">
+    <span class="k">الملفّ:</span> <code>web/src/pages/customer/LoginPage.tsx</code> (قُرِئ كاملًا)
+  </div>
+  <pre><code>const role: string = payload.role ?? "";
+if (role === "DRIVER") destination = "/driver";
+else if (role === "PROVIDER_ADMIN" || role === "PROVIDER_STAFF") ...
+// الدور يُحلَّل من JWT بعد المصادقة من الخادم — لا يوجد أي زرّ اختيار قبل ذلك</code></pre>
+  <p><strong>الحقيقة:</strong> التحقّق من الدور يحدث بعد نجاح تسجيل الدخول فقط، عبر مطالبات JWT القادمة من الخادم — لا وجود
+  لأي واجهة اختيار شخصيّة في الكود إطلاقًا. <strong>هذا نفسه هو السبب المباشر لفشل 39 من أصل 44 اختبار e2e</strong> الموثَّق في
+  تقرير 546 — الاختبارات تبحث عن زرّ لم يعد له وجود في الكود، وهذا التحقّق يؤكِّد أن الفجوة حقيقيّة في الاتّجاهَين معًا
+  (لا الاختبار أُصلِح ولا الميزة نُفِّذت).</p>
+</div>
+
+<div class="item-card not">
+  <div class="item-head"><span class="item-id">INIT-3(c)</span><span class="badge b-not">❌ غير منفَّذ — بصمة الجهاز لا تزال ثابتة</span></div>
+  <h4>الادّعاء المطلوب تحقيقه: هل تحوَّلت بصمة الجهاز (device fingerprint) من ثابتة إلى عشوائيّة لكل جلسة؟</h4>
+  <div class="evid">
+    <span class="k">الملفّ:</span> <code>web/src/pages/customer/PhoneLookupPage.tsx</code>
+  </div>
+  <pre><code>function getOrCreateDeviceId(): string {
+  let id = localStorage.getItem("device_id");
+  if (!id) {
+    id = genUUID();
+    localStorage.setItem("device_id", id);   // يُخزَّن بشكل دائم
+  }
+  return id;                                  // يُعاد استخدامه كما هو في كل زيارة لاحقة
+}</code></pre>
+  <p><strong>الحقيقة:</strong> اسم الدالّة نفسه (<code>getOrCreateDeviceId</code>) يفضح السلوك — تُنشَأ مرّة واحدة فقط ثمّ تُخزَّن
+  بشكل دائم في <code>localStorage</code>، وتُقرَأ كما هي في كل زيارة لاحقة. هذا بالضبط "الثابت" الذي كان الاقتراح يريد تغييره
+  إلى عشوائيّ لكل جلسة — لم يتغيَّر شيء.</p>
+</div>
+
+<div id="matrix"></div>
+<h2>④ خريطة الخطّة الكاملة — رسم توضيحيّ</h2>
+<p>كل خليّة أدناه بند مستقلّ من سلسلة تقارير التدقيق (538 → 546)، ملوَّنة حسب حالتها الفعليّة المتحقَّق منها بالكود:</p>
+<div class="matrix">
+  <div class="mcell done"><span class="mid">D-18</span>عكس القيد اليدويّ — موافقة ثانية مستقلّة</div>
+  <div class="mcell done"><span class="mid">D-32/D-33</span>حجز الطلب الذرّيّ (Postgres)</div>
+  <div class="mcell done"><span class="mid">D-41</span>ردّ Webhook نقاط البيع الحقيقيّ</div>
+  <div class="mcell done"><span class="mid">A0 (D-59/60/61)</span>تنبيهات إنتاجيّة فعليّة</div>
+  <div class="mcell done"><span class="mid">A3</span>بوّابة CI لمنع تراجع الصلاحيّات</div>
+  <div class="mcell done"><span class="mid">D-77</span>اختبار آليّ لرسائل الخطأ الثنائيّة اللغة</div>
+  <div class="mcell done"><span class="mid">D-39/D-40</span>رسائل إتمام كاذبة — مُصلَحة</div>
+  <div class="mcell done"><span class="mid">C-10(b)/C-12(f)/C-11(e)</span>من تقرير 545 — منفَّذة ومنشورة</div>
+  <div class="mcell not"><span class="mid">D-26</span>الإنفاذ الصارم — تحذير فقط</div>
+  <div class="mcell not"><span class="mid">D-29</span>أثر النزاع على دفتر الأستاذ — غائب</div>
+  <div class="mcell not"><span class="mid">D-09</span>ترحيل الصلاحيّات — لم يبدأ</div>
+  <div class="mcell not"><span class="mid">D-45</span>تشفير KMS — صفر كود</div>
+  <div class="mcell not"><span class="mid">INIT-3(b)</span>شاشة اختيار الشخصيّة — غائبة</div>
+  <div class="mcell not"><span class="mid">INIT-3(c)</span>بصمة عشوائيّة — لا تزال ثابتة</div>
+</div>
+
+<div id="done"></div>
+<h2>⑤ ما تحقَّق فعلًا من إنجازه ونشره (للمقارنة)</h2>
+<p>هذا القسم للسياق فقط — التفاصيل الكاملة والأدلّة الرقميّة (image ID، فحوصات حيّة، نسخ احتياطيّة) موجودة في تقرير 546.</p>
+<div class="callout done">
+  <strong>12 التزامًا منفَّذة ومنشورة فعليًّا</strong> على المواضع الأربعة (GitHub + test1 + test2 + production)، متحقَّق منها
+  رقميًّا (alembic <code>ab59</code> على الثلاثة، فحوصات HTTP حيّة 200/401 صحيحة). راجع تقرير 546 للأدلّة الكاملة.
+</div>
+
+<div id="verdict2"></div>
+<h2>⑥ الخلاصة النهائيّة</h2>
+<div class="callout not">
+  <strong>الجواب المباشر:</strong> لا، الخطّة التنفيذيّة (بمعناها الواسع عبر تقارير 538–546) <strong>لم تكتمل بالكامل</strong>.
+  6 بنود لا تزال — بدليل كود مباشر تحقَّقتُ منه في هذه الجلسة بالذات، لا من أي وثيقة — غير منفَّذة: D-26 (لا يزال تحذيرًا)،
+  D-29 (لا أثر ماليّ حقيقيّ للنزاعات)، D-09 (لم يبدأ ترحيل الصلاحيّات)، D-45 (صفر كود KMS)، INIT-3(b) (لا شاشة اختيار شخصيّة)،
+  و INIT-3(c) (بصمة الجهاز لا تزال ثابتة). كل بند منها مؤجَّل بقرار نطاق موثَّق مسبقًا، لا سهوًا — لكن هذا لا يغيِّر الجواب
+  الحرفيّ على السؤال: الخطّة غير مكتملة بالكامل اليوم.
+</div>
+
+<footer>تقرير 547 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-21</footer>
+
+</div>
+</body>
+</html>

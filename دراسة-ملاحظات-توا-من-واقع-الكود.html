@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دراسة ملاحظات منصّة توا — من واقع الكود</title>
+<style>
+  :root{
+    --green:#0F8056; --green-d:#0b5f40; --green-dark:#0b5f40;
+    --ink:#14231d; --muted:#5b6b64; --line:#dfe7e3; --bg:#f6f9f7;
+    --card:#ffffff; --red:#b3261e; --red-bg:#fde7e7; --amber:#b67100; --amber-bg:#fff7e0;
+    --ok:#0e7a4f; --ok-bg:#e5f4ec; --info:#1565c0; --info-bg:#eef6ff;
+    --code:#0d2b21; --code-bg:#f0f5f2;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Noto Sans Arabic",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.9}
+  .wrap{max-width:1060px;margin:0 auto;padding:24px 18px 80px}
+  header.hero{background:linear-gradient(135deg,#0F8056,#0b5f40);color:#fff;border-radius:20px;padding:34px 30px;margin-bottom:26px;box-shadow:0 10px 30px rgba(15,128,86,.25)}
+  header.hero h1{margin:0 0 6px;font-size:1.9rem}
+  header.hero p{margin:4px 0;opacity:.94;font-size:1rem}
+  .badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:20px;padding:3px 12px;font-size:.8rem;margin:6px 6px 0 0}
+  h2.sec{font-size:1.35rem;margin:38px 0 14px;padding:12px 16px;background:var(--green);color:#fff;border-radius:12px 12px 0 0;box-shadow:0 4px 12px rgba(15,128,86,.18)}
+  .note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:14px 0;font-size:.95rem}
+  .method{background:var(--info-bg);border:1px solid #cfe3fb;border-radius:12px;padding:16px 18px;color:#0d3c6e}
+  table.summary{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,.05);font-size:.9rem}
+  table.summary th{background:var(--green);color:#fff;padding:10px;text-align:right;font-weight:700}
+  table.summary td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:top}
+  table.summary tr:nth-child(even) td{background:#fafcfb}
+  .pill{display:inline-block;border-radius:20px;padding:2px 10px;font-size:.76rem;font-weight:700;white-space:nowrap}
+  .p-bug{background:var(--red-bg);color:var(--red)}
+  .p-gap{background:var(--amber-bg);color:var(--amber)}
+  .p-part{background:var(--info-bg);color:var(--info)}
+  .p-new{background:#efe9fb;color:#5b3ea6}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0;margin:18px 0;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.05)}
+  .card>.head{display:flex;align-items:center;gap:10px;padding:14px 18px;background:linear-gradient(90deg,#eaf4ef,#f6faf8);border-bottom:1px solid var(--line)}
+  .card>.head .num{background:var(--green);color:#fff;min-width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .card>.head h3{margin:0;font-size:1.08rem;flex:1}
+  .card>.body{padding:16px 18px}
+  .block{margin:12px 0}
+  .block>.lbl{font-weight:800;font-size:.86rem;color:var(--green-dark);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+  .lbl .dot{width:9px;height:9px;border-radius:50%;background:var(--green)}
+  code,.mono{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;direction:ltr;unicode-bidi:embed}
+  .fileref{display:inline-block;background:var(--code-bg);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:.82rem;color:var(--code);direction:ltr}
+  pre{background:var(--code);color:#dbf3e7;border-radius:10px;padding:12px 14px;overflow-x:auto;direction:ltr;font-size:.82rem;line-height:1.6;margin:8px 0}
+  pre .c{color:#6f9c88}
+  pre .k{color:#8fd3ff}
+  pre .s{color:#ffd291}
+  .why{background:var(--amber-bg);border-inline-start:4px solid var(--amber);border-radius:8px;padding:10px 14px;font-size:.92rem}
+  .rec{background:var(--ok-bg);border-inline-start:4px solid var(--ok);border-radius:8px;padding:10px 14px;font-size:.92rem}
+  .diagram{background:#fbfdfc;border:1px dashed var(--green);border-radius:12px;padding:16px;margin:12px 0;text-align:center;overflow-x:auto}
+  .flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+  .box{background:#fff;border:2px solid var(--green);border-radius:10px;padding:8px 12px;font-size:.82rem;font-weight:700;min-width:88px}
+  .box.bad{border-color:var(--red);background:var(--red-bg);color:var(--red)}
+  .box.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)}
+  .box.mut{border-color:var(--muted);background:#f2f5f4;color:var(--muted)}
+  .arrow{font-size:1.3rem;color:var(--green);font-weight:800}
+  .arrow.bad{color:var(--red)}
+  .legend-inline{font-size:.82rem;color:var(--muted);margin-top:8px}
+  .toc{columns:2;gap:20px;font-size:.9rem}
+  .toc a{color:var(--green-dark);text-decoration:none;display:block;padding:3px 0}
+  .toc a:hover{text-decoration:underline}
+  .kpi{display:flex;gap:12px;flex-wrap:wrap;margin:14px 0}
+  .kpi .k{flex:1;min-width:120px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .kpi .k b{display:block;font-size:1.6rem;color:var(--green)}
+  .kpi .k span{font-size:.78rem;color:var(--muted)}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem;text-align:center}
+  @media(max-width:640px){.toc{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>دراسة ملاحظات منصّة تُوا — من واقع الكود</h1>
+  <p>تحليل عميق لكل ملاحظة: ما الذي يحدث فعلًا في الشيفرة، ولماذا، وما التوصية.</p>
+  <p style="font-size:.9rem;opacity:.85">التاريخ: 2026-07-01 · النطاق: تطبيق الويب (<span class="mono">web/</span>) + الخادم (<span class="mono">backend/</span>)</p>
+  <div>
+    <span class="badge">🔎 كل ادّعاء مُوثّق برقم ملف/سطر</span>
+    <span class="badge">🧩 24 ملاحظة</span>
+    <span class="badge">🟢 المصدر: الشيفرة الحيّة المنشورة</span>
+  </div>
+</header>
+
+<div class="method">
+  <b>المنهجية (كيف تحقّقت):</b> قرأتُ ملفات المصدر الحقيقية سطرًا سطرًا (لا استنتاج).
+  اكتشفتُ أن ملاحظاتك على <b>تطبيق الويب</b> لأن النصوص التي ذكرتها (كود الدعوة، القبول التلقائي، الأرباح، التحضير، «لوحة تحكم المزوّد») مصدرها ملفات الويب لا الموبايل.
+  كل بطاقة تحتها: <b>الملاحظة</b> ← <b>الحقيقة من الكود</b> (مع <span class="fileref">path:line</span>) ← <b>السبب الجذري</b> ← <b>رسم توضيحي</b> ← <b>التوصية</b>.
+  <div class="legend-inline" style="margin-top:8px">
+    دلالات الحالة:
+    <span class="pill p-bug">عطب مؤكّد</span> خلل فعلي في الكود ·
+    <span class="pill p-gap">ميزة ناقصة</span> غير موجودة ·
+    <span class="pill p-part">موجود جزئيًا</span> يحتاج إكمالًا ·
+    <span class="pill p-new">بناء جديد</span> منطق/خوارزمية تُبنى من الصفر
+  </div>
+</div>
+
+<div class="kpi">
+  <div class="k"><b>3</b><span>أعطاب مؤكّدة في الكود</span></div>
+  <div class="k"><b>11</b><span>ميزات ناقصة / جديدة</span></div>
+  <div class="k"><b>10</b><span>توحيد وتنظيم واجهات</span></div>
+  <div class="k"><b>1</b><span>سبب جذري قاطع (405)</span></div>
+</div>
+
+<h2 class="sec">📋 الجدول الملخّص لكل الملاحظات</h2>
+<table class="summary">
+  <thead><tr><th style="width:32px">#</th><th>الملاحظة</th><th style="width:110px">الحالة</th><th>الحقيقة المختصرة من الكود</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>توزيع عادل بين موظّفي المزوّد (حسب الحِمل/السرعة/الضغط)</td><td><span class="pill p-new">بناء جديد</span></td><td>يوجد وضعان فقط: «آلي = بثّ للجميع» و«يدوي = إسناد بضغطة». لا خوارزمية توازن حِمل.</td></tr>
+    <tr><td>2</td><td>صلاحية موحّدة للتحضير + مفتوحة افتراضيًا للأدمن/عند غياب الموظفين</td><td><span class="pill p-part">جزئي</span></td><td>الصلاحيات مُجزّأة (20+ صلاحية). لا منطق «افتراضي مفتوح عند غياب موظفين / مغلق مع تنبيه».</td></tr>
+    <tr><td>3</td><td>تحميل تكلفة العرض على المزوّد/المنصّة + موافقة المنصّة</td><td><span class="pill p-gap">ناقصة</span></td><td><span class="mono">cost_bearer</span> موجود، لكن <b>لا حقل موافقة</b> — العرض يصبح فعّالًا فورًا.</td></tr>
+    <tr><td>4</td><td>رسالة التوصيل الذاتي (اسم المزوّد+هاتفه) قبل الدفع</td><td><span class="pill p-gap">ناقصة</span></td><td>التوصيل الذاتي مُنمذَج، لكن لا رسالة كشف للعميل قبل الدفع.</td></tr>
+    <tr><td>5</td><td>زر «كل شيء عن المزوّد» (هاتف/مواعيد/خريطة/تقييم/تعليقات)</td><td><span class="pill p-gap">ناقصة</span></td><td>صفحة المزوّد = مينيو فقط. لا لوحة معلومات ولا تعليقات (rating/review = 0).</td></tr>
+    <tr><td>6</td><td>روابط وسائل التواصل الاجتماعي للمزوّد</td><td><span class="pill p-gap">ناقصة</span></td><td>لا حقول تواصل اجتماعي في نموذج المزوّد إطلاقًا.</td></tr>
+    <tr><td>7</td><td>إيقاف مؤقّت متقدّم (≤ساعة، 4 مرّات/يوم، تحوّل تلقائي، تهدئة ساعة)</td><td><span class="pill p-new">بناء جديد</span></td><td>يوجد ثنائي فقط: <span class="mono">active_now</span> + <span class="mono">is_accepting_orders</span>. لا مؤقّت ولا عدّاد.</td></tr>
+    <tr><td>8</td><td>مؤشّر الحالة (أخضر/أصفر/أحمر) في الشريط العلوي للمزوّد والسائق</td><td><span class="pill p-gap">ناقصة</span></td><td>الشريط العلوي لا يعرض أي حالة. المفتاح داخل اللوحة لا الشريط.</td></tr>
+    <tr><td>9</td><td>استبدال «الأرباح» بـ«المبيعات» + توحيد الأيقونات</td><td><span class="pill p-bug">توحيد</span></td><td>كلمتان (أرباح/مبيعات) ونظاما أيقونات (إيموجي في اللوحة، SVG في الشريط).</td></tr>
+    <tr><td>10</td><td>استبدال «التحضير» بـ«إدارة الطلبات» + إزالة الازدواجية</td><td><span class="pill p-bug">توحيد</span></td><td>ثلاثة أسماء: «إدارة الطلبات» (الشريط) و«الطلبات»+«التحضير» (اللوحة).</td></tr>
+    <tr><td>11</td><td>سجل الطلبات: كل التفاصيل (السائق+الأوقات+وقت التحضير)</td><td><span class="pill p-gap">ناقصة</span></td><td>سجل المزوّد يعرض <span class="mono">created_at</span> فقط (110 أسطر). سجل السائق أغنى.</td></tr>
+    <tr><td>12</td><td>الموظّف يرى «لوحة تحكم المزوّد» بدل هوية موظّف</td><td><span class="pill p-bug">عطب</span></td><td>العنوان ثابت في <span class="fileref">ProviderDashboard.tsx:227</span> بلا وعي بالدور.</td></tr>
+    <tr><td>13</td><td>كود الدعوة يظهر للموظّف</td><td><span class="pill p-bug">عطب</span></td><td><span class="mono">StaffInviteCard</span> يُعرض دون شرط دور — <span class="fileref">:272</span>.</td></tr>
+    <tr><td>14</td><td>«جارٍ التحميل» في لوحة الموظّفين</td><td><span class="pill p-part">جزئي</span></td><td>حالات تحميل في الأسطر 275/312/755.</td></tr>
+    <tr><td>15</td><td>القبول التلقائي يظهر للموظّف</td><td><span class="pill p-bug">عطب</span></td><td>زر القبول التلقائي يُعرض للجميع — <span class="fileref">:349</span>.</td></tr>
+    <tr><td>16</td><td>لا لوحة إعدادات/صلاحيات موظّفين واضحة (حتى بلا موظّفين)</td><td><span class="pill p-gap">ناقصة</span></td><td><span class="mono">ProviderStaff</span> غير مربوطة في شبكة اللوحة ولا في خريطة الوصول.</td></tr>
+    <tr><td>17</td><td>زر «آلي» يفتح ويغلق فورًا</td><td><span class="pill p-bug">عطب</span></td><td><span class="mono">run()</span>→<span class="mono">load()</span> يضبط loading فيومض السبينر لكامل اللوحة كل ضغطة.</td></tr>
+    <tr><td>18</td><td>خانة مسمّى وظيفي «مخصّص» إجبارية</td><td><span class="pill p-gap">ناقصة</span></td><td>القائمة قوائم جاهزة فقط، لا حقل نصّي مخصّص (رغم دعم الخادم).</td></tr>
+    <tr><td>19</td><td>توسيع الصلاحيات + شرح لكل خانة</td><td><span class="pill p-part">جزئي</span></td><td>الصلاحيات غنية، لكن بلا شرح/tooltip لكل خانة.</td></tr>
+    <tr><td>20</td><td>توضيح «الإيقاف الدائم/المؤقت» في لوحة الموظّفين</td><td><span class="pill p-bug">توحيد</span></td><td>«إيقاف» محمّلة بمعنيين (إيقاف موظّف ≠ إيقاف متجر).</td></tr>
+    <tr><td>21</td><td>«تعذّر تنفيذ العملية» عند إزالة صلاحية</td><td><span class="pill p-bug">عطب مؤكّد</span></td><td>الواجهة تنادي <span class="mono">DELETE</span> غير موجود في الخادم → 405.</td></tr>
+    <tr><td>22</td><td>وثائق السائق: رخصة أمام/خلف، بطاقة شخصية/جواز، رقم وطني، وثائق مركبة متعدّدة، توكيلات، لوحة، صور مركبة</td><td><span class="pill p-gap">ناقصة</span></td><td>4 أنواع فقط: رخصة واحدة، بطاقة وطنية أمام/خلف، وثيقة مركبة واحدة.</td></tr>
+    <tr><td>23</td><td>زر مختفٍ تحت الشريط السفلي (السائق)</td><td><span class="pill p-part">تحقّق ميداني</span></td><td>الشريط <span class="mono">fixed z-index:100</span>؛ <span class="mono">.page</span> يترك 5rem — يحتاج إعادة إنتاج على الجهاز.</td></tr>
+    <tr><td>24</td><td>اللوحة الرئيسية للسائق تحتاج ترتيبًا</td><td><span class="pill p-gap">تحسين</span></td><td>تنظيم عام مطلوب (مرتبط بالنقاط 8/23).</td></tr>
+  </tbody>
+</table>
+
+<h2 class="sec">🗂️ الفهرس</h2>
+<div class="note toc">
+  <a href="#m1">المحور 1 — التوزيع والصلاحيات (1، 2)</a>
+  <a href="#m2">المحور 2 — العروض والعميل وصفحة المزوّد (3، 4، 5، 6، 7)</a>
+  <a href="#m3">المحور 3 — التوحيد والشريط والحالة (8، 9، 10، 11)</a>
+  <a href="#m4">المحور 4 — لوحة الموظّفين (12–21)</a>
+  <a href="#m5">المحور 5 — وثائق السائق ولوحته (22، 23، 24)</a>
+</div>
+
+<!-- ================= المحور 1 ================= -->
+<h2 class="sec" id="m1">المحور 1 — التوزيع العادل والصلاحيات</h2>
+
+<div class="card">
+  <div class="head"><div class="num">1</div><h3>التوزيع العادل للطلبات بين موظّفي المزوّد <span class="pill p-new">بناء جديد</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      يجب توزيع الطلبات بعدالة بين الموظّفين — لا موظّف عنده طلب واحد وآخر عنده عشرة — بحسابات دقيقة (السرعة، الضغط، الحِمل…).</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      يوجد اليوم وضعان فقط للتوزيع، مخزّنان على المزوّد (<span class="mono">order_distribution_mode</span>, <span class="mono">auto_cascade_seconds</span> — أُضيفا في هجرة <span class="mono">ab02</span>):
+      <ul>
+        <li><b>آلي (AUTO):</b> يعرض الطلب <b>لكل</b> الموظّفين ويصعّد عند عدم الاستجابة — <span class="fileref">ProviderStaff.tsx:116</span>: «الآلي يعرض للجميع ويصعّد عند عدم الاستجابة».</li>
+        <li><b>يدوي (MANUAL):</b> المالك يُسند الطلب يدويًا لموظّف عبر <span class="fileref">provider_router.py:2873</span> <span class="mono">POST /me/orders/{id}/assign</span> (يكتب <span class="mono">orders.assigned_staff_id</span>).</li>
+      </ul>
+      لا توجد أي خوارزمية تحسب حِمل كل موظّف وتوازن بينهم. (بحث في كل الخدمات: لا منطق load-balancing يرتبط بـ<span class="mono">assigned_staff_id</span>.)</div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box mut">طلب جديد</div><span class="arrow">→</span>
+        <div class="box">آلي = بثّ للجميع</div>
+        <span class="arrow">/</span>
+        <div class="box">يدوي = المالك يختار</div>
+        <span class="arrow bad">✗</span>
+        <div class="box bad">لا توازن حِمل</div>
+      </div>
+      <div class="legend-inline">الحالي: إمّا الكل يراه، أو المالك يوزّع بيده. لا حساب «مَن الأقل انشغالًا».</div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>السبب الجذري</div>
+      <div class="why">الميزة صُمِّمت كـ«بثّ + تصعيد» لا كـ«محرّك توزيع». لا يُخزَّن أي مقياس أداء لكل موظّف (طلبات مفتوحة الآن، متوسط زمن التحضير، معدّل القبول)، فلا مُدخلات لخوارزمية عادلة.</div></div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">بناء <b>محرّك توزيع</b> يضيف وضعًا ثالثًا «عادل/ذكي»: يحسب لكل موظّف نشِط درجة = دالة في (الطلبات المفتوحة حاليًا، متوسّط زمن التحضير، معدّل الرفض/التجاهل، آخر إسناد) ويُسند للأقل حِملًا؛ مع سقف طلبات متزامنة لكل موظّف وقواعد ضغط (تعطيل الإسناد عند تجاوز السقف). يتطلّب جدول مقاييس أداء لكل موظّف.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">2</div><h3>صلاحية «إدارة الطلبات/التحضير» موحّدة وذكيّة الافتراض <span class="pill p-part">جزئي</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      الأدمن أو أي موظّف يمنحه الأدمن الصلاحية يقوم بالتحضير وكل الأعمال بصلاحية واحدة. ويمنحها لنفسه. وإن كان وحده بلا موظّفين تكون <b>مفتوحة افتراضيًا</b>؛ وإن وُجد موظّفون تُغلق افتراضيًا مع تنبيه للأدمن.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      كتالوج الصلاحيات فيه <b>20+ صلاحية مزوّد</b> مُجزّأة (<span class="fileref">account_permission_service.py:114-227</span>): <span class="mono">provider_order:view/accept/reject/handoff/assign</span>، <span class="mono">provider_item:*</span>، <span class="mono">provider_catalog:*</span>… النموذج: <span class="mono">effective = (baseline ∪ GRANT) − REVOKE</span>.
+      <ul>
+        <li>الأدمن (<span class="mono">PROVIDER_ADMIN</span>) عنده كل الصلاحيات بالأساس.</li>
+        <li>الموظّف (<span class="mono">PROVIDER_STAFF</span>) يبدأ بلا صلاحيات ويمنحها المالك يدويًا — <span class="fileref">provider_router.py:2544</span>.</li>
+      </ul>
+      لا يوجد: (أ) صلاحية «مظلّة» واحدة تجمع كل أعمال إدارة الطلبات؛ (ب) منطق «افتراضيًا مفتوحة للمالك المنفرد / مغلقة مع تنبيه عند وجود موظّفين».</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>السبب الجذري</div>
+      <div class="why">الفلسفة الحالية «صلاحيات دقيقة à la carte» تخدم التحكّم، لكنها لا تُنفّذ سلوك الافتراض المشروط بعدد الموظّفين الذي تريده.</div></div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إضافة صلاحية-مظلّة <span class="mono">provider_order:manage</span> (تتضمّن view+accept+reject+handoff+prep). وعند إنشاء المتجر: إن لم يوجد موظّفون تُمنح للمالك تلقائيًا؛ وعند إضافة أول موظّف تُغلق افتراضيًا للموظّفين مع تنبيه للأدمن ليمنحها صراحةً.</div></div>
+  </div>
+</div>
+
+<!-- ================= المحور 2 ================= -->
+<h2 class="sec" id="m2">المحور 2 — العروض والعميل وصفحة المزوّد</h2>
+
+<div class="card">
+  <div class="head"><div class="num">3</div><h3>تحميل تكلفة العرض (المزوّد/المنصّة) + موافقة المنصّة <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      تكلفة العرض تُحمَّل على <b>المزوّد</b> (وليس «المؤسسة») أو على <b>المنصّة</b>. وإن اختار المزوّد «المنصّة» فيجب <b>موافقة المنصّة</b> ليصبح العرض ساريًا، ويُضاف إلى <b>لوحة عروض في المنصّة</b> للموافقة.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      نموذج <span class="fileref">promotion.py:54</span> فيه <span class="mono">cost_bearer: PROVIDER | PLATFORM</span> (مَن يتحمّل الخصم) — <b>موجود</b>. لكن:
+      <pre><span class="c"># promotion.py — لا يوجد أي حقل موافقة/حالة</span>
+cost_bearer  = <span class="s">"PROVIDER" | "PLATFORM"</span>   <span class="c"># موجود</span>
+is_active    = <span class="k">True</span>                    <span class="c"># الافتراضي فعّال فورًا</span>
+<span class="c"># لا: status / approved_by_platform / PENDING_APPROVAL</span></pre>
+      أي مزوّد يستطيع اختيار <span class="mono">PLATFORM</span> كمتحمّل، والعرض يصبح فعّالًا <b>فورًا</b> دون أي بوّابة موافقة. كلمة «المؤسسة» <b>غير موجودة في كود الويب إطلاقًا</b> (المسمّى الدلالي هو «المزود»/«المنصة»).</div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box">مزوّد ينشئ عرضًا</div><span class="arrow">→</span>
+        <div class="box bad">cost_bearer=PLATFORM</div><span class="arrow bad">→</span>
+        <div class="box bad">is_active=true فورًا</div>
+      </div>
+      <div class="legend-inline">المطلوب: إدراج بوّابة موافقة المنصّة قبل التفعيل عندما يكون المتحمّل = المنصّة.</div>
+      <div class="flow" style="margin-top:10px">
+        <div class="box">مزوّد → المنصّة</div><span class="arrow">→</span>
+        <div class="box mut">PENDING_APPROVAL</div><span class="arrow">→</span>
+        <div class="box">لوحة موافقات المنصّة</div><span class="arrow">→</span>
+        <div class="box ok">APPROVED → ساري</div>
+      </div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>السبب الجذري</div>
+      <div class="why">صُمِّم النموذج للمرونة (اختيار المتحمّل) دون خطر مالي مُدرَك: لا شيء يمنع مزوّدًا من تحميل تكلفته على المنصّة. غياب حقل الحالة يجعل أي عرض «سارٍ» لحظة إنشائه.</div></div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إضافة <span class="mono">approval_status</span> (<span class="mono">AUTO_APPROVED / PENDING / APPROVED / REJECTED</span>): إن كان المتحمّل = المزوّد → موافقة تلقائية؛ إن كان = المنصّة → <span class="mono">PENDING</span> ولا يُطبَّق حتى موافقة المنصّة، مع لوحة عروض جديدة في قسم العمليات لعرض/قبول/رفض هذه الطلبات. وتغيير أي تسمية «مؤسسة» إلى «المزوّد».</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">4</div><h3>رسالة التوصيل الذاتي قبل الدفع (اسم المزوّد + هاتفه) <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      في التوصيل الذاتي، تظهر رسالة للعميل قبل الدفع: «التوصيل يأتي من المزوّد مباشرةً»، مع اسم المزوّد ورقم هاتفه.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      التوصيل الذاتي مُنمذَج على المزوّد: <span class="mono">delivery_method</span>, <span class="mono">self_delivery_pricing</span>, <span class="mono">self_delivery_flat_minor</span>, <span class="mono">self_delivery_per_km_minor</span>, و<span class="mono">contact_phone</span> (<span class="fileref">provider.py</span>). لكن في صفحة الدفع <span class="fileref">CheckoutPage.tsx:82</span> الخيار هو <span class="mono">DELIVERY</span> مقابل <span class="mono">SELF_PICKUP</span> (<b>استلام العميل بنفسه</b>) — وهو مفهوم مختلف عن «المزوّد يوصّل مباشرةً». لا توجد أي رسالة تكشف للعميل اسم/هاتف المزوّد قبل الدفع في حالة التوصيل الذاتي.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>السبب الجذري</div>
+      <div class="why">التوصيل الذاتي مُعامَل كتسعير فقط (يؤثّر على رسوم التوصيل)، دون طبقة «كشف/إفصاح» في تدفّق الدفع. والبيانات (الاسم، <span class="mono">contact_phone</span>) متاحة لكنها غير مُستهلَكة في الواجهة عند الدفع.</div></div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">عند اكتشاف أن المزوّد ذاتي التوصيل: عرض بطاقة تنبيه واضحة في <span class="mono">CheckoutPage</span> قبل زر الدفع تكتب «هذا التوصيل من المزوّد مباشرةً» + اسم المزوّد + <span class="mono">contact_phone</span>، وإلزام العميل بالإقرار قبل المتابعة.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">5</div><h3>زر «كل شيء عن المزوّد» (هاتف/مواعيد/خريطة/تقييم/تعليقات) <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      عند الضغط على مزوّد يظهر المينيو + زر آخر لمعرفة كل شيء عنه (عدا البيانات الشخصية للمالك): الهاتف، مواعيد الفتح/الإغلاق، المكان كما كتبه، موقعه على الخريطة، والتقييم؛ ويستطيع رؤية تقييمات الآخرين وكتابة تقييم وتعليق وقراءة التعليقات.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      صفحة <span class="fileref">ProviderDetailPage.tsx</span> هي <b>المينيو فقط</b> (أصناف + مجموعات تعديل + تصنيفات). بمسح الصفحة: <span class="mono">rating</span>/<span class="mono">review</span>/<span class="mono">comment</span>/هاتف/مواعيد = <b>صفر</b> (فقط بعض استخدام <span class="mono">map/lat</span>). البيانات كلها موجودة في نموذج المزوّد (<span class="mono">contact_phone</span>, <span class="mono">opening_hours</span>, <span class="mono">address_text</span>, <span class="mono">lat/lng</span>, <span class="mono">rating_avg/count</span>, <span class="mono">description_ar</span>) لكنها غير معروضة هنا، ولا توجد واجهة قراءة/كتابة تعليقات.</div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box ok">موجود في النموذج</div>
+        <span class="arrow">→</span>
+        <div class="box bad">غير معروض في صفحة المزوّد</div>
+      </div>
+      <div class="legend-inline">phone · hours · address · map · rating — كلها في قاعدة البيانات، لكن الصفحة تعرض المينيو فقط.</div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إضافة زر «عن المتجر» يفتح لوحة تعرض: <span class="mono">contact_phone</span>، <span class="mono">opening_hours</span>، <span class="mono">address_text</span>+خريطة (<span class="mono">lat/lng</span>)، <span class="mono">rating_avg</span> مع عدد المقيّمين، وقائمة التعليقات + نموذج كتابة تقييم/تعليق. إخفاء بيانات المالك الشخصية.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">6</div><h3>روابط وسائل التواصل الاجتماعي للمزوّد <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      يستطيع المزوّد إضافة روابط صفحاته على وسائل التواصل، بقناة واضحة.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      نموذج المزوّد (<span class="fileref">provider.py</span>) — قائمة الأعمدة الكاملة تحتوي <span class="mono">logo_url</span>, <span class="mono">cover_image_url</span> فقط للصور، و<b>لا يوجد أي حقل تواصل اجتماعي</b> (لا instagram/facebook/whatsapp/social_links). و<span class="fileref">ProviderSettings.tsx</span> يعرض «رابط الشعار» و«رابط الغلاف» فقط.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إضافة حقل <span class="mono">social_links</span> (JSON: facebook/instagram/whatsapp/tiktok/website) في نموذج المزوّد + قسم في إعدادات المزوّد لإدخالها + عرضها في لوحة «عن المتجر» (النقطة 5).</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">7</div><h3>الإيقاف المؤقّت المتقدّم (مؤقّت/عدّاد/تحوّل تلقائي/تهدئة) <span class="pill p-new">بناء جديد</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      زر إيقاف مؤقّت (للصلاة مثلًا). أثناءه <b>لا يختفي</b> المزوّد من واجهة العميل بشرط ألّا يتجاوز <b>ساعة</b>؛ مسموح <b>4 مرّات/يوم</b>؛ وإن تجاوز الساعة يتحوّل تلقائيًا إلى إيقاف كامل (ويختفي من البحث والواجهة)؛ ولا يُجدّد الإيقاف المؤقّت إلا بعد <b>ساعة</b> تهدئة.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      نموذج المزوّد فيه حالتان ثنائيّتان فقط: <span class="mono">active_now</span> (مفتوح/مغلق) و<span class="mono">is_accepting_orders</span> (يستقبل أم لا)، وصلاحية <span class="mono">provider_intake:toggle</span> تقلب الثنائي. <b>لا يوجد</b>: حقل انتهاء الإيقاف المؤقّت، ولا عدّاد مرّات يومي، ولا منطق تحوّل تلقائي بعد ساعة، ولا نافذة تهدئة، ولا تفريق بين «مؤقّت يبقى ظاهرًا» و«كامل يختفي من البحث».</div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box mut">الحالي: مفتوح/مغلق فقط</div>
+        <span class="arrow">⇢</span>
+        <div class="box ok">يعمل (أخضر)</div><span class="arrow">/</span>
+        <div class="box">إيقاف مؤقّت (أصفر، ≤ساعة، يبقى ظاهرًا)</div><span class="arrow bad">→</span>
+        <div class="box bad">إيقاف كامل (أحمر، يختفي)</div>
+      </div>
+      <div class="legend-inline">المطلوب حالة وسطى بمؤقّت + قواعد (4/يوم، ساعة سقف، ساعة تهدئة، تحوّل تلقائي).</div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">بناء آلة حالة إيقاف: حقول <span class="mono">pause_until</span>, <span class="mono">pause_count_today</span>, <span class="mono">last_pause_ended_at</span>. زر «إيقاف مؤقّت» يضبط <span class="mono">pause_until=now+≤60m</span> ويبقي المزوّد ظاهرًا؛ مهمّة دورية تُحوّله لإيقاف كامل عند تجاوز الساعة؛ رفض بدء إيقاف جديد إن <span class="mono">count≥4</span> اليوم أو لم تمرّ ساعة تهدئة. الإيقاف الكامل يستثنيه من البحث/الواجهة.</div></div>
+  </div>
+</div>
+
+<!-- ================= المحور 3 ================= -->
+<h2 class="sec" id="m3">المحور 3 — التوحيد والشريط العلوي والحالة</h2>
+
+<div class="card">
+  <div class="head"><div class="num">8</div><h3>مؤشّر الحالة (أخضر/أصفر/أحمر) في الشريط العلوي <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      في الشريط العلوي للمزوّد والسائق تظهر حالة الحساب: «متوقّف» أحمر، «متوقّف مؤقتًا» أصفر، ويعمل أخضر — مكتوبة وواضحة.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      الشريط العلوي في <span class="fileref">Layout.tsx:172-281</span> يعرض: الشعار، هوية («بوّابة المزوّدين»/«بوّابة السائقين» — سطر 213/212)، المظهر، اللغة، قائمة الحساب — و<b>لا يعرض أي مؤشّر حالة</b>. مفتاح فتح/إغلاق المزوّد داخل اللوحة (<span class="fileref">ProviderDashboard.tsx:315</span>)، وتوفّر السائق داخل <span class="fileref">DriverHome.tsx:626</span> — لا في الشريط.</div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box ok">أخضر: يعمل</div>
+        <div class="box" style="border-color:var(--amber);background:var(--amber-bg);color:var(--amber)">أصفر: متوقّف مؤقتًا</div>
+        <div class="box bad">أحمر: متوقّف</div>
+      </div>
+      <div class="legend-inline">المطلوب: شارة ملوّنة دائمة في الشريط العلوي للمزوّد والسائق.</div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إضافة «شارة حالة» في الشريط العلوي تقرأ <span class="mono">active_now/pause_until</span> للمزوّد و<span class="mono">availability</span> للسائق وتُلوّن أخضر/أصفر/أحمر مع نصّ. (يتكامل مع النقطة 7.)</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">9</div><h3>«الأرباح» ← «المبيعات» + توحيد الأيقونات <span class="pill p-bug">توحيد</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      حذف كلمة «الأرباح» في المزوّد واستبدالها بـ«المبيعات»، وتوحيد كل شيء حتى الأيقونات — لا أيقونة أرباح وأخرى مبيعات وكتابات مختلفة.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      <ul>
+        <li>الشريط السفلي: «الأرباح» بأيقونة <span class="mono">Coins</span> (SVG) — <span class="fileref">Layout.tsx:392</span>.</li>
+        <li>اللوحة: بطاقة «الأرباح» بإيموجي 💰 — <span class="fileref">ProviderDashboard.tsx:579</span>.</li>
+        <li>ونفس اللوحة تعرض تحليلات «الأكثر مبيعاً» — <span class="fileref">:530</span>.</li>
+      </ul>
+      فالنتيجة: كلمتان (<b>أرباح</b> و<b>مبيعات</b>) لنفس السياق، ونظاما أيقونات: إيموجي في اللوحة مقابل أيقونات <span class="mono">lucide</span> (SVG) في الشريط.</div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box bad">💰 «الأرباح» (لوحة)</div>
+        <div class="box bad">Coins «الأرباح» (شريط)</div>
+        <div class="box bad">📊 «الأكثر مبيعاً»</div>
+        <span class="arrow">→</span>
+        <div class="box ok">«المبيعات» + أيقونة واحدة</div>
+      </div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>السبب الجذري</div>
+      <div class="why">اللوحة والشريط بُنيا في وقتين بنظامَي أيقونات مختلفين (إيموجي مقابل SVG) دون مصدر تسمية/أيقونات موحّد.</div></div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">توحيد التسمية إلى «المبيعات» في الشريط واللوحة، واعتماد نظام أيقونات واحد (<span class="mono">lucide</span> SVG) في كل مكان، مع مصدر تسمية/أيقونة مركزي واحد.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">10</div><h3>«التحضير» ← «إدارة الطلبات» + إزالة الازدواجية <span class="pill p-bug">توحيد</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      لا كلمة «التحضير»؛ تُستبدل بـ«إدارة الطلبات» كما في الشريط السفلي. الشريط السفلي هو الأساس؛ وحّد كل شيء عليه في لوحات المزوّد والعميل والسائق. لا ازدواجية.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      ثلاث تسميات لنفس المنطقة:
+      <ul>
+        <li>الشريط السفلي: «<b>إدارة الطلبات</b>» — <span class="fileref">Layout.tsx:357</span>.</li>
+        <li>اللوحة: بطاقتان منفصلتان «<b>الطلبات</b>» (<span class="fileref">ProviderDashboard.tsx:557</span>) و«<b>التحضير</b>» (<span class="fileref">:562</span> → <span class="mono">orders?tab=prep</span>).</li>
+        <li>صفحة مستقلّة <span class="fileref">ProviderPreparation.tsx</span> أيضًا.</li>
+      </ul></div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box bad">«الطلبات»</div>
+        <div class="box bad">«التحضير»</div>
+        <div class="box">«إدارة الطلبات» (الشريط)</div>
+        <span class="arrow">→</span>
+        <div class="box ok">اسم واحد: «إدارة الطلبات»</div>
+      </div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">اعتماد «إدارة الطلبات» في كل مكان (بطاقة واحدة في اللوحة بتبويبات داخلية: جديد/قيد التحضير/جاهز)، وحذف ازدواجية «الطلبات»+«التحضير». وتعميم المبدأ (الشريط السفلي = المرجع) على لوحات العميل والسائق.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">11</div><h3>سجل الطلبات: كل التفاصيل (السائق + الأوقات + وقت التحضير) <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>ملاحظتك</div>
+      في سجل الطلبات يظهر كل شيء، بما فيه أي سائق استلم الطلبية بالساعة والدقيقة؛ وبالضغط على الطلبية تظهر كل تفاصيلها حتى وقت التحضير. وميزة مشابهة للسائق بتفاصيل تناسبه.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      <ul>
+        <li>سجل المزوّد <span class="fileref">ProviderOrderHistory.tsx</span> (110 سطرًا فقط): يعرض <span class="mono">created_at</span> فقط — <b>لا اسم سائق، لا طوابع أوقات (قبول/استلام/تسليم)، لا وقت تحضير، ولا تفاصيل عند الضغط</b>.</li>
+        <li>سجل السائق <span class="fileref">DriverHistory.tsx</span> (188 سطرًا) أغنى: يذكر <span class="mono">delivered_at</span>, <span class="mono">picked</span>, ⏱ — يتوافق مع «تظهر للسائق مختلفة».</li>
+      </ul></div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">توسيع سجل المزوّد ليعرض لكل طلب خطًّا زمنيًا كاملًا (وقت الإنشاء/القبول/بدء التحضير/الجاهزية/استلام السائق باسمه والساعة/التسليم) ومدّة التحضير المحسوبة، مع صفحة تفاصيل عند الضغط. ومواءمة سجل السائق ليعرض تفاصيله الخاصة بشكل متّسق.</div></div>
+  </div>
+</div>
+
+<!-- ================= المحور 4 ================= -->
+<h2 class="sec" id="m4">المحور 4 — لوحة الموظّفين (أكبر عنقود أعطاب)</h2>
+
+<div class="note">
+  <b>جذر مشترك:</b> صفحة <span class="fileref">ProviderDashboard.tsx</span> هي <b>الصفحة نفسها</b> التي يراها المالك والموظّف. لا يوجد تفريق حقيقي بالدور سوى إخفاء بطاقة «الأرباح». لذلك يرى الموظّف عنوان المالك وبطاقة الدعوة والقبول التلقائي — وكلّها تخصّ المالك. (النقاط 12–15 تنبع من هذا.)
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">12</div><h3>الموظّف يرى «لوحة تحكم المزوّد» بدل هوية موظّف <span class="pill p-bug">عطب</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      العنوان ثابت غير مشروط بالدور:
+      <pre><span class="c">// ProviderDashboard.tsx:227</span>
+&lt;h2&gt;<span class="s">لوحة تحكم المزوّد</span>&lt;/h2&gt;
+&lt;p&gt;<span class="s">نظرة عامة على نشاطك</span>&lt;/p&gt;</pre>
+      يُعرض للجميع بمن فيهم <span class="mono">PROVIDER_STAFF</span>. ولا تُعرض هوية الموظّف (اسم المزوّد + رقم حساب الموظّف + اسمه).</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">جعل العنوان واعيًا بالدور: للموظّف يُكتب «موظّف لدى: {اسم المزوّد}» + رقم حساب الموظّف + اسمه، بدل «لوحة تحكم المزوّد».</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">13</div><h3>كود دعوة الموظّفين يظهر للموظّف <span class="pill p-bug">عطب</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      بطاقة <span class="mono">StaffInviteCard</span> تُعرض دون أي شرط دور:
+      <pre><span class="c">// ProviderDashboard.tsx:272 (داخل return للجميع)</span>
+&lt;StaffInviteCard /&gt;      <span class="c">// يعرض «كود دعوة الموظفين» (:710)</span></pre>
+      مع أنّ إدارة كود الدعوة صلاحية مالك حصريًا (<span class="mono">provider_invite:manage</span>, <span class="mono">is_grantable=False</span> — <span class="fileref">account_permission_service.py:293</span>).</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">تغليف <span class="mono">&lt;StaffInviteCard/&gt;</span> بشرط دور المالك فقط (<span class="mono">user.role === "PROVIDER_ADMIN"</span>).</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">14</div><h3>«جارٍ التحميل» في لوحة الموظّفين <span class="pill p-part">جزئي</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      «جارٍ التحميل» حالات تحميل في <span class="fileref">ProviderDashboard.tsx:275</span> (الإحصاءات)، <span class="fileref">:312</span> (حالة المنشأة)، و<span class="fileref">:755</span> (داخل بطاقة الدعوة). تظهر للموظّف لأنه يرى صفحة المالك كاملةً.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">بعد فصل عرض الموظّف عن المالك (النقاط 12/13/15)، تختفي هذه العناصر تلقائيًا من واجهة الموظّف. وتحسين حالات التحميل لتكون هيكلية (skeleton) لا نصًّا عاريًا.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">15</div><h3>القبول التلقائي للطلبات يظهر للموظّف <span class="pill p-bug">عطب</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      زر «القبول التلقائي» يُعرض دون شرط دور:
+      <pre><span class="c">// ProviderDashboard.tsx:349</span>
+&lt;button onClick={toggleAutoAccept} ...&gt;
+  <span class="s">القبول التلقائي للطلبات ...</span>
+&lt;/button&gt;   <span class="c">// يقلب auto_accept_orders على مستوى المتجر</span></pre>
+      وهو قرار مستوى-متجر يخصّ المالك، لا الموظّف.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">تقييد زر القبول التلقائي (وكتلة حالة المنشأة) بدور المالك فقط.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">16</div><h3>لا لوحة إعدادات/صلاحيات موظّفين واضحة (حتى بلا موظّفين) <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      توجد لوحة موظّفين مخصّصة <span class="fileref">ProviderStaff.tsx</span> (قائمة + صلاحيات + إيقاف + مسمّى + وضع توزيع)، لكنها:
+      <ul>
+        <li><b>غير مربوطة</b> في شبكة إجراءات اللوحة (<span class="fileref">ProviderDashboard.tsx:554-595</span> لا تحوي بطاقة «الموظّفون»).</li>
+        <li><b>غير مُدرَجة</b> في خريطة الوصول <span class="fileref">providerAccess.ts:14</span> (لا مفتاح <span class="mono">/provider-portal/staff</span>).</li>
+        <li>عند عدم وجود موظّفين تعرض فقط «لا يوجد موظّفون» — بلا إعدادات عامّة.</li>
+      </ul></div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إضافة بطاقة «الموظّفون والصلاحيات» في شبكة اللوحة + مدخل في الشريط + مفتاح في <span class="mono">PROVIDER_NAV_ACCESS</span> (مالك فقط)، وجعل الصفحة تعرض «إعدادات عامّة للموظّفين» دائمًا (وضع التوزيع، الافتراضات، الدعوة) حتى بلا موظّفين.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">17</div><h3>زر «آلي» (التوزيع) يفتح ويغلق فورًا <span class="pill p-bug">عطب</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      كل إجراء في اللوحة يمرّ عبر <span class="mono">run()</span> الذي يستدعي <span class="mono">load()</span>، و<span class="mono">load()</span> يضبط <span class="mono">setLoading(true)</span>، والمكوّن يعيد <span class="mono">&lt;LoadingSpinner/&gt;</span> لكامل اللوحة عند <span class="mono">loading</span>:
+      <pre><span class="c">// ProviderStaff.tsx</span>
+<span class="k">if</span> (loading) <span class="k">return</span> &lt;LoadingSpinner/&gt;;   <span class="c">// :63 — يستبدل كل اللوحة</span>
+<span class="k">const</span> run = async (fn,ok)=>{ await fn(); ...; await load(); } <span class="c">// :52 → load() يرفع loading</span></pre>
+      فعند ضغط «آلي» تُستبدل اللوحة كلها بسبينر لحظيًا ثم تعود = <b>وميض «يفتح ويغلق»</b> في كل ضغطة. كما أنّ زرَّي «آلي/يدوي» <b>لا يُظهران الوضع الحالي</b> (لا مؤشّر مُفعّل)، فتبدو الضغطة بلا أثر. (الخادم فعليًا يحفظ الوضع — <span class="fileref">provider_router.py:2859</span>.)</div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box">ضغط «آلي»</div><span class="arrow bad">→</span>
+        <div class="box bad">load(): loading=true</div><span class="arrow bad">→</span>
+        <div class="box bad">Spinner لكل اللوحة</div><span class="arrow">→</span>
+        <div class="box mut">تعود بلا مؤشّر وضع</div>
+      </div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">عدم إعادة استخدام بوّابة <span class="mono">loading</span> الكاملة بعد الإجراءات (تحديث موضعي بدل <span class="mono">load()</span> شامل)، وإظهار الوضع الحالي بوضوح (تمييز الزر المُفعّل) بقراءته من الخادم.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">18</div><h3>خانة مسمّى وظيفي «مخصّص» إجبارية <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      قائمة المسمّى <span class="fileref">ProviderStaff.tsx:199-221</span> تعرض قوائم جاهزة فقط (<span class="mono">GENERIC_STAFF_TITLES</span>) + «اختر مسمّى»، <b>بلا حقل نصّي مخصّص</b> — مع أنّ الخادم يدعم مسمّى مخصّصًا (<span class="fileref">provider_router.py:2816</span> <span class="mono">StaffTitleBody.title</span> حرّ حتى 40 حرفًا).</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إضافة خيار «مخصّص» في القائمة يُظهر حقل نصّ، ويُلزِم كتابة المسمّى عند اختياره (الخادم جاهز مسبقًا).</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">19</div><h3>توسيع الصلاحيات + شرح لكل خانة <span class="pill p-part">جزئي</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      الكتالوج غنيّ فعلًا: 20+ صلاحية مزوّد قابلة للمنح (Tier-A) + صلاحيات مالك حصرية (Tier-S) — <span class="fileref">account_permission_service.py:114-305</span>. لكن الواجهة تعرض فقط <span class="mono">description_ar</span> كنصّ بجانب مربّع الاختيار (<span class="fileref">ProviderStaff.tsx:285</span>) — بلا شرح لأثر كل صلاحية.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إضافة سطر شرح/تلميح (tooltip) لكل صلاحية يوضّح أثرها العملي، وتجميعها بالفئات، وإضافة أي صلاحيات دقيقة ناقصة (مثل فصل «عرض المبيعات» عن «عرض التسويات»).</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">20</div><h3>توضيح «الإيقاف الدائم/المؤقّت» في لوحة الموظّفين <span class="pill p-bug">توحيد</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      في لوحة الموظّفين، «إيقاف مؤقّت/دائم» تعني <b>إيقاف موظّف</b> (تعليق حسابه): <span class="fileref">ProviderStaff.tsx:296-320</span> → <span class="mono">suspend(TEMP/PERMANENT)</span>. وهذا يختلف عن «إيقاف المتجر» (النقطة 7). تحمّل كلمة «إيقاف» معنيين يسبّب اللبس.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">تغيير لفظ إيقاف الموظّف إلى «<b>تعليق</b> الموظّف (مؤقّت/دائم)» لتمييزه عن «إيقاف المتجر»، مع نصّ توضيحي لأثر كلٍّ.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">21</div><h3>«تعذّر تنفيذ العملية» عند إزالة صلاحية — السبب القاطع <span class="pill p-bug">عطب مؤكّد</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود (سبب قاطع)</div>
+      الواجهة عند إلغاء تحديد صلاحية تنادي <span class="mono">DELETE</span>:
+      <pre><span class="c">// providerStaff.ts:51</span>
+clearPermission: (id, perm) =&gt;
+  apiClient.<span class="k">delete</span>(`/providers/me/staff/${id}/permissions/${perm}`)</pre>
+      لكنّ الخادم <b>لا يملك أي مسار DELETE إطلاقًا</b> في <span class="fileref">provider_router.py</span> (تحقّقٌ شامل: صفر <span class="mono">@router.delete</span>). المتاح فقط <span class="mono">POST .../permissions</span> بـ<span class="mono">effect=GRANT|REVOKE</span> (<span class="fileref">:2544</span>). لذا:
+      <pre><span class="c">// المسار الفعلي</span>
+DELETE /providers/me/staff/{id}/permissions/{perm}
+  → <span class="s">405 Method Not Allowed</span>   <span class="c">(لا مسار مطابق)</span>
+  → run() catch → <span class="s">"تعذّر تنفيذ العملية"</span> (ProviderStaff.tsx:58)</pre></div>
+    <div class="diagram">
+      <div class="flow">
+        <div class="box">إلغاء تحديد صلاحية</div><span class="arrow bad">→</span>
+        <div class="box bad">DELETE (غير موجود)</div><span class="arrow bad">→</span>
+        <div class="box bad">405</div><span class="arrow bad">→</span>
+        <div class="box bad">«تعذّر تنفيذ العملية»</div>
+      </div>
+      <div class="legend-inline">المنح (POST GRANT) يعمل ✓ — الإزالة (DELETE) لا مسار لها ✗.</div>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>السبب الجذري</div>
+      <div class="why">مسار الإزالة لم يُنفَّذ في الخادم: الواجهة تفترض وجود <span class="mono">DELETE</span>، والخادم يعرّف <span class="mono">POST</span> فقط. الخدمة <span class="mono">remove_override()</span> جاهزة (<span class="fileref">account_permission_service.py:517</span>) لكن لا مسار HTTP ينادِيها.</div></div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">أحد حلّين: (أ) إضافة مسار <span class="mono">@router.delete("/me/staff/{id}/permissions/{perm}")</span> ينادي <span class="mono">remove_override</span>؛ أو (ب) تعديل <span class="mono">clearPermission</span> ليصبح <span class="mono">POST effect=REVOKE</span>. الأنظف: (أ) لأنّها تُرجِع الموظّف إلى الأساس بدل تخزين REVOKE دائم.</div></div>
+  </div>
+</div>
+
+<!-- ================= المحور 5 ================= -->
+<h2 class="sec" id="m5">المحور 5 — وثائق السائق ولوحته</h2>
+
+<div class="card">
+  <div class="head"><div class="num">22</div><h3>وثائق السائق: نواقص متعدّدة <span class="pill p-gap">ناقصة</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      أنواع وثائق السائق الحالية (<span class="fileref">DriverPending.tsx:10-15</span>):
+      <pre><span class="c">// DRIVER_DOC_TYPES — 4 أنواع فقط</span>
+LICENSE      → <span class="s">"رخصة القيادة"</span>          <span class="c">// واحدة (لا أمام/خلف)</span>
+ID_FRONT     → <span class="s">"بطاقة وطنية — الأمام"</span>   <span class="c">// لفظ «وطنية»</span>
+ID_BACK      → <span class="s">"بطاقة وطنية — الخلف"</span>
+VEHICLE_REG  → <span class="s">"وثيقة المركبة"</span>          <span class="c">// واحدة فقط</span></pre>
+      والتسجيل يجمع لوحة المركبة إن كان النوع يستلزمها لكن <b>دون إلزام</b> (<span class="fileref">RegistrationPage.tsx:350</span>: تُرسَل فقط إن لم تكن فارغة؛ <span class="mono">VEHICLE_NEEDS_PLATE = CAR/MOTORCYCLE/SCOOTER/CUSTOM</span> — <span class="fileref">:105</span>). مقارنة بطلبك:</div>
+    <div class="diagram">
+      <table class="summary" style="font-size:.84rem">
+        <thead><tr><th>ما تريده</th><th>الحالي في الكود</th></tr></thead>
+        <tbody>
+          <tr><td>رخصة أمام + خلف</td><td>رخصة <b>واحدة</b> فقط</td></tr>
+          <tr><td>«بطاقة شخصية أو جواز سفر»</td><td>«بطاقة <b>وطنية</b>»</td></tr>
+          <tr><td>حقل رقم وطني إجباري</td><td><b>غير موجود</b> في تدفّق السائق</td></tr>
+          <tr><td>وثائق مركبة متعدّدة</td><td>خانة <b>واحدة</b> (<span class="mono">VEHICLE_REG</span>)</td></tr>
+          <tr><td>رفع توكيلات (حتى 3)</td><td><b>غير موجود</b></td></tr>
+          <tr><td>إلزام اللوحة ورفض بلا لوحة</td><td>تُجمَع بلا إلزام/رفض</td></tr>
+          <tr><td>صور المركبة أمام/خلف باللوحة</td><td><b>غير موجود</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">توسيع <span class="mono">DRIVER_DOC_TYPES</span>: <span class="mono">LICENSE_FRONT/LICENSE_BACK</span>؛ إعادة تسمية «بطاقة وطنية» إلى «بطاقة شخصية / جواز سفر»؛ إضافة حقل نصّي «الرقم الوطني» إجباري؛ خانات وثائق مركبة متعدّدة؛ رفع حتى 3 توكيلات (قيادة/بيع)؛ إلزام إدخال اللوحة ورفض المركبة بلا لوحة مع تنبيه؛ رفع صورتَي المركبة (أمام/خلف) مطابقتَين للوحة.</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">23</div><h3>زر مختفٍ تحت الشريط السفلي (السائق) <span class="pill p-part">تحقّق ميداني</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      الشريط السفلي <span class="fileref">global.css .bottom-nav</span>: <span class="mono">position:fixed; bottom:0; z-index:100</span>. والصفحات التي تستخدم صنف <span class="mono">.page</span> تترك مساحة سفلية <span class="mono">padding-bottom:5rem</span>. و<span class="fileref">DriverHome.tsx:237</span> يستخدم <span class="mono">&lt;main className="page"&gt;</span> — أي أنّ المساحة موجودة نظريًا. لذلك السبب غالبًا في صفحة سائق لا تستخدم <span class="mono">.page</span> (مثل صفحة الخريطة) أو حالة عرض معيّنة على الجهاز، لا في <span class="mono">DriverHome</span> نفسها. يحتاج إعادة إنتاج على الجهاز لتحديد الزر بدقّة.</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إعادة إنتاج على الجهاز لتحديد الصفحة/الزر بالضبط، وضمان أنّ كل صفحات السائق تستخدم مساحة إخلاء الشريط (<span class="mono">.page</span> أو <span class="mono">padding-bottom</span> كافٍ)؛ ومراجعة صفحة الخريطة تحديدًا (كثيرًا ما تكسر نموذج المساحة).</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="head"><div class="num">24</div><h3>اللوحة الرئيسية للسائق تحتاج ترتيبًا ومراجعة <span class="pill p-gap">تحسين</span></h3></div>
+  <div class="body">
+    <div class="block"><div class="lbl"><span class="dot"></span>الحقيقة من الكود</div>
+      <span class="fileref">DriverHome.tsx</span> يخلط مفتاح التوفّر (سطر 626) مع قائمة العروض، و<span class="fileref">DriverProfile.tsx</span> ملف عرض بسيط (لا وثائق). التنظيم مرتبط بالنقطتين 8 (مؤشّر الحالة) و23 (الشريط).</div>
+    <div class="block"><div class="lbl"><span class="dot"></span>التوصية</div>
+      <div class="rec">إعادة ترتيب لوحة السائق: مؤشّر حالة واضح أعلى، ثم مفتاح التوفّر، ثم العروض، ثم إجراءات سريعة (الخريطة/السجل/الوثائق/التسوية) بنظام أيقونات موحّد كالمزوّد.</div></div>
+  </div>
+</div>
+
+<h2 class="sec">🧭 خلاصة الأولويات المقترحة</h2>
+<div class="note">
+  <b>أعطاب فورية (إصلاح سريع):</b>
+  <ol>
+    <li><b>النقطة 21</b> — إضافة مسار <span class="mono">DELETE</span> للصلاحيات (يكسر إدارة الموظّفين اليوم).</li>
+    <li><b>النقاط 12/13/15</b> — فصل عرض الموظّف عن المالك في <span class="mono">ProviderDashboard</span> (عنوان + إخفاء كود الدعوة والقبول التلقائي).</li>
+    <li><b>النقطة 17</b> — إزالة وميض السبينر الكامل + إظهار وضع التوزيع الحالي.</li>
+  </ol>
+  <b>توحيد واجهات (متوسّط):</b> النقاط 9، 10، 20 (تسميات وأيقونات موحّدة على مرجع الشريط السفلي) + 16، 18، 19 (لوحة موظّفين كاملة).<br>
+  <b>ميزات جديدة (تصميم + بناء):</b> النقاط 1، 2، 3، 4، 5، 6، 7، 8، 11، 22 — كلٌّ يحتاج حقول بيانات و/أو منطقًا جديدًا كما فُصِّل.
+</div>
+
+<footer>
+  أُعِدّ هذا التقرير من قراءة مباشرة لملفات المصدر الحيّة في <span class="mono">/home/a/Desktop/APP/platform</span> — كل ادّعاء موثّق برقم ملف/سطر.<br>
+  منصّة تُوا · 2026-07-01
+</footer>
+
+</div>
+</body>
+</html>

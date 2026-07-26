@@ -1,0 +1,377 @@
+<title>تدقيق عميق — React Native مقابل الويب</title>
+<style>
+  :root{
+    --bg:#12131c; --bg2:#191b28; --line:#eef0fb; --line-dim:#9aa3d4; --muted:#a5abcf;
+    --panel:rgba(255,255,255,.045); --panel-strong:rgba(255,255,255,.08); --panel-border:rgba(238,240,251,.14);
+    --grid-line:rgba(238,240,251,.045);
+    --done:#2fe0a8; --gap:#ff6b6b; --partial:#ffb84d; --info:#6fb8ff; --neutral:#8f97c9;
+    --font-mono: ui-monospace,"Cascadia Code","SFMono-Regular",Consolas,monospace;
+    --font-ar: "IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f7f7fb; --bg2:#eeeef7; --line:#171830; --line-dim:#4a4f80; --muted:#585d8c;
+      --panel:rgba(23,24,48,.035); --panel-strong:rgba(23,24,48,.06); --panel-border:rgba(23,24,48,.14); --grid-line:rgba(23,24,48,.05);
+      --done:#1c8a63; --gap:#c8323a; --partial:#b06a12; --info:#1a6ea3; --neutral:#565c8a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131c; --bg2:#191b28; --line:#eef0fb; --line-dim:#9aa3d4; --muted:#a5abcf;
+    --panel:rgba(255,255,255,.045); --panel-strong:rgba(255,255,255,.08); --panel-border:rgba(238,240,251,.14);
+    --grid-line:rgba(238,240,251,.045);
+    --done:#2fe0a8; --gap:#ff6b6b; --partial:#ffb84d; --info:#6fb8ff; --neutral:#8f97c9;
+  }
+  :root[data-theme="light"]{
+    --bg:#f7f7fb; --bg2:#eeeef7; --line:#171830; --line-dim:#4a4f80; --muted:#585d8c;
+    --panel:rgba(23,24,48,.035); --panel-strong:rgba(23,24,48,.06); --panel-border:rgba(23,24,48,.14); --grid-line:rgba(23,24,48,.05);
+    --done:#1c8a63; --gap:#c8323a; --partial:#b06a12; --info:#1a6ea3; --neutral:#565c8a;
+  }
+  *{box-sizing:border-box}
+  .bp-root{
+    background-color:var(--bg);
+    background-image:
+      repeating-linear-gradient(0deg, var(--grid-line) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(90deg, var(--grid-line) 0 1px, transparent 1px 34px);
+    color:var(--line); font-family:var(--font-ar); direction:rtl; line-height:1.85;
+    padding:26px 14px 90px; font-size:16px;
+  }
+  .bp-root, .bp-root *{ text-wrap: pretty; }
+  .sheet-wrap{max-width:1260px; margin:0 auto}
+  a{color:var(--line-dim)}
+  h1,h2,h3,h4{text-wrap:balance; color:var(--line); font-family:var(--font-ar)}
+  .frame{position:relative; border:1px solid var(--panel-border); border-radius:2px; background:var(--panel)}
+  .corner{position:absolute; width:20px; height:20px; pointer-events:none}
+  .corner::before,.corner::after{content:"";position:absolute;background:var(--line-dim)}
+  .c-tl{top:-1px;left:-1px} .c-tl::before{top:0;left:0;width:100%;height:2px} .c-tl::after{top:0;left:0;width:2px;height:100%}
+  .c-tr{top:-1px;right:-1px} .c-tr::before{top:0;right:0;width:100%;height:2px} .c-tr::after{top:0;right:0;width:2px;height:100%}
+  .c-bl{bottom:-1px;left:-1px} .c-bl::before{bottom:0;left:0;width:100%;height:2px} .c-bl::after{bottom:0;left:0;width:2px;height:100%}
+  .c-br{bottom:-1px;right:-1px} .c-br::before{bottom:0;right:0;width:100%;height:2px} .c-br::after{bottom:0;right:0;width:2px;height:100%}
+
+  .status-banner{background:linear-gradient(135deg, rgba(255,107,107,.14), rgba(255,184,77,.05)); border:2px solid var(--gap); border-radius:8px; padding:22px 26px; margin-bottom:26px}
+  .status-banner .gt{font-family:var(--font-mono); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--gap); font-weight:800; margin-bottom:7px}
+  .status-banner h2{margin:0 0 8px; font-size:1.2rem; color:var(--line)}
+  .status-banner p{margin:6px 0; font-size:.92rem; color:var(--line)}
+
+  header.title-block{padding:28px 26px 20px; margin-bottom:22px}
+  .eyebrow{font-family:var(--font-mono); font-size:.7rem; letter-spacing:.13em; color:var(--line-dim); text-transform:uppercase}
+  header.title-block h1{font-size:clamp(1.3rem,3vw,1.9rem); margin:8px 0 10px; font-weight:800}
+  header.title-block .lede{color:var(--muted); max-width:840px; font-size:.97rem}
+
+  .parity-gauge{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--panel-border); border:1px solid var(--panel-border); margin:20px 0; border-radius:6px; overflow:hidden}
+  .parity-gauge .cell{padding:18px 16px; background:var(--bg2); text-align:center}
+  .parity-gauge .cell .role{font-size:.78rem; color:var(--muted); margin-bottom:6px}
+  .parity-gauge .cell .pct{font-family:var(--font-mono); font-size:1.6rem; font-weight:800; color:var(--gap)}
+  .parity-gauge .cell .old{font-size:.66rem; color:var(--line-dim); font-family:var(--font-mono); margin-top:4px}
+  @media (max-width:700px){.parity-gauge{grid-template-columns:1fr 1fr}}
+
+  .index{padding:16px 22px; margin-bottom:30px; background:var(--panel); border:1px solid var(--panel-border); border-radius:6px}
+  .index .eyebrow{margin-bottom:8px; display:block}
+  .index ol{margin:0; padding-inline-start:1.3em; columns:2; column-gap:30px}
+  .index li{margin-bottom:6px; break-inside:avoid; font-size:.84rem}
+  @media (max-width:640px){.index ol{columns:1}}
+
+  section.sheet{margin:0 0 44px}
+  .sheet-head{display:flex; align-items:baseline; gap:12px; margin-bottom:6px; border-bottom:1px solid var(--panel-border); padding-bottom:9px; flex-wrap:wrap}
+  .sheet-num{font-family:var(--font-mono); font-size:.72rem; color:var(--line-dim); border:1px solid var(--panel-border); border-radius:3px; padding:2px 8px; white-space:nowrap}
+  .sheet-head h2{font-size:1.22rem; margin:0}
+  p.lede{color:var(--muted); max-width:860px; font-size:.95rem}
+
+  .stamp{display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:.63rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:2px 8px; border-radius:3px; border:1.5px solid currentColor; white-space:nowrap}
+  .stamp-real{color:var(--done)} .stamp-missing{color:var(--gap)} .stamp-stub{color:var(--partial)} .stamp-info{color:var(--info)}
+
+  .legend{display:flex; flex-wrap:wrap; gap:8px 14px; margin:13px 0 4px; font-size:.8rem; color:var(--muted); align-items:center}
+  .legend b{color:var(--line)}
+
+  .card{background:var(--panel); border:1px solid var(--panel-border); border-radius:6px; padding:18px 20px; margin-bottom:14px}
+  .card.done{border-inline-start:4px solid var(--done)}
+  .card.gap{border-inline-start:4px solid var(--gap)}
+  .card.partial{border-inline-start:4px solid var(--partial)}
+  .card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:8px}
+  .card-head h3{margin:0; font-size:1rem; font-weight:700}
+  .card p{margin:7px 0 0; font-size:.9rem}
+  code{font-family:var(--font-mono); font-size:.78rem; background:var(--bg2); border:1px solid var(--panel-border); border-radius:4px; padding:1px 6px; direction:ltr; unicode-bidi:isolate; display:inline-block; color:var(--line-dim)}
+  .path{font-family:var(--font-mono); font-size:.73rem; color:var(--info); direction:ltr; unicode-bidi:isolate; display:inline-block}
+
+  .diagram{background:var(--bg2); border:1px solid var(--panel-border); border-radius:6px; padding:20px; margin:16px 0; overflow-x:auto}
+  .diagram-cap{font-family:var(--font-mono); font-size:.67rem; color:var(--line-dim); letter-spacing:.05em; text-transform:uppercase; margin-bottom:13px}
+
+  /* data-flow mismatch diagram */
+  .flow{display:flex; align-items:center; gap:0; min-width:760px}
+  .flow-box{flex:1; border:1.5px solid var(--panel-border); border-radius:6px; padding:14px 14px; background:var(--panel)}
+  .flow-box .t{font-weight:700; font-size:.82rem; margin-bottom:8px}
+  .flow-box .field{font-family:var(--font-mono); font-size:.72rem; display:block; padding:3px 0; border-bottom:1px dashed var(--panel-border)}
+  .flow-box .field:last-child{border-bottom:none}
+  .flow-box.server .field{color:var(--info)}
+  .flow-box.client .field{color:var(--gap)}
+  .flow-arrow{flex:0 0 44px; text-align:center; color:var(--line-dim); font-size:1.3rem}
+  .flow-result{flex:0 0 190px; border:2px solid var(--gap); border-radius:6px; padding:14px; background:rgba(255,107,107,.07); text-align:center}
+  .flow-result .t{font-weight:800; font-size:.8rem; color:var(--gap)}
+  .flow-result .d{font-size:.7rem; color:var(--muted); margin-top:6px}
+  @media (max-width:760px){.flow{flex-direction:column; min-width:0} .flow-arrow{transform:rotate(90deg)}}
+
+  .gap-table-wrap{overflow-x:auto}
+  table{width:100%; border-collapse:collapse; font-size:.82rem}
+  th,td{border-bottom:1px solid var(--panel-border); padding:8px 10px; text-align:right; vertical-align:top}
+  th{color:var(--line-dim); font-family:var(--font-mono); font-size:.63rem; text-transform:uppercase; letter-spacing:.03em; font-weight:600}
+  td.ev{font-family:var(--font-mono); font-size:.7rem; color:var(--info); direction:ltr; text-align:right; unicode-bidi:isolate}
+  td.st{text-align:center; font-weight:700; font-family:var(--font-mono); font-size:.7rem}
+  td.st.real{color:var(--done)} td.st.missing{color:var(--gap)} td.st.stub{color:var(--partial)}
+  tr:last-child td{border-bottom:none}
+
+  details.module{border:1px solid var(--panel-border); border-radius:6px; margin-bottom:9px; background:var(--panel)}
+  details.module summary{cursor:pointer; padding:12px 17px; font-weight:700; display:flex; justify-content:space-between; align-items:center; gap:10px; list-style:none; font-size:.94rem}
+  details.module summary::-webkit-details-marker{display:none}
+  details.module summary .cnt{font-family:var(--font-mono); font-size:.66rem; color:var(--muted); font-weight:400}
+  details.module[open] summary{border-bottom:1px solid var(--panel-border)}
+
+  .note-block{border:1px dashed var(--panel-border); border-radius:6px; padding:14px 18px; margin:12px 0; font-size:.85rem; color:var(--muted)}
+  .note-block.ok{border-color:var(--done)} .note-block.warn{border-color:var(--partial)} .note-block.crit{border-color:var(--gap)} .note-block.info{border-color:var(--info)}
+  .note-block b{color:var(--line)}
+
+  /* endpoint coverage bars */
+  .endpoint-bars{margin:16px 0}
+  .ep-row{display:grid; grid-template-columns:150px 1fr 130px; align-items:center; gap:10px; margin-bottom:9px; font-size:.82rem}
+  .ep-label{font-family:var(--font-mono); font-size:.76rem; color:var(--muted)}
+  .ep-track{height:16px; background:var(--bg2); border:1px solid var(--panel-border); border-radius:3px; overflow:hidden; display:flex}
+  .ep-fill-used{height:100%; background:var(--done)}
+  .ep-fill-unused{height:100%; background:var(--gap); opacity:.55}
+  .ep-count{font-family:var(--font-mono); font-size:.74rem; color:var(--muted); text-align:left; direction:ltr}
+
+  /* pipeline for fix plan */
+  .pipeline{display:flex; align-items:stretch; gap:0; min-width:640px}
+  .pipe-stage{flex:1; border:1.5px solid var(--panel-border); border-radius:5px; padding:14px 12px; text-align:center; position:relative; background:var(--panel)}
+  .pipe-stage.next{border-color:var(--info); background:rgba(111,184,255,.06)}
+  .pipe-stage .t{font-weight:700; font-size:.86rem}
+  .pipe-stage .d{font-size:.73rem; color:var(--muted); margin-top:4px}
+  .pipe-arrow{display:flex; align-items:center; justify-content:center; width:30px; color:var(--line-dim); font-size:1.1rem}
+
+  footer.colophon{margin-top:46px; padding-top:16px; border-top:1px solid var(--panel-border); font-size:.78rem; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-family:var(--font-mono)}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
+</style>
+
+<div class="bp-root">
+<div class="sheet-wrap">
+
+  <div class="status-banner frame">
+    <div class="gt">تدقيق عميق ومستقلّ — أدلّة كود مباشرة، لا اعتماد على تقارير قديمة</div>
+    <h2>تطبيق React Native يعمل اليوم كنموذج عرض (Demo) لا كتطبيق فعليّ — في كل الأدوار الأربعة</h2>
+    <p>3 وكلاء تدقيق مستقلّون فحصوا الكود الفعليّ لتطبيق React Native (<code>apps/mobile/</code>) مقارنة بالويب، كلٌّ بدور منفصل (عميل، مزوّد، سائق+وكيل تسوية). النتائج أسوأ من التقديرات السابقة في نقاط جوهريّة — أبرزها: بطاقة أرباح السائق رقم مزيَّف ثابت لا يتّصل بالخادم إطلاقًا.</p>
+  </div>
+
+  <header class="title-block frame">
+    <span class="corner c-tl"></span><span class="corner c-tr"></span><span class="corner c-bl"></span><span class="corner c-br"></span>
+    <span class="eyebrow">تدقيق ما بعد نقل الفلاتر — التركيز الكامل الآن على React Native</span>
+    <h1>تدقيق عميق: React Native مقابل الويب</h1>
+    <p class="lede">هذا التقرير يوثّق تدقيقًا مستقلًّا وطازجًا (لا إعادة صياغة لتقارير سابقة) لكل ملفّ في تطبيق React Native، مقارنًا كل قدرة فعليّة بما يوازيها في الويب، بدليل <code>file:line</code> دقيق لكل نتيجة.</p>
+    <div class="parity-gauge">
+      <div class="cell"><div class="role">دور العميل</div><div class="pct">~16%</div><div class="old">سابقًا وُثِّق ~34%</div></div>
+      <div class="cell"><div class="role">دور المزوّد</div><div class="pct">~4%</div><div class="old">سابقًا وُثِّق ~7%</div></div>
+      <div class="cell"><div class="role">دور السائق</div><div class="pct">~5%</div><div class="old">مطابق للتقدير السابق</div></div>
+      <div class="cell"><div class="role">وكيل التسوية</div><div class="pct">0%</div><div class="old">مؤكَّد — لا كود إطلاقًا</div></div>
+    </div>
+  </header>
+
+  <nav class="index frame">
+    <span class="eyebrow">فهرس التقرير</span>
+    <ol>
+      <li><a href="#s01">المنهجية — كيف جرى التدقيق</a></li>
+      <li><a href="#s02">السبب الجذريّ الواحد وراء معظم الأعطال</a></li>
+      <li><a href="#s03">دور العميل — التفصيل الكامل</a></li>
+      <li><a href="#s04">دور المزوّد — واجهة بلا وظيفة</a></li>
+      <li><a href="#s05">دور السائق — الرقم المزيَّف والأزرار الميتة</a></li>
+      <li><a href="#s06">وكيل التسوية — صفر مطلق</a></li>
+      <li><a href="#s07">نقاط نهاية الخادم بلا أيّ مستهلك في RN</a></li>
+      <li><a href="#s08">جدول المقارنة الشامل الواحد</a></li>
+      <li><a href="#s09">خطّة الإصلاح المقترحة — من أين نبدأ</a></li>
+    </ol>
+  </nav>
+
+  <div class="legend">
+    <span><b>مفاتيح القراءة:</b></span>
+    <span class="stamp stamp-real">REAL — حقيقيّ يعمل</span>
+    <span class="stamp stamp-stub">STUB — موجود لكن معطَّل/جزئيّ</span>
+    <span class="stamp stamp-missing">MISSING — غير موجود إطلاقًا</span>
+  </div>
+
+  <!-- ============ S01 : METHODOLOGY ============ -->
+  <section class="sheet" id="s01">
+    <div class="sheet-head"><span class="sheet-num">SHEET 01</span><h2>المنهجية — كيف جرى التدقيق</h2></div>
+    <p class="lede">بدل تصديق التقارير القديمة، جرى فحص كل ملفّ حاليّ في <code>apps/mobile/src/</code> مباشرة، ومقارنته سطرًا بسطر بصفحات الويب المقابلة وبالنماذج الفعليّة (Pydantic schemas) في الباك إند. لكل نتيجة أدناه دليل <code>مسار_الملفّ:رقم_السطر</code> يمكن التحقّق منه فورًا.</p>
+    <div class="gap-table-wrap"><table>
+      <tr><th>الوكيل</th><th>النطاق</th><th>عدد عمليّات الفحص</th></tr>
+      <tr><td>تدقيق دور العميل</td><td>24 صفحة ويب × مسارات RN + طبقة API + SSE</td><td>20 عمليّة قراءة/بحث</td></tr>
+      <tr><td>تدقيق دور المزوّد</td><td>13 صفحة ويب × مسار RN واحد + 61 نقطة نهاية خلفيّة</td><td>11 عمليّة قراءة/بحث</td></tr>
+      <tr><td>تدقيق السائق ووكيل التسوية</td><td>10 صفحات ويب + صفحة تسوية × مسار RN واحد</td><td>12 عمليّة قراءة/بحث</td></tr>
+    </table></div>
+  </section>
+
+  <!-- ============ S02 : ROOT CAUSE ============ -->
+  <section class="sheet" id="s02">
+    <div class="sheet-head"><span class="sheet-num">SHEET 02</span><h2>السبب الجذريّ الواحد وراء معظم الأعطال</h2><span class="stamp stamp-missing">حرِج</span></div>
+    <p class="lede">عطب واحد في مكان واحد يفسّر لماذا تبدو شاشات كثيرة "موجودة" لكنّها فارغة أو معطوبة عند الاتّصال بالخادم الحقيقيّ: <code>apps/mobile/src/services/api/client.ts:142</code> يُعيد استجابة الخادم <b>كما هي بلا أيّ تحويل</b>. الخادم يرسل <code>snake_case</code>، والشاشات تقرأ <code>camelCase</code> — بلا محوِّل بينهما، وبلا الأنواع المولَّدة تلقائيًّا (سكربت <code>gen:types</code> موجود في <code>package.json</code> لكنّه لم يُشغَّل قطّ؛ ملف <code>api.d.ts</code> غير موجود إطلاقًا).</p>
+    <div class="diagram">
+      <div class="diagram-cap">مثال حقيقيّ — بيانات الطلب كما يرسلها الخادم مقابل كيف تقرؤها الشاشة</div>
+      <div class="flow">
+        <div class="flow-box server">
+          <div class="t">الخادم يرسل فعليًّا</div>
+          <span class="field">order_state</span>
+          <span class="field">provider_name</span>
+          <span class="field">cash_due_minor</span>
+          <span class="field">total_minor</span>
+        </div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-box client">
+          <div class="t">الشاشة تقرأ</div>
+          <span class="field">data.orderState</span>
+          <span class="field">data.providerName</span>
+          <span class="field">data.cashDueMinor</span>
+          <span class="field">data.totalMinor</span>
+        </div>
+        <div class="flow-arrow">←</div>
+        <div class="flow-result">
+          <div class="t">النتيجة الفعليّة</div>
+          <div class="d">كل قيمة = undefined<br>لا اسم مزوّد، لا مبلغ،<br>حالة الطلب لا تُقارَن أبدًا بصح</div>
+        </div>
+      </div>
+      <p style="margin-top:14px; color:var(--muted); font-size:.86rem; text-align:center">بلغة بسيطة: تخيّل موظّف استقبال يكتب "الاسم: أحمد" على ورقة، وموظّف آخر يبحث فيها عن سطر اسمه "Name" بالحروف الكبيرة تحديدًا — لن يجده أبدًا رغم أنّ المعلومة موجودة فعلًا في الورقة، لمجرّد اختلاف تهجئة اسم الحقل.</p>
+    </div>
+    <div class="note-block crit"><b>لماذا لم يظهر هذا العطب في الاختبار اليدويّ سابقًا؟</b> لأنّ التطبيق يعمل افتراضيًّا في وضع <code>apiMode: 'mock'</code> (بيانات وهميّة مكتوبة يدويًّا بصيغة camelCase من البداية) — <code>config.ts:12</code>. العطب "نائم" تمامًا في هذا الوضع، ولا يظهر إلا عند التبديل الفعليّ لوضع <code>real</code> والاتّصال بالخادم الحقيقيّ — وهي بالضبط اللحظة التي يعتمد فيها أيّ مستخدم حقيقيّ على التطبيق.</div>
+  </section>
+
+  <!-- ============ S03 : CUSTOMER ============ -->
+  <section class="sheet" id="s03">
+    <div class="sheet-head"><span class="sheet-num">SHEET 03</span><h2>دور العميل — التفصيل الكامل</h2><span class="stamp stamp-stub">~16% وظيفيّ فعليًّا</span></div>
+    <p class="lede">من 22 منطقة قدرة موجودة في الويب، ~3.5 فقط تعمل فعليًّا ضدّ الخادم الحقيقيّ. الباقي إمّا غير موجود كليًّا، أو موجود لكن يتعطّل بعطب التسمية أعلاه.</p>
+    <details class="module" open>
+      <summary>الشاشات الموجودة فعليًّا في الكود <span class="cnt">6 مناطق</span></summary>
+      <div class="gap-table-wrap"><table>
+        <tr><th>المنطقة</th><th>الحالة</th><th>الدليل</th></tr>
+        <tr><td>تسجيل الدخول / OTP</td><td class="st real">REAL</td><td class="ev">index.ts:200-240 — تحويل يدويّ صحيح (access_token→accessToken)</td></tr>
+        <tr><td>تصفّح المزوّدين / الرئيسيّة</td><td class="st stub">STUB</td><td class="ev">home.tsx:26 — provider.name.slice() ينهار على undefined</td></tr>
+        <tr><td>تفاصيل المزوّد</td><td class="st stub">STUB</td><td class="ev">restaurant/[id].tsx:49-79 — نفس عطب التسمية</td></tr>
+        <tr><td>الكتالوج/القائمة</td><td class="st stub">STUB</td><td class="ev">يقرأ nameAr/basePriceMinor؛ الخادم يرسل name_ar/price_minor</td></tr>
+        <tr><td>السلّة</td><td class="st real">REAL</td><td class="ev">store/cart.ts — محليّة بالكامل، لا تحتاج الخادم</td></tr>
+        <tr><td>إنشاء الطلب (Checkout)</td><td class="st stub">STUB جزئيًّا</td><td class="ev">index.ts:261-267 — جسم الطلب المُرسَل صحيح، لكن استجابة التأكيد فارغة</td></tr>
+        <tr><td>تتبّع الطلب + البثّ الحيّ</td><td class="st stub">STUB</td><td class="ev">الاتّصال بـ SSE حقيقيّ (orderStream.ts) لكن كل الحقول المعروضة فارغة</td></tr>
+        <tr><td>دفتر العناوين</td><td class="st stub">STUB محليّ فقط</td><td class="ev">store/addresses.ts — تخزين محليّ فقط، لا يتّصل بـ API العناوين إطلاقًا</td></tr>
+        <tr><td>الإعدادات (لغة/خروج)</td><td class="st real">REAL محليّ</td><td class="ev">account.tsx — لا يحتاج خادم</td></tr>
+      </table></div>
+    </details>
+    <details class="module">
+      <summary>غير موجود إطلاقًا في الكود <span class="cnt">13 منطقة</span></summary>
+      <p style="padding:0 17px 14px; font-size:.88rem; color:var(--muted)">المحفظة، تحويل المحفظة، نقاط الولاء، محادثة الدعم، "اطلب أيّ شيء"، المشاوير (Errand)، التسوّق الاقتصاديّ (Budget Shop)، الدفع الجماعيّ (Cart-Group)، حذف الحساب، التسجيل الكامل، البحث برقم الهاتف، نسيت كلمة المرور، صفحة التصنيفات، صفحة "عن التطبيق" — بحث شامل في الكود (<code>rg</code>) لم يجد أيّ أثر لأيٍّ منها.</p>
+    </details>
+    <div class="note-block ok"><b>لا أزرار ميتة في شاشات العميل تحديدًا</b> — عطب الأزرار الميتة (<code>onPress={() => undefined}</code>) وُجد فقط في شاشتَي السائق والمزوّد، وليس في شاشات العميل.</div>
+  </section>
+
+  <!-- ============ S04 : PROVIDER ============ -->
+  <section class="sheet" id="s04">
+    <div class="sheet-head"><span class="sheet-num">SHEET 04</span><h2>دور المزوّد — واجهة بلا وظيفة</h2><span class="stamp stamp-missing">~4%</span></div>
+    <p class="lede">كامل حضور المزوّد في التطبيق هو ملفّان: <code>(provider)/home.tsx</code> (74 سطرًا) و<code>_layout.tsx</code> (5 أسطر). من 13 منطقة قدرة في الويب، منطقة واحدة فقط موجودة جزئيًّا — والباقي غائب كليًّا.</p>
+    <div class="gap-table-wrap"><table>
+      <tr><th>المنطقة (صفحة الويب المقابلة)</th><th>الحالة</th><th>الدليل</th></tr>
+      <tr><td>طابور الطلبات (عرض فقط)</td><td class="st stub">STUB</td><td class="ev">home.tsx:17 — جلب واحد بلا تحديث تلقائيّ أو حيّ</td></tr>
+      <tr><td>قبول / رفض / جاهز</td><td class="st missing">ميت</td><td class="ev">home.tsx:47-48 — onPress={() => undefined}</td></tr>
+      <tr><td>الكتالوج (ProviderCatalog)</td><td class="st missing">MISSING</td><td class="ev">لا مسار ولا استدعاء API</td></tr>
+      <tr><td>لوحة التحضير (ProviderPreparation)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>الأرباح (ProviderEarnings)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>التسوية (ProviderSettlement)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>الوثائق/الامتثال (ProviderDocuments)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>العروض الترويجيّة (ProviderPromotions)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>إدارة الموظّفين (ProviderStaff)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>الصلاحيّات (MyPermissions)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>لوحة التحكّم (ProviderDashboard)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>سجلّ الطلبات (ProviderOrderHistory)</td><td class="st missing">MISSING</td><td class="ev">—</td></tr>
+      <tr><td>الإعدادات (ProviderSettings)</td><td class="st stub">STUB</td><td class="ev">home.tsx:19-22 — زرّ خروج فقط</td></tr>
+    </table></div>
+    <div class="note-block crit"><b>~60 من 61 نقطة نهاية للمزوّد في الباك إند (<code>provider_router.py</code>) بلا أيّ مستهلك في RN</b> — يشمل ذلك كل عمليّات الكتابة: قبول/رفض/بدء تحضير/جاهز/تأكيد استلام، الموظّفون (+25 نقطة نهاية)، الوثائق، التحليلات، السجلّ التجاريّ. النقطة الوحيدة المستخدَمة فعليًّا: <code>GET /providers/me/orders</code> — قراءة فقط.</div>
+    <div class="note-block info"><b>تحقّق من آخر تعديل:</b> commit <code>cd39d09</code> (R478-140) غيّر فقط تسميتَي عرض نصّيتَين في بطاقة تصفّح العميل (<code>ProviderCard.tsx</code>) — وهي مكوِّن للعميل يستعرض المزوّدين، وليس جزءًا من شاشة المزوّد نفسها. لم يُضِف أيّ قدرة جديدة لدور المزوّد.</div>
+  </section>
+
+  <!-- ============ S05 : DRIVER ============ -->
+  <section class="sheet" id="s05">
+    <div class="sheet-head"><span class="sheet-num">SHEET 05</span><h2>دور السائق — الرقم المزيَّف والأزرار الميتة</h2><span class="stamp stamp-missing">~5%</span></div>
+    <p class="lede">كامل حضور السائق: ملفّ <code>(driver)/home.tsx</code> واحد. من 10 مناطق قدرة في الويب، لا شيء يعمل من البداية للنهاية ضدّ الخادم الحقيقيّ.</p>
+    <div class="card gap">
+      <div class="card-head"><h3>الاكتشاف الأخطر: بطاقة "أرباح اليوم" رقم مزيَّف ثابت</h3><span class="stamp stamp-missing">جديد — لم يُوثَّق سابقًا</span></div>
+      <p><code>home.tsx:45</code> — <code>&lt;Text&gt;{formatMoney(45000)}&lt;/Text&gt;</code> تحت عنوان "أرباح اليوم". هذا الرقم <b>مكتوب حرفيًّا في الكود</b> — لا يستدعي الخادم إطلاقًا، ولا علاقة له بأرباح السائق الفعليّة. "3 طلبات مكتملة" (<code>home.tsx:46</code>) مكتوب حرفيًّا أيضًا. الصيغة الصحيحة موجودة وتعمل في الباك إند (<code>driver_payout_service.py:176-252</code>، نقطة نهاية <code>/drivers/me/balance</code>) — لكن RN لا يستدعيها أبدًا.</p>
+    </div>
+    <div class="card gap">
+      <div class="card-head"><h3>عطب ماليّ ثانٍ: مبلغ العرض يظهر "NaN" في الوضع الحقيقيّ</h3></div>
+      <p>مبلغ العائد المقدَّر لكل عرض توصيل يعمل بصحّة في الوضع الوهميّ (<code>estimatedPayoutMinor</code>)، لكن الخادم الحقيقيّ يرسله بصيغة <code>estimated_payout_minor</code> داخل غلاف <code>{"offers":[...]}</code> (<code>dispatch_router.py:513,544</code>) بينما RN يتوقّع مصفوفة مباشرة بأسماء camelCase (<code>api/index.ts:44-50</code>) — فتُصبح النتيجة الفعليّة "NaN د.ل" على شاشة كل سائق يستخدم النسخة المتّصلة بالخادم الحقيقيّ.</p>
+    </div>
+    <div class="gap-table-wrap"><table>
+      <tr><th>المنطقة</th><th>الحالة</th><th>الدليل</th></tr>
+      <tr><td>قبول/رفض العرض</td><td class="st missing">ميت</td><td class="ev">home.tsx:67 — onPress={() => undefined}؛ لا زرّ رفض إطلاقًا</td></tr>
+      <tr><td>حالة الاتّصال (أونلاين/أوفلاين)</td><td class="st stub">STUB واجهة فقط</td><td class="ev">home.tsx:16,39 — useState محليّ، لا يُبلَّغ الخادم أبدًا</td></tr>
+      <tr><td>التسليم النشط / الاستلام</td><td class="st missing">MISSING</td><td class="ev">لا شاشة إطلاقًا</td></tr>
+      <tr><td>الخريطة / الملاحة</td><td class="st missing">MISSING</td><td class="ev">لا مكتبة خرائط للسائق</td></tr>
+      <tr><td>سجلّ الرحلات</td><td class="st missing">MISSING</td><td class="ev">/drivers/me/trips/history غير مُستخدَمة</td></tr>
+      <tr><td>الملفّ الشخصيّ / الإعدادات</td><td class="st stub">STUB</td><td class="ev">زرّ خروج فقط (home.tsx:32)</td></tr>
+      <tr><td>التسوية / تسوية النقد</td><td class="st missing">MISSING</td><td class="ev">لا شاشة، لا استدعاء</td></tr>
+    </table></div>
+    <div class="note-block warn"><b>البثّ الحيّ:</b> شاشة السائق لا تستخدم SSE ولا استطلاعًا دوريًّا — <code>useQuery</code> بسيط بلا <code>refetchInterval</code>، يُجلب مرّة واحدة فقط عند تفعيل "أونلاين". طبقة SSE الموجودة في التطبيق (<code>useOrderLive</code>) تُستخدَم من شاشة تتبّع العميل فقط، لا من أيّ شاشة سائق.</div>
+    <div class="note-block crit"><b>ملاحظة إضافيّة:</b> حتى نقطة النداء الوحيدة المتّصلة فعليًّا (<code>getDriverOffers</code>) تشير إلى مسار غير موجود في الباك إند حسب دليل الوكيل — عدم تطابق مسار إضافيّ فوق عطب التسمية.</div>
+  </section>
+
+  <!-- ============ S06 : SETTLEMENT ============ -->
+  <section class="sheet" id="s06">
+    <div class="sheet-head"><span class="sheet-num">SHEET 06</span><h2>وكيل التسوية — صفر مطلق</h2><span class="stamp stamp-missing">0%</span></div>
+    <div class="note-block crit">بحث شامل حسّاس لحالة الأحرف في كامل <code>apps/mobile/src/</code> عن كلمة "settlement" أعاد <b>صفر نتائج</b>. لا مسار، لا شاشة، لا استدعاء API، لا حتى اختيار هذا الدور في شاشة تسجيل الدخول (<code>ROLE_PURPOSE</code> في <code>index.ts:21-26</code> يحتوي فقط: عميل/سائق/مزوّد/عمليّات). الواجهات البرمجيّة اللازمة جاهزة في الباك إند (<code>settlement/agent_router.py</code>, <code>settlement/party_router.py</code>) لكن لا يستهلكها أيّ كود جوّال حاليًّا.</div>
+  </section>
+
+  <!-- ============ S07 : ENDPOINT COVERAGE ============ -->
+  <section class="sheet" id="s07">
+    <div class="sheet-head"><span class="sheet-num">SHEET 07</span><h2>نقاط نهاية الخادم بلا أيّ مستهلك في RN</h2></div>
+    <p class="lede">هذا ليس عن واجهات ناقصة فقط — هذه نقاط API خلفيّة كاملة، جاهزة وتعمل، لا يستدعيها أيّ سطر كود في التطبيق:</p>
+    <div class="diagram endpoint-bars">
+      <div class="diagram-cap">نسبة الاستخدام الفعليّ لنقاط النهاية الخلفيّة حسب الدور</div>
+      <div class="ep-row"><span class="ep-label">المزوّد</span><div class="ep-track"><div class="ep-fill-used" style="width:1.6%"></div><div class="ep-fill-unused" style="width:98.4%"></div></div><span class="ep-count">1 / 61</span></div>
+      <div class="ep-row"><span class="ep-label">السائق</span><div class="ep-track"><div class="ep-fill-used" style="width:5%"></div><div class="ep-fill-unused" style="width:95%"></div></div><span class="ep-count">~1 (مسار خاطئ) / ~20+</span></div>
+      <div class="ep-row"><span class="ep-label">وكيل التسوية</span><div class="ep-track"><div class="ep-fill-unused" style="width:100%"></div></div><span class="ep-count">0 / الكل</span></div>
+    </div>
+    <details class="module">
+      <summary>قائمة أهمّ النقاط المهجورة <span class="cnt">عيّنة</span></summary>
+      <p style="padding:0 17px 14px; font-size:.85rem; color:var(--muted)">مزوّد: قبول/رفض/بدء تحضير/جاهز/تأكيد استلام، إبلاغ عن نفاد صنف، الوثائق، الإيقاف/الاستئناف، تحليلات المبيعات، السجلّ التجاريّ، كل نقاط الموظّفين (+25)، كتالوج CRUD الكامل (~25 نقطة).<br>سائق: قرار العرض (قبول/رفض)، حالة الاتّصال، الملفّ الشخصيّ، الأرباح، الرصيد، سجلّ الرحلات، التسوية، حدّ النقد، مواقع GPS، تأكيد الاستلام، تسليم الطلب.</p>
+    </details>
+  </section>
+
+  <!-- ============ S08 : MASTER TABLE ============ -->
+  <section class="sheet" id="s08">
+    <div class="sheet-head"><span class="sheet-num">SHEET 08</span><h2>جدول المقارنة الشامل الواحد</h2></div>
+    <div class="gap-table-wrap"><table>
+      <tr><th>الدور</th><th>مناطق القدرة في الويب</th><th>تعمل فعليًّا في RN</th><th>التكافؤ الصادق</th><th>التكافؤ القديم الموثَّق</th></tr>
+      <tr><td>العميل</td><td>22</td><td>~3.5</td><td class="st stub">~16%</td><td class="ev">~34%</td></tr>
+      <tr><td>المزوّد</td><td>13</td><td>~0.5</td><td class="st missing">~4%</td><td class="ev">~7%</td></tr>
+      <tr><td>السائق</td><td>10</td><td>~0.5</td><td class="st missing">~5%</td><td class="ev">~5%</td></tr>
+      <tr><td>وكيل التسوية</td><td>1</td><td>0</td><td class="st missing">0%</td><td class="ev">0%</td></tr>
+    </table></div>
+    <div class="note-block info"><b>لماذا الأرقام الجديدة أقلّ من القديمة رغم عدم تغيّر الكود؟</b> التقارير القديمة عدَّت أيّ شاشة "موجودة بالاسم" كقدرة جزئيّة حتى لو كانت بياناتها فارغة عند التشغيل الحقيقيّ. هذا التدقيق يفرّق بوضوح بين "الشاشة موجودة في الوضع الوهميّ" و"الشاشة تعمل فعليًّا ضدّ الخادم الحقيقيّ" — والفارق بينهما هو بالضبط عطب التسمية الموصوف في القسم الثاني.</div>
+  </section>
+
+  <!-- ============ S09 : FIX PLAN PREVIEW ============ -->
+  <section class="sheet" id="s09">
+    <div class="sheet-head"><span class="sheet-num">SHEET 09</span><h2>خطّة الإصلاح المقترحة — من أين نبدأ</h2><span class="stamp stamp-info">الخطوة التالية المقرَّرة</span></div>
+    <p class="lede">القرار: البدء بطبقة التحويل الجذريّة (snake_case↔camelCase) أوّلًا — لأنّها إصلاح واحد يفتح كل شاشة أخرى تلقائيًّا، بدل إصلاح كل شاشة يدويًّا على حدة.</p>
+    <div class="diagram">
+      <div class="diagram-cap">تسلسل الإصلاح المقترح</div>
+      <div class="pipeline">
+        <div class="pipe-stage next"><div class="t">1. طبقة التحويل</div><div class="d">إصلاح واحد في client.ts<br>يفتح كل الشاشات المعطوبة دفعة واحدة</div></div>
+        <div class="pipe-arrow">←</div>
+        <div class="pipe-stage"><div class="t">2. تفعيل الأزرار الميتة</div><div class="d">قبول/رفض عرض السائق<br>قبول/جاهز المزوّد</div></div>
+        <div class="pipe-arrow">←</div>
+        <div class="pipe-stage"><div class="t">3. إزالة الأرقام المزيَّفة</div><div class="d">ربط بطاقة أرباح السائق<br>بنقطة /drivers/me/balance الحقيقيّة</div></div>
+        <div class="pipe-arrow">←</div>
+        <div class="pipe-stage"><div class="t">4. سدّ الفجوات الكبرى</div><div class="d">حسب الأولويّة التشغيليّة<br>(يُحدَّد لاحقًا بالتشاور)</div></div>
+      </div>
+    </div>
+    <div class="note-block ok"><b>لماذا هذا الترتيب منطقيّ:</b> طبقة التحويل تصحّح البيانات المعروضة في كل شاشة موجودة فعلًا دفعة واحدة (تصفّح المزوّد، تتبّع الطلب، عروض السائق) بأثر فوريّ، بينما إصلاح الأزرار الميتة وربط الأرقام الحقيقيّة يحتاج تعديلات مركَّزة صغيرة بعدها مباشرة. سدّ الفجوات الكبرى (كتالوج المزوّد، محفظة العميل، تسوية السائق) عمل بناء من الصفر يحتاج تخطيطًا منفصلًا.</div>
+  </section>
+
+  <footer class="colophon">
+    <span>تدقيق عميق RN مقابل الويب — 2026-07-13 — 3 وكلاء مستقلّون، أدلّة كود مباشرة فقط</span>
+    <span>الحالة: تدقيق-فقط، لا تعديل كود — الخطوة التالية: طبقة التحويل الجذريّة</span>
+  </footer>
+
+</div>
+</div>

@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الخطة المنقّحة بعد المراجعة العميقة — عيوب نظام الخبراء (2026-05-31)</title>
+<style>
+  :root{--g:#0e7a4f;--a:#f59e0b;--r:#b3261e;--bg:#f6f8f7;--bd:#e3e9ee;--tx:#1f2a30;--mut:#5d6b75}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,"Segoe UI",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--tx);line-height:1.75}
+  .wrap{max-width:1100px;margin:0 auto;padding:1.5rem}
+  h1{color:var(--g);font-size:1.55rem;margin:.2rem 0}
+  h2{color:var(--g);border-bottom:2px solid var(--bd);padding-bottom:.3rem;margin-top:2rem}
+  h3{margin:1rem 0 .3rem;color:#0d3f29}
+  h4{margin:.85rem 0 .25rem;color:var(--mut);font-size:.93rem;text-transform:uppercase;letter-spacing:.04em}
+  .sub{color:var(--mut);font-size:.9rem}
+  .card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:1rem 1.2rem;margin:.8rem 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.5rem;margin:.5rem 0;font-size:.85rem}
+  .meta>div{background:#f1f5f3;padding:.4rem .6rem;border-radius:8px;border:1px solid var(--bd)}
+  table{width:100%;border-collapse:collapse;margin:.6rem 0;font-size:.88rem;background:#fff}
+  th,td{border:1px solid var(--bd);padding:.45rem .6rem;text-align:right;vertical-align:top}
+  th{background:#eef4f1;color:var(--g)}
+  code,pre{background:#0f172a;color:#e2e8f0;padding:.05rem .35rem;border-radius:5px;font-family:ui-monospace,Menlo,monospace;font-size:.84em;direction:ltr;display:inline-block}
+  pre{display:block;padding:.65rem .85rem;overflow-x:auto;text-align:left;font-size:.78rem;line-height:1.5;white-space:pre}
+  .sev{font-weight:800;padding:.12rem .55rem;border-radius:999px;font-size:.78rem;color:#fff;white-space:nowrap}
+  .s-hi{background:var(--r)}.s-md{background:var(--a);color:#3a2600}.s-lo{background:#64748b}
+  .file{color:#7dd3fc;direction:ltr;display:inline-block}
+  .changed{background:#dbeafe;border:1px solid #60a5fa;border-radius:8px;padding:.55rem .8rem;margin:.4rem 0}
+  .changed::before{content:"🔄 تصحيح من المراجعة: ";font-weight:800;color:#1e3a8a}
+  .new{background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:.55rem .8rem;margin:.4rem 0}
+  .new::before{content:"🆕 إضافة من المراجعة: ";font-weight:800;color:#92400e}
+  .dropped{background:#fee2e2;border:1px solid #f87171;border-radius:8px;padding:.55rem .8rem;margin:.4rem 0}
+  .dropped::before{content:"❌ مُسقَط: ";font-weight:800;color:#7f1d1d}
+  ol.step{counter-reset:s;list-style:none;padding-right:0}
+  ol.step li{counter-increment:s;padding-right:1.8rem;position:relative;margin:.4rem 0}
+  ol.step li::before{content:counter(s);position:absolute;right:0;top:.05rem;background:var(--g);color:#fff;width:1.35rem;height:1.35rem;border-radius:50%;font-size:.75rem;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .approve{background:#fef3c7;border:1px solid #fbbf24;border-radius:10px;padding:.6rem .9rem;margin:1rem 0;font-weight:700;color:#92400e}
+  .quote{border-right:4px solid var(--g);background:#fafdfb;padding:.55rem .9rem;margin:.5rem 0;font-style:italic;color:#0d3f29}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>الخطّة المنقّحة بعد المراجعة العميقة</h1>
+  <p class="sub">2026-05-31 · مراجعة كل بند مقابل الكود الفعلي مع محاكاة ذهنية لتدفّق التنفيذ. الإطارات الملوّنة تبيّن ما تغيّر مقابل الخطة الأصلية.</p>
+
+  <h2>منهج المراجعة (ما الذي تغيّر)</h2>
+  <div class="card">
+    <p>قراءات الكود المحقّقة:</p>
+    <ul>
+      <li><b>C-1:</b> <code>order_service.py:883-884</code> — <code>InsufficientBalanceError</code> مكتشف؛ <b>يُجرَّد من المعلومات</b> الآن. + معالج <code>order_router.py:349</code> يستبدل <code>details</code> بالكامل عند وجوده.</li>
+      <li><b>C-2:</b> <code>provider_router.py:85,95</code> — يفلتر <code>status='ACTIVE'</code> و<code>is_accepting_orders=true</code> فقط. لا <code>active_now</code>. مسار no-coords (offset path) يَفلت providers بلا <code>lat/lng</code>.</li>
+      <li><b>C-3:</b> <code>provider_hours.is_currently_open</code> موجود (سطر 77). <code>ItemVariant.status</code> افتراضي <code>"ACTIVE"</code>؛ <code>CatalogItem.status</code> افتراضي <code>"DRAFT"</code>.</li>
+      <li><b>OPS-1:</b> <code>publish_provider_order_event</code> موجود ومتّصل (order_router.py:319). الـcache غير معنيّ.</li>
+      <li><b>OPS-2:</b> <code>/operations/dashboard</code> <b>مُكاش 10ث</b> ⇒ KPIs لايف لا تنتمي له.</li>
+      <li><b>C-5:</b> <span class="dropped" style="display:inline-block;padding:.05rem .4rem">«إعادة الطلب» موجود فعلاً في <code>OrderHistoryPage.tsx:51-200</code> منذ المرحلة 373.</span></li>
+    </ul>
+
+    <h4>الاكتشافات الجوهرية للمراجعة</h4>
+    <ol>
+      <li><b>C-5 يُسقَط بالكامل</b> — false negative من تجربة العميل (الزرّ موجود).</li>
+      <li><b>C-1 يحتاج تعديلاً في الـhandler</b> أيضاً (لا يكفي raise جديد) لتمرير errors داخل details.</li>
+      <li><b>C-2 يحتاج توسيع الفلتر ليشمل <code>lat IS NOT NULL</code></b> أيضاً (no-coords path يَفلت).</li>
+      <li><b>OPS-2 يحتاج نقطة منفصلة بلا cache</b> بدل تضخيم dashboard.</li>
+      <li><b>أثر تغيير فلتر البحث على الاختبارات الموجودة:</b> فيكستشرات تنشئ providers بدون <code>active_now=true</code> سيُحجبون ⇒ يجب تحديثها.</li>
+    </ol>
+  </div>
+
+  <h2>0) ملخّص ما تغيّر</h2>
+  <div class="card">
+    <table>
+      <tr><th>#</th><th>الأصلي</th><th>المنقَّح</th></tr>
+      <tr><td>C-1</td><td>raise مُميَّز فقط</td><td>+ تعديل المعالج ليدمج <code>errors</code> داخل <code>details</code></td></tr>
+      <tr><td>C-2</td><td>إضافة <code>active_now=true</code></td><td>+ <code>lat IS NOT NULL AND lng IS NOT NULL</code> + تحديث فيكستشرات الاختبارات</td></tr>
+      <tr><td>C-3</td><td>إثراء البحث بـ3 حقول</td><td>(بلا تغيير، لكن وُثِّقت تكلفة الاستعلام التجميعيّ)</td></tr>
+      <tr><td>OPS-2</td><td>تضخيم <code>/operations/dashboard</code></td><td>نقطة منفصلة جديدة <code>/operations/live-kpis</code> بلا cache</td></tr>
+      <tr><td>OPS-1</td><td>اختبار end-to-end</td><td>(بلا تغيير)</td></tr>
+      <tr><td>C-4</td><td>إضافة <code>eta_minutes_estimate</code></td><td>(بلا تغيير)</td></tr>
+      <tr><td>C-5</td><td>زرّ «إعادة طلب»</td><td><b>أُسقِط</b> — موجود فعلاً</td></tr>
+    </table>
+    <p><b>الجهد المنقَّح:</b> ~12 ساعة (كان 13). <b>بلا migration. FIN-COR محميّ.</b></p>
+  </div>
+
+  <!-- ──────────── C-1 (refined) ──────────── -->
+  <h2>١) <span class="sev s-hi">عالٍ</span> C-1 (منقَّح) — رسالة WALLET موجِّهة + رابط شحن</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الجهد:</b> ~2 ساعة</div>
+      <div><b>Migration؟</b> لا</div>
+      <div><b>FIN-COR:</b> لا يُمَسّ</div>
+    </div>
+
+    <h4>السبب الجذري (مرجع كود مؤكَّد)</h4>
+    <pre><span class="file">backend/app/modules/orders/order_service.py</span>:859-884
+if payment_method == "WALLET":
+    try:
+        await wallet_service.reserve_wallet(...)
+        await apply_order_transition(...)
+    except InsufficientBalanceError as exc:
+        raise ValidationError([str(exc)]) from exc   ⟵ يفقد الـcode + details</pre>
+    <p>الـ<code>InsufficientBalanceError</code> رسالة فقط (<code>wallet_service.py:91</code>) — لا تحوي balance/required كصفات. <b>لكن النطاق المحلّي في create_order يحوي <code>wallet_balance</code> (سطر 667) و<code>total_minor + _delivery_fee_minor</code></b>، لذا نَحسبها عند الـraise.</p>
+
+    <div class="changed">المعالج في <code>order_router.py:349</code> يستبدل <code>details</code> الافتراضي <code>{"errors": e.errors}</code> بـ<code>e.details</code> عند وجوده ⇒ نصّ الخطأ يختفي من الواجهة لو مرّرنا <code>details</code> بحقول مهيكلة فقط. <b>الحلّ: دمج errors داخل details عند الإصدار.</b></div>
+
+    <h4>التصميم النهائي</h4>
+    <ol class="step">
+      <li><b>Backend (raise):</b>
+        <pre>except InsufficientBalanceError as exc:
+    required = total_minor + _delivery_fee_minor
+    raise ValidationError(
+        ["رصيد المحفظة لا يكفي لتغطية المبلغ"],
+        code="WALLET_INSUFFICIENT_FUNDS",
+        details={
+            "errors": ["رصيد المحفظة لا يكفي لتغطية المبلغ"],
+            "required_minor": required,
+            "available_minor": int(wallet_balance),
+            "shortfall_minor": required - int(wallet_balance),
+        },
+    ) from exc</pre>
+      </li>
+      <li><b>Backend (handler):</b> إضافة فرع في <code>except ValidationError</code> في <code>order_router.py:349</code>:
+        <pre>elif envelope_code == "WALLET_INSUFFICIENT_FUNDS":
+    message_ar = "رصيد المحفظة لا يكفي — اشحن المحفظة ثمّ أعد الطلب"</pre>
+      </li>
+      <li><b>FE (CheckoutPage):</b> على <code>err.code === "WALLET_INSUFFICIENT_FUNDS"</code>:
+        <ul>
+          <li>عرض رسالة + سطر «المبلغ الناقص: X د.ل» من <code>err.details.shortfall_minor</code>.</li>
+          <li>زرّ ثانوي «اشحن المحفظة» يذهب إلى <code>/wallet?return=checkout&shortfall=X</code>.</li>
+        </ul>
+      </li>
+      <li><b>FE (WalletPage):</b> قراءة <code>?return=checkout</code> ⇒ بانر «اشحن ثمّ أكمل طلبك» + اقتراح المبلغ من <code>?shortfall</code>.</li>
+    </ol>
+
+    <h4>اختبارات</h4>
+    <ul>
+      <li>WALLET بمحفظة فارغة (balance=0، total=8000) ⇒ 422 + code + details (required=8000, available=0, shortfall=8000).</li>
+      <li>WALLET برصيد جزئي (balance=3000، total=8000) ⇒ shortfall=5000.</li>
+      <li>WALLET برصيد كافٍ ⇒ 201 (regression).</li>
+      <li>FE: زرّ «اشحن المحفظة» يَظهر فقط على هذا الكود؛ ينقل إلى <code>/wallet?return=checkout</code>.</li>
+    </ul>
+  </div>
+
+  <!-- ──────────── C-2 (refined) ──────────── -->
+  <h2>٢) <span class="sev s-md">متوسط</span> C-2 (منقَّح) — توحيد فلاتر البحث + بانر OPS</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الجهد:</b> ~2.5 ساعة</div>
+      <div><b>Migration؟</b> لا</div>
+    </div>
+
+    <h4>السبب الجذري المُتحقَّق</h4>
+    <pre><span class="file">backend/app/modules/providers/provider_router.py</span>
+:80  stmt = select(Provider).where(Provider.status == "ACTIVE")
+:95  stmt = stmt.where(Provider.is_accepting_orders.is_(True))
+⟶ لا يفلتر active_now ولا lat/lng IS NOT NULL.</pre>
+    <p>المسار بإحداثيات (W2-02) يُضيف bounding box <b>يُخفي providers بلا coords ضمنيّاً</b>. لكن المسار بدون إحداثيات (default rating-based) يُرجِع providers بلا coords ⇒ الطلب بعدها سيفشل بـ"distance required" أو مشكلة في معاينة الرسم.</p>
+
+    <div class="new">إضافة <code>lat IS NOT NULL AND lng IS NOT NULL</code> إلى الفلتر العامّ لتغطية مسار no-coords أيضاً.</div>
+
+    <h4>التصميم النهائي</h4>
+    <ol class="step">
+      <li><b>تعديل الفلتر العامّ في <code>search_providers</code>:</b>
+        <pre>stmt = stmt.where(
+    Provider.is_accepting_orders.is_(True),
+    Provider.active_now.is_(True),              ← جديد
+    Provider.lat.is_not(None),                  ← جديد
+    Provider.lng.is_not(None),                  ← جديد
+)</pre>
+      </li>
+      <li><b>تحديث الفيكستشرات</b> في <code>tests/test_184_provider_search_query.py</code> + كل اختبار يضرب <code>/providers/search</code>: إضافة <code>active_now=True, lat=32.89, lng=13.19</code> عند إنشاء Provider التجريبي. (تقدير: ~5 اختبارات).</li>
+      <li><b>نقطة OPS جديدة:</b> <code>GET /operations/providers/inactive</code> تُرجع المسجَّلين+المعتمَدين الذين <b>لا</b> يظهرون في البحث، مع <code>reason</code> لكل واحد:
+        <pre>{
+  "items": [
+    {"id": "...", "business_name": "...", "reasons": ["not_active_now", "no_coords"]},
+    ...
+  ]
+}</pre>
+      </li>
+      <li><b>FE OPS:</b> صفحة <code>OpsInactiveProviders</code> + بطاقة على <code>OpsDashboard</code> «N مزوّداً غير نشط».</li>
+    </ol>
+
+    <h4>التحقّق</h4>
+    <ul>
+      <li>محاكاة ذهنية: مزوّد جديد بعد PROV-1 onboarding لا يظهر في البحث حتى يضغط «افتح المتجر» (الـactive_now يُضبط بـ<code>/me/online</code>). متّسق مع منطق PROV-1.</li>
+      <li>مزوّد يغلق مؤقّتاً (الزرّ نفسه) ⇒ يختفي من البحث فوراً. متّسق.</li>
+      <li>الاختبارات القائمة قد تكسر — تحديثها <b>في نفس الـcommit</b> لا commit منفصل.</li>
+    </ul>
+  </div>
+
+  <!-- ──────────── C-3 ──────────── -->
+  <h2>٣) <span class="sev s-md">متوسط</span> C-3 — إثراء كرت المزوّد</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الجهد:</b> ~3 ساعات</div>
+      <div><b>Migration؟</b> لا</div>
+    </div>
+
+    <h4>التصميم — مع تكلفة استعلام محسوبة</h4>
+    <ol class="step">
+      <li><b>استعلام تجميعيّ واحد للأسعار الدنيا:</b>
+        <pre>SELECT ci.provider_id, MIN(iv.base_price)
+FROM item_variants iv JOIN catalog_items ci ON ci.id = iv.item_id
+WHERE iv.status='ACTIVE' AND ci.status='PUBLISHED'
+  AND ci.provider_id IN (...20 ids...)
+GROUP BY ci.provider_id</pre>
+        <b>تكلفة:</b> استعلام واحد إضافي لكلّ طلب بحث = 60 query → 21 query لـ20 مزوّد. مقبول.
+      </li>
+      <li><b>Python computed:</b> <code>currently_open = is_currently_open(provider.opening_hours)</code> + <code>opening_hours_summary_ar</code> (دالّة جديدة في <code>provider_hours</code>).</li>
+      <li><b>إضافة الحقول إلى <code>_provider_public_dict</code>:</b> <code>min_price_minor</code>, <code>currently_open</code>, <code>opening_hours_summary_ar</code>.</li>
+      <li><b>FE (ProviderCard):</b> عرض «من X.XXX د.ل» + شارة مفتوح/مغلق + ساعات مختصرة.</li>
+    </ol>
+
+    <h4>حالات حدّيّة</h4>
+    <table>
+      <tr><th>الحالة</th><th>السلوك</th></tr>
+      <tr><td>مزوّد بلا أصناف منشورة</td><td><code>min_price_minor = null</code> ⇒ FE يخفي السطر</td></tr>
+      <tr><td><code>opening_hours = null</code></td><td><code>is_currently_open</code> يَرجع <code>true</code> أو <code>false</code>؟ <b>يجب التحقّق</b> من سلوكها الافتراضي وضمان حالة «لا ساعات معروفة» ⇒ شارة محايدة أو إخفاء</td></tr>
+      <tr><td>مزوّد بمعدّل تقييم 0</td><td>(لا علاقة بـC-3) — لا تغيير</td></tr>
+    </table>
+  </div>
+
+  <!-- ──────────── OPS-1 ──────────── -->
+  <h2>٤) <span class="sev s-md">متوسط</span> OPS-1 — تحقّق end-to-end لمسار إشعار المزوّد</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الجهد:</b> ~2 ساعة</div>
+      <div><b>Migration؟</b> لا</div>
+    </div>
+
+    <h4>المسار المؤكَّد في الكود</h4>
+    <p>الـpublish موجود في <code>order_router.py:319</code> داخل block <code>try/except</code> يسجّل التحذير (W4-09 الجلسة السابقة). الـSSE stream في <code>app/modules/sse/provider_stream.py</code>. الـFE Hook في <code>useProviderOrderStream.ts</code>.</p>
+
+    <h4>التحقّق</h4>
+    <ol class="step">
+      <li>سكربت smoke جديد <code>deploy/smoke_provider_notification.sh</code> يُنفَّذ من جانب الخادم:
+        <ul>
+          <li>تسجيل دخول مزوّد seeded.</li>
+          <li>فتح <code>GET /sse/providers/me/orders?token=...</code> في الخلفية لمدّة 30ث.</li>
+          <li>عميل seeded يَنشئ طلباً.</li>
+          <li>التأكّد من ظهور حدث <code>provider.order</code> في الـSSE خلال 5ث.</li>
+        </ul>
+      </li>
+      <li>إن فشل، التشخيص: Redis pub/sub متّصل؟ <code>REDIS_URL</code> صحيح؟ Worker subscriber يَستلم؟</li>
+    </ol>
+
+    <h4>تفعيل FCM (موثَّق فقط، لا كود)</h4>
+    <p><span class="file">deploy/notifications/PRODUCTION_ACTIVATION.md</span> يَشرح: <code>FCM_PROJECT_ID</code>، <code>FCM_SERVICE_ACCOUNT_FILE</code>، <code>pip install google-auth</code>.</p>
+  </div>
+
+  <!-- ──────────── OPS-2 (refined) ──────────── -->
+  <h2>٥) <span class="sev s-lo">منخفض</span> OPS-2 (منقَّح) — نقطة <code>/operations/live-kpis</code> منفصلة</h2>
+  <div class="card">
+    <div class="meta">
+      <div><b>الجهد:</b> ~2 ساعة</div>
+      <div><b>Migration؟</b> لا</div>
+    </div>
+
+    <div class="changed">الـ<code>/operations/dashboard</code> مُكاش 10ث ⇒ بيانات «لايف» لا تنتمي له. حلّ منفصل: نقطة جديدة بلا cache، تُستدعى أسرع.</div>
+
+    <h4>التصميم</h4>
+    <ol class="step">
+      <li><b>Backend:</b>
+        <pre>@router.get("/operations/live-kpis")
+async def live_kpis(user=Depends(require_role(OPS, SUPER)), db=...):
+    """No cache — meant for ~5s polling. 4 fast COUNT(*) queries."""
+    return {
+        "active_orders_now": ...,    # in active-lifecycle states
+        "drivers_online_now": ...,   # drivers.available=true AND status=ACTIVE
+        "orders_without_driver_now": ...,  # READY_FOR_PICKUP no ACCEPTED offer
+        "providers_open_now": ...,   # active_now AND is_accepting_orders
+    }</pre>
+        4 استعلامات <code>COUNT(*)</code> سريعة مع فهارس على الأعمدة المُستخدَمة (موجودة من aa07_perf_compound_indexes).
+      </li>
+      <li><b>FE:</b> 4 بطاقات أعلى <code>OpsDashboard</code> + <code>useQuery</code> بـ<code>refetchInterval: 5000</code>.</li>
+    </ol>
+
+    <h4>تقدير الأداء</h4>
+    <p>تحت ~100 طلب نشط + ~50 سائق ⇒ كل استعلام &lt; 10ms مع الفهارس. مجموع &lt; 50ms لكل polling tick. مقبول لـpolling كل 5ث.</p>
+  </div>
+
+  <!-- ──────────── C-4 ──────────── -->
+  <h2>٦) <span class="sev s-lo">منخفض</span> C-4 — ETA قبل إرسال الطلب</h2>
+  <div class="card">
+    <div class="meta"><div><b>الجهد:</b> ~1 ساعة</div></div>
+    <h4>التصميم</h4>
+    <p>إضافة حقل <code>eta_minutes_estimate</code> إلى استجابة <code>quote_delivery_fee</code>:</p>
+    <pre>eta_minutes_estimate = (provider.default_prep_time_min or 30)
+                      + max(int(distance_km * 3), 5)   # ~3 دقيقة لكل كم، أدنى 5</pre>
+    <p>FE: سطر «الوقت المتوقّع: حوالي N دقيقة» تحت رسم التوصيل في CheckoutPage.</p>
+    <p><b>تحذير دقّة:</b> القيمة <b>تقديريّة</b> — نُضيف شارة «تقديري» مماثلة لـCUST-6.</p>
+  </div>
+
+  <!-- ──────────── C-5 dropped ──────────── -->
+  <h2>٧) <s>C-5</s> — مُسقَط</h2>
+  <div class="card">
+    <div class="dropped">«إعادة الطلب» موجود فعلاً في <span class="file">web/src/pages/customer/OrderHistoryPage.tsx</span> منذ المرحلة 373 — السطر 51 (دالّة <code>reorder</code>) والسطر 200 (الزرّ "🔁 إعادة الطلب"). ملاحظة العميل في التقرير الأصلي كانت false negative. لا تنفيذ مطلوب.</div>
+  </div>
+
+  <!-- ──────────── Implementation Order ──────────── -->
+  <h2>٨) ترتيب التنفيذ المنقَّح</h2>
+  <div class="card">
+    <ol class="step">
+      <li><b>C-1</b> (~2س): handler + raise + FE.</li>
+      <li><b>C-2</b> (~2.5س): فلتر + تحديث الفيكستشرات + نقطة OPS + صفحة + بطاقة.</li>
+      <li><b>C-3</b> (~3س): استعلام تجميعيّ + Python helpers + FE ProviderCard.</li>
+      <li><b>OPS-2</b> (~2س): نقطة لايف منفصلة + 4 بطاقات.</li>
+      <li><b>C-4</b> (~1س): eta في quote + FE.</li>
+      <li><b>OPS-1</b> (~2س): smoke script + توثيق التفعيل.</li>
+      <li>اختبارات شاملة + commit واحد + نشر.</li>
+    </ol>
+  </div>
+
+  <!-- ──────────── Risks ──────────── -->
+  <h2>٩) المخاطر المحدَّدة من المراجعة</h2>
+  <div class="card">
+    <table>
+      <tr><th>المخاطرة</th><th>التخفيف</th></tr>
+      <tr><td><b>C-2 يكسر اختبارات قائمة</b> (فيكستشرات بدون <code>active_now=true</code> أو coords)</td><td>تحديث الفيكستشرات في نفس الـcommit. توقّع ~5 اختبارات تحتاج تعديل.</td></tr>
+      <tr><td><b>C-3 N+1 محتمل</b> إن نُفِّذ ساذجاً</td><td>استعلام تجميعيّ واحد بنمط <code>_provider_name_map</code> القائم</td></tr>
+      <tr><td><b>C-1 الـhandler يستبدل details</b> بالكامل</td><td>دمج <code>errors</code> داخل <code>details</code> في الـraise</td></tr>
+      <tr><td><b>OPS-2 cache</b> يجعل بيانات «لايف» قديمة</td><td>نقطة منفصلة بلا cache بدلاً من تضخيم dashboard</td></tr>
+      <tr><td><b>is_currently_open مع opening_hours=null</b> قد يرجع true/false غير متوقّع</td><td>التحقّق من السلوك الافتراضي + شارة محايدة عند غياب الساعات</td></tr>
+      <tr><td><b>تغيير فلتر البحث قد يقلق المزوّدين</b> (يختفون عند close)</td><td>هذا السلوك الصحيح الموافق لـPROV-1. لا تخفيف مطلوب.</td></tr>
+    </table>
+  </div>
+
+  <!-- ──────────── Deploy + DoD ──────────── -->
+  <h2>١٠) النشر ومعايير النجاح</h2>
+  <div class="card">
+    <ol class="step">
+      <li>اختبارات pytest محلّية كاملة (~1700 backend + المضافة).</li>
+      <li>typecheck/build/lint للويب.</li>
+      <li><code>deploy_be.sh</code> + <code>deploy_web.sh</code>. <b>بلا migrations.</b></li>
+      <li>تحقّق على tawanow.com:
+        <ul>
+          <li>WALLET بمحفظة فارغة ⇒ <code>code=WALLET_INSUFFICIENT_FUNDS</code> + <code>details.shortfall_minor</code>.</li>
+          <li><code>/providers/search</code> يُرجع <code>min_price_minor</code> + <code>currently_open</code>.</li>
+          <li><code>/operations/live-kpis</code> يُرجع 4 أعداد.</li>
+          <li><code>/operations/providers/inactive</code> يُرجع الـreasons.</li>
+          <li><code>delivery-quote</code> يحوي <code>eta_minutes_estimate</code>.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="approve">⚠ <b>للمراجعة النهائية:</b> أعطني تأشيرة الموافقة (أو طلبات تعديل) قبل البدء. الترتيب الموصى به: C-1 → C-2 → C-3 → OPS-2 → C-4 → OPS-1.</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التحليل العميق — G4 محرّك المال الواحد | منصة تووا</title>
+<style>
+  :root{
+    --green:#0f7b4f; --green-d:#0a5c3a; --green-l:#e7f4ee; --green-ll:#f3faf6;
+    --ink:#13241d; --muted:#5c6b64; --line:#d7e3dc; --bg:#f6faf8;
+    --amber:#b9770a; --amber-l:#fdf3df; --red:#b0322a; --red-l:#fbe9e7;
+    --blue:#1f5f8b; --blue-l:#e8f1f8; --card:#ffffff; --gold:#8a6d1f;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Noto Naskh Arabic",Tahoma,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.95;font-size:17px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+  header.hero{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+    padding:46px 20px 40px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.12)}
+  header.hero h1{margin:0 0 8px;font-size:33px;font-weight:800}
+  header.hero .sub{font-size:18px;opacity:.95;max-width:780px;margin:0 auto}
+  .pills{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px}
+  .pill{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.34);
+    border-radius:999px;padding:7px 15px;font-size:14.5px;font-weight:600}
+  h2{color:var(--green-d);font-size:25px;margin:46px 0 14px;padding-bottom:9px;
+    border-bottom:3px solid var(--green-l)}
+  h3{color:var(--green-d);font-size:20px;margin:26px 0 10px}
+  h4{color:var(--ink);font-size:17.5px;margin:18px 0 6px}
+  p{margin:10px 0}
+  .lead{font-size:18px}
+  code{background:#eef4f1;color:#0a5c3a;border:1px solid #d7e6de;border-radius:6px;
+    padding:1px 7px;font-family:"Cascadia Code",Consolas,monospace;font-size:14px;direction:ltr;display:inline-block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px 22px;margin:16px 0;box-shadow:0 1px 4px rgba(16,60,40,.05)}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:760px){.g2,.g3{grid-template-columns:1fr}}
+  .toc{background:var(--green-ll);border:1px solid var(--line);border-radius:14px;padding:18px 26px;columns:2;column-gap:40px}
+  @media(max-width:680px){.toc{columns:1}}
+  .toc a{color:var(--green-d);text-decoration:none;display:block;padding:4px 0;font-weight:600}
+  .toc a:hover{text-decoration:underline}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:var(--green);color:#fff;font-weight:700}
+  tr:nth-child(even) td{background:#f7fbf9}
+  .mono{font-family:"Cascadia Code",Consolas,monospace;direction:ltr;text-align:left;font-size:13px;color:#234}
+  .tag{display:inline-block;border-radius:6px;padding:1px 9px;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .t-ok{background:var(--green-l);color:var(--green-d)}
+  .t-warn{background:var(--amber-l);color:var(--amber)}
+  .t-risk{background:var(--red-l);color:var(--red)}
+  .t-info{background:var(--blue-l);color:var(--blue)}
+  .callout{border-radius:12px;padding:16px 20px;margin:18px 0;border-right:6px solid}
+  .c-key{background:var(--green-ll);border-color:var(--green)}
+  .c-warn{background:var(--amber-l);border-color:var(--amber)}
+  .c-risk{background:var(--red-l);border-color:var(--red)}
+  .c-info{background:var(--blue-l);border-color:var(--blue)}
+  .num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+    border-radius:50%;background:var(--green);color:#fff;font-weight:800;font-size:15px;margin-left:8px;flex:none}
+  ul,ol{margin:8px 0;padding-right:22px}li{margin:6px 0}
+  /* ===== diagram primitives ===== */
+  .diagram{background:#fbfdfc;border:1px dashed var(--green);border-radius:14px;padding:22px;margin:18px 0;text-align:center}
+  .dcap{font-size:14px;color:var(--muted);margin-top:10px;font-style:italic}
+  .box{display:inline-block;background:#fff;border:2px solid var(--green);border-radius:10px;
+    padding:9px 13px;margin:6px;font-weight:700;font-size:14.5px;color:var(--green-d);box-shadow:0 2px 5px rgba(0,0,0,.06)}
+  .box.sec{border-color:var(--blue);color:var(--blue)}
+  .box.warn{border-color:var(--amber);color:var(--amber)}
+  .box.risk{border-color:var(--red);color:var(--red)}
+  .box.solid{background:var(--green);color:#fff}
+  .box small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
+  .arrow{font-size:24px;color:var(--green);margin:0 4px;font-weight:800}
+  .layer{border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;background:#fff}
+  .layer .lh{font-weight:800;color:var(--green-d);margin-bottom:8px;font-size:16px}
+  .flowrow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px}
+  /* T account */
+  .tacc{display:inline-grid;grid-template-columns:1fr 1fr;min-width:340px;border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:#fff;text-align:center;margin:8px}
+  .tacc .th{background:var(--ink);color:#fff;font-weight:700;padding:5px;font-size:13.5px}
+  .tacc .dr,.tacc .cr{padding:9px 8px;font-size:13.5px}
+  .tacc .dr{border-left:1px solid var(--line)}
+  .tacc .ttl{grid-column:1/3;background:#eef4f1;font-weight:800;padding:6px;color:var(--green-d)}
+  /* number line for rounding */
+  .numline{position:relative;height:70px;margin:24px 10px 6px}
+  .numline .bar{position:absolute;top:34px;right:0;left:0;height:4px;background:var(--green)}
+  .numline .tick{position:absolute;top:26px;width:2px;height:20px;background:var(--green-d)}
+  .numline .lbl{position:absolute;top:48px;transform:translateX(50%);font-size:12px;color:var(--muted)}
+  .numline .dot{position:absolute;top:28px;width:16px;height:16px;border-radius:50%;border:3px solid var(--red);background:#fff;transform:translateX(50%)}
+  .numline .dotr{position:absolute;top:28px;width:16px;height:16px;border-radius:50%;background:var(--green);transform:translateX(50%)}
+  .numline .cap{position:absolute;top:2px;transform:translateX(50%);font-size:12.5px;font-weight:700}
+  .footer{margin-top:50px;padding-top:20px;border-top:2px solid var(--line);color:var(--muted);font-size:14px;text-align:center}
+  .src{font-size:13.5px;color:var(--blue);word-break:break-all}
+  .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+  .kpi{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin:14px 0}
+  .kpi .k{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;text-align:center;min-width:130px}
+  .kpi .k b{display:block;font-size:28px;color:var(--green-d)}
+  .kpi .k span{font-size:13px;color:var(--muted)}
+  .legend{font-size:13.5px;color:var(--muted);margin:6px 0}
+  .seq{counter-reset:s;max-width:760px;margin:0 auto;text-align:right}
+  .seq .step{position:relative;padding:8px 0 8px 0;padding-right:42px;border-right:2px solid var(--line);margin-right:14px}
+  .seq .step::before{counter-increment:s;content:counter(s);position:absolute;right:-16px;top:8px;
+    width:30px;height:30px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .seq .step.bad::before{background:var(--red)}
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>🔬 التحليل العميق — G4: «محرّك المال الواحد»</h1>
+  <div class="sub">تتبّع كامل لكل مسار مالي وكل تأثير جانبي وكل تشعّب في منصة تووا — مبنيٌّ على قراءة الكود الحيّ سطراً بسطر، وعلى شبكة وكلاء فحص متوازية، وبحثٍ في أحدث وأقوى الحلول العالمية 2026 المناسبة لليبيا.</div>
+  <div class="pills">
+    <span class="pill">📅 2026-06-29</span>
+    <span class="pill">🌳 تتبّع بالأدلة file:line</span>
+    <span class="pill">🤖 4 وكلاء فحص متوازية</span>
+    <span class="pill">🔬 بحث عالمي + سياق ليبيا</span>
+    <span class="pill">⛔ تحليل وتخطيط فقط — لا كود</span>
+    <span class="pill">🔒 FIN-COR سليم</span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="callout c-key" style="margin-top:26px">
+    <b>القاعدة الذهبية أولاً:</b> أرقام المال في تووا <b>صحيحة اليوم</b>. لا يوجد خطأ مالي ولا ثغرة أمنية في الحسابات.
+    G4 ليس إصلاح عُطل — هو <b>إعادة تنظيم معماري</b> يجعل المال يعيش خلف «بابٍ واحد» بدل أن يكون موزّعاً في عدة ملفات.
+    الفائدة: استحالة الانحراف مستقبلاً + نقطة تعديل واحدة لأي قاعدة مالية. <b>(لكن</b> التتبّع العميق كشف
+    عيباً واحداً نشطاً في «المطابقة» وفجوة تطابق واحدة في تطبيق الموبايل — كلاهما صغير ومنفصل عن G4، ويُفضَّل إصلاحهما الآن.)
+  </div>
+
+  <h2 id="toc">📑 الفهرس</h2>
+  <div class="toc">
+    <a href="#s0">٠) الخلاصة في ٣٠ ثانية</a>
+    <a href="#s1">١) ما هو G4 ببساطة؟ (مثال الطبّاخين)</a>
+    <a href="#s2">٢) الخريطة الكاملة لأموال تووا اليوم</a>
+    <a href="#s3">٣) المبعثَر اليوم مقابل المحرّك الواحد</a>
+    <a href="#s4">٤) التتبّع العميق: كل تأثير جانبي وتشعّب وخطر انحراف</a>
+    <a href="#s5">٥) العيب النشط الوحيد + فجوة الموبايل</a>
+    <a href="#s6">٦) أفضل الحلول العالمية 2026 (البحث)</a>
+    <a href="#s7">٧) ليبيا — لماذا يناسبنا هذا التصميم</a>
+    <a href="#s8">٨) تصميم G4 المقترح لتووا</a>
+    <a href="#s9">٩) خطة التنفيذ المرحلية</a>
+    <a href="#s10">١٠) القرار والتوصية</a>
+    <a href="#s11">١١) مسرد مبسّط + المصادر</a>
+  </div>
+
+  <!-- ============ 0 ============ -->
+  <h2 id="s0">٠) الخلاصة في ٣٠ ثانية</h2>
+  <div class="grid g3">
+    <div class="card"><h4>🧱 G4 = تنظيم لا إصلاح</h4>
+      الدوال المالية «نقيّة» ومشتركة فعلاً. المطلوب جمعها خلف واجهة واحدة <code>MoneyEngine</code> + مصدر ثوابت واحد للطرفين (خادم/واجهة). <span class="tag t-ok">مخاطرة منخفضة</span></div>
+    <div class="card"><h4>🌳 التكرار الحقيقي بين الطرفين</h4>
+      الثابتان <code>250</code> و<code>1000</code> وخوارزمية التقريب مكتوبة مرّتين (خادم Python + واجهة TS)، والتعليق نفسه يقول «MUST stay in sync». هذا جوهر G4. <span class="tag t-warn">خطر انحراف</span></div>
+    <div class="card"><h4>📱 الموبايل ناقص</h4>
+      <code>money.dart</code> لا يحوي <code>roundCashToUnit</code> ولا ثابت <code>250</code> أصلاً — يعتمد على الخادم. آمن اليوم، لكنه «نسخة ثالثة محتملة». <span class="tag t-warn">فجوة تطابق</span></div>
+    <div class="card"><h4>🐞 عيب نشط واحد</h4>
+      طلبات «الدفع الجزئي» تُطلِق إنذار <code>CASH_AMOUNT_MISMATCH</code> كاذباً في المطابقة (ضجيج تدقيق، لا خسارة مال). يُفضَّل إصلاحه الآن مستقلاً عن G4. <span class="tag t-risk">عيب فعلي</span></div>
+    <div class="card"><h4>🧮 3 محرّكات نسبة مئوية</h4>
+      العمولة بالـ<code>bps</code> محسوبة في ٤ مواضع مستقلة (عمولة المزوّد + الوكيل + الحوافز + الضريبة). يجب توحيدها في «دالة نسبة واحدة». <span class="tag t-warn">تكرار</span></div>
+    <div class="card"><h4>📒 الدفتر يبقى منفصلاً</h4>
+      <code>post_journal</code> «بابٌ» نظيف ومحميّ (DR=CR + 3 حُرّاس قاعدة بيانات). G4 لا يبتلعه — بل يستدعيه كـ«مصرف قيود». <span class="tag t-ok">سليم</span></div>
+  </div>
+  <div class="callout c-info">
+    <b>التوصية المختصرة:</b> <b>(أ)</b> أصلِح الآن — مستقلاً وبمخاطرة دنيا — العيب النشط في المطابقة + أضِف <code>roundCashToUnit</code> للموبايل.
+    <b>(ب)</b> ابدأ G4 بأعلى شريحة قيمة وأقلّها خطراً: <b>مصدر الثوابت الواحد + توليد الكود</b> (يقتل انحراف الواجهة/الخادم).
+    <b>(ج)</b> أجّل بقيّة إعادة الهيكلة (تغليف كل الحسابات) «تأجيلاً مُداراً» حتى أوّل ميزة مالية كبيرة قادمة.
+  </div>
+
+  <!-- ============ 1 ============ -->
+  <h2 id="s1">١) ما هو G4 ببساطة؟ — مثال الطبّاخين</h2>
+  <p class="lead">تخيّل مطعماً فيه عدّة طبّاخين، وكلٌّ منهم يحتفظ بنسخته الخاصّة من «وصفة الكاتشب». الطعم اليوم متطابق لأن الوصفات نُسِخت بدقّة. لكن لو احتجتَ تعديل الوصفة لاحقاً، عليك تغييرها عند <b>كل طبّاخ</b> — ولو نسيتَ واحداً، اختلف الطعم.</p>
+  <p>«محرّك المال الواحد» يعني: بدل أن تكون حسابات المال (تقريب الفكّة، توزيع البضاعة/الرسم، العمولة، تقسيم وسائل الدفع) <b>منثورةً</b> في عدّة ملفّات، نجمعها خلف <b>باب واحد</b> هو المرجع الوحيد لأي حساب مالي.</p>
+
+  <div class="diagram">
+    <div class="flowrow" style="gap:18px">
+      <div>
+        <div style="font-weight:800;color:var(--amber);margin-bottom:6px">😟 اليوم: عدّة «طبّاخين»</div>
+        <div class="box warn">order_service<small>يجمع الإجمالي يدوياً</small></div>
+        <div class="box warn">dispatch_service<small>يحسب الفكّة يدوياً</small></div>
+        <div class="box warn">reconciliation<small>يقرّب أحياناً ويغفل أحياناً</small></div>
+        <div class="box warn">money.ts (الواجهة)<small>نسخة ثانية من 250/1000</small></div>
+      </div>
+      <div class="arrow">⟸</div>
+      <div>
+        <div style="font-weight:800;color:var(--green-d);margin-bottom:6px">😌 المقترح: «شيف واحد»</div>
+        <div class="box solid" style="font-size:17px">🧱 MoneyEngine<small style="color:#dff">الوصفة الواحدة لكل حساب مالي</small></div>
+        <div style="margin-top:8px;font-size:13.5px;color:var(--muted)">تعديل الوصفة = مكان واحد فقط</div>
+      </div>
+    </div>
+    <div class="dcap">رسم ١: «وصفة المال» موزّعة على عدّة طبّاخين اليوم ← جمعها عند شيفٍ واحد يمنع اختلاف الطعم مستقبلاً.</div>
+  </div>
+
+  <!-- ============ 2 ============ -->
+  <h2 id="s2">٢) الخريطة الكاملة لأموال تووا اليوم</h2>
+  <p>تتبّع الوكلاء الكود الحيّ ورسم طبقات المال الثلاث. هذه الخريطة هي «أرض الواقع» التي يبني عليها G4:</p>
+
+  <div class="layer">
+    <div class="lh">① طبقة النواة — الدوال «النقيّة» المشتركة (الحساب الخام)</div>
+    <table>
+      <tr><th>الدالة</th><th>الموقع</th><th>ماذا تفعل</th><th>الحالة</th></tr>
+      <tr><td><code>round_cash_total</code><br><code>cash_due_for_order</code></td><td class="mono">core/cash_rounding.py:19</td><td>تقريب النقد لأقرب ٢٥٠ مِلّاً (الفكّة) — الثابت ٢٥٠ هنا</td><td><span class="tag t-ok">نقيّة ومشتركة</span></td></tr>
+      <tr><td><code>attribute_goods_fee</code><br><code>validate_sum</code> · <code>allocate</code></td><td class="mono">payments/tender_engine.py:61</td><td>توزيع المبلغ على البضاعة/الرسم (goods-first) + التحقّق من مجموع وسائل الدفع</td><td><span class="tag t-ok">نقيّة</span> · <span class="tag t-warn">allocate غير مستعملة إنتاجياً</span></td></tr>
+      <tr><td><code>resolve_provider_commission</code></td><td class="mono">core/provider_commission.py:75</td><td>عمولة المنصّة (نسبة/ثابت/شرائح) — المرجع الرسمي للعمولة</td><td><span class="tag t-ok">قانونيّة لكنها منفصلة</span></td></tr>
+      <tr><td><code>compute_delivery_fee</code><br><code>compute_browse_delivery_fee</code></td><td class="mono">orders/delivery_fee_service.py:59</td><td>رسم التوصيل (منصّة/ذاتي/فوق الحدّ) — ومعاينة نفس الرقم عند التصفّح</td><td><span class="tag t-ok">نقيّة ومتماسكة</span></td></tr>
+    </table>
+  </div>
+
+  <div class="layer">
+    <div class="lh">② طبقة الدفتر — القيد المزدوج (أين يُسجَّل المال فعلاً)</div>
+    <p style="margin:4px 0 10px"><code>payments/ledger_service.py</code> فيه ~٤٠ دالّة <code>record_*</code>، كلّها تمرّ عبر «بابٍ واحد» <code>post_journal</code> الذي يفرض توازن القيد <b>(مجموع المدين = مجموع الدائن)</b> + ≥ ساقَين + عدم سالبية، ومحميّ أيضاً على مستوى قاعدة البيانات بـ<b>٣ حُرّاس</b> (CHECK غير السالبية، CHECK أحادي الجانب <code>aa73</code>، Trigger توازن <code>aa43</code>).</p>
+    <div class="badge-row">
+      <span class="tag t-info">CASH_IN_TRANSIT_{driver}</span><span class="tag t-info">PLATFORM_REVENUE</span><span class="tag t-info">PLATFORM_ESCROW</span>
+      <span class="tag t-info">PROVIDER_PAYABLE_{prov}</span><span class="tag t-info">CUSTOMER_WALLET_{id}</span><span class="tag t-info">DRIVER_TIP_CLEARING/PAYABLE</span>
+      <span class="tag t-info">PROVIDER_COMMISSION_RECEIVABLE</span><span class="tag t-info">CUSTOMER_NOSHOW_RECEIVABLE</span><span class="tag t-info">TAX_PAYABLE</span><span class="tag t-info">… ~24 حساباً</span>
+    </div>
+    <p class="legend">ملاحظة دقيقة: أسماء الحسابات «نصّية» تُنشأ عند الطلب (لا سجلّ مركزي مُلزِم) — أيُّ خطأ إملائي يُنشئ حساباً جديداً صامتاً (مرشَّح للتحسين ضمن G4).</p>
+  </div>
+
+  <div class="layer">
+    <div class="lh">③ طبقة المستهلِكين — من يستدعي الحساب ومتى (المسارات الحيّة)</div>
+    <div class="diagram" style="border-style:solid;border-color:var(--line);background:#fff">
+      <div class="flowrow">
+        <span class="box">🛒 إنشاء الطلب<small>order_service</small></span><span class="arrow">→</span>
+        <span class="box">رسم التوصيل<small>compute_delivery_fee</small></span><span class="arrow">→</span>
+        <span class="box warn">جمع الإجمالي يدوياً<small>goods+fee+tip</small></span><span class="arrow">→</span>
+        <span class="box">تسجيل وسائل الدفع<small>record_order_tenders</small></span>
+      </div>
+      <div class="flowrow" style="margin-top:12px">
+        <span class="box sec">💵 تحصيل نقدي<small>dispatch_service</small></span><span class="arrow">→</span>
+        <span class="box">attribute_goods_fee + round_cash_total</span><span class="arrow">→</span>
+        <span class="box solid">📒 post_journal<small>قيد متوازن</small></span>
+      </div>
+      <div class="flowrow" style="margin-top:12px">
+        <span class="box sec">👛 محفظة / تسوية / لا-حضور / بقشيش / دفع جزئي / استلام ذاتي</span><span class="arrow">→</span>
+        <span class="box solid">📒 post_journal</span>
+      </div>
+      <div class="dcap">رسم ٢: كل حدث مالي يبدأ من مُستهلِك، يمرّ بحساب، وينتهي عند الدفتر. المشكلة: «جمع الإجمالي» و«اشتقاق النقد» مكرّران في عدّة مستهلكين بدل دالّة واحدة.</div>
+    </div>
+  </div>
+
+  <div class="kpi">
+    <div class="k"><b>4</b><span>دوال نواة نقيّة</span></div>
+    <div class="k"><b>~40</b><span>دالّة قيد في الدفتر</span></div>
+    <div class="k"><b>~24</b><span>حساب محاسبي</span></div>
+    <div class="k"><b>3</b><span>حُرّاس قاعدة بيانات</span></div>
+    <div class="k"><b>40+</b><span>ملف واجهة يستورد money.ts</span></div>
+  </div>
+
+  <!-- ============ 3 ============ -->
+  <h2 id="s3">٣) المبعثَر اليوم مقابل المحرّك الواحد</h2>
+  <div class="diagram">
+    <div class="grid g2" style="text-align:right">
+      <div>
+        <div style="font-weight:800;color:var(--amber);text-align:center;margin-bottom:10px">⛅ الآن: منطق صحيح لكنه منثور</div>
+        <div class="box warn" style="display:block">order_service — جمع الإجمالي + تحقّق وسائل الدفع يدوياً</div>
+        <div class="box warn" style="display:block">dispatch_service — الفكّة + دلتا التقريب يدوياً</div>
+        <div class="box warn" style="display:block">reconciliation — يقرّب في موضع ويُغفِل في موضعَين</div>
+        <div class="box warn" style="display:block">no-show / partial / errand — يحسبون التقسيم يدوياً</div>
+        <div class="box risk" style="display:block">money.ts — نسخة ثانية من 250/1000 + التقريب</div>
+        <div class="box risk" style="display:block">money.dart — لا يملك التقريب أصلاً (نسخة ثالثة محتملة)</div>
+      </div>
+      <div>
+        <div style="font-weight:800;color:var(--green-d);text-align:center;margin-bottom:10px">🌟 المقترح: محرّك واحد + مصدر ثوابت واحد</div>
+        <div class="box solid" style="display:block;font-size:16px">contracts/money.spec.json<small style="color:#dff">250 · 1000 · decimals=3 · largest-remainder · half-even</small></div>
+        <div class="arrow" style="display:block">↓ يُولِّد ↓</div>
+        <div class="flowrow">
+          <span class="box">cash_rounding.py (Python)</span>
+          <span class="box">money.ts (الواجهة)</span>
+          <span class="box">money.dart (الموبايل)</span>
+        </div>
+        <div class="arrow" style="display:block">↓ يلتفّ حوله ↓</div>
+        <div class="box solid" style="display:block">🧱 MoneyEngine — quote_order_money() · settle_order_money()</div>
+        <div class="arrow" style="display:block">↓ يستدعي ↓</div>
+        <div class="box sec" style="display:block">📒 LedgerService.post_journal (يبقى كما هو)</div>
+      </div>
+    </div>
+    <div class="dcap">رسم ٣: G4 لا يُعيد كتابة الحساب — بل يُغلِّف الدوال النقيّة الموجودة خلف بابٍ واحد، ويُولِّد الثوابت لكل اللغات من مصدرٍ واحد. النتيجة: استحالة الانحراف بنيوياً.</div>
+  </div>
+
+  <!-- ============ 4 ============ -->
+  <h2 id="s4">٤) التتبّع العميق: كل تأثير جانبي وتشعّب وخطر انحراف</h2>
+  <p>هذه نتائج شبكة الوكلاء — مرتّبة من الأهمّ، كلٌّ بدليل <code>file:line</code> (محقّقة بقراءة مباشرة للكود):</p>
+
+  <h3>أ) نقاط الحساب اليدوي (مصادر الانحراف التي يحلّها G4)</h3>
+  <table>
+    <tr><th>#</th><th>الانحراف</th><th>الموقع (دليل)</th><th>الأثر</th></tr>
+    <tr><td>1</td><td>إنشاء الطلب يتحقّق من مجموع وسائل الدفع <b>بكود يدوي</b> بدل استدعاء <code>validate_sum</code> الموجودة</td><td class="mono">order_service.py:~1041-1061</td><td><span class="tag t-risk">أعلى خطر</span> المحرّك النقيّ موجود لكن المسار يتجاوزه</td></tr>
+    <tr><td>2</td><td>تكوين «الإجمالي الكبير» <code>total + delivery_fee (+tip)</code> مكرّر خاماً في ~١٣ موضعاً (لا دالّة <code>grand_total</code> واحدة)</td><td class="mono">order_service · ledger_service · refund_router · reconciliation · batching …</td><td><span class="tag t-warn">تكرار واسع</span></td></tr>
+    <tr><td>3</td><td>المطابقة تُقرّب في موضع وتُغفِل في آخر (الفكّة): سطر ١٢٢ يقرّب، بينما ١٠٤/٢٥١ يجمعان دون تقريب</td><td class="mono">reconciliation_service.py:104,122,251</td><td><span class="tag t-risk">صنف عدم اتساق</span></td></tr>
+    <tr><td>4</td><td>دلتا تقريب الفكّة محسوبة يدوياً بدل <code>cash_rounding_delta</code> الموجودة</td><td class="mono">dispatch_service.py:~2018</td><td><span class="tag t-warn">تكرار</span></td></tr>
+    <tr><td>5</td><td><b>٤ محرّكات نسبة مئوية</b> مستقلّة: عمولة المزوّد (قانونية) + الوكيل + الحوافز + الضريبة كلٌّ يكتب <code>×bps//10000</code></td><td class="mono">provider_commission:56 · settlement/service:277 · bonus/service:126 · tax_service:18</td><td><span class="tag t-warn">تكرار خوارزمية</span></td></tr>
+    <tr><td>6</td><td><code>allocate</code> (توزيع وسائل الدفع) <b>لا مستدعي إنتاجي لها</b> — اختبارات فقط</td><td class="mono">tender_engine.py:76</td><td><span class="tag t-info">جاهزة لكن نائمة</span></td></tr>
+    <tr><td>7</td><td>حساب النقاط (mills↔points) منثور في عدّة مواضع</td><td class="mono">loyalty redemption/service/ops_router</td><td><span class="tag t-warn">تكرار</span></td></tr>
+  </table>
+
+  <h3>ب) مخاطر تكامل الدفتر (طبقة القيد)</h3>
+  <table>
+    <tr><th>الخطر</th><th>الشرح</th><th>دليل</th></tr>
+    <tr><td><span class="tag t-risk">تباعُد التقسيم</span></td><td><code>attribute_goods_fee</code> هي «المصدر الواحد» للتقسيم، لكنها تُستخدم فقط في مسار SPLIT/المحفظة/البطاقة. قيود <b>لا-حضور / محفظة-لا-حضور / دفع جزئي / مشاوير</b> تحسب التقسيم <b>يدوياً</b> → قد تتباعد.</td><td class="mono">ledger_service.py:240,268,332,503</td></tr>
+    <tr><td><span class="tag t-warn">حساب مُحمَّل بأكثر من معنى</span></td><td><code>CUSTOMER_NOSHOW_RECEIVABLE</code> يُستعمل أيضاً لِعجز «الدفع الجزئي» — خلط دلالي يُفضَّل فصله/تسميته.</td><td class="mono">partial_payment_service.py:119,134</td></tr>
+    <tr><td><span class="tag t-warn">العمولة في ٤ نقاط</span></td><td><code>resolve_provider_commission</code> تُستدعى من ٤ مواضع مستقلّة، وأحدها (الدفع الجزئي) يمرّر <code>fees=0</code> — لا سلطة عمولة واحدة.</td><td class="mono">dispatch · settlement_router · provider_service · provider_settlement_router</td></tr>
+    <tr><td><span class="tag t-warn">التزام «fail-open»</span></td><td>تثبيت النقاط/البطاقة قد يضع وسيلة الدفع «CAPTURED» بينما لم يُكتب القيد — يُكتشف لاحقاً فقط بـ<code>TENDER_LEDGER_DRIFT</code>.</td><td class="mono">reconciliation_service.py:265</td></tr>
+  </table>
+  <div class="callout c-info"><b>خلاصة الدفتر:</b> الدفتر نفسه نظيف ومحميّ جيّداً ويجب أن <b>يبقى منفصلاً</b>؛ مهمّة G4 ليست ابتلاعه بل أن يملك <b>خطوة تقسيم/عمولة واحدة موثوقة</b> تبني سيقان القيد مرّة واحدة ثم تستدعي <code>post_journal</code>. هكذا يصير الدفتر «مصرف القيود» للمحرّك، ويصير المحرّك «المصدر الوحيد» لكيفية تقسيم مال أيّ طلب.</div>
+
+  <h3>ج) تطابق الواجهة ↔ الخادم ↔ الموبايل (ثلاثيّ اللغات)</h3>
+  <table>
+    <tr><th>القاعدة</th><th>Python (cash_rounding.py)</th><th>TypeScript (money.ts)</th><th>Dart (money.dart)</th><th>متطابق؟</th></tr>
+    <tr><td>وحدة الفكّة النقدية</td><td class="mono">CASH_ROUNDING_UNIT_MINOR=250</td><td class="mono">=250</td><td class="mono">مفقود ✗</td><td><span class="tag t-risk">انحراف الموبايل</span></td></tr>
+    <tr><td>مِلّ لكل دينار</td><td class="mono">1000 (ضمنيّ)</td><td class="mono">MINOR_PER_LYD=1000</td><td class="mono">minorPerLyd=1000</td><td><span class="tag t-ok">نعم</span></td></tr>
+    <tr><td>عدد الخانات العشرية</td><td class="mono">3</td><td class="mono">MONEY_DECIMALS=3</td><td class="mono">moneyDecimals=3</td><td><span class="tag t-ok">نعم</span></td></tr>
+    <tr><td>خوارزمية التقريب</td><td class="mono">((m+125)//250)*250</td><td class="mono">round(m/250)*250</td><td class="mono">مفقودة ✗</td><td><span class="tag t-warn">Py≡TS، Dart مفقود</span></td></tr>
+    <tr><td>دالّة التقريب</td><td class="mono">round_cash_total</td><td class="mono">roundCashToUnit</td><td class="mono">مفقودة ✗</td><td><span class="tag t-risk">انحراف الموبايل</span></td></tr>
+  </table>
+  <p class="legend">✅ تحقّقتُ بنفسي: نتيجة <code>Python ((m+125)//250)*250</code> ونتيجة <code>TS Math.round(m/250)*250</code> <b>متطابقتان</b> لكل القيم المختبَرة (0→0، 125→250، 375→500، 1125→1250…). الموبايل آمن اليوم لأنه يستقبل <code>cash_due_minor</code> مقرَّباً من الخادم — لكن لو احتاج التقريب محلياً (وضع غير متّصل / معاينة) فلا يملك الأداة.</p>
+
+  <h3>د) بوابات الأعلام على مسارات المال</h3>
+  <div class="badge-row">
+    <span class="tag t-info">split_payment_enabled — تقسيم الدفع (order_service:1040)</span>
+    <span class="tag t-risk">production_payment_enabled — مختوم (البطاقة/الصرف)</span>
+    <span class="tag t-info">loyalty_redemption_enabled — ساق النقاط (order_service:1047)</span>
+    <span class="tag t-info">errand_enabled — تسوية المشاوير (dispatch:1733)</span>
+  </div>
+
+  <!-- ============ 5 ============ -->
+  <h2 id="s5">٥) العيب النشط الوحيد + فجوة الموبايل (يُفضَّل إصلاحهما الآن)</h2>
+
+  <div class="callout c-risk">
+    <b>🐞 العيب النشط (تدقيق، لا مال):</b> «المطابقة» تُطلِق إنذار <code>CASH_AMOUNT_MISMATCH</code> كاذباً على كل طلب «دفع جزئي».
+    المال صحيح (العجز مُتتبَّع كـ<code>CustomerDebt</code>)، لكنّ لوحة العمليّات تمتلئ بإنذارات وهميّة → ضجيج تدقيق يُخفي الإنذارات الحقيقية.
+  </div>
+
+  <div class="card">
+    <h4>لماذا يحدث؟ (بالأدلّة)</h4>
+    <div class="seq">
+      <div class="step">في الدفع الجزئي يُسجَّل <code>CashCollection.amount_minor = collected_minor</code> (المبلغ <b>الناقص</b> فعلاً) — <span class="mono">partial_payment_service.py:100-104</span></div>
+      <div class="step">المطابقة تتوقّع للطلب النقدي المُسلَّم: <code>round_cash_total(total+fee)+tip</code> (الإجمالي <b>الكامل</b>) — <span class="mono">reconciliation_service.py:122</span></div>
+      <div class="step bad">بما أن المُحصَّل ناقص ≠ المتوقَّع الكامل → يُنشَأ إنذار <code>CASH_AMOUNT_MISMATCH</code> — <span class="mono">reconciliation_service.py:124</span></div>
+      <div class="step bad">المطابقة تستثني <code>SELF_PICKUP</code> فقط (سطر 89)، ولا تعرف شيئاً عن «الدفع الجزئي» → لا استثناء.</div>
+    </div>
+    <p><b>الإصلاح المقترح (صغير، منفصل عن G4):</b> أن تُدرِك المطابقة طلبات الدفع الجزئي (أو تطرح العجز المُسجَّل <code>CustomerDebt</code>) قبل المقارنة — تماماً كما تستثني الاستلام الذاتي. <span class="tag t-ok">مخاطرة دنيا · قيمة عالية للتدقيق</span></p>
+  </div>
+
+  <div class="card">
+    <h4>📱 فجوة الموبايل (تقوية تطابق)</h4>
+    <p>إضافة الثابت <code>CASH_ROUNDING_UNIT_MINOR=250</code> ودالّة <code>roundCashToUnit</code> إلى <code>money.dart</code> (مطابقة لِـ Python/TS) — تمنع ظهور «نسخة ثالثة» من الخوارزمية لو احتاجها أيّ مطوّر مستقبلاً. مثاليّاً تُولَّد لاحقاً من «مصدر الثوابت الواحد» في G4.</p>
+  </div>
+
+  <!-- ============ 6 ============ -->
+  <h2 id="s6">٦) أفضل الحلول العالمية 2026 (من البحث)</h2>
+  <p>بحثَ وكيلٌ مخصَّص عن أقوى وأحدث الممارسات الصناعية وقارَنها ببنية تووا. الخلاصات (مع المصادر في القسم ١١):</p>
+
+  <div class="grid g2">
+    <div class="card"><h4>💰 تمثيل المال = أعداد صحيحة فقط</h4>
+      نمط Martin Fowler: <b>(مبلغ صحيح + عملة + مقياس)</b>. للمنصّة: الوحدة هي «المِلّ» (مقياس=3، 1 دينار=1000). <b>تحريم العدد العشري العائم (float)</b> في القاعدة والمنطق والشبكة والاختبارات. تووا تفعل هذا بالفعل (mills) — وهو الخيار الصحيح؛ <b>لا تغيير</b>. <span class="tag t-ok">مطابق لتووا</span></div>
+
+    <div class="card"><h4>🧱 محرّك واحد + توزيع «أكبر باقٍ»</h4>
+      مركزة كل الحساب خلف واجهة واحدة. للتقسيم: خوارزمية <b>«أكبر باقٍ» (Largest-Remainder)</b> — كما في <code>dinero.js allocate</code> — تضمن ألّا يضيع أو يُختلَق مِلّ واحد (<code>Σ الأجزاء = الإجمالي</code> دائماً). تُستعمل لتقسيم العمولة/الرسم/البقشيش.</div>
+
+    <div class="card"><h4>🔢 تقريبان مختلفان بأسماء صريحة</h4>
+      <b>(1) تقريب اشتقاقي</b> (عمولة/رسم/ضريبة) → يُفضَّل <b>«تقريب المصرفيّ» (half-even)</b> لتفادي الانحياز للأعلى عبر ملايين العمليات. <b>(2) تقريب نقديّ</b> (الفكّة) → يُطبَّق <b>مرّة واحدة على الإجمالي النقديّ النهائي فقط، وللنقد فقط</b> — تماماً مثل تقريب الفرنك السويسري/الكرونة. قاعدة الفكّة ٢٥٠ في تووا هي النمط الصحيح عالمياً.</div>
+
+    <div class="card"><h4>📒 دفتر ثابت + مفتاح تعطيل التكرار</h4>
+      القيود <b>غير قابلة للتعديل/الحذف</b> (التصحيح = قيد عكسيّ) — قاعدة Modern Treasury و TigerBeetle. <code>ΣDR=ΣCR</code> داخل دالّة النشر. <b>مفتاح Idempotency</b> على كل نقطة نهاية تحرّك مالاً → إعادة الطلب على شبكة ليبية متقطّعة لا تُنشئ قيداً مزدوجاً. تووا تطبّق الثبات والتوازن فعلاً.</div>
+
+    <div class="card"><h4>🌐 مصدر حقيقة واحد عبر اللغات</h4>
+      ملفّ مواصفات واحد (<code>money.spec</code>) يحوي الثوابت والقواعد، <b>يُولَّد منه</b> كود Python/TS/Dart بدل النسخ اليدوي (مصدر أخطاء ×10 التاريخية). + <b>اختبارات عقد مشتركة</b> (نفس المتجهات في الثلاث لغات) تُفشِل البناء عند أيّ اختلاف.</div>
+
+    <div class="card"><h4>🧪 اختبارات «الخصائص» الذهبية</h4>
+      توليد آلاف المدخلات والتأكّد أن: المجموع محفوظ، لا جزء سالب، الدورة <code>format→parse</code> بلا خسارة، ومجموع العمولة+الأجرة+البقشيش لا يتجاوز قيمة الطلب أبداً. (Hypothesis/Python · fast-check/TS · Dart) — تلتقط الحالة النادرة التي تُفلِت من اختبار الوحدة.</div>
+  </div>
+
+  <div class="diagram">
+    <div style="font-weight:800;color:var(--green-d);margin-bottom:10px">رسم ٤: توزيع «أكبر باقٍ» — لا يضيع مِلّ</div>
+    <div class="flowrow">
+      <span class="box">إجمالي 100.000 ÷ 3 شركاء</span><span class="arrow">→</span>
+      <span class="box warn">كلٌّ floor = 33.333<small>المجموع 99.999 (نقص مِلّ)</small></span><span class="arrow">→</span>
+      <span class="box solid">الباقي (1 مِلّ) يُمنح لصاحب أكبر كسر<small>33.334 + 33.333 + 33.333 = 100.000 ✓</small></span>
+    </div>
+    <div class="dcap">القسمة العاديّة تخسر مِلّاً؛ «أكبر باقٍ» تُوزِّع الباقي بإنصاف وتُبقي المجموع مساوياً للإجمالي تماماً.</div>
+  </div>
+
+  <h3>الفكّة بالصورة (نمط عالميّ مثبت)</h3>
+  <div class="diagram">
+    <div class="numline">
+      <div class="bar"></div>
+      <div class="tick" style="right:6%"></div><div class="lbl" style="right:6%">7.000</div>
+      <div class="tick" style="right:38%"></div><div class="lbl" style="right:38%">7.250</div>
+      <div class="tick" style="right:70%"></div><div class="lbl" style="right:70%">7.500</div>
+      <div class="dot" style="right:22%"></div><div class="cap" style="right:22%;color:var(--red)">المحسوب 7.300</div>
+      <div class="dotr" style="right:38%"></div><div class="cap" style="right:38%;color:var(--green-d);top:-16px">المُحصَّل نقداً 7.250</div>
+    </div>
+    <div class="dcap">رسم ٥: عميل يدفع نقداً مبلغاً محسوباً 7.300 → يُقرَّب لأقرب ٢٥٠ مِلّاً = 7.250. الفرق (50 مِلّ) يُسجَّل قيداً صريحاً في حساب «تقريب النقد». المحفظة/البطاقة تدفع المبلغ الدقيق بلا تقريب.</div>
+  </div>
+
+  <!-- ============ 7 ============ -->
+  <h2 id="s7">٧) ليبيا — لماذا يناسبنا هذا التصميم</h2>
+  <div class="grid g2">
+    <div class="card"><h4>💵 النقد أولاً — بنيويّاً لا احتياطيّاً</h4>
+      ليبيا تعتمد النقد بكثافة بسبب أزمة السيولة المزمنة وفجوة الثقة في الرقمي. هيمنة COD في تووا صحيحة؛ يجب أن يكون المحرّك <b>صحيحاً تماماً بلا أيّ قناة رقميّة</b>.</div>
+    <div class="card"><h4>🪙 الفكّة ٢٥٠ مِلّاً قاعدة محليّة مبرَّرة</h4>
+      الفئات النقديّة الصغيرة شحيحة (وحدود سحب ~1000 دينار). وحدة ربع الدينار هي نظير الفكّة السويديّة/السويسريّة. <b>أبقِها قاعدة من الدرجة الأولى</b> في المواصفات.</div>
+    <div class="card"><h4>🔌 الدفع الرقمي لاحقاً عبر مُجمِّع واحد</h4>
+      عند فكّ الختم، التكامل عبر مُجمِّع <b>Plutu</b> (يكشف Sadad / Adfali / T-Lync وبطاقات محليّة خلف واجهة واحدة) أفضل من ربط كل قناة على حدة — تحت قيود العقوبات. عامِله كـ<code>PaymentProvider</code> واحد خلف <code>production_payment_enabled</code>.</div>
+    <div class="card"><h4>📈 نموّ رقميّ انفجاريّ لكنه «إضافة» لا «بديل»</h4>
+      المصرف المركزي: مدفوعات إلكترونيّة 2025 بمئات المليارات و~4.29M مستخدم تطبيق — لكنّ القنوات الدوليّة مقيّدة. المعماريّة: COD+محفظة الآن، ومحوّلات قنوات محليّة قابلة للتوصيل لاحقاً.</div>
+    <div class="card"><h4>🧾 الشفافية تبني الثقة</h4>
+      السبب الأول لانعدام الثقة في الرقمي هو غموض النزاعات/الأخطاء. الدفتر الثابت + القيود العكسيّة + مسار استرداد واضح تعالج هذا مباشرةً.</div>
+    <div class="card"><h4>💱 عملة واحدة، لا أسعار صرف مثبتة</h4>
+      <code>LYD</code> فقط بـ٣ خانات (مِلّ). الدينار متقلّب (تحرّكات تخفيض 2026) — <b>لا تُثبِّت أيّ سعر صرف</b>؛ خزّن المبالغ لا المعدّلات المشتقّة.</div>
+  </div>
+
+  <!-- ============ 8 ============ -->
+  <h2 id="s8">٨) تصميم G4 المقترح لتووا</h2>
+  <div class="card">
+    <ol>
+      <li><b>مصدر مواصفات واحد مُوَلِّد:</b> <code>contracts/money.spec.json</code> (عملة=LYD، مقياس=3، 1000، فكّة=250، توزيع=أكبر-باقٍ، تقريب=half-even، رموز الحسابات). القواعد تعيش هنا فقط.</li>
+      <li><b><code>Money</code> ككائن قيمة صحيح:</b> (مبلغ-مِلّ + عملة + مقياس)؛ تحريم الـfloat في كل مكان؛ صيغة الشبكة = أعداد مِلّ صحيحة.</li>
+      <li><b>كل تقسيم</b> (عمولة/رسم/بقشيش/دفعات) يمرّ عبر <code>allocate()</code> (أكبر باقٍ) بحارس <code>Σ=الإجمالي</code>؛ والمشتقّات بتقريب المصرفيّ.</li>
+      <li><b>الفكّة ٢٥٠</b> تُطبَّق مرّة واحدة على الإجمالي النقديّ النهائي وللنقد فقط؛ الدلتا قيد صريح في حساب <code>CASH_ROUNDING</code> مُسمّى.</li>
+      <li><b>كل حدث ماليّ</b> ينشر قيداً متوازناً ثابتاً بمفتاح Idempotency عبر <code>post_journal</code> (يبقى المصرف الوحيد للقيود).</li>
+      <li><b>CI</b> يشغّل متجهات ذهبيّة مشتركة + اختبارات خصائص في Python/TS/Dart → التطابق <b>مفروض لا مُفترَض</b>.</li>
+      <li><b>حارس lint</b> يمنع استيراد دوال المال مباشرةً إلا عبر المحرّك → يمنع الانحراف مستقبلاً.</li>
+    </ol>
+  </div>
+  <div class="diagram">
+    <div class="flowrow">
+      <span class="box solid">money.spec.json</span><span class="arrow">→ يُولِّد →</span>
+      <span class="box">Python</span><span class="box">TS</span><span class="box">Dart</span>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="flowrow">
+      <span class="box sec">MoneyEngine (تغليف الدوال النقيّة)</span><span class="arrow">→</span>
+      <span class="box">allocate + round_cash + commission</span><span class="arrow">→</span>
+      <span class="box solid">post_journal (الدفتر كما هو)</span>
+    </div>
+    <div class="dcap">رسم ٦: نقطتا اختناق فقط — «المحرّك» (كيف يُقسَّم المال) و«الدفتر» (أين يُسجَّل) — يجعلان الانحراف مستحيلاً بنيوياً.</div>
+  </div>
+
+  <!-- ============ 9 ============ -->
+  <h2 id="s9">٩) خطة التنفيذ المرحلية</h2>
+  <table>
+    <tr><th>المرحلة</th><th>العمل</th><th>المخاطرة</th><th>القيمة</th></tr>
+    <tr><td><span class="num" style="width:24px;height:24px;font-size:13px">0</span> إصلاحات مستقلّة الآن</td><td>(أ) إدراك المطابقة لطلبات الدفع الجزئي (إنهاء الإنذار الكاذب) · (ب) إضافة <code>roundCashToUnit</code>+250 للموبايل</td><td><span class="tag t-ok">دنيا</span></td><td>تدقيق نظيف + تطابق محصَّن</td></tr>
+    <tr><td><span class="num" style="width:24px;height:24px;font-size:13px">1</span> مصدر الثوابت + التوليد</td><td>إنشاء <code>money.spec.json</code> + سكربت توليد كتلة ثوابت (بين علامتَي AUTO-GENERATED) لـ Python/TS/Dart + فحص CI «المُولَّد=المصدر»</td><td><span class="tag t-ok">دنيا</span></td><td><b>الأعلى</b>: يقتل انحراف الواجهة↔الخادم</td></tr>
+    <tr><td><span class="num" style="width:24px;height:24px;font-size:13px">2</span> واجهة المحرّك (تغليف)</td><td><code>core/money_engine.py</code> يكشف <code>quote_order_money()</code>/<code>settle_order_money()</code> ويستدعي الدوال النقيّة داخلياً — <b>صفر تغيير حسابي</b> + اختبار تكافؤ ذهبيّ</td><td><span class="tag t-warn">متوسطة</span></td><td>مرجع واحد للمنطق</td></tr>
+    <tr><td><span class="num" style="width:24px;height:24px;font-size:13px">3</span> تحويل تدريجيّ</td><td>المستهلكون (order_service/dispatch/reconciliation…) يستدعون المحرّك بدل النداءات المتفرّقة — ملفّاً ملفّاً مع إبقاء الاختبارات خضراء؛ توحيد العمولة و«الإجمالي الكبير» و<code>attribute_goods_fee</code></td><td><span class="tag t-warn">متوسطة</span></td><td>إزالة كل التكرار</td></tr>
+    <tr><td><span class="num" style="width:24px;height:24px;font-size:13px">4</span> تجميد + حماية</td><td>حارس lint على الاستيراد + اختبارات الخصائص في CI للّغات الثلاث</td><td><span class="tag t-ok">دنيا</span></td><td>منع الانحراف للأبد</td></tr>
+  </table>
+  <div class="callout c-key"><b>مبدأ السلامة:</b> كل خطوة هي «تغليف + إثبات تكافؤ»، لا «إعادة كتابة منطق». قبل/بعد كل تحويل، اختبارٌ يُثبت أن مخرجات المحرّك = الدوال القديمة <b>بايتاً ببايت</b> → المخاطرة على الأرقام تبقى دنيا.</div>
+
+  <!-- ============ 10 ============ -->
+  <h2 id="s10">١٠) القرار والتوصية</h2>
+  <div class="grid g3">
+    <div class="card"><h4 style="color:var(--red)">🐞 افعل الآن</h4>
+      المرحلة 0: أصلِح الإنذار الكاذب في المطابقة + أضِف تقريب الموبايل. بنود صغيرة منفصلة عن G4، قيمتها فوريّة.</div>
+    <div class="card"><h4 style="color:var(--green-d)">🌟 ابدأ قريباً</h4>
+      المرحلة 1: «مصدر الثوابت الواحد + التوليد». أعلى قيمة، أدنى مخاطرة — تحلّ جوهر G4 (انحراف الواجهة↔الخادم) وحدها.</div>
+    <div class="card"><h4 style="color:var(--amber)">⏳ أجِّل تأجيلاً مُداراً</h4>
+      المراحل 2–4 (تغليف وتحويل شامل): لا قيمة عاجلة لأن الأرقام موحّدة اليوم؛ نفّذها عند أوّل ميزة ماليّة كبيرة قادمة تلمس هذه الدوال.</div>
+  </div>
+  <div class="callout c-info">
+    <b>لماذا هذا الترتيب؟</b> خطّتك الأصليّة أوصت بـ«تأجيل G4 مُدار» — وهذا التحليل الأعمق <b>يوافق</b> على تأجيل إعادة الهيكلة الكاملة،
+    لكنّه يكشف أن جزءاً واحداً من G4 (مصدر الثوابت الموحَّد) يستحقّ التبكير لأنّه يحلّ الخطر الحقيقي الوحيد (تكرار الثابت بين اللغات) بمخاطرة دنيا،
+    وأنّ هناك عيباً نشطاً واحداً خارج G4 تماماً يستحقّ الإصلاح الفوريّ. <b>كل ما سبق تحليلٌ وتخطيط فقط — لم يُغيَّر أيّ سطر كود، وعقود FIN-COR سليمة.</b>
+  </div>
+
+  <!-- ============ 11 ============ -->
+  <h2 id="s11">١١) مسرد مبسّط + المصادر</h2>
+  <div class="grid g2">
+    <div class="card"><h4>مسرد بلغة بسيطة</h4>
+      <ul>
+        <li><b>المِلّ (minor):</b> أصغر وحدة مال نخزّنها؛ 1 دينار = 1000 مِلّ (٣ خانات).</li>
+        <li><b>الفكّة (cash rounding):</b> تقريب النقد لأقرب ٢٥٠ مِلّاً لأن الفئات الصغيرة شحيحة.</li>
+        <li><b>القيد المزدوج:</b> كل حركة مال لها طرف مدين وطرف دائن متساويان (مجموع = صفر).</li>
+        <li><b>Idempotency:</b> مفتاح يمنع تكرار التنفيذ لو أُعيد إرسال الطلب على شبكة متقطّعة.</li>
+        <li><b>أكبر باقٍ (largest-remainder):</b> طريقة قسمة عادلة لا تخسر مِلّاً.</li>
+        <li><b>تقريب المصرفيّ (half-even):</b> تقريب يتفادى الانحياز للأعلى على المدى الطويل.</li>
+        <li><b>SSOT:</b> مصدر حقيقة واحد — قاعدة تُكتب مرّة وتُولَّد لكل اللغات.</li>
+        <li><b>المحرّك (facade):</b> «باب واحد» يلتفّ حول الدوال الموجودة دون إعادة كتابتها.</li>
+      </ul>
+    </div>
+    <div class="card"><h4>منهجيّة هذا التقرير</h4>
+      <ul>
+        <li>قراءة مباشرة للكود الحيّ: <code>cash_rounding.py</code> · <code>tender_engine.py</code> · <code>provider_commission.py</code> · <code>delivery_fee_service.py</code> · <code>reconciliation_service.py</code> · <code>partial_payment_service.py</code> · <code>money.dart</code> · <code>money.ts</code>.</li>
+        <li>٤ وكلاء فحص متوازية: تدفقات الخادم · تكامل الدفتر/التسوية · تطابق الواجهة/الموبايل · بحث عالميّ + ليبيا.</li>
+        <li>تحقّقتُ بنفسي من أقوى الادعاءات (عيب المطابقة، فجوة الموبايل، تكافؤ التقريب Py↔TS) بقراءة مباشرة.</li>
+        <li>لا كود ولا migration ولا commit — تحليل وتخطيط فقط.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>المصادر (بحث 2026)</h3>
+  <div class="card" style="font-size:14px">
+    <p class="src">• Martin Fowler — Money pattern: martinfowler.com/eaaCatalog/money.html</p>
+    <p class="src">• Modern Treasury — Floats Don't Work For Storing Cents · Enforcing Immutability · Optimistic Locking: moderntreasury.com/journal</p>
+    <p class="src">• TigerBeetle — Data Modeling (idempotency/immutability): docs.tigerbeetle.com/coding/data-modeling</p>
+    <p class="src">• Shopify Engineering — 8 Tips for Hanging Pennies (largest-remainder): shopify.engineering/eight-tips-for-hanging-pennies</p>
+    <p class="src">• dinero.js #144 / #157 — allocate + banker's rounding: github.com/dinerojs/dinero.js/issues</p>
+    <p class="src">• Cash rounding (Swiss/Swedish) — Wikipedia: en.wikipedia.org/wiki/Cash_rounding</p>
+    <p class="src">• Single Source of Truth — Wikipedia · Augment "Spec as Source of Truth": augmentcode.com</p>
+    <p class="src">• Hypothesis.works / Increment — Property-based testing</p>
+    <p class="src">• Plutu Docs (Sadad/Adfali/T-Lync): docs.plutu.ly · Qabas — Plutu &amp; Libyan e-commerce: qbs.ly</p>
+    <p class="src">• Libya Tribune — Future of Digital Payments · Libya Observer — e-transactions 313bn 2025 · The Fintech Times — Libya 2026 · IFC — Building Resilience Through DFS</p>
+    <p class="src">• The New Arab — Libya's cash crisis · Libya Herald — CBL / dinar briefings</p>
+  </div>
+
+  <div class="footer">
+    منصة تووا / Tawa — تقرير التحليل العميق لـ«G4 محرّك المال الواحد» · 2026-06-29 · تحليل وتخطيط فقط (لا كود · لا commit · FIN-COR سليم).<br>
+    مبنيّ على تتبّع الكود الحيّ + شبكة وكلاء + بحث عالميّ مع سياق ليبيا.
+  </div>
+
+</div>
+</body>
+</html>

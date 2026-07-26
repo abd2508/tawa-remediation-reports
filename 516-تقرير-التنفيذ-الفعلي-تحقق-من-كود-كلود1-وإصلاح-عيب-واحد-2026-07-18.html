@@ -1,0 +1,481 @@
+<meta charset="utf-8">
+<title>تقرير التنفيذ الفعليّ — تحقّق مباشر من كود claude1 وإصلاح عيب واحد — تقرير 516</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 78ch; color: var(--ink); }
+  p.lead { font-size: 1.06rem; color: var(--ink-muted); max-width: 68ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.86em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🔎"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1040px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.95rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 32ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 70ch; font-size: 1.04rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.65rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.76rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.78rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 54px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 1rem; color: var(--ink-muted); max-width: 76ch; margin-bottom: 24px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.95rem; max-width: 66ch; }
+  .plain b { color: var(--accent-deep); }
+  .analogy { background: var(--accent-2-tint); border: 1px dashed var(--accent-2); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; }
+  .analogy .k { font-size: 0.76rem; font-weight: 800; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .analogy p { margin: 0; font-size: 0.92rem; color: var(--ink); max-width: 66ch; }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.95rem; max-width: 68ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.95rem; max-width: 68ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+  ol.steps { margin: 10px 0; padding-inline-start: 22px; }
+  ol.steps li { margin-bottom: 9px; color: var(--ink); font-size: 0.92rem; }
+  ol.steps li b { color: var(--accent-deep); }
+  ul.simple-list { margin: 10px 0; padding-inline-start: 22px; }
+  ul.simple-list li { margin-bottom: 8px; color: var(--ink-muted); font-size: 0.92rem; }
+  ul.simple-list li b { color: var(--ink); }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; min-width: 560px; }
+  thead th { text-align: right; font-family: var(--font-display); font-weight: 700; background: var(--surface-2); color: var(--ink-muted); font-size: 0.71rem; letter-spacing: 0.03em; padding: 10px 14px; border-bottom: 1px solid var(--border); position: sticky; top: 0; }
+  tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.mono { font-family: var(--font-mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; }
+  td.center { text-align: center; }
+  td.yes { color: var(--ok-ink); font-weight: 800; text-align: center; }
+  td.no { color: var(--crit-ink); font-weight: 800; text-align: center; }
+  td.scenario { font-weight: 600; }
+  td.mitigation { color: var(--ink-muted); }
+  .evidence-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; margin: 14px 0; font-size: 0.85rem; }
+  .evidence-box .k { font-weight: 800; color: var(--accent-deep); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+  .evidence-box .row { display: flex; gap: 8px; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+  .evidence-box .row:last-child { border-bottom: none; }
+  .evidence-box .row .l { color: var(--ink-faint); min-width: 220px; flex: 0 0 auto; }
+  .evidence-box .row .v { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink); direction: ltr; unicode-bidi: isolate; }
+  .verdict-card { border-radius: 18px; padding: 26px 26px; margin: 20px 0; border: 2px solid; }
+  .verdict-card.ready { background: linear-gradient(135deg, var(--ok-bg), var(--surface)); border-color: var(--ok-border); }
+  .verdict-card .vtitle { font-size: 1.1rem; font-weight: 800; color: var(--accent-deep); margin-bottom: 6px; }
+  .final-verdict { background: linear-gradient(135deg, var(--accent-tint), var(--surface)); border: 2px solid var(--accent); border-radius: 20px; padding: 32px 30px; text-align: center; margin: 24px 0; }
+  .final-verdict .big { font-size: 3rem; margin-bottom: 10px; }
+  .final-verdict h3 { font-size: 1.25rem; color: var(--accent-deep); margin: 0 0 8px; }
+  .final-verdict p { margin: 0 auto; color: var(--ink-muted); font-size: 0.95rem; max-width: 62ch; }
+  hr.div { border: none; border-top: 1px dashed var(--border); margin: 46px 0; }
+  footer { margin-top: 72px; padding: 24px 0; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--ink-faint); text-align: center; }
+  a { color: var(--accent-deep); }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="inner">
+      <span class="kicker">🏁 مكتمل بالكامل — تقرير 516 — يُغلق سلسلة 513 → 514 → 515 من أوّلها لآخرها</span>
+      <h1>خطّة السلّة/الطلب المجمّع والمزايا الأربع — تحقّق + دمج + نشر 4/4 + تفعيل حيّ + smoke test</h1>
+      <p class="lead">
+        بدأ هذا التقرير كتحقّق من كود جلسة عمل مستقلّة (claude1) في <code>git worktree</code> منفصل، وانتهى بإكمال
+        الخطّة كاملةً: تحقّق مزدوج بالكود والاختبارات، تجربة وظيفيّة حقيقيّة على test1 (لا مجرّد قلب علَم)، دمج نظيف
+        بـ<code>master</code>، نشر على المواضع الأربعة، تفعيل <code>group_order_enabled</code> حيًّا على البيئات
+        الثلاث كلّها، وsmoke test شامل على الإنتاج بعد التفعيل. ثلاثة عيوب صغيرة اكتُشِفت أثناء العمل — أُصلِحت جميعًا.
+      </p>
+      <div class="hero-stats">
+        <div class="s"><div class="n">4/4</div><div class="l">مواضع النشر (GitHub · test1 · test.194 · الإنتاج)</div></div>
+        <div class="s"><div class="n">3/3</div><div class="l">بيئات حيّة مفعَّل عليها group_order_enabled</div></div>
+        <div class="s"><div class="n">3739</div><div class="l">اختبار خلفيّ ناجح · 0 فاشل (بعد كل الإصلاحات)</div></div>
+        <div class="s"><div class="n">1674</div><div class="l">اختبار واجهة ناجح · 0 فاشل</div></div>
+        <div class="s"><div class="n">3</div><div class="l">عيوب حقيقيّة اكتُشِفت أثناء التحقّق والتجربة — كلّها أُصلِحت</div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#discovery">كيف وُجِد عمل claude1</a>
+    <a href="#phase2a">تحقّق المرحلة 2أ — بندًا ببند</a>
+    <a href="#phase2b">تحقّق المرحلة 2ب والمرحلة 3</a>
+    <a href="#bugfix">العيب المكتشَف والمُصلَح</a>
+    <a href="#tests">نتائج الفحص الكامل</a>
+    <a href="#deeper-pass">جولة تحقّق ثانية أعمق</a>
+    <a href="#merge-deploy">الدمج + النشر على المواضع الأربعة</a>
+    <a href="#functional-trial">التجربة الوظيفيّة الحقيقيّة + التفعيل الحيّ</a>
+    <a href="#smoke-test">Smoke test شامل على الإنتاج بعد التفعيل</a>
+    <a href="#pending">ما تبقّى فعليًّا</a>
+    <a href="#final">الخلاصة</a>
+  </nav>
+
+  <section id="discovery">
+    <div class="section-eyebrow">🔎 المنهجية</div>
+    <h2>كيف عُثِر على عمل claude1 بدقّة</h2>
+    <p class="intro">لم يكن هناك سجلّ صريح بالذاكرة المشتركة (<code>~/.claude-shared-memory</code>) يوثِّق هذا العمل تحديدًا
+    (آخر تحديث مسجَّل هناك كان 2026-07-15، قبل كتابة التقريرين 514/515 بيومين). التحقّق تمّ عبر فحص مباشر للنظام:</p>
+    <ol class="steps">
+      <li><b>فحص <code>git worktree list</code></b> على الشجرة الرئيسية — كشف وجود worktree ثانٍ: <code>/home/a/Desktop/APP/platform-r516-exec</code> على فرع <code>feat/r516-execution</code>، مبنيّ فوق نفس نقطة الأساس (<code>ec06e91</code>) التي كانت فيها الشجرة الرئيسية لحظة الانتهاء من دفعة R511 (18:48، 2026-07-17) — أي قبل كتابة 514 (22:33) و515 (22:51) بساعات قليلة.</li>
+      <li><b>تطابق عدد الملفّات:</b> <code>git status --short</code> داخل ذلك الـworktree أظهر <b>59 ملفًّا</b> غير محفوظة بالضبط — نفس العدد المذكور حرفيًّا بتقرير 514 ("الفحص الأساسيّ... على شجرة العمل الحاليّة التي تحوي الـ59 ملفًّا غير المحفوظة").</li>
+      <li><b>مطابقة أسماء الاختبارات:</b> خمسة ملفّات اختبار جديدة باسم <code>test_r516_*.py</code> تؤكِّد أن هذا هو تنفيذ خطّة 514/515 تحديدًا (لا عمل آخر غير مرتبط).</li>
+    </ol>
+    <div class="plain">
+      <div class="ic">✅</div>
+      <p><b>لا شيء ضاع ولا شيء تعارض:</b> عملي بالشجرة الرئيسية (دمج دفعة i18n، الفروع، إلخ) لم يمسّ هذا الـworktree
+      إطلاقًا — كل عمليّة <code>git checkout</code> نفَّذتها كانت على الشجرة الرئيسية فقط، والـworktree المنفصل يعيش
+      بمعزل تامّ فعليًّا (تأكَّدتُ عبر <code>git reflog</code> أنه لا توجد أيّ عمليّة تصفير/إسقاط تمسّ التزامات غير محفوظة).</p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="phase2a">
+    <div class="section-eyebrow">✅ تحقّق مباشر</div>
+    <h2>المرحلة 2أ — الإصلاحات الأساسيّة الثمانية (تقرير 515)</h2>
+    <p class="intro">كل بند فُحِص عبر <code>git diff</code> مباشرة مقابل نقطة الأساس، لا افتراضًا من رسائل الالتزام أو التعليقات.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>البند (من 515)</th><th>الحالة</th><th>الدليل من الكود الفعليّ</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">حقل "السعر المُتوقَّع لحظة الإضافة للسلّة"</td><td class="yes">✓ منفَّذ</td><td class="mono">expected_unit_price_minor (orders/schemas.py) — سياسة دقيقة: يُرفَض فقط إن ارتفع السعر، يُسمَح صامتًا إن انخفض أو تساوى، يُتجاوَز لعميل جوّال قديم لا يرسله (توافق خلفيّ)</td></tr>
+          <tr><td class="scenario">ربط الإيقاف الطارئ بقاعدة البيانات بمسار الدفع</td><td class="yes">✓ منفَّذ</td><td class="mono">carts/router.py — فحص feature_toggles الحيّ قبل أيّ معالجة دفع مجمَّع</td></tr>
+          <tr><td class="scenario">إصلاح حساب حالة/إجماليّ المجموعة (رفض/مهلة كحالات نهائيّة)</td><td class="yes">✓ منفَّذ بدقّة</td><td class="mono">carts/service.py — دالّة <code>_is_terminal_failed()</code> جديدة تُغطّي REJECTED_BY_PROVIDER/EXPIRED/SUBSTITUTION_REJECTED_CANCELLED/DISPUTE_RESOLVED/RETURNED، لا فقط "CANCELLED" كسابقًا</td></tr>
+          <tr><td class="scenario">فرض "طلب فرعيّ واحد لكلّ مزوّد" بمستوى الخدمة</td><td class="yes">✓ منفَّذ</td><td class="mono">carts/service.py — خطأ صريح <code>DUPLICATE_PROVIDER_IN_GROUP</code>، لا يثق بفحص نقطة الدخول فقط</td></tr>
+          <tr><td class="scenario">تمرير حقل الجدولة عبر السلّة المجمَّعة</td><td class="yes">✓ منفَّذ</td><td class="mono">carts/service.py يستدعي <code>_parse_scheduled_for(sub.scheduled_for)</code> قبل إنشاء كل طلب فرعيّ</td></tr>
+          <tr><td class="scenario">تجديد مفتاح منع التكرار تلقائيًّا + تفرّد لكل عميل</td><td class="yes">✓ أعمق من المطلوب</td><td class="mono">migration ab41 — قيد تفرّد <code>(customer_id, idempotency_key)</code> بدل المفتاح وحده؛ <code>GroupIdempotencyConflictError</code> صريح عند إعادة استخدام المفتاح بمحتوى مختلف (بدل تجديد صامت قد يخفي مشكلة)</td></tr>
+          <tr><td class="scenario">إصلاح عطل تحديث الصفحة بشاشة الدفع المجمَّع</td><td class="yes">✓ منفَّذ</td><td class="mono">CartGroupCheckoutPage.tsx — دالّة <code>computeBasketSignature()</code> جديدة: مفتاح منع التكرار يتجدَّد تلقائيًّا فقط حين يتغيَّر محتوى السلّة فعليًّا، لا عند كل تحديث صفحة</td></tr>
+          <tr><td class="scenario">تصحيح خلل التزامن (رقم إصدار + معاملة مستقلّة + تأجيل الإشعار)</td><td class="yes">✓ منفَّذ بدقّة</td><td class="mono">stale_no_driver_service.py — تحديث مشروط ذرّيّ على <code>id + observed_state + observed_version</code> معًا؛ commit مستقلّ لكل طلب؛ الإشعار وتحرير المبلغ يحدثان بعد <code>await db.commit()</code> فقط، لا قبله</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tag-row"><span class="pill ok">✓ 8/8 بنود المرحلة 2أ مؤكَّدة بدليل مباشر من الكود، لا افتراضًا</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="phase2b">
+    <div class="section-eyebrow">✅ تحقّق مباشر</div>
+    <h2>المرحلة 2ب (المزايا الأربع) والمرحلة 3 (تقييم الأداء)</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>البند</th><th>الحالة</th><th>التفصيل</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">تعديل هاتف/بريد المزوّد — القرار المعلَّق بتقرير 515</td><td class="yes">✓ صُحِّح: نُفِّذ الجوابان معًا، لا جواب واحد</td><td class="mitigation"><b>تصحيح لِما ذكرته أوّلًا بهذا التقرير</b> — بمراجعة أعمق (طلب المالك تحديدًا) تبيَّن أنّ claude1 لم "يتجنَّب" السؤال الصعب بل نفَّذ <b>كلا الجوابَين معًا، منفصلَين وواضحَين بالواجهة</b>: (أ) <code>contact_phone</code> — الرقم العامّ للمتجر، تعديل مباشر بلا موافقة، بقسم الإعدادات الرئيسيّ. (ب) قسم منفصل تمامًا بعنوان "🔐 بيانات حساب المالك" — هاتف/بريد <b>هويّة الحساب (تسجيل الدخول)</b> فعليًّا، عبر مسارَين حقيقيَّين مُفعَّلَين (<code>/providers/me/phone-change/request</code> و<code>/providers/me/email-change/request</code>)، يمرّان بطابور موافقة العمليّات نفسه المستخدَم لتغيير الاسم، مع إعادة فحص التفرّد لحظة الموافقة + إعادة تعيين حالة التحقّق لغير مُتحقَّق منها — بالضبط كما حذَّر 515. الحلّ الفعليّ هو: بدل التخمين بأيّ تفسير تقصده، بُنِي التفسيران معًا بتسميات واضحة تمامًا فارقة، فتُحسَم الغموض تلقائيًّا من واجهة المستخدم نفسها لا من تخمين مسبق.</td></tr>
+          <tr><td class="scenario">مهلة السلّة (نطاق سعر/مخزون فقط، كما صُحِّح بـ515)</td><td class="yes">✓ منفَّذ</td><td class="mitigation"><code>CartCountdown.tsx</code> + <code>useCartExpiry.ts</code> جديدان — عدّاد يعتمد على "وقت انتهاء" من الخادم، لا عدّاد محليّ متناقص (يُصلِح بالضبط سيناريو "الخلفيّة تُبطئ المؤقّتات" المذكور بـ515)</td></tr>
+          <tr><td class="scenario">شارة "جزء من مجموعة" بلوحة العمليّات</td><td class="yes">✓ منفَّذ</td><td class="mitigation">operations_router.py (+161 سطر) يُرسِل رقم المجموعة الآن للواجهة</td></tr>
+          <tr><td class="scenario">توحيد قسم الإشعارات (العميل/السائق)</td><td class="yes">✓ منفَّذ</td><td class="mitigation"><code>NotificationPreferences.tsx</code> مكوّن مشترك جديد، مُستخدَم بصفحتَي العميل والسائق (اللغة استُبعِدت من التوحيد كما حذَّر 515)</td></tr>
+          <tr><td class="scenario">صفحة تقييم الأداء (المرحلة 3 الكاملة)</td><td class="yes">✓ منفَّذة كاملة</td><td class="mitigation">3 هجرات (ab41→ab42→ab43، سلسلة صحيحة بلا تعارض) + نموذج + خدمة تجميع + cron + راوتر + صفحة واجهة. <b>الصلاحيّات سُجِّلت بنفس اللحظة بالضبط</b> التي أُضيف فيها المسار (opsAccess.ts + opsNav.ts + opsRouter.tsx بنفس الالتزام) — تمامًا كما حذَّر 515 من نسيانها.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="bugfix">
+    <div class="section-eyebrow">🐞 اكتُشِف أثناء التحقّق</div>
+    <h2>العيب الوحيد المكتشَف — نصّ إنجليزيّ ثابت في صفحة تقييم الأداء الجديدة</h2>
+    <p class="intro">الفحص الشامل لواجهة الويب (1673 اختبارًا) أظهر فشلًا واحدًا فقط: اختبار "الحاجز التلقائيّ" ضدّ نصوص جديدة
+    غير مُترجَمة. نفس نمط العيب الذي عولِج عشرات المرّات بجلسة i18n اليوم بالتحديد: مكوّن فرعيّ (<code>TrendChart</code>
+    برسم بيانيّ SVG) استُخدِم بداخله <code>t()</code> ضمنيًّا عبر aria-label ثابت، لكن دون أن يملك المكوّن الفرعيّ
+    نفسه خطّاف <code>useTranslation()</code> الخاصّ به.</p>
+    <div class="warn-box">
+      <div class="ic">🐞</div>
+      <p><b>العيب بالضبط:</b> <code>OpsPerformanceEvaluation.tsx:68</code> — <code>aria-label="composite score trend"</code>
+      نصّ إنجليزيّ ثابت غير مُترجَم، بمكوّن <code>TrendChart</code> الذي لا يملك <code>useTranslation()</code>.</p>
+    </div>
+    <div class="plain">
+      <div class="ic">✅</div>
+      <p><b>الإصلاح المطبَّق فورًا:</b> أُضيف <code>const {"{ t }"} = useTranslation();</code> لأعلى دالّة <code>TrendChart</code>،
+      واستُبدِل النصّ الثابت بـ<code>t("ops.performance.trend")</code> — مفتاح موجود أصلًا بنفس الملفّ بنفس المعنى
+      ("اتجاه الدرجة المركّبة" / "Composite Score Trend" / "Tendance du score composite")، فلم تكن هناك حاجة لمفتاح جديد.
+      أُعيد تشغيل الاختبار المعنيّ فورًا: <b>نجح</b>. أُعيد typecheck: 0 خطأ.</p>
+    </div>
+    <div class="tag-row"><span class="pill ok">✓ عيب واحد صغير، أُصلِح خلال دقائق، تحقّق فوريّ نجح</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="tests">
+    <div class="section-eyebrow">🧪 الفحص الكامل — بعد الإصلاح</div>
+    <h2>نتائج التشغيل الحيّ الكامل داخل worktree التنفيذ</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الفحص</th><th>النتيجة</th><th>التفصيل</th></tr></thead>
+        <tbody>
+          <tr><td>الاختبارات الخلفيّة الكاملة</td><td class="yes">✓ نجاح</td><td>3737 ناجحًا، 4 متجاوَزة، <b>0 فاشل</b> (شامل 30 اختبارًا جديدًا خاصًّا بـ<code>test_r516_*.py</code>)</td></tr>
+          <tr><td>فحص الأنواع (Web TypeScript)</td><td class="yes">✓ نجاح</td><td>0 خطأ</td></tr>
+          <tr><td>Lint (Web)</td><td class="yes">✓ نجاح</td><td>0 خطأ، 7 تحذيرات موجودة مسبقًا غير متعلّقة (مطابقة تمامًا لما بالشجرة الرئيسية)</td></tr>
+          <tr><td>اختبارات الواجهة الكاملة (Vitest)</td><td class="yes">✓ نجاح بعد الإصلاحَين</td><td>214 ملفّ اختبار، <b>1674 ناجحًا، 0 فاشل</b> (كان 1 فاشلًا قبل إصلاح النصّ الثابت، ثمّ أُضيف اختبار تغطية جديد للزرّ الجديد بـHomePage — راجع قسم "جولة تحقّق ثانية" أدناه)</td></tr>
+          <tr><td>سلسلة الهجرات (ab40→ab41→ab42→ab43)</td><td class="yes">✓ سليمة</td><td><code>alembic history</code> تُظهِر سلسلة خطّيّة صحيحة بلا تفرّع أو تعارض</td></tr>
+          <tr><td>ختم سلامة العقود (FIN-COR)</td><td class="yes">✓ لم يُمَسّ</td><td>بصمتا <code>feature_flags.yaml</code> و<code>launch_gates.yaml</code> مطابقتان تمامًا للمرجع الرسميّ</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="deeper-pass">
+    <div class="section-eyebrow">🔬 جولة تحقّق ثانية — بطلب صريح لمزيد من الدقّة</div>
+    <h2>جولة إكمال ومراجعة أعمق — 3 اكتشافات إضافيّة</h2>
+    <p class="intro">بطلب مباشر لمزيد من الدقّة، أُعيد فحص الكود بعمق أكبر: تحقّق حيّ من الهجرات على قاعدة بيانات
+    حقيقيّة (لا افتراضًا من سلامة السلسلة فقط)، ومراجعة كل "ملاحظة جانبيّة" ذكرها تقرير 515، ومراجعة دقيقة لقرار
+    هاتف/بريد المزوّد أعلاه (الذي صُحِّح). ثلاثة اكتشافات إضافيّة:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الاكتشاف</th><th>الإجراء</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">فجوة تغطية اختبار حقيقيّة: زرّ "اتصل بنا" الجديد بـ<code>HomePage.tsx</code> أُضيف فعليًّا (تقرير 514، المرحلة 1)، لكنّ <code>HomePage.test.tsx</code> — رغم أنّ 514 نصَّ صراحة على تحديثه بسطر واحد — لم يُحدَّث إطلاقًا</td><td class="mitigation">✅ أُضيف اختبار جديد يتحقّق من ظهور الزرّ بالنصّ الصحيح ومن عدم انهياره عند الضغط. أُعيد تشغيله: نجح (10/10 بالملفّ).</td></tr>
+          <tr><td class="scenario">الهجرات (ab41→ab42→ab43) كانت مُتحقَّقًا منها فقط عبر سلامة السلسلة النصّيّة (<code>alembic history</code>)، لا التشغيل الفعليّ على قاعدة بيانات حقيقيّة</td><td class="mitigation">✅ نُسِخت قاعدة بيانات test1 الحيّة لقاعدة تجريبيّة معزولة تمامًا (<code>r516_scratch_verify</code>، أُنشِئت وحُذِفت بهذه الجلسة فقط)، وشُغِّل <code>alembic upgrade head</code> ثمّ <code>alembic downgrade ab40</code> عليها فعليًّا داخل حاوية مؤقّتة على نفس شبكة docker — <b>كلاهما نجح بلا أخطاء</b>.</td></tr>
+          <tr><td class="scenario">ملاحظتان جانبيّتان (لا ثالثة) من "الاكتشافات الجانبيّة" بتقرير 515 — هل عُولجتا؟</td><td class="mitigation">✅ الاثنتان الأوليان (تناقض توثيق غرامة تخلّي السائق + دمج تنبيهات "لا يوجد سائق" لعدّة طلبات مختلفة بالخطأ) عُولجتا فعليًّا كتحسين إضافيّ آمن (تعليق مصحَّح بدقّة + مفتاح إلغاء تكرار التنبيه بات يتضمّن معرِّف الطلب لا نوع الحدث فقط). الملاحظة الثالثة (احتساب الضريبة) <b>تُركت كما هي عمدًا وبحق</b> — 515 نفسه نصَّ على أنها تحتاج مراجعة منفصلة مع فريق المحاسبة، لا تعديلًا مباشرًا.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="analogy">
+      <div class="k">اكتشاف إضافيّ لطيف غير مطلوب صراحة</div>
+      <p>نفس نمط إصلاح خلل التزامن (المرحلة 2أ، البند 8) طُبِّق أيضًا على خدمة أخرى مشابهة تمامًا
+      (<code>accept_timeout_service.py</code> — الرفض التلقائيّ للطلبات المتأخّرة على المزوّد) لم يذكرها 515 صراحةً،
+      لكنها كانت عرضة لنفس فئة الخلل بالضبط (قراءة الصفّ الكامل ثم تعديله بخطوتَين منفصلتَين). تعميم استباقيّ جيّد للنمط
+      الآمن نفسه.</p>
+    </div>
+    <div class="tag-row"><span class="pill ok">✓ فحص أعمق مكتمل — عيب تغطية اختبار واحد أُصلِح، هجرات مُتحقَّق منها حيًّا (up+down)، لا عيوب منطقيّة إضافيّة</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="merge-deploy">
+    <div class="section-eyebrow">🔀 إكمال — نفس اليوم، بإذن صريح "نعم أكمل"</div>
+    <h2>الدمج + النشر على المواضع الأربعة</h2>
+    <p class="intro">التعارض الخمسة المتوقَّعة أعلاه حُلَّت فعليًّا بقراءة الكود من الجهتين (لا دمج أعمى)، ثم نُشِر العمل
+    كاملًا على كل موضع.</p>
+    <ul class="simple-list">
+      <li><b>حلّ التعارض:</b> ملفّات i18n الثلاثة (<code>ar.json</code>/<code>en.json</code>/<code>fr.json</code>) دُمِجت
+      بسكربت Python عميق (دمج شجريّ حقيقيّ) — 0 تعارض ورقة حقيقيّ (الجهتان أضافتا مفاتيح منفصلة فقط). <code>OpsNameChangeRequests.tsx</code>
+      (3 نقاط) — أُبقيَ على كود claude1 في كل مرّة لأنه كان الأصحّ فعليًّا (تسميات <code>fieldLabel()</code> ديناميكيّة
+      بدل تسميات "الاسم" الثابتة من دفعة i18n).</li>
+      <li><b>الالتزام والدمج:</b> <code>commit db4bd3c</code> (59 ملفًّا من claude1 + إصلاح <code>HomePage.test.tsx</code>)
+      ثم <code>commit 2a30b0a</code> (دمج master) على <code>feat/r516-execution</code>، ثم <b>fast-forward نظيف بلا
+      تعارض</b> إلى <code>master</code> بالشجرة الرئيسية.</li>
+      <li><b>تحقّق كامل بعد الدمج:</b> خلفيّ 3737/4/0، واجهة 214 ملفًّا/1674 اختبارًا/0 فاشل، typecheck/lint 0 خطأ، FIN-COR PASS.</li>
+      <li><b>النشر:</b> <code>push origin master</code> ← <b>test1</b> (بناء + هجرة ab40→ab43 حيّة + فحص حيّ نظيف) ←
+      <b>test/.194</b> (save/scp/load للصورتَين — <code>docker compose build</code> يفشل صامتًا هناك — + هجرة تلقائيّة
+      عند إقلاع الحاوية + فحص حيّ نظيف؛ مكدّس <code>tawa-agentic-staging</code> المجاور بنفس السيرفر لم يُلمَس) ←
+      <b>الإنتاج</b> (تفصيل بالقسم التالي).</li>
+      <li><b>حادثة عابرة بلا ضرر أثناء نشر test1:</b> أمر <code>docker compose</code> بلا تحديد صريح لاسم المشروع
+      (<code>-p tawalocal</code>) أصاب سهوًا مشروعًا غريبًا موجودًا مسبقًا على نفس الجهاز باسم <code>platform</code>
+      (نفس ملفّ compose، قاعدة بيانات مختلفة تمامًا، شغّال منذ 8 أيّام لغرض غير معروف). فشل فورًا (<code>Can't locate
+      revision</code>) قبل أيّ تعديل فعليّ للبيانات — تحقَّقتُ أنّ حالته لم تتغيَّر إطلاقًا، وتُرِك بلا أيّ لمس آخر.</li>
+    </ul>
+  </section>
+
+  <hr class="div">
+
+  <section id="functional-trial">
+    <div class="section-eyebrow">🧪 تصحيح منهجيّ مهمّ — ليس مجرّد قلب علَم</div>
+    <h2>التجربة الوظيفيّة الحقيقيّة على test1 + التفعيل الحيّ على البيئات الثلاث</h2>
+    <div class="warn-box">
+      <div class="ic">⚠️</div>
+      <p><b>ملاحظة رُصِدت قبل التفعيل:</b> كل التحقّقات حتى تلك اللحظة كانت حالة-علَم + استجابات HTTP + هاش FIN-COR —
+      لا شيء منها نفَّذ طلبًا جماعيًّا حقيقيًّا فعليًّا عبر السلّة المجمَّعة. تقرير 515 صمَّم هذه الميزة لتُفعَّل بعد
+      "تجربة" فعليّة، لا مجرّد تشغيل مفتاح.</p>
+    </div>
+    <p class="intro">نُفِّذت تجربة وظيفيّة حقيقيّة كاملة على test1 عبر الـAPI الحيّ (عميل مسجَّل فعليًّا + مزوّدان
+    حقيقيّان بأصناف حقيقيّة، لا بيانات ملفَّقة):</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الفحص</th><th>النتيجة</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">إنشاء طلب جماعي حقيقيّ (مزوّدان، CASH)</td><td class="yes">✓ حساب صحيح: 60000 بضاعة + 6120 توصيل = 66120</td></tr>
+          <tr><td class="scenario">إعادة إرسال نفس المفتاح + نفس المحتوى</td><td class="yes">✓ نفس المجموعة تُرجَع، لا تكرار</td></tr>
+          <tr><td class="scenario">إعادة استخدام المفتاح بمحتوى مختلف</td><td class="yes">✓ 409 <code>IDEMPOTENCY_CONFLICT</code></td></tr>
+          <tr><td class="scenario">مزوّد مكرَّر بنفس السلّة</td><td class="yes">✓ 422 <code>DUPLICATE_PROVIDER_IN_GROUP</code></td></tr>
+          <tr><td class="scenario">رفض مزوّد واحد من اثنين (عبر endpoint الرفض الفعليّ، لا محاكاة DB)</td><td class="yes">✓ حالة المجموعة <code>PARTIALLY_FULFILLED</code>، الإجمالي الحيّ أُعيد حسابه صحيحًا (23060، يستثني الطلب المرفوض) — <b>أخطر عيب رصده 515، مؤكَّد يعمل حيًّا</b></td></tr>
+          <tr><td class="scenario">رفض المزوّدَين معًا</td><td class="yes">✓ حالة <code>CANCELLED</code>، إجمالي 0</td></tr>
+          <tr><td class="scenario">السعر ارتفع منذ إضافة السلّة</td><td class="yes">✓ يُرفَض بوضوح <code>PRICE_CHANGED</code> مع تفاصيل السعرَين</td></tr>
+          <tr><td class="scenario">السعر انخفض منذ إضافة السلّة</td><td class="yes">✓ يُقبَل بصمت بالسعر الجديد الأقلّ لصالح العميل</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="analogy">
+      <div class="k">عيب صغير غير حاجز وُجِد أثناء التجربة (ليس من R516، أقدم بكثير)</div>
+      <p>بعض رسائل <code>message_en</code> بمسار السلّة الموحّدة تحمل نصًّا عربيًّا فعليًّا بدل الإنجليزيّة — سببه كائن
+      <code>ValidationError</code> قديم أحاديّ اللغة موجود بـ<code>catalog_service.py</code> قبل هذا العمل بكثير
+      (<code>carts/router.py</code> ينفِّذ <code>message_en=str(exc)</code> دون ترجمة). تحقَّقتُ أنّ الواجهة الفعليّة
+      (<code>CartGroupCheckoutPage.tsx</code>) تقرأ <code>message_ar</code> حصرًا لهذا المسار — صفر أثر فعليّ على
+      العملاء. لم يُصلَح (خارج نطاق هذا العمل).</p>
+    </div>
+    <div class="subhead">🔓 التفعيل الحيّ — بعد إذن صريح لكل بيئة على حدة</div>
+    <ul class="simple-list">
+      <li><b>الآليّة المُختارة:</b> مفتاح <code>feature_toggles</code> عبر طبقة ADMIN(DB) (<code>set_toggle_3layer</code>
+      — نفس الكود الذي تستدعيه لوحة OPS)، <b>وليس</b> تعديل <code>contracts/feature_flags.yaml</code> — قرار صريح من
+      المالك بعد أن نبَّه advisor() إلى أنّ اليامل محميّ بختم FIN-COR ويستوجب إعادة توليد الهاش، بينما مفتاح DB
+      عكسيّ تمامًا ولا يمسّ العقد إطلاقًا.</li>
+      <li><b>test1:</b> فُعِّل ✓ — تحقُّق حيّ عبر <code>/operations/feature-flags/public</code> أظهر <code>true</code>.</li>
+      <li><b>عيب ثالث اكتُشِف حيًّا فورًا وأُصلِح:</b> نقطة <code>/operations/feature-flags/public</code> (التي تقرأ منها
+      الواجهة الأمامية لإظهار زرّ الطلب الجماعي) كانت تستخدم <code>is_enabled()</code> المتزامن (طبقة YAML فقط) لا
+      <code>is_enabled_3layer</code> — فمفتاح DB كان فعّالًا بجهة الخادم (بوّابة <code>carts/router.py</code>) لكن
+      <b>مخفيًّا تمامًا عن العميل</b> (الزرّ لا يظهر رغم تفعيل الميزة فعليًّا بقاعدة البيانات). أُصلِح
+      (<code>operations_router.py:3364</code>)، أُضيف اختبار انحدار <code>test_r516_public_flags_db_layer.py</code>
+      (اختباران)، خلفيّ كامل 3739/4/0، <code>commit 98a9bad</code> مدفوع لـ<code>origin/master</code>.</li>
+      <li><b>test/.194:</b> فُعِّل ✓ بنفس الآليّة — ظهر <code>true</code> فورًا (الإصلاح وصل مع نفس النشر، لا فجوة عرض هذه المرّة).</li>
+      <li><b>الإنتاج (tawanow.com):</b> فُعِّل ✓ بعد إذن صريح منفصل تحديدًا، وبعد تحقَّقتُ أنّ حساب <code>actor_id</code>
+      المُستخدَم على test1/.194 (Super Admin مزروع محليًّا) <b>غير موجود</b> بقاعدة الإنتاج — استُخدِم بدلًا منه حساب
+      SUPER_ADMIN حقيقيّ موثَّق (<code>+218910000001</code>، "مدير النظام"). سجلّ التدقيق يوثِّق التجربة الوظيفيّة
+      كاملةً كسبب التفعيل. هاش FIN-COR تحقَّق مطابقًا حرفيًّا (<code>25ddf010…</code>/<code>6c78dc89…</code>) قبل
+      وبعد على كل بيئة — لم يُلمَس اليامل إطلاقًا في أيّ بيئة.</li>
+    </ul>
+  </section>
+
+  <hr class="div">
+
+  <section id="smoke-test">
+    <div class="section-eyebrow">🩺 تأكيد نهائيّ حيّ</div>
+    <h2>Smoke test شامل على الإنتاج بعد التفعيل</h2>
+    <p class="intro">فحص حيّ على أربع طبقات عبر <code>tawanow.com</code> مباشرة، بعد التفعيل مباشرة:</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>الطبقة</th><th>النتيجة</th></tr></thead>
+        <tbody>
+          <tr><td class="scenario">البنية التحتيّة</td><td class="yes">✓ كل الحاويات healthy، <code>alembic ab43</code> (head)، هاش FIN-COR مطابق، <code>/api/health</code> و<code>/api/health/ready</code> سليمان</td></tr>
+          <tr><td class="scenario">الـAPI (انحدار)</td><td class="yes">✓ <code>group_order_enabled=true</code> حيًّا؛ كل نقاط R516 الجديدة محميّة صحيحًا (401 لا 500 قطّ): طلبات تغيير الاسم، تقييم الأداء، تغيير هاتف/بريد المزوّد، السلّة الموحّدة</td></tr>
+          <tr><td class="scenario">واجهة الضيف (متصفّح حقيقيّ)</td><td class="yes">✓ الصفحة الرئيسية تُعرَض بصريًّا بلا أخطاء (لقطة شاشة مؤكِّدة)، <code>/about</code> نظيفة (0 أخطاء console)، <code>/ops</code> يُعيد توجيه غير المسجَّلين بصورة صحيحة</td></tr>
+          <tr><td class="scenario">دخول OPS فعليّ حيّ (بإذن صريح للمالك)</td><td class="yes">✓ تسجيل الدخول نجح فعليًّا (حساب SUPER_ADMIN حقيقيّ)، أعاد التوجيه للوحة العمليّات — يؤكِّد المصادقة والتوجيه حسب الدور يعملان على البناء المنشور حديثًا</td></tr>
+          <tr><td class="scenario">صفحة "طلبات تعديل البيانات" الجديدة (<code>/ops/name-changes</code>)</td><td class="yes">✓ تُعرَض بصفر أخطاء، تبويبات صحيحة، حالة فارغة صادقة ("لا توجد طلبات بحالة «قيد المراجعة»")</td></tr>
+          <tr><td class="scenario">صفحة "تقييم أداء المنصة" الجديدة (<code>/ops/finance/performance</code>)</td><td class="yes">✓ تُعرَض بصفر أخطاء، تنبيه صحيح "⚠️ تجريبي — بانتظار اعتماد الأوزان"، تبويبات المدى الزمنيّ تعمل، حالة فارغة صادقة (cron التجميع لم يعمل بعد)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="plain">
+      <div class="ic">✅</div>
+      <p>عيب واجهة عابر واحد لوحِظ (خطأ شبكة <code>ERR_QUIC_PROTOCOL_ERROR</code> على اتصال SSE مستمرّ) — غير متعلّق
+      بـR516 إطلاقًا، طبيعة شبكة/بروتوكول عابرة. المسارَان الجديدان تحديدًا اكتشفتُ فيهما تخمينًا خاطئًا للمسار
+      أوّلًا (<code>/ops/name-change-requests</code> بدل الصحيح <code>/ops/name-changes</code>، ومثله لتقييم الأداء) —
+      صُحِّح بقراءة <code>opsRouter.tsx</code> مباشرة بدل الاستمرار بالتخمين.</p>
+    </div>
+    <div class="tag-row"><span class="pill ok">✓ smoke test شامل نظيف تمامًا — البنية التحتيّة + الـAPI + الواجهة كضيف + OPS بحساب فعليّ، الصفحتان الجديدتان تعملان بصفر أخطاء</span></div>
+  </section>
+
+  <hr class="div">
+
+  <section id="pending">
+    <div class="section-eyebrow">✅ مكتمل الآن</div>
+    <h2>ما تبقّى فعليًّا</h2>
+    <ul class="simple-list">
+      <li><b>لا شيء تقنيّ متبقٍّ من خطّة 515.</b> كل بند من المراحل 1/2أ/2ب/3 منفَّذ، مُتحقَّق منه بالكود والاختبارات
+      والتجربة الوظيفيّة الحقيقيّة معًا، مدموج بـ<code>master</code>، منشور على المواضع الأربعة كلّها، ومفعَّل حيًّا
+      على البيئات الثلاث الحيّة (test1/test.194/الإنتاج).</li>
+      <li><b>الملاحظة الثالثة من "الاكتشافات الجانبيّة" بتقرير 515 (احتساب الضريبة)</b> تُركت كما هي عمدًا وبحقّ — 515
+      نفسه نصَّ على أنها تحتاج مراجعة منفصلة مع فريق المحاسبة، لا تعديلًا مباشرًا. هذا الوحيد المتبقّي، وهو متروك
+      بقرار متعمَّد لا سهو.</li>
+    </ul>
+  </section>
+
+  <hr class="div">
+
+  <section id="final">
+    <div class="section-eyebrow">🏁 الخلاصة</div>
+    <h2>الخلاصة النهائيّة</h2>
+    <div class="final-verdict">
+      <div class="big">✅</div>
+      <h3>خطّة 515 مكتملة بالكامل من أوّلها لآخرها — لا نظريًّا، بل مُتحقَّق منها حيًّا على الإنتاج نفسه</h3>
+      <p>ثلاثة عيوب صغيرة اكتُشِفت أثناء التحقّق (نصّ إنجليزيّ ثابت، فجوة تغطية اختبار، ونقطة عرض عامّة لا تقرأ طبقة
+      DB) أُصلِحت جميعًا فورًا. الأهمّ: تجربة وظيفيّة حقيقيّة كاملة على test1 (طلب جماعي فعليّ، رفض مزوّد، قفل سعر)
+      أثبتت أنّ أخطر عيب رصده 515 — حساب حالة/إجماليّ المجموعة عند فشل جزئيّ — يعمل بشكل صحيح فعليًّا لا نظريًّا فقط،
+      قبل تفعيله على أيّ بيئة حيّة. الميزة الآن مفعَّلة على test1 وtest/.194 والإنتاج معًا، وSmoke test شامل بعد
+      التفعيل (بنية تحتيّة + API + واجهة ضيف + دخول OPS فعليّ + الصفحتان الجديدتان) نظيف تمامًا. FIN-COR لم يُمَسّ
+      إطلاقًا في أيّ بيئة طوال هذا العمل.</p>
+    </div>
+    <ul class="simple-list">
+      <li><b>تصحيح مهمّ أُجرِي بهذا التقرير:</b> الادّعاء الأوّل بأنّ claude1 "تجنَّب" سؤال هاتف/بريد المزوّد الحسّاس
+      كان غير دقيق — نفَّذ الجوابَين معًا بوضوح تامّ بالواجهة. صُحِّح بقسم "المرحلة 2ب".</li>
+      <li><b>تصحيح منهجيّ ثانٍ أُجرِي أثناء الإكمال:</b> صياغة سؤال الإذن الأوّل للتفعيل التجريبيّ وصفت 515 بأنه
+      "يوصي" بالتفعيل — غير دقيق؛ 515 يُلغي توصية 514 السابقة صراحةً ويجعل إتمام الإصلاحات شرط أهليّة فقط، لا توصية
+      بالتفعيل الفوريّ. صُحِّح مع المالك قبل أيّ تنفيذ.</li>
+      <li><b>عملي المنفصل (إغلاق سجلّ i18n العربي):</b> مكتمل ومنشور مسبقًا على المواضع الأربعة، لا علاقة له بهذه
+      الخطّة.</li>
+    </ul>
+  </section>
+
+  <footer>
+    تووا (Tawa) — تقرير رقم 516 · 2026-07-18 · تحقّق مباشر من كود claude1 + دمج + نشر 4/4 + تجربة وظيفيّة حقيقيّة + تفعيل حيّ + smoke test شامل — مكتمل بالكامل
+  </footer>
+
+</div>

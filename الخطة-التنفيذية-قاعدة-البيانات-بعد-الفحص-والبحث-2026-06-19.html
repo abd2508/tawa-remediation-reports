@@ -1,0 +1,150 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الخطة التنفيذيّة — قاعدة البيانات (بعد الفحص والبحث) — تووا — 2026-06-19</title>
+<style>
+ *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;background:#eef2f6;color:#1e293b;line-height:1.85}
+ .wrap{max-width:1160px;margin:0 auto;padding:0 18px 90px}
+ header{background:linear-gradient(135deg,#020617,#7c3aed 50%,#1e3a8a);color:#fff;padding:46px 28px;border-radius:0 0 26px 26px;box-shadow:0 12px 34px rgba(2,6,23,.34)}
+ header h1{margin:0 0 8px;font-size:1.75rem} header p{margin:4px 0;color:#cbd5e1}
+ .pill{display:inline-block;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);padding:3px 11px;border-radius:999px;font-size:.82rem;margin:3px 4px}
+ h2{font-size:1.4rem;margin:36px 0 12px;padding:8px 16px 8px 0;background:#fff;border-radius:10px;border-right:6px solid #7c3aed}
+ .lead{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px 22px;margin:14px 0}
+ table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.86rem;background:#fff;border-radius:10px;overflow:hidden}
+ th,td{border:1px solid #e2e8f0;padding:8px 11px;text-align:right;vertical-align:top} th{background:#7c3aed;color:#fff}
+ .item{background:#fff;border:1px solid #e2e8f0;border-right:5px solid #7c3aed;border-radius:12px;padding:13px 18px;margin:11px 0}
+ .ih{font-size:1.05rem;font-weight:700;margin-bottom:6px} .iid{background:#7c3aed;color:#fff;border-radius:6px;padding:1px 8px;font-size:.8rem}
+ .dim{display:inline-block;background:#ede9fe;color:#6d28d9;border-radius:6px;padding:1px 7px;font-size:.74rem;font-weight:600;margin-right:4px}
+ .eff{float:left;font-size:.78rem;color:#64748b;font-weight:400}
+ .r{font-size:.9rem;margin:4px 0} .r.risk{background:#fffbeb;border-radius:6px;padding:5px 9px;color:#78350f} .r.ok{color:#047857}
+ code{font-family:"Cascadia Code",Consolas,monospace;font-size:.76rem;color:#0f172a;direction:ltr;display:inline-block;unicode-bidi:embed;background:#f1f5f9;padding:0 5px;border-radius:5px}
+ .ph{background:#f5f3ff;border:2px solid #c4b5fd;border-radius:14px;padding:10px 18px;margin:22px 0 8px;font-size:1.15rem;font-weight:700;color:#6d28d9}
+ a{color:#6d28d9} .foot{margin-top:40px;padding-top:18px;border-top:1px solid #e2e8f0;font-size:.83rem;color:#64748b}
+</style></head><body>
+<header>
+ <h1>🛠️ الخطة التنفيذيّة لقاعدة البيانات — مبنيّة على الفحص العميق + بحث أحدث التقنيات</h1>
+ <p>كلّ بند مُتتبَّع إلى جذره في الكود/القاعدة، ومدعوم بأحدث تقنيات 2025-2026 — تخطيط فقط لمراجعتك</p>
+ <div style="margin-top:12px"><span class="pill">📅 2026-06-19</span><span class="pill">12 بندًا · 3 مراحل</span><span class="pill">مبنيّ على فحص حيّ</span><span class="pill">+ بحث إنترنت</span></div>
+</header>
+<div class="wrap">
+
+<div class="lead"><b>المنهجيّة:</b> فحصتُ القاعدة الحيّة (PostgreSQL 16.13، 145 جدولًا) والكود تتبّعًا كاملًا (أعمدة JSON، فهارس FK، فرض الثوابت، الأعمدة الميّتة، الـoutbox، المعرّفات)، ثمّ بحثتُ أحدث التقنيات (PG 17/18، JSONB، pg_partman، pgvector، نمط outbox، RLS). كلّ بند أدناه = <b>عيب مُتتبَّع → تغيير دقيق → ملفّات/هجرة → مخاطر → تحقّق</b>. <b>تخطيط فقط — لا تنفيذ قبل إذنك.</b></div>
+
+<h2>① التتبّع: العيب (إلى جذره) ← البند</h2>
+<table><tr><th>العيب المُتتبَّع (بالدليل)</th><th>البند</th></tr>
+<tr><td><code>providers.display_name</code> (نوع json) يُستعلَم بالمسار <code>-&gt;&gt;&#x27;ar&#x27;</code> في بحث المزوّد (<code>provider_router.py:128</code>, <code>operations_router.py:3923</code>) — لا يُفهرَس ⇒ مسح تسلسليّ</td><td><b>P1-A: JSONB + فهرس تعبيريّ</b></td></tr><tr><td>49 عمود JSON كلّها <code>json</code> النصّيّ (لا jsonb): snapshots, fraud_flags, signals_json, metadata...</td><td><b>P1-A</b></td></tr><tr><td>~43 مفتاحًا أجنبيًّا بلا فهرس داعم — منها <code>orders.address_id</code>، <code>order_items.catalog_item_id/variant_id</code>، <code>cash_collections.driver_id</code>، <b><code>wallet_transfers.sender/receiver_wallet_id</code> (جدولي الجديد)</b></td><td><b>P1-B: فهرسة FK</b></td></tr><tr><td><code>wallet_accounts.status</code>+<code>version</code> ميّتان (0 قراءة بالكود؛ version يُكتب 7 مرّات لا يُقرأ — قفل تفاؤليّ وهميّ بلا <code>version_id_col</code>)</td><td><b>P1-C: حذف الأعمدة الميّتة</b></td></tr><tr><td>توازن الدفتر (Σمدين=Σدائن) يُفرَض في <code>post_journal</code> بايثون (<code>ledger_service.py:63</code>) لا في القاعدة</td><td><b>P2-A: قيد قاعدة للدفتر</b></td></tr><tr><td>رصيد المحفظة <b>مخزَّن</b> على <code>wallet_accounts.balance_minor</code> بينما رصيد الدفتر <b>مشتقّ</b> — التطابق <code>Σ CUSTOMER_WALLET == Σ balance</code> بلا حارس قاعدة (الحارس الذي بُني استشاريّ للقراءة)</td><td><b>P2-B: حارس Σ حيّ</b></td></tr><tr><td>7 جداول append متنامية بلا تقسيم: <code>audit_log</code>(12.9k)، <code>ledger_entries</code>، <code>login_attempts</code>، <code>notification_delivery_logs</code>، <code>system_events</code>، <code>location_events</code>، <code>otp_events</code></td><td><b>P2-C: تقسيم زمنيّ</b></td></tr><tr><td><code>event_outbox</code> (نمط outbox الترانزاكشنيّ) <b>موجود في النموذج لكن بلا publisher يستنزفه</b> — أساس CDC غير مُفعَّل</td><td><b>P2-D: تفعيل الـoutbox</b></td></tr><tr><td><code>zone_suspensions.polygon_coordinates/polygon_holes</code> مضلّعات في JSON + الجغرافيا haversine بايثون + Redis GEO — لا فهرسة مكانيّة</td><td><b>P3-C: PostGIS</b></td></tr><tr><td><code>velocity_decisions.signals_json</code> + <code>wallet_topups.fraud_flags</code> — إشارات احتيال بلا ذكاء متجهيّ</td><td><b>P3-D: pgvector</b></td></tr><tr><td>134 معرّفًا <code>varchar(36)</code> بدل <code>uuid</code> أصليّ (16 بايت، مقارنة أسرع، فهارس أصغر)</td><td><b>P3-F: تقييم uuid أصليّ</b></td></tr><tr><td>PostgreSQL 16.13 — متاح 17 (vacuum/JSON_TABLE/partition) و18 (async I/O io_uring 3×، skip-scan)</td><td><b>P3-A: ترقية الإصدار</b></td></tr></table>
+
+<div class="ph">المرحلة 1 — مكاسب سريعة (مخاطرة منخفضة، قيمة عالية)</div>
+<div class="item">
+ <div class="ih"><span class="iid">P1-A</span> JSON → JSONB + فهارس تعبيريّة (لا GIN عمياء) <span class="dim">أحسن·أدقّ·أمرن</span><span class="eff">⏱ أيّام</span></div>
+ <div class="r"><b>التغيير:</b> تحويل أعمدة JSON المُستعلَمة بالمسار إلى <code>jsonb</code> (<code>ALTER COLUMN ... TYPE jsonb USING col::jsonb</code>)، وإضافة <b>فهارس تعبيريّة</b> على المفاتيح المُستعلَمة فعلًا (مثل <code>(display_name-&gt;&gt;&#x27;ar&#x27;)</code>) لا GIN كاملة (البحث يحدّد 2-3 مفاتيح فقط؛ GIN يكلّف 30-50% على الكتابة). الأولويّة: <code>providers.display_name</code> (بحث حيّ)، ثمّ بقيّة الـ49 تدريجيًّا.</div>
+ <div class="r"><b>الملفّات:</b> <code>models/provider.py</code>، <code>models/catalog.py</code>، ... + هجرة aaXX (JSONB + expression index). لا تغيير كود (jsonb متوافق مع json في القراءة).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة: <code>ALTER TABLE providers ALTER COLUMN display_name TYPE jsonb USING display_name::jsonb;</code> + <code>CREATE INDEX idx_providers_dn_ar ON providers ((display_name-&gt;&gt;&#x27;ar&#x27;));</code></div>
+ <div class="r risk"><b>المخاطر:</b> منخفضة — jsonb متوافق للقراءة؛ التحويل آمن (json نصّيّ صالح ⇒ jsonb). انتبه: فهرس تعبيريّ يجب أن يطابق صيغة الاستعلام (EXPLAIN ANALYZE للتأكّد).</div>
+ <div class="r ok"><b>التحقّق:</b> PG-validate up/down + <code>EXPLAIN ANALYZE</code> يُظهر استخدام الفهرس + بحث المزوّد لا يتغيّر سلوكه.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P1-B</span> فهرسة الـ43 FK غير المفهرسة <span class="dim">أقوى</span><span class="eff">⏱ يوم</span></div>
+ <div class="r"><b>التغيير:</b> إضافة فهرس B-tree على كلّ عمود FK ساخن بلا فهرس — يبدأ بالساخنة على المسار الحرج: <code>orders(address_id)</code>, <code>order_items(catalog_item_id)</code>, <code>order_items(variant_id)</code>, <code>cash_collections(driver_id)</code>, <code>complaints(opened_by_user_id)</code>, <code>customer_debts(order_id)</code>, <b><code>wallet_transfers(sender_wallet_id)</code>+<code>(receiver_wallet_id)</code></b>، وبقيّة الـ43.</div>
+ <div class="r"><b>الملفّات:</b> <code>__table_args__</code> في النماذج المعنيّة + هجرة aaXX واحدة بكلّ الفهارس.</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة: <code>op.create_index(&#x27;idx_orders_address&#x27;,&#x27;orders&#x27;,[&#x27;address_id&#x27;])</code> × 43 (مع <code>CREATE INDEX CONCURRENTLY</code> في الإنتاج لتفادي القفل عند الكِبَر).</div>
+ <div class="r risk"><b>المخاطر:</b> منخفضة جدًّا — فهارس إضافيّة فقط (لا تغيير سلوك). كلفة كتابة طفيفة مقابل تسريع JOIN/حذف كبير.</div>
+ <div class="r ok"><b>التحقّق:</b> PG-validate + التأكّد من ظهور الفهارس + رجعة الاختبارات.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P1-C</span> حذف الأعمدة الميّتة (تنظيف المخطّط) <span class="dim">أحسن</span><span class="eff">⏱ ساعات</span></div>
+ <div class="r"><b>التغيير:</b> حذف <code>wallet_accounts.status</code> و<code>version</code> (0 قراءة بالكود — مؤكَّد) + إزالة كتابات <code>version</code> الـ7 من <code>wallet_service</code>. (قفل تفاؤليّ وهميّ — التزامن يُحمى بـ<code>with_for_update</code>.)</div>
+ <div class="r"><b>الملفّات:</b> <code>models/payment.py</code> + <code>modules/payments/wallet_service.py</code> (إزالة <code>wallet.version += 1</code>) + هجرة aaXX (drop_column).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة: <code>op.drop_column(&#x27;wallet_accounts&#x27;,&#x27;version&#x27;); op.drop_column(&#x27;wallet_accounts&#x27;,&#x27;status&#x27;)</code>. تحقّق صفر-قراءة مرّة أخيرة قبل الحذف.</div>
+ <div class="r risk"><b>المخاطر:</b> منخفضة — مؤكَّد عدم القراءة (grep + التدقيق العدائيّ السابق). يزيل فخًّا أربك التدقيق.</div>
+ <div class="r ok"><b>التحقّق:</b> PG-validate up/down + رجعة اختبارات المحفظة (يجب أن تبقى خضراء).</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P1-D</span> تفعيل WAL/PITR + مراقبة <span class="dim">أأمن·أقوى</span><span class="eff">⏱ يوم</span></div>
+ <div class="r"><b>التغيير:</b> تفعيل أرشفة WAL (الإعداد جاهز: <code>deploy/backup/pitr/docker-postgresql-wal.conf</code>) ⇒ استعادة لأيّ لحظة. + تثبيت <code>pg_stat_statements</code> لرصد الاستعلامات البطيئة.</div>
+ <div class="r"><b>الملفّات:</b> <code>docker-compose</code> (مجلّد <code>/wal-archive</code> + إعادة تشغيل postgres مرّة) + <code>shared_preload_libraries=pg_stat_statements</code>.</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> لا هجرة مخطّط — إعداد تشغيليّ + إعادة تشغيل postgres واحدة (نافذة صيانة).</div>
+ <div class="r risk"><b>المخاطر:</b> منخفضة — إعداد قياسيّ؛ نافذة إعادة تشغيل قصيرة.</div>
+ <div class="r ok"><b>التحقّق:</b> نسخة احتياطيّة + drill استعادة (السكربت <code>restore_drill.sh</code> جاهز ومُجرَّب).</div>
+</div>
+<div class="ph">المرحلة 2 — تحصين القلب المالي + تجهيز التوسّع</div>
+<div class="item">
+ <div class="ih"><span class="iid">P2-A</span> قيد قاعدة لتوازن الدفتر (نقل الثابت من الكود) <span class="dim">أأمن·أدقّ</span><span class="eff">⏱ أسبوع</span></div>
+ <div class="r"><b>التغيير:</b> trigger مؤجَّل (<code>CONSTRAINT TRIGGER ... DEFERRABLE INITIALLY DEFERRED</code>) يفحص <code>Σ debit_minor = Σ credit_minor</code> لكلّ <code>journal_id</code> عند الـcommit ⇒ <b>يستحيل قيد غير متوازن حتى لو أخطأ الكود</b>. (نمط Stripe/Adyen: دفتر مزدوج غير قابل للتغيير + idempotency.)</div>
+ <div class="r"><b>الملفّات:</b> هجرة aaXX (دالّة PL/pgSQL + constraint trigger على <code>ledger_entries</code>). <code>post_journal</code> يبقى (دفاع عميق مزدوج).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة: دالّة تجمع DR/CR per journal_id وتُطلق exception عند اللاتوازن؛ trigger مؤجَّل بعد كلّ INSERT.</div>
+ <div class="r risk"><b>المخاطر:</b> متوسّطة — يجب اختبار أنّ كلّ المسارات الحاليّة تنشئ قيودًا متوازنة (هي كذلك بفضل post_journal) قبل التفعيل، وإلّا تُرفَض.</div>
+ <div class="r ok"><b>التحقّق:</b> تدقيق: لا قيد غير متوازن تاريخيًّا (trial-balance) + اختبار عدائيّ (محاولة قيد غير متوازن ⇒ رفض القاعدة).</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P2-B</span> ربط حارس Σ المحفظة حيًّا (بعد تدقيق) <span class="dim">أأمن·أدقّ</span><span class="eff">⏱ أيّام</span></div>
+ <div class="r"><b>التغيير:</b> تحويل <code>check_wallet_ledger_invariant</code> من استشاريّ إلى <b>فحص دوريّ مُنبِّه</b> (pg_cron كلّ ساعة ⇒ ينشئ <code>ReconciliationException</code> عند أيّ انحراف <code>Σ CUSTOMER_WALLET ≠ Σ balance_minor</code>). لاحقًا: قيد أصرم بعد ضمان التطابق التامّ.</div>
+ <div class="r"><b>الملفّات:</b> <code>reconciliation_service</code> (الدالّة موجودة) + جدولة pg_cron + ربط بالتنبيهات.</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> لا هجرة مخطّط (الدالّة موجودة) — جدولة + تدقيق بيانات أوّلًا.</div>
+ <div class="r risk"><b>المخاطر:</b> متوسّطة — يجب تأكيد أنّ الثابت يصدق على البيانات الحاليّة قبل التنبيه (تفادي إنذارات كاذبة من أرصدة بذور بلا قيد).</div>
+ <div class="r ok"><b>التحقّق:</b> تشغيل الفحص على الإنتاج ⇒ diff=0 قبل الجدولة.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P2-C</span> التقسيم الزمنيّ (pg_partman + pg_cron) <span class="dim">أقوى</span><span class="eff">⏱ أسابيع</span></div>
+ <div class="r"><b>التغيير:</b> تحويل الجداول الـ7 المتنامية إلى <b>partitioned by range(created_at)</b> شهريًّا عبر <code>pg_partman</code>، مع <code>pg_cron</code> لإنشاء الأقسام مسبقًا وفصل/حذف القديم (أرشفة) ⇒ استعلامات وصيانة أسرع آلاف المرّات عند الملايين.</div>
+ <div class="r"><b>الملفّات:</b> هجرة aaXX لكلّ جدول (إنشاء parent partitioned + ترحيل البيانات + إعداد partman). الكود لا يتغيّر (الاستعلامات بـcreated_at تستفيد من partition pruning).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة معقّدة لكلّ جدول (تحويل جدول قائم إلى مُقسَّم) — تُنفَّذ بحذر مع ترحيل بيانات؛ تبدأ بـ<code>login_attempts</code>/<code>otp_events</code> (أقلّ حساسيّة) ثمّ <code>audit_log</code> ثمّ <code>ledger_entries</code> (الأحسس).</div>
+ <div class="r risk"><b>المخاطر:</b> متوسّطة-عالية — تحويل جدول مُقسَّم على بيانات قائمة يحتاج خطّة ترحيل + اختبار حِمل. <code>ledger_entries</code> آخرًا.</div>
+ <div class="r ok"><b>التحقّق:</b> PG-validate على نسخة + التأكّد من partition pruning (<code>EXPLAIN</code>) + سلامة العدّ قبل/بعد.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P2-D</span> تفعيل الـoutbox القائم (CDC موثوق) <span class="dim">أمرن·أذكى·أقوى</span><span class="eff">⏱ أيّام</span></div>
+ <div class="r"><b>التغيير:</b> ربط <code>event_outbox</code> (الموجود بلا publisher) بـ<b>relay worker</b> يستنزفه ضمن الترانزاكشن وينشره (Redis pub/sub قائم أصلًا، أو وسيط رسائل) ⇒ بثّ أحداث موثوق بلا «dual-write» (نمط Stripe/Revolut/Adyen).</div>
+ <div class="r"><b>الملفّات:</b> <code>models/audit.py::EventOutbox</code> (موجود) + كاتبو الأحداث يكتبون إليه + worker جديد في <code>main.py</code> (نمط حلقات الخلفيّة القائمة).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> لا هجرة (الجدول موجود) — كود relay + ربط منتجي الأحداث.</div>
+ <div class="r risk"><b>المخاطر:</b> منخفضة-متوسّطة — البنية موجودة؛ الإضافة relay + idempotency على النشر.</div>
+ <div class="r ok"><b>التحقّق:</b> اختبار: حدث يُكتب ترانزاكشنيًّا ⇒ يُنشَر مرّة واحدة بالضبط؛ فشل النشر ⇒ إعادة محاولة.</div>
+</div>
+<div class="ph">المرحلة 3 — التوسّع والذكاء والأمان الأعمق</div>
+<div class="item">
+ <div class="ih"><span class="iid">P3-A</span> ترقية PostgreSQL 16 → 17 ثمّ 18 <span class="dim">أقوى·أحسن</span><span class="eff">⏱ أيّام (مع اختبار)</span></div>
+ <div class="r"><b>التغيير:</b> 17: vacuum أخفّ 20×، <code>JSON_TABLE</code>، تحسينات تقسيم. 18: <b>async I/O (io_uring) حتى 3× مسح تسلسليّ</b>، <b>skip-scan</b> لفهارس B-tree المركّبة. ترقية تدريجيّة (16→17→18) بـ<code>pg_upgrade</code> أو dump/restore.</div>
+ <div class="r"><b>الملفّات:</b> صورة postgres في الـcompose + اختبار التوافق (الامتدادات pg_trgm).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> لا هجرة مخطّط — ترقية محرّك القاعدة (نافذة صيانة + نسخة احتياطيّة + اختبار على نسخة أوّلًا).</div>
+ <div class="r risk"><b>المخاطر:</b> متوسّطة — ترقية كبرى؛ اختبار شامل على نسخة + خطّة rollback (النسخة الاحتياطيّة).</div>
+ <div class="r ok"><b>التحقّق:</b> تشغيل كامل الاختبارات على PG الجديد + قياس الأداء.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P3-B</span> PgBouncer + نسخة قراءة (read replica) <span class="dim">أقوى·أمرن</span><span class="eff">⏱ أسبوع</span></div>
+ <div class="r"><b>التغيير:</b> مجمّع اتّصالات (PgBouncer) أمام القاعدة + نسخة قراءة (logical/streaming replication) لتوزيع القراءات الثقيلة (تقارير/بحث/لوحات OPS) ⇒ تحمّل أحمال أعلى دون لمس الكود الكتابيّ.</div>
+ <div class="r"><b>الملفّات:</b> بنية تحتيّة (compose/خادم) + توجيه القراءات للنسخة (طبقة جلسة).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> لا هجرة — بنية تحتيّة.</div>
+ <div class="r risk"><b>المخاطر:</b> متوسّطة — إعداد تشغيليّ؛ يتطلّب فصل القراءة/الكتابة في طبقة الجلسة.</div>
+ <div class="r ok"><b>التحقّق:</b> اختبار حِمل قبل/بعد.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P3-C</span> PostGIS للمكان (دقّة جغرافيّة) <span class="dim">أدقّ·أذكى</span><span class="eff">⏱ أسبوع+</span></div>
+ <div class="r"><b>التغيير:</b> تثبيت PostGIS + تحويل <code>zone_suspensions.polygon_*</code> و إحداثيّات المزوّد/السائق إلى <code>geometry/geography</code> مع فهرسة GiST ⇒ <b>أقرب-سائق ومناطق-خدمة دقيقة في القاعدة</b> بدل haversine بايثون + احتواء-مضلّع حقيقيّ.</div>
+ <div class="r"><b>الملفّات:</b> هجرة aaXX (امتداد + أعمدة geometry + GiST) + <code>geo_service</code> يستعمل استعلامات PostGIS (مع احتفاظ بالاحتياطيّ).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة: <code>CREATE EXTENSION postgis; ALTER TABLE ... ADD COLUMN geom geography; CREATE INDEX ... USING GIST</code>.</div>
+ <div class="r risk"><b>المخاطر:</b> متوسّطة — امتداد جديد + ترحيل إحداثيّات؛ يتعايش مع Redis GEO الحاليّ.</div>
+ <div class="r ok"><b>التحقّق:</b> مقارنة نتائج أقرب-سائق PostGIS مقابل haversine (تكافؤ) + أداء.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P3-D</span> pgvector — ذكاء داخل القاعدة <span class="dim">أذكى</span><span class="eff">⏱ أسابيع (مع النموذج)</span></div>
+ <div class="r"><b>التغيير:</b> تثبيت <code>pgvector</code> (0.8: HNSW/IVFFlat، أسرع 9×) لتخزين تضمينات: <b>كشف الاحتيال</b> (تشابه متجهيّ لإشارات <code>velocity_decisions</code>/<code>fraud_flags</code> ⇒ شذوذ المعاملات)، <b>توصيات</b>، <b>بحث دلاليّ</b> — كلّه في Postgres دون قاعدة متجهيّة منفصلة.</div>
+ <div class="r"><b>الملفّات:</b> هجرة aaXX (امتداد + أعمدة vector) + خطّ تضمين (يربط <code>ml_scaffold</code> القائم بنموذج).</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة: <code>CREATE EXTENSION vector; ALTER TABLE ... ADD COLUMN embedding vector(N); CREATE INDEX ... USING hnsw</code>.</div>
+ <div class="r risk"><b>المخاطر:</b> منخفضة (إضافيّ) — يبني على <code>ml_scaffold</code> القائم؛ يحتاج بيانات/نموذج تضمين.</div>
+ <div class="r ok"><b>التحقّق:</b> تقييم دقّة الكشف على بيانات تاريخيّة.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P3-E</span> RLS + pgcrypto (أمان أعمق) <span class="dim">أأمن</span><span class="eff">⏱ أسبوع+</span></div>
+ <div class="r"><b>التغيير:</b> <b>RLS</b>: سياسات صفّ على الجداول الحسّاسة (<code>wallet_accounts</code>, <code>orders</code>, <code>wallet_transfers</code>) ⇒ طبقة دفاع ثانية تحت RBAC الكود (العميل يرى صفوفه فقط حتى لو أخطأ الكود). <b>pgcrypto</b>: تشفير حقول PII مختارة في الراحة.</div>
+ <div class="r"><b>الملفّات:</b> هجرة aaXX (<code>ENABLE ROW LEVEL SECURITY</code> + <code>CREATE POLICY</code>) + ضبط <code>app.current_user</code> في الجلسة + pgcrypto للحقول.</div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة: سياسات RLS + ربط سياق المستخدم بالجلسة (set_config).</div>
+ <div class="r risk"><b>المخاطر:</b> متوسّطة-عالية — RLS يتطلّب تمرير هويّة المستخدم للجلسة بدقّة؛ خطأ يحجب أو يكشف. يُطبَّق تدريجيًّا.</div>
+ <div class="r ok"><b>التحقّق:</b> اختبار: مستخدم لا يرى صفوف غيره حتى باستعلام مباشر.</div>
+</div><div class="item">
+ <div class="ih"><span class="iid">P3-F</span> تقييم uuid أصليّ بدل varchar(36) <span class="dim">أحسن·أقوى</span><span class="eff">⏱ تقييم</span></div>
+ <div class="r"><b>التغيير:</b> 134 معرّفًا <code>varchar(36)</code>؛ <code>uuid</code> أصليّ = 16 بايت (مقابل 36)، مقارنة أسرع، فهارس أصغر. <b>تقييم</b> الترحيل (PK+FK) — مكسب أداء/تخزين مقابل هجرة كبرى عالية المخاطرة ⇒ قرار محسوب (قد يُؤجَّل).</div>
+ <div class="r"><b>الملفّات:</b> كلّ النماذج (PK+FK) — هجرة ضخمة. <b>توصية: تقييم لا تنفيذ فوريّ.</b></div>
+ <div class="r"><b>الهجرة/التنفيذ:</b> هجرة كبرى (تحويل نوع كلّ PK/FK) — تُدرَس بعناية أو تُترَك.</div>
+ <div class="r risk"><b>المخاطر:</b> عالية — تمسّ كلّ الجداول؛ ليست أولويّة. للدراسة فقط.</div>
+ <div class="r ok"><b>التحقّق:</b> n/a (تقييم)</div>
+</div>
+
+<h2>② ملخّص بحث أحدث التقنيات (2025-2026)</h2>
+<table><tr><th>التقنية</th><th>ما الجديد وكيف ينطبق</th></tr>
+<tr><td style='white-space:nowrap'><b>PostgreSQL 17 (أواخر 2024)</b></td><td>vacuum أخفّ حتى 20× · <code>JSON_TABLE</code> · identity/exclusion على الجداول المُقسَّمة · تحسينات تزامن وتحميل.</td></tr><tr><td style='white-space:nowrap'><b>PostgreSQL 18 (سبتمبر 2025)</b></td><td><b>async I/O (io_uring) — حتى 3× مسح تسلسليّ</b> · <b>skip-scan</b> لفهارس B-tree المركّبة.</td></tr><tr><td style='white-space:nowrap'><b>JSONB + فهارس</b></td><td>GIN <code>jsonb_path_ops</code> (مدمج، احتواء) مقابل <code>jsonb_ops</code> (مرن، <code>?</code>)؛ <b>للمفاتيح 2-3 المُستعلَمة: فهرس تعبيريّ أرخص بكثير</b> من GIN (الذي يكلّف 30-50% على الكتابة).</td></tr><tr><td style='white-space:nowrap'><b>pg_partman + pg_cron</b></td><td>تقسيم زمنيّ تصريحيّ مُؤتمَت؛ <code>run_maintenance_proc</code> ينشئ الأقسام مسبقًا؛ فصل+حذف القديم بدل الحذف الجماعيّ.</td></tr><tr><td style='white-space:nowrap'><b>pgvector 0.8</b></td><td>أسرع 9× ونتائج أدقّ 100×؛ HNSW/IVFFlat؛ كشف احتيال بالتشابه المتجهيّ، توصيات، بحث دلاليّ — داخل Postgres.</td></tr><tr><td style='white-space:nowrap'><b>نمط Outbox + الدفتر المزدوج</b></td><td>Stripe/Adyen/Revolut: outbox ترانزاكشنيّ يحلّ «dual-write» + دفتر مزدوج غير قابل للتغيير + idempotency + optimistic locking ⇒ اتّساق 99.999%. <b>مشروعك يملك الأساس (event_outbox + دفتر مزدوج + idempotency).</b></td></tr><tr><td style='white-space:nowrap'><b>RLS + pgcrypto</b></td><td>RLS (<code>CREATE POLICY</code>+<code>ENABLE ROW LEVEL SECURITY</code>) كطبقة دفاع ثانية؛ pgcrypto لتشفير الأعمدة في الراحة؛ least-privilege + default-deny.</td></tr></table>
+
+<h2>③ المصادر</h2>
+<div class="lead"><ul><li><a href="https://www.postgresql.org/about/news/postgresql-17-released-2936/">PostgreSQL 17 Released</a></li><li><a href="https://pulse.support/kb/postgresql-releases">PostgreSQL 18 / Releases (PG 16,17,18)</a></li><li><a href="https://www.crunchydata.com/blog/indexing-jsonb-in-postgres">Indexing JSONB in Postgres — Crunchy Data</a></li><li><a href="https://www.percona.com/blog/pgvector-the-critical-postgresql-component-for-your-enterprise-ai-strategy/">pgvector for Enterprise AI — Percona</a></li><li><a href="https://medium.com/@golaneduard1/declarative-partitioning-in-postgresql-migrating-and-automating-with-pg-partman-and-pg-cron-b6d978abb507">Declarative Partitioning with pg_partman + pg_cron</a></li><li><a href="https://www.rapydo.io/blog/event-driven-architectures-and-databases-can-sql-keep-up">Transactional Outbox / Event-Driven SQL — Rapydo</a></li><li><a href="https://postgreshelp.com/postgresql-rls/">RLS + Encryption at Rest — postgreshelp</a></li><li><a href="https://medium.com/codetodeploy/solving-the-double-spend-system-design-patterns-for-bulletproof-fintech-ee5d73f33415">Solving the Double Spend — Fintech patterns</a></li></ul></div>
+
+<div class="foot">
+ <p>🛠️ الخطة التنفيذيّة لقاعدة بيانات تووا · 2026-06-19 · مبنيّة على فحص حيّ (information_schema/pg_catalog + الكود SQLAlchemy/Alembic) + بحث إنترنت. <b>تخطيط فقط؛ لا تنفيذ قبل مراجعتك وإذنك.</b> القلب المالي مختوم (FIN-COR PASS). كلّ هجرة تُتحقَّق على PG صعودًا/هبوطًا قبل أيّ نشر، والإنتاج عبر `CREATE INDEX CONCURRENTLY` لتفادي القفل.</p>
+</div>
+</div></body></html>

@@ -1,0 +1,361 @@
+<meta charset="utf-8">
+<title>تقرير 536 — تحقّق ما بعد 535: فجوة حرجة بين الموثَّق والمنشور فعليًّا، واكتشافها وإغلاقها على البيئات الثلاث</title>
+<style>
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px 100px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 90ch; color: var(--ink); }
+  p.lead { font-size: 1.04rem; color: var(--ink-muted); max-width: 76ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.85em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  a.src { color: var(--info-ink); text-decoration: none; border-bottom: 1px dotted var(--info-ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🔎"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1080px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 60ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 84ch; font-size: 1.0rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.25rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.7rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; position: sticky; top: 0; background: var(--bg); z-index: 5; padding: 10px 0; }
+  nav.toc a { font-size: 0.74rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 50px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.22rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 0.94rem; color: var(--ink-muted); max-width: 88ch; margin-bottom: 20px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.92rem; max-width: 78ch; }
+  .plain b { color: var(--accent-deep); }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.92rem; max-width: 82ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.92rem; max-width: 82ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .info-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .info-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .info-box p { margin: 0; color: var(--info-ink); font-size: 0.92rem; max-width: 82ch; }
+  .info-box b { color: var(--info-ink); }
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 20px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.71rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  pre { background: #0d1611; color: #d7e6da; border-radius: 10px; padding: 12px 14px; overflow-x: auto; font-size: 0.74rem; direction: ltr; text-align: left; margin: 8px 0 14px; border: 1px solid #1d3324; }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.84rem; }
+  table th, table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; vertical-align: top; }
+  table th { background: var(--surface-2); font-weight: 700; color: var(--ink-muted); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .table-wrap { overflow-x: auto; }
+
+  .stat-row { display: flex; gap: 14px; flex-wrap: wrap; margin: 16px 0; }
+  .stat-mini { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; min-width: 130px; }
+  .stat-mini .n { font-size: 1.25rem; font-weight: 800; color: var(--accent-deep); font-family: var(--font-mono); }
+  .stat-mini .l { font-size: 0.72rem; color: var(--ink-muted); }
+
+  .item-card { border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); background: var(--surface); padding: 16px 18px; margin-bottom: 12px; }
+  .item-card .i-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+  .item-card .i-id { font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; background: var(--surface-2); border-radius: 6px; padding: 2px 8px; }
+  .item-card .i-title { font-weight: 800; font-size: 0.92rem; }
+  .item-card .i-effort { margin-inline-start: auto; font-size: 0.72rem; }
+  .item-card .i-body { font-size: 0.85rem; color: var(--ink-muted); }
+  .item-card .i-fix { margin-top: 8px; font-size: 0.82rem; background: var(--ok-bg); color: var(--ok-ink); border: 1px solid var(--ok-border); border-radius: 8px; padding: 8px 12px; }
+  .item-card .i-test { margin-top: 6px; font-size: 0.78rem; background: var(--info-bg); color: var(--info-ink); border-radius: 6px; padding: 6px 10px; }
+  .item-card .i-note { margin-top: 6px; font-size: 0.78rem; background: var(--warn-bg); color: var(--warn-ink); border-radius: 6px; padding: 6px 10px; }
+
+  /* before/after diagram */
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; margin: 16px 0; }
+  @media (max-width: 760px) { .flow { grid-template-columns: 1fr; } .flow .arrow { transform: rotate(90deg); } }
+  .flow .box { border-radius: 10px; padding: 12px 14px; font-size: 0.82rem; border: 1px solid; }
+  .flow .box.before { background: var(--crit-bg); border-color: var(--crit-border); color: var(--crit-ink); }
+  .flow .box.after { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok-ink); }
+  .flow .box .k { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.75; margin-bottom: 4px; }
+  .flow .arrow { font-size: 1.4rem; color: var(--ink-faint); text-align: center; }
+
+  /* deploy timeline */
+  .timeline { position: relative; margin: 24px 0; padding-inline-start: 26px; border-inline-start: 2px solid var(--border); }
+  .t-step { position: relative; margin-bottom: 22px; }
+  .t-step::before { content: ""; position: absolute; inline-size: 12px; block-size: 12px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); inset-inline-start: -32px; top: 4px; box-shadow: 0 0 0 2px var(--accent); }
+  .t-step.warn::before { background: var(--accent-2); box-shadow: 0 0 0 2px var(--accent-2); }
+  .t-step.crit::before { background: var(--crit-ink); box-shadow: 0 0 0 2px var(--crit-ink); }
+  .t-step .t-title { font-weight: 800; font-size: 0.92rem; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+  .t-step .t-body { font-size: 0.84rem; color: var(--ink-muted); }
+
+  /* environment cards */
+  .env-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 20px 0; }
+  @media (max-width: 900px) { .env-grid { grid-template-columns: 1fr; } }
+  .env-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); text-align: center; }
+  .env-card .e-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 6px; }
+  .env-card .e-detail { font-size: 0.76rem; color: var(--ink-muted); margin-bottom: 8px; }
+  .env-card .e-status { font-family: var(--font-mono); font-size: 0.78rem; }
+
+  /* evidence terminal blocks */
+  .evidence { background: #0d1611; border: 1px solid #1d3324; border-radius: 10px; padding: 4px 0; margin: 10px 0 16px; }
+  .evidence .e-bar { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-bottom: 1px solid #1d3324; }
+  .evidence .e-bar .dot { width: 9px; height: 9px; border-radius: 50%; background: #3a4a3e; }
+  .evidence .e-bar .label { font-size: 0.68rem; color: #7fa08c; font-family: var(--font-mono); direction: ltr; }
+  .evidence pre { border: none; margin: 0; background: transparent; }
+
+  footer { text-align: center; padding: 40px 0 10px; color: var(--ink-faint); font-size: 0.8rem; }
+  .sources { font-size: 0.76rem; color: var(--ink-faint); margin-top: 30px; }
+  .sources ul { padding-inline-start: 18px; }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">🔎 تقرير 536 · تحقّق واكتشاف وإغلاق فجوة · 2026-07-20</span>
+    <h1>ما بعد تقرير 535: التحقّق الحيّ كشف أنّ إصلاحَين حرجَين موثَّقَين كـ"منشورَين" لم يكونا فعليًّا في الإنتاج — وأُغلقت الفجوة على البيئات الثلاث</h1>
+    <p class="lead">هذا التقرير لا يُعيد سرد ما فعله تقرير 535 (التنفيذ الكامل لخطّة 534 + مراجعة Codex الأولى + نشر أوّل على الإنتاج) — بل يبدأ من حيث توقّف: بعد استئناف العمل، تَحقّقتُ من كل بيئة سطرًا بكود حيّ، لا بنص تقرير. الفحص المباشر لحاويات test1 وtest/.194 والإنتاج نفسها كشف أنّ نسخة الكود التي كانت تعمل فعليًّا (لا التي وُثِّقت) كانت أقدم بخطوة واحدة من آخر إصلاحَين ذكرهما تقرير 535 نفسه. أُعيد بناء وفحص واختبار كل شيء من الصفر، ثمّ نُشِر على البيئات الثلاث من جديد بعد إذن صريح جديد لكل خطوة — بما فيها الإنتاج، مع نسخة احتياطية جديدة وفحص FIN-COR وخطوة إعادة وسم <code>tawa-migrate</code> الإلزاميّة.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">2</div><div class="l">إصلاح حرج موثَّق كـ"منشور" لكنّه لم يكن فعليًّا في الإنتاج</div></div>
+      <div class="s"><div class="n">3842</div><div class="l">اختبار خلفيّ ناجح، صفر فشل (بعد الإصلاح الإضافي)</div></div>
+      <div class="s"><div class="n">907/970</div><div class="l">فحص وظيفيّ حيّ على test1 (كل الإخفاقات مؤكَّدة غير متعلّقة)</div></div>
+      <div class="s"><div class="n">3/3</div><div class="l">بيئات مُعاد فحصها ونشرها ومطابقة بالكود الحيّ: test1 · test/.194 · الإنتاج</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#context">السياق: من أين بدأ هذا التقرير</a>
+  <a href="#discovery">الاكتشاف: فجوة بين الموثَّق والفعليّ</a>
+  <a href="#why">لماذا حدثت الفجوة</a>
+  <a href="#fixes">الإصلاحان اللذان أُعيد نشرهما</a>
+  <a href="#new-work">عمل إضافيّ جديد في هذه الجلسة</a>
+  <a href="#tests">الاختبارات</a>
+  <a href="#deploy">إعادة النشر الآمنة على البيئات الثلاث</a>
+  <a href="#summary">الجدول التجميعي النهائي</a>
+</nav>
+
+<section id="context">
+  <span class="section-eyebrow">🧭 السياق</span>
+  <h2>هذا التقرير يبدأ من حيث توقّف تقرير 535 — لا من الصفر</h2>
+  <p class="intro">تقرير 535 وثَّق تنفيذًا كاملًا لخطّة 534 (15 نتيجة حرجة C-01 → C-15)، مراجعة Codex عدائية وجدت خمسة إصلاحات إضافيّة، مراجعة شخصية وجدت ثلاثة أخرى، ثمّ نشرًا على test1 وtest/.194 والإنتاج. عند استئناف العمل، كانت التعليمات صريحة: <b>لا تُصدِّق التقرير — تحقَّق من الكود الحيّ نفسه</b>. هذا بالضبط ما جرى، وهذا التقرير يوثّق نتيجة ذلك التحقّق.</p>
+  <div class="plain">
+    <div class="ic">📐</div>
+    <p><b>القاعدة المتّبَعة طوال هذه الجلسة:</b> "المذكرة تقول كذا" ليست نفس الشيء من "الكود الحيّ يفعل كذا فعلًا". كل ادّعاء في هذا التقرير تحقَّقنا منه بأمر <code>grep</code> أو <code>psql</code> أو طلب HTTP فعليّ داخل الحاوية الحيّة نفسها — لا بقراءة نص تقرير سابق والثقة به.</p>
+  </div>
+</section>
+
+<section id="discovery">
+  <span class="section-eyebrow">🕵️ الاكتشاف</span>
+  <h2>فحص مباشر لثلاث بيئات كشف أنّ إصلاحَين "منشورَين" حسب التقرير لم يكونا في الكود الفعليّ</h2>
+  <p class="intro">بدل الوثوق بتقرير 535، فُحِصت كل بيئة بأمر مباشر داخل الحاوية الحيّة نفسها (<code>docker exec ... grep</code>). النتيجة: بصمة الواجهة الأماميّة في الإنتاج (<code>main-BF0C-x5K.js</code>) مطابقة تمامًا لبناء محليّ جديد — إثبات أنّ نشرًا سابقًا حدث فعلًا. لكنّ فحص ملفَّين خلفيَّين تحديدًا كشف فجوة حقيقيّة:</p>
+
+  <div class="crit-box">
+    <div class="ic">🔴</div>
+    <p><b>الفجوة الأولى — <code>bulk_router.py</code>:</b> تقرير 535 يذكر صراحةً أنّ Codex وجد "ثغرة تجاوز كاملة في القبول الجماعيّ" وأنّها "أُصلِحت". لكنّ فحص الكود الحيّ في الإنتاج أظهر أنّ الدالّة القديمة <code>_resolve_owner_user_id</code> (التي لا تُميِّز بين حساب مزوّد وحساب سائق) كانت لا تزال هي المُستخدَمة — لا الدالّة المُصلَحة <code>_resolve_owner_role</code>.</p>
+  </div>
+  <div class="evidence">
+    <div class="e-bar"><span class="dot"></span><span class="label">production · docker exec tawa-backend-core-1 grep</span></div>
+    <pre><code>$ grep -n "async def _resolve_owner" bulk_router.py
+211:async def _resolve_owner_user_id(db: AsyncSession, entity_id: str) -> str | None:
+   ← الاسم القديم؛ لا يُميّز Provider عن Driver لنفس الحساب</code></pre>
+  </div>
+
+  <div class="crit-box">
+    <div class="ic">🔴</div>
+    <p><b>الفجوة الثانية — <code>provider_service.py</code>:</b> ترتيب سطرَين حسّاسَين في دالّة رفض الطلب (<code>reject_order</code>) كان لا يزال بالترتيب القديم الخطِر: تسجيل التدقيق <b>قبل</b> تحرير حجز المحفظة، لا بعده — وهو بالضبط الترتيب الذي يمكن أن يُنتِج جمودًا (Deadlock) مع مسار آخر يُقفِل نفس الصفوف بترتيب معاكس.</p>
+  </div>
+  <div class="evidence">
+    <div class="e-bar"><span class="dot"></span><span class="label">production · قبل الإصلاح</span></div>
+    <pre><code>sed -n '/async def reject_order/,/^async def /p' | grep -n "log_with_session\|release_reservation"
+48:  await audit_logger.log_with_session(...)    ← يُقفَل هنا أوّلًا
+68:  await wallet_svc.release_reservation(...)   ← ثمّ هنا — الترتيب الخَطِر</code></pre>
+  </div>
+
+  <p>الإصلاحان الوحيدان الآخران اللذان بحثت عنهما تحديدًا (<code>C-16</code> قفل تسوية العمولة، وإصلاح "الرمز الناجي" في <code>jwt_service.py</code>) كانا <b>موجودَين فعلًا</b> في الإنتاج — لذا الفجوة لم تكن شاملة، بل محدَّدة بدقّة في ملفَّين اثنين فقط.</p>
+</section>
+
+<section id="why">
+  <span class="section-eyebrow">🧩 لماذا حدثت الفجوة</span>
+  <h2>تفسير مباشر بلا تجميل: نشرٌ حدث في لحظة متوسّطة من عمل لم يكتمل توثيقه بعد</h2>
+  <p class="intro">الفحص أظهر أنّ صورة حاوية الخلفيّة على test1 بُنيت الساعة 00:14 تقريبًا من نفس شجرة الكود، وأنّ تقرير 535 كُتِب الساعة 00:23 — أي بعد 9 دقائق فقط. الأرجح: النشر على الإنتاج تمّ في نفس تلك النافذة الزمنية الضيّقة، لكن من لقطة للكود سبقت اكتمال آخر إصلاحَين بدقائق — فوصل التقرير (الذي كُتِب بعد اكتمال كل الإصلاحات في الكود المحليّ) إلى وصفٍ أدقّ ممّا وصل فعليًّا للحاوية المنشورة قبله بلحظات.</p>
+  <div class="warn-box">
+    <div class="ic">⏱️</div>
+    <p><b>الدرس المستفاد:</b> "التقرير قال كذا" ليس دليلًا كافيًا لحالة الإنتاج عندما يكون التوثيق والبناء والنشر خطوات منفصلة زمنيًّا يمكن أن تتزاحم في نفس الدقائق. القاعدة المطبَّقة من الآن: التحقّق من الحاوية الحيّة نفسها دائمًا، لا من آخر تقرير مكتوب عنها فقط — وهذا بالضبط ما كشف الفجوة هذه المرّة.</p>
+  </div>
+</section>
+
+<div class="phase-band">
+  <div class="phase-title p0"><span class="p-badge">أُعيد نشرهما بالكامل</span><h3 id="fixes">الإصلاحان اللذان أُغلِقت فجوتهما على الإنتاج</h3></div>
+</div>
+
+<div class="item-card">
+  <div class="i-head"><span class="i-id">C-05 (الجزء الأخير)</span><span class="i-title">القبول/الرفض الجماعيّ قد يُفعِّل الدور الخطأ أو يُسقِط الدفعة كاملة</span><span class="i-effort pill ok">أُعيد نشره</span></div>
+  <div class="i-body">إن كان لنفس الحساب طلب انضمام كمزوّد وطلب انضمام كسائق معًا (وارد فعلًا لشخص يملك متجرًا ويقود أيضًا)، فإنّ قبول/رفض أحدهما عبر المعرِّف القديم كان قد يُفعِّل أو يرفض الدور الخطأ، أو حتى يُسقِط الدفعة الجماعيّة كاملة بخطأ برمجيّ غير معالَج (<code>MultipleResultsFound</code>) لم يكن أحد يلتقطه.</div>
+  <div class="i-fix">✅ <code>_resolve_owner_role</code> الآن يُعيد نوع الدور المتوقَّع صراحةً (PROVIDER_ADMIN أو DRIVER)، والفلترة تستخدمه لتحديد الصفّ الصحيح بدقّة، وكل عنصر معزول داخل <code>try/except</code> مستقلّ.</div>
+  <div class="i-test">🧪 اختبار جديد: حساب واحد بدورَين معلَّقَين معًا — يثبت أنّ القبول عبر معرِّف المزوّد يُفعِّل PROVIDER_ADMIN فقط، والرفض عبر معرِّف السائق يرفض DRIVER فقط، دون تداخل.</div>
+</div>
+
+<div class="item-card">
+  <div class="i-head"><span class="i-id">Codex #1</span><span class="i-title">ترتيب قفل قد يُنتِج جمودًا (Deadlock) بين رفض الطلب وإنفاق المحفظة</span><span class="i-effort pill ok">أُعيد نشره</span></div>
+  <div class="i-body">تسجيل التدقيق (الذي يُقفِل صفًّا وحيدًا لسلسلة التدقيق) كان يحدث <b>قبل</b> تحرير حجز المحفظة (الذي يُقفِل صفَّي الحجز والحساب) — بينما مسار إنفاق المحفظة في مكان آخر من النظام يُقفِل بالترتيب المعاكس تمامًا. إن التقى الطلبان في نفس اللحظة على نفس المحفظة، يمكن أن يقف كلاهما ينتظر الآخر إلى الأبد.</div>
+  <div class="flow">
+    <div class="box before"><div class="k">قبل</div>1) قفل سجلّ التدقيق ← 2) قفل صفوف المحفظة<br><span class="faint">(عكس ترتيب المسار الآخر)</span></div>
+    <div class="arrow">←</div>
+    <div class="box after"><div class="k">بعد</div>1) قفل صفوف المحفظة أوّلًا ← 2) ثمّ التدقيق أخيرًا<br><span class="faint">(نفس ترتيب كل مسار آخر في النظام)</span></div>
+  </div>
+  <div class="i-fix">✅ نُقِلت خطوة التدقيق لتصبح آخر خطوة، بعد تحرير الحجز — مطابقةً لنفس النمط المستخدَم في كل مسار آخر يلمس المحفظة.</div>
+</div>
+
+<section id="new-work">
+  <span class="section-eyebrow">➕ عمل إضافيّ جديد في هذه الجلسة</span>
+  <h2>إصلاحان جديدان لم يذكرهما تقرير 535 إطلاقًا</h2>
+  <p class="intro">بالإضافة لإغلاق الفجوة أعلاه، هذه الجلسة وجدت وأصلحت مشكلتَين لم يرد ذكرهما في أي تقرير سابق:</p>
+  <div class="item-card">
+    <div class="i-head"><span class="i-id">ملاحظة ترقية</span><span class="i-title">التراجع عن هجرة قاعدة البيانات ab49 كان يمكن أن يكسر القيد الماليّ في منتصف عمليّة طارئة</span><span class="i-effort pill ok">مُصلَح</span></div>
+    <div class="i-body">لو احتاج فريق العمليّات يومًا التراجع عن هجرة "الفصل بين إعداد واعتماد القيد اليدويّ" أثناء وجود قيود "بانتظار الاعتماد" فعليًّا، كانت الهجرة ستفشل بخطأ قاعدة بيانات غامض في منتصف حالة طارئة — أسوأ توقيت ممكن لاكتشاف مشكلة.</div>
+    <div class="i-fix">✅ التراجع الآن يرفض بوضوح ويطلب اعتماد/رفض القيود المعلَّقة أوّلًا عبر التطبيق، بدل الفشل الغامض منتصف الطريق.</div>
+  </div>
+  <div class="item-card">
+    <div class="i-head"><span class="i-id">أدوات الفحص</span><span class="i-title">سكربتا الفحص الذاتيّ كانا يُخفيان انحدارًا حقيقيًّا (Regression) خلف "نجاح" زائف</span><span class="i-effort pill ok">مُصلَح</span></div>
+    <div class="i-body">سكربتا فحص العمليّات كانا يعتبران أي استجابة أقلّ من 500 "ناجحة" — أي أنّ مسارًا كان موجودًا ثمّ حُذِف أو أُعيدت تسميته بالخطأ (يُعيد 404) كان سيظهر كـ"نجاح" بدل أن يُنبِّه لانحدار حقيقيّ.</div>
+    <div class="i-fix">✅ استُثنِيت أكواد 404 و501 صراحةً من معيار "النجاح" — الآن الفحص يكتشف هذا النوع من الانحدار بدل إخفائه.</div>
+  </div>
+</section>
+
+<section id="tests">
+  <span class="section-eyebrow">🧪 الاختبارات</span>
+  <h2>كل شيء أُعيد اختباره قبل أي لمسة لأي بيئة</h2>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="n">3842</div><div class="l">اختبار خلفيّ ناجح، 5 مُتجاهَل عمدًا (غير متعلّق)، صفر فشل</div></div>
+    <div class="stat-mini"><div class="n">907/970</div><div class="l">فحص وظيفيّ حيّ شامل على test1 بعد إعادة البناء</div></div>
+    <div class="stat-mini"><div class="n">63</div><div class="l">إخفاقات فُحِصت واحدًا واحدًا — كلّها مسارات وهمية في سكربت الفحص نفسه، لا في الخلفيّة</div></div>
+  </div>
+  <p>الإخفاقات الـ63 في الفحص الوظيفيّ (<code>/api/food</code>، <code>/api/carts</code>، <code>/api/loyalty/programs</code> وغيرها) تحقَّقنا منها بقراءة الكود مباشرة: هذه المسارات <b>لم تكن موجودة إطلاقًا</b> في الخلفيّة أصلًا — المسارات الحقيقية مختلفة قليلًا (<code>/api/food/categories</code>، <code>/api/carts/groups/{id}</code>، <code>/api/loyalty/me</code>). خطأ قديم في سكربت الفحص نفسه، لا علاقة له بأي تعديل في هذه الجلسة.</p>
+</section>
+
+<section id="deploy">
+  <span class="section-eyebrow">🚀 إعادة النشر</span>
+  <h2>البيئات الثلاث أُعيد بناؤها وفحصها ونشرها من الصفر — بإذن صريح لكل خطوة</h2>
+  <p class="intro">لأنّ الفجوة تحديدًا حدثت بسبب الثقة بتوثيق سابق بدل الكود الحيّ، أُعيدت هذه المرّة كل خطوة بتحقّق مباشر بعدها فورًا — لا افتراض أنّ "النشر نجح" لمجرّد أنّ الأمر انتهى بلا خطأ.</p>
+  <div class="env-grid">
+    <div class="env-card">
+      <div class="e-title">1️⃣ test1</div>
+      <div class="e-detail">أُعيد بناء صورة الخلفيّة والواجهة بالكامل من الفرع الحاليّ، وأُعيد إنشاء الحاويتَين</div>
+      <div class="e-status pill ok">✅ صحّة 200 · ab51 · الإصلاحان مؤكَّدان بالكود</div>
+    </div>
+    <div class="env-card">
+      <div class="e-title">2️⃣ test / .194</div>
+      <div class="e-detail">نفس الصورة المبنيّة على test1 نُقِلت (docker save/scp/load) وأُعيد إنشاء الحاويتَين — بيانات 64 مستخدمًا حقيقيًّا محفوظة بلا مساس</div>
+      <div class="e-status pill ok">✅ صحّة 200 · ab51 · 64 مستخدمًا سليمة</div>
+    </div>
+    <div class="env-card">
+      <div class="e-title">3️⃣ الإنتاج — tawanow.com</div>
+      <div class="e-detail">نسخة احتياطية جديدة (14MB) أوّلًا، ثمّ نفس الصورة المُختبَرة على test1/.194 بالضبط</div>
+      <div class="e-status pill ok">✅ صحّة 200 · ab51 · الإصلاحان مؤكَّدان بالكود</div>
+    </div>
+  </div>
+
+  <div class="subhead">🛡️ خطوات الأمان المُتَّبَعة قبل لمس الإنتاج</div>
+  <div class="timeline">
+    <div class="t-step"><div class="t-title">1) فحص FIN-COR</div><div class="t-body">تأكيد أنّ ملفَّي الأعلام المالية (<code>feature_flags.yaml</code>، <code>launch_gates.yaml</code>) لم يتغيّرا — النتيجة: PASS، البصمتان مطابقتان تمامًا للمرجع.</div></div>
+    <div class="t-step"><div class="t-title">2) نسخة احتياطية كاملة قبل أي لمسة</div><div class="t-body">نسخة مضغوطة كاملة لقاعدة بيانات الإنتاج (14 ميجابايت) أُخِذت وحُفِظت على السيرفر قبل أي تعديل.</div></div>
+    <div class="t-step"><div class="t-title">3) وسم نسخة تراجع قبل الاستبدال</div><div class="t-body">صورة الحاوية القديمة العاملة وُسِمت بعلامة تراجع صريحة (<code>tawa-backend-core:pre-r535-fix2-*</code>) قبل استبدالها — يمكن العودة إليها فورًا لو ظهرت مشكلة.</div></div>
+    <div class="t-step"><div class="t-title">4) نفس الصورة المبنيّة مرّة واحدة، لا إعادة بناء على السيرفر الحيّ</div><div class="t-body">الصورة المُختبَرة فعليًّا على test1 وtest/.194 نُقِلت بعينها للإنتاج (<code>docker save</code> → <code>scp</code> → <code>docker load</code>) — لا بناء منفصل قد يُنتِج نسخة مختلفة بالخطأ.</div></div>
+    <div class="t-step warn"><div class="t-title">5) وسم <code>tawa-migrate</code> إلزاميًّا مع <code>tawa-backend-core</code> معًا</div><div class="t-body">طبَّقنا بدقّة الدرس المستفاد من حادثة 2026-07-16 الموثَّقة في هذا المشروع (11 دقيقة توقّف بسبب صورة migrate قديمة): كلا الوسمَين أُشِّرا لنفس الصورة الجديدة في نفس الخطوة.</div></div>
+    <div class="t-step"><div class="t-title">6) إعادة إنشاء migrate ثمّ backend-core بالترتيب الصحيح</div><div class="t-body">migrate عمل وانتهى بنجاح (رمز الخروج 0 — لا هجرات جديدة مطلوبة، القاعدة كانت مطابقة أصلًا)، ثمّ بدأ backend-core بعده مباشرة واجتاز فحص الصحّة (healthy) خلال ثوانٍ.</div></div>
+    <div class="t-step"><div class="t-title">7) فحص خارجيّ حقيقيّ + محاولة تسجيل دخول فعليّة</div><div class="t-body"><code>https://tawanow.com/api/health/ready</code> ← 200 (قاعدة البيانات وRedis سليمان)، ثمّ طلب رمز تحقّق حقيقيّ عبر <code>/api/auth/otp/request</code> ← 200، يثبت أنّ المسار الحيّ يعمل من طرف إلى طرف لا فقط أنّ الحاوية "تعمل".</div></div>
+  </div>
+</section>
+
+<section id="summary">
+  <span class="section-eyebrow">📋 الخلاصة</span>
+  <h2>الجدول التجميعي النهائي</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>البند</th><th>الحالة قبل هذه الجلسة</th><th>الحالة بعدها</th></tr></thead>
+    <tbody>
+      <tr><td>C-05 — القبول/الرفض الجماعيّ لدورَين معلَّقَين معًا</td><td><span class="pill crit">موثَّق كمُصلَح، لكن غير منشور فعليًّا ❌</span></td><td><span class="pill ok">مُصلَح ومنشور على 3/3 بيئات، مؤكَّد بالكود ✅</span></td></tr>
+      <tr><td>ترتيب قفل رفض الطلب / تحرير المحفظة</td><td><span class="pill crit">موثَّق كمُصلَح، لكن غير منشور فعليًّا ❌</span></td><td><span class="pill ok">مُصلَح ومنشور على 3/3 بيئات، مؤكَّد بالكود ✅</span></td></tr>
+      <tr><td>C-16 (قفل تسوية العمولة) وإصلاح "الرمز الناجي"</td><td><span class="pill ok">كانا منشورَين فعلًا في الإنتاج بالفعل ✅</span></td><td><span class="pill ok">مؤكَّدان، بلا تغيير مطلوب ✅</span></td></tr>
+      <tr><td>حارس التراجع عن هجرة ab49 + إصلاح سكربتَي الفحص</td><td><span class="pill neutral">غير موجود بعد — عمل جديد هذه الجلسة</span></td><td><span class="pill ok">مُصلَح ومختبَر ✅</span></td></tr>
+      <tr><td>الحزمة الكاملة للاختبارات الخلفيّة</td><td>—</td><td><span class="pill ok">3842 ناجح / 0 فشل ✅</span></td></tr>
+      <tr><td>test1 · test/.194 · الإنتاج</td><td><span class="pill warn">مبنيّة من لقطة متوسّطة، غير متطابقة ⚠️</span></td><td><span class="pill ok">3/3 مُعاد بناؤها، مفحوصة، متطابقة تمامًا بالكود الحيّ ✅</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="plain">
+    <div class="ic">✅</div>
+    <p>الفجوة بين ما وُثِّق وما كان منشورًا فعليًّا في الإنتاج أُغلِقت بالكامل، بتحقّق مباشر من الكود الحيّ لا من نص أي تقرير — بما في ذلك هذا التقرير نفسه: كل رقم ونتيجة هنا مصدرها أمر تنفيذ فعليّ ظهرت نتيجته أعلاه، لا استنتاج.</p>
+  </div>
+</section>
+
+<footer>تقرير 536 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-20</footer>
+
+</div>

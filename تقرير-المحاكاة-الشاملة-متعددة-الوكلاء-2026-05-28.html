@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير المحاكاة الشاملة متعددة الوكلاء — منصّة تووا</title>
+<style>
+  :root{
+    --green:#0f7b53; --green-d:#0a5c3e; --green-l:#e7f4ee;
+    --ink:#16241d; --muted:#5d6b63; --line:#d9e4dd; --bg:#f6faf8;
+    --red:#b3261e; --red-l:#fdecea; --amber:#9a6700; --amber-l:#fff6e0;
+    --blue:#1554b3; --blue-l:#e9f1fd; --card:#ffffff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);
+       color:var(--ink);line-height:1.85;font-size:16px}
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 80px}
+  header.top{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;
+       border-radius:18px;padding:34px 30px;margin-bottom:26px;box-shadow:0 8px 28px rgba(15,123,83,.22)}
+  header.top h1{margin:0 0 8px;font-size:1.85rem;line-height:1.4}
+  header.top .sub{opacity:.93;font-size:1.02rem}
+  header.top .meta{margin-top:16px;font-size:.86rem;opacity:.85;display:flex;gap:18px;flex-wrap:wrap}
+  header.top .meta span{background:rgba(255,255,255,.14);padding:5px 12px;border-radius:999px}
+  h2{color:var(--green-d);font-size:1.4rem;margin:38px 0 14px;padding-bottom:8px;
+     border-bottom:2px solid var(--line);display:flex;align-items:center;gap:10px}
+  h3{color:var(--green-d);font-size:1.12rem;margin:24px 0 10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        padding:20px 22px;margin:16px 0;box-shadow:0 2px 10px rgba(16,36,29,.04)}
+  .verdict{border:2px solid var(--green);background:var(--green-l)}
+  .verdict .big{font-size:1.22rem;font-weight:700;color:var(--green-d)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:18px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .stat .n{font-size:1.9rem;font-weight:800;color:var(--green);line-height:1}
+  .stat .l{font-size:.82rem;color:var(--muted);margin-top:7px}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem;background:var(--card)}
+  th,td{border:1px solid var(--line);padding:10px 12px;text-align:right;vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  .tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78rem;font-weight:700;white-space:nowrap}
+  .t-ok{background:var(--green-l);color:var(--green-d)}
+  .t-high{background:var(--red-l);color:var(--red)}
+  .t-med{background:var(--amber-l);color:var(--amber)}
+  .t-low{background:var(--blue-l);color:var(--blue)}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:18px 0;justify-content:center}
+  .flow .step{background:var(--green-l);border:1px solid var(--green);color:var(--green-d);
+       border-radius:10px;padding:9px 13px;font-size:.86rem;font-weight:600;text-align:center}
+  .flow .arrow{color:var(--green);font-weight:800;font-size:1.1rem}
+  .role-fb{border-right:5px solid var(--green);background:var(--card)}
+  .role-fb h3{margin-top:0}
+  .role-fb .ok{color:var(--green-d)} .role-fb .warn{color:var(--amber)} .role-fb .wish{color:var(--blue)}
+  ul{margin:8px 0;padding-right:22px} li{margin:5px 0}
+  code{background:#eef3f0;padding:1px 6px;border-radius:5px;font-size:.86em;direction:ltr;display:inline-block}
+  .shot{margin:14px 0;text-align:center}
+  .shot img{max-width:100%;border:1px solid var(--line);border-radius:10px;box-shadow:0 3px 12px rgba(16,36,29,.08)}
+  .shot .cap{font-size:.84rem;color:var(--muted);margin-top:6px}
+  .note{background:var(--amber-l);border-right:5px solid var(--amber);border-radius:10px;padding:14px 18px;margin:14px 0}
+  .note.blue{background:var(--blue-l);border-color:var(--blue)}
+  .note.red{background:var(--red-l);border-color:var(--red)}
+  .toc{columns:2;font-size:.93rem}
+  .toc a{color:var(--green-d);text-decoration:none} .toc a:hover{text-decoration:underline}
+  .shotgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+  .footer{margin-top:48px;padding-top:18px;border-top:2px solid var(--line);color:var(--muted);font-size:.85rem;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>تقرير المحاكاة الشاملة متعددة الوكلاء<br>منصّة تووا (Toowa) — التوصيل في ليبيا</h1>
+  <div class="sub">أربعة خبراء أدوار يدخلون طبيعيًّا + أدمن يوافق + مراقب عام + مراقب أكواد — السلسلة الكاملة من التسجيل حتى التسليم، على مدى 10 أيام</div>
+  <div class="meta">
+    <span>التاريخ: 2026-05-28</span>
+    <span>الواجهة الخلفية: حيّة (حاوية backend)</span>
+    <span>إجمالي الخطوات: 244</span>
+    <span>أخطاء المحاكاة: 1 (في أداة المحاكاة)</span>
+    <span>طلبات سُلِّمت: 13</span>
+  </div>
+</header>
+
+<!-- ============ EXECUTIVE VERDICT ============ -->
+<div class="card verdict">
+  <div class="big">✅ الخلاصة التنفيذية: السلسلة الكاملة تعمل من البداية إلى النهاية</div>
+  <p>أُنشئ أربعة خبراء أدوار (عميل، مزوّد، سائق، موظف) وخبير أدمن. سجّل الجميع <b>تسجيلًا طبيعيًّا</b>،
+  رفع المزوّد والسائق وثائق KYC، <b>وافق الأدمن عليها</b>، فوصلت العقود الإلكترونية (PENDING_SIGNATURE)
+  إلى المزوّد والسائق، و<b>وقّعاها إلكترونيًّا</b> (اسم + صورة توقيع)، ثم بدأا العمل. على مدى عشرة أيام
+  طلب العميل 1–2 مرّة يوميًّا، فمرّ كل طلب بالدورة الكاملة: اختيار المزوّد ← قبول المزوّد ← تحضير ←
+  توزيع للسائق ← استلام ← تتبّع مباشر ← تسليم ← تحصيل نقد. <b>وصلت 13 طلبًا إلى DELIVERED بصفر أخطاء منتج.</b></p>
+  <p>الخطأ الوحيد في المحاكاة (244 خطوة) كان <b>تسمية خاطئة في أداة المحاكاة نفسها</b> (رفعَت نوع وثيقة
+  <code>COMMERCIAL_LICENSE</code> غير موجود في القائمة المقبولة) — والتحقّق رفضه بشكل صحيح. هذا ليس خطأ منتج.</p>
+  <p class="note red" style="margin-bottom:0">
+  ⚠️ <b>لكنّ مراقب الأكواد — وهو ما طلبتَه تحديدًا — كشف عيبين خفيّين (HIGH)</b> غطّاهما المسار السعيد
+  للمحاكاة (لأنها صادفت ضبط الإحداثيات ووقّعت العقد آليًّا دون قراءة نصّه). هذان العيبان موثّقان ومُتحقَّق
+  منهما بالكود في قسم «مراقب الأكواد» أدناه، ويجب إصلاحهما قبل التشغيل الحقيقي.</p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">محتويات التقرير</h3>
+  <div class="toc">
+    <a href="#method">1. المنهجية: المحاكاة والوكلاء الستة</a><br>
+    <a href="#onboarding">2. السلسلة الطبيعية: تسجيل ← KYC ← موافقة ← عقود</a><br>
+    <a href="#days">3. عشرة أيام من طلبات العميل</a><br>
+    <a href="#provider-sel">4. آلية اختيار المزوّد</a><br>
+    <a href="#driver-sel">5. آلية اختيار السائق (التوزيع)</a><br>
+    <a href="#tracking">6. التتبّع المباشر (إضافتك الحرجة)</a><br>
+    <a href="#general-overseer">7. المراقب العام: هل انحرف الوكلاء؟</a><br>
+    <a href="#code-overseer">8. مراقب الأكواد: أخطاء صامتة وأكواد ميتة</a><br>
+    <a href="#role-feedback">9. ملاحظات بشرية لكل دور</a><br>
+    <a href="#sim-error">10. الخطأ الوحيد في المحاكاة مشروحًا</a><br>
+    <a href="#reco">11. التوصيات المرتّبة بالأولوية</a><br>
+    <a href="#shots">12. لقطات من المنصّة</a>
+  </div>
+</div>
+
+<!-- ============ 1. METHOD ============ -->
+<h2 id="method">١. المنهجية: المحاكاة والوكلاء الستة</h2>
+<p>المحاكاة قادها سكربت حيّ (<code>sim.py</code>) ضرب الواجهة الخلفية الحقيقية مباشرةً داخل الحاوية،
+بنفس مسارات الـAPI التي يستخدمها التطبيق. كل خطوة سجّلت رمز الحالة + حالة الطلب، وكل خطأ جُمِع، وطُبع ملخّص.
+حول المحاكاة عمل ستّة وكلاء:</p>
+<table>
+  <tr><th>الوكيل</th><th>الدور</th><th>المخرَج</th></tr>
+  <tr><td>خبير العميل</td><td>يطلب، يتتبّع، يدفع نقدًا — كإنسان حقيقي</td><td>ملاحظات UX بشرية</td></tr>
+  <tr><td>خبير المزوّد</td><td>يسجّل، يرفع وثائق، يوقّع العقد، يدير الطلبات</td><td>ملاحظات UX بشرية</td></tr>
+  <tr><td>خبير السائق</td><td>يسجّل، يوقّع العقد، يستلم، يوصّل، يحصّل</td><td>ملاحظات UX بشرية</td></tr>
+  <tr><td>خبير الموظف</td><td>ينضمّ بكود دعوة، يعمل في الطابور والتحضير</td><td>ملاحظات UX بشرية</td></tr>
+  <tr><td><b>المراقب العام</b></td><td>يراقب: هل انحرف أيُّ وكيل عن الواقع؟</td><td>حكم على موثوقية الاستنتاجات</td></tr>
+  <tr><td><b>مراقب الأكواد</b></td><td>يفحص: أخطاء صامتة، عيوب، أكواد ميتة</td><td>قائمة عيوب مُتحقَّقة بالكود</td></tr>
+</table>
+
+<!-- ============ 2. ONBOARDING ============ -->
+<h2 id="onboarding">٢. السلسلة الطبيعية: تسجيل ← KYC ← موافقة ← عقود</h2>
+<p>هذا هو جوهر سؤالك: «هل بعد التسجيل ستصل العقود للمزوّدين والسائقين ويوقّعونها إلكترونيًّا، وتكتمل
+السلسلة؟» — الجواب المُثبَت: <b>نعم</b>.</p>
+
+<div class="flow">
+  <div class="step">تسجيل طبيعي<br><small>/auth/register</small></div>
+  <div class="arrow">←</div>
+  <div class="step">رفع وثائق KYC<br><small>المزوّد + السائق</small></div>
+  <div class="arrow">←</div>
+  <div class="step">موافقة الأدمن<br><small>SUPER_ADMIN</small></div>
+  <div class="arrow">←</div>
+  <div class="step">إصدار العقد<br><small>PENDING_SIGNATURE</small></div>
+  <div class="arrow">←</div>
+  <div class="step">توقيع إلكتروني<br><small>اسم + صورة توقيع</small></div>
+  <div class="arrow">←</div>
+  <div class="step">بدء العمل ✅</div>
+</div>
+
+<div class="grid">
+  <div class="stat"><div class="n">18/19</div><div class="l">خطوات الـonboarding ناجحة</div></div>
+  <div class="stat"><div class="n">4/4</div><div class="l">عقود وصلت ووُقِّعت إلكترونيًّا</div></div>
+  <div class="stat"><div class="n">2</div><div class="l">أنواع عقود (مزوّد + سائق)</div></div>
+  <div class="stat"><div class="n">PENDING<br>→SIGNED</div><div class="l">حالة العقد بعد الموافقة</div></div>
+</div>
+
+<p>التفصيل المُثبَت من المحاكاة:</p>
+<ul>
+  <li><b>العميل</b>: سجّل ونشط فورًا (لا يحتاج موافقة).</li>
+  <li><b>المزوّد</b>: سجّل ← رفع وثائق KYC ← وافق الأدمن ← صفحته صارت <code>ACTIVE</code>.</li>
+  <li><b>السائق</b>: سجّل ← رفع وثائق KYC ← وافق الأدمن ← صار <code>ACTIVE</code>.</li>
+  <li><b>العقود</b>: بمجرّد الموافقة، أصدر النظام عقدًا <code>onboarding_contract</code> بحالة
+      <code>PENDING_SIGNATURE</code> لكلٍّ من المزوّد (<code>TOS_PROVIDER</code>) والسائق
+      (<code>TOS_DRIVER</code>). جلبهما الوكيلان عبر <code>GET /onboarding/contract/me</code>،
+      ثم وقّعاهما عبر <code>POST /onboarding/contract/sign</code> بحقلَي
+      <code>signature_name</code> + <code>signature_photo_key</code>.</li>
+  <li><b>بوّابة العمل</b>: قبل التوقيع، يحجب النظام تفعيل توفّر السائق وقبول المزوّد للطلبات (403)
+      — أي لا أحد يعمل بعقد غير موقّع. بعد التوقيع، فُتح العمل.</li>
+  <li><b>الموظف</b>: انضمّ بكود دعوة المزوّد (8 خانات) وصار <code>PROVIDER_STAFF</code> فعّالًا فورًا.</li>
+  <li><b>الكتالوج</b>: نشر المزوّد صنفًا (إنشاء + variant بسعر + نشر) ليطلبه العميل.</li>
+</ul>
+
+<div class="shotgrid">
+  <div class="shot"><img src="shots_2026-05-27/02-register-roles.png" alt="اختيار الدور"><div class="cap">اختيار الدور عند التسجيل</div></div>
+  <div class="shot"><img src="shots_2026-05-27/03-register-provider-form.png" alt="نموذج المزوّد"><div class="cap">نموذج تسجيل المزوّد</div></div>
+  <div class="shot"><img src="shots_2026-05-27/04-register-driver-form.png" alt="نموذج السائق"><div class="cap">نموذج تسجيل السائق</div></div>
+  <div class="shot"><img src="shots_2026-05-27/13-ops-document-inbox.png" alt="صندوق وثائق KYC"><div class="cap">صندوق وثائق KYC في لوحة الأدمن — حيث تُوافَق المستندات</div></div>
+</div>
+
+<!-- ============ 3. DAYS ============ -->
+<h2 id="days">٣. عشرة أيام من طلبات العميل</h2>
+<p>العميل هو مصدر الإيراد ومركز المحاكاة. على مدى عشرة أيام طلب 1–2 مرّة يوميًّا أشياء مختلفة،
+ومرّ كل طلب بالدورة الكاملة.</p>
+<div class="grid">
+  <div class="stat"><div class="n">10</div><div class="l">أيام مُحاكاة</div></div>
+  <div class="stat"><div class="n">13</div><div class="l">طلبات سُلِّمت (DELIVERED)</div></div>
+  <div class="stat"><div class="n">182/182</div><div class="l">خطوات دورة الطلب ناجحة</div></div>
+  <div class="stat"><div class="n">100%</div><div class="l">نسبة إكمال الدورة</div></div>
+</div>
+<p>دورة الطلب الواحد المُثبَتة خطوةً خطوة:</p>
+<div class="flow">
+  <div class="step">إنشاء طلب<br><small>نقد COD</small></div><div class="arrow">←</div>
+  <div class="step">قبول المزوّد</div><div class="arrow">←</div>
+  <div class="step">بدء التحضير</div><div class="arrow">←</div>
+  <div class="step">جاهز<br><small>+ قائمة تغليف</small></div><div class="arrow">←</div>
+  <div class="step">توزيع للسائق</div><div class="arrow">←</div>
+  <div class="step">استلام<br><small>رمز QR</small></div><div class="arrow">←</div>
+  <div class="step">تتبّع مباشر</div><div class="arrow">←</div>
+  <div class="step">رمز تسليم</div><div class="arrow">←</div>
+  <div class="step">تحصيل نقد<br><small>مقرَّب 250</small></div><div class="arrow">←</div>
+  <div class="step">DELIVERED ✅</div>
+</div>
+
+<!-- ============ 4. PROVIDER SELECTION ============ -->
+<h2 id="provider-sel">٤. آلية اختيار المزوّد</h2>
+<p>اختيار المزوّد <b>بقيادة العميل</b>، يسانده النظام عند الرفض:</p>
+<ul>
+  <li>يتصفّح العميل المزوّدين عبر <code>providers/search</code> (مُصفّى بـ <code>is_accepting_orders</code>
+      + المدينة + الفئة)، فيختار المطعم ويطلب منه.</li>
+  <li>يدخل الطلب حالة <code>AWAITING_PROVIDER_ACCEPTANCE</code>، ويرى المزوّد الطلب <b>فورًا</b>
+      (بثّ SSE مع تحديث احتياطي) ويقبله أو يرفضه.</li>
+  <li><b>عند الرفض أو عدم الردّ</b>: يُصلح النظام المسار تلقائيًّا — يُشعر العميل، ويقترح أصنافًا مشابهة
+      من مزوّدين آخرين نشطين ضمن ±25% من السعر (<code>GET /orders/{id}/alternatives</code>)، مع بانر
+      «اقتراحات مشابهة» / «أبحث بنفسي». فلا يُترك الطلب معلّقًا.</li>
+</ul>
+
+<!-- ============ 5. DRIVER SELECTION ============ -->
+<h2 id="driver-sel">٥. آلية اختيار السائق (التوزيع التلقائي)</h2>
+<p>اختيار السائق <b>تلقائي بقيادة النظام</b>:</p>
+<ul>
+  <li>عند قبول المزوّد، يستدعي النظام <code>auto_dispatch_for_order</code> الذي يبحث عن
+      <b>أقرب سائق مؤهَّل</b> عبر <code>find_nearest_available_driver</code> (Redis GEOSEARCH ضمن نطاق،
+      مرتّب تصاعديًّا بالمسافة، مع سقوط احتياطي إلى حساب haversine دقيق).</li>
+  <li>شروط الأهلية: <code>status=ACTIVE</code> و<code>available=True</code> وغير مشغول، و<b>الكاش المستحق
+      أقل من حدّ السائق</b> (سائق فوق الحدّ تُحجب عنه العروض)، وغير موقوف.</li>
+  <li>يُنشأ <code>DispatchOffer</code> بنافذة قبول (افتراضي 120ث)، ويرى السائق <b>أجره المتوقّع قبل القبول</b>
+      (<code>estimated_payout_minor</code> بنفس أساس الدفع عند التسليم).</li>
+  <li><b>إن لم يوجد سائق</b>: <code>escalate_stuck_awaiting_driver</code> يُشعر العميل (<code>dispatch.no_driver</code>)
+      مع بانر «إلغاء واسترداد» — لا توقّف صامت.</li>
+</ul>
+<div class="note">آلية التوزيع تعمل بشكل صحيح في المحاكاة <b>لأن المزوّد كان له إحداثيات</b>. انظر العيب HIGH-2 في
+قسم مراقب الأكواد: مزوّد بلا إحداثيات يتسبّب في تخطٍّ صامت للتوزيع.</div>
+
+<!-- ============ 6. TRACKING ============ -->
+<h2 id="tracking">٦. التتبّع المباشر — إضافتك الحرجة</h2>
+<p>أضفتَ هذه النقطة في منتصف المهمة: «العميل يجب أن يتتبّع طلبه عند المزوّد، وبعد أن يستلمه السائق
+يتتبّع السائق». اختبرت المحاكاة الأمرين صراحةً.</p>
+<div class="grid">
+  <div class="stat"><div class="n">39/39</div><div class="l">خطوات تتبّع ناجحة</div></div>
+  <div class="stat"><div class="n">SSE</div><div class="l">بثّ مباشر + سقوط احتياطي استطلاع</div></div>
+  <div class="stat"><div class="n">ABAC</div><div class="l">موقع السائق يُكشف للعميل فقط</div></div>
+</div>
+<h3>أ. التتبّع عند المزوّد</h3>
+<p>يستطلع العميل <code>GET /orders/{id}</code> فيرى تقدّم الحالة (بانتظار القبول ← قيد التحضير ← جاهز)،
+وشريط مراحل واضح بالعربي + رمز التسليم. ومعه لوحة محادثة مع السائق (استطلاع 5ث).</p>
+<h3>ب. تتبّع السائق بعد الاستلام</h3>
+<p>بعد الاستلام، يبثّ السائق موقعه (<code>POST /dispatch/drivers/location</code> مع
+<code>order_id</code>)، ويتلقّى العميل الموقع عبر بثّ SSE (<code>/sse/orders/{id}/track</code>) مع
+ضوابط ABAC تقصُر <code>driver.location</code> على العميل، وسقوط احتياطي إلى استطلاع
+<code>GET /dispatch/orders/{id}/driver-location</code>. خريطة التتبّع تتحدّث لحظيًّا.</p>
+<div class="note blue">ملاحظة العميل البشرية (انظر قسم 9): الخريطة تُظهر <b>نقطة متحرّكة فقط</b> — لا اسم سائق ولا صورة
+ولا تقييم ولا نوع مركبة، ولا وقت وصول متوقّع (<code>eta_minutes</code> لا يُملأ أبدًا). التتبّع يعمل لكنه
+فقير المعلومات.</div>
+
+<!-- ============ 7. GENERAL OVERSEER ============ -->
+<h2 id="general-overseer">٧. المراقب العام: هل انحرف الوكلاء؟</h2>
+<div class="card">
+  <p><b>الحكم: لم ينحرف أيُّ وكيل — كل الاستنتاجات موثوقة.</b></p>
+  <p>راقب المراقب العام ما إذا كان أيُّ وكيل قد «اخترع» ميزات أو ادّعى أمورًا غير موجودة. النتيجة أن كل
+  وكيل <b>أرسى كل نقطة على الكود الفعلي</b> (مع <code>file:line</code>) و<b>تحقّق قبل الادّعاء</b>:</p>
+  <ul>
+    <li>وكيل العميل أكّد غياب معلومات السائق بفحص نوع <code>OrderSummary</code> (لا حقل اسم/صورة/هاتف للسائق)،
+        وأن <code>eta_minutes</code> يُعرض فقط <code>if != null</code> لكنه لا يُملأ.</li>
+    <li>وكيل المزوّد تحقّق بالبحث أنه <b>لا يوجد</b> زر طباعة/إيصال ولا تنبيه صوتي ولا عدّاد تحضير في أيّ ملف مزوّد.</li>
+    <li>وكيل السائق تحقّق أن رابط الملاحة للمزوّد <b>غير موجود</b> (المزوّد نصّ فقط)، وأن «العميل لا يردّ» مجرّد نوع بلاغ.</li>
+    <li>وكيل الموظف تحقّق أن تلميح كود الدعوة يقول «الإعدادات» بينما الكود فعليًّا في «الرئيسية»، وأن «العروض/التسوية»
+        تختفيان للموظف.</li>
+  </ul>
+  <p>لذلك: <b>لا اعتماد على وكيل منحرف</b> — كل ملاحظة قابلة للتحقّق بالكود.</p>
+</div>
+
+<!-- ============ 8. CODE OVERSEER ============ -->
+<h2 id="code-overseer">٨. مراقب الأكواد: أخطاء صامتة وأكواد ميتة</h2>
+<p>هذا أهم قسم — كما طلبتَ تحديدًا. فحص مراقب الأكواد وحدات الـonboarding/legal والتوزيع والطلبات والمزوّدين
+والمالية والعمليات وواجهاتها. <b>تحقّقتُ شخصيًّا من العيبين HIGH بقراءة الكود</b> قبل إدراجهما هنا.</p>
+<table>
+  <tr><th>#</th><th>العيب</th><th>الخطورة</th><th>الأثر</th></tr>
+  <tr>
+    <td>1</td>
+    <td><b>وثائق العقود لا تُزرع في الكود أبدًا.</b> migration <code>u1a2b3c4d5e6</code> ينشئ جدول
+        <code>legal_documents</code> فقط (create_table/create_index)، ولا migration ولا سكربت ولا deploy
+        يُدخل أيّ صفّ. الدالة الوحيدة <code>_seed_doc</code> موجودة في <b>ملف الاختبار</b>
+        <code>test_phase384</code>، لا في الإنتاج.</td>
+    <td><span class="tag t-high">HIGH</span></td>
+    <td><code>GET /legal/documents/{type}</code> يُرجع 404، فيُعرض في
+        <code>OnboardingContractSign.tsx</code> نصّ احتياطي فقط — <b>يوقّع المزوّد/السائق عقدًا لا يستطيع
+        قراءة نصّه.</b> محاكاتي وقّعت آليًّا دون قراءة النصّ فمرّت.</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td><b>مزوّد بلا إحداثيات يُفعَّل → تخطٍّ صامت للتوزيع.</b> <code>approve_onboarding</code>
+        (operations_router.py) يتحقّق من <code>business_name</code>+<code>city</code> فقط، لا
+        <code>lat/lng</code>. ثم <code>provider_router.py:246</code>:
+        <code>if provider.lat is not None and provider.lng is not None:</code> يتخطّى كتلة
+        <code>auto_dispatch</code> بالكامل <b>دون أيّ سجلّ</b> عند غياب الإحداثيات.</td>
+    <td><span class="tag t-high">HIGH</span></td>
+    <td>الطلب يبقى دون البحث عن أيّ سائق، بلا سجلّ ولا إشارة. مهلة القبول لا تلتقطه (تلتقط
+        <code>AWAITING_PROVIDER_ACCEPTANCE</code> فقط). محاكاتي ضبطت الإحداثيات فلم تُصِبه.</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>عقد الـonboarding لـ<code>PROVIDER_STAFF</code> ميّت فعليًّا: يُنشأ بحالة PENDING_SIGNATURE لكن
+        <code>/files/upload</code> يسمح بـ DRIVER/PROVIDER_ADMIN فقط → لا يستطيع الموظف رفع صورة التوقيع
+        الإلزامية، فلا يوقّع أبدًا (residual A-R01).</td>
+    <td><span class="tag t-med">MED</span></td>
+    <td>صفّ عقد غير قابل للتوقيع (غير ضارّ لأن قبول الطلبات admin-only).</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td><code>create_onboarding_contract</code> يلفّق <code>doc_version=1</code> حين لا يوجد مستند
+        (legal_router.py). مع العيب #1، كل عقد موقّع يشير إلى مستند غير موجود.</td>
+    <td><span class="tag t-med">MED</span></td>
+    <td>السجلّ الموقّع يشير إلى لا شيء.</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>جلب نصّ العقد في الواجهة مبتلَع: <code>OnboardingContractSign.tsx:43</code>
+        <code>catch { /* document optional */ }</code> — يخفي فشل تحميل النصّ ويتابع التوقيع بالنصّ الاحتياطي
+        دون إشارة. (هذا النصف الواجهي للعيب #1.)</td>
+    <td><span class="tag t-med">MED</span></td>
+    <td>المستخدم يوقّع دون أن يعلم أن الشروط الحقيقية لم تُحمَّل.</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td><code>_get_timeout_seconds</code> يقرأ عمودًا محذوفًا كل دورة كنس
+        (<code>accept_timeout_service.py</code>)، لكن except + rollback يحتوي الضرر ويسقط للقيمة الافتراضية 300ث.</td>
+    <td><span class="tag t-low">LOW</span></td>
+    <td>مُخفَّف؛ لكن تجاوز المهلة المُهيّأ لا يُطبَّق صامتًا (موثّق في تعليق الملف).</td>
+  </tr>
+</table>
+
+<h3>أكواد ميتة</h3>
+<p><b>لا أكواد ميتة مؤكَّدة في مسار الرحلة.</b> الدالة المُشار إليها سابقًا
+<code>record_cash_handover_to_provider</code> <b>حُذفت</b> (صفر مراجع في الباكند). و
+<code>OrderChat.tsx:33</code> (catch لاستطلاع 5ث) مقبول لأن أخطاء الإرسال تُظهَر في السطر 71.</p>
+
+<h3>مناطق نظيفة (تأكيد إيجابي)</h3>
+<p>كنس مهلة القبول، تصعيد لا-سائق، تسوية لا-حضور، كنس تحذير الوثائق — كلها تستخدم آلة الحالة بشكل صحيح،
+تحرّر حجوزات المحفظة، تُشعِر العميل، تُسجّل الإخفاقات، ومربوطة ومقفولة في <code>main.py</code>. مسار
+الرفض/لا-سائق + الاقتراحات البديلة مربوط بالكامل مع تطبيق الملكية.</p>
+
+<!-- ============ 9. ROLE FEEDBACK ============ -->
+<h2 id="role-feedback">٩. ملاحظات بشرية لكل دور</h2>
+<p>كل وكيل دور أعطى ملاحظاته كإنسان يستخدم المنصّة يوميًّا: ما عمل، ما صعُب أو نقص، وما يتمنّاه.</p>
+
+<div class="card role-fb">
+  <h3>🛒 العميل (بعد 10 أيام استخدام)</h3>
+  <p class="ok"><b>✅ ما أعجبني:</b> الرئيسية ترحّب بالاسم وتطلب الموقع وتعرض «بحوثاتي السابقة». التتبّع فيه
+  شريط مراحل واضح + رمز تسليم كبير. عند الخروج أرى الفرعي + رسم التوصيل + الإجمالي + بطاقة «جهّز نقدًا»
+  مقرَّبة لأقرب ¼ دينار. «إعادة الطلب» بنقرة، ومحادثة مع السائق، واقتراحات عند الرفض.</p>
+  <p class="warn"><b>⚠️ ما صعُب أو نقص:</b> لا أعرف شيئًا عن سائقي (لا اسم/صورة/مركبة/تقييم — نقطة على الخريطة فقط)؛
+  لا اتصال بالسائق من تطبيقي؛ <b>لا وقت وصول متوقّع</b> (<code>eta_minutes</code> لا يُملأ)؛ كل الفئات غير
+  المطاعم «قريبًا»؛ لا مفضّلة ولا «اطلب مجددًا من…»؛ صفحة الأصناف بلا صور؛ «مغلق» دون «يفتح الساعة…»؛
+  لا إشعار عند الردّ على الشكوى.</p>
+  <p class="wish"><b>💡 أتمنّى لو:</b> بطاقة سائق (اسم+صورة+تقييم+اتصال)؛ وقت وصول حقيقي على الخريطة؛ زر مفضّلة
+  وقسم «اطلب مجددًا»؛ صور للأصناف؛ رسم توصيل نهائي مبكّر؛ إشعارات Push لتغيّر الحالة.</p>
+</div>
+
+<div class="card role-fb">
+  <h3>🍽️ المزوّد (صاحب مطعم)</h3>
+  <p class="ok"><b>✅ ما أعجبني:</b> استلام الطلبات حيّ وفوري (SSE + ومضة 5ث)؛ «اقبل وابدأ التحضير» بضغطة؛
+  أرى الأصناف والكميات في البطاقة؛ كود دعوة الموظفين بنسخ وتجديد؛ صفحة التسوية شفّافة (عمولة + صافٍ + زر صرف)؛
+  لوحة «الأكثر مبيعًا».</p>
+  <p class="warn"><b>⚠️ ما صعُب أو نقص:</b> <b>لا تنبيه صوتي/اهتزاز</b> عند طلب جديد (أفقد طلبات لو الجوال بعيد)؛
+  <b>لا زر طباعة إيصال/تذكرة مطبخ</b> إطلاقًا؛ التحضير بلا عدّاد وقت؛ لا طريقة سريعة من شاشة واحدة لتعليم صنف نفد؛
+  التسعير محيّر («ضمن variant»)؛ لا قائمة واضحة مسبقًا بالوثائق المطلوبة.</p>
+  <p class="wish"><b>💡 أتمنّى لو:</b> تنبيه صوتي+اهتزاز قابل للكتم؛ زر «طباعة تذكرة مطبخ»؛ عدّاد تحضير يحمرّ عند
+  التأخّر؛ «وضع مشغول» يضيف وقتًا تلقائيًّا؛ زر «نفد اليوم» بجانب كل صنف؛ حقل سعر مباشر دون كلمة «متغيّر».</p>
+</div>
+
+<div class="card role-fb">
+  <h3>🛵 السائق (على الطريق — 13 توصيلة)</h3>
+  <p class="ok"><b>✅ ما أعجبني:</b> العرض يُظهر الأجر المتوقّع + المبلغ + المسافة قبل القبول؛ رمز الاستلام QR كبير؛
+  رمز التسليم 4 خانات واضح؛ بطاقة الكاش واعية بالحدّ مع تحذير لوني؛ وضع «بلا إنترنت» يحفظ ويرسل لاحقًا؛
+  «متابعة الطلب الحالي».</p>
+  <p class="warn"><b>⚠️ ما صعُب أو نقص:</b> <b>لا ملاحة حقيقية للمزوّد</b> (عنوانه نصّ فقط بلا رابط، والعميل بحث نصّي
+  لا إحداثيات)؛ «العميل لا يردّ» مجرّد بلاغ ينتظر العمليات (لا اتصال سريع/مؤقّت)؛ <b>أين أودِع الكاش؟</b> لا
+  خريطة/قائمة وكلاء قريبين؛ الاستلام يعتمد كليًّا على مسح المزوّد (عالق لو بطيء)؛ منتقي نوع الإثبات معقّد.</p>
+  <p class="wish"><b>💡 أتمنّى لو:</b> زر ملاحة لكل مرحلة بإحداثيات (المزوّد كالعميل)؛ تدفّق «العميل لا يردّ» متكامل
+  (اتصال+مؤقّت+«صَوّر وأكمل»)؛ خريطة أقرب نقاط إيداع الكاش؛ ملخّص «صافي ما لي» أوضح؛ تبسيط شاشة التسليم.</p>
+</div>
+
+<div class="card role-fb">
+  <h3>👷 الموظف (موظف متجر)</h3>
+  <p class="ok"><b>✅ ما أعجبني:</b> التسجيل بكود الدعوة سهل (يحوّل لحروف كبيرة ويشيل المسافات)؛ دخول مباشر بلا
+  انتظار موافقة؛ شاشة الطلبات ممتازة (طابور + تحضير + ومضة + تنبيه فوري)؛ قائمة التغليف قبل «جاهز»؛ زر «غير متاح»
+  للصنف الواحد.</p>
+  <p class="warn"><b>⚠️ ما صعُب أو نقص:</b> <b>من أين أجيب الكود؟</b> التلميح يقول «الإعدادات» بينما هو فعليًّا في
+  «الرئيسية»؛ غير واضح ما ليس مسموحًا لي («العروض/التسوية» تختفيان صامتًا)؛ رابط «الإعدادات» يظهر لكنّ لمس المال
+  يعطي 403 مفاجئ؛ لا «طلباتي» ولا وردية (الطابور يعرض كل طلبات المتجر للجميع).</p>
+  <p class="wish"><b>💡 أتمنّى لو:</b> شريط صلاحياتي عند الدخول؛ تصحيح تلميح الكود لـ«الرئيسية»؛ زر «طلباتي»
+  وتسجيل مَن حضّر؛ بداية/نهاية وردية؛ إخفاء/تعطيل إعدادات المال بصريًّا بدل 403.</p>
+</div>
+
+<!-- ============ 10. SIM ERROR ============ -->
+<h2 id="sim-error">١٠. الخطأ الوحيد في المحاكاة مشروحًا</h2>
+<div class="card">
+  <p>من 244 خطوة، فشلت خطوة واحدة: رفع وثيقة المزوّد بنوع <code>COMMERCIAL_LICENSE</code> → HTTP 422.</p>
+  <p><b>السبب:</b> أداة المحاكاة استخدمت اسم نوع غير موجود في القائمة المقبولة
+  <code>VALID_PROVIDER_DOC_TYPES</code> (الصحيح: <code>COMMERCIAL_REGISTER</code> أو
+  <code>ESTABLISHMENT_LICENSE</code> أو <code>TRADE_LICENSE</code> …). <b>التحقّق رفضه بشكل صحيح</b> برسالة
+  تَسرد الأنواع المقبولة.</p>
+  <p><b>الحكم:</b> هذا خطأ في <b>بيانات المحاكاة</b>، لا في المنتج. بل هو دليل إيجابي على أن التحقّق من نوع
+  الوثيقة يعمل.</p>
+</div>
+
+<!-- ============ 11. RECOMMENDATIONS ============ -->
+<h2 id="reco">١١. التوصيات المرتّبة بالأولوية</h2>
+<table>
+  <tr><th>الأولوية</th><th>التوصية</th><th>المصدر</th></tr>
+  <tr><td><span class="tag t-high">عاجل 1</span></td>
+      <td>زرع وثائق العقود في الكود (migration/seed idempotent) فيُعرض نصّ العقد الحقيقي قبل التوقيع.</td>
+      <td>مراقب الأكواد #1</td></tr>
+  <tr><td><span class="tag t-high">عاجل 2</span></td>
+      <td>إلزام إحداثيات المزوّد عند الموافقة (أو على الأقل تسجيل تخطّي التوزيع بدل التخطّي الصامت).</td>
+      <td>مراقب الأكواد #2</td></tr>
+  <tr><td><span class="tag t-med">مهم</span></td>
+      <td>عدم ابتلاع فشل تحميل نصّ العقد في الواجهة + معالجة عقد الموظف غير القابل للتوقيع.</td>
+      <td>مراقب الأكواد #3/#5</td></tr>
+  <tr><td><span class="tag t-low">UX عميل</span></td>
+      <td>بطاقة سائق (اسم/صورة/تقييم/اتصال) + وقت وصول متوقّع حقيقي على الخريطة.</td>
+      <td>وكيل العميل</td></tr>
+  <tr><td><span class="tag t-low">UX مزوّد</span></td>
+      <td>تنبيه صوتي/اهتزاز للطلب الجديد + زر طباعة تذكرة مطبخ + عدّاد تحضير.</td>
+      <td>وكيل المزوّد</td></tr>
+  <tr><td><span class="tag t-low">UX سائق</span></td>
+      <td>ملاحة بإحداثيات للمزوّد والعميل + خريطة أقرب نقاط إيداع الكاش.</td>
+      <td>وكيل السائق</td></tr>
+  <tr><td><span class="tag t-low">UX موظف</span></td>
+      <td>تصحيح تلميح كود الدعوة + شريط صلاحيات واضح للموظف.</td>
+      <td>وكيل الموظف</td></tr>
+</table>
+<div class="note">🧹 <b>تنظيف بيانات:</b> أنشأت المحاكاة نحو 15 مستخدم اختبار (<code>audit-*</code>) في قاعدة البيانات
+الحيّة. أوصي بحذفها بعد مراجعة هذا التقرير — أخبرني وأنفّذ التنظيف.</div>
+
+<!-- ============ 12. SHOTS ============ -->
+<h2 id="shots">١٢. لقطات من المنصّة</h2>
+<div class="shotgrid">
+  <div class="shot"><img src="shots_2026-05-27/01-landing.png" alt="الواجهة"><div class="cap">الواجهة الرئيسية</div></div>
+  <div class="shot"><img src="shots_2026-05-27/07-customer-home.png" alt="رئيسية العميل"><div class="cap">رئيسية العميل</div></div>
+  <div class="shot"><img src="shots_2026-05-27/08-order-history.png" alt="سجل الطلبات"><div class="cap">سجل الطلبات + إعادة الطلب</div></div>
+  <div class="shot"><img src="shots_2026-05-27/18-f19-preparation-page.png" alt="صفحة التحضير"><div class="cap">صفحة تحضير المزوّد</div></div>
+  <div class="shot"><img src="shots_2026-05-27/19-f19-driver-here-card.png" alt="بطاقة السائق هنا"><div class="cap">بطاقة «السائق وصل» عند المزوّد</div></div>
+  <div class="shot"><img src="shots_2026-05-27/12-ops-dashboard.png" alt="لوحة العمليات"><div class="cap">لوحة العمليات (الأدمن)</div></div>
+  <div class="shot"><img src="shots_2026-05-27/17-provider-nav.png" alt="تنقّل المزوّد"><div class="cap">تنقّل بوّابة المزوّد</div></div>
+  <div class="shot"><img src="shots_2026-05-27/09-wallet.png" alt="المحفظة"><div class="cap">المحفظة</div></div>
+  <div class="shot"><img src="shots_2026-05-27/10-support-chat.png" alt="الدعم"><div class="cap">محادثة الدعم</div></div>
+</div>
+
+<div class="footer">
+  منصّة تووا (Toowa) — تقرير المحاكاة الشاملة متعددة الوكلاء · 2026-05-28<br>
+  244 خطوة · 13 طلبًا سُلِّم · 6 وكلاء (4 أدوار + مراقب عام + مراقب أكواد) · السلسلة الكاملة مُثبَتة من التسجيل حتى التسليم
+</div>
+
+</div>
+</body>
+</html>

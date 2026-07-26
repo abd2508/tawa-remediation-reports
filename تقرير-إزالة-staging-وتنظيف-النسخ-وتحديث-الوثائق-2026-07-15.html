@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير إزالة staging وتنظيف النسخ وتحديث الوثائق</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+      --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+      --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+      --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+      --code-bg:#0f1018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+    --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+    --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+    --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --purple:#c4b5fd; --purple-bg:#241b3d;
+    --code-bg:#0f1018;
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --purple:#8b5cf6; --purple-bg:#f1ebfe;
+    --code-bg:#f1f2f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI","Tahoma","Geeza Pro","Noto Naskh Arabic",sans-serif;
+    line-height:1.75; margin:0; padding:0; font-size:16px;
+  }
+  .wrap{max-width:1140px; margin:0 auto; padding:28px 20px 90px;}
+  header.hero{
+    background:linear-gradient(135deg,var(--accent),#2563eb);
+    color:#fff; border-radius:18px; padding:34px 28px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+  }
+  header.hero h1{margin:0 0 10px; font-size:1.55rem; line-height:1.55; text-wrap:balance;}
+  header.hero p{margin:0; opacity:.95; font-size:1.02rem;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+  .meta-chip{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:6px 14px; border-radius:999px; font-size:.85rem;}
+
+  h2{font-size:1.35rem; margin:50px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px;}
+  h3{font-size:1.05rem; margin:22px 0 10px;}
+  h4{font-size:.98rem; margin:16px 0 8px;}
+  .lead{color:var(--sub); font-size:1rem; margin-bottom:18px;}
+
+  .card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,.03);}
+
+  .tbl-wrap{overflow-x:auto; border-radius:12px; border:1px solid var(--border); margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:.9rem;}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{background:var(--code-bg); font-size:.82rem; color:var(--sub);}
+  tr:last-child td{border-bottom:none;}
+  td.num-cell, th.num-cell{font-variant-numeric:tabular-nums; text-align:center;}
+  code{background:var(--code-bg); padding:2px 6px; border-radius:6px; font-size:.85em; direction:ltr; display:inline-block; unicode-bidi:embed;}
+  pre{background:var(--code-bg); padding:14px; border-radius:10px; overflow-x:auto; direction:ltr; text-align:left; font-size:.8rem; border:1px solid var(--border); white-space:pre-wrap;}
+
+  .badge{display:inline-block; padding:4px 12px; border-radius:999px; font-size:.76rem; font-weight:700; white-space:nowrap;}
+  .badge.done{background:var(--green-bg); color:var(--green);}
+  .badge.new{background:var(--red-bg); color:var(--red);}
+  .badge.info{background:var(--blue-bg); color:var(--blue);}
+  .badge.warn{background:var(--amber-bg); color:var(--amber);}
+  .badge.skip{background:var(--gray-bg); color:var(--gray);}
+
+  .simple{background:var(--blue-bg); border-inline-start:4px solid var(--blue); border-radius:10px; padding:12px 16px; margin:14px 0; font-size:.94rem;}
+  .simple b{color:var(--blue);}
+  .found{background:var(--purple-bg); border-inline-start:4px solid var(--purple); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .found b{color:var(--purple);}
+  .risk{background:var(--red-bg); border-inline-start:4px solid var(--red); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .risk b{color:var(--red);}
+  .safe{background:var(--green-bg); border-inline-start:4px solid var(--green); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .safe b{color:var(--green);}
+  .fix{background:var(--amber-bg); border-inline-start:4px solid var(--amber); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem;}
+  .fix b{color:var(--amber);}
+
+  .item{border:1px solid var(--border); border-radius:16px; padding:22px 24px; margin-bottom:20px; background:var(--card);}
+  .item.critical{border:2px solid var(--red);}
+  .item-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; margin-bottom:8px;}
+  .item-title-row{display:flex; align-items:center; gap:12px;}
+  .item-num{display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:var(--accent); color:#fff; font-weight:800; font-size:.95rem; flex-shrink:0;}
+  .item-num.new{background:var(--red);}
+  .item-head h3{margin:0; font-size:1.12rem;}
+  .badges-row{display:flex; gap:6px; flex-wrap:wrap;}
+
+  .verdict-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin:20px 0;}
+  .stat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; text-align:center;}
+  .stat .num{font-size:1.9rem; font-weight:800;}
+  .stat .lbl{color:var(--sub); font-size:.83rem; margin-top:4px;}
+  .stat.green .num{color:var(--green);}
+  .stat.red .num{color:var(--red);}
+  .stat.blue .num{color:var(--blue);}
+  .stat.amber .num{color:var(--amber);}
+
+  .trace{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin:10px 0; font-size:.86rem;}
+  .trace .step{display:flex; gap:10px; margin-bottom:8px; align-items:flex-start;}
+  .trace .step .dot{width:8px; height:8px; border-radius:50%; background:var(--accent); margin-top:7px; flex-shrink:0;}
+  .trace .step:last-child{margin-bottom:0;}
+
+  .platform-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:18px 0;}
+  .platform{border:1px solid var(--border); border-radius:14px; padding:16px 18px; background:var(--card);}
+  .platform .name{font-weight:800; font-size:1rem; margin-bottom:4px;}
+  .platform .sub{color:var(--sub); font-size:.82rem; margin-bottom:10px;}
+  .platform.ok{border-top:4px solid var(--green);}
+  .platform.skip{border-top:4px solid var(--amber);}
+  .platform.na{border-top:4px solid var(--gray);}
+
+  ul.clean{margin:8px 0; padding-inline-start:22px;}
+  ul.clean li{margin-bottom:6px;}
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:10px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.9rem;}
+  .toc ol{margin:6px 0; padding-inline-start:22px; columns:2; column-gap:24px;}
+  @media (max-width:640px){ .toc ol{columns:1;} }
+
+  .before-after{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; margin:10px 0; font-size:.86rem;}
+  .before-after .old{color:var(--red); text-decoration:line-through; text-align:left; direction:ltr;}
+  .before-after .arr{color:var(--sub); text-align:center;}
+  .before-after .new{color:var(--green); text-align:left; direction:ltr; font-weight:700;}
+  @media (max-width:640px){ .before-after{grid-template-columns:1fr;} .before-after .arr{transform:rotate(90deg);} }
+
+  footer{color:var(--sub); font-size:.82rem; text-align:center; margin-top:50px; padding-top:20px; border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير إزالة "staging" وتنظيف النسخ المُضلِّلة وتحديث الوثائق ورفع GitHub</h1>
+  <p>تنفيذ الطلبات الأربعة: (1) تنظيف أي نسخة أخرى على الخادم الحي قد تُضلِّل، (2) تحديث الوثائق بدقة عالية على المسارين المحلي والحي، (3) رفع آخر نسخة على GitHub، (4) إزالة كلمة "staging" من كل مكان ممكن الوصول إليه، مع الإفصاح الكامل عن كل مكان تعذّر الوصول إليه.</p>
+  <div class="meta-row">
+    <span class="meta-chip">📅 2026-07-15</span>
+    <span class="meta-chip">🧹 893 ملف مُعدَّل/مُعاد تسميته</span>
+    <span class="meta-chip">🐛 خطآن حرجان اكتُشفا وأُصلحا أثناء التنظيف</span>
+    <span class="meta-chip">✅ commit 947d50c مرفوع على GitHub</span>
+  </div>
+</header>
+
+<div class="toc">
+  <b>محتويات التقرير</b>
+  <ol>
+    <li><a href="#simple">الخلاصة بلغة بسيطة</a></li>
+    <li><a href="#cleanup">1) تنظيف النسخ المُضلِّلة على الخوادم الحية</a></li>
+    <li><a href="#sweep">2) إزالة كلمة staging — القرار والتنفيذ</a></li>
+    <li><a href="#bugs">🆕 خطآن حرجان اكتُشفا وأُصلحا أثناء التنظيف الآلي</a></li>
+    <li><a href="#dns">حذف نطاق staging.tawanow.com</a></li>
+    <li><a href="#docs">3) تحديث الوثائق بدقة عالية</a></li>
+    <li><a href="#unreachable">الأماكن التي تعذّر الوصول إليها أو استُثنيت عمداً</a></li>
+    <li><a href="#push">4) الرفع على GitHub</a></li>
+    <li><a href="#verify">التحقق النهائي</a></li>
+  </ol>
+</div>
+
+<h2 id="simple">1) الخلاصة بلغة بسيطة</h2>
+<div class="simple">
+  <b>بكلمات بسيطة:</b> نظّفتُ من على خادم الإنتاج والخوادم الثلاثة كل نسخة قديمة مهجورة كانت تحمل اسماً يوحي بأنها ربما تكون النسخة الحقيقية العاملة (وهي ليست كذلك) — بما فيها 3 نسخ APK متطابقة تماماً بايتاً بايت مع النسخة الحية الفعلية. ثم نفّذتُ إزالة كلمة "staging" من 860+ ملفاً في المستودع (بما فيها التقارير التاريخية المؤرَّخة، بموافقتك الصريحة)، وأعدتُ تسمية كل ملف أو مجلد كان اسمه يحمل هذه الكلمة. أثناء هذا التنظيف الآلي، اكتشفتُ بنفسي خطأين حقيقيين كانا سيُعطِّلان الوصول للخادم الحي (مفتاح SSH أُعيدت تسميته في النصوص لكن الملف الفعلي على القرص لم يكن قد أُعيد تسميته بعد) — فأصلحتهما فوراً قبل أن يُسبِّبا أي مشكلة فعلية، وتحققتُ من ذلك بمحاولة اتصال حقيقية ناجحة. حذفتُ أيضاً سجل DNS القديم لنطاق <code>staging.tawanow.com</code> (كان معطَّلاً أصلاً). حدَّثتُ CLAUDE.md وملف بيانات الخوادم بحقائق تحققتُ منها مباشرة اليوم (رأس الترحيلات الحقيقي، المسار الفعلي المستخدَم على الخادم). ورفعتُ كل شيء إلى GitHub كـ commit واحد. القسم السابع أدناه يسرد بصراحة تامة كل مكان لم أستطع أو لم يكن من الحكمة الوصول إليه.
+</div>
+
+<h2 id="cleanup">2) تنظيف النسخ المُضلِّلة على الخوادم الحية</h2>
+<p class="lead">قبل أي تعديل، بحثتُ عن كل نسخة قديمة/مكرَّرة على الخوادم الثلاثة قد تُربك أي فحص مستقبلي — نفس نمط الاكتشاف الذي حدث في تقرير النشر السابق (المجلد المهجور <code>/opt/tawa-staging/app</code>).</p>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>الخادم</th><th>ما وُجد</th><th>الإجراء</th></tr></thead>
+<tbody>
+<tr><td>الإنتاج (Hetzner)</td><td><code>/opt/tawa-staging/app</code> (9.2GB، Git checkout مهجور من 06-07) + <code>releases/</code> (902MB، 7 إصدارات قديمة من مايو) + رابط رمزي <code>current</code></td><td><span class="badge done">نُقل جانباً</span> إلى <code>_retired_2026-07-15/</code> — لم يُحذف</td></tr>
+<tr><td>الإنتاج (Hetzner)</td><td>ملفا <code>.env</code> إضافيان غير مستخدَمين (<code>/opt/tawa-staging/.env.staging</code>، <code>shared/.env</code>) — تحقَّقتُ أنهما غير مرجَّعين من أي سكربت فعلي قبل نقلهما</td><td><span class="badge done">نُقلا جانباً</span></td></tr>
+<tr><td>الإنتاج (Hetzner)</td><td>نسخ متفرِّقة قديمة تحت <code>/home/deploy/</code> مباشرة (خارج <code>/home/deploy/platform/</code>): سكربتات، <code>docker-compose.staging.yml</code>، ملف seed — تحقَّقتُ أنها غير مرجَّعة من أي cron/systemd</td><td><span class="badge done">نُقلت جانباً</span></td></tr>
+<tr><td>الإنتاج (Hetzner)</td><td>3 ملفات APK باسم <code>tawa-staging*.apk</code> — تحققتُ أنها <b>مطابقة بايتاً بايت</b> لملف <code>tawa-react.apk</code> الحي الفعلي المرتبط من صفحة التنزيل، وغير مرجَّعة من أي صفحة عامة</td><td><span class="badge done">نُقلت جانباً</span></td></tr>
+<tr><td>test (Ubuntu LAN)</td><td>3 أرشيفات build قديمة في <code>/tmp</code> (54MB) + نسخة مصدر قديمة <code>tawa-test-src</code> + نسخة احتياطية يدوية وحيدة قديمة</td><td><span class="badge done">حُذفت (tmp) / نُقلت جانباً (الباقي)</span></td></tr>
+</tbody>
+</table></div>
+<div class="safe"><b>تحقُّق:</b> بعد كل عملية نقل، تحققتُ فوراً أن الحاويات الحية (<code>docker ps</code>) بقيت سليمة وأن <code>/api/health/ready</code> ما زال يستجيب بنجاح — صفر تأثير على الخدمة الحية في كل خطوة.</div>
+
+<h2 id="sweep">3) إزالة كلمة staging — القرار والتنفيذ</h2>
+<p class="lead">لم تكن هناك أبداً بيئة "staging" منفصلة فعلياً — <code>staging.tawanow.com</code> و<code>tawanow.com</code> كانا دائماً نفس الخادم ونفس التطبيق، وهذا الازدواج بالتسمية هو بالضبط ما تسبَّب في اكتشاف المجلد المهجور المُربِك في التقرير السابق. سألتُك عن نطاق الإزالة والاسم البديل قبل البدء، فاخترتَ: <b>الشمول الكامل بلا استثناء</b> (حتى التقارير التاريخية المؤرَّخة)، والاسم البديل <b>"tawanow"</b>.</p>
+
+<div class="verdict-grid">
+  <div class="stat blue"><div class="num">860</div><div class="lbl">ملف احتوى الكلمة نصياً</div></div>
+  <div class="stat blue"><div class="num">~100</div><div class="lbl">ملف/مجلد بالاسم أُعيدت تسميته</div></div>
+  <div class="stat green"><div class="num">0</div><div class="lbl">خطأ صياغة (bash -n / py_compile)</div></div>
+  <div class="stat amber"><div class="num">2</div><div class="lbl">خطأ حرج اكتُشف وأُصلح</div></div>
+</div>
+
+<p>بعد الاستبدال الآلي (حساس لحالة الأحرف: staging/Staging/STAGING)، وجدتُ نمطاً لغوياً حقيقياً يستحق معالجة يدوية: عبارة "internal staging trial" في 82 ملفاً كانت تعني "تجربة داخلية تدريجية/مرحلية" — وليست إشارة لبيئة معيَّنة — فأصبحت بعد الاستبدال الآلي المباشر "internal tawanow trial" (تكرار غير مفهوم لاسم المنتج). صحَّحتُ هذا يدوياً إلى الصياغة الأنظف (حذف الكلمة الزائدة بدل استبدالها، لأن "داخلية" و"محدودة" أصلاً تنقلان معنى التدرّج):</p>
+<div class="before-after">
+  <div class="old">READY_FOR_LIMITED_INTERNAL_STAGING_TRIAL_ONLY</div>
+  <div class="arr">→</div>
+  <div class="new">READY_FOR_LIMITED_INTERNAL_TRIAL_ONLY</div>
+</div>
+
+<h2 id="bugs">4) 🆕 خطآن حرجان اكتُشفا وأُصلحا أثناء التنظيف الآلي</h2>
+<p class="lead">الاستبدال النصي الآلي دقيق للنص، لكنه أعمى تماماً عن الواقع الفعلي على القرص — واجهت حالتين حيث غيَّر النص المرجعي بينما الشيء الحقيقي المُشار إليه بقي بلا تغيير، مما كان سيُنتج مرجعاً مكسوراً بصمت.</p>
+
+<div class="item critical">
+  <div class="item-head">
+    <div class="item-title-row"><span class="item-num new">1</span><h3>اسم ملف مفتاح SSH الخاص تغيَّر في النصوص، لا على القرص</h3></div>
+    <div class="badges-row"><span class="badge done">اكتُشف قبل أي فشل فعلي، وأُصلح</span></div>
+  </div>
+  <p>الاستبدال الآلي غيَّر كل إشارة إلى <code>tawa_staging_ed25519</code> (اسم ملف مفتاح SSH الحقيقي المستخدَم يومياً طوال هذه الجلسة) إلى <code>tawa_tawanow_ed25519</code> — لكنه بالطبع لم يُعد تسمية الملف الفعلي في <code>~/.ssh/</code>. 176 ملفاً (كل سكربتات النشر تقريباً) أصبحت تُشير إلى ملف غير موجود. اكتشفتُ هذا فوراً عبر فحص سطر رأس أول سكربت بعد التنظيف، قبل تنفيذ أي عملية نشر فعلية.</p>
+  <div class="safe"><b>الإصلاح:</b> بدل التراجع عن الاستبدال، أعدتُ تسمية <b>الملف الحقيقي</b> على القرص ليطابق (اتساقاً مع رغبتك في إزالة الكلمة من كل مكان)، ثم تحقَّقتُ باتصال SSH حقيقي ناجح بالاسم الجديد قبل المتابعة.</div>
+</div>
+
+<div class="item critical">
+  <div class="item-head">
+    <div class="item-title-row"><span class="item-num new">2</span><h3>مسارات ومعرِّفات حقيقية على الخادم غُيِّرت في التوثيق رغم بقائها بلا تغيير فعلياً</h3></div>
+    <div class="badges-row"><span class="badge done">اكتُشف بفحص شامل بعد الاستبدال، وأُصلح</span></div>
+  </div>
+  <p>قررتُ عمداً <b>عدم</b> إعادة تسمية مجلد <code>/opt/tawa-staging</code> نفسه على الخادم (يحمل نظام النسخ الاحتياطي اليومي الفعلي عبر cron)، ولا اسم الحزمة غير المرتبطة <code>tawa-agentic-staging</code> على خادم .194 (مملوكة لعمل آخر مختلف تماماً، ومُعلَّمة صراحة "DO NOT DELETE"). لكن الاستبدال النصي الآلي لم "يعرف" هذا الاستثناء — فغيَّر 299 إشارة نصية في 106 ملف لتقول <code>/opt/tawa-tawanow</code> و<code>agentic-tawanow</code>، رغم أن المسار والاسم الحقيقيَّين على القرص لم يتغيَّرا. فحصٌ شامل بعد الاستبدال كشف هذا التناقض.</p>
+  <div class="safe"><b>الإصلاح:</b> استبدال عكسي دقيق أعاد هاتين السلسلتين تحديداً إلى اسمَيهما الحقيقيَّين الفعليَّين في كل مكان، مع الإبقاء على بقية عملية التنظيف (كل ما تغيَّر فعلياً على القرص) كما هي.</div>
+</div>
+
+<h2 id="dns">حذف نطاق staging.tawanow.com</h2>
+<p>سجل DNS كان سجلاً منفصلاً بسيطاً (وليس نطاقاً شاملاً wildcard)، غير مُفعَّل عبر Cloudflare proxy — ما يفسِّر فعلياً لماذا كان اتصال TLS يتوقف عنده دائماً (اكتُشف في التقرير السابق). حُذف عبر Cloudflare API مباشرة، وتحقَّقتُ من اختفائه ومن بقاء النطاق الأساسي <code>tawanow.com</code> سليماً بعد الحذف.</p>
+
+<h2 id="docs">5) تحديث الوثائق بدقة عالية</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>الملف</th><th>ما كان يقوله (قديم/خطأ)</th><th>ما يقوله الآن (مُتحقَّق منه مباشرة اليوم)</th></tr></thead>
+<tbody>
+<tr><td>CLAUDE.md</td><td>رأس الترحيلات <code>aa15_order_messages</code>، بانتظار "Stage-2 rebuild"</td><td>الرأس الحقيقي <code>f9a1b2c3d4e5</code> — مطابق فعلياً على الخوادم الثلاثة، لا شيء بانتظار</td></tr>
+<tr><td>SERVERS_AND_CREDENTIALS.md</td><td>اسم مضيف الإنتاج <code>tawa-staging-01</code>، مسار العمل <code>/opt/tawa-staging</code>، إصدار <code>aa60</code> "قديم"</td><td>اسم المضيف الجديد <code>tawa-tawanow-01</code>، المسار الحقيقي المُتحقَّق منه <code>/home/deploy/platform</code>، الإصدار <code>f9a1b2c3d4e5</code></td></tr>
+<tr><td>DEPLOY_TARGETS.md</td><td>إشارة خاطئة تولَّدت آلياً لمسار/اسم غير موجودين فعلياً</td><td>مُصحَّحة يدوياً للأسماء الحقيقية الفعلية على القرص</td></tr>
+</tbody>
+</table></div>
+
+<h2 id="unreachable">6) الأماكن التي تعذّر الوصول إليها أو استُثنيت عمداً</h2>
+<p class="lead">كما طلبتَ صراحة — كل مكان لم أستطع أو لم يكن من الحكمة تغييره، بصراحة كاملة:</p>
+<div class="item">
+  <h4 style="margin-top:0;">سجل تاريخ Git (commits/رسائل/عناوين PR)</h4>
+  <p><b>لا يمكن تغييره فعلياً.</b> كلمة "staging" موجودة في آلاف الـcommits ورسائلها عبر تاريخ المستودع الكامل. إعادة كتابة تاريخ Git على مستودع مشترك (تعمل عليه جلسة أخرى متزامنة حالياً فعلياً) عملية مدمِّرة تكسر كل استنساخ (clone) قائم وكل Pull Request مفتوح — لم يُقترب منها إطلاقاً.</p>
+</div>
+<div class="item">
+  <h4 style="margin-top:0;">مجلد <code>/opt/tawa-staging</code> الأصل على خادم الإنتاج</h4>
+  <p><b>استُثني عمداً، ليس عجزاً.</b> يحمل نظام النسخ الاحتياطي اليومي الفعلي (<code>tawa_backup.sh</code> عبر cron). إعادة تسمية هذا المسار تحديداً تسبَّبت في حادثة توثَّقة سابقاً (12 يوماً من نسخ احتياطي فاشل صامت) — التكرار غير مُبرَّر.</p>
+</div>
+<div class="item">
+  <h4 style="margin-top:0;">حزمة <code>tawa-agentic-staging</code> على خادم .194</h4>
+  <p><b>استُثنيت عمداً.</b> مملوكة لعمل آخر غير مرتبط يتشارك نفس الخادم، ومُعلَّمة صراحة في وثائق المشروع "DO NOT DELETE". ليست ملكاً لهذا المشروع لتُعاد تسميتها.</p>
+</div>
+<div class="item">
+  <h4 style="margin-top:0;">مفتاح SSH يتيم غير مستخدَم: <code>tawa_staging_new</code></h4>
+  <p><b>تُرك كما هو عمداً.</b> غير مُشار إليه من أي سكربت في المستودع بأكمله (تحقَّقتُ) — إعادة تسمية ملف غير مستخدَم لا تضيف قيمة، لكنه مذكور هنا وفي SERVERS_AND_CREDENTIALS.md حتى لا يُخلَط بالمفتاح الفعلي.</p>
+</div>
+<div class="item">
+  <h4 style="margin-top:0;">شهادات TLS وذاكرة HSTS في المتصفحات</h4>
+  <p>أي متصفح زار <code>staging.tawanow.com</code> سابقاً قد يحتفظ بذاكرة HSTS محلية له — لا وسيلة برمجية لمسحها عن بُعد من طرفي. غير ضارة عملياً بما أن النطاق حُذف ولم يعد يُخدَّم أصلاً.</p>
+</div>
+
+<h2 id="push">7) الرفع على GitHub</h2>
+<div class="trace">
+  <div class="step"><div class="dot"></div><div>فُحص التغيير الكامل: 893 ملف، وتحقَّقتُ يدوياً أن 16 ملفاً غير مرتبط (من جلسة عمل متزامنة أخرى نشطة على نفس الفرع الآن) استُبعِدت من الرفع تحديداً، مرتين — بعد أن كشف <code>git add -A</code> الأول أنه التقطها بالخطأ.</div></div>
+  <div class="step"><div class="dot"></div><div>خطاف husky لفحص الأسرار (gitleaks) تعطَّل بخطأ برمجي داخلي حقيقي في أداة gitleaks نفسها عند حجم diff بهذا الكبر (900+ ملف) — ليس بسبب أي سرّ حقيقي. تحقَّقتُ بطريقتين بديلتين مستقلتين (فحص كامل للشجرة، وفحص محتوى الـdiff مباشرة عبر وضع <code>--pipe</code>) وكلتاهما أظهرتا فقط قيماً وهمية معروفة موجودة مسبقاً في ملفات اختبار — لا سرّ حقيقي جديد.</div></div>
+  <div class="step"><div class="dot"></div><div>عرضتُ عليك هذا تحديداً قبل تجاوز الخطاف، ووافقتَ على التجاوز لهذا الالتزام فقط — تم توثيق سبب التجاوز والدليل الداعم له كاملاً داخل نص رسالة الـcommit نفسها.</div></div>
+  <div class="step"><div class="dot"></div><div>رُفع الالتزام <code>947d50c</code> بنجاح إلى <code>fix/464-full-remediation-2026-07-10</code> على GitHub.</div></div>
+</div>
+
+<h2 id="verify">8) التحقق النهائي</h2>
+<div class="verdict-grid">
+  <div class="stat green"><div class="num">✓</div><div class="lbl">صياغة كل سكربتات bash سليمة</div></div>
+  <div class="stat green"><div class="num">✓</div><div class="lbl">كل ملفات Python تُصرَّف بلا خطأ</div></div>
+  <div class="stat green"><div class="num">✓</div><div class="lbl">docker compose config صالح بالأسماء الجديدة</div></div>
+  <div class="stat green"><div class="num">✓</div><div class="lbl">سكربت نشر حقيقي مُعاد تسميته عمل فعلياً ضد الخادم الحي</div></div>
+</div>
+<p>بعد كل خطوة على أي خادم حي (تنظيف، إعادة تسمية مفتاح، تغيير اسم المضيف)، تحقَّقتُ فوراً أن الحاويات ما زالت <code>healthy</code> وأن <code>/api/health/ready</code> يستجيب بنجاح — صفر انقطاع خدمة طوال هذا التنظيف الكامل.</p>
+
+<footer>
+  تقرير أُنشئ فور اكتمال العمل — 2026-07-15 · كل رقم ونتيجة واردة أعلاه تم التحقق منها فعلياً (فحص مباشر على الخوادم، commit حقيقي مرفوع على GitHub)، وليست تقديرات أو محاكاة.
+</footer>
+
+</div>
+</body>
+</html>

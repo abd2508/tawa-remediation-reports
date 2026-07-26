@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تدقيق IDOR / الملكيّة عبر نقاط الموارد — منصّة تووا</title>
+<style>
+  :root{
+    --bg:#0f1419; --card:#1a2230; --card2:#212b3b; --ink:#e8eef6; --muted:#9fb0c3;
+    --green:#2ecc71; --green-bg:#173a28; --amber:#f1c40f; --red:#e74c3c;
+    --blue:#3498db; --border:#2c3a4f; --accent:#1abc9c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,sans-serif;line-height:1.85;padding:0}
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 22px 80px}
+  header.hero{background:linear-gradient(135deg,#15202e,#1a2a3a);border:1px solid var(--border);border-radius:18px;padding:30px 28px;margin-bottom:26px}
+  header.hero h1{margin:0 0 8px;font-size:1.7rem}
+  header.hero .sub{color:var(--muted);font-size:1.02rem}
+  .verdict{display:inline-block;margin-top:16px;background:var(--green-bg);color:var(--green);border:1px solid var(--green);
+    padding:9px 18px;border-radius:999px;font-weight:700;font-size:1.05rem}
+  .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+  .meta .chip{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:7px 13px;font-size:.86rem;color:var(--muted)}
+  .meta .chip b{color:var(--ink)}
+  section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 26px;margin-bottom:22px}
+  h2{margin:0 0 16px;font-size:1.28rem;border-right:4px solid var(--accent);padding-right:12px}
+  h3{margin:22px 0 10px;font-size:1.08rem;color:var(--accent)}
+  p{margin:10px 0}
+  .muted{color:var(--muted)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem}
+  th,td{border:1px solid var(--border);padding:10px 12px;text-align:right;vertical-align:top}
+  th{background:var(--card2);color:var(--ink);font-weight:700}
+  td code,p code,li code{background:#0c1118;border:1px solid var(--border);border-radius:6px;padding:1px 6px;font-size:.85em;color:#7fd6c6;direction:ltr;display:inline-block}
+  .ok{color:var(--green);font-weight:700}
+  .badge{display:inline-block;padding:2px 9px;border-radius:7px;font-size:.78rem;font-weight:700}
+  .b-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green)}
+  .b-blue{background:#15314a;color:#79c0ff;border:1px solid #2f6da1}
+  .b-grey{background:#222c3a;color:var(--muted);border:1px solid var(--border)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:16px 0}
+  .stat{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+  .stat .n{font-size:2rem;font-weight:800;color:var(--accent)}
+  .stat .l{color:var(--muted);font-size:.85rem;margin-top:4px}
+  ul{margin:8px 0;padding-right:22px}
+  li{margin:6px 0}
+  .codecard{background:#0c1118;border:1px solid var(--border);border-radius:10px;padding:14px 16px;overflow-x:auto;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:.84rem;color:#cdd9e5;white-space:pre}
+  .note{background:#13202b;border:1px solid #265a52;border-radius:10px;padding:12px 15px;margin:14px 0}
+  .foot{color:var(--muted);font-size:.84rem;text-align:center;margin-top:30px}
+  .pill-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>🔐 تقرير تدقيق IDOR / الملكيّة عبر نقاط الموارد</h1>
+    <div class="sub">منصّة تووا (Tawa) للتوصيل في ليبيا — تدقيق عدائيّ لصلاحيّات الوصول إلى الموارد حسب المُعرِّف</div>
+    <div class="verdict">✅ النتيجة: لا توجد ثغرات IDOR — السطح محصَّن بالكامل (0 اكتشاف)</div>
+    <div class="meta">
+      <span class="chip">التاريخ: <b>2026-06-13</b></span>
+      <span class="chip">النطاق: <b>كلّ نقاط <code>{id}</code> المواجِهة للمستخدم</b></span>
+      <span class="chip">النوع: <b>تدقيق قراءة-فقط</b></span>
+      <span class="chip">تغيير الكود: <b>لا يوجد</b></span>
+      <span class="chip">النشر: <b>لا شيء (لا تعديل)</b></span>
+      <span class="chip">FIN-COR: <b>غير متأثِّر</b></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>① الطلب والمنهج</h2>
+    <p>الطلب: «<b>دقّق IDOR/الملكيّة عبر نقاط الموارد بالقرارات الموصى بها</b>» — فحص عدائيّ يتأكّد أنّ كلّ نقطة وصول
+      إلى مورد حسب المُعرِّف (<code>/orders/{id}</code>، <code>/addresses/{id}</code>، وثائق، عناصر كتالوج…)
+      تتحقّق من أنّ الطالب يملك المورد فعلًا — حتى لا يستطيع عميلٌ/سائقٌ/مزوّدٌ تبديل المُعرِّف للوصول إلى مورد ليس له
+      (تسريب بيانات شخصيّة أو إجراء غير مُصرَّح به).</p>
+    <p>المنهج: <b>مسح آليّ شامل</b> لكلّ مُوجِّهات الـ <code>router</code> (استخراج كلّ نقاط الوصول ذات معلَمة المسار)
+      ثمّ <b>قراءة مباشرة</b> لجسم كلّ نقطة حسّاسة للتأكّد — لا اعتماد على الـ grep وحده (يُشوّه أسماء الدوال).
+      رُكِّز على أسطح العميل/السائق/المزوّد؛ أمّا نقاط غرفة العمليّات (OPS) فهي تصل لأيّ مورد بصلاحيّة مشروعة.</p>
+    <div class="grid">
+      <div class="stat"><div class="n">534</div><div class="l">إجمالي نقاط الوصول</div></div>
+      <div class="stat"><div class="n">220</div><div class="l">ذات معلَمة مسار <code>{id}</code></div></div>
+      <div class="stat"><div class="n">220</div><div class="l">مضبوطة الوصول ✓</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">ثغرة IDOR</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>② التصنيف النهائيّ لكلّ نقاط الـ <code>{id}</code> (٢٢٠)</h2>
+    <table>
+      <thead><tr><th>الفئة</th><th>العدد</th><th>آليّة الحماية</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>مقيَّدة بدور OPS / المالية</td>
+          <td>147</td>
+          <td><code>require_role(*_OPS / _FINANCE / _ACTION_ROLES / _PAYOUT_ROLES / _WRITE_ROLES)</code></td>
+          <td><span class="badge b-green">آمنة</span></td>
+        </tr>
+        <tr>
+          <td>محميّة بالملكيّة (مواجِهة للمستخدم)</td>
+          <td>63</td>
+          <td>عميل ⟵ <code>customer_id</code> · سائق ⟵ عرض مقبول · مزوّد ⟵ <code>provider_id</code></td>
+          <td><span class="badge b-green">آمنة</span></td>
+        </tr>
+        <tr>
+          <td>عامّة بالتصميم (تصفّح/وثيقة مشتركة)</td>
+          <td>5</td>
+          <td>واجهة متجر مزوّد · كتالوج مزوّد · تفصيل صنف · اقتراحات · وثيقة قانونيّة حسب النوع</td>
+          <td><span class="badge b-blue">عامّة عمدًا</span></td>
+        </tr>
+        <tr>
+          <td>Webhook لمزوّد الدفع</td>
+          <td>1</td>
+          <td>موثَّق بتوقيع <code>HMAC</code> لكلّ مزوّد، لا بدور/ملكيّة</td>
+          <td><span class="badge b-green">آمنة (توقيع)</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      ملاحظة منهجيّة: المسح الآليّ الأوّليّ «أبلغ» عن ٦ نقاط بلا رمز ملكيّة ظاهر؛ القراءة المباشرة أثبتت أنّها جميعًا
+      إمّا عامّة بالتصميم (٥) أو Webhook موقَّع (١) — أي صفر اكتشاف حقيقيّ. النقاط الأخرى التي «غابت» عن regex الأدوار
+      كانت تستخدم ثوابت مجموعات أدوار (<code>_PAYOUT_ROLES</code>، <code>_WRITE_ROLES</code>) لا اسم الدور المباشر —
+      وهي مقيَّدة فعليًّا للمالية/العمليّات.
+    </div>
+  </section>
+
+  <section>
+    <h2>③ المُحقِّقات المركزيّة للملكيّة (حجر الأساس)</h2>
+    <p>قوّة هذا السطح أنّه لا يكرّر منطق الملكيّة في كلّ نقطة، بل يمرّ عبر <b>مُحقِّقات مركزيّة</b> مُختبَرة:</p>
+
+    <h3>أ) <code>resolve_order_party()</code> — مُحقِّق ABAC الموحّد للطلبات</h3>
+    <p>المصدر: <code>app/modules/orders/order_access.py</code>. يُرجِع علاقة الطالب بالطلب
+      (<code>ops | customer | driver | provider | None</code>):</p>
+    <div class="codecard">CUSTOMER → "customer" إذا  order.customer_id == user.user_id  وإلا None
+DRIVER   → "driver"   إذا وُجد DispatchOffer.state=="ACCEPTED" لهذا السائق على هذا الطلب
+PROVIDER → "provider" إذا ملك المزوّدُ طلبَه (provider.id == order.provider_id) [عند include_provider]
+OPS/FIN/SUPER → "ops"
+غير ذلك → None  ⟹  403</div>
+    <p>يستخدمه: المحادثة (<code>/{id}/messages</code> قراءة/كتابة) والشكاوى — منع تسريب محادثة العميل↔السائق.</p>
+
+    <h3>ب) <code>_get_owned_item()</code> / <code>_get_owned_variant()</code> — ملكيّة الكتالوج</h3>
+    <p>المصدر: <code>app/modules/catalog/catalog_router.py</code>. يجلب المورد ويتحقّق
+      <code>item.provider_id != provider.id → 403</code>. كلّ نقاط تعديل الأصناف/الأحجام/المكوّنات/مجموعات
+      التعديل/الخيارات (١٥ نقطة) تمرّ عبره — فحتى لو خمّن مزوّدٌ مُعرِّف صنف مزوّدٍ آخر، يُرفَض. الموارد الأبناء
+      (variant/component/group/option) تُحلّ مُعرِّف الأب ثمّ تتحقّق من ملكيّته.</p>
+
+    <h3>ج) فحوص الملكيّة المباشرة المتّسقة</h3>
+    <table>
+      <thead><tr><th>المورد</th><th>الفحص</th><th>الرفض</th></tr></thead>
+      <tbody>
+        <tr><td>العنوان <code>PATCH/DELETE /addresses/{id}</code></td><td><code>addr.user_id != user.user_id</code></td><td>404</td></tr>
+        <tr><td>دَين العميل <code>/customer/debts/{id}/pay</code></td><td><code>debt.customer_id != user.user_id</code></td><td>404</td></tr>
+        <tr><td>محادثة الدعم <code>/support/sessions/{id}/messages</code></td><td><code>session.user_id == user.user_id</code> (أو OPS)</td><td>403</td></tr>
+        <tr><td>عقد قانونيّ <code>/legal/contracts/me</code></td><td><code>OnboardingContract.user_id == user.user_id</code></td><td>—</td></tr>
+        <tr><td>وثائق المزوّد <code>GET /{provider_id}/documents</code></td><td><code>str(provider.id) != provider_id</code></td><td>403</td></tr>
+        <tr><td>وثائق السائق <code>GET /drivers/{id}/documents</code></td><td>OPS/SUPER فقط</td><td>403</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>④ سطح الطلبات (١٣ نقطة فرعيّة) — تدقيق مباشر</h2>
+    <p>قُرئت أجسام كلّ النقاط الفرعيّة تحت <code>/{order_id}</code>؛ كلّها تفرض الملكيّة:</p>
+    <table>
+      <thead><tr><th>النقطة</th><th>الفحص</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /{id}</code></td><td>سائق ⟵ <code>get_order_for_driver</code> · غيره ⟵ <code>get_order(actor_id)</code> (يرفع OrderForbidden)</td><td class="ok">✓</td></tr>
+        <tr><td><code>GET /{id}/alternatives</code></td><td>عميل ⟵ OrderForbidden → 403</td><td class="ok">✓</td></tr>
+        <tr><td><code>POST /{id}/cancel</code></td><td><code>cancel_order(actor_id)</code> + حارس OPS</td><td class="ok">✓</td></tr>
+        <tr><td><code>POST /{id}/ratings</code></td><td><code>order.customer_id != user.user_id → 403</code></td><td class="ok">✓</td></tr>
+        <tr><td><code>POST /{id}/rate-customer</code></td><td>سائق مُسنَد (عرض مقبول) وإلا 403</td><td class="ok">✓</td></tr>
+        <tr><td><code>GET /{id}/ratings</code></td><td>عميل-مالك أو سائق-مُسنَد</td><td class="ok">✓</td></tr>
+        <tr><td><code>POST /{id}/disputes</code></td><td><code>order.customer_id != user.user_id → 403</code></td><td class="ok">✓</td></tr>
+        <tr><td><code>GET /{id}/complaints</code></td><td><code>order.customer_id != user.user_id → 403</code></td><td class="ok">✓</td></tr>
+        <tr><td><code>GET /{id}/refunds</code></td><td><code>order.customer_id != user.user_id → 403</code></td><td class="ok">✓</td></tr>
+        <tr><td><code>GET/POST /{id}/substitutions[...]</code></td><td>OrderForbidden / تمرير <code>customer_id</code> للخدمة</td><td class="ok">✓</td></tr>
+        <tr><td><code>GET/POST /{id}/messages</code></td><td><code>resolve_order_party</code> → غير مشارك = 403</td><td class="ok">✓</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>⑤ سطح إجراءات السائق (Dispatch) — فحص حارس الإسناد</h2>
+    <p>نقاط <code>pickup-confirm</code> / <code>arrive</code> / <code>delivery-proofs</code> / <code>cash-collections</code>
+      تُحلّ <code>driver_id</code> من حساب السائق المُصادَق (لا يمكن انتحال سائق آخر)، <b>والخدمة</b> تتحقّق من أنّه
+      السائق المُسنَد فعلًا (صاحب العرض المقبول):</p>
+    <div class="codecard">accepted_offer = SELECT DispatchOffer WHERE order_id == order_id AND state == "ACCEPTED"
+if accepted_offer is None or accepted_offer.driver_id != driver_id:
+    raise DispatchError(...)          # سائق غير مُسنَد ⟹ رفض</div>
+    <p>مُؤكَّد في: <code>confirm_pickup</code> (688) · <code>arrive_at_destination</code> (785) ·
+      <code>submit_delivery_proof</code> (870) · <code>record_cash_collection</code> (1350) ·
+      <code>respond_to_offer</code> (494 — <code>offer.driver_id != driver_id</code>). أيضًا
+      <code>GET /drivers/{id}/documents</code> و<code>delivery-proofs/{id}/validate|reject</code> = OPS فقط.</p>
+  </section>
+
+  <section>
+    <h2>⑥ القرار الموصى به والخلاصة</h2>
+    <p>تطبيقًا لمبدأ «ألّا نُفسد المشروع»، القرار الموصى به عند تدقيقٍ يجد السطحَ محصَّنًا أصلًا هو
+      <b>عدم اختلاق تغيير</b> — يُبلَّغ بالنتيجة النظيفة مع الأدلّة بدل تعديلٍ صوريّ. هذا التدقيق:</p>
+    <ul>
+      <li>فحص <b>٢٢٠</b> نقطة وصول ذات معلَمة مسار عبر كلّ المُوجِّهات.</li>
+      <li>وجد <b>صفر</b> ثغرة IDOR/ملكيّة: ١٤٧ مقيَّدة بدور · ٦٣ محميّة بالملكيّة · ٥ عامّة بالتصميم · ١ webhook موقَّع.</li>
+      <li>السطح محميّ بمُحقِّقات <b>مركزيّة مُختبَرة</b> (<code>resolve_order_party</code>، <code>_get_owned_item</code>)
+        وفحوص ملكيّة مباشرة متّسقة — لا منطق مُكرَّر هشّ.</li>
+      <li>هذه النتيجة متّسقة مع الإصلاحات السابقة المُسجَّلة (SEC-1 IDOR · C-2 ملكيّة العنوان · PROV-01 حارس مالك
+        verify-pickup · D-5 حلّ هويّة السائق · ملكيّة طلب العميل) — تراكمها أنتج سطحًا محكمًا.</li>
+    </ul>
+    <div class="pill-row">
+      <span class="badge b-grey">تغيير كود: لا يوجد</span>
+      <span class="badge b-grey">migration: لا يوجد</span>
+      <span class="badge b-grey">نشر: لا شيء</span>
+      <span class="badge b-green">FIN-COR: غير متأثِّر</span>
+      <span class="badge b-green">IDOR: 0 اكتشاف</span>
+    </div>
+    <div class="note">
+      <b>لا حاجة لنشرٍ أو تحقّقٍ حيّ</b> لأنّه لا تغيير سلوكيّ في الكود؛ لا يوجد جديد ليُتحقَّق منه على الإنتاج.
+      التدقيق قراءة-فقط بالكامل.
+    </div>
+  </section>
+
+  <div class="foot">
+    منصّة تووا (Tawa) — تدقيق IDOR/الملكيّة · 2026-06-13 · قراءة-فقط · 0 اكتشاف · لا تغيير كود
+  </div>
+
+</div>
+</body>
+</html>

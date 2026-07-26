@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير 479 — إكمال مسارات تطبيق الجوّال (RN) + إصلاح حرج لتسجيل الدخول (11 commit، خلل حرج واحد، صفر أخطاء)</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.8; margin:0; font-size:16px;}
+  .wrap{max-width:1260px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:960px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.med .num{color:var(--med)} .stat.ok .num{color:var(--ok)}
+  .stat .lbl{color:var(--muted); font-size:.82rem; margin-top:4px}
+  section{margin:44px 0}
+  h2.sec-title{font-size:1.5rem; border-inline-start:5px solid var(--accent); padding-inline-start:14px; margin-bottom:18px; color:#fff}
+  h2.sec-title.blocker{border-color:var(--blocker)}
+  h2.sec-title.cluster{border-color:var(--accent2); font-size:1.3rem}
+  p.lead{color:var(--muted); max-width:960px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 24px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+  .card-title{font-size:1.1rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.live{background:rgba(255,45,85,.12); color:#ff6b8f; border:1px solid rgba(255,45,85,.35)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .orig{background:var(--panel2); border-radius:10px; padding:10px 16px; margin:10px 0; font-size:.9rem; color:var(--muted)}
+  .orig b{color:var(--text)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.78rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem}
+  th,td{border:1px solid var(--border); padding:9px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight.blocker{background:rgba(255,45,85,.07); border-color:rgba(255,45,85,.4)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .insight.blocker h4{color:var(--blocker)}
+  .fine-list{background:rgba(55,201,135,.05); border:1px dashed rgba(55,201,135,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+  .shallow-list{background:rgba(111,211,255,.05); border:1px dashed rgba(111,211,255,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>📱 تقرير إكمال مسارات تطبيق الجوّال (React Native) + إصلاح حرج لتسجيل الدخول</h1>
+  <div class="sub">تنفيذًا لتوجيه "أكمل كل المسارات بالتسلسل، لا تتوقف حتى تكمل كل شيء": إكمال كامل الفجوات المتبقّية في تطبيق العميل بجانب RN — 9 شاشات/ميزات جديدة، إصلاحان لعيبين موروثَين خطيرَين (دفتر عناوين محلي بالكامل، فك تغليف أخطاء FastAPI)، و<b>خلل حرج ثالث تم اكتشافه وإصلاحه أثناء العمل</b>: تسجيل الدخول عبر OTP لدورَي العميل والسائق كان سيفشل بالكامل في الوضع الحقيقي.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-14</div>
+    <div class="badge">🌿 <b>الفرع:</b> fix/464-full-remediation-2026-07-10</div>
+    <div class="badge">📦 <b>المدى:</b> 11 commit (7a8642d → 5a3a83e)</div>
+    <div class="badge">📊 <b>الإحصاء:</b> 28 ملفًا، +3193 / -89 سطرًا</div>
+    <div class="badge">✅ <b>التحقق:</b> tsc + lint + jest (32/32) نظيف في كل commit على حدة</div>
+    <div class="badge">🚫 <b>النشر:</b> لا شيء — محلي فقط، لا push ولا deploy</div>
+  </div>
+</header>
+
+<div class="stats-grid">
+  <div class="stat blocker"><div class="num">1</div><div class="lbl">خلل حرج مُكتشَف ومُصلَح<br>(تسجيل دخول عميل/سائق)</div></div>
+  <div class="stat high"><div class="num">2</div><div class="lbl">عيوب موروثة خطيرة أُصلِحت<br>(عناوين، فك تغليف الأخطاء)</div></div>
+  <div class="stat ok"><div class="num">9</div><div class="lbl">شاشات/ميزات جديدة مبنيّة بالكامل</div></div>
+  <div class="stat ok"><div class="num">11</div><div class="lbl">commit، كلٌّ منها مُتحقَّق منه على حدة</div></div>
+  <div class="stat ok"><div class="num">32/32</div><div class="lbl">اختبار jest ناجح في كل مرة</div></div>
+  <div class="stat med"><div class="num">3</div><div class="lbl">ميزات كبيرة مُستبعَدة عمدًا<br>مع توثيق السبب الدقيق</div></div>
+</div>
+
+<nav class="toc">
+  <b>فهرس التقرير</b>
+  <ul>
+    <li><a href="#critical">0. الأولوية القصوى — الخلل الحرج</a></li>
+    <li><a href="#addr">1. إصلاح دفتر العناوين</a></li>
+    <li><a href="#errenv">2. إصلاح فك تغليف أخطاء FastAPI</a></li>
+    <li><a href="#screens">3. الشاشات الجديدة (9)</a></li>
+    <li><a href="#excluded">4. ما استُبعِد عمدًا وسببه الدقيق</a></li>
+    <li><a href="#verify">5. منهجية التحقق</a></li>
+    <li><a href="#commits">6. قائمة الـ Commits الكاملة</a></li>
+    <li><a href="#status">7. حالة الفرع الحالية</a></li>
+  </ul>
+</nav>
+
+<section id="critical">
+  <h2 class="sec-title blocker">🔴 0. الأولوية القصوى — خلل حرج تم اكتشافه وإصلاحه</h2>
+  <p class="lead">أثناء بناء شاشة "معرفة رقم الهاتف" اكتشفتُ أن <b>تسجيل الدخول عبر OTP لكل من دور العميل والسائق كان سيفشل بالكامل في الوضع الحقيقي (real mode)</b>، منذ أن بُنيت هذه الشاشات في وقت سابق من الجلسة الطويلة (قبل هذا المقطع من العمل).</p>
+
+  <div class="card blocker">
+    <div class="card-head">
+      <div class="card-title">السبب الجذري: قيمة purpose غير موجودة في enum الباك-إند</div>
+      <div class="tag-row"><span class="tag blocker">حرج</span><span class="tag audit">مؤكَّد بقراءة الكود المباشرة</span></div>
+    </div>
+    <p>الملف <code>apps/mobile/src/services/api/index.ts</code> كان يرسل:</p>
+    <pre>purpose: 'CUSTOMER_LOGIN'    // عند اختيار "عميل"
+purpose: 'DRIVER_LOGIN'      // عند اختيار "سائق"
+purpose: 'OPERATIONS_LOGIN'  // عند اختيار "عمليات"</pre>
+    <p>تحققتُ عبر <code>grep</code> شامل على كامل شجرة <code>backend/app/</code> — هذه القيم الثلاث <b>غير موجودة إطلاقًا</b> في enum الباك-إند <code>OTPPurpose</code> (<code>backend/app/modules/identity/auth_router.py:51-59</code>)، والذي يحوي حصرًا:</p>
+    <pre>WALLET_ACCESS, PASSWORD_RESET, EMAIL_RECOVERY, PHONE_LOOKUP,
+PROVIDER_LOGIN, ACCOUNT_DELETE, REGISTRATION, ORDER_CONFIRMATION</pre>
+    <p>بما أن الحقل معرَّف كـ Pydantic Enum صارم، فإن أي قيمة غير معروفة تُرفَض تلقائيًا بخطأ <b>422</b> من طبقة التحقق قبل حتى وصول التنفيذ إلى منطق المسار.</p>
+    <div class="insight blocker">
+      <h4>الأثر الفعلي</h4>
+      كل محاولة <code>requestOtp</code>/<code>verifyOtp</code> حقيقية لاختيار "عميل" أو "سائق" — أي <b>الخطوة الأولى من مسار الدخول بأكمله لدورَين من أصل أربعة أدوار</b> — كانت ستفشل فورًا بخطأ 422. اختيارَا "مزوّد" و"عمليات" لم يتأثرا (تسجيل دخول بكلمة مرور، لا علاقة له بـ purpose الـOTP).
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">كيف تأكّدتُ من الإصلاح الصحيح</div></div>
+    <ul>
+      <li>قارنتُ بتطبيق الويب (<code>web/src/api/auth.ts</code>): <code>authApi.requestOtp</code> يستخدم <code>"PROVIDER_LOGIN"</code> كقيمة <b>افتراضية</b> لكل استدعاء دخول عادي، بلا أي تمييز حسب الدور.</li>
+      <li>تتبّعتُ فرع "PROVIDER_LOGIN (and default)" في <code>auth_router.py:451</code> وما بعده سطرًا بسطر — لا يفرّع المنطق أبدًا بناءً على نص الـ purpose نفسه؛ فقط قيم أخرى (<code>WALLET_ACCESS</code>، <code>PASSWORD_RESET</code>...) تحوّل التنفيذ لفرع مختلف قبل هذه النقطة.</li>
+      <li>رقم هاتف جديد كليًا (لا صفّ Role له) يُنشأ بدور <code>CUSTOMER</code> افتراضيًا (<code>auth_router.py:644</code>) — سليم لاختيار "عميل" تمامًا.</li>
+      <li>سائق <b>جديد كليًا</b> سيُسجَّل خطأً كـ CUSTOMER عبر هذا المسار — وهذا <b>متوقَّع ومعماريًا صحيح</b>: سائق جديد يجب أن يمرّ عبر التسجيل الكامل ببيانات المركبة (البند 3-ح)، متّسق مع نص شاشة اختيار الدور نفسه: "اختر نوع حسابك <b>للدخول</b>".</li>
+    </ul>
+  </div>
+
+  <div class="card ok">
+    <div class="card-head"><div class="card-title">الإصلاح (commit 421c969)</div><span class="tag ok">مُطبَّق ومُتحقَّق منه</span></div>
+    <ol>
+      <li>تعديل <code>ROLE_PURPOSE</code> في <code>services/api/index.ts</code> ليرسل <code>'PROVIDER_LOGIN'</code> للاختيارات الأربعة كلها.</li>
+      <li>حذف الحقل الميت <code>otpPurpose</code> من <code>lib/roles.ts</code> (كان يحمل نفس القيم الخاطئة، ولم يكن يُقرأ فعليًا في أي مكان — <code>ROLE_PURPOSE</code> هو مصدر الحقيقة الوحيد).</li>
+      <li>اختباران جديدان في <code>errors.test.ts</code> لفك تغليف رسائل الخطأ التفصيلية.</li>
+    </ol>
+  </div>
+</section>
+
+<section id="addr">
+  <h2 class="sec-title">🏠 1. إصلاح دفتر العناوين — عيب موروث خطير (commit 7a8642d)</h2>
+  <div class="card blocker">
+    <p>دفتر عناوين العميل بأكمله كان <b>مخزَّنًا محليًا فقط (zustand) ولم يكن متزامنًا مع الباك-إند إطلاقًا</b>، ونوع <code>Address</code> كان يحوي حقلًا مُختلَقًا <code>cityName</code> غير موجود على الباك-إند إطلاقًا (العناوين الحقيقية = lat/lng + نص حر text_hint + tag).</p>
+    <p>تتبّعتُ المسار: <code>checkout.tsx</code> → معرّف محلي وهمي <code>addr-${Date.now()}</code> → <code>POST /orders</code> → <code>order_service.py:78-82</code> الذي يتحقق من وجود <code>address_id</code> فعليًا ويتجاهله بصمت إن لم يكن موجودًا.</p>
+    <div class="insight blocker"><h4>الأثر</h4>كل عملية شراء حقيقية عبر التطبيق كانت ستفقد عنوان التوصيل بصمت، بلا أي خطأ ظاهر للمستخدم.</div>
+  </div>
+  <div class="card ok">
+    <div class="card-title">الإصلاح</div>
+    <ul>
+      <li>إعادة كتابة <code>types/models.ts::Address</code> لتطابق <code>_addr_dict</code> تمامًا (<code>address_router.py:64-84</code>).</li>
+      <li>إضافة <code>listAddresses/createAddress/updateAddress/deleteAddress</code> (mock + حقيقي).</li>
+      <li>إعادة كتابة <code>store/addresses.ts</code>: من متجر يملك القائمة كاملة إلى <code>useSelectedAddress</code> (يحفظ فقط الاختيار).</li>
+      <li>إعادة كتابة <code>app/addresses.tsx</code> بالكامل + تعديل <code>checkout.tsx</code> لحل العنوان النشط بنفس منطق ترتيب الباك-إند.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="errenv">
+  <h2 class="sec-title">⚠️ 2. إصلاح فك تغليف أخطاء FastAPI (commit 5d44438)</h2>
+  <div class="card">
+    <p><code>lib/errors.ts::normalizeError</code> كان يبحث عن <code>{code, message_ar}</code> بشكل مسطّح، لكن معالج FastAPI يغلّف <code>HTTPException(detail={...})</code> تحت مفتاح <code>detail</code> — الشكل الفعلي: <code>{"detail": {"code":..., "message_ar":...}}</code>.</p>
+    <p>تحققتُ عبر <code>grep</code> شامل: <b>11 وحدة</b> في الباك-إند تستخدم هذا النمط: <code>loyalty_router.py</code>، <code>settlement/party_router.py</code>، <code>settlement/agent_router.py</code>، <code>identity/privacy_router.py</code>، <code>bonus/router.py</code>، <code>launch/soft_launch_guard.py</code>، <code>operations/app_version_router.py</code>، <code>operations/feature_toggle_router.py</code>، <code>catalog/catalog_moderation_router.py</code>، <code>core/rate_limiter.py</code>، <code>identity/email_router.py</code>.</p>
+    <div class="insight warn"><h4>الأثر</h4>كل رسائل الخطأ التجارية الدقيقة من هذه الوحدات كانت تسقط بصمت إلى رسالة عامة حسب رمز HTTP فقط.</div>
+    <p><b>الإصلاح:</b> فك تغليف مستوى واحد عند كون <code>detail</code> كائنًا، مع اختبارين جديدين.</p>
+  </div>
+</section>
+
+<section id="screens">
+  <h2 class="sec-title">🧩 3. الشاشات الجديدة المبنيّة (9 — حسب الترتيب الزمني)</h2>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">أ. المحفظة/المكافآت — loyalty.tsx</div><span class="tag ok">6e02744</span></div>
+    رصيد نقاط + قيمة محسوبة على الخادم + رمز إحالة تلقائي + نسخ/مشاركة واتساب (عبر <code>expo-clipboard</code> — حزمة جديدة) + قائمة إحالاتي + استخدام رمز صديق مع 4 رموز خطأ محدَّدة. تحقّق كامل مقابل <code>loyalty_router.py</code>.
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">ب. الدعم والمحادثة — support.tsx</div><span class="tag ok">8307863</span></div>
+    مشتركة بين عميل/سائق/مزوّد. استقصاء كل 5 ثوانٍ. اكتشفتُ أن الاستجابة الحقيقية تحوي <code>sender_role</code> لا <code>sender_id</code> — فحُلّت "هل هذه رسالتي" بمقارنة الدور.
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">ج. اطلب أي شيء + تسوّق بالميزانية — errand.tsx, budget-shop.tsx</div><span class="tag ok">8eda56a</span></div>
+    <code>errand.tsx</code>: طلب بلا كتالوج، دفع محفظة فقط، حواجز نفاد الرصيد وتجاوز السقف. <code>budget-shop.tsx</code>: بحث بحد أقصى للسعر محسوب على أرخص متغيّر نشط، شريط ميزانية حي.
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">د. البحث الموحّد + تصفح الفئات — search.tsx, category/[id].tsx</div><span class="tag ok">7ce3b3f</span></div>
+    بحث مزدوج (أصناف + متاجر) بعلامتَي تبويب. منتج من متجر مغلق مؤقتًا يظهر رماديًا معطّلًا لا مخفيًا. تصفح فئات هرمي مستويين مع فرز محسوب على الخادم.
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">هـ. نسيت كلمة المرور + حذف الحساب الذاتي + حول التطبيق</div><span class="tag ok">2218c8e</span></div>
+    <code>forgot-password.tsx</code>: هاتف→OTP→كلمة مرور جديدة. <code>profile-delete.tsx</code>: تدفق الحذف الذاتي الحقيقي (منفصل عمدًا عن مسار مراجعة العمليات) — معلومات→OTP بغرض ACCOUNT_DELETE→<code>action_token</code> أحادي الاستخدام→إقرار نهائي→جدولة حذف بفترة سماح 30 يومًا. <code>about.tsx</code>: نسخة حية عبر <code>expo-constants</code>.
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">و. معرفة رقم الهاتف المسجَّل — phone-lookup.tsx</div><span class="tag ok">b2386f2</span></div>
+    هاتف→OTP بغرض PHONE_LOOKUP→تلميح رقم مقنَّع فقط إن وُجد حساب فعلًا (منع تعداد الحسابات). <b>هذا الاكتشاف قاد مباشرة لاكتشاف الخلل الحرج في البند 0.</b>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">ز. إعدادات العميل — customer-settings.tsx</div><span class="tag ok">b0dded0</span></div>
+    تعديل اسم مع فترة تهدئة 30 يومًا حقيقية (429 برمز NAME_CHANGE_COOLDOWN)، تأكيد بريد عبر OTP، تفضيلات خصوصية/تنبيهات.
+    <div class="insight warn"><h4>استُبعِد عمدًا</h4>قسم "المحظورين" — لا توجد أي زر "حظر" في أي شاشة أخرى بتطبيق RN حتى الآن؛ قائمة بلا وسيلة تعبئة ليست ميزة مكتملة.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">ح. التسجيل الذاتي (سائق/مزوّد/موظف) — register.tsx</div><span class="tag ok">5a3a83e</span></div>
+    نموذج خاص بكل دور مطابق لـ<code>RegisterBody</code>. سائق: نفس تحقق الحقول الإلزامية للمركبة الذي يفرضه الباك-إند بالضبط. اكتشفتُ أن <code>RegisterResponse</code> لا يحمل tokens — فنُفِّذ تسجيل دخول تلقائي بعد النجاح، ثم توجيه مباشر لشاشتَي رفع مستندات KYC الموجودتين مسبقًا.
+    <div class="insight warn"><h4>استُبعِد عمدًا</h4>نافذة الشروط القانونية وOTP إلزامي قبل التسجيل — كلاهما معطَّل افتراضيًا على الباك-إند (<code>legal_registration_consent_required=False</code>, <code>registration_require_otp=False</code>).</div>
+  </div>
+</section>
+
+<section id="excluded">
+  <h2 class="sec-title">🚧 4. ما استُبعِد عمدًا — مع السبب الدقيق</h2>
+  <table>
+    <tr><th>الميزة</th><th>الحجم على الويب</th><th>سبب الاستبعاد الدقيق</th></tr>
+    <tr><td>سلة الطلب الجماعي (Group Order)</td><td>~1400 سطر</td><td><code>group_order_enabled: false</code> افتراضيًا على مستوى المنصّة بأكملها — غير مفعّلة في أي مكان حاليًا</td></tr>
+    <tr><td>قائمة الحظر (Blocklist)</td><td>جزء من 896 سطر</td><td>لا توجد أي واجهة "حظر" في أي شاشة أخرى بتطبيق RN لإنشاء إدخال حظر أصلًا</td></tr>
+    <tr><td>خريطة السائق الحية (DriverMapPage)</td><td>—</td><td>تحتاج <code>react-native-maps</code> + مفتاح Google Maps API — اعتماد خارجي (من جزء سابق من الجلسة)</td></tr>
+  </table>
+</section>
+
+<section id="verify">
+  <h2 class="sec-title">✅ 5. منهجية التحقق</h2>
+  <div class="card">
+    <p>كل واحد من الـ11 commit تم التحقق منه بثلاث خطوات <b>قبل</b> الإيداع، وليس دفعة واحدة في النهاية:</p>
+    <pre>npx tsc --noEmit     → نظيف في كل مرة (صفر أخطاء)
+npx expo lint        → نظيف في كل مرة (صفر أخطاء)
+npx jest              → 32/32 اختبار ناجح</pre>
+    <p>كل عقد نهاية API استُخدِم تم التحقق منه بقراءة مباشرة لكود الباك-إند الفعلي (مسار الملف + رقم السطر)، لا بالاعتماد على افتراضات.</p>
+    <div class="insight">
+      <h4>ملاحظة تقنية عرضية</h4>
+      واجهتُ انقطاعًا مؤقتًا في مصنّف أمان أداة تنفيذ الأوامر (استمر لعدة دقائق، منع <code>tsc</code>/<code>jest</code> بينما ظلت <code>git</code>/<code>grep</code> تعمل). تعاملتُ معه بمراجعة يدوية دقيقة سطرًا بسطر، ولم أُودِع أي تغيير إلا بعد عودة الأدوات وتشغيل التحقق الكامل فعليًا.
+    </div>
+  </div>
+</section>
+
+<section id="commits">
+  <h2 class="sec-title">📜 6. قائمة الـ Commits الكاملة</h2>
+  <table>
+    <tr><th>#</th><th>Hash</th><th>الوصف</th></tr>
+    <tr><td>1</td><td><code>7a8642d</code></td><td>إصلاح مزامنة دفتر العناوين مع الباك-إند</td></tr>
+    <tr><td>2</td><td><code>5d44438</code></td><td>إصلاح فك تغليف detail في أخطاء FastAPI</td></tr>
+    <tr><td>3</td><td><code>6e02744</code></td><td>إضافة شاشة المحفظة/المكافآت</td></tr>
+    <tr><td>4</td><td><code>8307863</code></td><td>إضافة شاشة الدعم والمحادثة</td></tr>
+    <tr><td>5</td><td><code>8eda56a</code></td><td>إضافة "اطلب أي شيء" و"تسوّق بالميزانية"</td></tr>
+    <tr><td>6</td><td><code>7ce3b3f</code></td><td>إضافة البحث الموحّد وتصفح الفئات</td></tr>
+    <tr><td>7</td><td><code>2218c8e</code></td><td>نسيت كلمة المرور + حذف الحساب الذاتي + حول التطبيق</td></tr>
+    <tr><td>8</td><td><code>b2386f2</code></td><td>إضافة شاشة معرفة رقم الهاتف المسجَّل</td></tr>
+    <tr><td>9</td><td><code>b0dded0</code></td><td>إضافة إعدادات العميل</td></tr>
+    <tr><td>10</td><td><code>421c969</code></td><td><b>إصلاح حرج</b>: تصحيح purpose في تسجيل دخول OTP</td></tr>
+    <tr><td>11</td><td><code>5a3a83e</code></td><td>إضافة التسجيل الذاتي لسائق/مزوّد/موظف</td></tr>
+  </table>
+</section>
+
+<section id="status">
+  <h2 class="sec-title">🔒 7. حالة الفرع الحالية</h2>
+  <div class="fine-list">
+    كل العمل محلي على الفرع <code>fix/464-full-remediation-2026-07-10</code> — <b>لم يتم أي git push، ولم يُنشَر أي شيء لأي بيئة</b>.<br>
+    لم تُلمَس أي ملفات ضمن المناطق المحظورة (<code>backend/app/modules/</code>, <code>backend/app/models/</code>, <code>backend/alembic/</code>, <code>backend/tests/</code>, <code>contracts/</code>, <code>docker-compose.yml</code>) — كل التعديلات ضمن <code>apps/mobile/</code> فقط.<br>
+    راية <code>wallet_cash_out</code> و<code>wallet_peer_transfer</code> لم تُمَسّا ولم تُفعَّلا في أي مكان من هذا العمل.
+  </div>
+</section>
+
+<footer>
+  تقرير 479 — إكمال مسارات تطبيق الجوّال (RN) + إصلاح حرج لتسجيل الدخول · تووا (Tawa) Libya Delivery Platform · 2026-07-14
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>

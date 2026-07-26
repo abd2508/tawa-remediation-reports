@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تووا — دراسة السلة العميقة (الجزء الثاني)</title>
+<style>
+  :root{--green:#1b7f4b;--green-d:#0f5c34;--green-l:#e7f5ee;--amber:#b97400;--amber-l:#fff4e0;
+    --red:#b4232a;--red-l:#fde7e8;--blue:#1f5fa8;--blue-l:#e8f1fb;--purple:#6b3fa0;--purple-l:#f0e9fa;
+    --ink:#1f2430;--muted:#5d6677;--line:#e2e6ec;--bg:#f6f8fa;--card:#fff;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI","Tahoma","Noto Sans Arabic",sans-serif;background:var(--bg);color:var(--ink);line-height:1.8;font-size:15.5px}
+  .wrap{max-width:1160px;margin:0 auto;padding:24px 18px 90px}
+  header.hero{background:linear-gradient(135deg,#08401f,#1b7f4b);color:#fff;border-radius:18px;padding:34px 30px;box-shadow:0 10px 30px rgba(15,92,52,.25)}
+  header.hero h1{margin:0 0 6px;font-size:28px}header.hero p{margin:4px 0;opacity:.96}
+  .pill{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:3px 12px;border-radius:999px;font-size:13px;margin-top:8px;margin-left:6px}
+  h2.section{font-size:24px;margin:48px 0 6px;padding-bottom:8px;border-bottom:3px solid var(--green);display:flex;align-items:center;gap:10px}
+  h3{font-size:19px;margin:28px 0 8px;color:var(--green-d)}
+  h4{font-size:16px;margin:18px 0 6px;background:var(--green-l);display:inline-block;padding:3px 12px;border-radius:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+  .num{background:#fff;color:var(--green-d);width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;border:2px solid var(--green)}
+  .badge{display:inline-block;padding:2px 9px;border-radius:8px;font-size:12.5px;font-weight:700;white-space:nowrap}
+  .b-ok{background:var(--green-l);color:var(--green-d)}.b-part{background:var(--amber-l);color:var(--amber)}
+  .b-miss{background:var(--red-l);color:var(--red)}.b-new{background:var(--purple-l);color:var(--purple)}.b-mod{background:var(--amber-l);color:var(--amber)}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:right;vertical-align:top}
+  th{background:var(--green-l);color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafbfc}
+  td.id{font-weight:800;color:var(--purple);white-space:nowrap;direction:ltr;text-align:center}
+  code{background:#eef1f4;border:1px solid #e0e4e9;border-radius:5px;padding:0 5px;font-family:"Consolas",monospace;font-size:12.5px;direction:ltr;display:inline-block}
+  .codeblock{background:#1f2430;color:#e6e9ef;border-radius:10px;padding:12px 14px;overflow-x:auto;direction:ltr;text-align:left;font-family:"Consolas",monospace;font-size:12px;line-height:1.55;margin:10px 0}
+  .codeblock .c{color:#7f8aa3}.codeblock .g{color:#7fd1b9}.codeblock .r{color:#ff9a9a}
+  .note{border-right:5px solid var(--green);background:var(--green-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .warn{border-right:5px solid var(--amber);background:var(--amber-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .danger{border-right:5px solid var(--red);background:var(--red-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .tip{border-right:5px solid var(--blue);background:var(--blue-l);padding:11px 15px;border-radius:8px;margin:12px 0}
+  .scenario{border:1px solid var(--line);border-right:5px solid var(--purple);border-radius:8px;padding:12px 16px;margin:12px 0;background:#fff}
+  .scenario .ttl{font-weight:800;color:var(--purple);margin-bottom:4px}
+  ul.clean{padding-right:22px;margin:8px 0}ul.clean li{margin:5px 0}
+  ol.steps{padding-right:22px}ol.steps li{margin:6px 0}
+  .fileref{font-size:12px;color:var(--muted);direction:ltr;display:inline-block;text-align:left}
+  .toc{columns:3;column-gap:26px;font-size:14px}.toc a{color:var(--green-d);text-decoration:none}
+  .diagram{background:#fff;border:1px dashed var(--green);border-radius:14px;padding:14px;margin:18px 0;text-align:center}
+  .diagram svg{max-width:100%;height:auto}.cap{font-size:13px;color:var(--muted);margin-top:6px}
+  .legend span{margin-left:12px}.foot{margin-top:50px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:14px}
+  a.src{color:var(--blue);font-size:13px}
+  .grp{background:var(--purple);color:#fff;padding:6px 14px;border-radius:9px;font-weight:800;margin:26px 0 4px;font-size:15.5px}
+  .cnt{background:#fff;color:var(--purple);border-radius:6px;padding:0 8px;font-size:13px;margin-right:8px}
+  @media(max-width:900px){.toc{columns:2}}@media(max-width:600px){.toc{columns:1}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>دراسة السلة العميقة — الجزء الثاني</h1>
+  <p>فحصٌ من الجذور لكل ما يتعلّق بالسلة: <b>الدفع · الاسترجاع · الدفع المجزّأ · حجز المحفظة · التسوية · التوصيل</b> — مبنيّ على واقع الكود، مع تصميم «السلة الموحّدة» ومحاكاة مئات السيناريوهات.</p>
+  <p class="pill">التاريخ: 2026-06-30</p>
+  <p class="pill">دراسة وتقرير فقط — لم يُكتب كود</p>
+  <p class="pill">النواة المالية + الأعلام المختومة: لا تُمسّ في الدراسة</p>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:6px">لماذا السلة منفصلة؟</h3>
+  <p>السلة أكبر النقاط أثراً لأنّها تمسّ <b>نموذج الطلب + الدفع + الاسترجاع + التسوية + التوصيل</b> معاً. لذلك أفردناها في «جزء ثانٍ». هذه الوثيقة تدرسها من الجذور: ماذا يحدث اليوم بالضبط في الكود، وأين الفجوة، وكيف نبني «سلة موحّدة» (متجر متعدّد بدفعة واحدة) بأمان دون كسر النواة المالية.</p>
+  <p class="legend">
+    <span class="badge b-ok">✅ موجود اليوم</span><span class="badge b-part">🟡 جزئي</span>
+    <span class="badge b-miss">🔴 فجوة</span><span class="badge b-new">🟣 سنضيفه</span><span class="badge b-mod">🟠 سنعدّله</span>
+  </p>
+  <h4>الفهرس</h4>
+  <div class="toc">
+    <a href="#today">• السلة اليوم (واقع الكود)</a><br>
+    <a href="#pay">• الدفع اليوم (نقد/محفظة/مجزّأ)</a><br>
+    <a href="#hold">• حجز المحفظة (دورة الحياة)</a><br>
+    <a href="#refund">• الاسترجاع والإلغاء</a><br>
+    <a href="#settle">• التسوية والتوصيل</a><br>
+    <a href="#gap">• الفجوة: لا سلة موحّدة</a><br>
+    <a href="#design">• تصميم السلة الموحّدة</a><br>
+    <a href="#splitdesign">• الدفع المجزّأ (مستويان)</a><br>
+    <a href="#model">• نموذج البيانات + الـAPI</a><br>
+    <a href="#lib">• مكتبة السيناريوهات</a><br>
+    <a href="#edge">• تعارضات وحالات حرجة</a><br>
+    <a href="#qa">• أسئلة وأجوبة</a><br>
+    <a href="#phases">• خطة مرحلية</a><br>
+    <a href="#nottouch">• ما لن نلمسه</a><br>
+    <a href="#sources">• المنهجية</a>
+  </div>
+</div>
+
+<!-- ============ TODAY ============ -->
+<h2 class="section" id="today"><span class="num">١</span> السلة اليوم — واقع الكود بدقّة</h2>
+<p>السلة الحالية ليست «سلة واحدة»، بل <b>«مزوّد واحد نشط + سِلال مُنحّاة»</b>: عند الإضافة من متجر مختلف تُنحّى سلة المتجر السابق جانباً (محفوظة باسم المتجر) وتُستأنف لاحقاً من شاشة «سِلالي». كل سلّة تُدفَع وحدها.</p>
+<div class="codeblock"><span class="c">// web/src/context/CartContext.tsx</span>
+type CartState = {
+  providerId: <span class="g">string | null</span>;          <span class="c">// مزوّد واحد نشط فقط</span>
+  items: Record&lt;string, CartItem&gt;;
+  parked: Record&lt;string, ParkedBasket&gt;;  <span class="r">// سِلال المتاجر الأخرى — منفصلة، تُدفَع كلٌّ على حدة</span>
+}</div>
+<table>
+  <thead><tr><th>المكوّن</th><th>الواقع</th><th>الموقع</th></tr></thead>
+  <tbody>
+    <tr><td>السلة (واجهة)</td><td>مزوّد نشط واحد + سِلال مُنحّاة (سِلالي)</td><td class="fileref">web/src/context/CartContext.tsx</td></tr>
+    <tr><td>الطلب (نموذج)</td><td><b>طلب لمزوّد واحد</b> (<code>orders.provider_id</code> إجباري)</td><td class="fileref">models/order.py:32</td></tr>
+    <tr><td>الدفع للطلب</td><td>نقد · محفظة · <b>مجزّأ نقد+محفظة (داخل طلب واحد)</b></td><td class="fileref">order_service.create_order(tenders=…)</td></tr>
+    <tr><td>الإنشاء</td><td>طلب واحد لكل مزوّد، مع idempotency + لقطة سعر + معاينة رسم</td><td class="fileref">order_service.py:364</td></tr>
+    <tr><td>سلّة متعددة المتاجر بدفعة واحدة</td><td><span class="badge b-miss">🔴 غير موجودة</span></td><td>—</td></tr>
+  </tbody>
+</table>
+
+<div class="diagram">
+<svg viewBox="0 0 900 240" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="13">
+  <text x="450" y="20" text-anchor="middle" font-weight="700" fill="#b4232a">الواقع اليوم — سِلال منفصلة، دفعات منفصلة</text>
+  <rect x="60" y="44" width="120" height="40" rx="8" fill="#fff" stroke="#1b7f4b"/><text x="120" y="69" text-anchor="middle">🍽️ مطعم</text>
+  <rect x="220" y="44" width="120" height="40" rx="8" fill="#fff" stroke="#1f5fa8"/><text x="280" y="69" text-anchor="middle">🛒 سوق</text>
+  <rect x="380" y="44" width="120" height="40" rx="8" fill="#fff" stroke="#6b3fa0"/><text x="440" y="69" text-anchor="middle">💊 صيدلية</text>
+  <text x="280" y="108" text-anchor="middle" fill="#b4232a" font-size="12">سلة نشطة واحدة + الباقي «مُنحّى» في سِلالي</text>
+  <line x1="120" y1="120" x2="120" y2="146" stroke="#b4232a" marker-end="url(#r)"/>
+  <line x1="280" y1="120" x2="280" y2="146" stroke="#b4232a" marker-end="url(#r)"/>
+  <line x1="440" y1="120" x2="440" y2="146" stroke="#b4232a" marker-end="url(#r)"/>
+  <rect x="70" y="148" width="100" height="36" rx="7" fill="#fde7e8" stroke="#b4232a"/><text x="120" y="171" text-anchor="middle" font-size="12">طلب+دفع ١</text>
+  <rect x="230" y="148" width="100" height="36" rx="7" fill="#fde7e8" stroke="#b4232a"/><text x="280" y="171" text-anchor="middle" font-size="12">طلب+دفع ٢</text>
+  <rect x="390" y="148" width="100" height="36" rx="7" fill="#fde7e8" stroke="#b4232a"/><text x="440" y="171" text-anchor="middle" font-size="12">طلب+دفع ٣</text>
+  <text x="280" y="214" text-anchor="middle" fill="#b4232a">٣ طلبات · ٣ عمليات دفع · ٣ متابعات منفصلة</text>
+  <defs><marker id="r" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#b4232a"/></marker></defs>
+</svg>
+<div class="cap">شكل ١: اليوم — كل متجر سلّة وطلب ودفعة مستقلّة.</div>
+</div>
+
+<!-- ============ PAY ============ -->
+<h2 class="section" id="pay"><span class="num">٢</span> الدفع اليوم — ثلاث طرق (مفاجأة: المجزّأ مُفعَّل)</h2>
+<table>
+  <thead><tr><th>الطريقة</th><th>كيف تعمل</th><th>الحالة</th></tr></thead>
+  <tbody>
+    <tr><td><b>نقد عند الاستلام (CASH)</b></td><td>لا حجز؛ السائق يحصّل عند الباب. المبلغ يُقرَّب لأقرب ٢٥٠ درهماً (الفكّة). إكرامية اختيارية.</td><td><span class="badge b-ok">✅</span></td></tr>
+    <tr><td><b>محفظة (WALLET)</b></td><td>يُحجَز المبلغ من الرصيد فوراً (<code>wallet_reservations</code> HELD)، ويُلتزَم عند التسليم أو يُحرَّر عند الإلغاء.</td><td><span class="badge b-ok">✅</span></td></tr>
+    <tr><td><b>مجزّأ (SPLIT = نقد+محفظة)</b></td><td>داخل <b>طلب واحد</b>: جزء من المحفظة يُحجَز الآن + الباقي نقداً عند الباب. مُفعَّل (<code>split_payment_enabled=True</code>).</td><td><span class="badge b-ok">✅ مُفعَّل</span></td></tr>
+  </tbody>
+</table>
+<div class="note"><b>تنبيه دقيق:</b> «الدفع المجزّأ» الموجود اليوم = <b>نقد+محفظة لطلب مزوّد واحد</b> (<code>tenders=[{tender_type, amount_minor}]</code>). إنه ليس «تقسيم دفعة على عدة متاجر». فهناك إذن مستويان للتجزئة سنوضّحهما لاحقاً. <span class="fileref">order_service.py:1029-1041</span></div>
+<div class="codeblock"><span class="c"># order_service.create_order — كشف الدفع المجزّأ (نقد+محفظة) داخل طلب واحد</span>
+if tenders and split_payment_enabled and payment_method == "CASH":
+    W = sum(t.amount_minor for t in tenders if t.tender_type == "WALLET")
+    <span class="c"># يُحجَز جزء المحفظة W الآن، والباقي (الإجمالي − W) يُحصَّل نقداً عند الباب → الطلب "SPLIT"</span></div>
+<p>وهناك بوّابات قبل أي حجز: <b>حظر العميل عالي المخاطر</b> من النقد/المجزّأ على التوصيل · <b>OTP للطلبات النقدية عالية القيمة</b> · <b>منع الطلب عند وجود دَين مفتوح</b> · <b>تحقّق إضافي للمحفظة فوق حدّ معيّن</b>. <span class="fileref">order_service.py:760-892</span></p>
+
+<!-- ============ HOLD ============ -->
+<h2 class="section" id="hold"><span class="num">٣</span> حجز المحفظة — دورة الحياة (مهمّ للاسترجاع)</h2>
+<div class="diagram">
+<svg viewBox="0 0 900 170" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="13">
+  <rect x="40" y="60" width="170" height="50" rx="9" fill="#e8f1fb" stroke="#1f5fa8"/><text x="125" y="82" text-anchor="middle">إنشاء الطلب (WALLET)</text><text x="125" y="100" text-anchor="middle" font-size="11">يُخصَم الرصيد + حجز HELD</text>
+  <line x1="210" y1="85" x2="270" y2="85" stroke="#1b7f4b" marker-end="url(#g)"/>
+  <rect x="270" y="40" width="170" height="40" rx="9" fill="#e7f5ee" stroke="#1b7f4b"/><text x="355" y="64" text-anchor="middle" font-size="12">التسليم → COMMITTED</text>
+  <rect x="270" y="92" width="170" height="40" rx="9" fill="#fff4e0" stroke="#b97400"/><text x="355" y="116" text-anchor="middle" font-size="12">الإلغاء/الرفض → RELEASED</text>
+  <line x1="440" y1="60" x2="500" y2="60" stroke="#1b7f4b" marker-end="url(#g)"/>
+  <line x1="440" y1="112" x2="500" y2="112" stroke="#b97400" marker-end="url(#a)"/>
+  <rect x="500" y="40" width="180" height="40" rx="9" fill="#e7f5ee" stroke="#1b7f4b"/><text x="590" y="64" text-anchor="middle" font-size="12">يُحوَّل للمزوّد (تسوية)</text>
+  <rect x="500" y="92" width="180" height="40" rx="9" fill="#fff4e0" stroke="#b97400"/><text x="590" y="116" text-anchor="middle" font-size="12">يُعاد الرصيد للعميل</text>
+  <text x="450" y="155" text-anchor="middle" fill="#5d6677" font-size="12">الرصيد لا يصبح سالباً أبداً (قيد ck_wallet_balance_nonneg) · حجز واحد لكل طلب (uq)</text>
+  <defs>
+    <marker id="g" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#1b7f4b"/></marker>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#b97400"/></marker>
+  </defs>
+</svg>
+<div class="cap">شكل ٢: حجز المحفظة — HELD عند الإنشاء، ثم COMMITTED (تسليم) أو RELEASED (إلغاء = استرجاع فوري للرصيد). <span class="fileref">models/payment.py · wallet_reservations</span></div>
+</div>
+
+<!-- ============ REFUND ============ -->
+<h2 class="section" id="refund"><span class="num">٤</span> الاسترجاع والإلغاء اليوم</h2>
+<ul class="clean">
+  <li><b>إلغاء قبل التسليم (محفظة):</b> <code>cancel_order</code> يُحرّر الحجز → يعود الرصيد فوراً (لا حاجة لطلب استرجاع). <span class="fileref">order_service.py:1535,1599</span></li>
+  <li><b>استرجاع رسميّ (Refund):</b> جدول <code>refunds</code> لكل <b>طلب</b> (مبلغ) — REQUESTED → APPROVED → COMPLETED (إيداع في المحفظة عبر دفتر الأستاذ). <b>موافقة مزدوجة</b> فوق حدّ. استرجاع النقد/PSP مؤجَّل خلف <code>GATE_PAYMENT_SANDBOX</code>. <span class="fileref">models/payment.py:324 · finance/refund_router.py</span></li>
+  <li><b>الحبيبية (granularity):</b> الاسترجاع اليوم بـ<b>مبلغ على مستوى الطلب</b>، لا «استرجاع صنف واحد» مُهيكَل (يُحسب المبلغ يدوياً).</li>
+</ul>
+<div class="warn"><b>أثر على السلة الموحّدة:</b> حين تصبح السلة عدة متاجر بطلب-أب واحد، يجب أن يبقى الاسترجاع/الإلغاء على مستوى <b>الطلب-الابن (المتجر)</b> — أي إلغاء متجر واحد دون الآخرين، واسترجاع حصّته فقط. البنية الحالية (refund per order_id + release per order) تدعم ذلك إذا جعلنا كل متجر طلباً-ابناً مستقلاً.</div>
+
+<!-- ============ SETTLE ============ -->
+<h2 class="section" id="settle"><span class="num">٥</span> التسوية والتوصيل اليوم (لكل طلب)</h2>
+<ul class="clean">
+  <li><b>التسوية:</b> لكل طلب مزوّد واحد — عمولة على قيمة البضاعة، ورسم التوصيل إيراد منصّة. <span class="fileref">finance/settlement_service.py · dispatch._create_delivery_settlement</span></li>
+  <li><b>التوصيل:</b> سائق واحد لكل طلب. توجد <b>خوارزمية تجميع (batching)</b> جاهزة (معطّلة): تجمع طلبات متقاربة لسائق واحد ضمن قيود (قُرب + سقف نقد السائق + حدّ عدد). <span class="fileref">dispatch/batching_service.compute_batch</span></li>
+</ul>
+<div class="tip"><b>هذا يخدم السلة الموحّدة مباشرةً:</b> «سائق واحد للمتاجر القريبة» = تشغيل خوارزمية التجميع على الطلبات-الأبناء؛ و«عدة سائقين» = الإرسال العادي لكل ابن. لا حاجة لاختراع توصيل جديد.</div>
+
+<!-- ============ GAP ============ -->
+<h2 class="section" id="gap"><span class="num">٦</span> الفجوة — وما هو موجود فعلاً للتجزئة</h2>
+<table>
+  <thead><tr><th>المفهوم</th><th>موجود؟</th><th>ملاحظة</th></tr></thead>
+  <tbody>
+    <tr><td>سلة واحدة لعدة متاجر بدفعة واحدة</td><td><span class="badge b-miss">🔴 لا</span></td><td>القلب المطلوب في الجزء الثاني</td></tr>
+    <tr><td>دفع مجزّأ نقد+محفظة (طلب واحد)</td><td><span class="badge b-ok">✅ نعم</span></td><td><code>tenders</code> + <code>split_payment_enabled=True</code></td></tr>
+    <tr><td>تقسيم فاتورة بين «مشاركين» (Group Order)</td><td><span class="badge b-part">🟡 إطار P3 معطّل</span></td><td><code>group_order_split.py</code> — «لا نيّة دفع مشتركة عبر المزوّدين»</td></tr>
+    <tr><td>تجميع طلبات لسائق واحد (batching)</td><td><span class="badge b-part">🟡 جاهز معطّل</span></td><td><code>compute_batch</code> (446)</td></tr>
+    <tr><td>استرجاع/إلغاء لكل طلب</td><td><span class="badge b-ok">✅ نعم</span></td><td>يصلح كأساس للاسترجاع على مستوى المتجر</td></tr>
+  </tbody>
+</table>
+<div class="danger"><b>الخلاصة:</b> كل اللبنات موجودة (حجز محفظة، دفع مجزّأ، استرجاع لكل طلب، تسوية لكل مزوّد، تجميع توصيل) — <b>الناقص هو «الغلاف» الذي يجمعها</b>: طلب-أب (مجموعة) يحمل طلبات-أبناء لكل متجر، بدفعة واحدة موزّعة عليهم.</div>
+
+<!-- ============ DESIGN ============ -->
+<h2 class="section" id="design"><span class="num">٧</span> تصميم «السلة الموحّدة»</h2>
+<div class="diagram">
+<svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI,Tahoma" font-size="12.5">
+  <text x="450" y="18" text-anchor="middle" font-weight="700" fill="#0f5c34">السلة الموحّدة — طلب-أب يجمع طلبات-أبناء بدفعة واحدة</text>
+  <rect x="60" y="34" width="110" height="34" rx="7" fill="#fff" stroke="#1b7f4b"/><text x="115" y="56" text-anchor="middle" font-size="11">🍽️ مطعم</text>
+  <rect x="230" y="34" width="110" height="34" rx="7" fill="#fff" stroke="#1f5fa8"/><text x="285" y="56" text-anchor="middle" font-size="11">🛒 سوق</text>
+  <rect x="400" y="34" width="110" height="34" rx="7" fill="#fff" stroke="#6b3fa0"/><text x="455" y="56" text-anchor="middle" font-size="11">💊 صيدلية</text>
+  <line x1="115" y1="68" x2="280" y2="92" stroke="#1b7f4b" marker-end="url(#g2)"/>
+  <line x1="285" y1="68" x2="285" y2="92" stroke="#1b7f4b" marker-end="url(#g2)"/>
+  <line x1="455" y1="68" x2="290" y2="92" stroke="#1b7f4b" marker-end="url(#g2)"/>
+  <rect x="190" y="94" width="210" height="40" rx="9" fill="#e7f5ee" stroke="#1b7f4b" stroke-width="2"/><text x="295" y="119" text-anchor="middle" font-weight="700">🛒 سلة واحدة موحّدة</text>
+  <line x1="295" y1="134" x2="295" y2="158" stroke="#1b7f4b" marker-end="url(#g2)"/>
+  <rect x="205" y="160" width="180" height="38" rx="9" fill="#1b7f4b"/><text x="295" y="184" text-anchor="middle" fill="#fff" font-weight="700">💳 دفعة واحدة (الإجمالي)</text>
+  <line x1="295" y1="198" x2="295" y2="220" stroke="#1b7f4b" marker-end="url(#g2)"/>
+  <rect x="120" y="222" width="350" height="42" rx="9" fill="#f0e9fa" stroke="#6b3fa0"/><text x="295" y="240" text-anchor="middle" font-size="12">طلب-أب (Order Group) يوزّع الدفعة على ٣ طلبات-أبناء</text><text x="295" y="257" text-anchor="middle" font-size="11">كل ابن = متجر مستقل (حالة/تسوية/عمولة/استرجاع)</text>
+  <!-- children -->
+  <line x1="200" y1="264" x2="120" y2="286" stroke="#6b3fa0" marker-end="url(#p)"/>
+  <line x1="295" y1="264" x2="295" y2="286" stroke="#6b3fa0" marker-end="url(#p)"/>
+  <line x1="390" y1="264" x2="470" y2="286" stroke="#6b3fa0" marker-end="url(#p)"/>
+  <rect x="60" y="288" width="120" height="26" rx="6" fill="#fff" stroke="#6b3fa0"/><text x="120" y="306" text-anchor="middle" font-size="11">ابن: مطعم</text>
+  <rect x="235" y="288" width="120" height="26" rx="6" fill="#fff" stroke="#6b3fa0"/><text x="295" y="306" text-anchor="middle" font-size="11">ابن: سوق</text>
+  <rect x="410" y="288" width="120" height="26" rx="6" fill="#fff" stroke="#6b3fa0"/><text x="470" y="306" text-anchor="middle" font-size="11">ابن: صيدلية</text>
+  <!-- dispatch -->
+  <rect x="600" y="120" width="250" height="120" rx="10" fill="#e8f1fb" stroke="#1f5fa8"/>
+  <text x="725" y="145" text-anchor="middle" font-weight="700" fill="#1f5fa8">التوصيل</text>
+  <text x="725" y="170" text-anchor="middle" font-size="12">قريبة؟ → 🛵 سائق واحد (batching)</text>
+  <text x="725" y="195" text-anchor="middle" font-size="12">متباعدة؟ → 🛵🛵 عدة سائقين</text>
+  <text x="725" y="222" text-anchor="middle" font-size="11" fill="#5d6677">قرار المنصّة لكل طلب-أب</text>
+  <defs>
+    <marker id="g2" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#1b7f4b"/></marker>
+    <marker id="p" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#6b3fa0"/></marker>
+  </defs>
+</svg>
+<div class="cap">شكل ٣: السلة الموحّدة — طلب-أب (Order Group) + طلبات-أبناء لكل متجر + دفعة واحدة موزّعة + توصيل سائق-واحد أو عدّة.</div>
+</div>
+<h4>المبدأ المعماري</h4>
+<ul class="clean">
+  <li><b>طلب-أب (Order Group):</b> كيان جديد يحمل الدفعة الواحدة وحالة المجموعة، ويربط عدة <b>طلبات-أبناء</b>.</li>
+  <li><b>طلب-ابن = الطلب الحالي تماماً</b> لكل متجر (نفس النموذج، نفس دورة الحياة، نفس التسوية والعمولة والدفع المجزّأ والاسترجاع). <b>لا نغيّر الطلب — نُغلّفه.</b></li>
+  <li><b>الدفع مرّة واحدة على مستوى الأب</b>، ثم يُوزَّع/يُنسَب لكل ابن (حجز محفظة لكل ابن أو حصّة نقد لكل وقفة).</li>
+  <li><b>التوصيل:</b> المنصّة تقرّر — تجميع لسائق واحد (batching الجاهز) أو عدّة سائقين.</li>
+  <li><b>الاسترجاع/الإلغاء على مستوى الابن</b> (متجر واحد) دون المساس بالباقي.</li>
+</ul>
+
+<!-- ============ SPLIT DESIGN ============ -->
+<h2 class="section" id="splitdesign"><span class="num">٨</span> الدفع المجزّأ — مستويان (توضيح حاسم)</h2>
+<table>
+  <thead><tr><th>المستوى</th><th>المعنى</th><th>الحالة</th></tr></thead>
+  <tbody>
+    <tr><td><b>أ — مجزّأ داخل طلب واحد</b></td><td>نقد + محفظة لنفس المتجر (جزء من المحفظة + الباقي نقداً).</td><td><span class="badge b-ok">✅ موجود ومُفعَّل</span></td></tr>
+    <tr><td><b>ب — تقسيم على عدة متاجر (السلة الموحّدة)</b></td><td>دفعة واحدة تُوزَّع على طلبات-أبناء لمتاجر مختلفة (كل ابن قد يكون نقداً أو محفظة).</td><td><span class="badge b-new">🟣 سنبنيه</span></td></tr>
+  </tbody>
+</table>
+<div class="tip"><b>الجمال:</b> المستويان يتركّبان — في السلة الموحّدة يمكن لكلّ ابن أن يستخدم «المجزّأ أ» الموجود (نقد+محفظة)، بينما «التوزيع ب» يقسّم الإجمالي على الأبناء. نُعيد استخدام منطق <code>tenders</code> الحالي لكل ابن.</div>
+<div class="warn"><b>قرار يحتاج المالك/المشغّل:</b> هل يُسمح بخلط طرق الدفع بين الأبناء (متجر نقداً + متجر محفظة في نفس السلة)؟ التوصية: <b>نعم</b> (مرونة)، مع قاعدة واضحة: ما يُدفع مسبقاً (محفظة) يُحجَز فوراً، وما هو نقد يُحصَّل عند كل وقفة. خيار أبسط للإطلاق الأول: <b>طريقة دفع موحّدة للسلة كلّها</b>، ثم نفتح الخلط لاحقاً.</div>
+
+<!-- ============ MODEL ============ -->
+<h2 class="section" id="model"><span class="num">٩</span> نموذج البيانات + الـAPI (مبدئي)</h2>
+<table>
+  <thead><tr><th>العنصر</th><th>النوع</th><th>التفصيل</th></tr></thead>
+  <tbody>
+    <tr><td><code>order_groups</code></td><td><span class="badge b-new">🟣 جدول جديد</span></td><td>id · customer_id · payment_method · total_minor · state · created_at. الدفعة الواحدة + حالة المجموعة.</td></tr>
+    <tr><td><code>orders.group_id</code></td><td><span class="badge b-mod">🟠 عمود</span></td><td>ربط الطلب-الابن بالأب (null = طلب مفرد كما اليوم → لا كسر).</td></tr>
+    <tr><td>حجز المحفظة</td><td><span class="badge b-ok">✅ إعادة استخدام</span></td><td>حجز لكل ابن (uq order_id) — أو حجز-أب يُوزَّع. التوصية: حجز لكل ابن (يتّسق مع الالتزام/التحرير الحالي).</td></tr>
+    <tr><td>التسوية/العمولة</td><td><span class="badge b-ok">✅ بلا تغيير</span></td><td>تبقى لكل طلب-ابن (مزوّد واحد) — لا مساس بالنواة المالية.</td></tr>
+    <tr><td>الاسترجاع</td><td><span class="badge b-ok">✅ إعادة استخدام</span></td><td><code>refunds.order_id</code> = الطلب-الابن → استرجاع متجر واحد.</td></tr>
+    <tr><td>التوصيل</td><td><span class="badge b-mod">🟠 تفعيل</span></td><td>تشغيل <code>compute_batch</code> على أبناء المجموعة (سائق واحد للقريب) أو إرسال مستقل.</td></tr>
+    <tr><td><code>POST /carts/checkout-group</code></td><td><span class="badge b-new">🟣</span></td><td>ينشئ الأب + الأبناء (طلب لكل متجر) ضمن معاملة واحدة + دفعة واحدة.</td></tr>
+    <tr><td><code>GET /orders/groups/{id}</code></td><td><span class="badge b-new">🟣</span></td><td>متابعة المجموعة (حالات الأبناء مجمّعة).</td></tr>
+    <tr><td><code>POST /orders/groups/{id}/cancel-child/{order_id}</code></td><td><span class="badge b-new">🟣</span></td><td>إلغاء متجر واحد + تحرير/استرجاع حصّته.</td></tr>
+  </tbody>
+</table>
+<div class="note"><b>مبدأ السلامة:</b> الطلب-الابن = الطلب الحالي بلا تغيير جوهري؛ كل المنطق المالي المُثبت (الحجز/الالتزام/التحرير/التسوية/العمولة/الاسترجاع/الفكّة/الدين/المخاطر) يعمل كما هو لكل ابن. نضيف <b>غلافاً</b> (الأب) + <b>دفعة واحدة</b> فقط.</div>
+
+<!-- ============ SCENARIO LIBRARY ============ -->
+<h2 class="section" id="lib"><span class="num">١٠</span> مكتبة السيناريوهات والمحاكاة</h2>
+<p>كل سطر: الموقف → السلوك المتوقّع. مرتّبة بمجموعات (الدفع · الاسترجاع · المجزّأ · الإلغاء · التوصيل · حالات حرجة).</p>
+
+<div class="grp">P — الدفع (السلة الموحّدة) <span class="cnt">P1–P14</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">P1</td><td>سلة من ٣ متاجر، محفظة، رصيد كافٍ.</td><td>دفعة واحدة → حجز لكل ابن → ٣ طلبات تبدأ دورتها.</td></tr>
+<tr><td class="id">P2</td><td>سلة محفظة، الرصيد لا يكفي الإجمالي.</td><td>رفض قبل أي حجز + رسالة «الرصيد لا يكفي» (لا حجز جزئي).</td></tr>
+<tr><td class="id">P3</td><td>سلة نقد، ٣ متاجر متباعدة.</td><td>إجمالي نقدي = مجموع وقفات؛ كل وقفة تُحصَّل عند بابها (أو عند المنزل).</td></tr>
+<tr><td class="id">P4</td><td>سلة مختلطة: متجر محفظة + متجر نقد.</td><td>الابن-المحفظة يُحجَز الآن؛ الابن-النقد يُحصَّل لاحقاً (إن سُمح بالخلط).</td></tr>
+<tr><td class="id">P5</td><td>مجزّأ داخل ابن (نقد+محفظة لنفس المتجر).</td><td>يُعاد استخدام <code>tenders</code> الموجود لذلك الابن.</td></tr>
+<tr><td class="id">P6</td><td>عميل عالي المخاطر يختار نقداً/مجزّأ على التوصيل.</td><td>يُحجَب (نفس بوّابة المخاطر الحالية) على مستوى السلة.</td></tr>
+<tr><td class="id">P7</td><td>إجمالي نقدي عالٍ القيمة.</td><td>بوّابة OTP (نفس آلية الطلب المفرد) على مستوى السلة.</td></tr>
+<tr><td class="id">P8</td><td>على العميل دَين مفتوح.</td><td>تُحجَب السلة كلّها قبل أي إنشاء (نفس حارس الدين).</td></tr>
+<tr><td class="id">P9</td><td>الفكّة (٢٥٠ درهم) على عدة وقفات نقدية.</td><td>قرار: تقريب لكل وقفة أم للإجمالي؟ التوصية: لكل وقفة (يطابق ما يُسلَّم فعلاً).</td></tr>
+<tr><td class="id">P10</td><td>كوبون/خصم على السلة.</td><td>قرار: خصم على مستوى الأب يُوزَّع على الأبناء بالتناسب (يحتاج قاعدة واضحة).</td></tr>
+<tr><td class="id">P11</td><td>إكرامية.</td><td>تُسنَد لابنٍ مُحدَّد أو للمجموعة (قرار عرض).</td></tr>
+<tr><td class="id">P12</td><td>تكرار الإرسال (idempotency) للسلة.</td><td>مفتاح idempotency على مستوى الأب → لا إنشاء مزدوج.</td></tr>
+<tr><td class="id">P13</td><td>فشل إنشاء أحد الأبناء أثناء المعاملة.</td><td>المعاملة ذرّية: إمّا كل الأبناء + الدفعة أو لا شيء (لا أب نصفيّ).</td></tr>
+<tr><td class="id">P14</td><td>التحقّق الإضافي للمحفظة فوق حدّ.</td><td>يُطبَّق على إجمالي السلة (نفس آلية step-up).</td></tr>
+</tbody></table>
+
+<div class="grp">R — الاسترجاع/الإلغاء <span class="cnt">R1–R12</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">R1</td><td>إلغاء متجر واحد قبل قبوله (محفظة).</td><td>تحرير حجز ذلك الابن فقط → يعود جزؤه للرصيد؛ بقية الأبناء تستمر.</td></tr>
+<tr><td class="id">R2</td><td>متجر يرفض الطلب بعد الدفع (محفظة).</td><td>تحرير حجز الابن المرفوض + إشعار + اقتراح بدائل؛ الباقي يستمر.</td></tr>
+<tr><td class="id">R3</td><td>استرجاع رسميّ لمتجر واحد بعد التسليم.</td><td><code>refund</code> على <code>order_id</code> الابن (المبلغ + موافقة) → إيداع محفظة.</td></tr>
+<tr><td class="id">R4</td><td>إلغاء السلة كلّها قبل القبول.</td><td>تحرير كل حجوزات الأبناء → يعود الإجمالي.</td></tr>
+<tr><td class="id">R5</td><td>استرجاع جزئي (صنف واحد من متجر).</td><td>مبلغ على طلب الابن (الحبيبية الحالية مبلغ لا صنف).</td></tr>
+<tr><td class="id">R6</td><td>عدم حضور العميل لمتجر واحد.</td><td>نموذج عدم الحضور الحالي على الابن (رسم + تعويض المزوّد).</td></tr>
+<tr><td class="id">R7</td><td>إلغاء بعد بدء تحضير متجر.</td><td>حسب آلة حالات الطلب الحالية (قد يُمنع/يُغرَّم) — لكل ابن.</td></tr>
+<tr><td class="id">R8</td><td>استرجاع نقدي (بعد فتح بوّابة الدفع).</td><td>مؤجَّل خلف <code>GATE_PAYMENT_SANDBOX</code> كما اليوم.</td></tr>
+<tr><td class="id">R9</td><td>موافقة مزدوجة على استرجاع كبير.</td><td>نفس الحدّ والموافقة المزدوجة على الابن.</td></tr>
+<tr><td class="id">R10</td><td>استرجاع متجر + بقاء آخر مُسلَّماً.</td><td>مستقلّان تماماً (طلبان ابنان).</td></tr>
+<tr><td class="id">R11</td><td>إلغاء ابن نقدي قبل التحصيل.</td><td>لا مال تحرّك → إلغاء نظيف بلا استرجاع.</td></tr>
+<tr><td class="id">R12</td><td>تعارض: إلغاء الأب أثناء تسليم ابن.</td><td>الابن قيد التسليم يُكمَل؛ الإلغاء يطال غير المُنفَّذ فقط.</td></tr>
+</tbody></table>
+
+<div class="grp">D — التوصيل والتوزيع <span class="cnt">D1–D10</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">D1</td><td>متاجر متقاربة + سائق متاح.</td><td>تجميع لسائق واحد (compute_batch) ضمن قيوده.</td></tr>
+<tr><td class="id">D2</td><td>متاجر متباعدة.</td><td>إرسال مستقل (عدة سائقين).</td></tr>
+<tr><td class="id">D3</td><td>تجاوز سقف نقد السائق في التجميع.</td><td>الخوارزمية تستبعد الوقفة الزائدة → ابن لسائق آخر.</td></tr>
+<tr><td class="id">D4</td><td>متجر جاهز قبل الآخر.</td><td>قرار: ينطلق السائق عند جاهزية الكل (تجميع) أم لكلٍّ على حدة.</td></tr>
+<tr><td class="id">D5</td><td>متجر استلام ذاتي + متجر توصيل في نفس السلة.</td><td>الاستلام الذاتي بلا سائق؛ التوصيل يُرسَل عادياً.</td></tr>
+<tr><td class="id">D6</td><td>متجر مجدول + متجر فوري.</td><td>المجدول ينتظر موعده؛ الفوري ينطلق (آلية الجدولة الحالية لكل ابن).</td></tr>
+<tr><td class="id">D7</td><td>لا سائق لمتجر.</td><td>تصعيد «لا سائق» الحالي على الابن + إشعار العميل.</td></tr>
+<tr><td class="id">D8</td><td>سائق واحد، تسليم متعدّد الوقفات.</td><td>تتبّع كل وقفة؛ تحصيل نقد كل وقفة على حدة.</td></tr>
+<tr><td class="id">D9</td><td>رسوم التوصيل في سلة موحّدة.</td><td>قرار: رسم موحّد (سائق واحد) أم مجموع رسوم؟ التوصية: رسم أقل عند التجميع (تحفيز).</td></tr>
+<tr><td class="id">D10</td><td>فشل تسليم وقفة واحدة.</td><td>تُعامَل كطلب فاشل لذلك الابن؛ الباقي يكتمل.</td></tr>
+</tbody></table>
+
+<div class="grp">X — حالات حرجة وتزامن <span class="cnt">X1–X10</span></div>
+<table><thead><tr><th>#</th><th>الموقف</th><th>السلوك المتوقّع</th></tr></thead><tbody>
+<tr><td class="id">X1</td><td>أحد المتاجر مغلق لحظة الدفع.</td><td>يُمنَع إنشاء ابنه؛ قرار: أكمل الباقي أم أوقف الكل؟ (تُعرَض للعميل).</td></tr>
+<tr><td class="id">X2</td><td>صنف نفد لحظة الدفع.</td><td>نفس معالجة نفاد الصنف الحالية على الابن.</td></tr>
+<tr><td class="id">X3</td><td>انقطاع أثناء الدفع.</td><td>idempotency الأب يمنع الازدواج عند إعادة المحاولة.</td></tr>
+<tr><td class="id">X4</td><td>تغيّر السعر بين العرض والدفع.</td><td>لقطة السعر لكل ابن (price_snapshot) تحمي العميل.</td></tr>
+<tr><td class="id">X5</td><td>الرصيد كفى وقت العرض ونقص وقت الدفع.</td><td>إعادة فحص ذرّية وقت الحجز → رفض نظيف إن نقص.</td></tr>
+<tr><td class="id">X6</td><td>حجز نجح لمتجرين وفشل الثالث.</td><td>المعاملة الذرّية تتراجع كلّياً (P13) — لا نصف سلة.</td></tr>
+<tr><td class="id">X7</td><td>عميل يلغي ويعيد الطلب بسرعة.</td><td>التحرير يعيد الرصيد؛ الطلب الجديد مفتاح idempotency جديد.</td></tr>
+<tr><td class="id">X8</td><td>زمن منطقة/توقيت للجدولة المختلطة.</td><td>UTC داخلياً؛ عرض بتوقيت ليبيا (كما اليوم).</td></tr>
+<tr><td class="id">X9</td><td>الفكّة تجعل مجموع الوقفات ≠ الإجمالي المعروض.</td><td>قاعدة الفكّة لكل وقفة موثّقة + تُعرَض بوضوح (P9).</td></tr>
+<tr><td class="id">X10</td><td>استرجاع ابن بعد التزام حجزه (تسليم).</td><td>مسار <code>refund</code> (إيداع محفظة) لا التحرير — حسب حالة الابن.</td></tr>
+</tbody></table>
+
+<div class="note"><b>الإجمالي:</b> P14 + R12 + D10 + X10 = <b>٤٦ سيناريو أساسياً</b> قابلاً للتوسيع لمئات الفروع عند البناء (كل سيناريو يتفرّع حسب طريقة الدفع × حالة الابن × التوصيل).</div>
+
+<!-- ============ EDGE ============ -->
+<h2 class="section" id="edge"><span class="num">١١</span> تعارضات وقرارات تحتاج حسماً</h2>
+<table>
+  <thead><tr><th>القرار</th><th>الخيارات</th><th>التوصية</th></tr></thead>
+  <tbody>
+    <tr><td>خلط طرق الدفع بين الأبناء</td><td>موحّد للسلة / مختلط لكل متجر</td><td>ابدأ موحّداً ثم افتح الخلط.</td></tr>
+    <tr><td>الفكّة في النقد متعدّد الوقفات</td><td>لكل وقفة / للإجمالي</td><td>لكل وقفة (يطابق التسليم الفعلي).</td></tr>
+    <tr><td>رسوم التوصيل عند التجميع</td><td>رسم موحّد / مجموع</td><td>رسم أقل عند سائق واحد (تحفيز Uber-style).</td></tr>
+    <tr><td>إغلاق متجر لحظة الدفع</td><td>أكمل الباقي / أوقف الكل</td><td>اعرض الخيار للعميل (لا تقرّر عنه).</td></tr>
+    <tr><td>توزيع الخصم/الكوبون</td><td>على الأب / بالتناسب على الأبناء</td><td>بالتناسب (يحفظ صحّة التسوية لكل مزوّد).</td></tr>
+    <tr><td>حدّ عدد المتاجر في السلة</td><td>بلا حدّ / سقف</td><td>سقف معقول (مثلاً ٤) لضبط التوصيل والاحتيال.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ QA ============ -->
+<h2 class="section" id="qa"><span class="num">١٢</span> أسئلة وأجوبة</h2>
+<div class="scenario"><div class="ttl">هل سنغيّر نموذج الطلب أو النواة المالية؟</div>لا. الطلب-الابن = الطلب الحالي بلا تغيير جوهري؛ نضيف غلافاً (الأب) + عمود <code>group_id</code> + دفعة واحدة. التسوية/العمولة/الدفتر تبقى لكل ابن.</div>
+<div class="scenario"><div class="ttl">كيف نضمن عدم «نصف سلة»؟</div>إنشاء الأب + كل الأبناء + الدفعة داخل <b>معاملة ذرّية واحدة</b> (X6/P13): إمّا الكل أو لا شيء.</div>
+<div class="scenario"><div class="ttl">هل الدفع المجزّأ موجود؟</div>نعم على مستوى الطلب الواحد (نقد+محفظة، مُفعَّل). الجديد هو «التوزيع على عدة متاجر»، ويُعيد استخدام المجزّأ لكل ابن.</div>
+<div class="scenario"><div class="ttl">كيف نسترجع متجراً واحداً؟</div>عبر <code>refund.order_id</code> الابن (بعد التسليم) أو تحرير الحجز (قبله) — البنية الحالية تدعمه لأن كل متجر طلب مستقل.</div>
+<div class="scenario"><div class="ttl">سائق واحد أم عدّة؟</div>المنصّة تقرّر: <code>compute_batch</code> الجاهز للمتقاربة (سائق واحد)، وإلا إرسال مستقل.</div>
+
+<!-- ============ PHASES ============ -->
+<h2 class="section" id="phases"><span class="num">١٣</span> خطة مرحلية مقترحة (للتنفيذ لاحقاً بإذنك)</h2>
+<table>
+  <thead><tr><th>المرحلة</th><th>المحتوى</th><th>المخاطرة</th></tr></thead>
+  <tbody>
+    <tr><td><b>س1 — الأساس</b></td><td>جدول <code>order_groups</code> + عمود <code>orders.group_id</code> (null = سلوك اليوم) + هجرة.</td><td>منخفضة (إضافي).</td></tr>
+    <tr><td><b>س2 — الدفع الموحّد</b></td><td><code>checkout-group</code>: معاملة ذرّية تنشئ الأبناء + دفعة واحدة (محفظة/نقد موحّد أولاً).</td><td>متوسطة (تمسّ مسار الدفع).</td></tr>
+    <tr><td><b>س3 — الواجهة</b></td><td>سلة موحّدة (دمج «سِلالي») + checkout موحّد + متابعة المجموعة.</td><td>متوسطة.</td></tr>
+    <tr><td><b>س4 — الاسترجاع/الإلغاء على مستوى الابن</b></td><td>إلغاء/استرجاع متجر واحد ضمن المجموعة.</td><td>متوسطة.</td></tr>
+    <tr><td><b>س5 — التوصيل الذكي</b></td><td>تفعيل التجميع للمتقاربة + رسم محفّز + متعدّد الوقفات.</td><td>مرتفعة (تحتاج اختبار حِمل).</td></tr>
+    <tr><td><b>س6 — الخلط والكوبونات</b></td><td>خلط طرق الدفع بين الأبناء + توزيع الخصم.</td><td>متوسطة.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ NOT TOUCH ============ -->
+<h2 class="section" id="nottouch">ما لن نلمسه</h2>
+<ul class="clean">
+  <li><b>النواة المالية (FIN-COR):</b> العمولة/التسوية/الدفتر تبقى لكل مزوّد كما هي.</li>
+  <li><b>الأعلام المختومة:</b> <code>production_payment_enabled</code> وأخواتها — استرجاع النقد/PSP يبقى مؤجَّلاً خلفها.</li>
+  <li><b>منطق الطلب المفرد:</b> <code>group_id=null</code> = السلوك الحالي حرفياً (لا كسر للطلبات المفردة).</li>
+</ul>
+
+<!-- ============ SOURCES ============ -->
+<h2 class="section" id="sources">المنهجية</h2>
+<div class="card">
+  <p>مبنيّ على قراءة مباشرة للكود بتاريخ ٢٠٢٦-٠٦-٣٠: <code>web/src/context/CartContext.tsx</code> (السلة) · <code>order_service.create_order</code> (الإنشاء + tenders + البوّابات + الفكّة) · <code>models/payment.py</code> (wallet_reservations · refunds · settlements) · <code>finance/refund_router.py</code> + <code>settlement_service.py</code> · <code>dispatch/batching_service.compute_batch</code> (التجميع) · <code>advanced/group_order_split.py</code> (تقسيم المشاركين P3، معطّل) · <code>config.py</code> (<code>split_payment_enabled=True</code>).</p>
+  <p>أحدث الممارسات (Multi-Store Ordering): <a class="src" href="https://www.uber.com/us/en/newsroom/multi-store-ordering/">Uber — Multi-Store Ordering</a> · <a class="src" href="https://www.restaurantdive.com/news/uber-eats-adds-multi-merchant-ordering/696186/">Restaurant Dive — multi-merchant</a></p>
+</div>
+
+<div class="foot">
+  <p><b>لم يُكتب أي كود.</b> هذه دراسة عميقة من الجذور + تصميم + سيناريوهات — بانتظار مراجعتك وقرارك في النقاط الستّ التي تحتاج حسماً، ثم نبدأ التنفيذ المرحلي (س1…س6).</p>
+  <p style="text-align:center;margin-top:18px;color:#1b7f4b;font-weight:700">— نهاية دراسة السلة · الجزء الثاني · منصّة تووا —</p>
+</div>
+
+</div>
+</body>
+</html>

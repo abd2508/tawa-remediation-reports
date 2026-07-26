@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الدراسة العميقة للوحة التحكم — الكيانات والأقسام · تووا</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#eaeee9;
+  --surface:#ffffff;
+  --surface-2:#f4f7f3;
+  --ink:#13201c;
+  --ink-soft:#33453f;
+  --muted:#62736c;
+  --line:#dde4dd;
+  --brand:#0e7c5a;
+  --brand-2:#16a37b;
+  --brand-ink:#0a3a2c;
+  --crit:#cf3b2c;
+  --crit-bg:#fdeceb;
+  --high:#d97a16;
+  --high-bg:#fdf2e3;
+  --med:#caa022;
+  --med-bg:#fbf6e1;
+  --low:#2f72c9;
+  --low-bg:#eaf1fb;
+  --good:#1f9d6b;
+  --good-bg:#e7f6ef;
+  --shadow:0 1px 2px rgba(16,40,33,.06),0 8px 28px rgba(16,40,33,.07);
+  --shadow-lg:0 24px 60px rgba(8,30,24,.18);
+  --radius:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:'Tajawal','Noto Kufi Arabic','Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.85;font-size:16.5px;
+  -webkit-font-smoothing:antialiased;
+}
+code,.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;direction:ltr;unicode-bidi:isolate;
+  background:#0e2a22;color:#9be9c8;padding:.08em .42em;border-radius:6px;font-size:.82em;white-space:nowrap}
+.lt{direction:ltr;unicode-bidi:isolate;display:inline-block}
+a{color:var(--brand);text-decoration:none}
+h2,h3,h4{line-height:1.4;color:var(--brand-ink)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ===== HERO ===== */
+.hero{
+  background:radial-gradient(120% 140% at 88% -10%,#15493a 0%,#0c3328 45%,#082019 100%);
+  color:#eafaf3;padding:64px 0 120px;position:relative;overflow:hidden;
+}
+.hero::after{content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(40% 50% at 12% 8%,rgba(22,163,123,.28),transparent 70%),
+    radial-gradient(30% 40% at 95% 90%,rgba(22,163,123,.18),transparent 70%);
+  pointer-events:none}
+.hero .wrap{position:relative;z-index:2}
+.kicker{display:inline-flex;align-items:center;gap:9px;background:rgba(155,233,200,.14);
+  border:1px solid rgba(155,233,200,.32);color:#bdf3da;padding:7px 15px;border-radius:999px;
+  font-weight:700;font-size:.82rem;letter-spacing:.3px}
+.kicker .dot{width:8px;height:8px;border-radius:50%;background:#3ee29e;box-shadow:0 0 0 4px rgba(62,226,158,.22)}
+h1{font-size:clamp(2rem,4.4vw,3.25rem);margin:20px 0 8px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.hero .sub{font-size:1.18rem;color:#bfe6d5;max-width:760px;font-weight:500}
+.hero .meta{margin-top:26px;display:flex;flex-wrap:wrap;gap:10px}
+.hero .meta span{background:rgba(0,0,0,.22);border:1px solid rgba(155,233,200,.18);
+  padding:7px 14px;border-radius:10px;font-size:.84rem;color:#d6f1e5}
+.stats{margin-top:-86px;position:relative;z-index:5}
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 16px;box-shadow:var(--shadow);text-align:center}
+.stat .n{font-size:2rem;font-weight:800;color:var(--brand);line-height:1.1}
+.stat .n.r{color:var(--crit)}
+.stat .l{font-size:.78rem;color:var(--muted);margin-top:5px;font-weight:600}
+
+/* ===== TOC ===== */
+.toc{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);margin-top:44px}
+.toc .wrap{display:flex;gap:4px;overflow-x:auto;padding:9px 22px}
+.toc a{white-space:nowrap;padding:8px 14px;border-radius:9px;font-size:.86rem;font-weight:700;color:var(--ink-soft)}
+.toc a:hover{background:var(--surface-2);color:var(--brand)}
+
+/* ===== SECTIONS ===== */
+section{padding:54px 0 8px}
+.sec-head{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+.sec-num{flex-shrink:0;width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,var(--brand),var(--brand-2));
+  color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.4rem;box-shadow:0 8px 20px rgba(14,124,90,.3)}
+.sec-head h2{font-size:1.85rem;margin:0;font-weight:800}
+.sec-head .tag{font-size:.82rem;color:var(--muted);font-weight:600;margin-top:2px}
+.lead{font-size:1.06rem;color:var(--ink-soft);margin:6px 0 22px;max-width:920px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px 26px;
+  box-shadow:var(--shadow);margin:18px 0}
+.card h3{margin:0 0 12px;font-size:1.25rem}
+.card h4{margin:20px 0 8px;font-size:1.05rem;color:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+/* severity */
+.sev{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:999px;font-size:.76rem;font-weight:800;
+  border:1px solid transparent;white-space:nowrap}
+.sev.c{background:var(--crit-bg);color:var(--crit);border-color:#f3c3bd}
+.sev.h{background:var(--high-bg);color:var(--high);border-color:#f3d6a9}
+.sev.m{background:var(--med-bg);color:#9a7c10;border-color:#ecdf9c}
+.sev.l{background:var(--low-bg);color:var(--low);border-color:#bcd4f3}
+.sev.g{background:var(--good-bg);color:var(--good);border-color:#aee0c7}
+
+.pill{display:inline-block;padding:2px 10px;border-radius:7px;font-size:.78rem;font-weight:700;background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--line)}
+
+/* finding block */
+.find{border:1px solid var(--line);border-radius:14px;padding:0;margin:16px 0;overflow:hidden;background:var(--surface)}
+.find>.top{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--surface-2);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.find>.top .id{font-weight:800;color:var(--brand-ink);font-family:'IBM Plex Mono',monospace;font-size:.85rem;background:#fff;border:1px solid var(--line);padding:2px 9px;border-radius:7px}
+.find>.top .ti{font-weight:700;font-size:1.04rem;flex:1;min-width:200px}
+.find>.body{padding:16px 20px}
+.find .ev{font-size:.9rem;color:var(--muted);margin-top:8px;border-top:1px dashed var(--line);padding-top:9px}
+.find .fix{background:var(--good-bg);border:1px solid #c2e6d3;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:.95rem}
+.find .fix b{color:var(--good)}
+.lcrit{border-right:5px solid var(--crit)}
+.lhigh{border-right:5px solid var(--high)}
+.lmed{border-right:5px solid var(--med)}
+.llow{border-right:5px solid var(--low)}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.92rem;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+th,td{padding:11px 13px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#10342a;color:#dff5ec;font-weight:700;font-size:.85rem}
+tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:var(--surface-2)}
+.yes{color:var(--good);font-weight:800}
+.no{color:var(--crit);font-weight:800}
+.part{color:var(--high);font-weight:800}
+
+/* callout */
+.note{border-radius:12px;padding:14px 18px;margin:14px 0;font-size:.96rem;border:1px solid}
+.note.warn{background:var(--high-bg);border-color:#f0d3a3}
+.note.bad{background:var(--crit-bg);border-color:#f0c1bb}
+.note.good{background:var(--good-bg);border-color:#bfe4d0}
+.note.info{background:var(--low-bg);border-color:#bdd5f2}
+.note b{color:inherit}
+
+/* diagram shells */
+.diagram{background:linear-gradient(180deg,#0d2b22,#0a221b);border-radius:16px;padding:26px;margin:18px 0;color:#dff5ec;box-shadow:var(--shadow)}
+.diagram .cap{font-size:.85rem;color:#86c6ad;text-align:center;margin-top:14px;font-weight:600}
+.diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}
+
+/* two-axis matrix */
+.axis-wrap{display:grid;grid-template-columns:auto 1fr;gap:0;margin:8px 0}
+.matrix{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mcell{border-radius:11px;padding:13px;font-size:.85rem;text-align:center;border:1px solid;font-weight:600}
+.mcell.on{background:var(--good-bg);border-color:#aee0c7;color:#15603f}
+.mcell.warn{background:var(--med-bg);border-color:#ecdf9c;color:#7e6608}
+.mcell.off{background:#eef1ee;border-color:var(--line);color:var(--muted)}
+.mcell.danger{background:var(--crit-bg);border-color:#f0c1bb;color:#a02d20}
+.mcell b{display:block;font-size:.95rem;color:inherit}
+
+/* before/after IA */
+.ba{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:start}
+.ba .col{background:#fff;border:1px solid var(--line);border-radius:13px;padding:16px;box-shadow:var(--shadow)}
+.ba .col h4{margin:0 0 10px;text-align:center;font-size:1rem}
+.ba .col.bad h4{color:var(--crit)}
+.ba .col.good h4{color:var(--good)}
+.ba ul{margin:0;padding:0 18px 0 0;list-style:none}
+.ba li{padding:6px 0;border-bottom:1px dashed var(--line);font-size:.88rem}
+.ba li:last-child{border:none}
+.ba .arrow{align-self:center;font-size:2rem;color:var(--brand);font-weight:800}
+.ba .col.bad{border-top:4px solid var(--crit)}
+.ba .col.good{border-top:4px solid var(--good)}
+
+ul.clean{list-style:none;padding:0;margin:10px 0}
+ul.clean li{padding:7px 0 7px 0;padding-right:26px;position:relative;border-bottom:1px solid var(--line)}
+ul.clean li:last-child{border:none}
+ul.clean li::before{content:"◆";position:absolute;right:0;color:var(--brand-2);font-size:.8rem;top:11px}
+
+.kvs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.kv{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:.9rem}
+.kv b{color:var(--brand-ink)}
+
+.op-quote{background:#0e2a22;color:#cdeede;border-radius:13px;padding:16px 20px;margin:14px 0;font-size:1rem;
+  border-right:5px solid var(--brand-2);font-style:italic}
+.op-quote span{color:#7fd3b1;font-style:normal;font-weight:700;display:block;margin-bottom:5px;font-size:.8rem}
+
+.tier{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+.tier .t{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;box-shadow:var(--shadow)}
+.tier .t .role{font-weight:800;color:var(--brand-ink);font-size:1rem}
+.tier .t .rank{font-size:.74rem;color:var(--muted);margin-top:3px}
+.tier .t .perm{font-size:.8rem;color:var(--ink-soft);margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+
+.bar-rbac{display:flex;height:46px;border-radius:11px;overflow:hidden;margin:14px 0;box-shadow:var(--shadow);font-weight:800;color:#fff}
+.bar-rbac .a{background:linear-gradient(90deg,#cf3b2c,#e0584a);flex:484;display:flex;align-items:center;justify-content:center;font-size:.9rem;padding:0 8px;text-align:center}
+.bar-rbac .b{background:linear-gradient(90deg,#16a37b,#0e7c5a);flex:11;display:flex;align-items:center;justify-content:center;font-size:.78rem;min-width:90px;text-align:center}
+
+footer{background:#08201a;color:#bfe6d4;padding:40px 0;margin-top:60px;text-align:center}
+footer .wrap{font-size:.9rem}
+footer b{color:#fff}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0;font-size:.85rem}
+.legend span{display:inline-flex;align-items:center;gap:6px;color:var(--ink-soft);font-weight:600}
+.sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+
+@media(max-width:880px){
+  .stat-grid{grid-template-columns:repeat(3,1fr)}
+  .grid2,.grid3,.kvs{grid-template-columns:1fr}
+  .ba{grid-template-columns:1fr}
+  .ba .arrow{transform:rotate(90deg);justify-self:center}
+  .matrix{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker"><span class="dot"></span>دراسة عميقة · المرحلة الأولى · فحص فقط — بلا تعديل كود</span>
+    <h1>الدراسة العميقة للوحة التحكم</h1>
+    <p class="sub">فحص جذريّ دقيق للكيانات (السائقون · المزوّدون · العملاء · المستخدمون) ولأقسام الرئيسية والكتالوج والأماكن والمالية — بأسطول من سبعة وكلاء قرؤوا الكود الفعلي، مع مقارنة بأفضل المنصّات العالمية.</p>
+    <div class="meta">
+      <span>📅 ٢٠٢٦-٠٦-٢٣</span>
+      <span>🔍 ٧ وكلاء فحص متوازين</span>
+      <span>🗂️ ٦٧ صفحة OPS + ١٦ لوحة تحكّم</span>
+      <span>📌 كل ادعاء موثّق بـ ملف:سطر</span>
+      <span>منصّة تووا · ليبيا</span>
+    </div>
+  </div>
+</header>
+
+<div class="stats wrap">
+  <div class="stat-grid">
+    <div class="stat"><div class="n r">4</div><div class="l">عيوب حرجة 🔴</div></div>
+    <div class="stat"><div class="n">7</div><div class="l">عيوب عالية 🟠</div></div>
+    <div class="stat"><div class="n">7</div><div class="l">عيوب متوسطة 🟡</div></div>
+    <div class="stat"><div class="n r">0</div><div class="l">مسار تعديل للكيانات</div></div>
+    <div class="stat"><div class="n r">484</div><div class="l">نقطة بصلاحية خشنة</div></div>
+    <div class="stat"><div class="n">11</div><div class="l">نقطة بتفويض دقيق</div></div>
+  </div>
+</div>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#summary">الملخّص التنفيذي</a>
+    <a href="#method">المنهجية</a>
+    <a href="#entities">الكيانات (السائقون/المزوّدون)</a>
+    <a href="#edit">التعديل والصلاحيات</a>
+    <a href="#dash">الرئيسية + التنقّل + الاهتزاز</a>
+    <a href="#catalog">الكتالوج</a>
+    <a href="#places">الأماكن</a>
+    <a href="#finance">المالية</a>
+    <a href="#bench">المقارنة العالمية</a>
+    <a href="#roadmap">خارطة الإصلاح</a>
+  </div>
+</nav>
+
+<!-- ============ EXECUTIVE SUMMARY ============ -->
+<section id="summary">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٠</div><div><h2>الملخّص التنفيذي</h2><div class="tag">الخلاصة قبل التفاصيل</div></div></div>
+    <p class="lead">لوحة التحكم <b>قوية في محرّكها المالي والأمني</b> (دفتر أستاذ مزدوج القيد متوازن، حضانة نقدية دقيقة، فصل أدوار على كل حدّ)، لكنها <b>ضعيفة في إدارة الكيانات وفي بنية التنقّل</b>. الشكاوى التي ذكرتها ليست انطباعًا — بل أكّدها الكود حرفيًا:</p>
+
+    <div class="grid2">
+      <div class="card lcrit" style="margin:0">
+        <h3>① «لا نستطيع تعديل البيانات» — مؤكَّد</h3>
+        <p style="margin:0 0 6px">لا يوجد <b>أي</b> نقطة وصول (endpoint) لتعديل مدينة/هاتف/اسم السائق أو المزوّد أو العميل من اللوحة. «السوبر أدمن يعدّل أي شيء» = <b class="no">غير صحيح اليوم</b>. اللوحة «عرض + مجموعة إجراءات ثابتة»، وليست محرّر بيانات.</p>
+        <div class="ev">الدليل: مصفوفة قابلية التعديل الكاملة — <code>operations_router.py</code> · <code>provider_router.py:1253</code> · <code>driver_phone_change_router.py</code></div>
+      </div>
+      <div class="card lcrit" style="margin:0">
+        <h3>② «نشط» في اللوحة مُضلِّل</h3>
+        <p style="margin:0 0 6px">القائمة تُسمّى «X سائق نشط» لكنها تُرشّح على <b>تفعيل الحساب</b> (<code>Role.status==ACTIVE</code>) لا على «يعمل الآن» (<code>available</code>/<code>is_accepting_orders</code>). مطعم مغلق وسائق غير متّصل يظهران كأنهما يعملان.</p>
+        <div class="ev">الدليل: <code>control_panel_router.py:800-839</code> · <code>ControlPanelDrivers.tsx:676</code></div>
+      </div>
+      <div class="card lcrit" style="margin:0">
+        <h3>③ تفويض الصلاحيات ~٩٠٪ شكليّ</h3>
+        <p style="margin:0 0 6px">نموذج التفويض موجود ويحسب الصلاحيات بدقّة، لكن <b>٤٨٤ نقطة محميّة بـ</b> <code>require_role</code> <b>تتجاهل التفويض تمامًا</b>؛ فقط ١١ نقطة تحترمه. منح موظف «قراءة الأستاذ» يظهر «مُفعَّل» لكنه لا يفتح الصفحة فعلًا.</p>
+        <div class="ev">الدليل: <code>dependencies.py</code> · <code>account_permission_service.py:124</code></div>
+      </div>
+      <div class="card lhigh" style="margin:0">
+        <h3>④ عطل الاهتزاز عند السكول</h3>
+        <p style="margin:0 0 6px">سببه <b>حلقة تغذية راجعة</b>: الشريط العلوي ذو الطبقتين يطوي طبقته عند التمرير، فيغيّر ارتفاع منطقة التمرير، فيتغيّر <code>scrollTop</code>، فيُعاد إطلاق المعالِج — يتذبذب قرب الأعلى تحديدًا.</p>
+        <div class="ev">الدليل: <code>OpsTopNav.tsx:127-145</code> · <code>global.css:479-490,405-413</code></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:32px">جدول النتائج الموحّد (٢٢ بندًا)</h3>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--crit)"></span>حرج: يكسر وظيفة جوهرية</span>
+      <span><span class="sw" style="background:var(--high)"></span>عالٍ: خلل تشغيليّ مؤثّر</span>
+      <span><span class="sw" style="background:var(--med)"></span>متوسط: تشويش/نقص</span>
+      <span><span class="sw" style="background:var(--low)"></span>منخفض: تحسين</span>
+    </div>
+    <table>
+      <thead><tr><th>المعرّف</th><th>البند</th><th>القسم</th><th>الخطورة</th></tr></thead>
+      <tbody>
+        <tr><td><code>ENT-1</code></td><td>لا مسار لتعديل هوية السائق/المزوّد/المستخدم (مدينة/هاتف/اسم) من اللوحة</td><td>الكيانات</td><td><span class="sev c">حرج</span></td></tr>
+        <tr><td><code>CAT-1</code></td><td>الصنف بفئة نصّية حرّة لا يظهر إطلاقًا عند تصفّح العميل للفئة (<code>category_id=None</code>)</td><td>الكتالوج</td><td><span class="sev c">حرج</span></td></tr>
+        <tr><td><code>PLC-1</code></td><td>لا كيان «مكان» موحّد — ٤ مفاهيم منفصلة مربوطة بمطابقة نصّية عربية فقط</td><td>الأماكن</td><td><span class="sev c">حرج</span></td></tr>
+        <tr><td><code>PRM-1</code></td><td>التفويض الدقيق غير مُنفَّذ على ٤٨٤ نقطة — الواجهة تُوهِم بتحكّم وصول لا يحدث</td><td>الصلاحيات</td><td><span class="sev c">حرج</span></td></tr>
+        <tr><td><code>ENT-2</code></td><td>قوائم «نشط» مُضلِّلة وغير قابلة للتصنيف (لا فلاتر، لا حالة تشغيليّة)</td><td>الكيانات</td><td><span class="sev h">عالٍ</span></td></tr>
+        <tr><td><code>ENT-3</code></td><td>لا لوحة «سائقون غير نشطين» (بينما توجد للمزوّدين)</td><td>الكيانات</td><td><span class="sev h">عالٍ</span></td></tr>
+        <tr><td><code>NAV-1</code></td><td>عطل الاهتزاز عند التمرير قرب الأعلى (حلقة scroll↔resize)</td><td>التنقّل</td><td><span class="sev h">عالٍ (المُبلَّغ)</span></td></tr>
+        <tr><td><code>CAT-2</code></td><td>تمثيلان متنافسان للفئة (نص حرّ مقابل FK) — التصنيف ديكوريّ للقائمة الحيّة</td><td>الكتالوج</td><td><span class="sev h">عالٍ</span></td></tr>
+        <tr><td><code>PLC-2</code></td><td>صفحتا المناطق مقسّمتان حسب الشكل — مضلّع يُنشأ في إحداهما غير مرئي في الأخرى</td><td>الأماكن</td><td><span class="sev h">عالٍ</span></td></tr>
+        <tr><td><code>FIN-1</code></td><td>١١ صفحة محاسبية أساسية خارج الشريط الجانبي (تُبلَغ عبر الكروت فقط)</td><td>المالية</td><td><span class="sev h">عالٍ</span></td></tr>
+        <tr><td><code>FIN-2</code></td><td>لا واجهة لإقفال الفترة المحاسبية + <code>wallet-transfers</code> بلا أي مدخل تنقّل</td><td>المالية</td><td><span class="sev h">عالٍ</span></td></tr>
+        <tr><td><code>NAV-2</code></td><td>تضارب التسمية: «غرفة التحكم» على صفحتين مختلفتين (لوحة + شات)</td><td>التنقّل</td><td><span class="sev m">متوسط</span></td></tr>
+        <tr><td><code>NAV-3</code></td><td>تكرار أسطح الطلبات (٣) والشكاوى (٢) والتدقيق (٣)</td><td>التنقّل</td><td><span class="sev m">متوسط</span></td></tr>
+        <tr><td><code>NAV-4</code></td><td>الجغرافيا مبعثرة عبر ٣ أقسام تنقّل</td><td>التنقّل</td><td><span class="sev m">متوسط</span></td></tr>
+        <tr><td><code>ENT-4</code></td><td>الدرج يعرض اسم المالك لا اسم النشاط؛ بيانات تُعاد ولا تُعرَض</td><td>الكيانات</td><td><span class="sev m">متوسط</span></td></tr>
+        <tr><td><code>PRM-3</code></td><td>تعارض واجهة/خلفية: إدارة الحسابات سوبر-فقط بينما الخلفية تقبل <code>ops_account:create</code></td><td>الصلاحيات</td><td><span class="sev m">متوسط</span></td></tr>
+        <tr><td><code>CAT-3</code></td><td>الكتالوج الرئيسي يُخلَط مع القائمة الحيّة؛ لا واجهة لتعدّد المقاسات/المكوّنات/رفع الصور</td><td>الكتالوج</td><td><span class="sev m">متوسط</span></td></tr>
+        <tr><td><code>PLC-3</code></td><td>المناطق الجغرافية تُغذّي قائمة التسجيل فقط؛ عنوان العميل لا يُتحقَّق من المنطقة</td><td>الأماكن</td><td><span class="sev m">متوسط</span></td></tr>
+        <tr><td><code>FIN-3</code></td><td>٣ صفحات نقد متداخلة؛ لا تصدير CSV/مدى تاريخي؛ شجرة الحسابات للقراءة فقط</td><td>المالية</td><td><span class="sev m">متوسط</span></td></tr>
+        <tr><td><code>PRM-4</code></td><td>درجان متكرّران للعميل/المستخدم؛ لا واجهة لإعادة كلمة السر/إدارة الأدوار</td><td>الصلاحيات</td><td><span class="sev l">منخفض</span></td></tr>
+        <tr><td><code>NAV-5</code></td><td>الرئيسية مثقلة بكروت حوكمة ساكنة؛ روابط مكرّرة مكتوبة يدويًا؛ لا قائمة «يتطلب انتباهًا»</td><td>التنقّل</td><td><span class="sev l">منخفض</span></td></tr>
+        <tr><td><code>FIN-4</code></td><td>تذبذب وحدة العملة (LYD مقابل د.ل)؛ <code>OpsWalletCredit</code> يلتفّ على <code>money.ts</code></td><td>المالية</td><td><span class="sev l">منخفض</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note good"><b>إيجابي مؤكَّد (حيّ):</b> الدفتر مزدوج القيد متوازن، الحضانة النقدية دقيقة، فصل الأدوار مُطبَّق على كل حدّ، والوحدة المالية مُتّسقة بـ«د.ل»/مِلّيمات. العيوب على <b>الأطراف</b> (التحرير، التصنيف، التنقّل) لا في قلب مسار المال.</div>
+  </div>
+</section>
+
+<!-- ============ METHODOLOGY ============ -->
+<section id="method">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">١</div><div><h2>منهجية الفحص</h2><div class="tag">كيف وصلنا إلى هذه النتائج</div></div></div>
+    <p class="lead">أُطلِق <b>٧ وكلاء فحص متوازين</b>، كلٌّ على نطاق منفصل، يقرأ الكود الفعلي (لا الذاكرة)، ويوثّق كل ادعاء بـ<code>ملف:سطر</code>، ويكتب تقريرًا مفصّلًا. ثم جُمِعت النتائج وتحقّقنا من تقاطعها (الوكيلان A وF تقاطعا على «انعدام التعديل» فتأكّد).</p>
+    <div class="grid3">
+      <div class="card" style="margin:0"><h4>🟢 الوكيل A</h4><p style="margin:0;font-size:.92rem">السائقون والمزوّدون — التصنيف نشط/خامل، التعديل، صفحات التفاصيل.</p></div>
+      <div class="card" style="margin:0"><h4>🟢 الوكيل B</h4><p style="margin:0;font-size:.92rem">العملاء والمستخدمون و RBAC — قدرة السوبر أدمن وتفويض الصلاحيات.</p></div>
+      <div class="card" style="margin:0"><h4>🟢 الوكيل C</h4><p style="margin:0;font-size:.92rem">التنقّل والبنية + الرئيسية + التشخيص الجذريّ لعطل الاهتزاز.</p></div>
+      <div class="card" style="margin:0"><h4>🟢 الوكيل D</h4><p style="margin:0;font-size:.92rem">الكتالوج والأماكن — تماسك الكيانات والتكرار والفجوات.</p></div>
+      <div class="card" style="margin:0"><h4>🟢 الوكيل E</h4><p style="margin:0;font-size:.92rem">المالية — بنية القسم والتكرار وتناسق العملة والنواقص.</p></div>
+      <div class="card" style="margin:0"><h4>🟢 الوكيل F</h4><p style="margin:0;font-size:.92rem">خريطة الكيانات في الخلفية — الحقول القابلة للتعديل فعلًا وبأي دور.</p></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h4>🌐 الوكيل G — البحث العالميّ</h4><p style="margin:0;font-size:.92rem">مقارنة بـ Bolt · Uber Eats · Talabat · DoorDash · Glovo + مراجع RBAC/التدقيق/الدفتر (Retool · Entra · Formance · Modern Treasury · Toast). المصادر كاملة في قسم المقارنة.</p></div>
+  </div>
+</section>
+
+<!-- ============ ENTITIES ============ -->
+<section id="entities">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٢</div><div><h2>الكيانات — السائقون والمزوّدون</h2><div class="tag">تعديلك الأول: التصنيف نشط / غير نشط</div></div></div>
+
+    <div class="op-quote"><span>ما طلبتَه</span>«السائقون النشطون يظهرون في واجهة السائقين، والمزوّدون النشطون في لوحة المزوّدين. والذين لا يعملون نُعدّلهم إلى: المزوّدون غير النشطين حاليًا، والسائقون غير النشطين حاليًا.»</div>
+
+    <h3>ما يقوله الكود اليوم</h3>
+    <p class="lead">المفهوم الذي تطلبه (تشغيليّ: «يعمل الآن») مختلف تمامًا عمّا تعرضه اللوحة فعلًا (إداريّ: «الحساب مُفعَّل»). هذا جوهر الالتباس:</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 760 250" role="img" aria-label="فرق بين معنى نشط الحالي والمطلوب">
+        <defs>
+          <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 Z" fill="#7fd3b1"/></marker>
+        </defs>
+        <rect x="20" y="30" width="330" height="190" rx="14" fill="#0a221b" stroke="#cf3b2c" stroke-width="2"/>
+        <text x="185" y="58" fill="#f0a89f" font-size="15" font-weight="700" text-anchor="middle" font-family="Tajawal">المعروض الآن: «نشط»</text>
+        <text x="185" y="92" fill="#dff5ec" font-size="13" text-anchor="middle" font-family="monospace" direction="ltr">Role.status == "ACTIVE"</text>
+        <text x="185" y="120" fill="#9bbcb1" font-size="12" text-anchor="middle" font-family="Tajawal">= الحساب مُوافَق عليه فقط</text>
+        <text x="185" y="150" fill="#f0a89f" font-size="12" text-anchor="middle" font-family="Tajawal">مطعم مغلق ✓ يظهر «نشط»</text>
+        <text x="185" y="172" fill="#f0a89f" font-size="12" text-anchor="middle" font-family="Tajawal">سائق غير متّصل ✓ يظهر «نشط»</text>
+        <text x="185" y="200" fill="#6f8a80" font-size="11" text-anchor="middle" font-family="monospace" direction="ltr">control_panel_router.py:800-839</text>
+
+        <rect x="410" y="30" width="330" height="190" rx="14" fill="#0a221b" stroke="#16a37b" stroke-width="2"/>
+        <text x="575" y="58" fill="#7fd3b1" font-size="15" font-weight="700" text-anchor="middle" font-family="Tajawal">المطلوب: «يعمل الآن»</text>
+        <text x="575" y="90" fill="#dff5ec" font-size="12" text-anchor="middle" font-family="monospace" direction="ltr">driver: status=ACTIVE</text>
+        <text x="575" y="108" fill="#dff5ec" font-size="12" text-anchor="middle" font-family="monospace" direction="ltr">AND available=true</text>
+        <text x="575" y="126" fill="#dff5ec" font-size="12" text-anchor="middle" font-family="monospace" direction="ltr">AND not blocked</text>
+        <text x="575" y="152" fill="#dff5ec" font-size="12" text-anchor="middle" font-family="monospace" direction="ltr">provider: active_now</text>
+        <text x="575" y="170" fill="#dff5ec" font-size="12" text-anchor="middle" font-family="monospace" direction="ltr">AND is_accepting_orders</text>
+        <text x="575" y="200" fill="#6f8a80" font-size="11" text-anchor="middle" font-family="monospace" direction="ltr">dispatch_service.py:337-343</text>
+        <line x1="405" y1="125" x2="355" y2="125" stroke="#7fd3b1" stroke-width="2" marker-end="url(#ar)"/>
+      </svg>
+      <div class="cap">القائمة لا تعرض حتى الحقل التشغيليّ الذي تدّعي التصنيف عليه — كل صف يُظهر حالة الحساب فقط (<code>ControlPanelDrivers.tsx:688</code>)</div>
+    </div>
+
+    <h3>النموذج الصحيح: محورا حالة مستقلّان</h3>
+    <p>المنصّات العالمية كلها تنمذج كل كيان بـ<b>محورين منفصلين</b> لا بقيمة واحدة: محور تشغيليّ لحظيّ (متّصل/مشغول/مقفل) ومحور دورة حياة الحساب (قيد المراجعة/مُفعّل/موقوف). هذا بالضبط ما يحلّ طلبك:</p>
+    <div class="matrix" style="margin-top:14px">
+      <div class="mcell off" style="background:#10342a;color:#dff5ec;border:none"><b>المحور ↓ / →</b>متّصل الآن</div>
+      <div class="mcell off" style="background:#10342a;color:#dff5ec;border:none"><b>&nbsp;</b>متّصل</div>
+      <div class="mcell off" style="background:#10342a;color:#dff5ec;border:none"><b>&nbsp;</b>غير متّصل</div>
+      <div class="mcell off" style="background:#10342a;color:#dff5ec;border:none"><b>&nbsp;</b>مقفل/مشغول</div>
+
+      <div class="mcell off" style="background:#10342a;color:#dff5ec;border:none"><b>مُفعّل</b></div>
+      <div class="mcell on"><b>اللوحة الرئيسية</b>«السائقون/المزوّدون النشطون»</div>
+      <div class="mcell warn"><b>خامل</b>مُفعّل لكن غير متّصل → لوحة «غير النشطين حاليًا»</div>
+      <div class="mcell warn"><b>مقفل مؤقّتًا</b>غير النشطين حاليًا</div>
+
+      <div class="mcell off" style="background:#10342a;color:#dff5ec;border:none"><b>موقوف/مرفوض</b></div>
+      <div class="mcell danger"><b>تناقض</b>موقوف لكن متّصل — يجب ألا يحدث</div>
+      <div class="mcell off"><b>موقوف</b>لوحة منفصلة</div>
+      <div class="mcell off"><b>قيد المراجعة</b>طابور الاعتماد</div>
+    </div>
+
+    <div class="find lhigh">
+      <div class="top"><span class="id">ENT-2</span><span class="ti">قوائم «نشط» مُضلِّلة وغير قابلة للتصنيف</span><span class="sev h">عالٍ</span></div>
+      <div class="body">
+        لا فلاتر على <code>available</code>/<code>status</code>/<code>is_accepting_orders</code>/<code>city</code> إطلاقًا؛ والخلفية <code>_cp_people_by_role</code> تقبل <code>status, limit, offset</code> فقط ولا تربط جدولَي Driver/Provider أصلًا.
+        <div class="ev">الدليل: <code>control_panel_router.py:800-872</code> · <code>ControlPanelDrivers.tsx:676,688</code> · <code>ControlPanelProviders.tsx:541</code></div>
+        <div class="fix"><b>الحل:</b> ربط جدولَي Driver/Provider في القائمة، وإعادة الحقول التشغيليّة، وإضافة تبويبات «نشط الآن / خامل / موقوف / قيد المراجعة» + شارات حالة، وإعادة تسمية «نشط» — تمامًا كما طلبت.</div>
+      </div>
+    </div>
+
+    <div class="find lhigh">
+      <div class="top"><span class="id">ENT-3</span><span class="ti">لا لوحة «سائقون غير نشطون» (مع وجودها للمزوّدين)</span><span class="sev h">عالٍ</span></div>
+      <div class="body">
+        توجد <code>OpsInactiveProviders.tsx</code> (تُرشّح <code>active_now</code>/<code>is_accepting_orders</code>/<code>no_coords</code>) لكن <b>لا يوجد</b> <code>OpsInactiveDrivers</code>، ولا قائمة «المتّصلون الآن» لأيّ منهما (خريطة الأسطول هي الأقرب للسائقين، لكنها خريطة لا قائمة قابلة للإدارة).
+        <div class="ev">الدليل: <code>operations_router.py:264-274</code> · لا تطابق لـ <code>*InactiveDrivers*</code></div>
+        <div class="fix"><b>الحل المطابق لطلبك:</b> إعادة تسمية لوحة المزوّدين إلى «<b>المزوّدون غير النشطين حاليًا</b>»، وإنشاء «<b>السائقون غير النشطون حاليًا</b>» (المسجّلون-غير-المتّصلين/المقفلين/الصامتين)، وجعل اللوحتين الرئيسيتين تعرضان «العاملين الآن» فقط.</div>
+      </div>
+    </div>
+
+    <div class="find lmed">
+      <div class="top"><span class="id">ENT-4</span><span class="ti">الدرج يعرض اسم المالك لا اسم النشاط · بيانات تُهدَر</span><span class="sev m">متوسط</span></div>
+      <div class="body">
+        رأس درج المزوّد يعرض <code>full_name</code> للمستخدم لا <code>business_name</code> (فمطعم يظهر باسم صاحبه)؛ ونقطة «المزوّدون الخاملون» تُعيد <code>city</code>+<code>provider_type</code> لكن الواجهة ترميهما.
+        <div class="ev">الدليل: <code>ControlPanelProviders.tsx:199</code> · <code>OpsInactiveProviders.tsx:12-17</code> · <code>operations_router.py:280-282</code></div>
+      </div>
+    </div>
+
+    <div class="note info"><b>ملاحظة معماريّة:</b> لا توجد صفحة تفاصيل مستقلّة قابلة للربط المباشر (<code>/ops/drivers/:id</code>) — فقط درج منزلق داخل صفحة القائمة. التوصية العالمية: صفحة «٣٦٠°» واحدة لكل كيان (الهويّة + المحورين + الإجراءات + الجدول الزمنيّ) — تُفصَّل في قسم المقارنة.</div>
+  </div>
+</section>
+
+<!-- ============ EDIT + PERMISSIONS ============ -->
+<section id="edit">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٣</div><div><h2>التعديل والصلاحيات</h2><div class="tag">تعديلك الثاني: تعديل البيانات + قدرة السوبر أدمن + التفويض</div></div></div>
+
+    <div class="op-quote"><span>ما طلبتَه</span>«لماذا لا نستطيع تعديل بيانات السائقين؟ سائق أخطأ في المدينة نُعدّلها، أخطأ في الهاتف نُعدّله. السوبر أدمن يعدّل أي شيء، أو يُعطي الصلاحية لمن يشاء من الموظفين.»</div>
+
+    <h3>مصفوفة قابلية التعديل — الحقيقة من الكود</h3>
+    <p class="lead">هذا أهمّ جدول في التقرير. <b>الشكوى مؤكَّدة بالكامل.</b> الرموز: <span class="yes">✅</span> قابل للتعديل · <span class="part">🟡</span> للمالك/الذات فقط (لا مسار للوحة) · <span class="no">❌</span> لا مسار إطلاقًا.</p>
+    <table>
+      <thead><tr><th>الكيان</th><th>الحقل</th><th>قابل اليوم؟</th><th>المسار / الدور</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="3"><b>السائق</b></td><td>المدينة <code>city</code></td><td><span class="no">❌ لا مسار</span></td><td>يُضبَط عند التسجيل فقط — ويُغذّي اختيار شريحة الأجر</td></tr>
+        <tr><td>منطقة العمل <code>operating_area</code></td><td><span class="no">❌ لا مسار</span></td><td>تعديل الذات يطال جدولًا آخر (<code>driver_preferences</code>) لا هذا الحقل</td></tr>
+        <tr><td>الهاتف (عبر المستخدم)</td><td><span class="part">🟡 ذاتيًا فقط</span></td><td><code>POST /drivers/me/phone-change</code> — لا مسار للوحة</td></tr>
+        <tr><td rowspan="3"><b>المزوّد</b></td><td>اسم النشاط <code>business_name</code></td><td><span class="part">🟡 للمالك فقط</span></td><td><code>PUT /providers/me</code> — لا مسار للوحة</td></tr>
+        <tr><td>المدينة <code>city</code></td><td><span class="part">🟡 للمالك فقط</span></td><td><code>PUT /providers/me</code> — لا مسار للوحة</td></tr>
+        <tr><td>هاتف التواصل <code>contact_phone</code></td><td><span class="no">❌ لا مسار</span></td><td>الحقل موجود لكن غائب عن كل قائمة تحديث</td></tr>
+        <tr><td rowspan="2"><b>المستخدم/العميل</b></td><td>الاسم <code>full_name</code></td><td><span class="no">❌ لا مسار</span></td><td><code>/customer/me</code> للقراءة فقط لهذا الحقل</td></tr>
+        <tr><td>هاتف العميل</td><td><span class="no">❌ لا مسار</span></td><td>السائق وحده لديه نقطة تغيير هاتف</td></tr>
+        <tr><td><b>السائق</b></td><td>حدّ النقد · شريحة الأجر · الحالة</td><td><span class="yes">✅ متاح للـ OPS</span></td><td>هذه الإجراءات التشغيليّة موجودة فعلًا</td></tr>
+        <tr><td><b>المزوّد</b></td><td>الإحداثيات · الرعاية · الحالة</td><td><span class="yes">✅ متاح للـ OPS</span></td><td>تعديل حقل المزوّد الوحيد للـ OPS = الإحداثيات</td></tr>
+      </tbody>
+    </table>
+    <div class="note bad"><b>الخلاصة:</b> «السوبر أدمن يعدّل أي شيء» <b>غير صحيح اليوم</b> — لا الـendpoint موجود ولا النموذج في الواجهة. حتى نقطة تعديل المركبة <code>PATCH /operations/drivers/{id}/vehicle</code> (<code>operations_router.py:1097</code>) <b>غير مربوطة بالواجهة إطلاقًا</b> فهي يتيمة. خطأ في المدينة عند التسجيل = غير قابل للإصلاح من الدعم.</div>
+
+    <h3>الـ endpoints الناقصة المطلوب بناؤها (محدّدة)</h3>
+    <ul class="clean">
+      <li><code>PATCH /operations/drivers/{id}</code> — مدينة/منطقة عمل/نوع مركبة السائق <span class="pill">جديد</span></li>
+      <li><code>PATCH /operations/users/{id}</code> — اسم/هاتف/بريد أي مستخدم (مع حارس فرادة الهاتف الموجود مسبقًا في <code>driver_phone_change_router.py:41</code>) <span class="pill">جديد</span></li>
+      <li><code>PATCH /operations/providers/{id}</code> — اسم النشاط/المدينة/هاتف التواصل/إعدادات التوصيل <span class="pill">جديد</span></li>
+      <li><code>PUT /customer/me</code> + تدفّق تغيير هاتف للعميل والمزوّد (محاكاة تدفّق السائق) <span class="pill">جديد</span></li>
+    </ul>
+    <div class="note good"><b>التوصية العالمية المرافقة:</b> كل تعديل يُسجَّل في <b>سجلّ تدقيق على مستوى الحقل</b> (مَن · قبل/بعد · وقت · سبب)، والحقول الحسّاسة (الهاتف، الحساب البنكيّ، العمولة، الهويّة) تمرّ عبر <b>تصديق ثانٍ (maker-checker)</b> — وهي بنية موجودة مسبقًا في تدفّق الاسترداد، نعمّمها.</div>
+
+    <h3>التفويض الدقيق للصلاحيات — موجود لكنه شبه شكليّ</h3>
+    <p>سألت: هل يستطيع السوبر أدمن أن «يُعطي الصلاحية لمن يشاء من الموظفين»؟ <b>النموذج موجود وصحيح حسابيًّا، لكن التنفيذ ~٩٠٪ شكليّ.</b> هذه أخطر مفاجأة في الفحص:</p>
+
+    <div class="card">
+      <p style="margin:0 0 4px;font-weight:700">أين يُفحَص التفويض فعلًا؟ نسبة مُقلِقة:</p>
+      <div class="bar-rbac">
+        <div class="a">٤٨٤ نقطة <code style="background:none;color:#fff;padding:0">require_role</code> — تتجاهل التفويض</div>
+        <div class="b">١١ تحترمه</div>
+      </div>
+      <p style="margin:8px 0 0;font-size:.92rem;color:var(--ink-soft)">الـ١١ نقطة التي تحترم التفويض = ٨ للشات الداخليّ + ٢ لإنشاء حسابات + ١ للبثّ. كل ما عداها (المالية، الشكاوى، المحافظ، التسويات…) محميّ بـ<code>require_role</code> الذي <b>لا ينظر إلى جدول المنح/المنع إطلاقًا</b>.</p>
+      <div class="ev">الدليل: <code>dependencies.py</code> · <code>account_permission_service.py:124</code> (<span class="lt">effective = (baseline ∪ GRANT) − REVOKE</span>) · <code>internal_chat_router.py</code></div>
+    </div>
+
+    <div class="find lcrit">
+      <div class="top"><span class="id">PRM-1</span><span class="ti">الواجهة تُوهِم بتحكّم وصول لا يحدث فعلًا</span><span class="sev c">حرج (ثقة)</span></div>
+      <div class="body">
+        منح موظف MONITOR صلاحية <code>ledger:read_all</code> في <code>OpsAccountManagement</code> يظهر «مُفعَّل»، لكن <code>/finance/ledger</code> يفحص <code>require_role</code> لا التفويض → المنح بلا أثر. بل إن <b>المنع (REVOKE) خامل أيضًا</b>: قد يظنّ المشغّل أنه قيّد موظفًا وهو لم يفعل. و٨ من ١٢ صلاحية في الكتالوج غير مُنفَّذة في أي مكان.
+        <div class="fix"><b>قرار مطلوب:</b> إمّا (أ) ربط <code>require_permission</code> بنقاط المالية/العمليات المُدرَجة في الكتالوج (تفويض دقيق حقيقيّ)، أو (ب) تقليص الكتالوج إلى المُنفَّذ فعلًا وإعادة تسمية المحرّر «صلاحيات غرفة التحكّم» حتى لا يُوهِم.</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="find lhigh" style="margin:0">
+        <div class="top"><span class="id">PRM-3</span><span class="ti">تعارض واجهة/خلفية في إنشاء الحسابات</span><span class="sev m">متوسط</span></div>
+        <div class="body">الواجهة تحصر <code>OpsAccountManagement</code> بـ SUPER، بينما الخلفية تقبل أي حامل <code>ops_account:create</code> (ADMIN/SUPERVISOR) → قدرة خلفية لا منفذ لها + تعليق مُضلِّل.
+        <div class="ev"><code>opsRouter.tsx:198</code> · <code>operations_router.py:3039</code></div></div>
+      </div>
+      <div class="find llow" style="margin:0">
+        <div class="top"><span class="id">PRM-4</span><span class="ti">نواقص إدارة المستخدم</span><span class="sev l">منخفض</span></div>
+        <div class="body">درجان متكرّران (عميل/مستخدم) بنفس المنطق؛ لا واجهة لإعادة كلمة السر/تعطيل TOTP (موجودة كـ API للسوبر فقط)؛ لا واجهة لإدارة أدوار مستخدم قائم.
+        <div class="ev"><code>ControlPanelCustomers.tsx</code> · <code>control_panel_router.py:738,767</code></div></div>
+      </div>
+    </div>
+
+    <h3>هرم الأدوار الحاليّ (سليم ومتماسك)</h3>
+    <p style="font-size:.95rem;color:var(--ink-soft)">الجانب المضيء: نموذج الأدوار نفسه واعٍ بالوراثة ومتطابق بين الواجهة والخلفية، وإنشاء الحسابات محدود بالرتبة الأدنى («لا تمنح ما لا تملك»).</p>
+    <div class="tier">
+      <div class="t"><div class="role">SUPER_ADMIN</div><div class="rank">رتبة 100</div><div class="perm">حصريّ — لا شيء يرثه</div></div>
+      <div class="t"><div class="role">ADMIN</div><div class="rank">رتبة 80</div><div class="perm">يرث العمليات+المالية+الامتثال</div></div>
+      <div class="t"><div class="role">SUPERVISOR</div><div class="rank">رتبة 60</div><div class="perm">يرث العمليات</div></div>
+      <div class="t"><div class="role">OPS / FIN / COMPLIANCE</div><div class="rank">رتبة 40</div><div class="perm">متخصّصون</div></div>
+      <div class="t"><div class="role">MONITOR</div><div class="rank">رتبة 20</div><div class="perm">قراءة فقط — لا يرث شيئًا</div></div>
+    </div>
+    <div class="ev" style="border:none">المرجع: <code>roles.py:10-23,100-110,162-165</code></div>
+  </div>
+</section>
+
+<!-- ============ DASHBOARD + NAV + SCROLL ============ -->
+<section id="dash">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٤</div><div><h2>الرئيسية · التنقّل · عطل الاهتزاز</h2><div class="tag">العطل المُبلَّغ + بنية المعلومات</div></div></div>
+
+    <h3>🔴 العطل المُبلَّغ: «تصل إلى الأعلى ثم تبدأ بالاهتزاز»</h3>
+    <p class="lead">السبب الجذريّ <b>حلقة تغذية راجعة بين الشريط العلوي ومنطقة التمرير</b>. الطبقة الثانية من الشريط تُخفى عند التمرير للأسفل، وبما أنها <b>عنصر شقيق فوق منطقة التمرير (لا طبقة عائمة)</b>، فإنّ طيّها يغيّر ارتفاع <code>.ops-main</code> → يغيّر <code>scrollTop</code> → يُعيد إطلاق المعالِج → يقلب الحالة — فيتذبذب، تحديدًا قرب الأعلى عند عتبة الـ80px.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 720 320" role="img" aria-label="حلقة التغذية الراجعة لعطل الاهتزاز">
+        <defs><marker id="ar2" markerWidth="11" markerHeight="11" refX="8" refY="5.5" orient="auto"><path d="M0,0 L11,5.5 L0,11 Z" fill="#f0a89f"/></marker></defs>
+        <circle cx="360" cy="160" r="130" fill="none" stroke="#23463b" stroke-width="2" stroke-dasharray="5 5"/>
+        <g font-family="Tajawal" font-size="13" fill="#dff5ec" text-anchor="middle">
+          <rect x="270" y="20" width="180" height="58" rx="11" fill="#0f3528" stroke="#16a37b"/>
+          <text x="360" y="44">المستخدم يمرّر للأسفل</text>
+          <text x="360" y="64" font-size="11" fill="#7fd3b1">scrollTop &gt; 80</text>
+
+          <rect x="540" y="130" width="170" height="62" rx="11" fill="#3a1410" stroke="#cf3b2c"/>
+          <text x="625" y="153">الطبقة الثانية تُطوى</text>
+          <text x="625" y="173" font-size="10" fill="#f0a89f" font-family="monospace" direction="ltr">grid-rows 1fr→0fr</text>
+
+          <rect x="270" y="245" width="180" height="58" rx="11" fill="#3a1410" stroke="#cf3b2c"/>
+          <text x="360" y="269">‎.ops-main يكبُر</text>
+          <text x="360" y="289" font-size="10" fill="#f0a89f">المتصفّح يثبّت scrollTop</text>
+
+          <rect x="10" y="130" width="170" height="62" rx="11" fill="#3a1410" stroke="#cf3b2c"/>
+          <text x="95" y="153">scroll يُطلَق ثانيةً</text>
+          <text x="95" y="173" font-size="10" fill="#f0a89f">الحالة تنقلب → اهتزاز</text>
+        </g>
+        <path d="M455,55 Q545,80 575,128" fill="none" stroke="#f0a89f" stroke-width="2.4" marker-end="url(#ar2)"/>
+        <path d="M610,195 Q520,240 455,262" fill="none" stroke="#f0a89f" stroke-width="2.4" marker-end="url(#ar2)"/>
+        <path d="M265,275 Q150,250 110,195" fill="none" stroke="#f0a89f" stroke-width="2.4" marker-end="url(#ar2)"/>
+        <path d="M115,128 Q150,80 268,55" fill="none" stroke="#f0a89f" stroke-width="2.4" marker-end="url(#ar2)"/>
+      </svg>
+      <div class="cap">حلقة <span class="lt">scroll → resize → scroll</span> — اختبار الوحدة لا يلتقطها لأن jsdom بلا محرّك تخطيط (<code>OpsTopNav.test.tsx:177-203</code>)</div>
+    </div>
+
+    <div class="find lhigh">
+      <div class="top"><span class="id">NAV-1</span><span class="ti">سلسلة الدليل + الحل</span><span class="sev h">عالٍ — المُبلَّغ</span></div>
+      <div class="body">
+        <div class="kvs">
+          <div class="kv"><b>المُطلِق:</b> <code>OpsTopNav.tsx:127-145</code> يقلب <code>compact</code> من <code>scrollTop</code> بنطاق ميت ضيّق ±4px يتشارك حدّ الـ80.</div>
+          <div class="kv"><b>الآليّة:</b> <code>global.css:479-490</code> يطوي الطبقة عبر <code>grid-template-rows</code>، و<code>.ops-topnav</code> شقيق <code>flex-shrink:0</code> فوق <code>.ops-main</code> (<code>:405-413</code>).</div>
+        </div>
+        <div class="fix"><b>الحل (الأقلّ خطرًا أولًا):</b> (أ) جعل طيّ الطبقة الثانية <b>طبقة عائمة</b> لا تغيّر ارتفاع <code>.ops-main</code> ← تنكسر الحلقة؛ + (ب) في الـJS نافذة حماية ~250ms بعد كل تبديل + نطاق ميت أوسع (طيّ عند <code>top&gt;120 &amp;&amp; Δ&gt;24</code>، فرد عند <code>top&lt;60</code>). الأرخص: تعطيل الإخفاء التلقائيّ كليًّا (تحسين مريح لا حمل وظيفيّ) ← يختفي الاهتزاز فورًا.</div>
+      </div>
+    </div>
+
+    <h3>بنية التنقّل — تكرارات وتناقضات</h3>
+    <p>٦٧ وجهة عبر ٩ أقسام، بمصدر تنقّل واحد منضبط (<code>opsNav.ts</code>) وخريطة وصول مطابقة للحُرّاس ١:١ — لكن فيها تكرارات وتناقضات حقيقية:</p>
+    <div class="grid2">
+      <div class="find lmed" style="margin:0"><div class="top"><span class="id">NAV-2</span><span class="ti">تضارب «غرفة التحكم»</span><span class="sev m">متوسط</span></div><div class="body">عنوان <code>OpsDashboard</code> هو «غرفة التحكم»، بينما صفحة أخرى <code>OpsControlRoom</code> (شات الموظفين) هي «غرفة التحكّم» في التنقّل. اسمان لشيئين.<div class="ev"><code>OpsDashboard.tsx:512</code> · <code>opsNav.ts:29</code></div></div></div>
+      <div class="find lmed" style="margin:0"><div class="top"><span class="id">NAV-3</span><span class="ti">أسطح مكرّرة</span><span class="sev m">متوسط</span></div><div class="body">الطلبات على ٣ أسطح (<code>OpsOrders</code>/<code>OpsStuckOrders</code>/<code>ControlPanelOrders</code>)، الشكاوى على صفحتين (الرئيسية تربطهما معًا!)، التدقيق على ٣ صفحات بنفس بيانات الأخطاء/النسخ.<div class="ev"><code>OpsDashboard.tsx:671-672</code></div></div></div>
+      <div class="find lmed" style="margin:0"><div class="top"><span class="id">NAV-4</span><span class="ti">الجغرافيا مبعثرة</span><span class="sev m">متوسط</span></div><div class="body">٤ صفحات جغرافية متمايزة لكنها موزّعة عبر ٣ أقسام تنقّل مختلفة بلا تجميع.<div class="ev"><code>opsNav.ts:67,170,227,232</code></div></div></div>
+      <div class="find llow" style="margin:0"><div class="top"><span class="id">NAV-5</span><span class="ti">الرئيسية مثقلة</span><span class="sev l">منخفض</span></div><div class="body">~٦ من ١٦ كرتًا حوكمة/جاهزية ساكنة (تُطيل الصفحة وتزيد الاهتزاز)؛ <code>NAV_LINKS</code> ٢٥ رابطًا مكتوبة يدويًا تكرّر التنقّل؛ لا قائمة «يتطلب انتباهًا» رغم توفّر العدّادات.<div class="ev"><code>OpsDashboard.tsx:153-180</code></div></div></div>
+    </div>
+
+    <h3>بنية مقترَحة — من التشتّت إلى التمركز حول الكيان</h3>
+    <div class="ba">
+      <div class="col bad">
+        <h4>الآن — ٩ أقسام مختلطة</h4>
+        <ul>
+          <li>الرئيسية (١٠) — تخلط لوحة + شات + خريطة</li>
+          <li>الكيانات (٥)</li>
+          <li>الكتالوج والأماكن (٥)</li>
+          <li>المالية (٧) — وتنقص ١١ صفحة!</li>
+          <li>تسويات ومخاطر السائقين (٨) — مال + سلامة</li>
+          <li>الوثائق والجغرافيا (٤)</li>
+          <li>التحكم والإطلاق (٩)</li>
+          <li>البيانات والتدقيق (١٠)</li>
+          <li>الأمان والإدارة (٧)</li>
+        </ul>
+      </div>
+      <div class="arrow">←</div>
+      <div class="col good">
+        <h4>المقترح — ٧ مجموعات حول الكيان</h4>
+        <ul>
+          <li>🛰️ اللوحة المباشرة (دمج اللوحة+المؤشرات+الأسطول+التوزيع)</li>
+          <li>📦 الطلبات (سطح واحد + تبويب التدخّل)</li>
+          <li>👥 الكيانات (مزوّد/سائق/عميل + إجراءاتهم عليهم)</li>
+          <li>🍽️ الكتالوج والأماكن</li>
+          <li>🗺️ الجغرافيا (مجموعة جديدة موحّدة)</li>
+          <li>💰 المالية (وحدة كاملة بشريط فرعيّ)</li>
+          <li>🛟 السلامة والدعم + التحكم والتدقيق</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATALOG ============ -->
+<section id="catalog">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٥</div><div><h2>الكتالوج</h2><div class="tag">عيب حرج يخفي أصناف المزوّدين عن العملاء</div></div></div>
+
+    <div class="find lcrit">
+      <div class="top"><span class="id">CAT-1</span><span class="ti">الصنف بفئة نصّية حرّة لا يظهر إطلاقًا عند تصفّح الفئة</span><span class="sev c">حرج</span></div>
+      <div class="body">
+        تصفّح العميل <code>/food/categories/{id}/items</code> يُرشّح بصرامة على <code>category_id</code> بلا أيّ بديل نصّيّ، لكن <code>category_id</code> يُضبَط <b>فقط</b> عند اختيار صنف من الكتالوج الرئيسي. المزوّد الذي يكتب فئة نصّية حرّة (المسار الافتراضيّ) يحصل على <code>category_id = None</code>، والتعديل لا يحلّ النصّ إلى مُعرّف. <b>النتيجة: أي صنف لم يُنشأ عبر منتقي الكتالوج الرئيسي يختفي عند ضغط العميل على الفئة</b> — والبحث بالاسم يجده فيُخفي العيب.
+        <div class="ev">الدليل: <code>food_categories_router.py:95</code> · <code>catalog_router.py:310,328,736</code> · القائمة المنسدلة تربط بـ <code>name_ar</code> لا المُعرّف: <code>ProviderCatalog.tsx:111</code></div>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 720 200" role="img" aria-label="انكسار ربط الفئة">
+        <defs><marker id="ar3" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#7fd3b1"/></marker>
+        <marker id="arx" markerWidth="10" markerHeight="10" refX="7" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#cf3b2c"/></marker></defs>
+        <g font-family="Tajawal" font-size="12.5" text-anchor="middle">
+          <rect x="20" y="70" width="160" height="60" rx="11" fill="#0f3528" stroke="#16a37b"/>
+          <text x="100" y="95" fill="#dff5ec">المزوّد ينشئ صنفًا</text>
+          <text x="100" y="115" fill="#7fd3b1" font-size="11">بفئة نصّية حرّة</text>
+
+          <rect x="280" y="70" width="160" height="60" rx="11" fill="#3a1410" stroke="#cf3b2c"/>
+          <text x="360" y="95" fill="#f0a89f">‎category_id = None</text>
+          <text x="360" y="115" fill="#f0a89f" font-size="11">لا يُحَلّ النصّ أبدًا</text>
+
+          <rect x="540" y="70" width="160" height="60" rx="11" fill="#0a221b" stroke="#5a6f68"/>
+          <text x="620" y="95" fill="#9bbcb1">تصفّح الفئة</text>
+          <text x="620" y="115" fill="#cf3b2c" font-size="11">✗ لا يظهر للعميل</text>
+        </g>
+        <line x1="184" y1="100" x2="276" y2="100" stroke="#cf3b2c" stroke-width="2.4" marker-end="url(#arx)"/>
+        <line x1="444" y1="100" x2="536" y2="100" stroke="#cf3b2c" stroke-width="2.4" marker-end="url(#arx)"/>
+      </svg>
+      <div class="cap">الإصلاح: حلّ/إنشاء <code>category_id</code> من النصّ الحرّ عند كل إنشاء/تعديل + تعبئة رجعيّة للأصناف القديمة + ربط القائمة المنسدلة بالمُعرّف</div>
+    </div>
+
+    <div class="grid2">
+      <div class="find lhigh" style="margin:0"><div class="top"><span class="id">CAT-2</span><span class="ti">تمثيلان للفئة لا يتصالحان</span><span class="sev h">عالٍ</span></div><div class="body">نصّ حرّ <code>category</code> مقابل <code>category_id</code> (FK). الـ OPS يحرّر جدول المُعرّف بينما المزوّدون يملؤون النصّ → التصنيف الذي تنسّقه <code>OpsFoodCategories</code> <b>ديكوريّ</b> للقائمة الحيّة.</div></div>
+      <div class="find lmed" style="margin:0"><div class="top"><span class="id">CAT-3</span><span class="ti">طبقات مُلتبسة + نواقص واجهة</span><span class="sev m">متوسط</span></div><div class="body">٣ صفحات (تدقيق/رئيسي/تصنيف) <b>طبقات لا تكرار</b> لكن بلا روابط متبادلة؛ والكتالوج الرئيسي مكتبة لا يراها العميل (للتسجيل فقط). لا واجهة لتعدّد المقاسات/تعديل المكوّنات/رفع الصور رغم دعم النموذج.</div></div>
+    </div>
+    <div class="note good"><b>المضيء:</b> عزل السعر آمن ماليًّا — السعر يعيش حصرًا على <code>ItemVariant</code> (مِلّيمات)، والمكتبة الرئيسية والمكوّنات بلا سعر (<code>master_catalog.py:10-13</code>)؛ ودورة الموافقة (مسوّدة→مراجعة→منشور، وإعادة مراجعة عند تعديل جوهريّ) متماسكة.</div>
+  </div>
+</section>
+
+<!-- ============ PLACES ============ -->
+<section id="places">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٦</div><div><h2>الأماكن</h2><div class="tag">٤ مفاهيم منفصلة لا يربطها كيان</div></div></div>
+
+    <div class="find lcrit">
+      <div class="top"><span class="id">PLC-1</span><span class="ti">لا كيان «مكان» موحّد — أربعة مفاهيم منفصلة</span><span class="sev c">حرج</span></div>
+      <div class="body">
+        «المكان» يعني أربعة أشياء في أربعة جداول: <code>MasterPlace.city</code> · <code>Provider.city</code> · <code>GeographicMunicipality.municipality_name</code> · هندسة <code>ZoneSuspension</code>. الرابط الوحيد بين المزوّد والبلدية هو <b>تطابق نصّيّ عربيّ تامّ بلا مفتاح أجنبيّ</b> — فيمكن أن تتعارض الأربعة بصمت.
+        <div class="ev">الدليل: <code>provider.py:181</code> · <code>master_place.py</code> · <code>zone_suspension.py</code></div>
+      </div>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 720 230" role="img" aria-label="أربعة مفاهيم مكان منفصلة">
+        <g font-family="Tajawal" font-size="12.5" text-anchor="middle">
+          <rect x="30" y="30" width="150" height="56" rx="11" fill="#0f3528" stroke="#16a37b"/><text x="105" y="55" fill="#dff5ec">المكان الرئيسي</text><text x="105" y="73" fill="#7fd3b1" font-size="10">للتسجيل · بلا إحداثيّات</text>
+          <rect x="540" y="30" width="150" height="56" rx="11" fill="#0f3528" stroke="#16a37b"/><text x="615" y="55" fill="#dff5ec">المزوّد</text><text x="615" y="73" fill="#7fd3b1" font-size="10">city (نصّ) + إحداثيّات</text>
+          <rect x="30" y="150" width="150" height="56" rx="11" fill="#0f3528" stroke="#16a37b"/><text x="105" y="175" fill="#dff5ec">البلديّة/المنطقة</text><text x="105" y="193" fill="#7fd3b1" font-size="10">تُغذّي التسجيل فقط</text>
+          <rect x="540" y="150" width="150" height="56" rx="11" fill="#0f3528" stroke="#16a37b"/><text x="615" y="175" fill="#dff5ec">تعليق المنطقة</text><text x="615" y="193" fill="#7fd3b1" font-size="10">هندسة فقط</text>
+          <circle cx="360" cy="118" r="40" fill="#3a1410" stroke="#cf3b2c" stroke-width="2"/><text x="360" y="114" fill="#f0a89f" font-size="11">لا كيان</text><text x="360" y="130" fill="#f0a89f" font-size="11">موحّد</text>
+        </g>
+        <g stroke="#cf3b2c" stroke-width="1.6" stroke-dasharray="4 4" fill="none">
+          <line x1="180" y1="58" x2="540" y2="58"/><line x1="180" y1="178" x2="540" y2="178"/>
+          <line x1="105" y1="86" x2="105" y2="150"/><line x1="615" y1="86" x2="615" y2="150"/>
+        </g>
+        <text x="360" y="50" fill="#cf3b2c" font-size="10.5" text-anchor="middle" font-family="Tajawal">تطابق نصّيّ فقط — بلا مفتاح أجنبيّ</text>
+      </svg>
+      <div class="cap">الحل: كيان «مكان/فرع» قانونيّ (بإحداثيّات) يملؤه المكان الرئيسي ويشير إليه المزوّد، أو على الأقلّ FK من <code>Provider.city</code> إلى البلديّة</div>
+    </div>
+
+    <div class="grid2">
+      <div class="find lhigh" style="margin:0"><div class="top"><span class="id">PLC-2</span><span class="ti">صفحتا المناطق مقسّمتان حسب الشكل</span><span class="sev h">عالٍ</span></div><div class="body"><code>OpsZoneSuspensions</code> تُنشئ BBOX/CIRCLE فقط، و<code>OpsZonePolygon</code> تُرشّح <code>shape_type==="POLYGON"</code> — نفس الجدول، عرضان جزئيّان: مضلّع يُنشأ في إحداهما <b>غير مرئيّ</b> في الأخرى، ولا عرض «كل التعليقات النشطة».<div class="ev"><code>OpsZonePolygon.tsx:30</code></div></div></div>
+      <div class="find lmed" style="margin:0"><div class="top"><span class="id">PLC-3</span><span class="ti">روابط ميّتة + لا تحقّق تغطية</span><span class="sev m">متوسط</span></div><div class="body">المناطق الجغرافية تُغذّي قائمة التسجيل فقط لا التوزيع؛ وعنوان العميل لا يُتحقَّق من المنطقة إطلاقًا (التعليق يُفحَص ضدّ موقع المزوّد فقط)؛ ولا محرّر خرائطيّ (المضلّعات تُلصَق كنصّ <code>lat,lng</code>).</div></div>
+    </div>
+    <div class="note good"><b>المضيء:</b> إنفاذ تعليق المنطقة متين — الأشكال الثلاثة تُفحَص عند إنشاء الطلب ضدّ إحداثيّات المزوّد، بما فيها الثقوب (donut). البنية الهندسية سليمة؛ المشكلة في النمذجة والتنقّل.</div>
+  </div>
+</section>
+
+<!-- ============ FINANCE ============ -->
+<section id="finance">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٧</div><div><h2>المالية</h2><div class="tag">محرّك عالميّ المستوى · لكن تشتّت في التنقّل</div></div></div>
+    <p class="lead">الحكم: <b>تشتّت مع مركز نصف-مبنيّ، لا وحدة متماسكة.</b> ١٩ سطحًا ماليًّا موزّعة على ٣ عائلات مسارات و٤ أقسام تنقّل. <b>لا عيب صحّة ماليّة — FIN-COR سليم</b> — لكن التنقّل والاكتمال ضعيفان.</p>
+
+    <div class="find lhigh">
+      <div class="top"><span class="id">FIN-1</span><span class="ti">١١ صفحة محاسبية أساسية خارج الشريط الجانبيّ</span><span class="sev h">عالٍ</span></div>
+      <div class="body">
+        قسم «المالية» في الشريط يضمّ ٧ بنود فقط؛ أمّا الأستاذ العامّ، شجرة الحسابات، الضريبة، التقارير، القيد اليدويّ، الرواتب، المطالبات، العمولة، مخاطر النقد، التسوية — فـ<b>غير موجودة في الشريط إطلاقًا</b>، تُبلَغ عبر كروت لوحة المالية فقط. المشغّل الذي يتنقّل بالشريط <b>لا يجد دفتر الأستاذ ولا قائمة الدخل</b>.
+        <div class="ev">الدليل: <code>opsNav.ts:71-94</code> · <code>OpsFinanceDashboard.tsx:123-198</code></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="find lhigh" style="margin:0"><div class="top"><span class="id">FIN-2</span><span class="ti">نواقص تشغيليّة + صفحة بلا منفذ</span><span class="sev h">عالٍ</span></div><div class="body"><b>لا واجهة لإقفال الفترة المحاسبية</b> رغم اكتمال الخلفية (<code>period_router.py</code>) → لا يمكن إغلاق شهر؛ و<code>wallet-transfers</code> (طابور maker-checker حقيقيّ) <b>بلا أيّ مدخل تنقّل</b>.</div></div>
+      <div class="find lmed" style="margin:0"><div class="top"><span class="id">FIN-3</span><span class="ti">٣ صفحات نقد متداخلة + نواقص</span><span class="sev m">متوسط</span></div><div class="body">مخاطر النقد / استثناءات النقد / التسوية — كلّها «نقد لا يتطابق» بثلاث خلفيّات وقسمين تنقّل بلا روابط؛ ولا تصدير CSV ولا مدى تاريخيّ على التقارير؛ وشجرة الحسابات للقراءة فقط.</div></div>
+    </div>
+
+    <div class="find llow">
+      <div class="top"><span class="id">FIN-4</span><span class="ti">تذبذب وحدة العملة</span><span class="sev l">منخفض</span></div>
+      <div class="body"><code>OpsCommissionConfig</code> يكتب <code>(LYD)</code> بدل «د.ل» المعتمدة (<code>:166,175,181</code>)، و<code>OpsWalletCredit</code> يلتفّ على <code>money.ts</code> بحساب <code>×1000</code>/<code>÷1000</code> خام. كلّها تَعرض صحيحًا لكنها فخّ صيانة.</div>
+    </div>
+    <div class="note good"><b>المضيء (مهمّ):</b> المحرّك المالي <b>مُتوائم مع المستوى العالميّ أصلًا</b> — قيد مزدوج متوازن، تسويات بحجز (generate→approve→pay)، استرداد بتصديق مزدوج، طابور استثناءات تسوية، شجرة حسابات وتقارير. الفجوة الكبرى مقابل العالميّ هي <b>التنقّل والتكامل في «٣٦٠°»</b> لا هندسة المال.</div>
+  </div>
+</section>
+
+<!-- ============ BENCHMARK ============ -->
+<section id="bench">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٨</div><div><h2>المقارنة العالمية</h2><div class="tag">ماذا تفعل أفضل المنصّات — ونتعلّم منه</div></div></div>
+    <p class="lead">قرأ الوكيل G بوّابات الشركاء/الأساطيل ومدوّنات الهندسة ومراجع RBAC/الدفتر العالمية. أبرز ١٢ توصية قابلة للتبنّي لتووا:</p>
+    <table>
+      <thead><tr><th>#</th><th>التوصية</th><th>المصدر</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><b>محورا حالة لكل كيان دائمًا</b> — <code>availability</code> (متّصل/مشغول/مقفل) + <code>account_status</code> (مراجعة/مُفعّل/موقوف). القوائم تُرشّح افتراضيًّا للشريحة القابلة للفعل.</td><td>Bolt · Uber Eats · Talabat</td></tr>
+        <tr><td>2</td><td><b>القائمة تبدأ بـ«النشط الآن»</b> مع زرّ تبديل للخامل/الموقوف + فلاتر مدينة/منطقة/مركبة — لا جدول واحد غير مصنّف.</td><td>Bolt Live Map</td></tr>
+        <tr><td>3</td><td><b>صفحة «٣٦٠°» لكل مزوّد وسائق</b> — الهويّة + المحوران + الأعلام أعلى، سياق يمين/إجراءات يسار، جدول زمنيّ مدمج، كل الإجراءات في المكان نفسه.</td><td>Customer-360 · Gorgias/Shopify</td></tr>
+        <tr><td>4</td><td><b>جدول زمنيّ تاريخيّ</b> في كل ٣٦٠° (طلبات، تعديلات بفروق قبل/بعد، مدفوعات، شكاوى، طوارئ).</td><td>AppMaster</td></tr>
+        <tr><td>5</td><td><b>تدقيق على مستوى الحقل</b> لكل تعديل: مَن + قبل/بعد + وقت + سبب؛ الحقول المتغيّرة فقط؛ إخفاء PII.</td><td>Sonar · Salesforce</td></tr>
+        <tr><td>6</td><td><b>maker-checker على الحقول الحسّاسة والمال</b> — الهاتف، الحساب البنكيّ، العمولة، الاسترداد الكبير، استبعاد المناطق.</td><td>GxP · Toast · (تووا تملكها للاسترداد)</td></tr>
+        <tr><td>7</td><td><b>إنفاذ RBAC على طبقة الـAPI لا القائمة</b> — كل استعلام مُرشَّح بالدور/النطاق، والإجراءات المدمّرة محميّة خادميًّا.</td><td>Retool defense-in-depth</td></tr>
+        <tr><td>8</td><td><b>عطِّل لا تُخفِ</b> — لا روابط 403 ميّتة؛ تظليل ما لا يملكه الدور.</td><td>Retool · Uber</td></tr>
+        <tr><td>9</td><td><b>نطاقات مدينة/منطقة للأدوار</b> (أقلّ امتياز + تفويض مؤقّت) — وكيل إقليميّ يرى منطقته فقط.</td><td>Entra/GDAP · Oso</td></tr>
+        <tr><td>10</td><td><b>تنظيم التنقّل حول الكيان</b> (مزوّدون/سائقون/طلبات/مالية/مناطق) ودمج صفحات «لوحة التحكم» المكرّرة في الـ٣٦٠°.</td><td>Object-oriented nav</td></tr>
+        <tr><td>11</td><td><b>لوحة أوامر ⌘K</b> — قفزة لأيّ مزوّد/سائق/طلب بالمُعرّف/الاسم/الهاتف وتنفيذ إجراء.</td><td>Enterprise UI</td></tr>
+        <tr><td>12</td><td><b>قالب Admin/Manager/Staff الثلاثيّ</b> أساسًا، مع صلاحيات دقيقة لكل إجراء؛ Staff مستبعَد من المدفوعات/الضريبة/المستخدمين.</td><td>Uber Eats Manager</td></tr>
+      </tbody>
+    </table>
+    <div class="note info"><b>الحكم العالميّ على تووا:</b> محرّكها المالي والأمنيّ <b>متوائم أصلًا</b> مع أفضل الممارسات. الفجوات الكبرى = <b>توحيد «٣٦٠°»، نمذجة المحورين، RBAC على طبقة الـAPI بنطاقات، تعميم maker-checker، والتنقّل حول الكيان + لوحة الأوامر</b> — أي بنية وتجربة، لا هندسة مال.</div>
+  </div>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section id="roadmap">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٩</div><div><h2>خارطة الإصلاح المقترَحة</h2><div class="tag">مرتّبة بالأولوية — بانتظار إذنك (لم يُنفَّذ شيء)</div></div></div>
+    <p class="lead">هذه المرحلة <b>دراسة فقط — لم يُعدَّل أي كود</b>. فيما يلي خارطة موجَات مقترَحة. كثير منها يلامس الخلفية (نقاط تعديل، نماذج، migrations) ويتطلّب <b>إذنك الصريح</b> ومنطقة محظورة معلنة.</p>
+
+    <h4>الموجة ١ — الكيانات (طلبك المباشر) <span class="sev c">أولوية قصوى</span></h4>
+    <ul class="clean">
+      <li><b>التصنيف:</b> ربط جدولَي Driver/Provider في القوائم؛ تبويبات «نشط الآن/خامل/موقوف/مراجعة» + فلاتر؛ إعادة تسمية اللوحات إلى «العاملون الآن» و«غير النشطين حاليًا»؛ إنشاء «السائقون غير النشطين حاليًا». <span class="pill">واجهة + خلفية خفيفة</span></li>
+      <li><b>التعديل:</b> بناء <code>PATCH /operations/{drivers|providers|users}/{id}</code> بقائمة حقول بيضاء + تدقيق + سبب، ونماذج تعديل في الدرج. <span class="pill">خلفية + واجهة</span></li>
+      <li><b>صفحة ٣٦٠°</b> قابلة للربط المباشر لكل سائق/مزوّد (تستضيف الدرج بملء الشاشة + الجدول الزمنيّ). <span class="pill">واجهة</span></li>
+    </ul>
+
+    <h4>الموجة ٢ — الصلاحيات والثقة <span class="sev c">حرج</span></h4>
+    <ul class="clean">
+      <li><b>قرار:</b> هل RBAC خشن أم دقيق؟ ثم اجعل الواجهة تقول الحقيقة (ربط <code>require_permission</code> بنقاط المالية/العمليات، أو تقليص الكتالوج وإعادة التسمية). <span class="pill">قرار مشغّل</span></li>
+      <li>محرّر PII للعميل/المستخدم خلف <code>require_permission</code> + تدقيق + maker-checker للهاتف/البريد.</li>
+      <li>حلّ تعارض إدارة الحسابات (واجهة سوبر-فقط مقابل خلفية <code>ops_account:create</code>).</li>
+    </ul>
+
+    <h4>الموجة ٣ — العطل والتنقّل <span class="sev h">عالٍ</span></h4>
+    <ul class="clean">
+      <li><b>إصلاح الاهتزاز</b> (طبقة عائمة + نافذة حماية، أو تعطيل الإخفاء التلقائيّ). <span class="pill">واجهة فقط — سريع</span></li>
+      <li>توحيد التسمية «غرفة التحكم»؛ دمج الطلبات/الشكاوى/التدقيق المكرّرة؛ مجموعة «الجغرافيا»؛ قائمة «يتطلب انتباهًا» على الرئيسية؛ لوحة أوامر ⌘K (موجودة جزئيًّا).</li>
+    </ul>
+
+    <h4>الموجة ٤ — الكتالوج والأماكن <span class="sev c">حرج (بيانات)</span></h4>
+    <ul class="clean">
+      <li><b>إصلاح <code>category_id</code></b>: حلّ/إنشاء من النصّ الحرّ + تعبئة رجعيّة + ربط القائمة بالمُعرّف. <span class="pill">خلفية + واجهة</span></li>
+      <li><b>كيان «مكان/فرع» موحّد</b> (أو FK من المدينة للبلديّة) + إحداثيّات للمكان الرئيسي. <span class="pill">migration</span></li>
+      <li>دمج صفحتَي المناطق في سطح خرائطيّ واحد؛ تحقّق عنوان العميل من المنطقة عند الدفع.</li>
+    </ul>
+
+    <h4>الموجة ٥ — المالية <span class="sev h">عالٍ (تنقّل)</span></h4>
+    <ul class="clean">
+      <li>إظهار الـ١١ صفحة في شريط فرعيّ مالي؛ صفحة إقفال الفترة (الخلفية جاهزة)؛ ربط <code>wallet-transfers</code> بالتنقّل؛ توحيد صفحات النقد الثلاث؛ تصدير CSV + مدى تاريخيّ؛ توحيد «د.ل».</li>
+    </ul>
+
+    <div class="note warn"><b>متطلّبات الإذن:</b> الموجات ١/٢/٤/٥ تلامس الخلفية والنماذج و<code>migrations</code> (منطقة محظورة في أطوار الواجهة). الموجة ٣ (إصلاح الاهتزاز + التنقّل) <b>واجهة فقط</b> ويمكن البدء بها بأقلّ خطر فور إذنك. لن أبدأ أيّ تنفيذ تلقائيًّا — بانتظار قرارك.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>الدراسة العميقة للوحة التحكم — منصّة تووا</b> · ٢٠٢٦-٠٦-٢٣</p>
+    <p>٧ وكلاء فحص · ٢٢ بندًا موثّقًا بـ ملف:سطر · مقارنة عالمية · بلا تعديل كود (مرحلة دراسة)</p>
+    <p style="opacity:.7;margin-top:8px;font-size:.82rem">النتائج التفصيلية المصدريّة محفوظة في <code>/tmp/p448/</code> (٧ ملفات A–G) · هذا التقرير في <span class="lt">New Folder 10</span></p>
+  </div>
+</footer>
+
+</body>
+</html>

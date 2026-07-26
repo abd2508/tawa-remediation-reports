@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تووا — تقرير تنفيذ إصلاح العيوب P1–P8 (2026-06-03)</title>
+<style>
+  :root{
+    --bg:#0e1217;--card:#181f27;--card2:#11171e;--ink:#e9eef3;--muted:#9aa7b4;--line:#283440;
+    --crit:#ff4d4f;--high:#ff8c00;--med:#f5c542;--low:#5aa9e6;--ok:#3ec46d;--fix:#7c5cff;--accent:#4da3ff;--gate:#ff6fb5;--sim:#19c3c9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI","Noto Sans Arabic",Tahoma,sans-serif;line-height:1.85;font-size:16px}
+  .wrap{max-width:1180px;margin:0 auto;padding:34px 22px 110px}
+  h1{font-size:29px;margin:0 0 6px;font-weight:800}
+  h2{font-size:22px;margin:48px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--line)}
+  h3{font-size:17.5px;margin:24px 0 8px}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:22px}
+  .pill{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:13px;color:var(--muted);margin:3px 5px 3px 0}
+  .pill.ok{border-color:rgba(62,196,109,.5);color:#9be8b8}
+  code{background:#070a0e;border:1px solid var(--line);border-radius:5px;padding:2px 7px;font-family:Consolas,"Cascadia Code",monospace;font-size:12.5px;color:#cfe3ff;direction:ltr;display:inline-block}
+  .loc{direction:ltr;font-family:Consolas,monospace;font-size:12.5px;color:#9fd0ff;white-space:nowrap}
+  pre{background:#070a0e;border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow:auto;direction:ltr;font-family:Consolas,monospace;font-size:12px;line-height:1.55;color:#cfe3ff;margin:8px 0;white-space:pre}
+  .del{color:#ff9b9b}.add{color:#9be8b8}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#121922;color:var(--muted)}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:6px}
+  .t-crit{background:rgba(255,77,79,.16);color:var(--crit)}.t-high{background:rgba(255,140,0,.16);color:var(--high)}
+  .t-med{background:rgba(245,197,66,.16);color:var(--med)}.t-low{background:rgba(90,169,230,.16);color:var(--low)}
+  .t-gate{background:rgba(255,111,181,.16);color:var(--gate)}.t-sim{background:rgba(25,195,201,.18);color:#9af0f3}
+  .t-ok{background:rgba(62,196,109,.16);color:#9be8b8}
+  .f{background:var(--card);border:1px solid var(--line);border-radius:13px;margin:18px 0;overflow:hidden}
+  .f .hd{padding:14px 18px 12px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .f .bd{padding:8px 18px 16px}
+  .lbl{font-size:11.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--accent);margin:12px 0 4px}
+  .ok{color:var(--ok);font-weight:700}.no{color:var(--crit);font-weight:700}
+  ul,ol{padding-right:22px;margin:6px 0}li{margin:4px 0}
+  .note{background:rgba(77,163,255,.08);border:1px solid rgba(77,163,255,.32);border-radius:10px;padding:12px 16px;margin:14px 0;font-size:14.5px}
+  .warn{background:rgba(255,77,79,.07);border:1px solid rgba(255,77,79,.3);border-radius:10px;padding:12px 16px;margin:14px 0;font-size:14.5px}
+  .okbox{background:rgba(62,196,109,.07);border:1px solid rgba(62,196,109,.32);border-radius:10px;padding:12px 16px;margin:14px 0;font-size:14.5px}
+  .gatebox{background:rgba(255,111,181,.07);border:1px solid rgba(255,111,181,.34);border-radius:10px;padding:12px 16px;margin:14px 0;font-size:14.5px}
+  .foot{margin-top:46px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+  .mini{font-size:12.5px;color:var(--muted)}
+  details{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:6px 14px;margin:8px 0}
+  summary{cursor:pointer;font-weight:700;color:var(--accent);font-size:13.5px}
+  /* faithful UI mockup */
+  .mock{background:#f6f7f9;color:#1a2230;border-radius:14px;padding:18px;max-width:430px;margin:10px 0;border:1px solid #d8dde3;direction:rtl;font-size:14px}
+  .mock .mbtn{display:block;width:100%;text-align:center;background:#1f8f4e;color:#fff;border:none;border-radius:10px;padding:11px;font-weight:700;margin-top:8px}
+  .mock .mnote-warn{background:#fdeaea;border:1px solid #f2b8b8;border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:6px;color:#9a2222}
+  .mock .msupport{font-size:12.5px;color:#5a6675;text-align:center;margin-top:7px}
+  .mock .mtitle{font-weight:800;margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>تووا — تقرير تنفيذ إصلاح العيوب (P1–P8)</h1>
+  <div class="sub">من بداية التنفيذ حتى الآن: المنهجيّة، كل تغيير في الكود (قبل/بعد)، تغيير الواجهة بتمثيل بصريّ، التحقّق على PostgreSQL، وجرد الملفّات. مبنيّ على «التحليل العميق» ثمّ خطّتين (الثانية بعد محاكاة ذهنيّة) — كلّه بإذن المالك وقراراته.</div>
+  <div>
+    <span class="pill">📅 2026-06-03</span>
+    <span class="pill ok">✅ BE 2017 ناجح / 29 سابقة / 0 جديد</span>
+    <span class="pill ok">✅ aa24 مُتحقَّقة على PostgreSQL</span>
+    <span class="pill">🧩 19 عيبًا + 7 SIM · 8 مراحل</span>
+    <span class="pill ok">FIN-COR PASS</span>
+    <span class="pill">🚫 بلا commit/نشر</span>
+  </div>
+
+  <h2>① المنهجيّة والإذن</h2>
+  <ol>
+    <li>المالك طلب تحويل <span class="loc">newfile10/التحليل-العميق-الجذور-والتأثير.html</span> إلى خطّة تنفيذ دقيقة → أُنتجت <span class="loc">newfile10/خطة-التنفيذ-الدقيقة.html</span> بعد <strong>التحقّق من 10 مراسٍ في الكود الحيّ</strong>.</li>
+    <li>المالك طلب مراجعة دقيقة + محاكاة ذهنيّة → أُنتجت <span class="loc">New Folder 10/خطة-التنفيذ-المنقحة-بعد-المحاكاة-الذهنية-2026-06-03.html</span> مع <strong>7 نتائج محاكاة (SIM-1..7)</strong> دُمجت.</li>
+    <li>«ابدأ التنفيذ، واعتمد الخيار (أ) لـSIM-1» → نُفِّذت P1–P6.</li>
+    <li>«أكمل P7 وP8 بعد قراراتي» → قرارات: D-3✅ · D-2✅ · C-6=بانر دعم+إعفاء · P-2=OFF · S-2=حذف → نُفِّذت P7/P8.</li>
+  </ol>
+  <div class="warn"><strong>حوكمة:</strong> الأهداف في <span class="loc">backend/app/modules/</span> = منطقة محظورة؛ التنفيذ تمّ بإذن المالك الصريح كنمط المراحل 414+. <strong>لا commit · لا نشر · FIN-COR محفوظ · العقود غير ممسوسة.</strong></div>
+
+  <h2>② خلاصة النتيجة</h2>
+  <table>
+    <tr><th>المقياس</th><th>القيمة</th></tr>
+    <tr><td>اختبارات الخلفيّة (الحزمة الكاملة)</td><td><span class="ok">2017 ناجح</span> · 29 فاشل سابق موثَّق · 0 جديد · 3 متجاوَز (الأساس 1986 → +31)</td></tr>
+    <tr><td>اختبارات وقاية جديدة</td><td>29 دالّة في 8 ملفّات <span class="loc">test_remediation_*</span> + تحديث 6 ملفّات قائمة (عقد C-3) + WS (4→5)</td></tr>
+    <tr><td>Migration <code>aa24_remediation_p7</code></td><td><span class="ok">مُتحقَّقة على PostgreSQL حقيقيّ</span> (upgrade head + downgrade aa23 + re-upgrade، حاوية مؤقّتة)</td></tr>
+    <tr><td>الواجهة</td><td>typecheck 0 · lint 0 أخطاء · build PASS (precache 41) · CheckoutPage 18/18</td></tr>
+    <tr><td>FIN-COR</td><td><span class="ok">PASS</span> · SHAs feature_flags/launch_gates غير ممسوسة</td></tr>
+    <tr><td>ملفّات الإنتاج المُعدَّلة</td><td>16 backend + 1 نموذج (ضمنها) + 1 migration + 1 واجهة (CheckoutPage)</td></tr>
+  </table>
+  <p class="mini"><strong>دليل صفر تراجع:</strong> الـ29 فشلًا تطابق الأساس الموثَّق (الذاكرة 2026-06-02: «29 سابقة»). الوحيد القريب من تغييري (<span class="loc">test_phase422</span>) <strong>ينجح منعزلًا</strong> (فليك حِمل)؛ والباقي (catalog/variant 201-vs-200 · بحث مزوّد · soft-launch · wallet) في ملفّات لم تُمَسّ.</p>
+
+  <h2>③ تفصيل المراحل والتغييرات (قبل / بعد)</h2>
+
+  <!-- P1 -->
+  <div class="f">
+    <div class="hd"><span class="tag t-crit">P1 · D-1 حرج</span><span class="tag t-sim">+SIM-1/2/4</span><b>الإرسال عند القبول قبل الجاهزيّة → ربط السائق يُبتلَع → طلب عالق</b></div>
+    <div class="bd">
+      <div class="lbl">الجذر</div>
+      <p>auto_dispatch كان يُطلَق في معالج <em>القبول</em> فيُنشئ عرضًا والطلب لا يزال <code>ACCEPTED_BY_PROVIDER</code>؛ قبول السائق قبل «جاهز» يفشل انتقال <code>DRIVER_ASSIGNED</code> ويُبتلَع صامتًا (<span class="loc">dispatch_service.py:488</span>).</p>
+      <div class="lbl">التغيير 1 — نقل المُطلِق <span class="loc">provider_router.py</span></div>
+<pre><span class="del">- # accept handler: auto_dispatch_for_order(...) بعد القبول مباشرةً</span>
+<span class="add">+ # accept: لا إرسال — D-1: المُطلِق انتقل إلى mark_ready (حالة قابلة للإسناد)</span>
+<span class="add">+ # mark_ready_for_pickup: إن كان fulfillment_type=="DELIVERY":</span>
+<span class="add">+     auto_dispatch_for_order(...)  # best-effort + log (لا ابتلاع)</span></pre>
+      <div class="lbl">التغيير 2 — حارس حالة في <code>create_offer</code> <span class="loc">dispatch_service.py:157</span></div>
+<pre><span class="add">+ _DISPATCHABLE = ("READY_FOR_PICKUP","AWAITING_DRIVER","NO_DRIVER_ESCALATION")</span>
+<span class="add">+ if order is None: raise 404</span>
+<span class="add">+ if fulfillment_type == "SELF_PICKUP": raise 422   # لا إسناد سائق</span>
+<span class="add">+ if order.order_state not in _DISPATCHABLE: raise 422</span></pre>
+      <div class="lbl">التغيير 3 — SIM-1 (الخيار أ) في <code>try_dispatch_to_newly_available</code></div>
+<pre><span class="add">+ if order.order_state == "NO_DRIVER_ESCALATION":</span>
+<span class="add">+     apply_order_transition(order, "AWAITING_DRIVER", ...)  # قبل العرض</span>
+  # وإلّا فقبول العرض على طلب مُصعَّد كان يُبتلَع (نفس صنف D-1)</pre>
+      <div class="lbl">التغيير 4 — SIM-2 الابتلاع المشروط <span class="loc">:488</span></div>
+<pre><span class="del">- except InvalidTransitionError: pass  # ابتلاع أعمى</span>
+<span class="add">+ except InvalidTransitionError:</span>
+<span class="add">+   if order.order_state in _PRE_DISPATCH: log.error(...); raise 409</span>
+<span class="add">+   # وإلّا (DRIVER_ASSIGNED+ / طرفيّ) = تكرار آمن → تجاوز</span></pre>
+      <div class="lbl">اختبارات</div>
+      <p><span class="loc">test_remediation_d1_dispatch.py</span> (5): رفض create_offer قبل الجاهزيّة · رفض self-pickup · مسار سعيد READY→DRIVER_ASSIGNED · <b>SIM-1</b> طلب مُصعَّد يُعاد إسناده · <b>SIM-2</b> قبول على حالة ما-قبل-الإرسال → 409. <span class="loc">test_phase4_provider/5_dispatch/444</span> أخضر.</p>
+    </div>
+  </div>
+
+  <!-- P2 -->
+  <div class="f">
+    <div class="hd"><span class="tag t-high">P2 · O-1 / O-3</span><b>حُرّاس دور ناقصون</b></div>
+    <div class="bd">
+<pre>O-1 <span class="loc">action_items_router.py:58</span>
+<span class="del">- _user = Depends(get_current_user)            # مصادقة فقط</span>
+<span class="add">+ _user = Depends(require_role(OPERATIONS_AGENT, SUPER_ADMIN))</span>
+
+O-3 <span class="loc">dr_router.py:22</span>
+<span class="del">- _OPS = (OPERATIONS_AGENT,)                    # يحجب SUPER عن 7 نقاط DR</span>
+<span class="add">+ _OPS = (OPERATIONS_AGENT, SUPER_ADMIN)</span></pre>
+      <p class="mini">توسيع فقط (لا تضييق) → صفر تموّج. اختبارات <span class="loc">test_remediation_p2_rbac.py</span> (4): CUSTOMER→403 · OPS→200 · DR للـSUPER→200.</p>
+    </div>
+  </div>
+
+  <!-- P3 -->
+  <div class="f">
+    <div class="hd"><span class="tag t-high">P3 · C-2</span><span class="tag t-med">C-3</span><span class="tag t-sim">+SIM-3</span><b>ملكيّة العنوان (IDOR) + توصيل بلا عنوان</b></div>
+    <div class="bd">
+      <div class="lbl">C-2 <span class="loc">order_service.py</span> — تمرير customer_id عبر 3 دوال + نقطتَي راوتر</div>
+<pre>_resolve_delivery(provider, address_id<span class="add">, customer_id</span>)
+<span class="del">- _addr = session.get(Address, address_id)         # مفتاح أساسيّ فقط = أوراكل موقع/PII</span>
+<span class="add">+ if _addr.user_id != customer_id: raise ValidationError(code="ADDRESS_FORBIDDEN")  # 422</span>
+  # + quote_delivery_fee / quote_promotion + نقطتا الراوتر تمرّر user.user_id</pre>
+      <div class="lbl">C-3 <span class="loc">order_service.create_order</span> (قبل أي كتابة)</div>
+<pre><span class="add">+ if fulfillment_type == "DELIVERY" and not address_id:</span>
+<span class="add">+     raise ValidationError(code="MISSING_DELIVERY_ADDRESS")  # 422</span></pre>
+      <p class="mini"><b>SIM-3:</b> الإصلاح لمس 3 دوال + نقطتَي راوتر لا «فلترًا واحدًا». اختبارات <span class="loc">test_remediation_p3_address.py</span> (4): عنوان غريب→422 · عنوان مملوك→201 · معاينة بعنوان غريب→422 · DELIVERY بلا عنوان→422. + عُدِّلت تجهيزات 6 ملفّات قائمة لإرسال العنوان المبذور (عقد C-3 المتوقَّع).</p>
+    </div>
+  </div>
+
+  <!-- P4 -->
+  <div class="f">
+    <div class="hd"><span class="tag t-high">P4 · C-1</span><span class="tag t-sim">+SIM-5</span><b>التقييم لا يربط target_id بالطلب → احتيال ترتيب/مكافآت</b></div>
+    <div class="bd">
+<pre><span class="loc">order_router.py:825</span> قبل الإدراج:
+<span class="add">+ PROVIDER: target_id == order.provider_id  وإلّا 422</span>
+<span class="add">+ DRIVER : == العرض المقبول (DispatchOffer ACCEPTED).order_by(accepted_at desc).limit(1)</span>
+<span class="add">+          self-pickup / لا عرض → 422   (SIM-5: limit(1) ضدّ MultipleResultsFound)</span>
+  PLATFORM: لا ربط (ليس متجه سمعة)</pre>
+      <p class="mini">اختبارات <span class="loc">test_remediation_p4_rating.py</span> (5): مزوّد خطأ→422 · مزوّد صحيح→201 · سائق خطأ→422 · سائق صحيح→201 · بلا سائق مُسنَد→422. <span class="loc">test_phase138/376/434</span> أخضر.</p>
+    </div>
+  </div>
+
+  <!-- P5 -->
+  <div class="f">
+    <div class="hd"><span class="tag t-med">P5 · O-2 / S-1</span><b>velocity تستثني SUPER/FIN + WebSocket بلا ABAC</b></div>
+    <div class="bd">
+<pre>O-2 <span class="loc">wallet_velocity_router.py:25</span>
+<span class="del">- require_role(OPERATIONS_AGENT)</span>
+<span class="add">+ require_role(OPERATIONS_AGENT, FINANCE_AGENT, SUPER_ADMIN)   # = OPS_FIN في الواجهة</span>
+
+S-1 <span class="loc">ws_gateway.py</span>
+<span class="add">+ role = await _resolve_role(db, order_id, user_id, jwt_role)   # ABAC كـSSE</span>
+<span class="add">+ if role is None: ws.close(4403)   # كان أيّ توكن صالح يشترك بأيّ طلب (IDOR)</span>
+<span class="add">+ if not _event_visible_to(role, evt): continue   # فلترة driver.location عن المزوّد</span></pre>
+      <p class="mini">اختبارات: <span class="loc">test_remediation_p5_velocity_rbac.py</span> (4: CUSTOMER→403 · OPS/FIN/SUPER→200) · <span class="loc">test_phase409_ws_gateway.py</span> (مُحدَّث: مستخدم مرتبط→connected · غير مرتبط→مرفوض). S-1 سطح بلا مستهلك (الإنتاج SSE) → إصلاح وقائيّ.</p>
+    </div>
+  </div>
+
+  <!-- P6 -->
+  <div class="f">
+    <div class="hd"><span class="tag t-high">P6 · P-1</span><span class="tag t-sim">+SIM-7</span><span class="tag t-gate">قرار نطاق</span><b>تفعيل المزوّد لا يفرض وثائق KYC</b></div>
+    <div class="bd">
+<pre><span class="loc">operations_router.py:1351</span> قبل provider.status="ACTIVE":
+<span class="add">+ سياسات نوع المزوّد → لكل doc_type مطلوب: وثيقة APPROVED غير منتهية غير مُستبدَلة</span>
+<span class="add">+ وإلّا 422 بقائمة الناقص   (مرآة لوحة الامتثال :2420)</span></pre>
+      <p class="mini"><b>SIM-7:</b> مطابقة حالة أحرف <code>provider_type</code> متّسقة مع اللوحة؛ قاعدة الاختبار بلا بذور سياسة → الحارس <b>خامل</b> في الاختبارات القائمة (لا تنكسر). الحارس يحمي <b>الموافقات الجديدة</b> فقط — لا backfill إجباريّ للنشطين (سؤال النطاق الرجعيّ متروك لك، لا يحجب الكود). + إصلاح عزل conftest (تنظيف <code>ProviderDocumentPolicy</code> المتسرّبة عبر commit). اختبارات <span class="loc">test_remediation_p6_kyc.py</span> (3): بلا وثيقة→422 · بوثيقة معتمَدة→200 · بلا سياسة→200.</p>
+    </div>
+  </div>
+
+  <!-- P7 -->
+  <div class="f">
+    <div class="hd"><span class="tag t-med">P7 · D-3 / D-2 / S-2 / P-2</span><span class="tag t-gate">قرارات المالك + migration</span><b>النقد المزدوج · أداء الكنّاس · حذف نقطة · إشراف</b></div>
+    <div class="bd">
+      <div class="lbl">D-3 — عمود الربط + أقفال صفّ على 3 مسارات نقد</div>
+<pre>نموذج <span class="loc">CashCollection</span>: <span class="add">+ settlement_id (nullable) + idx</span>
+أقفال (لا تغيير سلوك، تمنع الخصم المزدوج المتزامن):
+  <span class="loc">driver_settlement_router:191</span> · <span class="loc">settlement/service:269</span> · <span class="loc">cash_risk_router:137</span>
+<span class="del">- driver = db.get(Driver, id)</span>
+<span class="add">+ driver = db.scalar(select(Driver).where(id==...).with_for_update())</span></pre>
+      <div class="lbl">D-2 — فهرس + فلترة العروض المنتهية فورًا</div>
+<pre>نموذج <span class="loc">DispatchOffer</span>: <span class="add">+ idx(state, expires_at)</span>
+busy_set في try_dispatch: <span class="add">+ عرض SENT منتهٍ لا يُبقي الطلب «مشغولًا» (لا انتظار تِكّة الـ60ث)</span></pre>
+      <div class="lbl">S-2 — حذف <code>POST /wallets/spend</code> (قرار: حذف)</div>
+<pre><span class="del">- @router.post("/wallets/spend")  + WalletSpendRequest + قيد idempotency + اختباره</span>
+  (دالّة الخدمة spend_from_wallet مع إنفاذ التجميد R-066-03 محفوظة)</pre>
+      <div class="lbl">P-2 — إبقاء OFF (قرارك) → لا تغيير كود.</div>
+      <p class="mini">اختبارات <span class="loc">test_remediation_p7_dispatch_cash.py</span> (3): D-2 عرض منتهٍ لا يحجب إعادة الإسناد · عرض حيّ يحجب · D-3 العمود قابل للختم. <span class="loc">test_phase6_payments</span> (29) · 139 اختبار تسوية/نقد أخضر.</p>
+    </div>
+  </div>
+
+  <!-- P8 -->
+  <div class="f">
+    <div class="hd"><span class="tag t-low">P8 · D-6</span><b>تحديث الموقع يقبل أيّ طلب (IDOR موقع) — أُعيد التحقّق: عيب حقيقيّ</b></div>
+    <div class="bd">
+<pre><span class="loc">location_router.py:61</span>
+<span class="del">- if order is None: 404   # فحص وجود فقط</span>
+<span class="add">+ عرض ACCEPTED يربط driver.id بالطلب وإلّا 403   # ملكيّة حقيقيّة</span></pre>
+      <p class="mini">التقرير حذّر أنّه كان «إيجابيّة كاذبة 2026-06-02» → <b>أعدتُ التحقّق: حقيقيّ</b> (سائق يسم أحداث موقع/قرب لأيّ طلب). اختبارات <span class="loc">test_remediation_p8_location.py</span> (3): طلب غير مملوك→403 · مملوك→200 · بلا order_id→200.</p>
+    </div>
+  </div>
+
+  <h2>④ تغيير الواجهة (C-6) — قبل / بعد (تمثيل بصريّ أمين)</h2>
+  <div class="note">التغيير الأماميّ الوحيد في هذه الجلسة: تلميح «تواصل مع الدعم» على حالة <code>OUTSTANDING_DEBT</code> في <span class="loc">web/src/pages/customer/CheckoutPage.tsx</span>. (واجهة OPS للإعفاء <code>OpsCustomerDebts</code> + <code>waiveCustomerDebt</code> كانت موجودة أصلًا.) أدناه تمثيل أمين مُستخرَج من الكود الفعليّ — <strong>ليست لقطة حيّة</strong> (تتطلّب رفع الحزمة كاملةً + بذر دَين عدم-حضور للوصول لهذه الحالة؛ أعرض فعلها إن رغبت).</div>
+
+  <div style="display:flex;gap:24px;flex-wrap:wrap">
+    <div>
+      <div class="lbl">قبل — صفحة الخروج عند وجود دَين</div>
+      <div class="mock">
+        <div class="mtitle">تأكيد الطلب</div>
+        <div class="mnote-warn">لديك رسم عدم حضور غير مدفوع. ادفعه لإتمام الطلب.</div>
+        <button class="mbtn">ادفع رسم عدم الحضور من المحفظة ثمّ أكمل</button>
+      </div>
+    </div>
+    <div>
+      <div class="lbl">بعد — أُضيف تلميح الدعم (للحالة المتعذّرة)</div>
+      <div class="mock">
+        <div class="mtitle">تأكيد الطلب</div>
+        <div class="mnote-warn">لديك رسم عدم حضور غير مدفوع. ادفعه لإتمام الطلب.</div>
+        <button class="mbtn">ادفع رسم عدم الحضور من المحفظة ثمّ أكمل</button>
+        <div class="msupport">إن تعذّر الدفع من المحفظة، تواصل مع الدعم لمراجعة الرسم.</div>
+      </div>
+    </div>
+  </div>
+<pre><span class="add">+ {debtBlocked && (
++   &lt;div role="note" ...&gt;
++     {t("checkout.debt_contact_support",
++       {defaultValue:"إن تعذّر الدفع من المحفظة، تواصل مع الدعم لمراجعة الرسم."})}
++   &lt;/div&gt;
++ )}</span></pre>
+
+  <h2>⑤ التحقّق من Migration على PostgreSQL حقيقيّ</h2>
+  <div class="okbox">
+    <p>حاوية <code>postgres:16-alpine</code> مؤقّتة (منفذ 5456)، عبر <code>DATABASE_URL=postgresql+asyncpg://…</code>:</p>
+    <ul>
+      <li><span class="ok">upgrade head</span> — السلسلة الكاملة aa01..aa24 نظيفة.</li>
+      <li><span class="ok">تأكيد الكائنات</span> — <code>cash_collections.settlement_id</code> + <code>idx_cash_collections_settlement_id</code> + <code>idx_dispatch_offers_state_expires_at</code> موجودة.</li>
+      <li><span class="ok">downgrade aa23</span> — الكائنات الثلاثة أُزيلت (0/0).</li>
+      <li><span class="ok">re-upgrade head</span> — إعادة دخول نظيفة. ثمّ أُزيلت الحاوية.</li>
+    </ul>
+    <p class="mini">رأس المستودع = <code>aa24_remediation_p7</code> (وحيد). القاعدة المحليّة/الإنتاج <strong>لم تُطبَّق عليها</strong> — التطبيق + إعادة بناء الصورة = خطوة نشر بيد المالك.</p>
+  </div>
+
+  <h2>⑥ جرد الملفّات المُعدَّلة</h2>
+  <details><summary>16 ملفّ إنتاج backend + نموذج + migration</summary>
+  <ul class="mini">
+    <li><span class="loc">models/dispatch.py</span> — CashCollection.settlement_id + فهرسان (D-3/D-2)</li>
+    <li><span class="loc">modules/dispatch/dispatch_service.py</span> — حارس create_offer · SIM-1 · SIM-2 · فلترة D-2</li>
+    <li><span class="loc">modules/dispatch/driver_settlement_router.py</span> — قفل صفّ D-3</li>
+    <li><span class="loc">modules/dispatch/location_router.py</span> — D-6 ملكيّة</li>
+    <li><span class="loc">modules/finance/cash_risk_router.py</span> — قفل صفّ D-3</li>
+    <li><span class="loc">modules/settlement/service.py</span> — قفل صفّ D-3</li>
+    <li><span class="loc">modules/orders/order_service.py</span> — C-2 · C-3</li>
+    <li><span class="loc">modules/orders/order_router.py</span> — C-1 · تمرير customer_id</li>
+    <li><span class="loc">modules/providers/provider_router.py</span> — D-1 (نقل المُطلِق)</li>
+    <li><span class="loc">modules/operations/action_items_router.py</span> — O-1</li>
+    <li><span class="loc">modules/operations/dr_router.py</span> — O-3</li>
+    <li><span class="loc">modules/operations/operations_router.py</span> — P-1 KYC</li>
+    <li><span class="loc">modules/operations/wallet_velocity_router.py</span> — O-2</li>
+    <li><span class="loc">modules/sse/ws_gateway.py</span> — S-1 ABAC</li>
+    <li><span class="loc">modules/payments/payment_router.py</span> — S-2 حذف</li>
+    <li><span class="loc">core/idempotency_middleware.py</span> — S-2 إزالة المسار</li>
+    <li><span class="loc">alembic/versions/aa24_remediation_p7_d3_d2.py</span> — migration</li>
+  </ul></details>
+  <details><summary>اختبارات (8 جديدة + 6 محدَّثة + conftest)</summary>
+  <ul class="mini">
+    <li>جديدة: test_remediation_{d1_dispatch, p2_rbac, p3_address, p4_rating, p5_velocity_rbac, p6_kyc, p7_dispatch_cash, p8_location}.py (29 دالّة)</li>
+    <li>محدَّثة (عقد C-3 / S-2 / S-1): test_phase3_orders · 427 · 433 · 436 · 439 · test_promotions_order_application · test_phase6_payments · test_phase409_ws_gateway</li>
+    <li><span class="loc">tests/conftest.py</span> — تجهيزة autouse تُنظّف ProviderDocumentPolicy</li>
+  </ul></details>
+  <details><summary>الواجهة (1 ملفّ)</summary>
+  <ul class="mini"><li><span class="loc">web/src/pages/customer/CheckoutPage.tsx</span> — C-6 تلميح الدعم</li></ul></details>
+
+  <h2>⑦ ما لم يُنفَّذ (متروك بشفافيّة لقرارك)</h2>
+  <div class="gatebox">
+    <p><b>D-3 — الإصلاح المحاسبيّ الأعمق:</b> تحويل خصم <code>cash_outstanding_minor</code> من «المبلغ الذي يُدخله المشغّل» إلى «مجموع صفوف CashCollection المختومة بـsettlement_id» + backfill. هذا <strong>تغيير للنموذج المحاسبيّ الحيّ</strong> (يلمس بوّابة سقف النقد + المخاطر + التسوية)، من صنف قرارات المراحل 416–421. <strong>الثغرة المُستغَلّة فعلًا (سباق التزامن) أُغلقت بالأقفال</strong>؛ العمود سقّالة جاهزة. القرار التالي هو موضوع الانتقال.</p>
+    <p class="mini"><b>P-2</b> (إشراف الكتالوج) = OFF بقرارك. <b>النشر</b> (تطبيق aa24 + إعادة بناء الصورة) = خطوتك.</p>
+  </div>
+
+  <div class="foot">تووا / Toowa · تقرير تنفيذ إصلاح العيوب P1–P8 · 2026-06-03 · مبنيّ على «التحليل العميق» + خطّتين + تنفيذ مُتحقَّق · BE 2017/29-سابقة/0-جديد · aa24 على PostgreSQL · FIN-COR PASS · بلا commit/نشر · التالي: المرحلة الماليّة الأعمق (D-3) بقرار المالك.</div>
+
+</div>
+</body>
+</html>

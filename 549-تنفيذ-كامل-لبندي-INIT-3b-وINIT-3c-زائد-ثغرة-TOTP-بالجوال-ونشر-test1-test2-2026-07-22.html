@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>549 — تنفيذ كامل لبندَي INIT-3(b) وINIT-3(c) + ثغرة TOTP بالجوال + نشر test1/test2</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2540; --text:#e8ecf7; --muted:#9aa5c0;
+    --line:#2a3350; --accent:#5b8cff;
+    --done:#1f7a4d; --done-bg:#123425; --done-fg:#7be3ab;
+    --partial:#8a6d1f; --partial-bg:#332a10; --partial-fg:#f0c95b;
+    --not:#9b2c2c; --not-bg:#3a1414; --not-fg:#ff8f8f;
+    --auth:#7a3fc9; --auth-bg:#241a3a; --auth-fg:#c9a8f5;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef1fa; --text:#1a2030; --muted:#5a6480;
+      --line:#dbe0ee; --accent:#2a5fd8;
+      --done:#0f6a3a; --done-bg:#e5f6ec; --done-fg:#0f6a3a;
+      --partial:#8a6d1f; --partial-bg:#fbf1d8; --partial-fg:#8a6d1f;
+      --not:#a12727; --not-bg:#fbe6e6; --not-fg:#a12727;
+      --auth:#7a3fc9; --auth-bg:#f1e8fb; --auth-fg:#5c2c96;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","Cairo","Tahoma",sans-serif; line-height:1.75; margin:0; padding:0 0 60px 0;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+  header.hero{background:linear-gradient(160deg, var(--panel2), var(--bg)); border-bottom:1px solid var(--line); padding:48px 0 36px 0; margin-bottom:32px;}
+  h1{font-size:1.85rem; margin:0 0 10px 0;}
+  h1 .num{color:var(--accent); font-weight:800;}
+  .sub{color:var(--muted); font-size:1.05rem; max-width:920px;}
+  h2{font-size:1.4rem; margin:44px 0 16px 0; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  h3{font-size:1.15rem; margin:22px 0 10px 0; color:var(--accent);}
+  h4{font-size:1rem; margin:16px 0 6px 0;}
+  p{margin:0 0 14px 0;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:18px;}
+  .item-card{background:var(--panel); border:1px solid var(--line); border-inline-start:5px solid var(--accent); border-radius:10px; padding:20px 24px; margin-bottom:20px;}
+  .item-card.done{border-inline-start-color:var(--done);}
+  .item-card.not{border-inline-start-color:var(--not);}
+  .item-card.partial{border-inline-start-color:var(--partial);}
+  .item-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:10px;}
+  .item-id{font-weight:800; color:var(--accent); font-size:1.15rem;}
+  .badge{display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.8rem; font-weight:700; white-space:nowrap;}
+  .b-done{background:var(--done-bg); color:var(--done-fg); border:1px solid var(--done);}
+  .b-not{background:var(--not-bg); color:var(--not-fg); border:1px solid var(--not);}
+  .b-partial{background:var(--partial-bg); color:var(--partial-fg); border:1px solid var(--partial);}
+  .b-auth{background:var(--auth-bg); color:var(--auth-fg); border:1px solid var(--auth);}
+  .evid{margin:10px 0; padding:10px 14px; border-radius:8px; background:var(--panel2); font-size:0.9rem;}
+  .evid .k{font-weight:700; color:var(--accent); display:block; margin-bottom:4px;}
+  code{background:var(--panel2); padding:1px 6px; border-radius:5px; font-size:0.88em; direction:ltr; display:inline-block;}
+  pre{background:#0a0e17; color:#d7e0f5; border:1px solid var(--line); border-radius:10px; padding:14px 16px; overflow-x:auto; font-size:0.8rem; direction:ltr; text-align:left; margin:10px 0;}
+  pre code{background:none; padding:0;}
+  .preview-label{display:inline-block; background:var(--auth-bg); color:var(--auth-fg); border:1px solid var(--auth); border-radius:6px; padding:2px 10px; font-size:0.78rem; font-weight:800; margin-bottom:6px;}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:20px 0;}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center;}
+  .stat .n{font-size:1.7rem; font-weight:800; color:var(--accent);}
+  .stat .l{color:var(--muted); font-size:0.85rem; margin-top:4px;}
+  .callout{border-inline-start:5px solid var(--accent); background:var(--panel2); border-radius:10px; padding:16px 20px; margin:16px 0;}
+  .callout.not{border-color:var(--not); background:var(--not-bg);}
+  .callout.auth{border-color:var(--auth); background:var(--auth-bg);}
+  .callout.done{border-color:var(--done); background:var(--done-bg);}
+  .toc{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px 24px;}
+  .toc a{color:var(--text); text-decoration:none; display:block; padding:5px 0; border-bottom:1px dashed var(--line);}
+  .toc a:last-child{border-bottom:none;}
+  .toc a:hover{color:var(--accent);}
+  .checklist{list-style:none; padding:0; margin:14px 0;}
+  .checklist li{background:var(--panel2); border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; gap:10px;}
+  .checklist .cn{font-weight:800; color:var(--accent); min-width:22px;}
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:0.88rem; min-width:640px;}
+  th,td{padding:9px 11px; text-align:right; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--panel2); color:var(--muted); font-size:0.78rem;}
+  tr:last-child td{border-bottom:none;}
+  footer{color:var(--muted); text-align:center; font-size:0.85rem; margin-top:60px; padding-top:24px; border-top:1px solid var(--line);}
+  .kicker{color:var(--accent); font-weight:800; font-size:0.85rem; letter-spacing:0.04em; margin-bottom:6px;}
+  .pipeline{display:flex; flex-wrap:wrap; gap:0; align-items:stretch; margin:18px 0; direction:ltr;}
+  .pnode{flex:1; min-width:140px; background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:12px; text-align:center; direction:rtl; font-size:0.85rem;}
+  .pnode.done{border-color:var(--done);}
+  .pnode.not{border-color:var(--not);}
+  .pnode.partial{border-color:var(--partial);}
+  .arrow{display:flex; align-items:center; justify-content:center; min-width:24px; color:var(--accent); font-size:1.2rem;}
+  @media (max-width:900px){ .pipeline{flex-direction:column;} .arrow{transform:rotate(90deg);} }
+  .backtop{position:fixed; bottom:24px; left:24px; background:var(--accent); color:#fff; padding:9px 16px; border-radius:30px; text-decoration:none; font-size:0.82rem; font-weight:700; box-shadow:0 4px 14px rgba(0,0,0,0.35); z-index:50;}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">تقرير 549 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-22 · تنفيذ كامل، لا معاينة</div>
+  <h1><span class="num">549</span> — تنفيذ كامل لبندَي INIT-3(b) وINIT-3(c) + إغلاق ثغرة TOTP بالجوال + نشر test1/test2</h1>
+  <p class="sub">
+    تقرير 548 (السابق) انتهى بحكم "لا تنفيذ اليوم" على البندَين INIT-3(b) وINIT-3(c) تحديدًا لأنّهما بلا مواصفة تفصيليّة
+    وبهما توتّر تصميميّ يحتاج حسمًا قبل أي كود. منذ ذلك التقرير: جرت جلسة تخطيط مستقلّة حسمت التوتّرَين، ثمّ نُفِّذت
+    البنود الأربعة الأصليّة (رابط التنقّل، سباق OTP، INIT-3c، INIT-3b) بالكامل — الأخيران بمراجعة عدائيّة عبر Codex،
+    عدّة جولات لكلّ منهما، وإصلاح كل نتيجة حقيقيّة ظهرت. أثناء مراجعة INIT-3(b) اكتُشفت ثغرة مسبقة لم تكن جزءًا من
+    الطلب الأصليّ: <strong>تطبيق الجوال لا يملك أي شاشة لتسجيل الدخول بخطوة تحقّق ثانية (TOTP) إطلاقًا</strong> — بُنيت
+    وروجِعت أيضًا. كل شيء اختُبِر بالكامل (باك إند + ويب + جوال) ونُشر فعليًّا على <strong>test1</strong> و<strong>test2</strong>
+    (لم يُلمَس GitHub أو الإنتاج).
+  </p>
+</div></header>
+
+<div class="wrap">
+
+<div class="card toc">
+  <strong>فهرس سريع</strong>
+  <a href="#stats">① الأرقام الإجماليّة لهذه الجلسة</a>
+  <a href="#resolved">② كيف حُسِمت أسئلة تقرير 548 المفتوحة</a>
+  <a href="#item12">③ البندان 1 و2 — كانا منجزَين فعلًا، تحقّق فقط</a>
+  <a href="#item3">④ البند 3 — INIT-3(c) بصمة الجهاز الحقيقيّة</a>
+  <a href="#item4">⑤ البند 4 — INIT-3(b) شاشة اختيار الشخصيّة</a>
+  <a href="#mobiletotp">⑥ الإضافة المكتشَفة — إغلاق ثغرة TOTP في تطبيق الجوال</a>
+  <a href="#deploy">⑦ النشر الفعليّ إلى test1 وtest2</a>
+  <a href="#tests">⑧ حالة الاختبارات النهائيّة — كل بيئة</a>
+  <a href="#remaining">⑨ ما لم يُلمَس ولماذا</a>
+</div>
+
+<div id="stats"></div>
+<h2>① الأرقام الإجماليّة لهذه الجلسة</h2>
+<div class="stat-grid">
+  <div class="stat"><div class="n">4</div><div class="l">بنود من الخطّة الأصليّة، كل واحد أُغلِق</div></div>
+  <div class="stat"><div class="n">1</div><div class="l">ثغرة إضافيّة اكتُشفت وأُغلِقت (TOTP بالجوال)</div></div>
+  <div class="stat"><div class="n">4</div><div class="l">جولات مراجعة عدائيّة عبر Codex (2 لكل من INIT-3c/INIT-3b + 1 لملحق الجوال)</div></div>
+  <div class="stat"><div class="n">13</div><div class="l">نتيجة حقيقيّة وجدها Codex عبر كل الجولات — كلّها أُصلِحت</div></div>
+  <div class="stat"><div class="n">4001</div><div class="l">اختبار باك إند ناجح (0 فشل)</div></div>
+  <div class="stat"><div class="n">1754+</div><div class="l">اختبار ويب ناجح</div></div>
+  <div class="stat"><div class="n">84</div><div class="l">اختبار جوال ناجح</div></div>
+  <div class="stat"><div class="n">2</div><div class="l">بيئتا نشر حيّتان (test1 + test2) — مؤكَّدتان بفحص مباشر على الحاوية</div></div>
+</div>
+
+<div id="resolved"></div>
+<h2>② كيف حُسِمت أسئلة تقرير 548 المفتوحة</h2>
+<p>تقرير 548 طرح توتّرًا تصميميًّا محدَّدًا لكل من البندين قبل أن يوصي بأي كود:</p>
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">INIT-3(b)</span><span class="badge b-done">✅ حُسِم</span></div>
+  <p><strong>سؤال 548:</strong> "هل شاشة اختيار الشخصيّة لا تزال مطلوبة أصلًا مع منطق تحليل الدور الحاليّ من الخادم بعد الدخول؟"</p>
+  <p><strong>الحسم:</strong> نعم لا تزال مطلوبة — لأنّ المشكلة الحقيقيّة ليست "من يحلِّل الدور" بل <strong>أيّ دور يُختار
+  تلقائيًّا</strong> عندما يملك الحساب أكثر من دور مؤهَّل (مثلًا شخص هو DRIVER وCUSTOMER معًا). الكود القديم كان يختار
+  دائمًا أقدم صفّ <code>Role</code> بصمت (<code>order_by(created_at).limit(1)</code>) — أي دور ثانٍ كان غير قابل
+  للوصول إطلاقًا عبر تسجيل الدخول. الحلّ: إن كان للحساب دور مؤهَّل واحد فقط (الغالبيّة الساحقة) لا شيء يتغيّر؛ إن كان
+  له أكثر من دور، يُعرَض عليه اختيار صريح قبل إصدار الجلسة.</p>
+</div>
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">INIT-3(c)</span><span class="badge b-done">✅ حُسِم</span></div>
+  <p><strong>سؤال 548:</strong> "ما الهدف الأمنيّ الفعليّ من عشوائيّة بصمة الجهاز، وكيف تتوافق مع منطق كشف مشاركة
+  الأجهزة القائم على ثبات المعرِّف؟"</p>
+  <p><strong>الحسم:</strong> الاكتشاف الحاسم — JWT الحاليّ يحمل <code>device.id</code> (المفتاح الأساسيّ لصفّ الجهاز)
+  وليس بصمة الجهاز نفسها. بمعنى: بمجرّد أن يبدأ كل جهاز فعليّ بإنشاء صفّ <code>Device</code> مستقلّ خاصّ به (بدل مشاركة
+  صفّ واحد لكل مستخدم كما كان يحدث في تسجيل الدخول بكلمة المرور)، يحمل كل جهاز <code>device.id</code> مختلفًا تلقائيًّا
+  — بلا أي تعديل في طبقة JWT، وبلا أي تعارض مع منطق كشف المشاركة (الذي يبقى يعمل بالضبط كما صُمِّم، بل يبدأ بالعمل
+  فعليًّا لأوّل مرّة لمستخدمي كلمة المرور بعد أن كان معطَّلًا بنيويًّا عندهم).</p>
+</div>
+<p>الخطّة الكاملة بعد هذا الحسم (تسلسل التنفيذ، تحليل الأثر الجانبيّ على كل نظام متأثِّر) وُثِّقت في جلسة تخطيط مستقلّة
+قبل بدء أي كود، ثمّ نُفِّذت حرفيًّا في هذه الجلسة.</p>
+
+<div id="item12"></div>
+<h2>③ البندان 1 و2 — كانا منجزَين فعلًا، تحقّق فقط</h2>
+<div class="pipeline">
+  <div class="pnode done"><div><strong>رابط تنقّل استثناءات النقد</strong></div><div>وُجِد منجزًا من جلسة موازية — <code>OpsTopNav.tsx</code> يفلتر حسب <code>canAudit("cash:audit")</code>، اختباران جديدان يمرّان، اختبار القاعدة الذهبيّة لم يحتَج تعديلًا</div></div>
+  <div class="arrow">←</div>
+  <div class="pnode done"><div><strong>سباق تزامن OTP عبر IP</strong></div><div>وُجِد منجزًا من جلسة موازية — <code>otp_service.py</code> يشتقّ الحالة من عدّاد <code>(phone, device_id)</code> جديد بلا IP، بمنطق WATCH/MULTI ذرّيّ، مطابق تمامًا للتصميم المخطَّط له</div></div>
+</div>
+<p>طبَّقت التزام المستخدم الصريح: "تأكّد أنّ البند منجَز أم لا قبل أن تُنشئ أي شيء" — تحقّقت من كلا البندين بقراءة الكود
+مباشرة (لا افتراض)، وجدتهما مطابقَين للتصميم المطلوب حرفيًّا، فتجاوزتهما دون أي تعديل إضافيّ.</p>
+
+<div id="item3"></div>
+<h2>④ البند 3 — INIT-3(c) بصمة الجهاز الحقيقيّة</h2>
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">INIT-3(c)</span><span class="badge b-done">✅ منجَز، مراجَع، منشور</span></div>
+  <p><strong>التغيير الجوهريّ:</strong> <code>LoginBody.device_id</code> جديد (اختياريّ، يتوافق رجعيًّا) في مسار كلمة
+  المرور — يُستخدَم كبصمة حقيقيّة بدل <code>password-login:{user_id}</code> الثابتة. مسار TOTP المسبَق أُصلِح ليعيد
+  استخدام نفس البصمة المحسوبة بدل تكرار الحرف يدويًّا (كان يمكن أن يُنشئ صفّ جهاز مكرَّرًا).</p>
+  <h4>جولة المراجعة الأولى عبر Codex — 3 نتائج حقيقيّة، كلّها أُصلِحت:</h4>
+  <ul class="checklist">
+    <li><span class="cn">1</span> <strong>حرجة:</strong> تصادم مفتاح <code>localStorage</code> — <code>AuthContext.tsx</code> يكتب فوق <code>"device_id"</code> بعد كل دخول ناجح بمطالبة JWT، وهو نفس المفتاح الذي كانت البصمة الجديدة تقرأه/تكتبه. أُصلِح بمفتاح مخصَّص منفصل <code>"device_fingerprint"</code>.</li>
+    <li><span class="cn">2</span> تسجيل الدخول بكلمة المرور لم يكن يُشغِّل فحص "مشاركة الجهاز عبر حسابات" إطلاقًا (كان يعمل فقط عند تسجيل الدخول بـOTP) — استُخرِج المنطق إلى وحدة مشتركة جديدة <code>device_sharing_check.py</code> واستُدعِيت من كلا المسارَين.</li>
+    <li><span class="cn">3</span> اختبار ضعيف كان يتحقّق من عدد الصفوف المطابقة للبصمة الجديدة فقط، لا يكتشف صفًّا ثانيًا شبحيًّا تحت البصمة القديمة.</li>
+  </ul>
+  <h4>جولة المراجعة الثانية عبر Codex — 4 نتائج جديدة، كلّها أُصلِحت:</h4>
+  <ul class="checklist">
+    <li><span class="cn">1</span> <strong>حرجة (P1):</strong> اختطاف صفّ جهاز عبر حسابات — منطق اختصار UUID في مسار OTP كان يبحث عن <code>Device.id</code> بلا فلتر <code>user_id</code>، فيمكن لمهاجم إرسال UUID جهاز مستخدم آخر والارتباط بصفّه فعليًّا. أُصلِح بتقييد البحث بالمستخدم الحاليّ + تمرير البصمة المحلولة الفعليّة (لا النصّ الخام) لفحص المشاركة.</li>
+    <li><span class="cn">2</span> <strong>حرجة (P1):</strong> <code>device_id</code> فارغ/فراغات كان مقبولًا في مسارَي OTP — يُعطِّل فحص المشاركة صامتًا لبصمة فارغة مشتركة. أُضيف مدقِّق رفض صريح.</li>
+    <li><span class="cn">3</span> اختبار إعادة الدخول من نفس الجهاز كان يعاني نفس ضعف الاختبار في الجولة الأولى.</li>
+    <li><span class="cn">4</span> ملفّ OpenAPI/schema.d.ts المولَّد كان قديمًا (لا يعكس <code>maxLength</code> الجديد) — أُعيد توليده عبر حاوية Docker مؤقَّتة منفصلة (بلا لمس الحاوية الحيّة المشتركة).</li>
+  </ul>
+</div>
+
+<div id="item4"></div>
+<h2>⑤ البند 4 — INIT-3(b) شاشة اختيار الشخصيّة</h2>
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">INIT-3(b)</span><span class="badge b-done">✅ منجَز على الباك إند + الويب + الجوال، مراجَع، منشور</span></div>
+  <h4>التصميم المُنفَّذ:</h4>
+  <ul class="checklist">
+    <li><span class="cn">1</span> رمز JWT جديد <code>create_role_selection_token()</code> (نوع <code>role_selection</code>، صلاحيّة 5 دقائق، مرفوض كرمز وصول في أي مكان آخر — يطابق نمط <code>pre_auth</code>/<code>enrollment</code> الموجود).</li>
+    <li><span class="cn">2</span> استعلام تحديد الدور في كلا مسارَي الدخول (كلمة المرور وOTP) عُدِّل من <code>limit(1)</code> إلى جلب <strong>كل</strong> الأدوار المؤهَّلة — حساب واحد المؤهَّل (الغالبيّة) يسلك المسار السريع تمامًا كما قبل، حسابان فأكثر يحصلان على <code>select_role_required</code> بدل جلسة.</li>
+    <li><span class="cn">3</span> ذيل إكمال تسجيل الدخول (بوّابة TOTP → بوّابة تسجيل MFA → إصدار الجلسة) استُخرِج حرفيًّا إلى دالّتين مشتركتين (<code>_complete_password_login</code>, <code>_complete_otp_login</code>) — تُستدعيان من المسار الفوريّ (حساب أحاديّ الدور) ومن نقطة النهاية الجديدة <code>POST /auth/select-role</code> على حدّ سواء، بلا تكرار منطق.</li>
+    <li><span class="cn">4</span> شاشة اختيار جديدة في الويب (<code>LoginPage.tsx</code>) والجوال (<code>select-role.tsx</code>) تعرض الأدوار المتاحة وتُكمل الدخول بعد الاختيار.</li>
+  </ul>
+  <h4>جولة المراجعة عبر Codex — 5 نتائج، كلّها أُصلِحت:</h4>
+  <ul class="checklist">
+    <li><span class="cn">1</span> <strong>حرجة (P1):</strong> دور مُلغى بين إصدار الرمز واستخدامه — لو حذف مشرِف الدور المختار (وأبطل الجلسات) بين الطلبَين، كان الكود يتراجع صامتًا إلى <code>role_status="ACTIVE"</code> ويصدر جلسة لدور لم يعد موجودًا. أُصلِح برفض الطلب صراحةً إن لم يعد الدور موجودًا/مؤهَّلًا وقت الاستبدال.</li>
+    <li><span class="cn">2</span> <strong>حرجة (P1):</strong> إمكانيّة إعادة استخدام رمز اختيار الدور بعد إبطال الجلسات (مثلًا بعد تغيير كلمة مرور مسروقة) — لم يكن يُطبَّق فحص <code>tokens_valid_after</code> المستخدَم في كل رمز آخر مهمّ بالمشروع. أُضيف نفس الفحص.</li>
+    <li><span class="cn">3</span> <strong>حرجة (P1):</strong> شاشة الويب كانت تعلَق إلى الأبد في شاشة اختيار الدور لحساب متعدّد الأدوار يحتاج TOTP أيضًا — الكود كان يُفعِّل خطوة TOTP بلا إلغاء تفعيل خطوة اختيار الدور، والعرض كان يُفضِّل شاشة الاختيار دائمًا. أُصلِح.</li>
+    <li><span class="cn">4</span> تكرار تسجيل حدث "OTP_VERIFY ناجح" مرّتين لعمليّة تحقّق واحدة فعليّة (مرّة عند إرجاع <code>select_role_required</code>، ومرّة أخرى عند إكمال الاختيار) — يُفسِد عدّادات التدقيق. أُصلِح بمعامل <code>already_logged</code> جديد.</li>
+    <li><span class="cn">5</span> تحقّق صارم من قيمة <code>method</code> (رفض أي قيمة غير "password"/"otp" صراحةً بدل السقوط الضمنيّ لمسار OTP).</li>
+  </ul>
+</div>
+
+<div id="mobiletotp"></div>
+<h2>⑥ الإضافة المكتشَفة — إغلاق ثغرة TOTP في تطبيق الجوال</h2>
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">ثغرة مسبقة، غير مطلوبة أصلًا</span><span class="badge b-done">✅ أُغلِقت بطلب صريح من المستخدم بعد اكتشافها</span></div>
+  <p>أثناء مراجعة Codex للبند 4، ظهر أنّ تطبيق الجوال (React Native) <strong>لا يملك أي شاشة لخطوة تحقّق ثانية (TOTP)
+  إطلاقًا</strong> — لا لتسجيل الدخول العاديّ (كان موجودًا قبل هذه الجلسة أصلًا)، ولا للمسار الجديد. طلب المستخدم إغلاقها
+  فور اكتشافها كمهمّة منفصلة صريحة.</p>
+  <h4>ما بُني:</h4>
+  <ul class="checklist">
+    <li><span class="cn">1</span> خيار جديد <code>bearerOverride</code> في طبقة الشبكة (<code>client.ts</code>) — يسمح لطلب يحمل رمز تسجيل مؤقَّت فقط (بلا جلسة حقيقيّة بعد) بإرسال ذلك الرمز كـBearer، مع تعطيل صريح لمنطق تحديث/إبطال الجلسة الحقيقيّة لهذا الطلب تحديدًا.</li>
+    <li><span class="cn">2</span> شاشتان جديدتان: <code>totp-verify.tsx</code> (تبادل الرمز المؤقَّت + رمز من تطبيق المصادقة مقابل جلسة كاملة) و<code>totp-enroll.tsx</code> (توليد سرّ TOTP، عرضه كنصّ يدويّ — لا مكتبة QR مثبَّتة بالجوال، قرار نطاق متعمَّد لتفادي اعتماديّة أصليّة جديدة — ثمّ تفعيله بالرمز الأوّل).</li>
+    <li><span class="cn">3</span> وُصِّلت في <code>login.tsx</code> وotp.tsx وselect-role.tsx.</li>
+  </ul>
+  <h4>جولة المراجعة عبر Codex — 3 نتائج، كلّها أُصلِحت:</h4>
+  <ul class="checklist">
+    <li><span class="cn">1</span> <strong>عالية:</strong> رموز الاسترداد الاحتياطيّة العشرة (يُرجعها الباك إند مرّة واحدة فقط عند التفعيل) كانت تُهمَل تمامًا في الجوال، وحقل إدخال شاشة التحقّق كان يرفض أي شيء غير 6 أرقام — يمنع استخدام رمز الاسترداد نفسه لو فُقِد جهاز المصادقة. أُصلِح: عرض الرموز على شاشة "تمّ"، وتوسيع الحقل ليقبل الصيغتين.</li>
+    <li><span class="cn">2</span> اختبارات عزل الجلسة عند فشل رمز التسجيل (401) لم تكن تُثبِت فعليًّا أنّ الجلسة الحقيقيّة لا تُلمَس — أُضيف اختباران يتحقّقان صراحة من عدم استدعاء أي تحديث/مسح/إشعار انتهاء جلسة.</li>
+    <li><span class="cn">3</span> عدم اتّساق في وضع المحاكاة (mock) — منخفضة الخطورة، مؤجَّلة عمدًا (بلا أثر إنتاجيّ، موثَّقة في التعليقات).</li>
+  </ul>
+</div>
+
+<div id="deploy"></div>
+<h2>⑦ النشر الفعليّ إلى test1 وtest2</h2>
+<div class="callout done">
+  <strong>اكتشاف مهمّ قبل النشر:</strong> عند فحص حاوية test1 مباشرة (<code>docker exec ... tar -cf - | tar -xf -</code>
+  ثمّ <code>diff</code> فعليّ، لا افتراض)، تبيَّن أنّها تُشغِّل بالفعل نسخة <strong>جزئيّة وأقدم</strong> من نفس عمل البند 4
+  — من جلسة موازية سبقت جولة مراجعة Codex الثانية، وتفتقر لكل إصلاحات الأمان الخمسة المذكورة أعلاه في §⑤. الشجرة المحليّة
+  الحاليّة كانت أحدث وأكثر أمانًا بشكل قاطع، فكان النشر فوقها الخطوة الصحيحة، لا تعارضًا.
+</div>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>الخطوة</th><th>test1 (Kali، هذا الجهاز)</th><th>test2 (.194)</th></tr></thead>
+<tbody>
+<tr><td>فحص FIN-COR</td><td colspan="2">PASS — تجزئة <code>contracts/feature_flags.yaml</code> و<code>launch_gates.yaml</code> مطابقة تمامًا للموثَّق في CLAUDE.md، لم تُلمَس هذه الجلسة</td></tr>
+<tr><td>ترحيل قاعدة بيانات</td><td colspan="2">لا حاجة — رأس Alembic بقي <code>ab60</code> على الجهازَين قبل وبعد (تحقَّق منه فعليًّا، لا افتراضًا)</td></tr>
+<tr><td>نسخة احتياطيّة قبل اللمس</td><td><code>tawalocal-20260722_121624-pre-item34-deploy.dump.gz</code></td><td><code>tawatest-20260722_102000-pre-item34-deploy.dump.gz</code></td></tr>
+<tr><td>الباك إند</td><td>بُني محليًّا وأُعيد إنشاء الحاوية مباشرة</td><td>نُقلت نفس الصورة عبر <code>docker save | scp | docker load</code> (لا إعادة بناء منفصلة — يتفادى فئة أخطاء الانحراف الموثَّقة سابقًا)</td></tr>
+<tr><td>الواجهة الأماميّة</td><td colspan="2"><code>npm run build</code> محليًّا → الحزمة <code>main-Bf1AoXEl.js</code> → <code>docker cp</code> إلى جذر nginx + <code>nginx -s reload</code> على كلا الجهازَين (وليس إعادة إنشاء compose — يحافظ على ربط المنفذ غير الموجود في ملفّات compose نفسها)</td></tr>
+<tr><td>التحقّق</td><td><code>/auth/me</code> → 401، <code>/auth/select-role</code> برمز عشوائيّ → 401 برسالة الرفض الصحيحة، المنفذ 8080 سليم، الحزمة الجديدة تُخدَّم</td><td>نفس الفحوصات عبر المنفذ 8091 — كلّها ناجحة</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>لم يُلمَس:</strong> GitHub (لا commit أُنشِئ لهذا العمل بعد — يحتاج إذنًا صريحًا منفصلًا)، والإنتاج (Hetzner —
+يحتاج إذنًا تشغيليًّا صريحًا منفصلًا لم يُطلَب هذه الجلسة). تطبيق الجوال لم يُبنَ منه APK — التغييرات كود مصدريّ فقط،
+لأنّ الجوال ليس جزءًا من مواضع النشر الأربعة الموثَّقة (Docker/GitHub).</p>
+
+<div id="tests"></div>
+<h2>⑧ حالة الاختبارات النهائيّة — كل بيئة</h2>
+<div class="stat-grid">
+  <div class="stat"><div class="n">4001 ✅</div><div class="l">باك إند (10 متجاوَزة، 0 فاشلة)</div></div>
+  <div class="stat"><div class="n">1754+ ✅</div><div class="l">ويب Vitest — 2 فشل عابر في التشغيل الكامل تأكَّدا كعطل معروف مسبقًا مرتبط بالحمل (نجحا كلاهما عند إعادة التشغيل المعزول)</div></div>
+  <div class="stat"><div class="n">84 ✅</div><div class="l">جوال Jest</div></div>
+  <div class="stat"><div class="n">0</div><div class="l">أخطاء TypeScript (ويب + جوال) وruff/black (باك إند)</div></div>
+  <div class="stat"><div class="n">0</div><div class="l">أخطاء ESLint (تحذيرات موجودة مسبقًا فقط، غير متعلّقة بهذا العمل)</div></div>
+</div>
+
+<div id="remaining"></div>
+<h2>⑨ ما لم يُلمَس ولماذا</h2>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>البند</th><th>السبب</th></tr></thead>
+<tbody>
+<tr><td>Commit إلى Git / دفع GitHub</td><td>قاعدة CLAUDE.md — لا commit بلا إذن صريح منفصل لهذا العمل تحديدًا</td></tr>
+<tr><td>نشر الإنتاج (Hetzner)</td><td>يحتاج إذنًا تشغيليًّا صريحًا منفصلًا — لم يُطلَب هذه الجلسة</td></tr>
+<tr><td>بناء APK للجوال</td><td>الجوال ليس من مواضع النشر الأربعة الموثَّقة؛ تغييراته كود مصدريّ جاهز فقط، بانتظار قرار بناء/توزيع منفصل إن رُغِب</td></tr>
+<tr><td>توحيد فلترة حالة الدور بين مساري كلمة المرور وOTP</td><td>فارق مسبق موثَّق (كلمة المرور تشمل PENDING_VERIFICATION، OTP لا تشمل) — تُرِك عمدًا دون توحيد لتفادي المساس بمنطق تحديد الدور أحاديّ الدور بلا تغطية اختباريّة مخصَّصة لذلك السلوك تحديدًا، تفاديًا لمخاطرة غير ضروريّة</td></tr>
+<tr><td>عدم اتّساق وضع محاكاة TOTP بالجوال (mock)</td><td>منخفضة الخطورة، بلا أثر إنتاجيّ — موثَّقة في تعليقات الكود، مؤجَّلة عمدًا</td></tr>
+</tbody>
+</table>
+</div>
+
+<footer>تقرير 549 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-22</footer>
+
+</div>
+<a href="#" class="backtop">↑ الأعلى</a>
+</body>
+</html>

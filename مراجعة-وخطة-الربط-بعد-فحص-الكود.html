@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تووا — مراجعة دقيقة + خطة ربط مُصحَّحة (مطابَقة للكود)</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;margin:0;background:#0f1720;color:#e8eef5;direction:rtl;line-height:1.85}
+header{background:linear-gradient(135deg,#0e7a4f,#0b5c3c);padding:30px 22px}
+header h1{margin:0;font-size:25px}header p{margin:8px 0 0;opacity:.93;font-size:14px}
+.wrap{max-width:1100px;margin:0 auto;padding:20px}
+h2{color:#5fd0a0;border-bottom:2px solid #243240;padding-bottom:8px;margin:34px 0 14px;font-size:22px}
+h3{color:#8be0b0;margin:22px 0 8px;font-size:18px}
+p,li{font-size:15px}
+.box{background:#15202b;border:1px solid #243240;border-radius:12px;padding:14px 20px;margin:12px 0}
+.warn{background:#3a2a13;border:1px solid #7a5a1f;border-radius:12px;padding:14px 20px;margin:12px 0;color:#ffd591}
+.ok{background:#13402c;border:1px solid #1f6b46;border-radius:12px;padding:14px 20px;margin:12px 0;color:#9be8be}
+.err{background:#2a1717;border:1px solid #5a2a2a;border-radius:12px;padding:14px 20px;margin:12px 0;color:#ffb4b4}
+.flow{background:#13283a;border:1px solid #1f4f6b;border-radius:12px;padding:14px 20px;margin:12px 0;color:#a9d8f5}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;background:#15202b;border-radius:10px;overflow:hidden}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid #243240;vertical-align:top}
+th{background:#1c2a38;color:#9fb2c4}
+code{background:#0c141d;color:#7fd6a8;padding:2px 7px;border-radius:6px;font-size:12.5px;direction:ltr;display:inline-block}
+.tag{display:inline-block;border-radius:14px;padding:2px 10px;font-size:12px;margin:2px;white-space:nowrap}
+.safe{background:#13402c;color:#8be0b0;border:1px solid #1f6b46}
+.mid{background:#3a2a13;color:#ffd591;border:1px solid #7a5a1f}
+.bad{background:#2a1717;color:#ffb4b4;border:1px solid #5a2a2a}
+.new{background:#13283a;color:#a9d8f5;border:1px solid #1f4f6b}
+.muted{color:#9fb2c4;font-size:13px}
+.step{display:flex;gap:12px;align-items:flex-start;margin:10px 0}
+.num{flex:0 0 34px;height:34px;border-radius:50%;background:#0e7a4f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+hr{border:none;border-top:1px solid #243240;margin:24px 0}
+.lab{font-size:12px;color:#9fb2c4}
+</style>
+</head>
+<body>
+<header>
+<h1>🔬 مراجعة دقيقة + خطة ربط مُصحَّحة</h1>
+<p>مطابَقة سطراً بسطر مع كود المنصّة الفعلي · محاكاة ذهنية للأثر على كل طبقة · 2026-05-25</p>
+<p>القرار المعتمد سابقاً: كتالوج مرجعي كامل + استضافة صور ثابتة (nginx)</p>
+</header>
+<div class="wrap">
+
+<h2>القسم الأول — نتائج المراجعة (ماذا تأكّد، وماذا تغيّر عن الخطة الأولى)</h2>
+
+<div class="ok">
+<b>الاكتشاف الأهم (سارّ):</b> نموذج «المكوّنات القابلة للإزالة» <b>موجود فعلاً ومُوصَّل بالطلب بالكامل</b> — أقوى ممّا قدّرتُ.
+<br><code>ItemComponent(is_removable, price_delta, name_json)</code> + <code>ModifierGroup/Option</code> موجودة (catalog.py:101–188)،
+و<b>الطلب يحفظ <code>removed_component_ids</code> في سطر الطلب</b> (order_service.py:355) → <b>المكوّن المُزال يصل فعلاً لبيانات الطلب/المطبخ</b>. تصميم مخزننا يطابق هذا تماماً.
+</div>
+
+<h3>تصحيحات أُدخلت على الخطة الأولى بعد فحص الكود</h3>
+<table>
+<tr><th>#</th><th>في الخطة الأولى</th><th>الحقيقة في الكود</th><th>التصحيح</th></tr>
+<tr><td>1</td><td>«نضيف migration بعد aa04»</td><td>رأس الـmigration الحقيقي = <code>aa12_promotions</code> (aa01..aa12). الذاكرة كانت قديمة بـ8 مهاجرات. (تحقّقت: <b>رأس واحد</b>، لا تشعّب.)</td><td>الـmigration الجديدة تُبنى بعد <code>aa12</code></td></tr>
+<tr><td>2</td><td>«نموذج المكوّنات موجود (نقطة جانبية)»</td><td>موجود <b>ومُوصَّل بالطلب والتسعير</b>؛ والإزالة تُحفظ على سطر الطلب</td><td>الجزء الأصعب جاهز؛ يتبقّى واجهة العميل (خاصة Flutter) + API كتابة المكوّنات للمزوّد</td></tr>
+<tr><td>3</td><td>—</td><td>المشروع <b>محكوم مرحلياً</b> (المرحلة الحالية 446) وله <b>مناطق محظورة صريحة</b>: <code>models, modules, alembic, mobile_app, docker-compose</code></td><td>يُنفَّذ كـ<b>مراحل مرقّمة</b> بإذن صريح + اختبارات + FIN-COR + تقرير، لا تعديلاً عابراً</td></tr>
+<tr><td>4</td><td>«صور متعددة لكل صنف»</td><td><code>CatalogItem.image_url</code> <b>حقل واحد</b>؛ والعميل يرى صورة واحدة</td><td>الصور المتعددة على مستوى <b>المرجعي فقط</b> (بركة اختيار)؛ المزوّد يختار <b>واحدة</b> تُنسخ إلى <code>image_url</code>. هذا بالضبط ما تريده: «ليختار المزوّد».</td></tr>
+<tr><td>5</td><td>«صفحة OPS جديدة»</td><td>لوحة OPS <b>بناء مستقل على <code>/ops</code></b> (المرحلة 377)؛ كود العميل لا يحوي صفحات OPS</td><td>الصفحة الجديدة تُضاف إلى بناء <code>/ops</code> (opsRouter)، لا بناء العميل</td></tr>
+<tr><td>6</td><td>—</td><td>الصنف لا يُطلب إلا بـ<b>variant فعّال</b> + حالة <b>PUBLISHED</b> + يمرّ بـ<b>موافقة OPS</b> (aa09)</td><td>عند الاختيار: المزوّد يُنشئ سعراً (variant) إجبارياً، والصنف يمرّ بالموافقة كالمعتاد</td></tr>
+<tr><td>7</td><td>«بلا أثر مالي»</td><td>مؤكَّد: <code>calculate_price</code> يجمع <code>price_delta</code> للمكوّنات؛ مكوّناتنا <b>price_delta=0</b> → الإزالة محايدة السعر تماماً</td><td>FIN-COR يبقى PASS؛ لا نستخدم مكوّنات مدفوعة</td></tr>
+</table>
+
+<h2>القسم الثاني — ماذا سيتغيّر وماذا لن يتغيّر (مؤكَّد من الكود)</h2>
+<table>
+<tr><th>الطبقة</th><th>الحالة</th><th>التفصيل</th></tr>
+<tr><td>المزوّدون وأصنافهم الحالية</td><td class="tag safe">لا يتغيّر</td><td>الميزة <b>إضافية</b>؛ من يكتب يدوياً يستمر. لا تهجير لبياناتهم</td></tr>
+<tr><td>تصفّح/بحث العميل</td><td class="tag safe">لا يتغيّر</td><td>يقرأ <code>CatalogItem</code> كما هو؛ صورنا تظهر فقط لِما يختاره مزوّد</td></tr>
+<tr><td>التسعير / الدفتر / FIN-COR</td><td class="tag safe">لا يتغيّر</td><td>السعر من <code>ItemVariant</code> (مليم)؛ المكوّنات price_delta=0؛ لا أعلام محظورة تُمسّ</td></tr>
+<tr><td>الموافقة على الأصناف</td><td class="tag safe">لا يتغيّر</td><td>الصنف المُختار يمرّ بـ DRAFT→PENDING_APPROVAL→PUBLISHED كالمعتاد</td></tr>
+<tr><td>قاعدة البيانات</td><td class="tag new">يُضاف</td><td>3 جداول مرجعية + migration بعد aa12 (تُطبَّق عند إعادة بناء المرحلة 2؛ DB المحلي الآن أقدم z1a2b3c4d5e6)</td></tr>
+<tr><td>الصور</td><td class="tag new">يُضاف</td><td>مجلّد ثابت يُخدَم عبر nginx (تعديل بنية تحتية — منطقة محظورة → بإذن)</td></tr>
+<tr><td>إنشاء صنف المزوّد</td><td class="tag mid">يُوسَّع</td><td>قبول <code>master_item_id</code> + نسخ المكوّنات الافتراضية + إضافة CRUD للمكوّنات (ناقص)</td></tr>
+<tr><td>واجهة المزوّد (ويب)</td><td class="tag mid">يُضاف</td><td>نافذة «اختر من الكتالوج»</td></tr>
+<tr><td>لوحة OPS</td><td class="tag mid">يُضاف</td><td>صفحة «الكتالوج المرجعي» في بناء <code>/ops</code> + إدارة الفئات</td></tr>
+<tr><td>تطبيق العميل (Flutter)</td><td class="tag mid">يُضاف</td><td>شاشة تخصيص المكوّنات (البيانات جاهزة؛ الويب فيه ProductCustomizer جزئياً)</td></tr>
+</table>
+
+<h2>القسم الثالث — محاكاة ذهنية (الأثر على كل طرف وكل حالة حافّة)</h2>
+
+<h3>🧑‍🍳 المزوّد يضيف «شاورما دجاج»</h3>
+<div class="flow">
+<div class="step"><div class="num">1</div><div>«اختر من الكتالوج» → مشاوي/ساندويتشات → «شاورما دجاج»</div></div>
+<div class="step"><div class="num">2</div><div>يرى صورها المتعددة → يختار <b>واحدة</b> → تُنسخ إلى <code>CatalogItem.image_url</code></div></div>
+<div class="step"><div class="num">3</div><div>تُنسخ المكوّنات الافتراضية إلى <code>ItemComponent</code> (خبز صاج/دجاج <code>is_removable=false</code>؛ ثومية/مخلل/بطاطس <code>true</code>) → يضيف/يحذف</div></div>
+<div class="step"><div class="num">4</div><div>يُدخل السعر → <code>ItemVariant.base_price</code> (مليم، إجباري) → الصنف DRAFT ثم للموافقة</div></div>
+</div>
+
+<h3>🛒 العميل يطلب «بدون مخلل»</h3>
+<div class="flow">
+يفتح الصنف → يرى المكوّنات → يزيل «مخلل» → عند الإرسال يُحفظ <code>removed_component_ids</code> على سطر الطلب (مؤكَّد order_service.py:355) → المطبخ يراه. السعر لا يتغيّر (price_delta=0).
+</div>
+
+<h3>🛠️ المشغّل في لوحة التحكم</h3>
+<div class="flow">
+صفحة «الكتالوج المرجعي» (في <code>/ops</code>): تصفّح بالفئات، تفعيل/إخفاء، تعديل الصور والمكوّنات، زر «استيراد/تحديث من المخزن»، + إدارة الفئات التسع. (الموافقة على أصناف المزوّدين تبقى كما هي.)
+</div>
+
+<h3>حالات حافّة وأخطار رصدتُها (وكيف نعالجها)</h3>
+<table>
+<tr><th>الحالة</th><th>الأثر</th><th>المعالجة</th></tr>
+<tr><td>تعديل صنف مرجعي لاحقاً</td><td>لا يُحدِّث أصناف المزوّدين تلقائياً (نُسخ وقت الاختيار)</td><td>بالتصميم؛ المزوّد خصّص نسخته. (يمكن لاحقاً «إعادة مزامنة» اختيارية)</td></tr>
+<tr><td>نقل مسار الصور الثابت</td><td>روابط <code>image_url</code> المطلقة تنكسر</td><td>تثبيت مسار <code>/static/catalog/</code> دائماً</td></tr>
+<tr><td><code>removed_component_ids</code> لا يتحقّق من ملكية المكوّن للصنف</td><td>خطر منخفض (price_delta=0 → لا استغلال سعري)</td><td>نضيف تحقّق ملكية + منع إزالة مكوّن غير قابل للإزالة في مرحلة B (تحصين)</td></tr>
+<tr><td>الـmigration لا تعمل محلياً الآن</td><td>DB المحلي عند z1a2b3c4d5e6</td><td>تُطبَّق عند إعادة بناء المرحلة 2 (نفس نمط aa01–aa12)</td></tr>
+<tr><td>تكرار صورة العميل الواحدة</td><td>العميل يرى صورة واحدة لا «متعددة»</td><td>مقصود: التعدّد بركة اختيار للمزوّد، لا عرض للعميل</td></tr>
+</table>
+
+<h2>القسم الرابع — الخطة المُصحَّحة (مراحل محكومة)</h2>
+<div class="warn">⚠️ كل مرحلة = <b>مرحلة مرقّمة</b> بإذن صريح (تجاوز المناطق المحظورة موثّق) + اختبارات BE/FE + <b>FIN-COR PASS</b> + migration مُتحقَّقة على PostgreSQL + تقرير، بلا commit.</div>
+<table>
+<tr><th>المرحلة</th><th>المحتوى الملموس</th><th>المنطقة</th><th>المخاطرة</th></tr>
+<tr><td><b>A — أساس البيانات</b></td><td>جداول <code>MasterCatalogItem/Image/Ingredient</code> + migration بعد aa12 + استضافة 292 صورة (nginx) + سكربت استيراد + استيراد 9 فئات + صفحة OPS للعرض</td><td>models·alembic·infra·/ops</td><td><span class="tag safe">آمنة</span> لا تمسّ تدفّق المزوّد/العميل</td></tr>
+<tr><td><b>B — المزوّد</b></td><td>قبول <code>master_item_id</code> في إنشاء الصنف + نسخ المكوّنات + <b>CRUD المكوّنات</b> + <b>تحقّق إزالة المكوّن</b> + نافذة «اختر من المرجعي»</td><td>modules·web</td><td><span class="tag mid">متوسطة</span></td></tr>
+<tr><td><b>C — العميل</b></td><td>تأكيد تخصيص المكوّنات في الويب + <b>شاشة تخصيص Flutter</b> (تُرسل removed_component_ids)</td><td>web·mobile_app</td><td><span class="tag mid">متوسطة</span></td></tr>
+</table>
+
+<div class="ok">
+<b>التوصية:</b> نبدأ بالمرحلة (أ) — آمنة بالكامل، تُظهر الكتالوج المرجعي في لوحة التحكم بسرعة، ولا تغيّر أي سلوك قائم. ثم (ب) فـ(ج).
+</div>
+
+<hr>
+<p class="muted">
+ملخّص الحقائق الكودية المرجعية: <code>catalog.py:19–188</code> (CatalogItem/ItemVariant/ItemComponent/ModifierGroup/Option) ·
+<code>catalog_service.py:57–234</code> (تفاصيل الصنف + التسعير) · <code>order_service.py:225–356</code> (لقطة removed_component_ids) ·
+<code>customer_extra.py:22–40</code> (FoodCategory) · رأس alembic <code>aa12_promotions</code> · OPS بناء مستقل على <code>/ops</code> (377) ·
+المناطق المحظورة + FIN-COR في <code>platform/CLAUDE.md</code>. لم يُكتب أي كود — هذا للمراجعة فقط.
+</p>
+
+</div>
+</body>
+</html>

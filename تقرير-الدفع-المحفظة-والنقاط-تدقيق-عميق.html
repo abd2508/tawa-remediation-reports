@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تقرير تدقيق عميق — المحفظة والنقاط والتحقّق عند الدفع (توا)</title>
+<style>
+:root{--ink:#111827;--muted:#475569;--line:#dbe2ea;--soft:#f1f5f9;--brand:#1e3a8a;--brand2:#60a5fa}
+*{box-sizing:border-box}
+body{margin:0;background:#e5e7eb;color:var(--ink);font-family:Tahoma,Arial,sans-serif;line-height:1.85}
+header{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:34px 24px;border-bottom:6px solid var(--brand2)}
+header .tag{display:inline-block;background:#fbbf24;color:#3a2a00;font-weight:bold;font-size:12px;padding:4px 12px;border-radius:999px;margin-bottom:10px}
+main{max-width:1180px;margin:24px auto;padding:0 18px 80px}
+section{background:#fff;border:1px solid var(--line);border-radius:18px;margin:18px 0;padding:24px 26px;box-shadow:0 8px 24px rgba(15,23,42,.07)}
+h1{margin:0 0 8px;font-size:30px}
+h2{font-size:24px;margin:0 0 18px;border-bottom:2px solid #e2e8f0;padding-bottom:10px}
+h3{font-size:19px;margin:24px 0 8px;color:#0f172a}
+h4{font-size:15px;margin:16px 0 6px;color:#334155}
+p{margin:10px 0}
+table{border-collapse:collapse;width:100%;margin:14px 0;font-size:14px}
+th,td{border:1px solid #e2e8f0;padding:10px 11px;vertical-align:top;text-align:right}
+th{background:var(--soft)}
+pre{background:#0b1220;color:#d1e7ff;padding:14px 16px;border-radius:12px;overflow:auto;direction:ltr;text-align:left;line-height:1.6;font-size:13px}
+code{background:var(--soft);border:1px solid #e2e8f0;border-radius:6px;padding:1px 6px;direction:ltr;display:inline-block;font-size:13px}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:bold;color:#fff;white-space:nowrap}
+.crit{background:#7f1d1d}.high{background:#b91c1c}.med{background:#b45309}.low{background:#0369a1}.ok{background:#047857}.info{background:#475569}
+.callout{padding:14px 18px;border-radius:14px;margin:16px 0;border:1px solid}
+.critical{background:#fef2f2;border-color:#fecaca}.warn{background:#fffbeb;border-color:#fde68a}.good{background:#ecfdf5;border-color:#bbf7d0}.infobox{background:#eff6ff;border-color:#bfdbfe}
+.simple{background:#f5f3ff;border:1px solid #ddd6fe;border-right:6px solid #7c3aed;border-radius:12px;padding:12px 16px;margin:14px 0}
+.simple b{color:#5b21b6}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.kpi{grid-column:span 3;text-align:center;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px}
+.kpi strong{display:block;font-size:30px;color:var(--brand)}
+.kpi span{font-size:13px;color:var(--muted)}
+.diagram{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:14px;margin:18px 0;overflow:auto}
+.diagram .cap{font-size:13px;color:var(--muted);text-align:center;margin-top:8px}
+.evidence{font-size:13px;color:#334155;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;margin-top:8px}
+.evidence b{color:#0f172a}
+.toc{columns:2;font-size:14px}
+.toc a{color:var(--brand);text-decoration:none}
+.footer{color:#64748b;text-align:center;font-size:13px;margin-top:30px}
+.tf{color:#047857;font-weight:bold}.ff{color:#b91c1c;font-weight:bold}
+ul{margin:8px 0 8px 0;padding-inline-start:22px}
+li{margin:4px 0}
+@media(max-width:820px){.kpi{grid-column:span 6}.toc{columns:1}h1{font-size:23px}}
+</style>
+</head>
+<body>
+<header>
+<div class="tag">تقرير تدقيق — للعميل عند الدفع</div>
+<h1>لماذا «المحفظة مقفلة»؟ وكيف يجب أن يتصرّف النظام مع النقاط والمحفظة عند الدفع</h1>
+<p>تدقيق جذريّ لملاحظتَي المالك — بلغة بسيطة يفهمها أيّ شخص، مع الدليل من الكود سطرًا سطرًا، ورسوم توضيحية.</p>
+<p style="opacity:.85;font-size:14px">التاريخ: 2026-07-07 · المنصّة: توا/Tawa · النطاق: صفحة الدفع للعميل (Web) + الخادم · <b>لا تعديل كود — تشخيص فقط</b> · مرجع رسميّ: <span dir="ltr">app_report/450_*</span></p>
+</header>
+<main>
+
+<!-- ملخص أرقام -->
+<section>
+<div class="grid">
+<div class="kpi"><strong>2</strong><span>ملاحظتان من المالك</span></div>
+<div class="kpi"><strong>8</strong><span>عيوب مثبتة بالدليل</span></div>
+<div class="kpi"><strong>3</strong><span>«عالية الخطورة» (تحقّق مفقود)</span></div>
+<div class="kpi"><strong>0</strong><span>تعديلات على الكود (تقرير فقط)</span></div>
+</div>
+<div class="callout infobox" style="margin-top:18px">
+<b>الفكرة الأساسية في جملة:</b> لا شيء «مكسور» في حساب الأموال — الخادم يحسب ويتحقّق بدقّة. المشكلة أن <b>واجهة الدفع لا تتحقّق مبكّرًا</b>: المحفظة تظهر مقفلة لأنها فارغة (بسبب بوّابة قانونية لا نقص برمجة)، والنقاط مخبّأة خلف مسار، وتجاوز الرصيد لا يُمنَع قبل الضغط، وبعض الرسائل تظهر عامّة «خطأ في التحقق من البيانات».
+</div>
+</section>
+
+<!-- كيف تقرأ -->
+<section>
+<h2>0) كيف تقرأ هذا التقرير + مفتاح الألوان</h2>
+<div class="simple"><b>بلغة بسيطة:</b> كل نقطة هنا مكتوبة مرّتين — مرّة بكلام عاديّ (بصندوق بنفسجيّ) يشرح الفكرة بمثال من الحياة، ومرّة بالدليل التقنيّ (اسم الملف ورقم السطر) حتى يستطيع المبرمج التأكّد بنفسه.</div>
+<table>
+<tr><th>الوسم</th><th>المعنى</th></tr>
+<tr><td><span class="badge high">عالية</span></td><td>عيب يؤثّر مباشرةً على العميل (يمرّ خطأ كان يجب منعه، أو يظهر شيء مضلِّل).</td></tr>
+<tr><td><span class="badge med">متوسطة</span></td><td>رسالة أو تجربة غير واضحة، لكنها لا تُفسد الطلب.</td></tr>
+<tr><td><span class="badge low">منخفضة</span></td><td>تحسين لطيف.</td></tr>
+<tr><td><span class="badge ok">سليم</span></td><td>جزء يعمل بشكل صحيح — ذكرناه لطمأنتك.</td></tr>
+</table>
+<p class="footer" style="text-align:right">الملفات المفحوصة: <code>CheckoutPage.tsx</code> · <code>payment_resolver.py</code> · <code>order_service.py</code> · <code>order_router.py</code> · <code>feature_flags.yaml</code> · <code>WalletPage.tsx</code> · <code>loyalty/service.py</code>.</p>
+</section>
+
+<!-- فهرس -->
+<section>
+<h2>الفهرس</h2>
+<div class="toc">
+<p><a href="#p1">1) لماذا المحفظة «مقفلة» عند الدفع؟</a></p>
+<p><a href="#p2a">2) هل تظهر النقاط مباشرةً؟</a></p>
+<p><a href="#p2b">3) لماذا لا يمنعني النظام مبكّرًا؟ (المحفظة الفارغة/التجاوز)</a></p>
+<p><a href="#errors">4) لماذا تظهر «خطأ في التحقق من البيانات»؟</a></p>
+<p><a href="#table">5) جدول العيوب الثمانية</a></p>
+<p><a href="#fix">6) التوصيات (بانتظار اعتمادك)</a></p>
+<p><a href="#evi">7) قائمة الأدلّة الكاملة</a></p>
+</div>
+</section>
+
+<!-- P1 -->
+<section id="p1">
+<h2>1) لماذا المحفظة «مقفلة» عند الدفع؟ <span class="badge med">متوسطة</span></h2>
+
+<div class="simple">
+<b>بالمثال البسيط:</b> تخيّل صرّاف بنك مكتوب عليه «مغلق». أنت تظنّ أن الجهاز نفسه معطّل. لكن الحقيقة أنه يعمل تمامًا — فقط <b>حسابك فارغ</b> ولا يوجد مكان قريب لتضع فيه نقودًا. هذا بالضبط حال المحفظة: <b>الميزة تعمل، لكن الرصيد صفر ولا يمكن شحنه الآن</b>، فيظهر الخيار رماديًّا.
+</div>
+
+<h3>الحقيقة رقم 1: المحفظة ليست مختومة بالتصميم</h3>
+<p>عند فتح صفحة الدفع، الخادم يقرّر أيّ طرق دفع تظهر. شرط ظهور «المحفظة» بسيط جدًّا: أن يكون <b>رصيدك أكبر من أو يساوي قيمة الطلب</b>. لو توفّر الرصيد، تظهر المحفظة قابلة للاختيار <b>فورًا</b> — لا يوجد أي ختم يمنعها.</p>
+<pre>// backend/app/modules/payments/payment_resolver.py
+55  if m == "WALLET":
+58      if wallet_balance_minor &lt; order_amount_minor:
+59          return PaymentMethodOption("WALLET", None, False, "Insufficient wallet balance", False)  // غير متاح
+60      return PaymentMethodOption("WALLET", None, True, None, False)                                  // متاح فورًا</pre>
+<div class="evidence"><b>الدليل:</b> <code>payment_resolver.py:58-60</code> — الشرط الوحيد هو مقارنة الرصيد بالمبلغ. لا يوجد فحص لأي «ختم» على المحفظة نفسها.</div>
+
+<h3>الحقيقة رقم 2: لماذا الرصيد فارغ دائمًا (السبب الجذريّ)</h3>
+<p>الرصيد يبقى صفرًا لأن <b>شحن المحفظة مُقفَل</b> بسبب بوّابة إطلاق قانونية/دفع (وليس نقصًا في البرمجة):</p>
+<ul>
+<li>العلم <code>production_payment_enabled = false</code> في <code>feature_flags.yaml</code> (خلفه بوّابتان مغلقتان: القرار القانونيّ + اختبار الدفع الرمليّ «Sandbox»).</li>
+<li>صفحة المحفظة نفسها <b>تُخفي زرّ الشحن</b> عندما يكون الختم مغلقًا، وتكتب حرفيًّا «شحن المحفظة سيتوفّر قريبًا».</li>
+</ul>
+<div class="evidence"><b>الدليل:</b> <code>WalletPage.tsx:57-62,98-102</code> (المتغيّر <code>topupEnabled</code> يبدأ <code>false</code>) · نصّ <code>ar.json:258 "topup_disabled_hint"</code> · <code>feature_flags.yaml → production_payment_enabled:false</code>.</div>
+
+<div class="diagram">
+<svg viewBox="0 0 980 250" width="100%" role="img" aria-label="سلسلة سبب قفل المحفظة">
+<style>
+.bx{fill:#fff;stroke:#94a3b8;stroke-width:1.5;rx:12}
+.t{font:14px Tahoma;fill:#0f172a}.tm{font:12px Tahoma;fill:#475569}
+.red{fill:#fef2f2;stroke:#ef4444}.amb{fill:#fffbeb;stroke:#f59e0b}
+.ar{stroke:#64748b;stroke-width:2;fill:none;marker-end:url(#a)}
+</style>
+<defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<!-- RTL: نبدأ من اليمين -->
+<rect class="bx amb" x="770" y="40" width="190" height="70" rx="12"/>
+<text class="t" x="865" y="70" text-anchor="middle">الشحن مُقفَل</text>
+<text class="tm" x="865" y="92" text-anchor="middle">production_payment_enabled=false</text>
+
+<rect class="bx" x="530" y="40" width="190" height="70" rx="12"/>
+<text class="t" x="625" y="70" text-anchor="middle">لا طريق لتعبئة المحفظة</text>
+<text class="tm" x="625" y="92" text-anchor="middle">زرّ الشحن مخفيّ</text>
+
+<rect class="bx" x="290" y="40" width="190" height="70" rx="12"/>
+<text class="t" x="385" y="70" text-anchor="middle">الرصيد = صفر</text>
+<text class="tm" x="385" y="92" text-anchor="middle">wallet_balance = 0</text>
+
+<rect class="bx red" x="50" y="40" width="190" height="70" rx="12"/>
+<text class="t" x="145" y="66" text-anchor="middle">المحفظة «غير متاحة»</text>
+<text class="tm" x="145" y="86" text-anchor="middle">0 &lt; قيمة الطلب</text>
+<text class="tm" x="145" y="102" text-anchor="middle">فتظهر رمادية</text>
+
+<line class="ar" x1="770" y1="75" x2="722" y2="75"/>
+<line class="ar" x1="530" y1="75" x2="482" y2="75"/>
+<line class="ar" x1="290" y1="75" x2="242" y2="75"/>
+
+<rect class="bx red" x="360" y="165" width="260" height="55" rx="12"/>
+<text class="t" x="490" y="190" text-anchor="middle">العيب D1: تُكتب «قريبًا» بدل السبب الحقيقيّ</text>
+<text class="tm" x="490" y="208" text-anchor="middle">«رصيدك لا يكفي» يُهمَل تمامًا</text>
+<line class="ar" x1="145" y1="110" x2="360" y2="180"/>
+</svg>
+<div class="cap">شكل 1: سلسلة السبب — من البوّابة القانونية إلى ظهور المحفظة رمادية، ثم الرسالة المضلِّلة.</div>
+</div>
+
+<h3>العيب القابل للإصلاح فورًا (D1): كلمة «قريبًا» مضلِّلة</h3>
+<p>الواجهة تكتب على أي طريقة معطّلة كلمة <b>«قريبًا»</b> — وكأنها ميزة لم تُبنَ بعد. لكن الخادم يعرف السبب الحقيقيّ («الرصيد لا يكفي») و<b>الواجهة ترميه ولا تعرضه</b>. لهذا تحتار: «أليس كل شيء جاهزًا؟ لماذا ما زالت مقفلة؟».</p>
+<pre>// web/src/pages/customer/CheckoutPage.tsx
+1195  {!m.available &amp;&amp; (
+1196    &lt;span&gt;— {t("order.payment_method_coming_soon", { defaultValue: "قريبًا" })}&lt;/span&gt;
+1197  )}   // نفس الكلمة لكل طريقة معطّلة — والسبب الحقيقيّ reason_if_unavailable مُهمَل</pre>
+
+<div class="callout warn"><b>الخلاصة للنقطة 1:</b> المحفظة <b>مفتوحة برمجيًّا بالفعل</b>؛ ما يقفلها هو خلوّ الرصيد الناتج عن قفل الشحن (قرار قانونيّ/حَوكمة). <span class="ff">فتحها للدفع الفعليّ ليس تعديلًا كوديًّا يُجرى تلقائيًّا — بل قرار مالك يتبع إغلاق بوّابتَي «القانون» و«الاختبار الرمليّ».</span> أمّا الإصلاح الفوريّ المتاح فهو تصحيح الرسالة (D1).</div>
+</section>
+
+<!-- P2a -->
+<section id="p2a">
+<h2>2) هل تظهر النقاط مباشرةً وخيار الدفع بها؟ <span class="badge med">متوسطة</span></h2>
+<div class="simple">
+<b>بالمثال البسيط:</b> عندك رصيد نقاط في متجر، لكن الكاشير لا يذكّرك بها إطلاقًا. لن تعرف أنها تُستخدَم إلا إذا <b>سألت بنفسك وطلبت فتح درج خاصّ</b>. هنا النقاط لا تظهر إلا بعد أن تختار «الدفع نقدًا» ثم تفعّل مربّعًا اختياريًّا اسمه «ادفع جزءًا من المحفظة أو النقاط؟».
+</div>
+
+<h3>الحكم: لا — النقاط مدفونة خلف خطوتين</h3>
+<ul>
+<li>لا توجد أي بطاقة تقول «لديك N نقطة = X دينار، هل تستبدلها؟» عند دخولك صفحة الدفع.</li>
+<li>صندوق النقاط يظهر <b>فقط</b> إذا اخترت CASH ثمّ فعّلت مربّع الدفع المجزّأ.</li>
+<li>مع أي طريقة غير «نقدًا» (محفظة/بطاقة) النقاط <b>مخفيّة تمامًا</b>.</li>
+</ul>
+<pre>// CheckoutPage.tsx — النقاط محبوسة داخل شرطين متتاليين
+1258  {isCashPay &amp;&amp; (            // الشرط 1: يجب اختيار «نقدًا»
+        ...
+1298    {splitOn &amp;&amp; (           // الشرط 2: يجب تفعيل مربّع «ادفع جزءًا…»
+              🪙 صفّ النقاط
+        )}
+      )}</pre>
+<div class="evidence"><b>الدليل:</b> <code>CheckoutPage.tsx:1258</code> (حارس <code>isCashPay</code>) + <code>:1298</code> (حارس <code>splitOn</code>). والبيانات جاهزة فعلًا: الرصيد يُحمَّل في <code>:300-308</code>، والاستبدال مُفعَّل في الخادم <code>config.py:213 loyalty_redemption_enabled=True</code>. أي أن <b>النقاط قابلة للاستخدام، لكنها مخفيّة عن العرض</b>.</div>
+
+<div class="diagram">
+<svg viewBox="0 0 980 150" width="100%" role="img" aria-label="مسار الوصول للنقاط">
+<style>.s{fill:#eff6ff;stroke:#3b82f6;stroke-width:1.5}.g{fill:#ecfdf5;stroke:#10b981;stroke-width:1.5}
+.t2{font:14px Tahoma;fill:#0f172a}.ar2{stroke:#64748b;stroke-width:2;fill:none;marker-end:url(#b)}</style>
+<defs><marker id="b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+<rect class="s" x="740" y="45" width="220" height="60" rx="12"/>
+<text class="t2" x="850" y="80" text-anchor="middle">1) اختَر «الدفع نقدًا»</text>
+<rect class="s" x="440" y="45" width="240" height="60" rx="12"/>
+<text class="t2" x="560" y="80" text-anchor="middle">2) فعّل مربّع «ادفع جزءًا…»</text>
+<rect class="g" x="120" y="45" width="260" height="60" rx="12"/>
+<text class="t2" x="250" y="80" text-anchor="middle">🪙 عندها فقط تظهر النقاط</text>
+<line class="ar2" x1="740" y1="75" x2="682" y2="75"/>
+<line class="ar2" x1="440" y1="75" x2="382" y2="75"/>
+</svg>
+<div class="cap">شكل 2: النقاط لا تُكتشَف إلا بعد خطوتين — المطلوب إظهارها استباقيًّا عند الدخول (D2).</div>
+</div>
+</section>
+
+<!-- P2b -->
+<section id="p2b">
+<h2>3) لماذا لا يمنعني النظام مبكّرًا؟ (محفظة فارغة / تجاوز الرصيد) <span class="badge high">عالية</span></h2>
+<div class="simple">
+<b>بالمثال البسيط:</b> في محفظتك 10 دنانير، وتكتب «ادفع 12 من المحفظة». المفروض أن يوقفك الصندوق فورًا: <b>يحمرّ</b>، ويكتب «رصيدك 10 لا يغطّي 12»، و<b>زرّ «تقديم الطلب» يبهت فلا تستطيع الضغط</b>. لكن ما يحدث فعلًا: كل شيء يبدو طبيعيًّا، تضغط الزرّ، ثم <b>بعد الإرسال</b> يرجع الخادم بالرفض. أي أن المنع يأتي متأخّرًا.
+</div>
+
+<h3>السبب 1: الحقل يقارن نفسه بـ«باقي الطلب» لا بـ«رصيدك»</h3>
+<p>عندما تكتب مبلغ المحفظة، البرنامج يقصّه على «المتبقّي من الطلب»، <b>ولا يقارنه أبدًا برصيدك الحقيقيّ</b>. فمبلغ 12 (وهو أقلّ من إجمالي 22) يمرّ كما هو.</p>
+<pre>// CheckoutPage.tsx
+287  const splitWalletMinor = Math.min(Math.max(0, parseToMinor(splitWalletText)), afterPointsMinor);
+     //                                                                         ▲ باقي الطلب — وليس الرصيد!</pre>
+
+<h3>السبب 2: رصيدك محمَّل… لكن غير مُستخدَم للحصّة المجزّأة</h3>
+<p>البرنامج <b>يعرف رصيدك</b> (يحمّله في الأعلى)، لكنه يستعمله فقط لتنبيه «المحفظة الكاملة»، لا للحصّة المجزّأة. ولا توجد رسالة «المحفظة فارغة» في صندوق الدفع المجزّأ (يوجد شريط «لا نقاط متاحة» للنقاط، <b>لكن لا نظير له للمحفظة</b>).</p>
+<pre>42    paymentsApi.getWallet().then(({data}) =&gt; setWalletBalanceMinor(data.balance_minor)) // الرصيد معروف
+1496  paymentMethod === "WALLET" &amp;&amp; walletBalanceMinor &lt; grandTotalMinor &amp;&amp; (...)         // يُستخدَم للكامل فقط</pre>
+
+<h3>السبب 3: زرّ «تقديم الطلب» لا يبهت عند التجاوز</h3>
+<p>شرط تعطيل الزرّ يفحص أشياء (الحدّ الأدنى، العنوان، رسوم التوصيل) لكنه <b>لا يفحص إطلاقًا تجاوز رصيد المحفظة أو النقاط</b>. لذلك يبقى الزرّ مضيئًا وقابلًا للضغط.</p>
+<pre>1699  disabled={
+1700    submitting || !paymentMethod || belowMinimum ||
+1703    (fulfillmentType === "DELIVERY" &amp;&amp; !selectedAddressId) ||
+1707    (fulfillmentType === "DELIVERY" &amp;&amp; !feeKnown &amp;&amp; !feeQuoteFailed)
+      }   // ◀ لا يوجد أي شرط عن تجاوز رصيد المحفظة/النقاط</pre>
+<div class="evidence"><b>الدليل:</b> <code>CheckoutPage.tsx:287</code> (القصّ على الباقي) · <code>:42,1496</code> (الرصيد للكامل فقط) · <code>:1699-1708</code> (شرط الزرّ بلا فحص تجاوز) · <code>:285</code> (النقاط تُقصّ على قيمة البضاعة لا على رصيد النقاط).</div>
+
+<div class="diagram">
+<svg viewBox="0 0 980 340" width="100%" role="img" aria-label="الوضع الحالي مقابل المطلوب">
+<style>
+.hd{font:bold 15px Tahoma}.t3{font:13px Tahoma;fill:#0f172a}.tm3{font:12px Tahoma;fill:#475569}
+.box{fill:#fff;stroke:#cbd5e1;stroke-width:1.5}.badbox{fill:#fef2f2;stroke:#ef4444}.goodbox{fill:#ecfdf5;stroke:#10b981}
+.arr{stroke:#64748b;stroke-width:2;fill:none;marker-end:url(#c)}
+.btnG{fill:#22c55e}.btnGrey{fill:#cbd5e1}
+</style>
+<defs><marker id="c" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/></marker></defs>
+
+<!-- عمود الحالي (يمين) -->
+<text class="hd" x="730" y="26" fill="#b91c1c" text-anchor="middle">الوضع الحاليّ ✗</text>
+<rect class="box" x="560" y="42" width="340" height="46" rx="10"/>
+<text class="t3" x="730" y="70" text-anchor="middle">تكتب: محفظة 12 (رصيدك 10)</text>
+<rect class="box" x="560" y="104" width="340" height="46" rx="10"/>
+<text class="t3" x="730" y="126" text-anchor="middle">الصندوق يبقى عاديًّا (لا احمرار)</text>
+<text class="tm3" x="730" y="143" text-anchor="middle">لا رسالة تحذير مبكّرة</text>
+<rect class="box" x="560" y="166" width="340" height="46" rx="10"/>
+<rect class="btnG" x="700" y="176" width="120" height="26" rx="7"/>
+<text class="t3" x="760" y="194" text-anchor="middle" fill="#fff">تقديم الطلب (فعّال)</text>
+<rect class="badbox" x="560" y="228" width="340" height="66" rx="10"/>
+<text class="t3" x="730" y="252" text-anchor="middle">تضغط ➜ يُرسَل للخادم ➜ يرجع الرفض</text>
+<text class="tm3" x="730" y="272" text-anchor="middle">المنع جاء متأخّرًا — بعد المحاولة</text>
+<line class="arr" x1="730" y1="88" x2="730" y2="104"/>
+<line class="arr" x1="730" y1="150" x2="730" y2="166"/>
+<line class="arr" x1="730" y1="212" x2="730" y2="228"/>
+
+<!-- عمود المطلوب (يسار) -->
+<text class="hd" x="250" y="26" fill="#047857" text-anchor="middle">الوضع المطلوب ✓</text>
+<rect class="box" x="80" y="42" width="340" height="46" rx="10"/>
+<text class="t3" x="250" y="70" text-anchor="middle">تكتب: محفظة 12 (رصيدك 10)</text>
+<rect class="badbox" x="80" y="104" width="340" height="46" rx="10"/>
+<text class="t3" x="250" y="126" text-anchor="middle">الصندوق يحمرّ فورًا 🔴</text>
+<text class="tm3" x="250" y="143" text-anchor="middle">«رصيدك 10 لا يغطّي 12»</text>
+<rect class="box" x="80" y="166" width="340" height="46" rx="10"/>
+<rect class="btnGrey" x="220" y="176" width="120" height="26" rx="7"/>
+<text class="t3" x="280" y="194" text-anchor="middle" fill="#64748b">تقديم الطلب (باهت)</text>
+<rect class="goodbox" x="80" y="228" width="340" height="66" rx="10"/>
+<text class="t3" x="250" y="252" text-anchor="middle">تُصحّح الرقم قبل الإرسال</text>
+<text class="tm3" x="250" y="272" text-anchor="middle">لا محاولة فاشلة أصلًا</text>
+<line class="arr" x1="250" y1="88" x2="250" y2="104"/>
+<line class="arr" x1="250" y1="150" x2="250" y2="166"/>
+<line class="arr" x1="250" y1="212" x2="250" y2="228"/>
+</svg>
+<div class="cap">شكل 3: الفرق بين ما يحدث الآن (منع متأخّر بعد الإرسال) وما يطلبه المالك (منع مبكّر: احمرار + زرّ باهت + رسالة واضحة).</div>
+</div>
+</section>
+
+<!-- errors -->
+<section id="errors">
+<h2>4) لماذا تظهر أحيانًا «خطأ في التحقق من البيانات»؟ <span class="badge med">متوسطة</span></h2>
+<div class="simple">
+<b>بالمثال البسيط:</b> عندما يرفض الخادم شيئًا، يفترض أن يقول لك <b>ما هو الخطأ بالضبط</b> («النقاط أكثر من قيمة البضاعة»). لكنه في كثير من الحالات يعرض عنوانًا عامًّا «خطأ في التحقق من البيانات» + سطرًا تقنيًّا بالإنجليزيّة. أشبه بلافتة «خطأ» بلا توضيح.
+</div>
+
+<h3>السبب: قائمة بيضاء قصيرة في الخادم</h3>
+<p>الخادم يضع عنوانًا افتراضيًّا «خطأ في التحقق من البيانات» لكل خطأ، ولا يستبدله برسالة واضحة إلا لأربعة أكواد فقط. أي كود خارج هذه القائمة يظهر بالعنوان العامّ.</p>
+<pre>// backend/app/modules/orders/order_router.py
+638  message_ar = "خطأ في التحقق من البيانات"                       // ◀ الافتراضيّ العامّ
+639  if   code == "ZONE_SUSPENDED":            message_ar = ...     // ✓ مُعالَج
+641  elif code == "PROVIDER_OFFLINE":          message_ar = ...     // ✓ مُعالَج
+644  elif code == "PROVIDER_CLOSED":           message_ar = ...     // ✓ مُعالَج
+648  elif code == "WALLET_INSUFFICIENT_FUNDS": message_ar = ...     // ✓ مُعالَج
+     // كل ما عداه ➜ يظهر بالعنوان العامّ</pre>
+
+<h4>الأخطاء التي تظهر «عامّة» في الدفع المجزّأ (كلّها خارج القائمة):</h4>
+<table>
+<tr><th>الكود</th><th>متى يحدث (بلغة بسيطة)</th><th>ما يراه العميل الآن</th></tr>
+<tr><td><code>POINTS_EXCEED_GOODS</code></td><td>نقاط أكثر من قيمة البضاعة</td><td>عنوان عامّ + «points can only cover the goods value»</td></tr>
+<tr><td><code>POINTS_INSUFFICIENT</code></td><td>نقاط أكثر من رصيدك الفعليّ</td><td>عنوان عامّ + «رصيد النقاط لا يكفي»</td></tr>
+<tr><td><code>TENDER_SUM_MISMATCH</code></td><td>مجموع الحصص ≠ الإجمالي</td><td>عنوان عامّ + «tender sum must equal the order total»</td></tr>
+<tr><td><code>CARD_NOT_AVAILABLE</code></td><td>حصّة بطاقة والدفع بالبطاقة مقفل</td><td>عنوان عامّ + «بطاقة الدفع غير متاحة بعد»</td></tr>
+<tr><td><code>SPLIT_DELIVERY_ONLY</code></td><td>دفع مجزّأ مع استلام ذاتيّ</td><td>عنوان عامّ + «split payment is only available for delivery orders»</td></tr>
+</table>
+<div class="evidence"><b>الدليل:</b> العنوان الافتراضيّ <code>order_router.py:638</code> · القائمة البيضاء <code>:639-650</code> · مصادر الأكواد في <code>order_service.py:1215,1218-1222,1226-1229,1230-1239,1256-1260,1526</code>.</div>
+
+<div class="callout good"><b>الجزء السليم <span class="badge ok">سليم</span>:</b> حالة «رصيد المحفظة لا يكفي» (<code>WALLET_INSUFFICIENT_FUNDS</code>) <b>ضمن القائمة</b>، فتظهر برسالة عربية مفهومة. لكن يبقى عيبان: (أ) تظهر <b>بعد</b> الضغط لا قبله (شكل 3)، (ب) تَعِد بـ«اشحن المحفظة» رغم أن الشحن مقفل — وعدٌ لا يمكن الوفاء به (D8).</div>
+</section>
+
+<!-- table -->
+<section id="table">
+<h2>5) جدول العيوب الثمانية (كلّها بالدليل)</h2>
+<table>
+<tr><th>#</th><th>العيب</th><th>الملف : السطر</th><th>الشدّة</th><th>النوع</th></tr>
+<tr><td>D1</td><td>«قريبًا» على المحفظة المعطّلة تُخفي السبب الحقيقيّ (رصيد لا يكفي)</td><td><code>CheckoutPage.tsx:1195</code> + <code>payment_resolver.py:59</code></td><td><span class="badge med">متوسطة</span></td><td>رسالة</td></tr>
+<tr><td>D2</td><td>النقاط لا تظهر إلا بعد «نقدًا» + مربّع اختياريّ؛ لا عرض استباقيّ</td><td><code>CheckoutPage.tsx:1258,1298</code></td><td><span class="badge med">متوسطة</span></td><td>اكتشاف/UX</td></tr>
+<tr><td>D3</td><td>حصّة المحفظة لا تُقارَن بالرصيد (قصّ على الباقي فقط)</td><td><code>CheckoutPage.tsx:287</code></td><td><span class="badge high">عالية</span></td><td>تحقّق مفقود</td></tr>
+<tr><td>D4</td><td>زرّ «تقديم الطلب» لا يبهت عند تجاوز الرصيد</td><td><code>CheckoutPage.tsx:1699-1708</code></td><td><span class="badge high">عالية</span></td><td>تحقّق مفقود</td></tr>
+<tr><td>D5</td><td>لا صندوق أحمر/رسالة «المحفظة فارغة» قبل الإرسال (للحصّة المجزّأة)</td><td><code>CheckoutPage.tsx:1344-1441</code></td><td><span class="badge high">عالية</span></td><td>تحقّق مفقود</td></tr>
+<tr><td>D6</td><td>حصّة النقاط لا تُقصّ على الرصيد المتاح</td><td><code>CheckoutPage.tsx:285</code></td><td><span class="badge med">متوسطة</span></td><td>تحقّق مفقود</td></tr>
+<tr><td>D7</td><td>عدّة أكواد دفع مجزّأ تظهر بعنوان عامّ + تفصيل إنجليزيّ</td><td><code>order_router.py:638</code></td><td><span class="badge med">متوسطة</span></td><td>رسالة</td></tr>
+<tr><td>D8</td><td>رسالة عجز المحفظة تَعِد بـ«اشحن المحفظة» رغم قفل الشحن</td><td><code>order_router.py:650</code></td><td><span class="badge low">منخفضة</span></td><td>رسالة مضلِّلة</td></tr>
+</table>
+</section>
+
+<!-- fix -->
+<section id="fix">
+<h2>6) التوصيات — بانتظار اعتمادك (لم يُنفَّذ شيء)</h2>
+<div class="callout infobox"><b>مبدأ عامّ طلبته أنت («ينطبق على كل شيء في المنصّة»):</b> اعتماد نمط <b>تحقّق استباقيّ موحّد</b> في كل نموذج — الحقل يُقصّ على حدّه الحقيقيّ، العنصر يحمرّ عند التجاوز، زرّ الإجراء يبهت، ورسالة عربية واضحة بدل العنوان العامّ.</div>
+
+<h3>أ) إصلاحات واجهة فقط (آمنة — <code>web/</code> فقط)</h3>
+<ul>
+<li><b>D1:</b> عرض السبب الحقيقيّ بدل «قريبًا» للمحفظة: «رصيد محفظتك لا يكفي» مع نصّ لا يَعِد بالشحن ما دام مقفلًا.</li>
+<li><b>D2:</b> بطاقة نقاط استباقية أعلى الدفع: «لديك N نقطة = X د.ل — استخدمها؟» تفتح الدفع المجزّأ مباشرةً.</li>
+<li><b>D3 / D6:</b> قصّ حصّة المحفظة على <code>min(الباقي, الرصيد)</code>، وحصّة النقاط على <code>min(قيمة البضاعة, رصيد النقاط)</code>.</li>
+<li><b>D4:</b> إضافة شرط للزرّ يُبهته عند تجاوز المحفظة أو النقاط.</li>
+<li><b>D5:</b> احمرار صندوق المحفظة + رسالة واضحة <b>قبل</b> الإرسال (نفس نمط تنبيه المحفظة الكاملة، لكن للحصّة).</li>
+</ul>
+
+<h3>ب) إصلاحات تمسّ الخادم (تحتاج إذنك الصريح — منطقة محظورة)</h3>
+<ul>
+<li><b>D7:</b> توسيع القائمة البيضاء في <code>order_router.py:639-650</code> لتشمل أكواد النقاط/المجموع/الاستلام الذاتيّ برسائل عربية واضحة.</li>
+<li><b>D8:</b> توحيد رسالة عجز المحفظة المجزّأة: «الشحن غير متاح — ادفع نقدًا أو تواصل مع الدعم» بدل «اشحن المحفظة».</li>
+</ul>
+
+<h3>ج) «فتح المحفظة للدفع» (سؤالك الأول)</h3>
+<div class="callout warn">قرار حَوكمة لا كود: يتطلّب إمّا فتح <code>production_payment_enabled</code> (مقفل حتى إغلاق بوّابتَي «القانون» + «الاختبار الرمليّ») أو منح رصيد للعميل. <span class="ff">يُرفَع إليك كبوّابة إطلاق — لا يُنفَّذ تلقائيًّا.</span></div>
+</section>
+
+<!-- evidence -->
+<section id="evi">
+<h2>7) قائمة الأدلّة الكاملة (ما جرى فحصه)</h2>
+<ul>
+<li><code>web/src/pages/customer/CheckoutPage.tsx</code> — كامل (1727 سطرًا): تحميل الطرق، الرصيد، صندوق الدفع المجزّأ، شروط الزرّ، معالجة الأخطاء.</li>
+<li><code>backend/app/modules/payments/payment_resolver.py</code> — كامل: منطق إتاحة المحفظة/البطاقة/النقد.</li>
+<li><code>backend/app/modules/orders/order_service.py:1205-1313</code> — التحقّق من الحصص والأكواد.</li>
+<li><code>backend/app/modules/orders/order_router.py:631-690</code> — تحويل الخطأ إلى رسالة (العنوان العامّ + القائمة البيضاء).</li>
+<li><code>web/src/components/ErrorMessage.tsx</code> — عرض العنوان + التفاصيل كنقاط.</li>
+<li><code>contracts/feature_flags.yaml</code> — <code>production_payment_enabled=false</code> (بوّابتا القانون + الاختبار مقفلتان).</li>
+<li><code>backend/app/config.py:213</code> — <code>loyalty_redemption_enabled=True</code> · <code>loyalty/service.py:63-81</code> — قيمة النقاط + قابلية الاستبدال.</li>
+<li><code>web/src/pages/customer/WalletPage.tsx:57-102</code> — إخفاء زرّ الشحن عند القفل.</li>
+</ul>
+<div class="callout good"><b>نزاهة التقرير:</b> لم يُعدَّل أيّ كود ولم تُشغَّل اختبارات — هذا تشخيص فقط، وكلّ استنتاج مسنودٌ إلى ملف وسطر. المرجع الرسميّ في المستودع: <code>app_report/450_CHECKOUT_WALLET_LOCK_AND_SPLIT_POINTS_VALIDATION_UX_AUDIT_CHATGPT_UPLOAD_REPORT.md</code>. (تعذّرت استشارة المُراجِع الأقوى «advisor» في هذه الجلسة — لذا اعتُمِد الدليل المباشر من الكود حصريًّا.)</div>
+</section>
+
+<p class="footer">توا/Tawa — تقرير تدقيق صفحة الدفع · 2026-07-07 · تشخيص بالدليل، بلا تعديل كود.</p>
+</main>
+</body>
+</html>

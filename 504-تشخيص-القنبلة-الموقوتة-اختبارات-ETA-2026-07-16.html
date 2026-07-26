@@ -1,0 +1,295 @@
+<title>504 — لغز الاختبارات الخمسة الفاشلة (ETA)</title>
+<style>
+  @font-face {
+    font-family: "TawaSys";
+    src: local("Segoe UI"), local("Tahoma"), local("Noto Sans Arabic"), local("Arial");
+  }
+  :root {
+    --bg: #eef1f3; --surface: #ffffff; --surface-2: #f5f7f9; --text: #17222d; --muted: #5b6b7a;
+    --border: #dbe2e8; --accent: #a8790a; --accent-soft: #fdf3df; --accent2: #2f7d74; --accent2-soft: #e6f3f1;
+    --ok: #1f8a4c; --ok-soft: #e6f6ec; --high: #c73037; --high-soft: #fbe7e8; --med: #b06a17; --med-soft: #fbeedb;
+    --low: #5b6b7a; --low-soft: #edf0f2; --code-bg: #101820; --code-text: #d7e2ea;
+    --shadow: 0 1px 2px rgba(20,30,40,.06), 0 6px 20px rgba(20,30,40,.06);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1720; --surface: #172230; --surface-2: #1c2836; --text: #e8edf3; --muted: #93a4b5;
+    --border: #2a3849; --accent: #d9ad4d; --accent-soft: #2b2416; --accent2: #55b6ab; --accent2-soft: #142523;
+    --ok: #4cc179; --ok-soft: #10281a; --high: #f0666c; --high-soft: #2c1517; --med: #e0a655; --med-soft: #2b2013;
+    --low: #93a4b5; --low-soft: #1c2836; --code-bg: #0a1017; --code-text: #cfe0ea;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1720; --surface: #172230; --surface-2: #1c2836; --text: #e8edf3; --muted: #93a4b5;
+      --border: #2a3849; --accent: #d9ad4d; --accent-soft: #2b2416; --accent2: #55b6ab; --accent2-soft: #142523;
+      --ok: #4cc179; --ok-soft: #10281a; --high: #f0666c; --high-soft: #2c1517; --med: #e0a655; --med-soft: #2b2013;
+      --low: #93a4b5; --low-soft: #1c2836; --code-bg: #0a1017; --code-text: #cfe0ea;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  .report-root {
+    direction: rtl; text-align: right; font-family: "TawaSys", "Segoe UI", Tahoma, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.85; max-width: 960px; margin: 0 auto; padding: 28px 20px 80px;
+  }
+  .report-root code, .report-root .mono { font-family: "Cascadia Code", "Consolas", monospace; direction: ltr; unicode-bidi: isolate; font-size: .85em; }
+  h1, h2, h3 { text-wrap: balance; font-weight: 800; margin: 0 0 .4em; }
+  h1 { font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.2rem); letter-spacing: -.01em; }
+  h2 { font-size: clamp(1.2rem, 1rem + 1vw, 1.55rem); margin-top: 0; }
+  h3 { font-size: 1.02rem; color: var(--accent2); }
+  p { margin: 0 0 1em; }
+  .muted { color: var(--muted); }
+  header.hero { background: linear-gradient(155deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 18px; padding: 30px 28px; margin-bottom: 24px; box-shadow: var(--shadow); }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 700; color: var(--accent2); background: var(--accent2-soft); border: 1px solid var(--accent2); border-radius: 999px; padding: 4px 14px; margin-bottom: 14px; }
+  header.hero .lede { font-size: 1.03rem; color: var(--muted); max-width: 66ch; }
+  section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 26px 26px 28px; margin-bottom: 22px; box-shadow: var(--shadow); }
+  section > .section-num { display: inline-block; font-size: .74rem; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 12px; margin-bottom: 10px; }
+  .callout { background: var(--surface-2); border-inline-start: 4px solid var(--accent2); border-radius: 10px; padding: 14px 18px; margin: 16px 0; font-size: .95rem; }
+  .callout.ok { border-inline-start-color: var(--ok); }
+  .callout.high { border-inline-start-color: var(--high); background: var(--high-soft); }
+  .callout b.tag { color: var(--accent2); }
+  .callout.ok b.tag { color: var(--ok); }
+  .callout.high b.tag { color: var(--high); }
+
+  /* sliding-window diagram */
+  .window-diagram { margin: 24px 0; }
+  .w-row { display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .w-label { font-size: .82rem; font-weight: 700; color: var(--muted); text-align: left; direction: ltr; }
+  .w-track { position: relative; height: 34px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .w-window { position: absolute; top: 0; bottom: 0; background: var(--accent2-soft); border-inline: 2px solid var(--accent2); }
+  .w-dot { position: absolute; top: 50%; transform: translate(50%, -50%); width: 14px; height: 14px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--accent); z-index: 2; }
+  .w-dot-label { position: absolute; top: -22px; font-size: .68rem; font-weight: 700; color: var(--accent); white-space: nowrap; transform: translate(50%, 0); }
+  .w-row.miss .w-window { background: var(--high-soft); border-color: var(--high); }
+  .w-row.miss .w-dot { background: var(--high); box-shadow: 0 0 0 1px var(--high); }
+
+  .proof-flow { display: flex; flex-wrap: wrap; gap: 0; margin: 20px 0; overflow-x: auto; }
+  .proof-step { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 160px; flex: 1 1 160px; }
+  .proof-step .who { font-size: .7rem; font-weight: 700; text-transform: uppercase; color: var(--accent2); }
+  .proof-step .what { font-size: .9rem; font-weight: 700; margin-top: 4px; }
+  .proof-step .detail { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+  .proof-step.pass { border-color: var(--ok); background: var(--ok-soft); }
+  .proof-step.fail { border-color: var(--high); background: var(--high-soft); }
+  .proof-arrow { display: flex; align-items: center; justify-content: center; min-width: 30px; color: var(--muted); font-size: 1.2rem; }
+  @media (max-width: 680px) { .proof-flow { flex-direction: column; } .proof-arrow { transform: rotate(90deg); padding: 4px 0; } }
+
+  .codebox { background: var(--code-bg); color: var(--code-text); border-radius: 10px; padding: 14px 16px; font-size: .82rem; overflow-x: auto; margin: 12px 0; direction: ltr; text-align: left; }
+  .codebox .c1 { color: #e0a655; } .codebox .c2 { color: #55b6ab; } .codebox .c3 { color: #8fa1b3; }
+
+  table.simple { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: .89rem; }
+  table.simple th, table.simple td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; }
+  table.simple th { background: var(--surface-2); font-weight: 700; }
+  .pill { display:inline-block; background: var(--accent2-soft); color: var(--accent2); border-radius: 999px; padding: 2px 10px; font-size:.76rem; font-weight:700; }
+  .pill.ok { background: var(--ok-soft); color: var(--ok); }
+  .pill.bad { background: var(--high-soft); color: var(--high); }
+  ul.plain { margin: 0 0 1em; padding-inline-start: 22px; }
+  ul.plain li { margin-bottom: 6px; }
+  footer { text-align: center; color: var(--muted); font-size: .8rem; margin-top: 30px; }
+</style>
+
+<div class="report-root">
+
+<header class="hero">
+  <span class="eyebrow">تقرير 504 · متابعة تقرير 503</span>
+  <h1>لغز الاختبارات الخمسة الفاشلة — وفحص شامل لكل حزمة الاختبارات</h1>
+  <p class="lede">
+    فحصتُ الاختبارات الخمسة التي وصفتها بأنها "غير مرتبطة بهذا العمل" بأقصى درجة تدقيق —
+    لا افتراضات، بل إثبات تجريبي مباشر. النتيجة: لم تكن مشكلة بيئة قديمة كما ظننت في
+    البداية، بل خلل حقيقي وبسيط في طريقة كتابة الاختبارات نفسها، كان سيحدث اليوم بالضبط
+    بغضّ النظر عن أي شيء آخر. أصلحته، ثم — بطلبك — فحصتُ كامل حزمة الاختبارات (16 ملفًّا
+    يحتمل فيها نفس الخلل) بوكلاء مستقلّين لكل واحد، ووجدتُ خللًا ثانيًا من نوع مختلف
+    وأصلحته أيضًا.
+  </p>
+</header>
+
+<!-- ================= القسم 1: ما القصة ================= -->
+<section>
+  <span class="section-num">أولًا</span>
+  <h2>القصة ببساطة: ماذا يعني "قنبلة موقوتة" في اختبار برمجي؟</h2>
+  <p>
+    الاختبارات الخمسة كلها تفحص جزءًا من النظام اسمه <b>"تعلّم وقت التوصيل" (ETA
+    Learning)</b> — ميزة تحلّل آخر 30 يومًا من الطلبات المُسلَّمة فعليًّا لتتعلّم كم يستغرق
+    التوصيل واقعيًّا في كل منطقة وساعة، بدل الاعتماد على تقدير ثابت فقط. لهذا، الكود يسأل
+    قاعدة البيانات دائمًا: <b>"أعطني كل الطلبات المُسلَّمة خلال آخر 30 يومًا من اليوم
+    الحقيقي الآن."</b>
+  </p>
+  <p>
+    الاختبار، لكي يتأكّد أن هذا الحساب صحيح، يحتاج طلبات وهمية للتجربة. المشكلة: بدل أن
+    يقول للطلبات الوهمية "كوني بتاريخ الأمس دائمًا"، كتبها المبرمج بتاريخ ثابت ومحدَّد
+    سلفًا: <b>16 يونيو 2026</b>. هذا يعمل تمامًا طالما "اليوم الحقيقي" لا يبعد عن 16
+    يونيو أكثر من 30 يومًا. لكن بمجرّد أن يمرّ أكثر من شهر — أي تلقائيًّا، بلا أي تغيير في
+    الكود إطلاقًا — تخرج تلك البيانات الوهمية من نافذة الـ30 يومًا وتختفي من كل نتيجة.
+  </p>
+  <div class="window-diagram">
+    <div class="w-row">
+      <div class="w-label">15 يوليو</div>
+      <div class="w-track">
+        <div class="w-window" style="right:20%; width:65%;"></div>
+        <div class="w-dot" style="right:35%;"><span class="w-dot-label">بيانات الاختبار<br>(16 يونيو)</span></div>
+      </div>
+    </div>
+    <div class="w-row">
+      <div class="w-label">16 يوليو (اليوم)</div>
+      <div class="w-track miss">
+        <div class="w-window" style="right:12%; width:65%;"></div>
+        <div class="w-dot" style="right:35%;"></div>
+      </div>
+    </div>
+  </div>
+  <p class="muted">
+    الشريط الملوّن يمثّل "آخر 30 يومًا" كما يراها الكود كل يوم؛ النقطة الثابتة هي تاريخ
+    بيانات الاختبار. بالأمس كانت النقطة لا تزال داخل الشريط (الاختبار ينجح)؛ اليوم خرجت
+    النقطة تمامًا من الشريط (الاختبار يفشل) — لأن الشريط يتحرّك للأمام كل يوم، بينما
+    النقطة ثابتة في مكانها إلى الأبد.
+  </p>
+</section>
+
+<!-- ================= القسم 2: الإثبات التجريبي ================= -->
+<section>
+  <span class="section-num">ثانيًا</span>
+  <h2>لم أفترض — أثبتّ الأمر تجريبيًّا</h2>
+  <p>
+    بدل الاكتفاء بالحساب النظري، أجريتُ تجربة مباشرة: أخذتُ نفس بيانات الاختبار بالضبط
+    ونفس كود النظام بالضبط، وغيّرتُ شيئًا واحدًا فقط — "ساعة النظام" التي يراها الكود
+    مؤقّتًا، لأحاكي كيف كان الوضع قبل أيّام قليلة من انتهاء المهلة.
+  </p>
+  <div class="proof-flow">
+    <div class="proof-step fail">
+      <span class="who">التجربة الأولى</span>
+      <span class="what">الساعة الحقيقية (اليوم فعليًّا)</span>
+      <span class="detail">نفس البيانات + نفس الكود ← النتيجة: فارغة تمامًا (فشل)، مطابق تمامًا لما رأيناه في الاختبارات الخمسة الأصلية.</span>
+    </div>
+    <div class="proof-arrow">→</div>
+    <div class="proof-step pass">
+      <span class="who">التجربة الثانية</span>
+      <span class="what">ساعة مؤقّتة قبل يوم الحدّ</span>
+      <span class="detail">نفس البيانات + نفس الكود بالضبط، فقط "الساعة" مضبوطة على تاريخ أقرب لبيانات الاختبار ← النتيجة: نجاح كامل، البيانات تظهر بشكل صحيح 100%.</span>
+    </div>
+  </div>
+  <div class="callout ok">
+    <b class="tag">هذا إثبات قاطع لا افتراض:</b> الفرق الوحيد بين نجاح الاختبار وفشله هو
+    "كم يوم مضى منذ 16 يونيو" — لا شيء آخر في الكود أو البيانات تغيّر بين التجربتين. هذا
+    يستبعد نهائيًّا أي احتمال آخر (خطأ منطقي، مشكلة في نوع البيانات، تعارض مع تعديلاتي
+    اليوم على ميزات أخرى، أو أي شيء غير مرتبط بالتاريخ).
+  </div>
+</section>
+
+<!-- ================= القسم 3: لماذا الآن بالضبط ================= -->
+<section>
+  <span class="section-num">ثالثًا</span>
+  <h2>لماذا فشلت اليوم بالضبط، لا أمس ولا الأسبوع الماضي؟</h2>
+  <p>حساب دقيق بالثواني، لا تقريب:</p>
+  <table class="simple">
+    <tr><th>القيمة</th><th>الوقت</th></tr>
+    <tr><td>تاريخ بيانات الاختبار الوهمية</td><td class="mono">2026-06-16 ~12:00 UTC</td></tr>
+    <tr><td>طول النافذة الزمنية التي يستخدمها الكود</td><td>30 يومًا بالضبط</td></tr>
+    <tr><td>حدّ النافذة (يُحسَب من "الآن" الحقيقي لحظة تشغيل الاختبار)</td><td class="mono">2026-06-16 ~21:15 UTC</td></tr>
+    <tr><td>هل بيانات الاختبار أحدث من الحدّ؟</td><td><b style="color:var(--high)">لا — أقدم بحوالي 9 ساعات</b> ← تُستبعَد بالكامل</td></tr>
+  </table>
+  <p>
+    بمعنى آخر: الحدّ الزمني نفسه سقط في نفس اليوم (16 يونيو) لكن في وقت متأخّر منه (~21:15
+    مساءً)، بينما بيانات الاختبار مؤرَّخة في وقت مبكّر من نفس اليوم (~12:00 ظهرًا) — فارق
+    تسع ساعات كافٍ ليجعل البيانات "قديمة جدًّا" بالضبط في اللحظة التي شغّلتُ فيها
+    الاختبارات اليوم. لو شغّلتُها بالأمس (15 يوليو)، لكانت لا تزال ناجحة.
+  </p>
+</section>
+
+<!-- ================= القسم 4: الإصلاح ================= -->
+<section>
+  <span class="section-num">رابعًا</span>
+  <h2>الإصلاح: تاريخ نسبي بدل تاريخ ثابت</h2>
+  <p>
+    الحلّ ليس تغيير "16 يونيو" إلى تاريخ آخر ثابت — فهذا يُعيد المشكلة نفسها بعد شهر آخر
+    فقط. الحلّ الصحيح: اجعل بيانات الاختبار تحسب تاريخها دائمًا نسبةً لـ"اليوم الحقيقي"،
+    لا بتاريخ محفوظ سلفًا.
+  </p>
+  <div class="codebox">
+<span class="c3"># قبل — قنبلة موقوتة</span>
+picked = datetime(<span class="c1">2026, 6, 16</span>, hour, minute, tzinfo=timezone.utc)
+
+<span class="c3"># بعد — آمن للأبد، بغضّ النظر متى يُشغَّل الاختبار</span>
+picked = (datetime.now(timezone.utc) - timedelta(<span class="c2">days=1</span>)).replace(
+    hour=hour, minute=minute, second=0, microsecond=0
+)
+  </div>
+  <p>
+    "الأمس" دائمًا داخل أي نافذة زمنية معقولة (30 يومًا هنا)، مهما مرّ من وقت قبل تشغيل
+    الاختبارات مجدَّدًا — فلا يمكن لهذه المشكلة أن تتكرّر إطلاقًا لهذا الاختبار تحديدًا.
+  </p>
+  <div class="callout ok">
+    <b class="tag">التحقّق الكامل بعد الإصلاح:</b> الاختبارات الخمسة تنجح الآن، كل الـ16
+    اختبارًا في نفس الملفّ تنجح، وحزمة اختبارات النظام الخلفي كاملة أصبحت
+    <b>3603 ناجحًا / 0 فاشل / 4 مُستثنى</b> — الحالة الموثَّقة رسميًّا للمشروع "صفر فشل"
+    عادت بالكامل.
+  </div>
+</section>
+
+<!-- ================= القسم 5: الفحص الشامل ================= -->
+<section>
+  <span class="section-num">خامسًا</span>
+  <h2>الفحص الشامل: 16 ملفًّا، وكيل مستقلّ لكل واحد</h2>
+  <p>
+    بدل الاكتفاء بفحص سريع، بحثتُ في كامل حزمة الاختبارات عن أي استخدام لتاريخ ثابت، ووجدتُ
+    <b>16 ملفًّا</b> يستخدمون تواريخ من هذا النوع. لكل ملفّ، شغّلتُ وكيل تحقيق مستقلّ يقرأ
+    الملفّ فعليًّا، يتتبّع إلى أين يذهب التاريخ (هل يُحفَظ كبيانات، أم يُمرَّر كمُدخَل آمن؟)،
+    ثم يقرأ الكود الإنتاجي المرتبط ليتأكّد هل يستخدم "الساعة الحقيقية" لمقارنته أم لا. أي
+    نتيجة "فيها خطر" مرّت بعد ذلك على وكيل تحقّق ثانٍ مستقلّ يعيد التتبّع من الصفر بنفسه قبل
+    اعتمادها.
+  </p>
+  <table class="simple">
+    <tr><th>الملفّ</th><th>الحالة</th></tr>
+    <tr><td class="mono">test_audit_fixes.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_b2_eta_learning.py</td><td><span class="pill ok">مُصلَح مسبقًا (هذا التقرير)</span></td></tr>
+    <tr><td class="mono">test_b4_demand_forecast.py</td><td><span class="pill bad">وُجد فيه عيب — أُصلح</span></td></tr>
+    <tr><td class="mono">test_eta_time_to_door.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_f_t_02_prep_countdown.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_phase373_reconciliation_cron.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_phase383_restore_drill.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_phase449_documents.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_phase454_wave4.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_promotions_resolver.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_remediation_batch2.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_remediation_p7b_d3_reconcile.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_scn_distribution.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_scn_driver_docs.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_scn_order_timeline.py</td><td><span class="pill ok">آمن</span></td></tr>
+    <tr><td class="mono">test_scn_pause.py</td><td><span class="pill ok">آمن</span></td></tr>
+  </table>
+</section>
+
+<!-- ================= القسم 6: العيب الثاني ================= -->
+<section>
+  <span class="section-num">سادسًا</span>
+  <h2>العيب الثاني: ليس قنبلة موقوتة — بل اختبار "لا يفحص شيئًا" أبدًا</h2>
+  <p>
+    ملفّ <code>test_b4_demand_forecast.py</code> (يفحص ميزة "توقّع الطلب" المشابهة لـETA)
+    فيه نفس المكوّن الأوّل (تاريخ ثابت يُحفَظ كبيانات، وكود إنتاجي يقارنه بالساعة الحقيقية)،
+    لكن بنتيجة مختلفة تمامًا وأخطر بطريقتها الخاصّة:
+  </p>
+  <div class="callout high">
+    <b class="tag">الفرق الجوهري:</b> اختبار ETA كان يتحقّق من <b>قيمة</b> محدَّدة، فحين
+    اختفت البيانات بسبب التاريخ الثابت، فشل الاختبار وأنذر بالمشكلة فورًا. أمّا هذا
+    الاختبار فكان يتحقّق فقط من "هل الحقل موجود؟" لا "هل قيمته صحيحة؟" — فالحساب كان يحسب
+    عمر البيانات بشكل خاطئ يزداد سوءًا كل يوم (نحو 29 يومًا من "التقادم" وقت الفحص)، لكن
+    الاختبار كان سيبقى <b>ناجحًا للأبد</b> مهما كانت النتيجة غلطًا، لأنه لا يتحقّق من الرقم
+    نفسه إطلاقًا. هذا أخطر من قنبلة موقوتة: لا يوجد إنذار على الإطلاق.
+  </div>
+  <p>
+    <b>الإصلاح:</b> جعلتُ التاريخ نسبيًّا (لا يتجمَّد في الماضي)، <b>وأضفتُ تحقّقًا فعليًّا
+    من القيمة</b> بدل مجرّد وجود الحقل — الآن الاختبار يتحقّق حقًّا أن حساب "عمر البيانات"
+    يعطي الرقم الصحيح.
+  </p>
+  <div class="callout ok">
+    <b class="tag">التحقّق:</b> 4/4 اختبارات هذا الملفّ ناجحة بعد الإصلاح، وحزمة النظام
+    الخلفي كاملة لا تزال <b>3603 ناجح / صفر فاشل</b>. كل الإصلاحات مرفوعة على GitHub.
+  </div>
+  <div class="callout">
+    <b class="tag">تحديث لاحق:</b> فرع <code>fix/464-full-remediation-2026-07-10</code> —
+    بكل التزاماته، بما فيها إصلاحا "القنبلة الموقوتة" الواردَين في هذا التقرير — دُمج لاحقًا
+    في طلب سحب واحد (PR #19) على فرع <code>master</code> الرسمي على GitHub، وحُذف الفرع
+    المؤقّت بعد التأكّد من اكتمال الدمج وتزامن المنصّات الأربع (تفصيله الكامل في تقرير 505).
+  </div>
+</section>
+
+<footer>تقرير 504 — تووا (Tawa) · 2026-07-16</footer>
+
+</div>

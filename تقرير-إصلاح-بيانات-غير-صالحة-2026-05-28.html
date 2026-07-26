@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>تقرير: إصلاح «بيانات غير صالحة» في التسجيل</title>
+<style>
+  :root {
+    --bg: #0b1220; --panel: #121a2e; --panel-2: #1a2440; --txt: #eaeef7; --muted: #9aa6c2;
+    --primary: #4f8cff; --accent: #ffb84f; --ok: #6cd58d; --warn: #ffd166; --danger: #ff6b6b;
+    --code-bg: #0a1224; --border: #243056;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--txt); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif; margin: 0; padding: 0; line-height: 1.9; font-size: 16px; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  h1 { color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 0.5rem; font-size: 1.8rem; margin-top: 2.25rem; }
+  h2 { color: var(--accent); border-right: 4px solid var(--accent); padding-right: 0.75rem; margin-top: 2rem; font-size: 1.3rem; }
+  h3 { color: #cfd8ee; margin-top: 1.5rem; font-size: 1.1rem; }
+  p, li { color: var(--txt); }
+  ul, ol { padding-right: 1.5rem; }
+  li { margin-bottom: 0.5rem; }
+  .meta { color: var(--muted); font-size: 0.92rem; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  code { font-family: ui-monospace, monospace; direction: ltr; background: var(--code-bg); padding: 0.12rem 0.45rem; border-radius: 4px; color: #ffd49a; font-size: 0.88em; unicode-bidi: embed; }
+  pre { font-family: ui-monospace, monospace; direction: ltr; text-align: left; background: var(--code-bg); padding: 1rem 1.25rem; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); font-size: 0.84rem; line-height: 1.6; }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: var(--panel); border-radius: 8px; overflow: hidden; }
+  th, td { padding: 0.65rem 0.85rem; text-align: right; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--panel-2); color: var(--accent); }
+  tr:last-child td { border-bottom: none; }
+  .hero { background: linear-gradient(135deg,#0e2547 0%,#1a2440 100%); border: 2px solid var(--primary); border-radius: 14px; padding: 1.5rem 1.8rem; margin: 1.5rem 0; }
+  .hero .label { color: var(--primary); font-weight: 800; font-size: 1.1rem; margin-bottom: 0.5rem; }
+  .hero .text { font-size: 1.15rem; line-height: 1.9; }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; }
+  .panel.warn { border-color: var(--warn); background: linear-gradient(135deg,#2a2510 0%,#1a2440 100%); }
+  .panel.ok { border-color: var(--ok); }
+  .badge { display: inline-block; padding: 0.18rem 0.6rem; border-radius: 999px; font-size: 0.76rem; font-weight: 700; }
+  .badge.live { background: #0d3b22; color: #6cd58d; }
+  .before { background: #2a1010; border: 1px solid var(--danger); border-radius: 8px; padding: 0.8rem 1rem; margin: 0.5rem 0; }
+  .after { background: #0d2a18; border: 1px solid var(--ok); border-radius: 8px; padding: 0.8rem 1rem; margin: 0.5rem 0; }
+  .ok-mark { color: var(--ok); font-weight: 700; }
+  .warn-mark { color: var(--warn); font-weight: 700; }
+  .footnote { font-size: 0.84rem; color: var(--muted); border-right: 3px solid var(--border); padding-right: 0.75rem; }
+</style>
+</head>
+<body><div style="background:#fff8e1;border:2px solid #f0b429;border-radius:10px;padding:10px 16px;margin:12px;font-family:system-ui,'Segoe UI','Noto Sans Arabic',sans-serif;direction:rtl;text-align:right;color:#5a4500;font-size:14px;font-weight:600;line-height:1.7">⏱️ <b>لقطة وقت النشر</b> — الأرقام والبصمات في هذا التقرير (مثل <code>main-XXXX.js</code>، أعداد الاختبارات، حالة الحاويات) صحيحة <b>بتاريخ هذا التقرير</b> وقد تغيّرت بنشرات تالية. للحالة الحيّة الحاليّة راجِع <b>أحدث تقرير تنفيذ</b> في هذا المجلّد.</div>
+
+<div class="wrap">
+
+<h1>تقرير: إصلاح «بيانات غير صالحة» في التسجيل</h1>
+<p class="meta">التاريخ: 2026-05-28 · الحالة: <span class="badge live">مُصلَح + منشور + مُتحقَّق بصرياً على tawanow.com</span></p>
+
+<div class="hero">
+<div class="label">الخلاصة</div>
+<div class="text">
+رسالة «بيانات غير صالحة» كانت تَظهر <strong>لسببين متراكبَين</strong>:<br/>
+<strong>(1) سبب جذريّ:</strong> الواجهة لم تَكن تَفهم صيغة الأخطاء التي تُرسلها الخلفية في حالات معيّنة، فتَعرض رسالة عامّة بلا تحديد الحقل.<br/>
+<strong>(2) سبب يُفاقم:</strong> متصفّحك كان يُقدّم نسخة قديمة مخزَّنة (PWA cache) من قبل أيّ إصلاح.<br/>
+أصلحتُ الاثنين. الآن الخطأ يَظهر واضحاً تحت الحقل المعنيّ بالعربية.
+</div>
+</div>
+
+<!-- what errors -->
+<h1>أولاً: ما هي الأخطاء التي وجدتُها بالضبط؟</h1>
+<p>بفحص الخلفية الحيّة، رسالة «بيانات غير صالحة» تَظهر في 3 حالات (الأرجح الأولى لك):</p>
+
+<table>
+<thead><tr><th>ما تُدخله</th><th>لماذا يُرفَض</th></tr></thead>
+<tbody>
+<tr><td><strong>اسم المستخدم بالعربية</strong> (مثل «عبدالكريم»)</td><td>حقل اسم المستخدم يَقبل <strong>أحرفاً لاتينية + أرقاماً + <code>_</code> فقط</strong> — لا عربية ولا مسافات</td></tr>
+<tr><td>اسم مستخدم أقصر من 4 أحرف</td><td>يَجب أن يَكون 4–30 حرفاً</td></tr>
+<tr><td>كلمة مرور أقصر من 8 أحرف</td><td>يَجب ألّا تقلّ عن 8 أحرف</td></tr>
+</tbody>
+</table>
+
+<div class="panel">
+<p><strong>المُلاحظة المهمّة:</strong> حقل اسم المستخدم <strong>اختياريّ تماماً</strong> — يُمكنك تركه فارغاً وسيَنجح التسجيل. لكنّك (على الأرجح) كتبتَ اسمك بالعربية فيه ظنّاً أنّه مطلوب، فرُفِض.</p>
+</div>
+
+<p>تحقّقتُ أنّ كل الحالات الأخرى تَعمل: الهاتف المحلّي (<code>0911...</code>)، بمسافات، بشرطات، كلها تَنجح. والمزوّد والسائق والعميل يَنجحون عبر الخلفية. <strong>الخلفية سليمة تماماً.</strong></p>
+
+<!-- why nothing showed -->
+<h1>ثانياً: لماذا لم يَظهر شيء (لا اسم الحقل ولا السبب)؟</h1>
+
+<h3>السبب الجذريّ (1): الواجهة لم تَفهم صيغة الخطأ</h3>
+<p>الخلفية تُرسل أخطاء التحقّق بثلاث صيغ مختلفة:</p>
+<pre>
+1) details.fields = { "username": "..." }        ← صيغتنا المخصّصة
+2) details.field  = "username"                    ← صيغة قديمة
+3) details.errors = [{ loc: ["body","username"],  ← صيغة Pydantic (FastAPI)
+                       msg: "username must be ..." }]
+</pre>
+<p>مُعالِج الأخطاء في الواجهة (<code>useFieldErrors</code>) كان يَفهم الصيغتَين (1) و(2) فقط. لكن أخطاء اسم المستخدم/كلمة المرور تَأتي بالصيغة (3) <strong>Pydantic</strong> — التي لم يَكن يَفهمها. فيَسقط إلى رسالة عامّة:</p>
+<div class="before">قبل: <strong>«بيانات غير صالحة»</strong> فقط — بلا ذكر أيّ حقل ولا لماذا 😕</div>
+
+<h3>السبب المُفاقِم (2): كاش الـPWA يُقدّم نسخة قديمة</h3>
+<p>الموقع تطبيق ويب تقدّميّ (PWA) فيه <strong>service worker</strong> يُخزّن الواجهة محلياً ليَعمل دون إنترنت. لكنّه أيضاً يُقدّم <strong>النسخة القديمة المخزَّنة</strong> حتى بعد نشري للإصلاحات.</p>
+<p>دليل حيّ من اختباري: المتصفّح كان يُحمّل <code>main-tDaqFCi7.js</code> (قديمة) بينما الخادم فيه <code>main-B8onWcaQ.js</code> (الجديدة بالإصلاح). بعد مسح الكاش، حُمّلت الجديدة وظَهر الإصلاح فوراً.</p>
+<div class="panel warn">
+<p><strong class="warn-mark">المعنى لك:</strong> حتى بعد نشري أيّ إصلاح، قد ترى النسخة القديمة في متصفّحك حتى يُحدّث الـservice worker نفسه (عند إغلاق كل التبويبات وإعادة الفتح) أو بعد <strong>تحديث قسري</strong>.</p>
+</div>
+
+<!-- the fix -->
+<h1>ثالثاً: ما الذي أصلحتُه؟</h1>
+<ol>
+  <li><strong>جعلتُ <code>useFieldErrors</code> يَفهم صيغة Pydantic</strong> (<code>details.errors</code>) — يَستخرج اسم الحقل من <code>loc</code> ويُترجم الرسالة للعربية الواضحة.</li>
+  <li><strong>أضفتُ عرض خطأ حقل اسم المستخدم</strong> (لم يَكن يُعرَض أصلاً) — حدّ أحمر + رسالة تحته.</li>
+  <li><strong>وضّحتُ التسمية:</strong> «اسم المستخدم (اختياري — أحرف لاتينية وأرقام و_، 4–30 حرفًا. <strong>يمكن تركه فارغًا</strong>)».</li>
+  <li><strong>أوقفتُ البانر العام</strong> عند توفّر خطأ حقل (لا ازدواج).</li>
+</ol>
+
+<div class="after">بعد: تحت حقل اسم المستخدم بالضبط ✅<br/>
+<strong>«اسم المستخدم: أحرف لاتينية وأرقام و_ فقط (بلا عربية أو مسافات) — أو اتركه فارغاً»</strong></div>
+
+<h3>التحقّق البصريّ (Playwright على tawanow.com)</h3>
+<ul>
+  <li>✓ بعد مسح الكاش، حُمّلت الحزمة الجديدة <code>main-B8onWcaQ.js</code></li>
+  <li>✓ التسمية الجديدة تَظهر («يمكن تركه فارغًا»)</li>
+  <li>✓ إدخال «عبدالكريم» (عربي) → الخطأ الواضح يَظهر تحت الحقل (لا «بيانات غير صالحة» العامّة)</li>
+</ul>
+
+<!-- what you should do -->
+<h1>رابعاً: ماذا تَفعل لترى الإصلاح الآن؟</h1>
+<p>لأنّ متصفّحك قد يَحمل النسخة القديمة المخزَّنة، افعل أحد هذه:</p>
+<table>
+<thead><tr><th>الطريقة</th><th>كيف</th></tr></thead>
+<tbody>
+<tr><td><strong>تحديث قسريّ</strong> (الأسهل)</td><td>على tawanow.com اضغط <code>Ctrl+Shift+R</code> (أو <code>Cmd+Shift+R</code> على ماك)</td></tr>
+<tr><td>نافذة خاصّة (Incognito)</td><td>افتح tawanow.com في نافذة تصفّح خفيّ — بلا كاش</td></tr>
+<tr><td>مسح بيانات الموقع</td><td>إعدادات المتصفّح → بيانات الموقع لـtawanow.com → مسح</td></tr>
+<tr><td>الانتظار</td><td>الـservice worker يُحدّث نفسه تلقائياً بعد إغلاق كل تبويبات tawanow.com وإعادة فتحها</td></tr>
+</tbody>
+</table>
+
+<!-- experiment to confirm -->
+<h1>خامساً: جرّب الآن (بعد تحديث قسريّ)</h1>
+<ul>
+  <li>اترك حقل اسم المستخدم <strong>فارغاً</strong> → التسجيل يَنجح ✓</li>
+  <li>أو اكتب اسم مستخدم <strong>لاتينيّاً</strong> (مثل <code>karim2026</code>) → يَنجح ✓</li>
+  <li>لو كتبتَه عربياً → ترى رسالة واضحة تَطلب أحرفاً لاتينية أو تركه فارغاً (لا «بيانات غير صالحة» الغامضة)</li>
+</ul>
+
+<hr/>
+
+<div class="hero">
+<div class="label">الزبدة في 3 أسطر</div>
+<div class="text">
+1. «بيانات غير صالحة» كانت غالباً بسبب <strong>كتابة اسم المستخدم بالعربية</strong> (حقل اختياريّ يَقبل لاتينية فقط).<br/>
+2. لم يَظهر السبب لأنّ الواجهة لم تَفهم صيغة الخطأ + كاش قديم كان يُقدَّم.<br/>
+3. أصلحتُ الاثنين ونشرتُ على tawanow.com. اعمل <strong>تحديثاً قسرياً (Ctrl+Shift+R)</strong> لترى الإصلاح فوراً.
+</div>
+</div>
+
+<p class="footnote" style="margin-top:1.5rem;">ملاحظة: الإصلاح منشور على tawanow.com (الإنتاج) — تحقّقتُ من الحزمة الحيّة على الدومين مباشرةً. مسألة «staging» كانت اسم مجلد على الخادم فقط؛ tawanow.com هو الحيّ. هذا الإصلاح في الواجهة محلياً غير مُلتزَم في git بعد (أُلتزمه لاحقاً إن أردت).</p>
+
+</div>
+</body>
+</html>

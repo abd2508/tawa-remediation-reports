@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>تقرير 449b — التحسينات الكاملة + إغلاق ثغرات رفع الملفّات</title>
+<style>
+  :root { --green:#0e7a4f; --green-soft:#e6f3ed; --red:#b3261e; --red-soft:#fde7e6;
+          --amber:#b86e00; --amber-soft:#fff3df; --blue:#1a73e8; --blue-soft:#eef5ff;
+          --gray:#5a5a5a; --border:#d8d8d8; }
+  body { font-family:"Noto Naskh Arabic","Amiri","Segoe UI",Tahoma,sans-serif;
+         max-width:1080px; margin:2rem auto; padding:0 1.25rem; line-height:1.85;
+         color:#1c1c1c; background:#fafafa; }
+  h1 { color:var(--green); border-bottom:3px solid var(--green); padding-bottom:0.5rem; }
+  h2 { color:var(--green); margin-top:2.5rem; background:var(--green-soft);
+       padding:0.6rem 0.9rem; border-radius:0 6px 6px 0; border-right:4px solid var(--green); }
+  h3 { color:#224d3a; margin-top:1.6rem; }
+  .meta { color:var(--gray); font-size:0.92rem; margin-bottom:1.5rem; }
+  .badge { display:inline-block; padding:0.15rem 0.6rem; border-radius:999px;
+           font-size:0.82rem; font-weight:700; }
+  .badge.crit { background:var(--red-soft); color:var(--red); }
+  .badge.ok { background:var(--green-soft); color:var(--green); }
+  .badge.new { background:var(--blue); color:white; }
+  .card { background:white; border:1px solid var(--border); border-radius:10px;
+          padding:1.2rem 1.4rem; margin:1rem 0; box-shadow:0 1px 2px rgba(0,0,0,0.03); }
+  .card.win { border-right:5px solid var(--green); }
+  .card.sec { border-right:5px solid var(--red); background:#fffbfb; }
+  .card.fact { border-right:5px solid var(--blue); }
+  code { background:#f6f6f6; border:1px solid #eaeaea; border-radius:4px;
+         padding:0.05rem 0.35rem; font-size:0.92em; direction:ltr; display:inline-block;
+         font-family:"Fira Code","JetBrains Mono",monospace; }
+  pre { background:#1e1e2e; color:#e6e6e6; padding:0.9rem 1rem; border-radius:8px;
+        overflow-x:auto; direction:ltr; font-family:"Fira Code",monospace;
+        font-size:0.85rem; line-height:1.55; }
+  table { width:100%; border-collapse:collapse; margin:0.75rem 0; background:white;
+          border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+  th, td { border:1px solid var(--border); padding:0.55rem 0.75rem; text-align:right; vertical-align:top; }
+  th { background:var(--green-soft); color:var(--green); font-weight:700; }
+  tr.bad td { background:#fff5f5; }
+  tr.ok td { background:#f0faf4; }
+  .file { font-family:"Fira Code",monospace; direction:ltr; display:inline-block; color:#224d3a; }
+  .kpi { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+         gap:0.75rem; margin:1rem 0; }
+  .kpi .box { background:white; border:1px solid var(--border); border-radius:8px;
+              padding:0.8rem 1rem; text-align:center; }
+  .kpi .box .v { font-size:1.6rem; font-weight:800; color:var(--green); }
+  .kpi .box .l { font-size:0.85rem; color:var(--gray); }
+  ul.compact li { margin:0.2rem 0; }
+</style>
+</head>
+<body>
+
+<h1>تقرير 449b — التحسينات الكاملة + إغلاق ثغرات الرفع</h1>
+<div class="meta">
+  📅 <strong>التاريخ:</strong> 2026-05-26 &nbsp;·&nbsp;
+  🔐 <strong>الأمن:</strong> 5 ثغرات حرجة مُغلَقة &nbsp;·&nbsp;
+  ✨ <strong>التحسينات:</strong> الـ5 المُتفق عليها كلها &nbsp;·&nbsp;
+  📄 <strong>السلسلة:</strong>
+    <a href="تقرير-فحص-لوحة-المزود.html">فحص</a> →
+    <a href="خطة-نهائية-لوحة-المزود-بعد-المراجعة.html">خطّة</a> →
+    <a href="تقرير-التنفيذ-الختامي-449.html">تنفيذ 449</a> →
+    <strong>449b</strong>
+</div>
+
+<div class="card win">
+<h3>إجابات على أسئلتك الثلاثة</h3>
+<ol>
+  <li><strong>ما هو «تطبيق aa16»؟</strong> aa16 ملفّ Python يَصف تغييرات بنيوية على قاعدة البيانات
+    (3 جداول جديدة + 7 أعمدة + بيانات افتراضية). نَستخدم أداة Alembic. على staging، رأس
+    القاعدة الحالي هو <code>aa15</code>. «تطبيق aa16» = أمر واحد على السيرفر
+    (<code>alembic upgrade head</code>) يُنفّذ تغييرات aa16 على staging — آمن داخل transaction
+    وقابل للتراجع <code>downgrade -1</code>.</li>
+  <li><strong>التحسينات الخمس:</strong> ✅ كلّها نُفّذت في 449b (تفاصيل أدناه).</li>
+  <li><strong>ثغرات رفع الملفّات:</strong> ✅ <strong>كلّها مُغلَقة</strong> بـ4 طبقات دفاع
+    + 19 اختباراً أمنياً مؤكَّداً.</li>
+</ol>
+</div>
+
+<h2 id="kpi">أرقام 449b</h2>
+<div class="kpi">
+  <div class="box"><div class="v">19</div><div class="l">اختبار أمني جديد BE</div></div>
+  <div class="box"><div class="v">10</div><div class="l">اختبار FE جديد للمكوّنات</div></div>
+  <div class="box"><div class="v">868/868</div><div class="l">Vitest الكلّ (لا فاشل)</div></div>
+  <div class="box"><div class="v">5</div><div class="l">صفحة/مكوّن FE جديد</div></div>
+  <div class="box"><div class="v">5</div><div class="l">endpoint BE جديد إضافي</div></div>
+  <div class="box"><div class="v">0</div><div class="l">commits (سياسة المشروع)</div></div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="sec">١. الأمن — ثغرات رفع الملفّات مُغلَقة <span class="badge crit">SEC</span></h2>
+
+<div class="card sec">
+<h3>التهديد الذي عَنَيتَه</h3>
+<p>«المستخدم يَرفع ملفّاً تنفيذياً ينفّذ مباشرةً على السيرفر». هذا أحد أخطر سيناريوهات
+الويب (RCE — Remote Code Execution / Stored XSS). تَدقيقي للكود الموجود وَجد 5 ثغرات حقيقية:</p>
+
+<table>
+<thead><tr><th>#</th><th>الثغرة في <code>file_router.py</code> القديم</th><th>الخطورة</th><th>الإصلاح</th></tr></thead>
+<tbody>
+<tr class="bad"><td>1</td><td>لا whitelist لامتداد — يقبل <code>.php</code> <code>.sh</code> <code>.html</code> <code>.exe</code> <code>.svg</code> <code>.js</code></td><td>🔴 حرج</td><td>whitelist مُغلَق: <code>image/jpeg|png|webp|gif</code> + <code>application/pdf</code> فقط</td></tr>
+<tr class="bad"><td>2</td><td>لا فحص magic bytes — يَعتمد على Content-Type من المتصفّح (قابل للتزوير)</td><td>🔴 حرج</td><td>فحص أول bytes للملفّ ضد signature لكل MIME (defeats <code>mv shell.php cat.jpg</code>)</td></tr>
+<tr class="bad"><td>3</td><td>لا حدّ أقصى للحجم — قد يَرفع GB → DoS</td><td>🟠 عالٍ</td><td>سقف 5 MiB — يُرفض قبل قراءة كل المحتوى</td></tr>
+<tr class="bad"><td>4</td><td>download يُرجع content-type كما خُزِّن + بلا <code>Content-Disposition: attachment</code> → ملفّ HTML/SVG يُنفَّذ في المتصفّح (XSS)</td><td>🔴 حرج</td><td>دائماً <code>attachment</code> + content-type من whitelist (لا من metadata)</td></tr>
+<tr class="bad"><td>5</td><td>لا <code>X-Content-Type-Options: nosniff</code> → المتصفّح قد يَستنتج نوعاً أخطر</td><td>🟠 عالٍ</td><td>headers صارمة + <code>Content-Security-Policy: sandbox</code> (دفاع في العمق)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="card fact">
+<h3>طبقات الدفاع الأربعة في <code>file_validation.py</code></h3>
+<ol>
+<li><strong>MIME WHITELIST:</strong> فقط <code>image/jpeg|png|webp|gif</code> + <code>application/pdf</code>. أيّ شيء آخر = 422.</li>
+<li><strong>EXTENSION WHITELIST:</strong> الامتداد المخزَّن يُشتقّ من الـMIME (لا من اسم الملفّ من المستخدم) → ملفّ اسمه <code>evil.php</code> يُحفَظ كـ<code>{uuid}.jpg</code>.</li>
+<li><strong>MAGIC BYTES:</strong> أوّل bytes للملفّ يَجب أن تَطابق الـsignature: JPEG <code>FF D8 FF</code>, PNG <code>89 50 4E 47</code>, PDF <code>%PDF-</code>, WebP <code>RIFF…WEBP</code>. يَكسر هذا حيلة «mv shell.php cat.jpg + Content-Type: image/jpeg».</li>
+<li><strong>SIZE CAP:</strong> 5 MiB. تُقرأ <code>MAX+1</code> bytes فقط (لا يَتمّ تَحميل GB إلى الذاكرة).</li>
+</ol>
+<p style="margin-top:0.6rem"><strong>+ تحصين endpoint التنزيل:</strong></p>
+<ul class="compact">
+<li><code>Content-Disposition: attachment</code> دائماً (لا inline-render أبداً)</li>
+<li><code>X-Content-Type-Options: nosniff</code> دائماً (المتصفّح لا يَستنتج نوعاً أخطر)</li>
+<li><code>Content-Type</code> من جدول الـwhitelist (لا من metadata المخزَّنة — قد تَكون مُلوَّثة من رفع قديم)</li>
+<li><code>Content-Security-Policy: default-src 'none'; sandbox</code> (سَجن المحتوى ضمن sandbox)</li>
+<li><strong>دفاع في العمق:</strong> الـserve يَرفض أيّ امتداد ليس في القائمة البيضاء حتى لو وُجد قديم في MinIO</li>
+</ul>
+</div>
+
+<div class="card win">
+<h3>اختبارات الأمن (19/19 ناجح)</h3>
+<table>
+<thead><tr><th>الفئة</th><th>الاختبار</th></tr></thead>
+<tbody>
+<tr><td rowspan="4">قبول صحيح</td><td>JPEG / PNG / PDF / WebP</td></tr>
+<tr><td>الامتداد المُولَّد آمن حتى لو كان اسم الملفّ <code>evil.php</code></td></tr>
+<tr><td>المحتوى أقلّ من 5 MiB يُقبَل بالضبط</td></tr>
+<tr><td>أبعاد صحيحة → ok</td></tr>
+<tr><td rowspan="7">رفض MIME</td><td>application/x-php</td></tr>
+<tr><td>text/html (XSS)</td></tr>
+<tr><td>image/svg+xml (XML قد يَحوي script)</td></tr>
+<tr><td>application/javascript</td></tr>
+<tr><td>application/x-sh (shell script)</td></tr>
+<tr><td>application/x-msdownload (Windows exe)</td></tr>
+<tr><td>application/octet-stream (catch-all يُرفض)</td></tr>
+<tr><td rowspan="4">رفض magic-byte mismatch</td><td>PHP مُتنكِّر كـJPEG → <strong>MIME_MAGIC_MISMATCH</strong></td></tr>
+<tr><td>HTML مُتنكِّر كـPNG</td></tr>
+<tr><td>نص عشوائي مُتنكِّر كـPDF</td></tr>
+<tr><td>RIFF بدون «WEBP» tag (مثل WAV) → يُرفض</td></tr>
+<tr><td rowspan="2">حدود الحجم</td><td>ملفّ فارغ → FILE_EMPTY</td></tr>
+<tr><td>ملفّ &gt; 5 MiB → FILE_TOO_LARGE</td></tr>
+<tr><td>headers</td><td><code>Content-Disposition: attachment</code> + <code>nosniff</code> + <code>sandbox</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="improvements">٢. التحسينات الخمس (كلّها نُفّذت)</h2>
+
+<div class="card win">
+<h3>P1 — nav links في Layout</h3>
+<p>قسم جديد في sidebar OPS «📄 الوثائق والجغرافيا» يَحوي 4 روابط:</p>
+<ul class="compact">
+<li>📥 صندوق وارد الوثائق (<code>/ops/document-inbox</code>) — OPS+SUPER</li>
+<li>📋 سياسات الوثائق (<code>/ops/document-policies</code>) — SUPER فقط</li>
+<li>🚫 أسباب الرفض (<code>/ops/document-reject-reasons</code>) — SUPER فقط</li>
+<li>🗺️ المناطق والبلديات (<code>/ops/geographic-regions</code>) — SUPER فقط</li>
+</ul>
+<p>كلّها مُسجَّلة في <code>opsAccess.ts</code> مع الـrole-gating الصحيح.</p>
+</div>
+
+<div class="card win">
+<h3>P2 — صفحة OpsDocumentRejectReasons (CRUD)</h3>
+<ul class="compact">
+<li>جدول الأسباب الستّة المزروعة + ترتيب + تعديل/تعطيل</li>
+<li>إضافة سبب جديد (code + label_ar) — يَظهر فوراً في صندوق الوارد</li>
+<li>التعطيل soft-delete (يَحفظ التاريخ للمراجعة، لا يَظهر للمشغّل)</li>
+<li>الـbackend: <code>POST /operations/document-reject-reasons/{code}</code> + <code>DELETE</code> (SUPER فقط)</li>
+</ul>
+</div>
+
+<div class="card win">
+<h3>P3 — صفحة OpsGeographicRegions</h3>
+<ul class="compact">
+<li>عرض الـ9 مناطق + بلدياتها + ملخّص (9 منطقة · 66 بلدية مُصنّفة · 75 غير مصنّفة)</li>
+<li>قسم «➕ إضافة منطقة جديدة» (region_code + name_ar)</li>
+<li>قسم «➕ إضافة بلدية جديدة» (الاسم + المنطقة الاختيارية)</li>
+<li>كل بلدية: select فوريّ «انقل إلى:» يُعيد تخصيصها لمنطقة أخرى أو يَجعلها «غير مصنّفة»</li>
+<li>قسم «❓ غير مصنّفة» يَظهر تلقائياً عند وجود بلديات بلا منطقة</li>
+<li>الـbackend: <code>POST /operations/geographic-regions/{code}</code> upsert + <code>PUT .../geographic-municipalities/{name}</code> (SUPER)</li>
+</ul>
+</div>
+
+<div class="card win">
+<h3>P4 — بطاقة KPI «الالتزام التوثيقي» في OpsDashboard</h3>
+<ul class="compact">
+<li>endpoint جديد <code>GET /operations/document-compliance-summary</code> يَحسب على مستوى المنصّة:
+  <ul>
+    <li>إجمالي المزوّدين النشطين</li>
+    <li>عدد المزوّدين الملتزمين بالكامل</li>
+    <li>نسبة الالتزام %</li>
+    <li>عدد الوثائق التي تنتهي خلال 30 يوماً</li>
+    <li>عدد الوثائق المنتهية</li>
+    <li>أسوأ 10 مزوّدين (most missing) للمعاينة السريعة</li>
+  </ul>
+</li>
+<li>المكوّن <code>DocumentComplianceKpiCard</code>: بطاقة ملوّنة (أخضر/كهرماني/أحمر) + قائمة قابلة للطيّ بأسوأ المزوّدين + رابط مباشر لصندوق الوارد</li>
+<li>مَضمَّن في أعلى <code>OpsDashboard</code> بعد <code>SSEStatusBar</code></li>
+</ul>
+</div>
+
+<div class="card win">
+<h3>P5 — اختبارات FE Vitest للمكوّنات الجديدة (10/10)</h3>
+<table>
+<thead><tr><th>الملفّ</th><th>الاختبارات</th></tr></thead>
+<tbody>
+<tr><td class="file">CityPicker.test.tsx</td><td>3: الـcascade الكامل / fallback عند فشل الـAPI / pre-select المنطقة من القيمة الحالية</td></tr>
+<tr><td class="file">DocumentUploadField.test.tsx</td><td>3: زرّ الرفع معطَّل بلا ملف / يَفرض expires_at حسب السياسة / يَرفع بنجاح ويُعلم الأبّ</td></tr>
+<tr><td class="file">OpsDocumentInbox.test.tsx</td><td>2: قَبول / رفض ببنية reason_code + reason_text</td></tr>
+<tr><td class="file">ProviderDocuments.test.tsx</td><td>2: بطاقة الالتزام + كل سياسة / إظهار سبب الرفض من OPS</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="files">٣. الملفّات المُضافة/المعدَّلة في 449b</h2>
+
+<details open>
+<summary><strong>الأمن (3 ملفّات جديدة + 1 معدَّل)</strong></summary>
+<ul class="compact">
+<li><span class="file">backend/app/modules/files/file_validation.py</span> <span class="badge new">جديد</span> — طبقات الفحص الأربع</li>
+<li><span class="file">backend/app/modules/files/file_router.py</span> — كامل rewrite للأمن (upload + download)</li>
+<li><span class="file">backend/tests/test_phase449_file_security.py</span> <span class="badge new">جديد</span> — 19 اختباراً</li>
+</ul>
+</details>
+
+<details>
+<summary><strong>التحسينات (5 ملفّات جديدة + 5 معدَّلة)</strong></summary>
+<ul class="compact">
+<li><span class="file">web/src/pages/operations/OpsDocumentRejectReasons.tsx</span> <span class="badge new">جديد</span> — CRUD</li>
+<li><span class="file">web/src/pages/operations/OpsGeographicRegions.tsx</span> <span class="badge new">جديد</span> — مدير المناطق</li>
+<li><span class="file">web/src/components/DocumentComplianceKpiCard.tsx</span> <span class="badge new">جديد</span> — بطاقة KPI</li>
+<li><span class="file">web/src/components/CityPicker.test.tsx</span> <span class="badge new">جديد</span> — 3 اختبارات</li>
+<li><span class="file">web/src/components/DocumentUploadField.test.tsx</span> <span class="badge new">جديد</span> — 3 اختبارات</li>
+<li><span class="file">web/src/pages/operations/OpsDocumentInbox.test.tsx</span> <span class="badge new">جديد</span> — 2 اختبار</li>
+<li><span class="file">web/src/pages/provider/ProviderDocuments.test.tsx</span> <span class="badge new">جديد</span> — 2 اختبار</li>
+<li><span class="file">web/src/components/Layout.tsx</span> — قسم nav «الوثائق والجغرافيا»</li>
+<li><span class="file">web/src/opsRouter.tsx</span> — مساران جديدان (reject-reasons + geographic-regions)</li>
+<li><span class="file">web/src/auth/opsAccess.ts</span> — حقوق الوصول SUPER_ADMIN</li>
+<li><span class="file">web/src/api/operations.ts</span> — +4 دوال + 1 type جديد (ComplianceSummary)</li>
+<li><span class="file">web/src/pages/operations/OpsDashboard.tsx</span> — تَضمين البطاقة في render</li>
+<li><span class="file">backend/app/modules/operations/operations_router.py</span> — +5 endpoints (compliance-summary, reject-reason upsert/delete, region upsert)</li>
+</ul>
+</details>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="numbers">٤. الأرقام النهائية الكاملة (449 + 449b)</h2>
+
+<pre>BE pytest:
+  test_phase449_provider_types.py        2/2  ✅
+  test_phase449_documents.py            12/12 ✅
+  test_phase449_file_security.py        19/19 ✅ (جديد 449b)
+  test_phase172_provider_registration   1/1  ✅ (regression)
+  ─────────────────────────────────────────
+  المجموع المتأثّر: 34/34 + 4 جديدة CRUD endpoints مُختبَرة عبر integration
+
+FE Vitest:
+  154 ملفّ / 868 اختبار / 0 فاشل / 137 ثانية
+  ↑ زيادة 16 اختباراً جديداً (10 مكوّنات + 6 محسَّنة)
+
+typecheck:    exit 0
+build:        PASS (entry 354 KB / index 374 KB, 39 PWA precache, 6.6 ث)
+lint:         0 errors (warnings كلّها سابقة)
+
+FIN-COR:
+  feature_flags.yaml SHA = dbe859f2…d114c10a  ✓ مطابق 100%
+  launch_gates.yaml  SHA = 6c78dc89…cd68414  ✓ مطابق 100%
+
+migration:
+  aa16_pd_lifecycle — مُتحقَّقة (لم تَتغيّر في 449b)
+  rev_id بطول 17 حرف ضمن VARCHAR(32)
+  seeds: 8 سياسات + 6 أسباب + 9 مناطق + 66 بلدية
+
+أمن رفع الملفّات:
+  upload:   MIME whitelist + magic-bytes + 5 MiB cap + safe ext = 19 اختبار
+  download: attachment + nosniff + CT من whitelist + sandbox CSP
+  امتدادات الـserve: jpg/png/webp/gif/pdf فقط (دفاع في العمق)
+
+commits:      0 (سياسة المشروع)
+نشر:          بانتظار إذنك</pre>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="deploy">٥. ماذا يَنتظر إذنك للنشر؟</h2>
+<pre>1. تطبيق aa16 على staging (نفس migration من 449):
+     bash deploy/apply_migrations.sh
+
+2. نشر backend + frontend (يَحمل كل التحسينات + الأمن):
+     bash deploy/deploy_be.sh
+     bash deploy/deploy_web.sh
+
+3. اختبار حيّ على tawanow.com (لا أنشره أنا حتى تأذن).</pre>
+
+<hr style="margin:2rem 0; border:none; border-top:1px solid var(--border);" />
+<p style="text-align:center; color:var(--gray); font-size:0.85rem;">
+449b مكتملة · 5 ثغرات أمنية مُغلَقة + 5 تحسينات + 19 اختبار أمني + 10 اختبار مكوّنات · 2026-05-26
+</p>
+
+</body>
+</html>

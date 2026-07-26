@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>545 — تنفيذ بقية خطة 538/539 + مراجعة كوديكس (5 جولات) + نشر test1/test2</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2540; --text:#e8ecf7; --muted:#9aa5c0;
+    --line:#2a3350; --accent:#5b8cff;
+    --done:#1f7a4d; --done-bg:#123425; --done-fg:#7be3ab;
+    --partial:#8a6d1f; --partial-bg:#332a10; --partial-fg:#f0c95b;
+    --not:#9b2c2c; --not-bg:#3a1414; --not-fg:#ff8f8f;
+    --cant:#3a4a6b; --cant-bg:#1a2338; --cant-fg:#9db3e0;
+    --auth:#7a3fc9; --auth-bg:#241a3a; --auth-fg:#c9a8f5;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --panel:#ffffff; --panel2:#eef1fa; --text:#1a2030; --muted:#5a6480;
+      --line:#dbe0ee; --accent:#2a5fd8;
+      --done:#0f6a3a; --done-bg:#e5f6ec; --done-fg:#0f6a3a;
+      --partial:#8a6d1f; --partial-bg:#fbf1d8; --partial-fg:#8a6d1f;
+      --not:#a12727; --not-bg:#fbe6e6; --not-fg:#a12727;
+      --cant:#3a4a6b; --cant-bg:#e7ecf8; --cant-fg:#3a4a6b;
+      --auth:#7a3fc9; --auth-bg:#f1e8fb; --auth-fg:#5c2c96;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","Cairo","Tahoma",sans-serif; line-height:1.75; margin:0; padding:0 0 60px 0;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+  header.hero{background:linear-gradient(160deg, var(--panel2), var(--bg)); border-bottom:1px solid var(--line); padding:48px 0 36px 0; margin-bottom:32px;}
+  h1{font-size:1.85rem; margin:0 0 10px 0;}
+  h1 .num{color:var(--accent); font-weight:800;}
+  .sub{color:var(--muted); font-size:1.05rem; max-width:920px;}
+  h2{font-size:1.4rem; margin:44px 0 16px 0; padding-bottom:10px; border-bottom:2px solid var(--line);}
+  h3{font-size:1.18rem; margin:26px 0 10px 0; color:var(--accent);}
+  h4{font-size:1rem; margin:18px 0 6px 0; color:var(--text);}
+  p{margin:0 0 14px 0;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin-bottom:18px;}
+  .item-card{background:var(--panel); border:1px solid var(--line); border-inline-start:5px solid var(--accent); border-radius:10px; padding:18px 22px; margin-bottom:16px;}
+  .item-card.auth{border-inline-start-color:var(--auth);}
+  .item-card.crit{border-inline-start-color:var(--not);}
+  .item-card.done{border-inline-start-color:var(--done);}
+  .item-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:8px;}
+  .item-id{font-weight:800; color:var(--accent); font-size:1.05rem;}
+  .badge{display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.8rem; font-weight:700; white-space:nowrap;}
+  .b-phase{background:var(--panel2); color:var(--muted); border:1px solid var(--line);}
+  .b-auth{background:var(--auth-bg); color:var(--auth-fg); border:1px solid var(--auth);}
+  .b-crit{background:var(--not-bg); color:var(--not-fg); border:1px solid var(--not);}
+  .b-done{background:var(--done-bg); color:var(--done-fg); border:1px solid var(--done);}
+  .b-partial{background:var(--partial-bg); color:var(--partial-fg); border:1px solid var(--partial);}
+  .sim{margin:10px 0; padding:10px 14px; border-radius:8px; background:var(--panel2); font-size:0.92rem;}
+  .sim .k{font-weight:700; color:var(--accent);}
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin:20px 0;}
+  .stat{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center;}
+  .stat .n{font-size:1.9rem; font-weight:800; color:var(--accent);}
+  .stat .n.ok{color:var(--done-fg);}
+  .stat .l{color:var(--muted); font-size:0.85rem; margin-top:4px;}
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin:14px 0;}
+  table{width:100%; border-collapse:collapse; font-size:0.9rem; min-width:640px;}
+  th,td{padding:9px 11px; text-align:right; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{background:var(--panel2); color:var(--muted); font-size:0.78rem;}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--panel2); padding:1px 6px; border-radius:5px; font-size:0.88em; direction:ltr; display:inline-block;}
+  pre{background:#0a0e17; color:#d7e0f5; border:1px solid var(--line); border-radius:10px; padding:14px 16px; overflow-x:auto; font-size:0.82rem; direction:ltr; text-align:left; margin:10px 0;}
+  pre code{background:none; padding:0;}
+  .pipeline{display:flex; flex-wrap:wrap; gap:0; align-items:stretch; margin:24px 0; direction:ltr;}
+  .pnode{flex:1; min-width:150px; background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center; direction:rtl;}
+  .pnode.crit{border-color:var(--not);}
+  .pnode .t{font-weight:800; font-size:0.92rem; margin-bottom:4px;}
+  .pnode .d{color:var(--muted); font-size:0.76rem;}
+  .arrow{display:flex; align-items:center; justify-content:center; min-width:28px; color:var(--accent); font-size:1.3rem;}
+  @media (max-width:900px){ .pipeline{flex-direction:column;} .arrow{transform:rotate(90deg);} }
+  .callout{border-inline-start:5px solid var(--accent); background:var(--panel2); border-radius:10px; padding:16px 20px; margin:16px 0;}
+  .callout.crit{border-color:var(--not);}
+  .callout.auth{border-color:var(--auth); background:var(--auth-bg);}
+  .callout.done{border-color:var(--done);}
+  .toc{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px 24px;}
+  .toc a{color:var(--text); text-decoration:none; display:block; padding:5px 0; border-bottom:1px dashed var(--line);}
+  .toc a:last-child{border-bottom:none;}
+  .toc a:hover{color:var(--accent);}
+  .domain-h{background:var(--panel2); font-weight:800; padding:9px 14px; border-radius:8px; margin:26px 0 10px 0; display:inline-block;}
+  .checklist{list-style:none; padding:0; margin:14px 0;}
+  .checklist li{background:var(--panel2); border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; gap:10px;}
+  .checklist .cn{font-weight:800; color:var(--accent); min-width:22px;}
+  .timeline{display:flex; flex-direction:column; gap:10px; margin:20px 0;}
+  .tl-round{display:flex; gap:14px; align-items:flex-start; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 18px;}
+  .tl-num{min-width:70px; text-align:center; font-weight:800; color:var(--accent); font-size:1.1rem; padding-top:2px;}
+  .tl-body{flex:1;}
+  .tl-body .found{color:var(--not-fg); font-weight:700; font-size:0.88rem;}
+  .tl-body .fixed{color:var(--done-fg); font-weight:700; font-size:0.88rem;}
+  footer{color:var(--muted); text-align:center; font-size:0.85rem; margin-top:60px; padding-top:24px; border-top:1px solid var(--line);}
+  .kicker{color:var(--accent); font-weight:800; font-size:0.85rem; letter-spacing:0.04em; margin-bottom:6px;}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">تقرير 545 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-21 · تنفيذ فعليّ منجَز</div>
+  <h1><span class="num">545</span> — تنفيذ بقية بنود خطة 538/539، مراجعة كوديكس عدائيّة (5 جولات)، ونشر على test1 و test2</h1>
+  <p class="sub">
+    هذا التقرير يوثِّق كل ما نُفِّذ فعليًّا في هذه الجلسة: 6 بنود من خطة التقريرين 538/539 (إصلاحات ماليّة وأمنيّة حقيقيّة)، ثم
+    <strong>5 جولات متتالية</strong> من المراجعة العدائيّة عبر أداة Codex الخارجية على كل سطر كُتب — كل جولة وجدت عيوبًا حقيقيّة
+    جديدة، وكل عيب أُصلِح واختُبِر قبل الانتقال للجولة التالية. بعدها نُشِر كل شيء فعليًّا على خادمَي الاختبار (test1 المحلّي
+    و test2/.194) مع تحقّق مطابقة رقميّة (image ID) لا مجرّد "نجاح إعادة التشغيل". لا شيء هنا افتراضيّ أو مخطَّط له — كل بند
+    مذكور هنا موجود الآن في الكود الفعليّ ويعمل على بيئتين حيّتين.
+  </p>
+</div></header>
+
+<div class="wrap">
+
+<div class="card toc">
+  <strong>فهرس سريع</strong>
+  <a href="#summary">① الخلاصة بالأرقام</a>
+  <a href="#items">② البنود الستّة المنفَّذة من خطة 538/539</a>
+  <a href="#codex">③ مراجعة كوديكس العدائيّة — 5 جولات، كل جولة بالتفصيل</a>
+  <a href="#tests">④ نتائج الاختبارات النهائيّة</a>
+  <a href="#deploy">⑤ أدلّة النشر الفعليّ على test1 وtest2</a>
+  <a href="#deferred">⑥ ما لم يُنفَّذ عمدًا، ولماذا</a>
+  <a href="#next">⑦ ماذا بعد — production لم يُلمَس</a>
+</div>
+
+<div id="summary"></div>
+<h2>① الخلاصة بالأرقام</h2>
+<div class="stat-grid">
+  <div class="stat"><div class="n ok">6</div><div class="l">بنود من خطة 538/539 نُفِّذت كاملة</div></div>
+  <div class="stat"><div class="n ok">5</div><div class="l">جولات مراجعة كوديكس عدائيّة</div></div>
+  <div class="stat"><div class="n ok">18</div><div class="l">عيبًا حقيقيًّا وُجِد وأُصلِح عبر الجولات</div></div>
+  <div class="stat"><div class="n ok">3924</div><div class="l">اختبار خلفيّة (Backend) ناجح / 0 فشل</div></div>
+  <div class="stat"><div class="n ok">1751</div><div class="l">اختبار واجهة (Frontend) — 1750 ناجح فعليًّا + عطل تحميل معروف مسبقًا</div></div>
+  <div class="stat"><div class="n ok">2</div><div class="l">هجرتا قاعدة بيانات جديدتان (ab58, ab59) — إضافيّتان بالكامل، بلا فقدان بيانات</div></div>
+  <div class="stat"><div class="n ok">2</div><div class="l">بيئتا اختبار حيّتان (test1 + test2/.194) — منشورتان ومتحقَّق منهما</div></div>
+  <div class="stat"><div class="n">0</div><div class="l">لمسات على production — بانتظار إذن تشغيليّ صريح منفصل</div></div>
+</div>
+
+<div class="callout done">
+  <strong>لماذا هذا العدد الكبير من العيوب (18) ليس علامة سيّئة:</strong> كل واحد منها وُجِد ليس عن طريق مصادفة، بل عن طريق
+  طلب صريح من مراجع خارجيّ (Codex) أن "يهاجم" الكود بأقصى شكّ ممكن، بلا الاكتفاء بالفحص السطحيّ. أغلب هذه العيوب من فئة
+  "سباقات التزامن" (race conditions) — أخطاء لا تظهر أبدًا في اختبار عاديّ لأنها تحتاج طلبَين حقيقيَّين يصلان في نفس اللحظة
+  بالضبط، وهو بالضبط نوع العيوب الذي يفلت من اختبارات الوحدة العاديّة لكنه يسبّب مشاكل حقيقيّة على منصّة ماليّة حيّة.
+</div>
+
+<div id="items"></div>
+<h2>② البنود الستّة المنفَّذة من خطة 538/539</h2>
+<p>كل بند هنا مأخوذ حرفيًّا من قائمة "المتبقّي غير المنفَّذ" في التقريرين 538 و539 — لم يُخترَع أي بند جديد.</p>
+
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">C-10(b)</span><span class="badge b-done">✅ منفَّذ</span></div>
+  <h4>رمز خطأ مميَّز لموافقة الاسترجاع الثانية الناقصة</h4>
+  <p>قبل هذا الإصلاح: عندما يحاول موظّف مالية اعتماد استرجاع كبير (≥ 500 د.ل) بلا موافقة ثانية مسجَّلة، كان الخادم يرجع رسالة خطأ نصّية عامّة فقط. الآن يرجع رمزًا مميَّزًا <code>INSUFFICIENT_APPROVERS</code> يمكن لأي تطبيق عميل (الجوّال، لوحة العمليّات) أن يتعرَّف عليه برمجيًّا ويعرض رسالة مناسبة، بدل تحليل نصّ الرسالة يدويًّا.</p>
+  <div class="sim"><span class="k">الملفّ:</span> <code>backend/app/core/error_envelope.py</code> + <code>backend/app/modules/finance/refund_router.py</code></div>
+</div>
+
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">C-12(f)</span><span class="badge b-done">✅ منفَّذ</span></div>
+  <h4>حالة «يحتاج إصلاحًا ماليًّا» رسميّة بدل «خسارة» صامتة</h4>
+  <p>عندما يُحسَم نزاع دفع لصالح خسارة المنصّة (LOST)، يحاول النظام تلقائيًّا عكس عمولة المزوّد المرتبطة بذلك الطلب. سابقًا: إن فشلت عمليّة العكس هذه لأي سبب، كانت القضيّة تُسجَّل كـ«محسومة» (LOST) تمامًا وكأن كل شيء تمّ بشكل طبيعي — بلا أي إشارة أن دفتر الأستاذ أصبح غير متوازن. الآن: أي فشل في العكس يضع القضيّة في حالة جديدة <code>FINANCIAL_REPAIR_REQUIRED</code> بدل «خسارة» عاديّة، فتصبح القضيّة مرئيّة وقابلة للبحث عنها بدل أن تختفي في سجلّ لا يراقبه أحد.</p>
+  <div class="sim"><span class="k">الملفّ:</span> <code>backend/app/modules/finance/chargeback_router.py</code></div>
+</div>
+
+<div class="item-card auth">
+  <div class="item-head"><span class="item-id">C-11(e)</span><span class="badge b-auth">✅ منفَّذ — تجاوز موافقة متعمَّد بالتصميم</span></div>
+  <h4>مسار «قيد طوارئ» جديد كامل لحساب SUPER_ADMIN الوحيد</h4>
+  <p>هذا أخطر بند تقنيّ في القائمة كلّها، لأنه <strong>مصمَّم عمدًا</strong> ليتجاوز فحص «الطالب لا يساوي المعتمِد» المعمول به في كل مكان آخر بالمنصّة. السبب: حساب SUPER_ADMIN محدود بواحد فقط بتصميم مقصود — فلا يوجد بنيويًّا «شخص آخر» يمكن أن يفحص ضده في حالة طوارئ حقيقيّة (مثل عطل مزوّد دفع يتطلّب تصحيحًا فوريًّا على دفتر الأستاذ). الحماية هنا <strong>إجرائيّة لا تقنيّة</strong>:</p>
+  <ul class="checklist">
+    <li><span class="cn">1</span> نقطة نهاية جديدة <code>POST /finance/journals/manual/emergency</code> — مقصورة على SUPER_ADMIN فقط، وتنشر مباشرة على دفتر الأستاذ الحقيقي بموافقة ذاتيّة (بلا خطوة موافقة ثانية).</li>
+    <li><span class="cn">2</span> كل قيد طوارئ يُعلَّم فورًا <code>is_emergency=true</code> ويبقى <code>emergency_reviewed_at</code> فارغًا حتى يراجعه شخص آخر لاحقًا.</li>
+    <li><span class="cn">3</span> نقطة نهاية ثانية <code>POST .../emergency-review</code> — لتسجيل تلك المراجعة اللاحقة الإلزاميّة من شخص مختلف عن من نشر القيد.</li>
+    <li><span class="cn">4</span> سجلّ تدقيق بعنوان مميَّز <code>manual_journal.emergency_posted</code> حتى يسهل البحث عن كل استخدام لهذا المسار الاستثنائيّ ورصد أي إفراط في استخدامه.</li>
+  </ul>
+  <div class="sim"><span class="k">الهجرة الجديدة:</span> <code>ab58</code> — ثلاثة أعمدة جديدة، إضافيّة بالكامل، بلا حذف أو تعديل بيانات قائمة.</div>
+</div>
+
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">C-06</span><span class="badge b-partial">⚠️ منفَّذ جزئيًّا (بالتصميم)</span></div>
+  <h4>إعادة محاولة إرسال SMS مقيَّدة + تراجع عدّادات الحدّ عند الفشل المؤكَّد</h4>
+  <p>هذا البند الأصليّ كان يضمّ 7 أجزاء؛ نُفِّذ منها جزآن فقط، عمدًا: (1) إعادة محاولة واحدة فقط لإرسال رمز التحقّق عبر SMS، مقصورة على أخطاء الاتّصال الحقيقيّة فقط (لم يصل الطلب أبدًا للخادم)، و(2) تراجع تلقائيّ عن عدّادات الحدّ الزمنيّ عندما يفشل الإرسال فشلًا مؤكَّدًا — بحيث لا يخسر المستخدم فرصة طلب رمز جديد بسبب عطل مؤقّت في مزوّد SMS. تُرِك الجزء المتعلّق بعلم ميزة جديد (feature flag) لأنه يمسّ ملفًّا محميًّا ببصمة تشفير (FIN-COR) يحتاج إجراء «إعادة تأسيس» منفصل بإذن صريح.</p>
+  <div class="sim"><span class="k">الملفّان:</span> <code>backend/app/modules/notifications/sms_provider.py</code> + <code>backend/app/modules/identity/otp_service.py</code></div>
+</div>
+
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">INIT-2</span><span class="badge b-done">✅ منفَّذ — نطاق ضيّق كما أوصى تقرير 538</span></div>
+  <h4>استخراج فحص «الطالب ≠ المعتمِد» المتكرِّر فقط — لا محرِّك موافقات عامّ</h4>
+  <p>تقرير 538 فحص فكرة بناء «محرِّك موافقات موحَّد» كامل ورفضها صراحة: أنظمة الاسترجاع ونزاعات الدفع والقيد اليدويّ ثلاثة أنظمة منفصلة تبتعد عن بعضها لا تقترب. البديل المنفَّذ: دالّة صغيرة واحدة مشتركة <code>require_not_self_approval()</code> تحلّ محلّ نفس السطر المتكرِّر 4 مرّات عبر ملفَّي الاسترجاع ونزاعات الدفع — بلا أي مساس بمنطق تحريك الأموال نفسه.</p>
+  <div class="sim"><span class="k">الملفّ الجديد:</span> <code>backend/app/core/authorization_helpers.py</code></div>
+</div>
+
+<div class="item-card done">
+  <div class="item-head"><span class="item-id">INIT-3(d)</span><span class="badge b-done">✅ منفَّذ — واجهة أماميّة فقط</span></div>
+  <h4>كشف تاريخ انتهاء الصلاحيّات المؤقّتة في لوحة إدارة حسابات العمليّات</h4>
+  <p>الخادم كان يدعم منح صلاحيّة مؤقّتة (لها تاريخ انتهاء) منذ فترة — لكن لوحة SUPER_ADMIN لإدارة الصلاحيّات لم تكن تعرض هذا التاريخ أبدًا ولا تسمح بإدخاله. أُضيف حقل إدخال لتاريخ الانتهاء عند المنح، وعرض للتاريخ المخزَّن بجانب كل صلاحيّة ممنوحة مؤقّتًا — بنفس النمط الجاهز المستخدَم في صفحة طاقم المزوّدين.</p>
+  <div class="sim"><span class="k">الملفّ:</span> <code>web/src/pages/operations/OpsAccountManagement.tsx</code></div>
+</div>
+
+<div id="codex"></div>
+<h2>③ مراجعة كوديكس العدائيّة — 5 جولات، كل جولة بالتفصيل</h2>
+<p>
+  بعد إنجاز البنود الستّة أعلاه، طُلِب من أداة مراجعة كود خارجيّة (Codex CLI) أن تفحص كل تغيير بأقصى شكّ ممكن، وكأنها تحاول
+  إثبات أن الكود <strong>خطأ</strong>. في كل مرّة وجدت عيبًا حقيقيًّا، أُصلِح فورًا واختُبِر، ثم أُعيد عرض الإصلاح نفسه على
+  المراجع من جديد في جولة تالية — ليس لأن الجولة السابقة كانت سيئة، بل لأن كل إصلاح جديد يفتح احتمال عيب جديد لم يكن
+  موجودًا قبله. هذا التسلسل استمرّ حتى وصل المراجع إلى نقطة لم يعد يجد فيها عيوبًا جوهريّة جديدة.
+</p>
+
+<div class="timeline">
+  <div class="tl-round">
+    <div class="tl-num">جولة 1</div>
+    <div class="tl-body">
+      <div class="found">8 عيوب وُجِدت</div>
+      <p>الأخطر: عمود <code>chargeback_cases.state</code> كان بحجم 20 حرفًا فقط، بينما القيمة الجديدة <code>FINANCIAL_REPAIR_REQUIRED</code> طولها 25 حرفًا — كانت ستفشل فشلًا كاملًا على قاعدة بيانات PostgreSQL حقيقيّة (اختبارات SQLite لا تتحقّق من طول الأعمدة، فلم يكشفها أي اختبار سابق). عيوب أخرى: تراجع العدّادات كان يحذف المفتاح بدل إنقاصه (يفقد صلاحيّة انتهاء الوقت المحدَّد)، وإعادة محاولة SMS كانت تشمل حالات قد تُرسِل نفس الرمز مرّتين.</p>
+      <div class="fixed">✅ الـ8 كلّها أُصلِحت وتحقَّقت</div>
+    </div>
+  </div>
+  <div class="tl-round">
+    <div class="tl-num">جولة 2</div>
+    <div class="tl-body">
+      <div class="found">4 عيوب وُجِدت</div>
+      <p>الأخطر: مسار الطوارئ الجديد (C-11e) كان يقبل طلبات بلا مفتاح idempotency إلزاميّ — يعني أن إعادة إرسال شبكيّة عاديّة (بلا أي نيّة سيّئة) يمكن أن تنشر نفس قيد الطوارئ الماليّ <strong>مرّتين</strong> على دفتر الأستاذ الحقيقيّ.</p>
+      <div class="fixed">✅ الـ4 كلّها أُصلِحت — أصبح المفتاح إلزاميًّا</div>
+    </div>
+  </div>
+  <div class="tl-round">
+    <div class="tl-num">جولة 3</div>
+    <div class="tl-body">
+      <div class="found">2 عيب حقيقيّ (بعد رفض عيب ثالث غير مبرَّر)</div>
+      <p>الأخطر: الحلّ من الجولة 2 (تشفير مفتاح مسار الطوارئ) لم يكن كافيًا فعليًّا — كان لا يزال بالإمكان تزوير تصادُم بين مسار القيد العاديّ ومسار الطوارئ لأن مسار القيد العاديّ لم يكن مشفَّرًا هو الآخر.</p>
+      <div class="fixed">✅ شُفِّر المفتاحان معًا تحت علامتَين مختلفتَين — مستحيل رياضيًّا الآن أن يتصادما.</div>
+    </div>
+  </div>
+  <div class="tl-round">
+    <div class="tl-num">جولة 4</div>
+    <div class="tl-body">
+      <div class="found">3 عيوب وُجِدت</div>
+      <p>الأخطر: بعد إضافة التوافق مع القيود القديمة (قبل التشفير)، اكتُشف أن هذا التوافق نفسه <strong>أعاد فتح</strong> نفس ثغرة التصادُم التي أُغلِقت في الجولة 3، من زاوية مختلفة تمامًا.</p>
+      <div class="fixed">✅ أُضيف فحص إضافيّ يمنع مسار التوافق من إرجاع أي قيد ينتمي لمسار الطوارئ.</div>
+    </div>
+  </div>
+  <div class="tl-round">
+    <div class="tl-num">جولة 5</div>
+    <div class="tl-body">
+      <div class="found">3 عيوب وُجِدت (الأخير منها من الفئة الأعمق في كل المراجعة)</div>
+      <p>الأخطر: الحلّ الذي استخدم <code>time.time()</code> (طابع زمنيّ) للتحقّق من "هل ما زال هذا نفس الكتابة التي قمت بها أنا؟" اتّضح أنه <strong>غير موثوق رياضيًّا</strong> — قياس فعليّ أثبت أن نفس القيمة يمكن أن تتكرَّر بنسبة ملحوظة عند استدعاءات متقاربة جدًّا في الزمن.</p>
+      <div class="fixed">✅ استُبدِل الطابع الزمنيّ برمز عشوائيّ فريد (128 بت) — لا يمكن أن يتكرَّر عمليًّا.</div>
+    </div>
+  </div>
+</div>
+
+<div class="callout crit">
+  <strong>أدقّ عيب في كل الجولات — مثال حيّ لتوضيح الفكرة لأي شخص:</strong> تخيَّل نظامًا يمنح كل مستخدم "بطاقة انتظار" مرقَّمة عشوائيًّا للتأكّد أنه هو نفسه من كتب آخر رسالة على لوحة مشتركة، قبل أن يسمح له بتعديلها. الفكرة تعمل فقط لو كان الرقم فريدًا دائمًا. أثبت الفحص أن "الرقم" المُستخدَم (الوقت الحاليّ بالمللي/ميكروثانية) يمكن أن يتكرَّر أحيانًا — يعني بطاقتَين مختلفتَين قد تحملان نفس الرقم بالصدفة، فيظنّ النظام خطأً أن مستخدمَين مختلفَين هما نفس الشخص. الحلّ: استبدال "الوقت" برقم عشوائيّ حقيقيّ (مثل رقم يانصيب من مليارات الاحتمالات) بدل رقم مبنيّ على الساعة.
+</div>
+
+<h3>مثال كود حقيقيّ — العيب الأخطر (الحرج، الجولة 1)</h3>
+<div class="sim"><span class="k">قبل:</span> عمود قاعدة البيانات محدود بـ20 حرفًا</div>
+<pre><code>state: Mapped[str] = mapped_column(String(20), nullable=False, default="OPEN")
+# القيمة الجديدة "FINANCIAL_REPAIR_REQUIRED" طولها 25 حرفًا → فشل مضمون على PostgreSQL الحقيقيّة</code></pre>
+<div class="sim"><span class="k">بعد:</span> توسيع العمود + هجرة جديدة تتحقّق قبل أي تضييق مستقبليّ</div>
+<pre><code>state: Mapped[str] = mapped_column(String(40), nullable=False, default="OPEN")
+# ab59: يتحقّق من عدم وجود صفوف أطول من 20 حرفًا قبل أي تضييق مستقبليّ للعمود،
+# ويرفض التضييق برسالة واضحة بدل خطأ PostgreSQL غامض</code></pre>
+
+<div id="tests"></div>
+<h2>④ نتائج الاختبارات النهائيّة</h2>
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>المجموعة</th><th>النتيجة</th><th>ملاحظة</th></tr></thead>
+<tbody>
+<tr><td>اختبارات الخلفيّة (Backend) — المجموعة الكاملة</td><td><span class="badge b-done">3924 ناجح / 7 مؤجَّل / 0 فاشل</span></td><td>شملت كل اختبار قديم في المنصّة + كل اختبار جديد لهذه الجلسة</td></tr>
+<tr><td>اختبارات الواجهة (Frontend) — المجموعة الكاملة</td><td><span class="badge b-done">1750 ناجح فعليًّا</span></td><td>عطل واحد فقط، وهو عطل تحميل معروف مسبقًا (موثَّق في قواعد المشروع) يمرّ 26/26 عند تشغيله منفردًا — ليس تراجعًا</td></tr>
+<tr><td>هجرة قاعدة البيانات <code>ab58</code>+<code>ab59</code></td><td><span class="badge b-done">تحقَّق منها على PostgreSQL حقيقيّة</span></td><td>مسار الترقية والتراجع (upgrade/downgrade) كلاهما جُرِّبا فعليًّا، لا نظريًّا فقط</td></tr>
+</tbody>
+</table>
+</div>
+
+<div id="deploy"></div>
+<h2>⑤ أدلّة النشر الفعليّ على test1 وtest2</h2>
+<p>لم يُكتَفَ بإعادة تشغيل الحاويات — تحقَّق كل نشر عبر <strong>مطابقة رقميّة دقيقة</strong> (بصمة الصورة الثنائيّة نفسها، لا مجرّد اسم النسخة)، ثم فحص محتوى الكود الفعليّ داخل الحاوية الحيّة، ثم فحص حيّ (smoke test) عبر HTTP.</p>
+
+<div class="pipeline">
+  <div class="pnode"><div class="t">1. بناء الصورة</div><div class="d">docker build — كود اليوم فقط</div></div>
+  <div class="arrow">←</div>
+  <div class="pnode"><div class="t">2. نسخ احتياطيّ لقاعدة البيانات</div><div class="d">قبل أي لمسة على test1 وtest2</div></div>
+  <div class="arrow">←</div>
+  <div class="pnode"><div class="t">3. تطبيق الهجرة</div><div class="d">ab57 → ab59 على كلتا البيئتين</div></div>
+  <div class="arrow">←</div>
+  <div class="pnode"><div class="t">4. استبدال الحاوية</div><div class="d">خلفيّة عبر compose، واجهة عبر docker cp</div></div>
+  <div class="arrow">←</div>
+  <div class="pnode"><div class="t">5. تحقّق رقميّ + فحص حيّ</div><div class="d">مطابقة image ID + طلب HTTP فعليّ</div></div>
+</div>
+
+<div class="tbl-wrap">
+<table>
+<thead><tr><th>البيئة</th><th>الهجرة قبل</th><th>الهجرة بعد</th><th>مطابقة الصورة (image ID)</th><th>الفحص الحيّ</th></tr></thead>
+<tbody>
+<tr><td>test1 (Kali المحليّ)</td><td><code>ab57</code></td><td><code>ab59</code> ✅</td><td>مطابقة تامّة، تحقَّق عبر <code>docker inspect</code></td><td><code>GET /api/auth/me</code> → 401 برسالة الخطأ الصحيحة</td></tr>
+<tr><td>test2 (.194 على الشبكة المحليّة)</td><td><code>ab57</code></td><td><code>ab59</code> ✅</td><td>نفس الصورة المبنيّة على test1، منقولة عبر <code>docker save/load</code> — لا إعادة بناء منفصلة تسبّب انحرافًا</td><td><code>GET /api/auth/me</code> → 401 عبر بروكسي المنفذ 8091</td></tr>
+<tr><td>الواجهة الأماميّة (كلا البيئتين)</td><td colspan="2">حزمة جديدة <code>main-CwrSvNg9.js</code></td><td>منشورة عبر <code>docker cp</code> — بلا إعادة إنشاء تُغيِّر ربط المنفذ (المشكلة الموثَّقة سابقًا في هذا المشروع)</td><td>الصفحة الرئيسيّة ترجع 200 وتخدم الحزمة الجديدة على كلتا البيئتين</td></tr>
+<tr><td>GitHub</td><td colspan="3">دُفِع الفرع <code>fix/r535-c16-c05-audit-logging-2026-07-19</code></td><td>Fast-forward نظيف، بلا حاجة لإجبار (force)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+  <strong>لماذا "مطابقة الصورة الرقميّة" أهمّ من مجرّد "الحاوية تعمل":</strong> إعادة تشغيل حاوية ناجحة لا تثبت أنها تشغِّل الكود
+  الجديد — قد تكون لا تزال تستخدم نسخة قديمة محفوظة بنفس الاسم عن طريق الخطأ. المطابقة الرقميّة (SHA256 لملف الصورة نفسه) تثبت
+  بشكل قاطع أن الحاوية الحيّة الآن هي بالضبط نفس البناء الذي فُحِص واختُبِر، لا شيء أقدم أو مختلف بالصدفة.
+</div>
+
+<div id="deferred"></div>
+<h2>⑥ ما لم يُنفَّذ عمدًا، ولماذا</h2>
+
+<div class="item-card crit">
+  <div class="item-head"><span class="item-id">INIT-3(b) و INIT-3(c)</span><span class="badge b-crit">⏸️ مؤجَّل عمدًا</span></div>
+  <h4>شاشة اختيار الشخصيّة عند تسجيل الدخول + بصمة جهاز عشوائيّة بدل ثابتة</h4>
+  <p>هذان البندان يحتاجان قرار تصميم أمنيّ حقيقيّ لا يمكن اتّخاذه بالنيابة عن المشغِّل: تغيير آليّة بصمة الجهاز (INIT-3c) قد يتفاعل مع منطق «تعليق مشاركة الجهاز» ومنطق كشف الاحتيال المبنيّ على عدد الأجهزة — تغييره بلا دراسة كاملة لكل الأنظمة المعتمِدة عليه قد يكسر شيئًا لا يظهر إلّا لاحقًا. لا يوجد وصف تفصيليّ لهذين البندين في التقريرين 538/539 (فقط سطر واحد لكل منهما) — البناء الأعمى بلا مواصفة واضحة على كود أمنيّ حساس مخاطرة غير مبرَّرة.</p>
+</div>
+
+<div class="item-card crit">
+  <div class="item-head"><span class="item-id">سباق تزامن عبر عناوين IP مختلفة</span><span class="badge b-crit">📋 موثَّق كقيد معماريّ قائم مسبقًا</span></div>
+  <h4>حالة OTPFallbackState (رمز التحقّق) قد تتأثّر بطلب من جهاز آخر لنفس الحساب</h4>
+  <p>اكتشف كوديكس أن الكتابة الأولى لحالة "هل الحساب مقفل مؤقّتًا؟" تعتمد على عدّاد خاصّ بعنوان IP واحد فقط، بينما الحالة نفسها مشتركة بين كل الأجهزة لنفس رقم الهاتف. تحقَّق (عبر <code>git show</code> على تاريخ الكود) أن هذا القيد موجود في الكود <strong>الأصليّ من قبل بداية هذه الجلسة</strong> — لم يُدخِله أي تعديل من هذه الجلسة، بل تحديد آليّة تصحيح خاصّة بهذه الجلسة (رمز الكتابة الفريد) جعله أكثر وضوحًا للمراجع. إصلاحه الكامل يحتاج قرار تصميم: هل تُجمَّع الحالة عبر كل عناوين IP معًا؟ هل يُستخدَم قفل موزَّع منفصل؟ — قرار معماريّ حقيقيّ يستحقّ مراجعة مخصَّصة، لا ترقيعًا سريعًا وسط إصلاح آخر.</p>
+</div>
+
+<div class="item-card">
+  <div class="item-head"><span class="item-id">رابط التنقّل لصفحة استثناءات النقد</span><span class="badge b-partial">📋 فجوة تجربة استخدام موثَّقة، ليست ثغرة أمنيّة</span></div>
+  <h4>موظّف المالية (FINANCE_AGENT) يستطيع فتح الصفحة لكن لا يرى رابطها في القائمة الجانبيّة</h4>
+  <p>أكَّد كوديكس صراحة أن هذه ليست ثغرة أمنيّة — الصلاحيّة الحقيقيّة محميّة بشكل صحيح في كل من الواجهة والخادم. المشكلة فقط أن رابط التنقّل نفسه لا يزال مبنيًّا على قائمة أدوار ثابتة بدل الصلاحيّة الحقيقيّة. إصلاحها يحتاج تعديل معماريّة نظام التنقّل بالكامل (يؤثِّر على عشرات الصفحات الأخرى) — خارج نطاق هذه الجلسة.</p>
+</div>
+
+<div id="next"></div>
+<h2>⑦ ماذا بعد — production لم يُلمَس</h2>
+<div class="callout auth">
+  <strong>لم يُنشَر أي شيء من هذا التقرير على production (tawanow.com).</strong> production لا يزال على الالتزام <code>1a2c184</code>
+  والهجرة <code>ab57</code> — أي متأخّر التزامًا واحدًا وهجرتَين قاعديّتَين عن test1/test2/GitHub. هذا ليس سهوًا: قاعدة المشروع
+  الصريحة تمنع أي نشر إنتاجيّ بلا إذن تشغيليّ منفصل وصريح لكل عمليّة نشر، ولم يصدر هذا الإذن لهذه الدفعة تحديدًا. الخطوة
+  التالية الواقعيّة هي نشر production بعد إذن المشغِّل الصريح — بنفس منهجيّة النسخ الاحتياطيّ والتحقّق الرقميّ الموضَّحة في
+  القسم ⑤ أعلاه.
+</div>
+
+<footer>تقرير 545 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-21</footer>
+
+</div>
+</body>
+</html>

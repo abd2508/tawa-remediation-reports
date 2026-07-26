@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تدقيق الفرونت إند — منصة توا</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #f0f4f8; color: #1a202c; line-height: 1.7; font-size: 15px; }
+
+  /* ── Header ── */
+  .site-header { background: linear-gradient(135deg, #1a3c5e 0%, #2d6a9f 100%); color: white; padding: 2.5rem 2rem; text-align: center; }
+  .site-header h1 { font-size: 2rem; margin-bottom: 0.4rem; }
+  .site-header .sub { opacity: 0.85; font-size: 1rem; }
+  .site-header .meta { display: flex; justify-content: center; gap: 2rem; margin-top: 1.2rem; flex-wrap: wrap; }
+  .site-header .meta span { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 0.3rem 1rem; font-size: 0.85rem; }
+
+  /* ── Nav ── */
+  .toc { background: white; border-bottom: 3px solid #2d6a9f; padding: 1rem 2rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .toc ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .toc a { color: #2d6a9f; text-decoration: none; font-size: 0.85rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 4px; border: 1px solid #2d6a9f; white-space: nowrap; }
+  .toc a:hover { background: #2d6a9f; color: white; }
+
+  /* ── Layout ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+  /* ── Sections ── */
+  .section { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 2.5rem; overflow: hidden; }
+  .section-header { padding: 1.25rem 1.75rem; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 0.75rem; }
+  .section-header h2 { font-size: 1.3rem; color: #1a3c5e; }
+  .section-header .icon { font-size: 1.5rem; }
+  .section-body { padding: 1.75rem; }
+
+  /* ── Summary Cards ── */
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .summary-card { background: white; border-radius: 10px; padding: 1.25rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-top: 4px solid; }
+  .summary-card.blue { border-color: #3b82f6; }
+  .summary-card.green { border-color: #10b981; }
+  .summary-card.orange { border-color: #f59e0b; }
+  .summary-card.red { border-color: #ef4444; }
+  .summary-card.purple { border-color: #8b5cf6; }
+  .summary-card .num { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.25rem; }
+  .summary-card.blue .num { color: #3b82f6; }
+  .summary-card.green .num { color: #10b981; }
+  .summary-card.orange .num { color: #f59e0b; }
+  .summary-card.red .num { color: #ef4444; }
+  .summary-card.purple .num { color: #8b5cf6; }
+  .summary-card .label { font-size: 0.85rem; color: #64748b; font-weight: 600; }
+
+  /* ── Role tabs ── */
+  .role-header { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.75rem; border-bottom: 1px solid #e2e8f0; }
+  .role-badge { font-size: 2rem; background: #f0f4f8; border-radius: 50%; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; }
+  .role-title { font-size: 1.15rem; font-weight: 700; color: #1a3c5e; }
+  .role-sub { font-size: 0.82rem; color: #64748b; }
+
+  /* ── Page inventory table ── */
+  .page-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; }
+  .page-table th { background: #1a3c5e; color: white; padding: 0.7rem 1rem; text-align: right; font-weight: 600; }
+  .page-table td { padding: 0.65rem 1rem; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  .page-table tr:nth-child(even) td { background: #f8fafc; }
+  .page-table tr:hover td { background: #eff6ff; }
+
+  /* ── Gap tables ── */
+  .gap-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; }
+  .gap-table th { background: #374151; color: white; padding: 0.7rem 1rem; text-align: right; font-weight: 600; }
+  .gap-table td { padding: 0.7rem 1rem; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  .gap-table tr:nth-child(even) td { background: #f8fafc; }
+
+  /* ── Badges ── */
+  .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+  .badge-critical { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+  .badge-high { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
+  .badge-medium { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+  .badge-low { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .badge-done { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .badge-missing { background: #fee2e2; color: #991b1b; }
+
+  /* ── Check/Cross ── */
+  .check { color: #16a34a; font-weight: 700; font-size: 1.1rem; }
+  .cross { color: #dc2626; font-weight: 700; font-size: 1.1rem; }
+  .warn { color: #d97706; font-weight: 700; }
+
+  /* ── Comparison table ── */
+  .compare-table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
+  .compare-table th { background: #1e40af; color: white; padding: 0.7rem 1rem; text-align: center; font-weight: 600; }
+  .compare-table th:first-child { text-align: right; background: #1e3a8a; }
+  .compare-table td { padding: 0.6rem 1rem; border: 1px solid #e2e8f0; text-align: center; }
+  .compare-table td:first-child { text-align: right; font-weight: 600; background: #f8fafc; }
+  .compare-table tr:hover td { background: #eff6ff; }
+  .compare-table tr:hover td:first-child { background: #e0f2fe; }
+
+  /* ── Priority list ── */
+  .priority-list { list-style: none; }
+  .priority-list li { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; }
+  .priority-list li:last-child { border-bottom: none; }
+  .priority-num { background: #1a3c5e; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .priority-content strong { display: block; font-size: 0.95rem; color: #1a3c5e; }
+  .priority-content span { font-size: 0.83rem; color: #64748b; }
+
+  /* ── Detail box ── */
+  .detail-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; margin: 0.75rem 0; }
+  .detail-box .title { font-weight: 700; color: #1a3c5e; margin-bottom: 0.4rem; font-size: 0.95rem; }
+  .detail-box .current { color: #059669; font-size: 0.85rem; margin-bottom: 0.3rem; }
+  .detail-box .missing { color: #dc2626; font-size: 0.85rem; margin-bottom: 0.3rem; }
+  .detail-box .compare { color: #7c3aed; font-size: 0.85rem; }
+  .detail-box .impact { color: #d97706; font-size: 0.85rem; font-style: italic; margin-top: 0.3rem; }
+
+  /* ── Screen mockup ── */
+  .screen-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin: 1rem 0; }
+  .screen-card { border: 2px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
+  .screen-card .screen-title { background: #1a3c5e; color: white; padding: 0.6rem 1rem; font-size: 0.85rem; font-weight: 700; }
+  .screen-card .screen-body { padding: 1rem; font-size: 0.82rem; }
+  .screen-card .has-item { color: #16a34a; margin: 0.2rem 0; }
+  .screen-card .missing-item { color: #dc2626; margin: 0.2rem 0; }
+
+  /* ── Alert boxes ── */
+  .alert { border-radius: 8px; padding: 1rem 1.25rem; margin: 0.75rem 0; border-right: 4px solid; }
+  .alert-critical { background: #fef2f2; border-color: #dc2626; color: #7f1d1d; }
+  .alert-warning { background: #fffbeb; border-color: #f59e0b; color: #78350f; }
+  .alert-info { background: #eff6ff; border-color: #3b82f6; color: #1e3a8a; }
+  .alert-success { background: #f0fdf4; border-color: #16a34a; color: #14532d; }
+  .alert strong { display: block; margin-bottom: 0.25rem; }
+
+  /* ── Footer ── */
+  footer { background: #1a3c5e; color: rgba(255,255,255,0.7); text-align: center; padding: 1.5rem; font-size: 0.82rem; margin-top: 3rem; }
+
+  /* ── Print ── */
+  @media print { .toc { display: none; } .site-header { background: #1a3c5e !important; } }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) { .container { padding: 1rem; } .site-header h1 { font-size: 1.4rem; } .summary-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ HEADER -->
+<div class="site-header">
+  <h1>🚚 تقرير تدقيق الفرونت إند — منصة توا</h1>
+  <div class="sub">فحص شامل لجميع الصفحات مقارنةً بالمعايير العالمية (Talabat · Uber Eats · Careem Food)</div>
+  <div class="meta">
+    <span>📅 تاريخ التقرير: 2026-05-18</span>
+    <span>📁 75 صفحة مفحوصة</span>
+    <span>👥 4 أدوار</span>
+    <span>⚠️ 42 فجوة مُحددة</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ NAV -->
+<nav class="toc">
+  <ul>
+    <li><a href="#summary">الملخص التنفيذي</a></li>
+    <li><a href="#inventory">جرد الصفحات</a></li>
+    <li><a href="#customer">العميل</a></li>
+    <li><a href="#driver">السائق</a></li>
+    <li><a href="#provider">المزوّد</a></li>
+    <li><a href="#ops">العمليات</a></li>
+    <li><a href="#compare">المقارنة العالمية</a></li>
+    <li><a href="#global">مشاكل عامة</a></li>
+    <li><a href="#priorities">الأولويات</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+<!-- ══════════════════════════════════════════════════════ SECTION 1: SUMMARY -->
+<section id="summary" class="section">
+  <div class="section-header">
+    <span class="icon">📊</span>
+    <h2>الملخص التنفيذي</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="summary-grid">
+      <div class="summary-card blue"><div class="num">75</div><div class="label">إجمالي الصفحات</div></div>
+      <div class="summary-card green"><div class="num">14</div><div class="label">صفحات العميل</div></div>
+      <div class="summary-card orange"><div class="num">8</div><div class="label">صفحات المزوّد</div></div>
+      <div class="summary-card purple"><div class="num">6</div><div class="label">صفحات السائق</div></div>
+      <div class="summary-card red"><div class="num">47</div><div class="label">صفحات العمليات</div></div>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-card red"><div class="num">12</div><div class="label">فجوة حرجة 🔴</div></div>
+      <div class="summary-card orange"><div class="num">18</div><div class="label">فجوة مهمة 🟠</div></div>
+      <div class="summary-card" style="border-color:#eab308;"><div class="num" style="color:#ca8a04;">12</div><div class="label">فجوة تحسين 🟡</div></div>
+    </div>
+
+    <div class="alert alert-success">
+      <strong>✅ ما هو ناجح وجيد جداً</strong>
+      التدفق الأساسي للطلب كامل ومتكامل (تصفح → سلة → دفع → تتبع). التخصيص المتقدم للأصناف (modifiers, variants, removable components) موجود وجيد. الأمان قوي: OTP للمحفظة، TOTP للعمليات، idempotency للمدفوعات. لوحة العمليات ضخمة ومتكاملة تفوق كثيراً من المنصات المنافسة. نظام الشكاوى والتقييم مبني داخل صفحة التتبع. قائمة التحقق للسائق عند الاستلام ميزة احترافية.
+    </div>
+
+    <div class="alert alert-critical">
+      <strong>🔴 أخطر 3 فجوات تؤثر على إيرادات الإطلاق</strong>
+      (1) الصفحة الرئيسية تفتقر للصور والتقييمات وسعر التوصيل — العميل لا يملك معلومات كافية لاتخاذ قرار الطلب.
+      (2) لا يوجد عرض تفصيلي للأسعار في صفحة الدفع — العميل لا يرى رسوم التوصيل قبل التأكيد.
+      (3) المزوّد لا يملك جدول ساعات عمل — يجب فتح/غلق المتجر يدوياً كل يوم.
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>⚖️ حكم عام</strong>
+      المنصة جاهزة تقنياً للإطلاق المحدود (pilot). لكن للإطلاق الكامل أمام الجمهور، يجب معالجة الفجوات الحرجة المتعلقة بعرض المعلومات للعميل (صور، أسعار، تقييمات) وأدوات المزوّد الأساسية (ساعات العمل).
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 2: INVENTORY -->
+<section id="inventory" class="section">
+  <div class="section-header">
+    <span class="icon">📋</span>
+    <h2>جرد كامل لجميع الصفحات</h2>
+  </div>
+  <div class="section-body">
+
+    <h3 style="color:#1a3c5e; margin-bottom:0.75rem; font-size:1rem;">🛒 صفحات العميل (14 صفحة)</h3>
+    <table class="page-table">
+      <thead><tr><th>#</th><th>المسار (Route)</th><th>اسم الملف</th><th>الوصف</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>/welcome</td><td>LandingPage.tsx</td><td>صفحة الترحيب — شعار + زر دخول + زر تسجيل</td><td><span class="badge badge-done">✅ موجودة</span></td></tr>
+        <tr><td>2</td><td>/login</td><td>LoginPage.tsx</td><td>تسجيل الدخول بكلمة مرور + TOTP (خطوتان)</td><td><span class="badge badge-done">✅ موجودة</span></td></tr>
+        <tr><td>3</td><td>/register</td><td>RegistrationPage.tsx</td><td>إنشاء حساب — اختيار الدور، البيانات الشخصية</td><td><span class="badge badge-done">✅ موجودة</span></td></tr>
+        <tr><td>4</td><td>/forgot-password</td><td>ForgotPasswordPage.tsx</td><td>استعادة كلمة المرور عبر OTP</td><td><span class="badge badge-done">✅ موجودة</span></td></tr>
+        <tr><td>5</td><td>/phone-lookup</td><td>PhoneLookupPage.tsx</td><td>البحث برقم الهاتف لتحديد الحساب</td><td><span class="badge badge-done">✅ موجودة</span></td></tr>
+        <tr><td>6</td><td>/ (index)</td><td>HomePage.tsx</td><td>الصفحة الرئيسية — قائمة المزودين + بحث + فلتر</td><td><span class="badge badge-high">⚠️ ناقصة المحتوى</span></td></tr>
+        <tr><td>7</td><td>/provider/:id</td><td>ProviderDetailPage.tsx</td><td>قائمة المزوّد + تخصيص الأصناف + سلة التسوق</td><td><span class="badge badge-high">⚠️ ناقصة المعلومات</span></td></tr>
+        <tr><td>8</td><td>/checkout/:providerId</td><td>CheckoutPage.tsx</td><td>مراجعة السلة + اختيار العنوان + طريقة الدفع</td><td><span class="badge badge-high">⚠️ لا تعرض رسوم التوصيل</span></td></tr>
+        <tr><td>9</td><td>/order/:id</td><td>OrderTrackingPage.tsx</td><td>تتبع الطلب المباشر + خريطة + تقييم + شكوى</td><td><span class="badge badge-done">✅ جيدة جداً</span></td></tr>
+        <tr><td>10</td><td>/orders</td><td>OrderHistoryPage.tsx</td><td>سجل الطلبات مع pagination</td><td><span class="badge badge-medium">🟡 بدون reorder</span></td></tr>
+        <tr><td>11</td><td>/wallet</td><td>WalletPage.tsx</td><td>رصيد المحفظة + شحن عبر OTP</td><td><span class="badge badge-high">⚠️ بدون سجل المعاملات</span></td></tr>
+        <tr><td>12</td><td>/profile</td><td>ProfilePage.tsx</td><td>الملف الشخصي + تغيير اللغة + تسجيل الخروج</td><td><span class="badge badge-high">⚠️ فارغ جداً</span></td></tr>
+        <tr><td>13</td><td>/address-book</td><td>AddressBook.tsx</td><td>إدارة العناوين مع GPS</td><td><span class="badge badge-medium">🟡 بدون خريطة تفاعلية</span></td></tr>
+        <tr><td>14</td><td>/support/chat</td><td>SupportChat.tsx</td><td>دردشة الدعم مع polling كل 5 ثوانٍ</td><td><span class="badge badge-done">✅ موجودة</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:#1a3c5e; margin:1.5rem 0 0.75rem; font-size:1rem;">🚗 صفحات السائق (6 صفحات)</h3>
+    <table class="page-table">
+      <thead><tr><th>#</th><th>المسار</th><th>الملف</th><th>الوصف</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>/driver</td><td>DriverHome.tsx</td><td>تشغيل/إيقاف التوفر + استقبال العروض + ملخص الأرباح</td><td><span class="badge badge-high">⚠️ ناقص تسوية الكاش</span></td></tr>
+        <tr><td>2</td><td>/driver/pickup/:id</td><td>DriverPickup.tsx</td><td>تفاصيل الاستلام + قائمة تحقق + تأكيد الوصول للمزوّد</td><td><span class="badge badge-high">⚠️ بدون فتح خريطة التنقل</span></td></tr>
+        <tr><td>3</td><td>/driver/delivery/:id</td><td>DriverDelivery.tsx</td><td>تسليم الطلب + دليل التسليم (QR/توقيع/صورة)</td><td><span class="badge badge-done">✅ جيدة</span></td></tr>
+        <tr><td>4</td><td>/driver/pending</td><td>DriverPending.tsx</td><td>حالة انتظار موافقة المشغّل</td><td><span class="badge badge-critical">🔴 بدون رفع وثائق</span></td></tr>
+        <tr><td>5</td><td>/driver/history</td><td>DriverHistory.tsx</td><td>سجل التوصيلات المكتملة</td><td><span class="badge badge-medium">🟡 بدون فلتر تاريخ</span></td></tr>
+        <tr><td>6</td><td>/driver/profile</td><td>DriverProfile.tsx</td><td>الملف الشخصي + التقييم + تسجيل الخروج</td><td><span class="badge badge-high">⚠️ بدون بيانات السيارة والوثائق</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:#1a3c5e; margin:1.5rem 0 0.75rem; font-size:1rem;">🏪 صفحات المزوّد (8 صفحات)</h3>
+    <table class="page-table">
+      <thead><tr><th>#</th><th>المسار</th><th>الملف</th><th>الوصف</th><th>الحالة</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>/provider-portal</td><td>ProviderDashboard.tsx</td><td>لوحة التحكم — 4 إحصائيات + فتح/غلق المتجر</td><td><span class="badge badge-high">⚠️ إحصاءات محدودة جداً</span></td></tr>
+        <tr><td>2</td><td>/provider-portal/queue</td><td>ProviderOrderQueue.tsx</td><td>طابور الطلبات الجديدة + قبول/رفض + وقت التحضير</td><td><span class="badge badge-done">✅ جيدة</span></td></tr>
+        <tr><td>3</td><td>/provider-portal/catalog</td><td>ProviderCatalog.tsx</td><td>إدارة القائمة + الإضافات + الأحجام + الصور</td><td><span class="badge badge-done">✅ جيدة جداً</span></td></tr>
+        <tr><td>4</td><td>/provider-portal/preparation</td><td>ProviderPreparation.tsx</td><td>الطلبات قيد التحضير + قائمة تحقق التغليف</td><td><span class="badge badge-done">✅ جيدة</span></td></tr>
+        <tr><td>5</td><td>/provider-portal/history</td><td>ProviderOrderHistory.tsx</td><td>سجل الطلبات المكتملة</td><td><span class="badge badge-done">✅ موجودة</span></td></tr>
+        <tr><td>6</td><td>/provider-portal/settings</td><td>ProviderSettings.tsx</td><td>إعدادات المنشأة (اسم، مدينة، lat/lng فقط)</td><td><span class="badge badge-critical">🔴 فارغة جداً</span></td></tr>
+        <tr><td>7</td><td>/provider-portal/earnings</td><td>ProviderEarnings.tsx</td><td>أرباح المنشأة — سجل معاملات + إجمالي</td><td><span class="badge badge-done">✅ موجودة</span></td></tr>
+        <tr><td>8</td><td>/provider/pending</td><td>ProviderPending.tsx</td><td>حالة انتظار الموافقة</td><td><span class="badge badge-medium">🟡 بدون رفع وثائق</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:#1a3c5e; margin:1.5rem 0 0.75rem; font-size:1rem;">⚙️ صفحات العمليات (47 صفحة) — ملاحظة عامة</h3>
+    <div class="alert alert-info">
+      <strong>ℹ️ لوحة العمليات متكاملة ومتقدمة جداً</strong>
+      تحتوي على: لوحة KPI، خريطة الأسطول، مركز الشكاوى، مركز الاسترداد، مركز الاحتيال، تتبع التدفق، سجل التدقيق، أنظمة الإطلاق التدريجي (pilot, soft launch)، إدارة الطوارئ، وقف الطوارئ، الصيانة، الأرشيف، TOTP للأمان. هذه تفوق كثيراً مما يتوفر لدى المنصات المنافسة في مراحلها الأولى. لا توجد فجوات حرجة فيها.
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 3: CUSTOMER GAPS -->
+<section id="customer" class="section">
+  <div class="section-header">
+    <span class="icon">🛒</span>
+    <h2>تحليل صفحات العميل — الفجوات التفصيلية</h2>
+  </div>
+
+  <!-- 3.1 Landing Page -->
+  <div class="role-header">
+    <div class="role-badge">🏠</div>
+    <div><div class="role-title">صفحة الترحيب (LandingPage)</div><div class="role-sub">/welcome</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً:</div>
+      <div class="current">✅ شعار توا (أيقونة شاحنة + اسم) | ✅ جملة تعريفية | ✅ زر "إنشاء حساب" | ✅ زر "تسجيل الدخول" | ✅ 3 أيقونات: طلب سهل، توصيل سريع، دفع آمن</div>
+    </div>
+
+    <div class="detail-box">
+      <div class="title">🔴 المشكلة الأولى: المسار الافتراضي "/" ليس صفحة الترحيب</div>
+      <div class="missing">❌ المستخدم الجديد الذي يكتب الرابط الرئيسي "/" مباشرة في المتصفح يصل إلى ProtectedRoute — إذا لم يكن مسجلاً الدخول سيُعاد توجيهه، لكن لا توجد صفحة 404 ولا صفحة ترحيب في "/". صفحة الترحيب موجودة في "/welcome" وليس في الجذر.</div>
+      <div class="impact">⚡ التأثير: الزائر الجديد الذي يصل من رابط خارجي يرى صفحة بيضاء أو يُعاد توجيهه بطريقة مربكة</div>
+    </div>
+
+    <div class="detail-box">
+      <div class="title">🟡 ما ينقصها مقارنةً بالمنصات العالمية:</div>
+      <div class="missing">❌ لا توجد صور جذابة للطعام أو المنتجات (hero image)</div>
+      <div class="missing">❌ لا يوجد ذكر المناطق المخدومة (متوفر في طرابلس، بنغازي...)</div>
+      <div class="missing">❌ لا توجد شهادات العملاء أو الأرقام (1000+ مطعم، 50,000 طلب...)</div>
+      <div class="missing">❌ لا يوجد رابط "تحميل التطبيق" للموبايل</div>
+      <div class="compare">🌍 Talabat/Uber Eats: صفحة ترحيب ضخمة بصور طعام + إحصاءات + شهادات + متاجر التطبيقات</div>
+    </div>
+  </div>
+
+  <!-- 3.2 Home Page -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">🏡</div>
+    <div><div class="role-title">الصفحة الرئيسية للعميل (HomePage)</div><div class="role-sub">/ (index route)</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+
+    <div class="alert alert-critical">
+      <strong>🔴 هذه أهم صفحة في المنصة — وهي الأضعف بصرياً ومعلوماتياً</strong>
+      الصفحة الرئيسية هي أول ما يراه العميل بعد تسجيل الدخول. قرار "من أين أطلب؟" يُتخذ هنا. المعلومات المعروضة حالياً غير كافية لاتخاذ هذا القرار.
+    </div>
+
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً:</div>
+      <div class="current">✅ خانة بحث نصي | ✅ فلاتر النوع (الكل / مطعم / بقالة / صيدلية) | ✅ اسم المزوّد + أيقونة النوع | ✅ شارة مفتوح/مغلق | ✅ وقت التوصيل التقديري (إذا متوفر)</div>
+    </div>
+
+    <h4 style="margin: 1rem 0 0.5rem; color: #dc2626;">الفجوات المفصّلة:</h4>
+
+    <table class="gap-table">
+      <thead><tr><th>الفجوة</th><th>الأثر</th><th>المنافسون</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>لا توجد صورة للمزوّد في البطاقة</strong><br><small>بطاقة كل مطعم نصية فقط بدون أي صورة</small></td>
+          <td>قرار الطعام قرار بصري بطبيعته. بدون صور، العميل لا يشعر بالإغراء للطلب</td>
+          <td>Talabat, Uber Eats, Careem: كل بطاقة لها صورة غلاف واضحة</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يظهر سعر التوصيل</strong><br><small>العميل لا يعرف كم سيدفع توصيلاً قبل فتح المنيو</small></td>
+          <td>يبني العميل سلة كاملة ثم يكتشف رسوم التوصيل في صفحة الدفع → صدمة سعرية → هجر السلة</td>
+          <td>جميع المنصات تعرض "رسوم التوصيل: 5 د.ل" على بطاقة المطعم</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يظهر الحد الأدنى للطلب</strong><br><small>العميل لا يعرف "الحد الأدنى للطلب: 20 دينار" مثلاً</small></td>
+          <td>العميل يكمل الطلب ثم يُرفض بسبب عدم الوصول للحد الأدنى → إحباط وغضب</td>
+          <td>Talabat: يعرض "الحد الأدنى: 15 ريال" على كل بطاقة</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يظهر تقييم المزوّد</strong><br><small>لا يوجد عرض للنجوم أو عدد التقييمات</small></td>
+          <td>التقييم هو العامل الأول في اختيار المطعم لدى 73% من المستخدمين (دراسات UX لمنصات طلبات الطعام)</td>
+          <td>جميع المنصات العالمية: نجمة + رقم "4.8 (250 تقييم)"</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا توجد أقسام (sections) في الصفحة</strong><br><small>قائمة عمودية واحدة مسطحة فقط</small></td>
+          <td>الصفحة تبدو بسيطة وغير جذابة. العميل لا يعرف ما هو "الأفضل" أو "الأقرب"</td>
+          <td>Uber Eats: "لك اليوم", "الأكثر طلباً", "جديد", "قريب منك", "عروض"</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا توجد المفضلة (Favorites)</strong><br><small>لا يمكن للعميل حفظ مطاعمه المفضلة</small></td>
+          <td>العميل الذي يأتي للطلب من مطعمه المعتاد يجب أن يبحث كل مرة من جديد</td>
+          <td>جميع المنصات العالمية: قلب ❤️ على كل بطاقة + قائمة مفضلة</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا توجد بانرات/عروض في أعلى الصفحة</strong><br><small>لا يوجد carousel أو banner للعروض الترويجية</small></td>
+          <td>تفويت فرصة التسويق المباشر داخل التطبيق وإبراز العروض</td>
+          <td>Talabat: أول ما يراه المستخدم هو شريط عروض دوّار</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>فلاتر البحث محدودة</strong><br><small>فقط 3 أنواع (مطعم/بقالة/صيدلية) + نص</small></td>
+          <td>لا يمكن الفلترة بـ: المسافة، وقت التوصيل، التقييم، سعر التوصيل، نوع المطبخ</td>
+          <td>Uber Eats: فلاتر متعددة قابلة للتركيب</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا توجد صفحة بحث مخصصة</strong><br><small>البحث inline في الصفحة الرئيسية فقط</small></td>
+          <td>لا يمكن البحث في الأصناف نفسها (مثلاً: "بيتزا")</td>
+          <td>Talabat: بحث يشمل الأطعمة والمطاعم معاً</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3.3 Provider Detail -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">📋</div>
+    <div><div class="role-title">صفحة قائمة المزوّد (ProviderDetailPage)</div><div class="role-sub">/provider/:id</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً بشكل جيد:</div>
+      <div class="current">✅ الأصناف مصنّفة بالفئات | ✅ أسعار الأصناف | ✅ إضافة للسلة مع counter +/- | ✅ نافذة التخصيص (أحجام، إضافات، إزالة مكونات، الإجمالي التلقائي) | ✅ زر "تأكيد الطلب" ثابت في الأسفل مع الإجمالي | ✅ معالجة حالة السلة من مزوّد آخر</div>
+    </div>
+
+    <table class="gap-table">
+      <thead><tr><th>الفجوة</th><th>الأثر</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>لا يوجد رأس (header) للمزوّد في أعلى الصفحة</strong><br><small>الصفحة تفتح مباشرة على القائمة بدون أي تعريف بالمكان</small></td>
+          <td>العميل لا يرى: اسم المطعم الكبير، صورة الغلاف، عدد التقييمات، ساعات العمل، الحد الأدنى، سعر التوصيل. يشعر وكأنه فتح قائمة مجهولة المصدر</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد وصف للصنف</strong><br><small>الصنف يعرض الاسم والسعر فقط، لا يوجد وصف</small></td>
+          <td>العميل لا يعرف مكونات الطبق قبل فتح نافذة التخصيص</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا توجد صور للأصناف في القائمة</strong><br><small>الكتالوج يدعم image_url لكنها لا تظهر في عرض القائمة</small></td>
+          <td>قرار اختيار الطبق بصري بالأساس. بدون صور، كل الأطباق تبدو متشابهة</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد مؤشر "الأكثر طلباً" أو "اختيار الشيف"</strong></td>
+          <td>فرصة ضائعة لتوجيه العميل نحو الأصناف الأفضل مبيعاً</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يمكن الانتقال السريع بين الفئات</strong><br><small>لا توجد sticky navigation بين فئات القائمة</small></td>
+          <td>في القوائم الطويلة، العميل يجب أن يمرر طويلاً للوصول لفئة معينة</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3.4 Checkout -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">💳</div>
+    <div><div class="role-title">صفحة الدفع (CheckoutPage)</div><div class="role-sub">/checkout/:providerId</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً بشكل جيد:</div>
+      <div class="current">✅ قائمة بأصناف السلة | ✅ اختيار العنوان من دفتر العناوين | ✅ اختيار طريقة الدفع | ✅ إجمالي الأصناف | ✅ تأكيد مع idempotency key | ✅ صفحة نجاح مع معرّف الطلب + زر تتبع</div>
+    </div>
+
+    <table class="gap-table">
+      <thead><tr><th>الفجوة</th><th>الأثر</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>لا يوجد تفصيل تكلفة التوصيل والرسوم</strong><br><small>يعرض فقط مجموع الأصناف. لا يوجد سطر "رسوم التوصيل" و"رسوم الخدمة"</small></td>
+          <td>العميل يضغط "تأكيد الطلب" وهو لا يعرف كم الإجمالي الفعلي الذي سيُدفع. هذا سبب رئيسي لفشل الطلبات وفقدان الثقة</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد حقل كوبون/خصم</strong></td>
+          <td>تفويت أداة تسويق أساسية للاستحواذ على عملاء جدد وتحفيز العودة</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد وقت التوصيل التقديري في صفحة الدفع</strong><br><small>ETA يظهر في صفحة التتبع بعد الطلب، لكن ليس قبله</small></td>
+          <td>العميل لا يعرف "سيصلك في 35 دقيقة" قبل التأكيد</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد تعديل السلة من صفحة الدفع</strong><br><small>إذا أراد العميل تغيير الكمية يجب الرجوع لصفحة المزوّد</small></td>
+          <td>احتكاك غير ضروري في مرحلة قريبة من إتمام الطلب</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يمكن إضافة عنوان جديد مباشرة من صفحة الدفع</strong><br><small>يجب الذهاب لـ /address-book أولاً</small></td>
+          <td>عميل يطلب لأول مرة أو لعنوان جديد يجب أن يخرج من صفحة الدفع ويضيف العنوان ثم يعود</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3.5 Wallet -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">👛</div>
+    <div><div class="role-title">صفحة المحفظة (WalletPage)</div><div class="role-sub">/wallet</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً:</div>
+      <div class="current">✅ رصيد المحفظة | ✅ OTP gate للشحن (خطوة هاتف → خطوة رمز OTP → نموذج الشحن) | ✅ wallet_session_token يُرسل مع طلب الشحن | ✅ تحديث الرصيد بعد الشحن</div>
+    </div>
+
+    <table class="gap-table">
+      <thead><tr><th>الفجوة</th><th>الأثر</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>لا يوجد سجل المعاملات (Transaction History)</strong><br><small>لا يمكن للعميل رؤية: متى شحنت؟ كم خُصم من كل طلب؟</small></td>
+          <td>العميل يرى رصيده نقص ولا يعرف لماذا. يولّد استفسارات للدعم وفقدان الثقة</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد تاريخ انتهاء الرصيد (إذا كان محدداً)</strong></td>
+          <td>إذا كانت بعض رصيد المحفظة مؤقتاً (عروض)، العميل لا يعرف</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>UX خطوات OTP قد تكون مربكة</strong><br><small>العميل يدخل رقم هاتفه من جديد رغم أنه مسجل الدخول بالفعل</small></td>
+          <td>يجب أن يكون الهاتف pre-filled من بيانات الحساب</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3.6 Profile -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">👤</div>
+    <div><div class="role-title">الملف الشخصي (ProfilePage)</div><div class="role-sub">/profile</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً:</div>
+      <div class="current">✅ نوع الحساب (badge) | ✅ رقم المحفظة | ✅ زر تغيير اللغة | ✅ زر تسجيل الخروج</div>
+      <div class="missing">❌ لا يوجد الاسم الكامل | ❌ لا يوجد رقم الهاتف | ❌ لا يمكن تعديل الاسم | ❌ لا يمكن تغيير كلمة المرور | ❌ لا توجد صورة شخصية</div>
+      <div class="impact">⚡ هذه الصفحة تُظهر للعميل أنه مجهول الهوية في التطبيق — لا اسم ولا معلومات شخصية</div>
+    </div>
+
+    <div class="detail-box">
+      <div class="title">المقارنة مع المنافسين:</div>
+      <div class="compare">🌍 Talabat: الاسم، البريد الإلكتروني، رقم الهاتف، الصورة الشخصية، تغيير كلمة المرور، الأجهزة المسجلة، الإشعارات، تفضيلات التطبيق</div>
+      <div class="compare">🌍 Uber Eats: إضافةً لما سبق: تاريخ الميلاد، قسيمة هدية، برامج الولاء</div>
+    </div>
+  </div>
+
+  <!-- 3.7 Missing Pages -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">❌</div>
+    <div><div class="role-title">صفحات مفقودة كلياً للعميل</div><div class="role-sub">لا وجود لها في router.tsx</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <table class="gap-table">
+      <thead><tr><th>الصفحة المفقودة</th><th>ماذا تفعل؟</th><th>في المنافسين</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>صفحة الإشعارات</strong></td>
+          <td>سجل بجميع التنبيهات: "طلبك تم تسليمه"، "خصم 15%"، "تم قبول طلبك"</td>
+          <td>موجودة في كل المنصات — جرس الإشعارات في الأعلى</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>صفحة العروض والكوبونات</strong></td>
+          <td>إدخال كوبون خصم، عرض العروض المتاحة للمستخدم</td>
+          <td>Talabat, Uber Eats: قسم كامل للعروض</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>صفحة المفضلة</strong></td>
+          <td>عرض المطاعم والأصناف التي حفظها المستخدم</td>
+          <td>موجودة في جميع المنصات</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>صفحة 404</strong></td>
+          <td>عرض رسالة لطيفة عند الوصول لرابط غير موجود</td>
+          <td>أساسية في كل تطبيق ويب</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>صفحة تفاصيل الطلب القديم</strong></td>
+          <td>عرض تفاصيل طلب قديم مكتمل مع الأصناف والأسعار</td>
+          <td>موجودة في جميع المنصات — من سجل الطلبات</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 4: DRIVER GAPS -->
+<section id="driver" class="section">
+  <div class="section-header">
+    <span class="icon">🚗</span>
+    <h2>تحليل صفحات السائق — الفجوات التفصيلية</h2>
+  </div>
+
+  <!-- Driver Home -->
+  <div class="role-header">
+    <div class="role-badge">🏠</div>
+    <div><div class="role-title">الصفحة الرئيسية للسائق (DriverHome)</div><div class="role-sub">/driver</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً بشكل جيد:</div>
+      <div class="current">✅ مفتاح التوفر (ON/OFF) مع طلب GPS | ✅ بث الموقع كل 15 ثانية عند التشغيل | ✅ استقبال العروض مع: المبلغ، طريقة الدفع، اسم المزوّد، عنوان التسليم، المسافة، الوقت | ✅ قبول/رفض بضغطة | ✅ ملخص أرباح: اليوم + الأسبوع + عدد الطلبات | ✅ تحذير الكاش المستحق</div>
+    </div>
+
+    <table class="gap-table">
+      <thead><tr><th>الفجوة</th><th>الأثر</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>لا توجد آلية لتسوية الكاش</strong><br><small>يظهر "كاش مستحق: X دينار" بالأحمر لكن لا يوجد أي زر أو إجراء</small></td>
+          <td>السائق يعرف أن عليه مبلغاً لكن لا يعرف كيف يسلّمه. المشغّل لا يعرف إذا سلّم السائق أم لا. إشكالية مالية حقيقية</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد زر "افتح في خريطة التنقل" في بطاقة العرض</strong><br><small>العنوان النصي موجود لكن لا يوجد رابط لفتح Google Maps/Waze</small></td>
+          <td>قبل قبول العرض، السائق يريد أن يرى المسافة الفعلية على الخريطة</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد إحصاء معدل القبول (Acceptance Rate)</strong><br><small>كم نسبة العروض التي قبلها مقابل التي رفضها</small></td>
+          <td>بعض المنصات تربط الأولوية في العروض بمعدل القبول</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Driver Pickup -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">📦</div>
+    <div><div class="role-title">صفحة الاستلام (DriverPickup)</div><div class="role-sub">/driver/pickup/:orderId</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً بشكل جيد:</div>
+      <div class="current">✅ اسم المزوّد والمدينة | ✅ قائمة تحقق الاستلام (4 بنود: التغليف، الفاتورة، عدم التسرب، عدد الأصناف) | ✅ يجب تعليم جميع البنود لتفعيل زر "تأكيد الاستلام" | ✅ تأكيد الوصول للمزوّد | ✅ تأكيد الاستلام</div>
+    </div>
+
+    <table class="gap-table">
+      <thead><tr><th>الفجوة</th><th>الأثر</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>لا يوجد زر "افتح في خريطة التنقل" للوصول للمزوّد</strong><br><small>اسم المزوّد والمدينة معروضان نصياً فقط</small></td>
+          <td>السائق يحتاج ملاحة فعلية للوصول — لا يستطيع الوصول بالاسم النصي وحده</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد زر "الإبلاغ عن مشكلة"</strong><br><small>ماذا لو المحل مغلق؟ لا يجيب أحد؟ عنوان خاطئ؟</small></td>
+          <td>السائق عالق بدون خيار رسمي — قد يضطر لإلغاء الطلب بدون سبب واضح</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد عرض أصناف الطلب</strong><br><small>السائق لا يرى ما يستلمه بالتفصيل</small></td>
+          <td>السائق لا يستطيع مطابقة الأصناف مع الطلب عند الاستلام</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Driver Pending -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">⏳</div>
+    <div><div class="role-title">صفحة الانتظار (DriverPending)</div><div class="role-sub">/driver/pending</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+
+    <div class="alert alert-critical">
+      <strong>🔴 مشكلة حرجة: السائق لا يستطيع رفع وثائقه</strong>
+      سائق جديد يسجّل في المنصة يُحوَّل لصفحة "قيد المراجعة" وينتظر. لكن لا توجد أي واجهة لرفع الوثائق المطلوبة:
+      رخصة القيادة، البطاقة الشخصية، تسجيل السيارة، صورة السيارة.
+      كيف يكمل المشغّل عملية الموافقة؟ من أين تأتيه الوثائق؟ هذا يخلق حلقة مفرغة.
+    </div>
+
+    <div class="detail-box">
+      <div class="title">المقارنة مع Uber / Careem:</div>
+      <div class="compare">🌍 عند تسجيل السائق في Uber: يُطلب منه رفع 4-6 وثائق مباشرة في التطبيق، ويرى حالة مراجعة كل وثيقة (مقبول/مرفوض/قيد المراجعة)</div>
+    </div>
+  </div>
+
+  <!-- Driver Profile -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">👤</div>
+    <div><div class="role-title">الملف الشخصي للسائق (DriverProfile)</div><div class="role-sub">/driver/profile</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً:</div>
+      <div class="current">✅ أيقونة سيارة | ✅ label "السائق" | ✅ حالة الحساب (نشط/قيد المراجعة) | ✅ رقم الحساب (أول 8 أحرف) | ✅ الكاش المستحق | ✅ متوسط التقييم وعدده</div>
+      <div class="missing">❌ لا يوجد الاسم الكامل | ❌ لا يوجد رقم الهاتف | ❌ لا توجد بيانات السيارة (النوع، اللوحة) | ❌ لا توجد حالة الوثائق (منتهية؟ سارية؟) | ❌ لا يمكن تغيير كلمة المرور | ❌ لا يوجد تاريخ انتهاء رخصة القيادة</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 5: PROVIDER GAPS -->
+<section id="provider" class="section">
+  <div class="section-header">
+    <span class="icon">🏪</span>
+    <h2>تحليل صفحات المزوّد — الفجوات التفصيلية</h2>
+  </div>
+
+  <!-- Provider Settings -->
+  <div class="role-header">
+    <div class="role-badge">⚙️</div>
+    <div><div class="role-title">إعدادات المنشأة (ProviderSettings)</div><div class="role-sub">/provider-portal/settings</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+
+    <div class="alert alert-critical">
+      <strong>🔴 هذه أهم صفحة للمزوّد — وهي الأفقر محتوىً</strong>
+      الإعدادات الحالية: اسم المنشأة، المدينة، خط العرض، خط الطول. هذا الحد الأدنى المطلق من البيانات. بدون إعدادات مكتملة، صفحة المزوّد للعميل لا يمكن بناؤها.
+    </div>
+
+    <table class="gap-table">
+      <thead><tr><th>الإعداد المفقود</th><th>لماذا ضروري؟</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>صورة الشعار (Logo)</strong></td>
+          <td>تُعرض في بطاقة المزوّد في الصفحة الرئيسية — هوية المنشأة البصرية</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>صورة الغلاف (Cover Image)</strong></td>
+          <td>تُعرض في رأس صفحة القائمة — أول ما يراه العميل عند فتح المزوّد</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>الحد الأدنى للطلب</strong><br><small>minimum_order_minor</small></td>
+          <td>يُعرض في بطاقة المزوّد + يُفرض في صفحة الدفع. بدونه لا يمكن للعميل معرفة الحد الأدنى</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>رسوم التوصيل</strong><br><small>delivery_fee_minor</small></td>
+          <td>يُعرض في بطاقة المزوّد + يُجمع في صفحة الدفع</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>جدول ساعات العمل الأسبوعي</strong><br><small>Sun-Sat، من ... إلى ...</small></td>
+          <td>المزوّد يجب أن يغلق/يفتح يدوياً كل يوم. الجدول يتيح الأتمتة والدقة</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>وقت التحضير الافتراضي</strong><br><small>يُعرض للعميل عند الطلب</small></td>
+          <td>لكل طلب جديد يجب اختيار وقت التحضير يدوياً. الافتراضي يسرّع القبول</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>وصف المنشأة</strong></td>
+          <td>يُعرض في صفحة القائمة لتعريف العميل بالمطعم</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>نوع المطبخ (Cuisine Types)</strong><br><small>مثلاً: مأكولات شرقية، وجبات سريعة، مشاوي</small></td>
+          <td>يُستخدم في الفلترة والبحث</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>نطاق التوصيل (Delivery Radius)</strong></td>
+          <td>المزوّد يحدد الكيلومترات التي يوصّل فيها</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Provider Dashboard -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">📊</div>
+    <div><div class="role-title">لوحة التحكم (ProviderDashboard)</div><div class="role-sub">/provider-portal</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="detail-box">
+      <div class="title">ما يعرضه حالياً:</div>
+      <div class="current">✅ عدد إجمالي الأصناف | ✅ عدد الأصناف المنشورة | ✅ عدد الطلبات المعلقة | ✅ عدد الطلبات المكتملة | ✅ زر فتح/غلق المتجر مع تحديث فوري</div>
+    </div>
+
+    <table class="gap-table">
+      <thead><tr><th>الإحصاء/الميزة المفقودة</th><th>لماذا ضروري؟</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>الإيرادات اليوم / هذا الأسبوع</strong></td>
+          <td>المعلومة الأهم لصاحب المطعم كل صباح — كم كسبنا؟</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>الأصناف الأكثر طلباً</strong></td>
+          <td>صاحب المطعم يريد معرفة أفضل منتجاته لزيادة التركيز عليها</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>متوسط وقت التحضير الفعلي</strong></td>
+          <td>مقارنة الوعد بالواقع — هل تحضيرنا 20 دقيقة أم 35؟</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>معدل الرفض (من المنشأة)</strong></td>
+          <td>نسبة الطلبات التي رُفضت — مشكلة في التوافر؟</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>تقييمات العملاء</strong></td>
+          <td>المزوّد لا يرى أي تغذية راجعة من عملائه</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>رسم بياني للطلبات (مقارنة يومية/أسبوعية)</strong></td>
+          <td>اتجاه العمل صعوداً أم نزولاً؟</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Provider Catalog -->
+  <div class="role-header" style="border-top: 2px solid #e2e8f0;">
+    <div class="role-badge">📝</div>
+    <div><div class="role-title">إدارة القائمة (ProviderCatalog)</div><div class="role-sub">/provider-portal/catalog</div></div>
+  </div>
+  <div class="section-body" style="padding-top:0.75rem;">
+    <div class="alert alert-success">
+      <strong>✅ هذه الصفحة متقدمة جداً بالفعل</strong>
+      إنشاء/تعديل/حذف الأصناف، رفع الصور، إدارة مجموعات الإضافات (Modifier Groups) مع خيارات متعددة وأسعار، تحديد نوع الاختيار (واحد/متعدد)، إلزامي/اختياري. هذا مستوى يفوق كثيراً من المنصات الناشئة.
+    </div>
+
+    <table class="gap-table">
+      <thead><tr><th>الفجوة المتبقية</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>إدارة الفئات مجرد نص حر</strong> — لا يمكن ترتيب الفئات أو إعادة تسميتها مركزياً. إذا كتب المزوّد "مشروبات" في أصناف وكتب "مشروبات باردة" في أخرى، ستظهر كفئتين منفصلتين</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد ترتيب الأصناف يدوياً</strong> — المزوّد لا يستطيع رفع صنف معين لأعلى القائمة</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد نسخ صنف</strong> — لإضافة صنف مشابه يجب إدخال كل البيانات من الصفر</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا توجد وحدة Removable Components في واجهة الإضافة</strong> — المكونات القابلة للإزالة (بدون بصل مثلاً) موجودة في قاعدة البيانات لكن لا توجد واجهة لإدارتها في صفحة الكتالوج</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 6: OPS -->
+<section id="ops" class="section">
+  <div class="section-header">
+    <span class="icon">⚙️</span>
+    <h2>لوحة العمليات (Ops) — ملاحظات عامة</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="alert alert-success">
+      <strong>✅ هذا القسم ممتاز بشكل عام — تفصيل أبرز ما فيه</strong>
+    </div>
+
+    <div class="screen-grid">
+      <div class="screen-card">
+        <div class="screen-title">لوحة القيادة (OpsDashboard)</div>
+        <div class="screen-body">
+          <div class="has-item">✅ KPI لحظي</div>
+          <div class="has-item">✅ تنبيهات SSE فورية</div>
+          <div class="has-item">✅ جرس إشعارات</div>
+          <div class="has-item">✅ قفل تلقائي بعد 30 دقيقة خمول</div>
+        </div>
+      </div>
+      <div class="screen-card">
+        <div class="screen-title">المالية والحسابات</div>
+        <div class="screen-body">
+          <div class="has-item">✅ مركز الاسترداد</div>
+          <div class="has-item">✅ مركز Chargeback</div>
+          <div class="has-item">✅ التسوية</div>
+          <div class="has-item">✅ مخاطر الكاش</div>
+          <div class="has-item">✅ المصالحة المالية</div>
+          <div class="has-item">✅ سجل الحسابات</div>
+        </div>
+      </div>
+      <div class="screen-card">
+        <div class="screen-title">الإدارة والتحكم</div>
+        <div class="screen-body">
+          <div class="has-item">✅ وقف الطوارئ</div>
+          <div class="has-item">✅ وضع الصيانة</div>
+          <div class="has-item">✅ بوابات الإطلاق</div>
+          <div class="has-item">✅ Pilot + SoftLaunch</div>
+          <div class="has-item">✅ خريطة الأسطول المباشرة</div>
+          <div class="has-item">✅ قواعد الاحتيال</div>
+        </div>
+      </div>
+      <div class="screen-card">
+        <div class="screen-title">الأمان والمراقبة</div>
+        <div class="screen-body">
+          <div class="has-item">✅ TOTP لعمليات الأمان</div>
+          <div class="has-item">✅ سجل التدقيق الكامل</div>
+          <div class="has-item">✅ تتبع التدفق</div>
+          <div class="has-item">✅ أحداث النظام</div>
+          <div class="has-item">✅ النسخ الاحتياطي</div>
+          <div class="has-item">✅ تدريبات الاستعادة</div>
+        </div>
+      </div>
+    </div>
+
+    <h4 style="margin: 1rem 0 0.5rem; color:#7c3aed;">ملاحظة حكيمة على توزيع الجهد:</h4>
+    <div class="alert alert-warning">
+      <strong>⚖️ لوحة العمليات = 47 صفحة (63% من الفرونت إند كله)</strong>
+      هذا التوزيع يعكس جهداً هندسياً ضخماً في الجانب الداخلي بينما الواجهة الخارجية للعميل (14 صفحة) تعاني من فجوات تؤثر على الإيرادات مباشرة. التوصية: إعادة التوازن في المرحلة القادمة نحو تحسين تجربة العميل والمزوّد.
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 7: COMPARISON -->
+<section id="compare" class="section">
+  <div class="section-header">
+    <span class="icon">🌍</span>
+    <h2>المقارنة مع المنصات العالمية</h2>
+  </div>
+  <div class="section-body">
+    <p style="margin-bottom:1rem; color:#64748b; font-size:0.9rem;">المقارنة مع: Talabat (الأكثر انتشاراً في المنطقة)، Uber Eats، Careem Food. ✅ = متوفر  ❌ = غير متوفر  🔶 = جزئي</p>
+
+    <h4 style="color:#1a3c5e; margin-bottom:0.75rem;">من منظور العميل:</h4>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>الميزة</th>
+          <th>توا (حالياً)</th>
+          <th>Talabat</th>
+          <th>Uber Eats</th>
+          <th>Careem Food</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>تسجيل دخول بكلمة مرور</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>تسجيل دخول بـ OTP</td><td>🔶 للمحفظة فقط</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>أمان TOTP للعمليات الحساسة</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        <tr><td>صور المطاعم في الصفحة الرئيسية</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>تقييمات المطاعم في الصفحة الرئيسية</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>سعر التوصيل قبل الطلب</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>الحد الأدنى للطلب مرئي</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>صور الأصناف في القائمة</td><td>❌ (البنية موجودة)</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>تخصيص الأصناف (إضافات/إزالة)</td><td>✅ ممتاز</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>سلة تسوق متعددة المزودين</td><td>❌ (مزود واحد فقط)</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        <tr><td>تتبع الطلب بخريطة مباشرة</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>مراحل الطلب (timeline)</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>الشكاوى داخل التطبيق</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>تقييم المزوّد بعد التسليم</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>أكواد الخصم (Promo Codes)</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>المفضلة (Favorites)</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>زر "اطلب مرة أخرى"</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>سجل معاملات المحفظة</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>خريطة لاختيار عنوان التسليم</td><td>❌ (GPS فقط)</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>دردشة الدعم</td><td>✅</td><td>✅</td><td>🔶</td><td>✅</td></tr>
+        <tr><td>إشعارات داخل التطبيق</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>محفظة رقمية مدمجة</td><td>✅</td><td>✅</td><td>🔶</td><td>✅</td></tr>
+        <tr><td>دعم اللغة العربية</td><td>✅</td><td>✅</td><td>🔶</td><td>✅</td></tr>
+        <tr><td>دعم اللغة الفرنسية</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td></tr>
+        <tr><td>صفحة 404</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+      </tbody>
+    </table>
+
+    <h4 style="color:#1a3c5e; margin:1.5rem 0 0.75rem;">من منظور السائق:</h4>
+    <table class="compare-table">
+      <thead>
+        <tr><th>الميزة</th><th>توا</th><th>Uber Driver</th><th>Talabat Fleet</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>استقبال العروض مع تفاصيل</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>قبول/رفض العروض</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>بث الموقع تلقائي</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>قائمة تحقق الاستلام</td><td>✅ مميّز</td><td>❌</td><td>❌</td></tr>
+        <tr><td>دليل التسليم (QR/صورة/توقيع)</td><td>✅ مميّز</td><td>✅</td><td>🔶</td></tr>
+        <tr><td>خريطة التنقل مدمجة أو رابط</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>رفع وثائق السائق</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>تفاصيل الأرباح التفصيلية</td><td>🔶 ملخص فقط</td><td>✅</td><td>✅</td></tr>
+        <tr><td>تسوية الكاش</td><td>❌</td><td>N/A</td><td>✅</td></tr>
+        <tr><td>الإبلاغ عن مشاكل التوصيل</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>معدل القبول والإكمال</td><td>❌</td><td>✅</td><td>✅</td></tr>
+      </tbody>
+    </table>
+
+    <h4 style="color:#1a3c5e; margin:1.5rem 0 0.75rem;">من منظور المزوّد:</h4>
+    <table class="compare-table">
+      <thead>
+        <tr><th>الميزة</th><th>توا</th><th>Talabat Partner</th><th>Uber Eats Manager</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>إدارة قائمة متقدمة (modifiers)</td><td>✅ ممتاز</td><td>✅</td><td>✅</td></tr>
+        <tr><td>رفع صور الأصناف</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>طابور الطلبات مع قبول/رفض</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>تحديد وقت التحضير لكل طلب</td><td>✅</td><td>✅</td><td>✅</td></tr>
+        <tr><td>جدول ساعات العمل الأسبوعي</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>صورة الغلاف والشعار</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>الحد الأدنى للطلب وسعر التوصيل</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>إحصاءات الأداء والإيرادات</td><td>🔶 محدودة</td><td>✅</td><td>✅</td></tr>
+        <tr><td>تقييمات العملاء</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>العروض والخصومات</td><td>❌</td><td>✅</td><td>✅</td></tr>
+        <tr><td>إدارة فئات القائمة</td><td>🔶 نص حر</td><td>✅</td><td>✅</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 8: GLOBAL ISSUES -->
+<section id="global" class="section">
+  <div class="section-header">
+    <span class="icon">⚠️</span>
+    <h2>مشاكل عامة تؤثر على كل الأدوار</h2>
+  </div>
+  <div class="section-body">
+
+    <table class="gap-table">
+      <thead><tr><th>المشكلة</th><th>الوصف التفصيلي</th><th>التأثير</th><th>الأولوية</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>لا توجد صفحة 404</strong></td>
+          <td>عند الوصول لرابط غير موجود (مثلاً /xyz أو /order/invalid-id) لا توجد صفحة خطأ لطيفة. المستخدم يرى إما شاشة بيضاء أو خطأ تقني</td>
+          <td>تجربة مستخدم سيئة جداً، وتُظهر المنصة بمظهر غير احترافي</td>
+          <td><span class="badge badge-critical">🔴 حرجة</span></td>
+        </tr>
+        <tr>
+          <td><strong>مسار "/" لا يوصل لصفحة الترحيب</strong></td>
+          <td>المستخدم غير المسجّل الذي يكتب الرابط الرئيسي في المتصفح يصل لـ ProtectedRoute ويُعاد توجيهه، لكن لا يصل لـ LandingPage التي هي في /welcome</td>
+          <td>المستخدم الجديد لا يجد صفحة الترحيب بشكل طبيعي</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد نظام إشعارات لأي دور</strong></td>
+          <td>لا توجد صفحة "الإشعارات" لأي دور (عميل، سائق، مزوّد). SSE موجود في لوحة العمليات فقط. الأدوار الأخرى تفقد جميع التنبيهات عند إغلاق الصفحة</td>
+          <td>العميل لا يعرف حالة طلبه بدون فتح التطبيق يدوياً</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>التصميم البصري أساسي جداً</strong></td>
+          <td>الصفحات تعتمد على بطاقات بسيطة (card) وأزرار بسيطة. لا توجد صور، لا animations، لا تدرجات لونية، لا هوية بصرية قوية. الصفحة الرئيسية تشبه قائمة نصية أكثر من تطبيق توصيل</td>
+          <td>الانطباع الأول للمستخدم لن يكون مبهراً — وهذا يؤثر على معدل الاحتفاظ</td>
+          <td><span class="badge badge-high">🟠 مهمة</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد Skeleton Loading</strong></td>
+          <td>عند تحميل الصفحات يظهر LoadingSpinner (دوّار) فقط. لا يوجد skeleton loading (هياكل رمادية تُظهر شكل الصفحة)</td>
+          <td>تجربة انتظار سلبية — المستخدم لا يعرف ما الذي يتحمّل</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا توجد حالة عدم الاتصال (Offline State)</strong></td>
+          <td>إذا انقطع الاتصال لا يوجد أي إشعار للمستخدم بذلك</td>
+          <td>في ليبيا حيث الاتصال متقطع أحياناً، هذه مشكلة عملية</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+        <tr>
+          <td><strong>لا يوجد تطبيق موبايل ويب (PWA)</strong></td>
+          <td>لا توجد manifest.json كاملة أو service worker لتثبيت التطبيق على الشاشة الرئيسية</td>
+          <td>المستخدمون في ليبيا يعتمدون كثيراً على الموبايل</td>
+          <td><span class="badge badge-medium">🟡 تحسين</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ SECTION 9: PRIORITIES -->
+<section id="priorities" class="section">
+  <div class="section-header">
+    <span class="icon">🎯</span>
+    <h2>خارطة الأولويات — ماذا نفعل وبأي ترتيب؟</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="alert alert-critical">
+      <strong>🔴 المرحلة الأولى — يجب قبل الإطلاق الكامل (Critical for Launch)</strong>
+      هذه الفجوات تمنع المنافسة الحقيقية في السوق. بدونها، العميل لا يملك معلومات كافية لاتخاذ قرار الطلب.
+    </div>
+
+    <ol class="priority-list">
+      <li>
+        <div class="priority-num">1</div>
+        <div class="priority-content">
+          <strong>صور وتقييمات وسعر التوصيل والحد الأدنى في بطاقة المزوّد (الصفحة الرئيسية)</strong>
+          <span>يتطلب: إضافة هذه الحقول لنموذج إعدادات المزوّد + عرضها في بطاقة HomePage. ملف: ProviderSettings.tsx + HomePage.tsx + API providers</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">2</div>
+        <div class="priority-content">
+          <strong>رأس صفحة المزوّد (صورة الغلاف + التقييم + الحد الأدنى + سعر التوصيل + ساعات العمل)</strong>
+          <span>ملف: ProviderDetailPage.tsx — إضافة header component في أعلى الصفحة</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">3</div>
+        <div class="priority-content">
+          <strong>عرض تفصيل السعر في صفحة الدفع (رسوم التوصيل + الإجمالي الحقيقي)</strong>
+          <span>ملف: CheckoutPage.tsx — إضافة price breakdown: أصناف + توصيل + خدمة = الإجمالي</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">4</div>
+        <div class="priority-content">
+          <strong>ساعات العمل المجدولة للمزوّد</strong>
+          <span>ملف: ProviderSettings.tsx — إضافة grid أسبوعي (الأحد-السبت) مع from/to لكل يوم</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">5</div>
+        <div class="priority-content">
+          <strong>صفحة 404</strong>
+          <span>ملف: router.tsx — إضافة catch-all route يعرض صفحة خطأ لطيفة مع زر "العودة للرئيسية"</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">6</div>
+        <div class="priority-content">
+          <strong>زر "افتح في خريطة التنقل" للسائق (DriverPickup + DriverDelivery)</strong>
+          <span>ملف: DriverPickup.tsx + DriverDelivery.tsx — رابط geo:lat,lng?q=... أو https://maps.google.com/?q=</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">7</div>
+        <div class="priority-content">
+          <strong>آلية تسوية الكاش للسائق</strong>
+          <span>ملف: DriverHome.tsx — زر "سلّمت الكاش" يفتح نموذج تأكيد مع إرسال للباك إند</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">8</div>
+        <div class="priority-content">
+          <strong>إضافة عنوان جديد مباشرة من صفحة الدفع</strong>
+          <span>ملف: CheckoutPage.tsx — modal أو inline form لإضافة عنوان بدون الخروج من صفحة الدفع</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="alert alert-warning" style="margin-top:1.5rem;">
+      <strong>🟠 المرحلة الثانية — بعد الإطلاق مباشرة (First Month)</strong>
+    </div>
+
+    <ol class="priority-list">
+      <li>
+        <div class="priority-num">9</div>
+        <div class="priority-content">
+          <strong>سجل معاملات المحفظة للعميل</strong>
+          <span>ملف: WalletPage.tsx — إضافة قسم "المعاملات الأخيرة" يسترجع transactions API</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">10</div>
+        <div class="priority-content">
+          <strong>رفع وثائق السائق (صفحة DriverPending)</strong>
+          <span>ملف: DriverPending.tsx — نموذج رفع: رخصة القيادة، البطاقة الشخصية، تسجيل السيارة</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">11</div>
+        <div class="priority-content">
+          <strong>الإبلاغ عن مشكلة في DriverPickup (محل مغلق، عنوان خاطئ)</strong>
+          <span>ملف: DriverPickup.tsx — زر "الإبلاغ عن مشكلة" مع قائمة أسباب</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">12</div>
+        <div class="priority-content">
+          <strong>تحسين الملف الشخصي للعميل (اسم، هاتف، تغيير كلمة المرور)</strong>
+          <span>ملف: ProfilePage.tsx — إضافة بيانات المستخدم مع إمكانية التعديل</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">13</div>
+        <div class="priority-content">
+          <strong>الإيرادات اليومية في لوحة المزوّد</strong>
+          <span>ملف: ProviderDashboard.tsx — إضافة: إيرادات اليوم، إيرادات الأسبوع، متوسط قيمة الطلب</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">14</div>
+        <div class="priority-content">
+          <strong>زر "اطلب مرة أخرى" في سجل الطلبات</strong>
+          <span>ملف: OrderHistoryPage.tsx — زر "أعد الطلب" يملأ السلة من طلب سابق</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">15</div>
+        <div class="priority-content">
+          <strong>المفضلة للعميل</strong>
+          <span>جديد: FavoritesPage.tsx + زر ❤️ في بطاقة المزوّد + HomePage.tsx</span>
+        </div>
+      </li>
+    </ol>
+
+    <div class="alert alert-info" style="margin-top:1.5rem;">
+      <strong>🟡 المرحلة الثالثة — النمو (Growth Phase)</strong>
+    </div>
+
+    <ol class="priority-list">
+      <li>
+        <div class="priority-num">16</div>
+        <div class="priority-content">
+          <strong>أكواد الخصم (Promo Codes)</strong>
+          <span>CheckoutPage.tsx + صفحة جديدة + API backend جديد</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">17</div>
+        <div class="priority-content">
+          <strong>صفحة الإشعارات لكل الأدوار</strong>
+          <span>جديد: NotificationsPage.tsx — سجل الإشعارات مع تمييز المقروء/غير المقروء</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">18</div>
+        <div class="priority-content">
+          <strong>بانرات وأقسام الصفحة الرئيسية (الأكثر طلباً، قريب منك، عروض)</strong>
+          <span>ملف: HomePage.tsx — إعادة تصميم مع sections</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">19</div>
+        <div class="priority-content">
+          <strong>تقييمات المزودين مرئية للمزوّد</strong>
+          <span>جديد: صفحة ProviderReviews.tsx — عرض كل تقييمات العملاء</span>
+        </div>
+      </li>
+      <li>
+        <div class="priority-num">20</div>
+        <div class="priority-content">
+          <strong>خريطة تفاعلية لاختيار عنوان التسليم</strong>
+          <span>ملف: AddressBook.tsx + CheckoutPage.tsx — map picker</span>
+        </div>
+      </li>
+    </ol>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════ FOOTER -->
+<footer>
+  <div>تقرير تدقيق الفرونت إند — منصة توا للتوصيل الذكي في ليبيا</div>
+  <div style="margin-top:0.4rem;">تاريخ الإصدار: 2026-05-18 | إجمالي الصفحات المفحوصة: 75 | إجمالي الفجوات المحددة: 42</div>
+</footer>
+
+</div><!-- /container -->
+</body>
+</html>

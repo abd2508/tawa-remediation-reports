@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>الخطّة النهائية — لوحة المزوّد (بعد المحاكاة والمراجعة العميقة)</title>
+<style>
+  :root {
+    --green: #0e7a4f;
+    --green-soft: #e6f3ed;
+    --red: #b3261e;
+    --red-soft: #fde7e6;
+    --amber: #b86e00;
+    --amber-soft: #fff3df;
+    --blue: #1a73e8;
+    --blue-soft: #eef5ff;
+    --gray: #5a5a5a;
+    --gray-soft: #f3f3f3;
+    --border: #d8d8d8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Noto Naskh Arabic", "Amiri", "Segoe UI", Tahoma, sans-serif;
+    max-width: 1180px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+    line-height: 1.85;
+    color: #1c1c1c;
+    background: #fafafa;
+  }
+  h1 { color: var(--green); border-bottom: 3px solid var(--green); padding-bottom: 0.5rem; }
+  h2 {
+    color: var(--green); margin-top: 2.75rem;
+    border-right: 4px solid var(--green); padding-right: 0.75rem;
+    background: var(--green-soft); padding: 0.7rem 0.95rem; border-radius: 0 6px 6px 0;
+  }
+  h3 { color: #224d3a; margin-top: 1.75rem; }
+  h4 { color: #333; margin-top: 1.25rem; margin-bottom: 0.4rem; }
+  .meta { color: var(--gray); font-size: 0.92rem; margin-bottom: 1.5rem; }
+  .badge {
+    display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px;
+    font-size: 0.82rem; font-weight: 700; vertical-align: middle;
+  }
+  .badge.critical { background: var(--red-soft); color: var(--red); }
+  .badge.high { background: var(--amber-soft); color: var(--amber); }
+  .badge.medium { background: var(--blue-soft); color: var(--blue); }
+  .badge.cosmetic { background: var(--gray-soft); color: var(--gray); }
+  .badge.ok { background: var(--green-soft); color: var(--green); }
+  .badge.new { background: var(--blue); color: white; }
+  .card {
+    background: white; border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.25rem 1.4rem; margin: 1rem 0; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .card.problem { border-right: 5px solid var(--red); }
+  .card.gap { border-right: 5px solid var(--amber); }
+  .card.fix { border-right: 5px solid var(--green); }
+  .card.q { border-right: 5px solid var(--blue); background: var(--blue-soft); }
+  .card.add { border-right: 5px solid var(--blue); background: #f5f9ff; }
+  .card.phase { border: 2px solid var(--green); border-radius: 12px; padding: 1.4rem 1.5rem; }
+  .card.phase .phase-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid var(--green-soft); padding-bottom: 0.5rem; margin-bottom: 1rem;
+  }
+  .card.phase .phase-title {
+    color: var(--green); font-size: 1.35rem; font-weight: 800; margin: 0;
+  }
+  code {
+    background: #f6f6f6; border: 1px solid #eaeaea; border-radius: 4px;
+    padding: 0.05rem 0.35rem; font-size: 0.92em; direction: ltr; display: inline-block;
+    font-family: "Fira Code", "JetBrains Mono", monospace;
+  }
+  pre {
+    background: #1e1e2e; color: #e6e6e6; padding: 0.9rem 1rem; border-radius: 8px;
+    overflow-x: auto; direction: ltr; font-family: "Fira Code", monospace;
+    font-size: 0.85rem; line-height: 1.55;
+  }
+  pre.sql { background: #fdf6e3; color: #586e75; border: 1px solid #eee8d5; }
+  pre.sql .kw { color: #859900; font-weight: 700; }
+  table {
+    width: 100%; border-collapse: collapse; margin: 0.75rem 0; background: white;
+    border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+  }
+  th, td { border: 1px solid var(--border); padding: 0.55rem 0.75rem; text-align: right; vertical-align: top; }
+  th { background: var(--green-soft); color: var(--green); font-weight: 700; }
+  tr.bad td { background: #fff5f5; }
+  tr.ok td  { background: #f0faf4; }
+  tr.add td { background: #f0f7ff; }
+  .mockup-ar {
+    font-family: inherit; white-space: pre-line; direction: rtl;
+    background: #fafafa; border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.9rem 1rem; line-height: 1.7; color: #333;
+    margin: 0.5rem 0;
+  }
+  .mockup {
+    font-family: "Fira Code", monospace; white-space: pre; direction: ltr;
+    background: #fafafa; border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.9rem 1rem; font-size: 0.78rem; line-height: 1.5; color: #333;
+    margin: 0.5rem 0;
+  }
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;
+  }
+  .col-head { font-weight: 700; margin-bottom: 0.3rem; padding-bottom: 0.2rem; border-bottom: 1px solid var(--border); }
+  .col-head.bad { color: var(--red); border-color: var(--red); }
+  .col-head.ok  { color: var(--green); border-color: var(--green); }
+  .col-head.add { color: var(--blue); border-color: var(--blue); }
+  ul.compact li { margin: 0.2rem 0; }
+  .toc { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; }
+  .toc a { color: var(--green); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+  .file { font-family: "Fira Code", monospace; direction: ltr; display: inline-block; color: #224d3a; }
+  .stage-num {
+    display: inline-block; width: 2.2rem; height: 2.2rem; line-height: 2.2rem;
+    background: var(--green); color: white; border-radius: 50%;
+    text-align: center; font-weight: 800; margin-left: 0.5rem;
+  }
+  .story {
+    background: #fff; border-right: 5px solid var(--blue); padding: 0.8rem 1.1rem;
+    margin: 0.6rem 0; border-radius: 6px;
+  }
+  .story .who { font-weight: 700; color: var(--blue); }
+  .ops-knob {
+    display: inline-block; background: var(--amber-soft); color: var(--amber);
+    padding: 0.1rem 0.45rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600;
+  }
+  details {
+    margin: 0.5rem 0; padding: 0.5rem 0.75rem;
+    background: #fafafa; border: 1px solid var(--border); border-radius: 6px;
+  }
+  details summary { cursor: pointer; font-weight: 700; color: var(--green); }
+  details[open] summary { margin-bottom: 0.5rem; }
+</style>
+</head>
+<body>
+
+<h1>الخطّة النهائية — لوحة المزوّد بعد المحاكاة والمراجعة العميقة</h1>
+<div class="meta">
+  📁 <strong>المسار:</strong> <code>/home/a/Desktop/New Folder 10/</code> &nbsp;·&nbsp;
+  📅 <strong>التاريخ:</strong> 2026-05-26 &nbsp;·&nbsp;
+  📄 <strong>التقرير السابق:</strong> <code>تقرير-فحص-لوحة-المزود.html</code> &nbsp;·&nbsp;
+  ⛔ <strong>تنفيذ:</strong> <strong>لم يُلمس أيّ كود بعد</strong> — انتظار إذنك «ابدأ التنفيذ»
+</div>
+
+<div class="card">
+<h3>كيف بُنيت هذه الخطة؟</h3>
+<ol>
+  <li>قراءة كاملة لأجوبتك (مفصَّلة في §٢).</li>
+  <li>محاكاة ذهنية لكلّ مرحلة <em>أثناء البناء</em> + <em>أثناء التشغيل</em> + <em>حالات حافّة</em>.</li>
+  <li>تحقّق من البنية التحتية القائمة: رفع الملفّات (MinIO/<code>/api/files/upload</code>)، نظام الإشعارات
+    (push+SMS+email)، حلقات asyncio مع Redis lock (3 حلقات قائمة في <code>main.py</code> = نمط جاهز).
+    كلّها <strong>متوفّرة</strong> — لا حاجة لبناء البنية التحتية من الصفر.</li>
+  <li>اقتراح ميزات إضافية تزيد الكفاءة (5 ميزات جديدة في §٣).</li>
+  <li>تطبيق مبدأك القاطع: <strong>«كل شيء يجب أن يظهر في لوحة التحكم لكي نتحكم به»</strong> — كل عتبة/سياسة/قائمة
+    أنشأتُها أصبحت قابلة للتعديل من OPS بلا migration ولا code-deploy.</li>
+</ol>
+</div>
+
+<div class="toc">
+<strong>محتويات الخطّة النهائية</strong>
+<ul class="compact">
+  <li><a href="#answers">١. أجوبتك مُلخّصة في جدول قرارات</a></li>
+  <li><a href="#sim">٢. المحاكاة الذهنية — اكتشافات جديدة خلال المراجعة</a></li>
+  <li><a href="#additions">٣. ميزات أضفتُها تزيد كفاءة المنظومة <span class="badge new">جديد</span></a></li>
+  <li><a href="#ops">٤. مبدأ «كل شيء في OPS» — جدول التحكّم الموحَّد</a></li>
+  <li><a href="#plan">٥. الخطّة النهائية بـ 4 مراحل (A → B → C → D)</a></li>
+  <li><a href="#stories">٦. محاكاة التشغيل — 8 قصص استخدام دقيقة</a></li>
+  <li><a href="#risks">٧. مخاطر معروفة + كيف نخفّفها</a></li>
+  <li><a href="#estimate">٨. التقدير الزمني والتتابع</a></li>
+  <li><a href="#approve">٩. طلب الإذن للبدء</a></li>
+</ul>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="answers">١. أجوبتك مُلخّصة في جدول قرارات</h2>
+<table>
+<thead><tr><th>السؤال</th><th>إجابتك</th><th>القرار التنفيذي</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>س-١</strong> سياسة الوثيقة المفقودة/المنتهية للمزوّد النشط</td>
+  <td>تنبيه فقط، ثم تنبيه بعد شهر، ثم تنبيه أخير «للإغلاق» بعد شهر آخر.</td>
+  <td>3 تنبيهات تصاعدية بفواصل قابلة للتعديل من OPS. الإغلاق التلقائي <strong>معطَّل افتراضياً</strong>
+  (OPS تُفعّله يدوياً وتختار يوم الإغلاق). + بنود إضافية للكفاءة في §٣.</td>
+</tr>
+<tr>
+  <td><strong>س-٢</strong> طريقة رفع الوثيقة</td>
+  <td>كاميرا الجوّال + اختيار ملف/صورة، يجب أن تكون <strong>واضحة</strong>.</td>
+  <td><code>&lt;input type=file accept=image/*,application/pdf capture=environment&gt;</code> +
+  فحص جودة (حد أدنى للحجم + أبعاد للصور + معاينة قبل الرفع + تحذير إن كانت ضبابية).</td>
+</tr>
+<tr>
+  <td><strong>س-٣</strong> تاريخ انتهاء الوثيقة</td>
+  <td>نعم، خصوصاً الشهادة الصحية.</td>
+  <td>عمود <code>expires_at</code> في <code>provider_documents</code> + كل سياسة وثيقة تُحدّد إن كانت
+  تستوجب expiry. الشهادة الصحية + رخصة المنشأة + إذن البلدية = expiry إلزامي.</td>
+</tr>
+<tr>
+  <td><strong>س-٤</strong> منهج تجميع البلديات</td>
+  <td>التقسيم الجغرافي العُرفي.</td>
+  <td>أُسوّد التجميع (9 مناطق كبرى)، تراجعها أنت وتُعدّل من OPS. <strong>OPS يستطيع إعادة تجميع البلديات
+  في أيّ وقت</strong> بدون migration ولا commit.</td>
+</tr>
+<tr>
+  <td><strong>س-٥</strong> شكل القائمة في الواجهة</td>
+  <td>قائمتان متتابعتان (مدينة → بلدية).</td>
+  <td>Cascading dropdowns: «المنطقة» تُفعّل «البلدية». بحث داخل كل قائمة. اتّساق على RegistrationPage
+  للمزوّد والسائق.</td>
+</tr>
+<tr>
+  <td><strong>س-٦</strong> <code>grocery</code> و<code>pharmacy</code></td>
+  <td>أزل <code>pharmacy</code> فقط (بعد التحقّق من غياب صفوف).</td>
+  <td>قبل الإزالة: استعلام DB. لو صفر صفّ → أُزيلها من <code>VALID_PROVIDER_TYPES</code> + اختبار.
+  <code>grocery</code> تبقى (لم تطلب إزالتها). إن وُجدت صفوف pharmacy → أعود إليك بسؤال.</td>
+</tr>
+<tr>
+  <td><strong>س-٧</strong> الترتيب</td>
+  <td>رتّبه أنت كما تراه مناسباً.</td>
+  <td>الترتيب الذي اخترته: A (تسميات سريعة لكسب الثقة) → B (الوثائق — الأكبر، الأهم) → C (المدن
+  الهرمية) → D (تجميع OPS بنواة موحَّدة). انظر §٨.</td>
+</tr>
+</tbody>
+</table>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="sim">٢. المحاكاة الذهنية — اكتشافات جديدة خلال المراجعة</h2>
+
+<div class="card gap">
+<h4>اكتشاف ١ — البوّابة الأصلية تتجاوزها الوثائق الفعلية</h4>
+<p><code>ProviderPending</code> تَفرض الوثائق الإلزامية الثلاث قبل القبول. لكن المزوّدَين التجريبيَّين زُرعا
+<code>ACTIVE</code> مباشرة في seed → قفزا فوق هذه البوّابة → 0 وثائق. <strong>هذا ليس عَطلاً في الوثائق، بل
+ثغرة في الـseed.</strong> الإصلاح في §٥/مرحلة-B: عند التحوّل إلى ACTIVE من OPS، نتحقّق أوّلاً من
+وجود الوثائق الإلزامية (اختياري عبر OPS).</p>
+</div>
+
+<div class="card gap">
+<h4>اكتشاف ٢ — حالة سباق على رفع الوثيقة</h4>
+<p>سيناريو: المزوّد يرفع شهادة صحية → الحالة PENDING. قبل أن يراجعها OPS، يرفع نسخة أحدث (لأنه
+لاحظ خطأ). الآن لدينا صفّان PENDING من نفس النوع. OPS يرى الاثنين — أيّهما هو «النسخة الحالية»؟</p>
+<p><strong>الإصلاح:</strong> عند رفع نسخة جديدة من نفس النوع، نُحدّث الصفّ السابق إلى <code>SUPERSEDED</code>
+تلقائياً، ونحتفظ به للأرشيف. OPS يرى دائماً «الأحدث فقط» مع زر «إظهار التاريخ».</p>
+</div>
+
+<div class="card gap">
+<h4>اكتشاف ٣ — التنبيهات تحتاج idempotency</h4>
+<p>المسح الخلفي يعمل كل دقيقة. لو لم نُسجِّل «أيّ تنبيه أُرسل سابقاً»، فسيُرسل التنبيه ١ كل دقيقة طوال
+30 يوماً = إغراق المزوّد ⇒ كارثة UX.</p>
+<p><strong>الإصلاح:</strong> عمود <code>last_warning_level</code> على <code>provider_documents</code> (0/1/2/3).
+المسح يرسل فقط إذا <code>applicable_level &gt; last_warning_level</code>، ثم يُحدّثه. نمط مثبت من
+<code>_provider_accept_timeout_loop</code>.</p>
+</div>
+
+<div class="card gap">
+<h4>اكتشاف ٤ — البلديات الفعليّة في بياناتنا أقل من 141</h4>
+<p>التحقّق على staging: <strong>454 مكاناً موزّعة على 42 بلدية فقط</strong> من أصل 141. أي 99
+بلدية بلا أيّ مكان مسجّل. في الواجهة سيختار المزوّد بلدية فارغة → يسجّل أوّل مكان فيها (وارد). لكن
+في OPS يحتاج المشغّل أن يرى: «99 بلدية فارغة بانتظار التسجيل». بطاقة KPI جديدة في OpsDashboard.</p>
+</div>
+
+<div class="card gap">
+<h4>اكتشاف ٥ — صور الوثائق غير مُتاحة للعرض في OPS بدون مصادقة</h4>
+<p><code>/api/files/{key}</code> محميّ بـBearer (صحيح). صفحة OPS تستخدم <code>AuthedImage</code>
+(مرحلة 402/WP-9) لعرض صور KYC بمصادقة. <strong>يجب التأكّد أنّ OpsProviderDocuments تستخدم نفس
+المكوّن</strong> — وإلا لن يَرى المشغّل الصورة فيرفض/يقبل أعمى. (إن لم يكن، يضاف خلال المرحلة B.)</p>
+</div>
+
+<div class="card gap">
+<h4>اكتشاف ٦ — لا يوجد «صندوق وارد» موحَّد للوثائق في OPS</h4>
+<p>حالياً: المشغّل يفتح <code>ControlPanelProviders</code>، يبحث عن مزوّد، يدخل في صفحته، يرى وثائقه.
+لو 50 مزوّداً جديداً وصلت وثائقهم اليوم، يحتاج المشغّل أن يدخل 50 صفحة. <strong>مقترح: صفحة
+<code>OpsDocumentInbox</code> = جميع الوثائق PENDING عبر كل المزوّدين، مرتّبة زمنياً، مع قبول/رفض سريع.</strong></p>
+</div>
+
+<div class="card gap">
+<h4>اكتشاف ٧ — وثائق مختلفة لأنواع مزوّدين مختلفة</h4>
+<p>منطقياً: ملحمة (butcher) تحتاج «شهادة سلامة لحوم» إضافية. مقهى لا يحتاج «إذن البلدية للطعام».
+<strong>سياسات الوثائق يجب أن تكون per-provider_type</strong> (مصفوفة في <code>provider_document_policies</code>).
+في OPS: «هذه الوثيقة تنطبق على: [✓] restaurant [✓] cafe [✓] butcher [ ] other».</p>
+</div>
+
+<div class="card gap">
+<h4>اكتشاف ٨ — رسائل سبب الرفض ضعيفة</h4>
+<p>عند رفض وثيقة من OPS، السبب يُرسَل عبر <code>operationsApi.rejectDocument</code> لكن لا توجد
+واجهة لعرضه للمزوّد. المزوّد يرى «مرفوضة» بلا تفسير ⇒ يرفع نفس الخطأ ثانية. <strong>قائمة أسباب
+رفض مُعَدّة سلفاً + حقل نصّ حر + تظهر للمزوّد في بطاقة الوثيقة المرفوضة</strong>. قائمة الأسباب
+يديرها OPS.</p>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="additions">٣. ميزات أضفتُها لتعزيز الكفاءة <span class="badge new">جديد</span></h2>
+
+<div class="card add">
+<h3>إضافة ١ — تنبيهات «قبل» الانتهاء (وقاية)</h3>
+<p>طلبك = 3 تنبيهات <strong>بعد</strong> الانتهاء. أُضيف 3 تنبيهات <strong>قبل</strong> (افتراضي):
+<strong>قبل 60 يوماً / قبل 30 يوماً / قبل 7 أيام</strong>. النتيجة: المزوّد يُجدّد قبل الانتهاء فلا
+يَنزل من المنصّة أصلاً. <em>كلّها قابلة للتعديل/التعطيل من OPS لكل نوع وثيقة.</em></p>
+</div>
+
+<div class="card add">
+<h3>إضافة ٢ — دعم متعدّد الملفّات لكل وثيقة</h3>
+<p>الهوية فيها وجه أمامي وخلفي. الرخصة قد تكون متعدّدة الصفحات. أسمح برفع <strong>عدّة ملفّات
+في وثيقة منطقية واحدة</strong> (نفس <code>doc_type</code> + علاقة <code>group_id</code> داخلية). OPS يراها مجموعة.</p>
+</div>
+
+<div class="card add">
+<h3>إضافة ٣ — Document Inbox في OPS</h3>
+<p>صفحة موحَّدة تُظهر كل الوثائق <code>PENDING</code> عبر كل المزوّدين + فلتر بنوع/مزوّد/تاريخ + معاينة
+الصورة مباشرة + قبول/رفض من نفس الصفحة. يلغي التنقّل بين 50 صفحة مزوّد.</p>
+</div>
+
+<div class="card add">
+<h3>إضافة ٤ — KPI «الالتزام التوثيقي»</h3>
+<p>بطاقة في <code>OpsDashboard</code> تُظهر: «X% من المزوّدين النشطين بكامل الوثائق الإلزامية الصالحة».
+أرقام سريعة: «5 وثائق تنتهي خلال أسبوع» «12 منتهية تحتاج تجديد» «3 مزوّدين فقدوا 2+ وثائق».</p>
+</div>
+
+<div class="card add">
+<h3>إضافة ٥ — سياسات الوثائق per-provider_type في OPS</h3>
+<p>صفحة <code>OpsDocumentPolicies</code>: جدول 7 وثائق × 6 أنواع نشاط = 42 خلية. كل خلية: «إلزامي/اختياري/غير
+مطبَّق» + expiry نعم/لا + intervals + auto-close. تغيير سياسة = تطبيق فوريّ على كل المزوّدين بلا
+deploy.</p>
+</div>
+
+<div class="card add">
+<h3>إضافة ٦ — اكتشاف بصري للجودة في الواجهة</h3>
+<p>قبل الرفع: معاينة الصورة + قياس الحجم (إن &lt; 100KB تحذير «قد تكون منخفضة الجودة») + قياس الأبعاد
+(إن أيّ بُعد &lt; 600px تحذير) + تحذير «الصورة ضبابية» باستخدام Laplacian variance (اختياري — لو
+طلبت). الإغلاق على الجودة <strong>اختياري لOPS</strong>.</p>
+</div>
+
+<div class="card add">
+<h3>إضافة ٧ — قاموس بلديات قابل للتمدّد</h3>
+<p>اليوم: 141 بلدية. غداً قد يضاف 5. أنقل القائمة من ملف TypeScript إلى جدول DB
+<code>geographic_municipalities</code> + OPS تقدر تُضيف/تُعدّل/تُعطّل. الأمر يصبح بيانياً لا برمجياً.</p>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="ops">٤. مبدأ «كل شيء في OPS» — جدول التحكّم الموحَّد</h2>
+
+<p>تطبيقاً لقرارك «كل شيء يجب أن يظهر في لوحة التحكم»، إليك كل عتبة/قائمة/سياسة وأين تظهر في OPS:</p>
+
+<table>
+<thead>
+<tr>
+  <th>المتغيّر</th><th>اسم الصفحة في OPS</th><th>نوع التخزين</th><th>تأثير التغيير</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>تسميات أنواع النشاط (FE)</td><td>—</td><td>كود (مجمَّد بقصد)</td><td>يحتاج commit</td></tr>
+<tr><td>القيم البرمجية لأنواع النشاط (BE)</td><td><code>OpsProviderTypeCatalog</code> <span class="badge new">جديد</span></td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>قائمة الوثائق وأسماؤها</td><td><code>OpsDocumentTypes</code> <span class="badge new">جديد</span></td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>سياسات الوثائق (إلزامي/expiry/إلخ)</td><td><code>OpsDocumentPolicies</code> <span class="badge new">جديد</span></td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>فواصل التنبيهات قبل/بعد الانتهاء</td><td><code>OpsDocumentPolicies</code> (نفس الصفحة)</td><td>DB</td><td>المسح القادم يَلتقطها</td></tr>
+<tr><td>تفعيل/تعطيل الإغلاق التلقائي</td><td><code>OpsDocumentPolicies</code> (نفس الصفحة)</td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>أيّ وثيقة لأيّ نوع مزوّد</td><td><code>OpsDocumentPolicies</code> (مصفوفة)</td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>أسباب رفض الوثيقة المُعَدّة سلفاً</td><td><code>OpsDocumentRejectReasons</code> <span class="badge new">جديد</span></td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>صندوق وارد الوثائق المعلَّقة</td><td><code>OpsDocumentInbox</code> <span class="badge new">جديد</span></td><td>—</td><td>—</td></tr>
+<tr><td>المناطق الجغرافية الكبرى</td><td><code>OpsGeographicRegions</code> <span class="badge new">جديد</span></td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>تجميع البلديات داخل المناطق</td><td><code>OpsGeographicRegions</code> (DnD)</td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>إضافة/تعديل/تعطيل بلدية</td><td><code>OpsMunicipalities</code> <span class="badge new">جديد</span></td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>قوالب الإشعارات (موجود)</td><td><code>OpsNotificationTemplates</code> (قائم)</td><td>DB</td><td>فوريّ</td></tr>
+<tr><td>KPI الالتزام التوثيقي</td><td><code>OpsDashboard</code> (بطاقة جديدة)</td><td>—</td><td>قراءة فقط</td></tr>
+</tbody>
+</table>
+
+<p style="margin-top: 1rem;">
+<strong>تجميل في الحوكمة:</strong> كل صفحة جديدة تُضاف لـ<code>opsAccess.ts</code> + <code>opsRouter.tsx</code>
++ <code>Layout</code> nav. الأدوار: <code>OPS_ADMIN</code> للقراءة والحركة، <code>SUPER_ADMIN</code> لتعديل السياسات.
+</p>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="plan">٥. الخطّة النهائية بـ 4 مراحل (A → B → C → D)</h2>
+
+<!-- ─────────────── المرحلة A ─────────────── -->
+<div class="card phase">
+<div class="phase-head">
+<h3 class="phase-title"><span class="stage-num">A</span>تصحيح أنواع النشاط + تنظيف <code>pharmacy</code></h3>
+<span class="badge ok">منخفضة المخاطر · ~25 دقيقة</span>
+</div>
+
+<h4>التغييرات</h4>
+<table>
+<thead><tr><th>#</th><th>الملف</th><th>التغيير</th></tr></thead>
+<tbody>
+<tr><td>A1</td><td class="file">web/src/pages/customer/RegistrationPage.tsx:65–71</td><td>تعديل 3 <code>labelAr</code>: «سوق / محل» · «مخبز وحلويات» · «محل بيع لحوم / قصاب / جزار»</td></tr>
+<tr><td>A2</td><td class="file">web/src/pages/customer/RegistrationPage.test.tsx</td><td>تحديث 3 أسطر تأكيد تسميات</td></tr>
+<tr><td>A3</td><td>استعلام live DB</td><td><code>SELECT COUNT(*) FROM providers WHERE provider_type='pharmacy'</code></td></tr>
+<tr><td>A4 <em>(شرطي على A3=0)</em></td><td class="file">backend/app/modules/identity/registration_router.py:109–114</td><td>حذف <code>"pharmacy"</code> من <code>VALID_PROVIDER_TYPES</code></td></tr>
+<tr><td>A5 <em>(شرطي)</em></td><td class="file">backend/tests/test_phase449_provider_types.py</td><td>اختبار: pharmacy → 422</td></tr>
+</tbody>
+</table>
+
+<h4>محاكاة البناء</h4>
+<ol>
+  <li>أقرأ السطور الثلاثة، أعدّلها، أحفظ.</li>
+  <li>أُحدّث اختبار RegistrationPage (يفشل الآن لأنه يؤكّد التسمية القديمة).</li>
+  <li>SSH → staging → استعلام: لو 0 صفّ pharmacy → أُكمل A4. لو &gt; 0 → أُرسل لك سؤالاً قبل المتابعة.</li>
+  <li><code>npm run typecheck && npm test -- RegistrationPage && python -m pytest test_phase449</code> → كل أخضر.</li>
+</ol>
+
+<h4>محاكاة التشغيل</h4>
+<ul class="compact">
+<li>المزوّدان الحاليّان: <em>كافيه كازا</em> = <code>cafe</code> ← لا تأثير. <em>مطعم القمبري</em> = <code>restaurant</code> ← لا تأثير.</li>
+<li>أي مزوّد قديم بنوع <code>market</code> → يرى اسمه الجديد «🛒 سوق / محل». لا فقدان بيانات.</li>
+<li>محاولة تسجيل جديد بـ pharmacy → 422 مع رسالة واضحة بالقيم المتاحة.</li>
+</ul>
+
+<h4>مخاطر</h4>
+<p><span class="badge ok">صفر</span> — تسميات + إزالة قيمة غير مستخدمة (بعد تحقّق DB).</p>
+</div>
+
+<!-- ─────────────── المرحلة B ─────────────── -->
+<div class="card phase">
+<div class="phase-head">
+<h3 class="phase-title"><span class="stage-num">B</span>منظومة وثائق المنشأة الكاملة</h3>
+<span class="badge high">المرحلة الأكبر · ~6 ساعات · migration واحدة</span>
+</div>
+
+<h4>المخطّط البصري — الواجهة المكشوفة</h4>
+<div class="mockup-ar">┌─────────────────────────────────────────────────────────────┐
+│  📄 وثائق المنشأة                                            │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ ✅ رخصة المنشأة                       2026-05-20   │   │
+│  │ النسخة الفعّالة · مقبولة · تنتهي 2027-05-20         │   │
+│  │ [👁️ عرض]  [♻️ تجديد]  [🕓 التاريخ (2)]              │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ ⚠️ الشهادة الصحية              تنتهي خلال 12 يوماً │   │
+│  │ مقبولة · تنتهي 2026-06-07                          │   │
+│  │ [👁️ عرض]  [♻️ جدّد الآن (مُلحّ)]                    │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ 🚫 هوية مدير المنشأة                                │   │
+│  │ مرفوضة من OPS — السبب: «الصورة ضبابية، أعد التصوير»│   │
+│  │ [⬆️ ارفع جديدة]                                     │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ ⭕ السجل التجاري                       اختياري      │   │
+│  │ لم تُرفع. [⬆️ ارفع]                                  │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                              │
+│  ┌─ ⬆️ رفع وثيقة ────────────────────────────────────┐   │
+│  │ النوع:       [ الشهادة الصحية         ▾ ]         │   │
+│  │ الصور/الملفّ: [ 📷 الكاميرا ]  [ 🖼️ الملفّات ]      │   │
+│  │ تاريخ الانتهاء: [ 2027-06-07          📅 ]        │   │
+│  │ [ معاينة ] ←─ تحذير الجودة هنا إن وُجد              │   │
+│  │ [ ⬆️ رفع ]                                          │   │
+│  └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘</div>
+
+<h4>تغييرات الخلفية (مع migration واحدة)</h4>
+<pre class="sql"><span class="kw">-- migration aa16_provider_documents_lifecycle</span>
+<span class="kw">ALTER TABLE</span> provider_documents <span class="kw">ADD COLUMN</span>
+  expires_at TIMESTAMPTZ <span class="kw">NULL</span>,
+  last_warning_level <span class="kw">INT NOT NULL DEFAULT</span> 0,    <span class="kw">-- 0/1/2/3</span>
+  superseded_by_id UUID <span class="kw">NULL REFERENCES</span> provider_documents(id),
+  group_id UUID <span class="kw">NULL</span>,                              <span class="kw">-- للملفّات المتعدّدة لنفس الوثيقة</span>
+  reject_reason TEXT <span class="kw">NULL</span>,
+  uploaded_via VARCHAR(20) <span class="kw">DEFAULT</span> 'web';            <span class="kw">-- web/mobile_camera/mobile_file</span>
+
+<span class="kw">CREATE INDEX</span> idx_pd_expires_at <span class="kw">ON</span> provider_documents(expires_at) <span class="kw">WHERE</span> expires_at <span class="kw">IS NOT NULL</span>;
+<span class="kw">CREATE INDEX</span> idx_pd_provider_type <span class="kw">ON</span> provider_documents(provider_id, doc_type, status);
+
+<span class="kw">CREATE TABLE</span> provider_document_policies (
+  doc_type VARCHAR(40) <span class="kw">PRIMARY KEY</span>,
+  name_ar VARCHAR(120) <span class="kw">NOT NULL</span>,
+  display_order <span class="kw">INT DEFAULT</span> 0,
+  requires_expiry <span class="kw">BOOLEAN DEFAULT FALSE</span>,
+  applies_to_provider_types JSONB <span class="kw">DEFAULT</span> '["restaurant","cafe","market","bakery_sweets","butcher"]',
+  required_for_provider_types JSONB <span class="kw">DEFAULT</span> '[]',         <span class="kw">-- إلزامي لأيّ نوع</span>
+  pre_expiry_warning_days JSONB <span class="kw">DEFAULT</span> '[60,30,7]',
+  post_expiry_warning_days JSONB <span class="kw">DEFAULT</span> '[0,30,60]',
+  auto_close_after_days <span class="kw">INT NULL</span>,                     <span class="kw">-- NULL = لا إغلاق تلقائي</span>
+  is_active <span class="kw">BOOLEAN DEFAULT TRUE</span>
+);
+
+<span class="kw">CREATE TABLE</span> provider_document_reject_reasons (
+  id UUID <span class="kw">PRIMARY KEY</span>,
+  code VARCHAR(40) <span class="kw">UNIQUE</span>,
+  label_ar VARCHAR(200) <span class="kw">NOT NULL</span>,
+  is_active <span class="kw">BOOLEAN DEFAULT TRUE</span>
+);
+
+<span class="kw">CREATE TABLE</span> geographic_regions (
+  region_code VARCHAR(40) <span class="kw">PRIMARY KEY</span>,
+  name_ar VARCHAR(80) <span class="kw">NOT NULL</span>,
+  display_order <span class="kw">INT DEFAULT</span> 0,
+  is_active <span class="kw">BOOLEAN DEFAULT TRUE</span>
+);
+
+<span class="kw">CREATE TABLE</span> geographic_municipalities (
+  municipality_name VARCHAR(120) <span class="kw">PRIMARY KEY</span>,    <span class="kw">-- بالعربية، يطابق providers.city</span>
+  region_code VARCHAR(40) <span class="kw">REFERENCES</span> geographic_regions(region_code),
+  official_no <span class="kw">INT NULL</span>,                              <span class="kw">-- الترقيم الرسمي 2026</span>
+  is_active <span class="kw">BOOLEAN DEFAULT TRUE</span>
+);
+</pre>
+
+<h4>السياسات الافتراضية (تُزرع مع migration، تُعدّلها OPS)</h4>
+<table>
+<thead><tr><th>الوثيقة</th><th>إلزامي لـ</th><th>expiry</th><th>قبل</th><th>بعد</th><th>إغلاق</th></tr></thead>
+<tbody>
+<tr class="bad"><td>ESTABLISHMENT_LICENSE</td><td>كل الأنواع</td><td>✅</td><td>[60,30,7]</td><td>[0,30,60]</td><td>لا (افتراضي)</td></tr>
+<tr class="bad"><td>HEALTH_CERTIFICATE</td><td>restaurant, cafe, bakery_sweets, butcher</td><td>✅</td><td>[60,30,7]</td><td>[0,30,60]</td><td>لا</td></tr>
+<tr class="bad"><td>MANAGER_ID</td><td>كل الأنواع</td><td>اختياري</td><td>—</td><td>—</td><td>لا</td></tr>
+<tr><td>COMMERCIAL_REGISTER</td><td>—</td><td>اختياري</td><td>—</td><td>—</td><td>لا</td></tr>
+<tr><td>TAX_CARD</td><td>—</td><td>اختياري</td><td>—</td><td>—</td><td>لا</td></tr>
+<tr><td>MUNICIPAL_PERMIT</td><td>—</td><td>✅</td><td>[60,30,7]</td><td>[0,30,60]</td><td>لا</td></tr>
+<tr><td>MEAT_HANDLING_PERMIT <span class="badge new">جديد</span></td><td>butcher فقط</td><td>✅</td><td>[60,30,7]</td><td>[0,30,60]</td><td>لا</td></tr>
+<tr><td>OTHER</td><td>—</td><td>اختياري</td><td>—</td><td>—</td><td>لا</td></tr>
+</tbody>
+</table>
+
+<h4>تغييرات الخلفية — نقاط النهاية</h4>
+<table>
+<thead><tr><th>المسار</th><th>الدور</th><th>التغيير</th></tr></thead>
+<tbody>
+<tr><td><code>POST /providers/me/documents</code></td><td>PROVIDER_ADMIN</td><td>+حقول <code>expires_at</code>, <code>group_id</code> اختياريّان؛ يَنسخ النوع نفسه إلى SUPERSEDED تلقائياً</td></tr>
+<tr><td><code>GET /providers/me/documents</code></td><td>PROVIDER_ADMIN</td><td>يُرجع <code>is_required, days_until_expiry, expiry_state</code> (OK/WARN/EXPIRED) محسوبة</td></tr>
+<tr><td><code>GET /providers/me/document-compliance</code></td><td>PROVIDER_ADMIN <span class="badge new">جديد</span></td><td>ملخّص: إجمالي/مكتمل/معلَّق/منتهي/مفقود</td></tr>
+<tr><td><code>GET /operations/document-policies</code></td><td>OPS_ADMIN <span class="badge new">جديد</span></td><td>قراءة جدول السياسات</td></tr>
+<tr><td><code>PUT /operations/document-policies/{doc_type}</code></td><td>SUPER_ADMIN <span class="badge new">جديد</span></td><td>تعديل سياسة</td></tr>
+<tr><td><code>GET /operations/document-inbox</code></td><td>OPS_ADMIN <span class="badge new">جديد</span></td><td>كل الوثائق PENDING عبر المزوّدين</td></tr>
+<tr><td><code>GET /operations/document-reject-reasons</code></td><td>OPS_ADMIN <span class="badge new">جديد</span></td><td>قائمة أسباب الرفض المُعَدّة</td></tr>
+<tr><td><code>POST /operations/providers/{id}/documents/{doc_id}/reject</code></td><td>OPS_ADMIN</td><td>+حقل <code>reason_code</code> + <code>reason_text</code> (يُحفظان)</td></tr>
+</tbody>
+</table>
+
+<h4>الحلقة الخلفية (المسح اليومي)</h4>
+<pre>async def _provider_document_warning_loop():
+    """يمسح كل ساعة وثائق المزوّدين، يُرسل تنبيهات حسب السياسة، فعّال
+    للوثائق التي expires_at != NULL. يستخدم Redis lock 'docs:warn:lock'.
+    Idempotent عبر last_warning_level."""
+    while True:
+        async with redis_lock("docs:warn:lock", ttl=300):
+            for doc in get_expiring_documents():
+                level = compute_warning_level(doc)  # 0/1/2/3
+                if level > doc.last_warning_level:
+                    await notify(doc.provider, event="document.expiring",
+                                 doc_type=doc.doc_type, days=doc.days_to_expiry)
+                    doc.last_warning_level = level
+                    db.commit()
+        await asyncio.sleep(3600)</pre>
+
+<h4>الواجهة — ملفات تُضاف/تُعدَّل</h4>
+<table>
+<thead><tr><th>الملف</th><th>تعديل/جديد</th><th>الوصف</th></tr></thead>
+<tbody>
+<tr><td class="file">web/src/pages/provider/ProviderDocuments.tsx</td><td><span class="badge new">جديد</span></td><td>قسم/صفحة مستقلّة، تُضمَّن في ProviderSettings كتبويب</td></tr>
+<tr><td class="file">web/src/pages/provider/ProviderSettings.tsx</td><td>تعديل</td><td>إضافة تبويب «📄 وثائق المنشأة»</td></tr>
+<tr><td class="file">web/src/pages/provider/ProviderPending.tsx</td><td>تعديل</td><td>يستخدم نفس المكوّن الجديد (إزالة تكرار)</td></tr>
+<tr><td class="file">web/src/pages/provider/ProviderDashboard.tsx</td><td>تعديل</td><td>بطاقة تنبيه «X وثيقة تنتهي قريباً»</td></tr>
+<tr><td class="file">web/src/components/DocumentUploadField.tsx</td><td><span class="badge new">جديد</span></td><td>مكوّن قابل لإعادة الاستخدام (كاميرا + ملف + معاينة + جودة)</td></tr>
+<tr><td class="file">web/src/pages/operations/OpsDocumentInbox.tsx</td><td><span class="badge new">جديد</span></td><td>صندوق الوارد الموحَّد</td></tr>
+<tr><td class="file">web/src/pages/operations/OpsDocumentPolicies.tsx</td><td><span class="badge new">جديد</span></td><td>محرّر السياسات (SUPER فقط)</td></tr>
+<tr><td class="file">web/src/api/operations.ts</td><td>تعديل</td><td>+6 دوال (policies/inbox/reject-reasons/compliance)</td></tr>
+<tr><td class="file">web/src/router.tsx / opsRouter.tsx</td><td>تعديل</td><td>+3 مسارات OPS</td></tr>
+<tr><td class="file">web/src/components/Layout.tsx + auth/opsAccess.ts</td><td>تعديل</td><td>روابط nav + role-gating</td></tr>
+</tbody>
+</table>
+
+<h4>اختبارات</h4>
+<ul class="compact">
+<li>BE: <code>test_phase449_provider_documents</code> (~12 اختبار): supersede عند رفع جديد، expiry محسوب
+صحيح، المسح يُرسل مرة واحدة لكل مستوى، السياسات per-provider_type، policies CRUD، inbox listing.</li>
+<li>FE: ProviderDocuments (5)، DocumentUploadField (4)، OpsDocumentInbox (3)، OpsDocumentPolicies (3).</li>
+</ul>
+</div>
+
+<!-- ─────────────── المرحلة C ─────────────── -->
+<div class="card phase">
+<div class="phase-head">
+<h3 class="phase-title"><span class="stage-num">C</span>المنطقة → البلدية (هرميّ قابل للإدارة)</h3>
+<span class="badge medium">متوسطة · ~3 ساعات · migration واحدة (مدمجة مع B)</span>
+</div>
+
+<h4>التجميع الأوّلي المقترَح (تَراجعه أنت قبل الzeroing)</h4>
+<details>
+<summary>📂 9 مناطق + 141 بلدية — مسوّدة قابلة للتعديل من OPS</summary>
+<table>
+<thead><tr><th>المنطقة</th><th>البلديات المقترحة</th></tr></thead>
+<tbody>
+<tr><td><strong>طرابلس الكبرى</strong></td><td>طرابلس المركز · تاجوراء · سوق الجمعة · أبوسليم · حي الأندلس · جنزور · قصر بن غشير · عين زارة · جنوب المرقب · سوق الخميس</td></tr>
+<tr><td><strong>الزاوية وصبراتة</strong></td><td>الزاوية · الزاوية الجنوب · الزاوية الغرب · العجيلات · صبراتة · صرمان · الجميل · زلطن · العزيزية</td></tr>
+<tr><td><strong>الجبل الغربي / نفوسة</strong></td><td>غريان · يفرن · جادو · نالوت · الزنتان · ككلة · القلعة · الرجبان · الأصابعة · الرحيبات · الرياينة · الجوش · مزدة · ترهونة</td></tr>
+<tr><td><strong>الساحل الأوسط (مصراتة)</strong></td><td>مصراتة · زليتن · الخمس · بني وليد · سوق الخميس · تاورغاء · الجفرة</td></tr>
+<tr><td><strong>بنغازي</strong></td><td>بنغازي · المرج · سلوق · الأبيار · توكرة · قمينس</td></tr>
+<tr><td><strong>الجبل الأخضر</strong></td><td>البيضاء · شحات · القبة · الأبرق · درنة · الفائدية</td></tr>
+<tr><td><strong>الساحل الشرقي / طبرق</strong></td><td>طبرق · البردي · امساعد · البطنان</td></tr>
+<tr><td><strong>الواحات</strong></td><td>إجدابيا · البريقة · أوجلة · اجخرة · جالو</td></tr>
+<tr><td><strong>الجنوب (فزّان)</strong></td><td>سبها · أوباري · براك الشاطئ · إدري الشاطئ · مرزق · القطرون · غات · غدامس · الكفرة</td></tr>
+<tr><td><em>(غير مصنّفة)</em></td><td>أي بلدية لم تُصنَّف بعد تظهر هنا في الـpicker مع وسم «أخرى»</td></tr>
+</tbody>
+</table>
+<p><em>⚠ هذه مسوّدة كلود — يجب أن تراجعها كليبيّ وتُصحّحها قبل أن تُزرَع في DB. بعد الزرع، تستطيع OPS
+تعديل أيّ بلدية إلى منطقة أخرى لحظياً.</em></p>
+</details>
+
+<h4>المخطّط البصري — الواجهة</h4>
+<div class="two-col">
+<div>
+<div class="col-head bad">الحالي (مسطّح)</div>
+<div class="mockup-ar">المدينة / البلدية *
+[ ابحث أو اختر…  ▾ ]
+  أبوسليم
+  اجخرة
+  إجدابيا
+  …</div>
+</div>
+<div>
+<div class="col-head ok">المقترح (هرمي قابل للبحث)</div>
+<div class="mockup-ar">المنطقة *
+[ طرابلس الكبرى     ▾ ]
+  طرابلس الكبرى
+  الزاوية وصبراتة
+  الجبل الغربي / نفوسة
+  …
+
+البلدية *  (في طرابلس الكبرى)
+[ تاجوراء            ▾ ]
+  طرابلس المركز
+  تاجوراء
+  سوق الجمعة
+  أبوسليم
+  حي الأندلس
+  جنزور
+  قصر بن غشير
+  عين زارة
+  …</div>
+</div>
+</div>
+
+<h4>تغييرات الخلفية</h4>
+<table>
+<tbody>
+<tr><td>migration</td><td>جداول <code>geographic_regions</code> + <code>geographic_municipalities</code> (مدمجة في نفس migration الـB لتقليل الـrevisions)</td></tr>
+<tr><td>seed</td><td>9 مناطق + 141 بلدية (مع الترقيم الرسمي)</td></tr>
+<tr><td><code>GET /geo/regions</code></td><td>عام — للـRegistrationPage (مع إعطاء قائمة البلديات لكل منطقة)</td></tr>
+<tr><td><code>GET /operations/geographic-regions</code></td><td>OPS — تفصيلي + التعديل</td></tr>
+<tr><td>OPS CRUD للمناطق + البلديات + إعادة التخصيص</td><td>POST/PUT/PATCH/DELETE</td></tr>
+</tbody>
+</table>
+
+<h4>تغييرات الواجهة</h4>
+<table>
+<tbody>
+<tr><td class="file">web/src/components/CityPicker.tsx</td><td><span class="badge new">جديد</span> — Cascading dropdowns + بحث</td></tr>
+<tr><td class="file">web/src/pages/customer/RegistrationPage.tsx</td><td>استبدال datalist في قسمَي PROVIDER + DRIVER بـCityPicker</td></tr>
+<tr><td class="file">web/src/pages/operations/OpsGeographicRegions.tsx</td><td><span class="badge new">جديد</span> — جدول مناطق + drag-drop للبلديات</td></tr>
+<tr><td class="file">web/src/data/libyaMunicipalities.ts</td><td>إفراغ — يبقى كـfallback إن فشل API (احتراز)</td></tr>
+</tbody>
+</table>
+
+<h4>الهجرة من القديم إلى الجديد (بلا فقد بيانات)</h4>
+<ol>
+<li>المزوّدون/السائقون الحاليّون يحتفظون بقيمة <code>city</code> النصّية كما هي.</li>
+<li>عند فتح صفحة الإعدادات، إن كانت <code>city</code> في <code>geographic_municipalities</code> → نستنتج المنطقة تلقائياً.</li>
+<li>إن لم تكن مُصنَّفة → نُظهر مقترح «صنّفها في منطقة» للمزوّد (أو يَتجاهل).</li>
+<li>لا migration بيانات إجباري — التحوّل تدريجي وآمن.</li>
+</ol>
+</div>
+
+<!-- ─────────────── المرحلة D ─────────────── -->
+<div class="card phase">
+<div class="phase-head">
+<h3 class="phase-title"><span class="stage-num">D</span>لوحة OPS الموحّدة + KPI الالتزام</h3>
+<span class="badge medium">صغيرة · ~1.5 ساعة · لا migration</span>
+</div>
+
+<h4>التغييرات</h4>
+<ul class="compact">
+<li><strong>OpsDashboard:</strong> بطاقة KPI «الالتزام التوثيقي» (نسبة + قائمة سريعة لمزوّدين خارجين عن الالتزام).</li>
+<li><strong>OpsProviderDocuments (موجود ضمن ControlPanelProviders):</strong> ترقية لعرض الإصدارات + التاريخ + الانتهاء.</li>
+<li><strong>OpsDocumentInbox:</strong> ربط ببطاقة «وثائق معلّقة» في OpsDashboard.</li>
+<li><strong>OpsDocumentRejectReasons:</strong> صفحة CRUD مع 6 أسباب افتراضية مزروعة.</li>
+<li><strong>قائمة nav موحَّدة:</strong> مجموعة جديدة في sidebar اسمها «📄 الوثائق» تضمّ Inbox + Policies + Reject-Reasons.</li>
+</ul>
+
+<h4>أسباب الرفض الافتراضية المزروعة</h4>
+<table>
+<thead><tr><th>الكود</th><th>الرسالة</th></tr></thead>
+<tbody>
+<tr><td><code>BLURRY</code></td><td>الصورة ضبابية — أعد التصوير بإضاءة أفضل</td></tr>
+<tr><td><code>CROPPED</code></td><td>جزء من الوثيقة مقصوص — صوّر الوثيقة كاملةً</td></tr>
+<tr><td><code>EXPIRED</code></td><td>الوثيقة منتهية الصلاحية</td></tr>
+<tr><td><code>WRONG_TYPE</code></td><td>الملفّ ليس من نوع الوثيقة المطلوبة</td></tr>
+<tr><td><code>UNREADABLE</code></td><td>المعلومات غير واضحة للقراءة</td></tr>
+<tr><td><code>OTHER</code></td><td>سبب آخر — يُحدَّد في الملاحظة</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="stories">٦. محاكاة التشغيل — 8 قصص استخدام</h2>
+
+<div class="story"><span class="who">١. مزوّد جديد:</span> يسجّل → يختار «طرابلس الكبرى» ← «تاجوراء» → يرفع رخصة المنشأة وشهادة صحية وهوية المدير → الحالة PENDING → OPS يقبل الوثائق من Inbox → الحساب يصبح ACTIVE.</div>
+
+<div class="story"><span class="who">٢. مزوّد نشط بلا وثائق (كازا/القمبري):</span> يفتح ProviderSettings → يرى تحذير «3 وثائق إلزامية مفقودة» → يرفع تباعاً → OPS يقبلها → الحساب يظل ACTIVE (بلا إغلاق، حسب قرارك «تنبيه فقط»).</div>
+
+<div class="story"><span class="who">٣. الشهادة الصحية تنتهي بعد 60 يوماً:</span> المسح يكتشف الحدّ → يُرسل push «شهادتك تنتهي بعد شهرين، جدّدها لتجنّب الإيقاف» → بعد 30 يوماً → تنبيه ثاني → بعد 7 أيام → تنبيه ثالث «أسبوع فقط». المزوّد يجدّد قبل الانتهاء.</div>
+
+<div class="story"><span class="who">٤. مزوّد تجاهل التنبيهات:</span> الوثيقة انتهت → اليوم 0 → تنبيه «وثيقتك انتهت اليوم» → اليوم 30 → تنبيه ثاني → اليوم 60 → تنبيه «هذا آخر تنبيه قبل الإغلاق» → اليوم 90 (إن OPS مفعِّل auto-close) → الحساب يُحوَّل إلى <code>SUSPENDED_DOCUMENTS</code>.</div>
+
+<div class="story"><span class="who">٥. OPS يرفض وثيقة:</span> يفتح Inbox → يضغط «رفض» → ينبثق منتقي أسباب (BLURRY/CROPPED/…) + ملاحظة → المزوّد يَرى السبب فوراً في بطاقة الوثيقة المرفوضة → يُعيد التصوير → يَرفع → OPS يَقبل.</div>
+
+<div class="story"><span class="who">٦. مزوّد ملحمة (butcher) يسجّل:</span> سياسة <code>MEAT_HANDLING_PERMIT</code> مفعَّلة له فقط → يَظهر له في قائمة الوثائق الإلزامية إضافة للسبعة الافتراضية.</div>
+
+<div class="story"><span class="who">٧. OPS يُعيد تجميع البلديات:</span> يفتح OpsGeographicRegions → يَنقل «ترهونة» من «الجبل الغربي» إلى «طرابلس الكبرى» (لأنها تقع جغرافياً أقرب) → التغيير فوريّ في picker الجديد بلا deploy.</div>
+
+<div class="story"><span class="who">٨. مزوّد يَرفع نسخة جديدة من رخصة صالحة:</span> يضغط «تجديد» → يرفع الجديدة → النظام يَلصق المُسبَقة بـSUPERSEDED تلقائياً → الجديدة PENDING → OPS يَقبل → تصبح الجديدة الفعّالة، والمُسبَقة محفوظة في «التاريخ».</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="risks">٧. مخاطر معروفة + كيف نخفّفها</h2>
+<table>
+<thead><tr><th>المخاطرة</th><th>الاحتمال</th><th>التخفيف</th></tr></thead>
+<tbody>
+<tr><td>إغراق المزوّد بإشعارات متكرّرة</td><td>متوسط</td><td><code>last_warning_level</code> idempotent + اختبار يدوي قبل النشر</td></tr>
+<tr><td>التجميع الجغرافي مسوّدة كلود غير دقيقة</td><td>عالٍ</td><td>قبل الزرع: تراجعها أنت + يَبقى OPS قادراً على التعديل لحظياً</td></tr>
+<tr><td>migration aa16 يفشل على PG</td><td>منخفض</td><td>تحقّق upgrade+downgrade على حاوية PG قابلة للرمي قبل النشر (نمط مثبَّت من aa15)</td></tr>
+<tr><td>الإغلاق التلقائي يَوقف مزوّداً بالخطأ</td><td>متوسط</td><td>افتراضي = معطَّل. OPS تُفعّله عن قصد + إشعار قبل الإغلاق بـ7 أيام + قابل للتراجع من OPS</td></tr>
+<tr><td>صور بحجم ضخم تَملأ MinIO</td><td>منخفض</td><td>حدّ أقصى 5MB لكل ملفّ + ضغط جانب الواجهة قبل الرفع</td></tr>
+<tr><td>المزوّد يَرفع PDF بدل صورة</td><td>—</td><td>مدعوم بالفعل (<code>accept=image/*,application/pdf</code>) + معاينة PDF تظهر صفحة أولى</td></tr>
+<tr><td>سياسة جديدة في OPS تَكسر مزوّدين قائمين</td><td>متوسط</td><td>السياسات لا تَفعّل الإغلاق التلقائي افتراضياً + ConfirmDialog «هذه السياسة ستؤثر على N مزوّداً» قبل الحفظ</td></tr>
+<tr><td>FIN-COR / forbidden zones</td><td>—</td><td>كلّ التعديلات خارج <code>contracts/</code>؛ <code>backend/app/modules/</code> يحتاج إذنك صراحةً (كما في 414+)؛ <code>docker-compose.yml</code> غير ملموس</td></tr>
+</tbody>
+</table>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="estimate">٨. التقدير الزمني والتتابع</h2>
+<table>
+<thead><tr><th>المرحلة</th><th>الوقت التقريبي</th><th>migration</th><th>المخاطرة</th><th>checkpoint</th></tr></thead>
+<tbody>
+<tr><td>A — تسميات + pharmacy</td><td>~25 دقيقة</td><td>لا</td><td><span class="badge ok">صفر</span></td><td>عرض النتيجة قبل B</td></tr>
+<tr><td>B — منظومة الوثائق</td><td>~6 ساعات</td><td>aa16 (دمج كل الجداول)</td><td><span class="badge high">متوسطة</span></td><td>عرض الواجهة + اختبار رفع حيّ قبل C</td></tr>
+<tr><td>C — مناطق هرمية</td><td>~3 ساعات</td><td>(مدمج في aa16)</td><td><span class="badge medium">منخفضة</span></td><td>عرض التجميع للمراجعة الجغرافية</td></tr>
+<tr><td>D — OPS موحَّد</td><td>~1.5 ساعة</td><td>لا</td><td><span class="badge ok">صفر</span></td><td>عرض KPIs نهائي</td></tr>
+<tr><td><strong>الإجمالي</strong></td><td><strong>~11 ساعة عمل</strong></td><td>1 migration</td><td>—</td><td>4 نقاط مراجعة معك</td></tr>
+</tbody>
+</table>
+
+<p><strong>كل اختبارات BE الـ1764 + FE الـ854 الحالية يجب أن تَبقى خضراء +
+يُضاف ~30 اختباراً جديداً (BE: ~20، FE: ~10). FIN-COR PASS مضمون (لا تغيير على contracts).</strong></p>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+<h2 id="approve">٩. طلب الإذن للبدء</h2>
+
+<div class="card q">
+<p>الخطّة جاهزة. هل تأذن بـ:</p>
+<ol>
+<li><strong>«ابدأ A»</strong> ← أبدأ بالتسميات + تنظيف pharmacy (25 دقيقة، صفر مخاطر) ⇐ <em>توصيتي للبداية</em>.</li>
+<li><strong>«ابدأ A و B»</strong> ← المرحلتان معاً ثم أعرض النتيجة قبل C/D.</li>
+<li><strong>«ابدأ الأربع كاملةً»</strong> ← أنفّذ كل شيء، أعرض النتيجة النهائية مرّة واحدة.</li>
+<li><strong>«انتظر»</strong> ← أحتاج تعديل بند ما، تخبرني ثم أُحدّث الخطّة.</li>
+</ol>
+<p>أحتاج أيضاً تأكيداً صريحاً على بنود تَلمس backend (forbidden zone حسب <code>platform/CLAUDE.md</code>):</p>
+<ul class="compact">
+<li>migration aa16 (B+C) ⇐ تحتاج إذنك (آخر مرّة أُذِن في 414+).</li>
+<li>إزالة pharmacy من <code>VALID_PROVIDER_TYPES</code> (A4) ⇐ تحتاج إذنك بعد تأكيد 0 صفّ.</li>
+<li>إضافة 6 endpoints جديدة (operations + providers) ⇐ تحتاج إذنك.</li>
+</ul>
+<p><strong>قاعدة لا-commits</strong> مضمونة (لا git commits، نموذج المشروع).</p>
+</div>
+
+<hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);" />
+<p style="text-align: center; color: var(--gray); font-size: 0.85rem;">
+نسخة ١.٠ بعد المراجعة العميقة · 2026-05-26 · انتظار جوابك قبل أيّ تعديل على الكود
+</p>
+
+</body>
+</html>

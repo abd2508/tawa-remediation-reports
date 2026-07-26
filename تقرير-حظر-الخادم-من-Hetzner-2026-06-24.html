@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير حادثة حظر الخادم من Hetzner — تووا · 2026-06-24</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#eef0f3;--surface:#fff;--surface-2:#f5f6f9;--ink:#16202b;--ink-soft:#36465a;--muted:#64748b;--line:#dde2ea;
+  --brand:#b3261e;--brand-2:#d4453b;--brand-ink:#7a1610;--blue:#1d6fb8;--green:#1f9d6b;--amber:#d97a16;
+  --ok-bg:#e7f6ef;--warn-bg:#fdf2e3;--info-bg:#eaf1fb;--bad-bg:#fdeceb;--neutral-bg:#f0f1f3;
+  --shadow:0 1px 2px rgba(16,32,43,.06),0 8px 28px rgba(16,32,43,.08);--radius:15px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Tajawal','Noto Kufi Arabic','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.9;font-size:16.5px}
+code,.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;direction:ltr;unicode-bidi:isolate;background:#10212e;color:#7fd1ff;padding:.08em .42em;border-radius:6px;font-size:.8em;white-space:nowrap}
+pre{background:#10212e;color:#cfe6f5;border-radius:12px;padding:13px 16px;overflow-x:auto;direction:ltr;text-align:left;font-family:'IBM Plex Mono',monospace;font-size:.78rem;line-height:1.6;box-shadow:var(--shadow)}
+.ok{color:#6ee7a8}.bad{color:#ff9b8f}.warn{color:#ffd27a}
+h2,h3,h4{line-height:1.4;color:var(--brand-ink)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+
+.hero{background:radial-gradient(120% 140% at 85% -10%,#7a1610 0%,#5a0f0b 50%,#3a0907 100%);color:#ffeae8;padding:54px 0 104px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(40% 50% at 12% 8%,rgba(212,69,59,.3),transparent 70%)}
+.hero .wrap{position:relative;z-index:2}
+.kicker{display:inline-flex;align-items:center;gap:9px;background:rgba(255,180,170,.14);border:1px solid rgba(255,180,170,.32);color:#ffc7bf;padding:7px 15px;border-radius:999px;font-weight:700;font-size:.82rem}
+.kicker .dot{width:8px;height:8px;border-radius:50%;background:#ff6b5b;box-shadow:0 0 0 4px rgba(255,107,91,.22)}
+h1{font-size:clamp(1.7rem,4vw,2.7rem);margin:18px 0 8px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.hero .sub{font-size:1.1rem;color:#ffd2cc;max-width:870px;font-weight:500}
+.hero .meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px}
+.hero .meta span{background:rgba(0,0,0,.22);border:1px solid rgba(255,180,170,.18);padding:7px 14px;border-radius:10px;font-size:.83rem;color:#ffdcd6}
+
+.stats{margin-top:-74px;position:relative;z-index:5}
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px 12px;box-shadow:var(--shadow);text-align:center}
+.stat .n{font-size:1.4rem;font-weight:800;line-height:1.15;color:var(--brand)}
+.stat .n.g{color:var(--green)}.stat .n.b{color:var(--blue)}
+.stat .l{font-size:.72rem;color:var(--muted);margin-top:5px;font-weight:600}
+
+.toc{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin-top:38px}
+.toc .wrap{display:flex;gap:3px;overflow-x:auto;padding:9px 22px}
+.toc a{white-space:nowrap;padding:8px 12px;border-radius:9px;font-size:.83rem;font-weight:700;color:var(--ink-soft)}
+.toc a:hover{background:var(--surface-2);color:var(--brand)}
+
+section{padding:42px 0 8px}
+.sec-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.sec-num{flex-shrink:0;width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.2rem;box-shadow:0 8px 20px rgba(179,38,30,.3)}
+.sec-head h2{font-size:1.5rem;margin:0;font-weight:800}
+.lead{font-size:1.02rem;color:var(--ink-soft);margin:6px 0 16px;max-width:920px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);margin:14px 0}
+.simple{background:var(--info-bg);border:1px solid #bdd5f2;border-radius:12px;padding:13px 17px;margin:12px 0;font-size:.98rem}
+.simple::before{content:"💡 ببساطة: ";font-weight:800;color:var(--blue)}
+.note{border-radius:12px;padding:12px 16px;margin:12px 0;font-size:.95rem;border:1px solid}
+.note.bad{background:var(--bad-bg);border-color:#f3c4bf}
+.note.ok{background:var(--ok-bg);border-color:#bfe4d0}
+.note.warn{background:var(--warn-bg);border-color:#f0d3a3}
+
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:.88rem;background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:#3a0907;color:#ffe2de;font-weight:700;font-size:.83rem}
+tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:var(--surface-2)}
+.pill{display:inline-block;border-radius:6px;padding:1px 9px;font-size:.74rem;font-weight:800}
+.pill.bad{background:#fdeceb;color:var(--brand)}.pill.ok{background:#e7f6ef;color:var(--green)}
+
+.flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;margin:14px 0;background:var(--surface-2);border:1px dashed var(--line);border-radius:12px;padding:18px}
+.flow .box{background:#fff;border:1.5px solid var(--brand-2);border-radius:10px;padding:9px 13px;font-size:.82rem;font-weight:700;color:var(--brand-ink);box-shadow:var(--shadow);text-align:center;min-width:86px}
+.flow .box.g{border-color:var(--green);color:var(--green)}
+.flow .box.blk{background:#3a0907;border-color:#3a0907;color:#ffd2cc}
+.flow .arr{color:var(--brand-2);font-weight:800;font-size:1.1rem}
+.flow .x{color:var(--brand);font-weight:800;font-size:1.3rem}
+
+.timeline{position:relative;margin:16px 0;padding-inline-start:28px}
+.timeline::before{content:"";position:absolute;inset-inline-start:7px;top:6px;bottom:6px;width:3px;background:linear-gradient(var(--brand-2),var(--line))}
+.tl{position:relative;margin-bottom:14px}
+.tl::before{content:"";position:absolute;inset-inline-start:-25px;top:5px;width:13px;height:13px;border-radius:50%;background:var(--brand-2);border:3px solid #fff;box-shadow:0 0 0 2px var(--brand-2)}
+.tl.g::before{background:var(--green);box-shadow:0 0 0 2px var(--green)}
+.tl h4{margin:0 0 2px;font-size:1rem}.tl .t{font-size:.74rem;color:var(--muted);font-weight:700}
+
+ul.clean{list-style:none;padding:0;margin:8px 0}
+ul.clean li{padding:6px 0;padding-inline-start:23px;position:relative;border-bottom:1px solid var(--line)}
+ul.clean li:last-child{border:none}
+ul.clean li::before{content:"◆";position:absolute;inset-inline-start:0;color:var(--brand-2);font-size:.75rem;top:10px}
+
+figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;box-shadow:var(--shadow)}
+figure img{width:100%;border-radius:8px;display:block}
+figcaption{font-size:.8rem;color:var(--muted);text-align:center;margin-top:8px;font-weight:600}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:880px){.stat-grid{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1fr}}
+
+footer{background:#2a0706;color:#ffd2cc;padding:32px 0;margin-top:48px;text-align:center}
+footer .wrap{font-size:.9rem}footer b{color:#fff}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker"><span class="dot"></span>تقرير حادثة · فحص عميق عبر Hetzner Cloud API · أدلّة موثّقة</span>
+    <h1>حظر الخادم من Hetzner — التشخيص الكامل</h1>
+    <p class="sub">لماذا توقّف الوصول للخادم فجأةً (لك ولي)، وما السبب الحقيقيّ بالأدلّة، وما هي العيوب، وكيف نُصلحها. كل رقم هنا مأخوذ مباشرةً من Hetzner Cloud API — لا تخمين. الخلاصة المطمئنة: <b>الخادم وبياناتك سليمة تمامًا؛ المشكلة حظر شبكيّ من Hetzner يُرفَع بطلب.</b></p>
+    <div class="meta">
+      <span>📅 2026-06-24</span>
+      <span>🖥️ الخادم: tawanow (CPX32)</span>
+      <span>🔴 IPv4 + IPv6 محظوران</span>
+      <span>🟢 لا إساءة صادرة (دليل)</span>
+      <span>🟢 البيانات سليمة</span>
+    </div>
+  </div>
+</header>
+
+<div class="stats wrap">
+  <div class="stat-grid">
+    <div class="stat"><div class="n">2</div><div class="l">عنوانان محظوران (IPv4+IPv6)</div></div>
+    <div class="stat"><div class="n g">running</div><div class="l">حالة الخادم (يعمل)</div></div>
+    <div class="stat"><div class="n g">~150</div><div class="l">بايت/ث صادر (شبه صفر)</div></div>
+    <div class="stat"><div class="n b">0</div><div class="l">دليل على إساءة</div></div>
+    <div class="stat"><div class="n g">سليمة</div><div class="l">البيانات والكود</div></div>
+  </div>
+</div>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#tldr">الخلاصة</a>
+    <a href="#what">ما الذي حدث</a>
+    <a href="#how">كيف يحجب Hetzner</a>
+    <a href="#evidence">الأدلّة من الـAPI</a>
+    <a href="#timeline">التسلسل الزمنيّ</a>
+    <a href="#cause">السبب والعيوب</a>
+    <a href="#fix">الحلّ</a>
+  </div>
+</nav>
+
+<!-- TLDR -->
+<section id="tldr">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">★</div><div><h2>الخلاصة ببساطة شديدة</h2></div></div>
+    <div class="simple">
+      شركة الاستضافة <b>Hetzner</b> وضعت «حاجزًا» على عنوان خادمك على مستوى شبكتها — فصار أيّ شخص (أنت وأنا) لا يستطيع الوصول إليه، رغم أن الخادم نفسه <b>يعمل وبياناته سليمة</b>. الأمر أشبه بأن البلديّة أغلقت الشارع المؤدّي إلى بيتك: البيت سليم، لكن لا أحد يصل إليه حتى تُفتَح الطريق. <b>الحلّ: تضغط زرّ «Request unblock» في لوحة Hetzner (+ ربّما تردّ على بريد منهم)، فيُرفَع الحاجز ويعود كل شيء.</b>
+    </div>
+    <div class="note ok"><b>أهمّ ما تطمئن له:</b> فحصتُ حركة الشبكة عبر الـAPI — <b>خادمك لا يُرسل أيّ حركة مشبوهة (الصادر شبه صفر)</b>. أي أنه <b>ليس مخترَقًا ولا يهاجم أحدًا</b>. الحظر على الأرجح <b>إنذار كاذب أو بلاغ قديم</b>، ويُرفَع بسهولة.</div>
+  </div>
+</section>
+
+<!-- WHAT -->
+<section id="what">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">١</div><div><h2>ما الذي حدث بالضبط</h2></div></div>
+    <p class="lead">أثناء عملنا، توقّف الوصول إلى الخادم فجأةً — لي (محاولات SSH تنتهي بـtimeout) ثم لك (حساب السوبر-أدمن يقول «الخادم غير متاح»). الفحص كشف أن السبب ليس الكود ولا fail2ban ولا المفتاح، بل أن <b>Hetzner حظرت عنوانَي الخادم على شبكتها</b>.</p>
+    <figure>
+      <img src="hetzner-block-evidence.png" alt="لوحة Hetzner تُظهر الشريط الأحمر: IP address of this server is blocked">
+      <figcaption>📸 لقطتك من لوحة Hetzner — الشريط الأحمر «IP address of this server is blocked» + زرّ «Request unblock». هذا الدليل البصريّ الأوّل.</figcaption>
+    </figure>
+    <div class="note bad"><b>المهمّ:</b> هذا حظر على مستوى <b>شبكة Hetzner</b> (خارج خادمك) — لذلك <b>لا fail2ban ولا إعادة تشغيل ولا مفتاح SSH جديد يُصلحه</b>. كلّها لا فائدة منها هنا، لأن الحزم تُسقَط قبل أن تصل الخادم أصلًا.</div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٢</div><div><h2>كيف يعمل حظر Hetzner (الرسم)</h2></div></div>
+    <div class="simple">عادةً تمرّ طلباتك عبر شبكة Hetzner ثم تصل الخادم. عند الحظر، <b>تُسقِط شبكة Hetzner كل الحزم</b> قبل أن تصل الخادم — فيبدو وكأنه «غير متاح» رغم أنه يعمل.</div>
+    <div class="card">
+      <div style="font-weight:700;color:var(--green);margin-bottom:6px">الوضع الطبيعيّ:</div>
+      <div class="flow">
+        <div class="box">أنت / المتصفّح</div><span class="arr">←</span>
+        <div class="box">شبكة Hetzner</div><span class="arr">←</span>
+        <div class="box g">الخادم tawanow ✅</div>
+      </div>
+      <div style="font-weight:700;color:var(--brand);margin:14px 0 6px">الوضع الحاليّ (محظور):</div>
+      <div class="flow">
+        <div class="box">أنت / المتصفّح</div><span class="arr">←</span>
+        <div class="box blk">شبكة Hetzner<br>🚫 تُسقِط الحزم</div><span class="x">✗</span>
+        <div class="box g" style="opacity:.55">الخادم يعمل (لا يصله شيء)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVIDENCE -->
+<section id="evidence">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٣</div><div><h2>الأدلّة الدقيقة من Hetzner Cloud API</h2></div></div>
+    <p class="lead">استخدمتُ مفتاح الـAPI (قراءة فقط) لاستجواب Hetzner مباشرةً. هذه الحقائق من النظام نفسه:</p>
+    <table>
+      <thead><tr><th>الفحص (عبر الـAPI)</th><th>النتيجة</th><th>الدلالة</th></tr></thead>
+      <tbody>
+        <tr><td>حالة الخادم <code>status</code></td><td><span class="pill ok">running</span></td><td>الخادم يعمل — لم يتعطّل ولم يُطفأ</td></tr>
+        <tr><td><code>ipv4.blocked</code> (178.105.87.192)</td><td><span class="pill bad">True</span></td><td>🔴 Hetzner حظرت العنوان الرابع</td></tr>
+        <tr><td><code>ipv6.blocked</code></td><td><span class="pill bad">True</span></td><td>🔴 والسادس أيضًا → نمط حظر «abuse»</td></tr>
+        <tr><td><code>locked</code> / <code>rescue</code></td><td><span class="pill ok">False / False</span></td><td>غير مقفل، لا وضع إنقاذ — الخادم طبيعيّ</td></tr>
+        <tr><td><code>protection.delete/rebuild</code></td><td><span class="pill ok">False</span></td><td>لا خطر حذف — لكن يُنصَح بتفعيل الحماية لاحقًا</td></tr>
+        <tr><td>الحركة <b>الصادرة</b> (network out)</td><td><span class="pill ok">شبه صفر</span></td><td>ذروة ١.٣ ك.ب/ث · متوسّط ١٥٠ بايت/ث → <b>لا إساءة صادرة</b></td></tr>
+        <tr><td>الحركة <b>الواردة</b> (network in)</td><td>منخفضة ثم تقطّعت</td><td>الانقطاع = أثر الحظر نفسه</td></tr>
+        <tr><td>سجلّ الإجراءات (actions)</td><td>آخرها: فتح Console اليوم</td><td>⚠️ <b>لا يوجد reboot</b> — إعادة تشغيلك لم تُنفَّذ فعليًّا</td></tr>
+        <tr><td>تاريخ إنشاء الخادم</td><td>2026-05-10</td><td>خادم قائم منذ ٦ أسابيع</td></tr>
+      </tbody>
+    </table>
+    <div class="note ok"><b>قراءة الأدلّة:</b> الحركة الصادرة <b>شبه صفر</b> دليلٌ قويّ أن الخادم <b>لا يهاجم أحدًا ولا يُرسل سبامًا</b> — فالسبب المعتاد لحظر Hetzner («إساءة صادرة») <b>مستبعَد</b>. هذا يقوّي موقفك عند طلب رفع الحظر.</div>
+    <figure>
+      <img src="hetzner-firewall-evidence.png" alt="جدار Hetzner Cloud: المنفذ 22 مفتوح 0.0.0.0/0، مطبَّق على 0 موارد">
+      <figcaption>📸 جدار Hetzner Cloud (<code>tawa-staging-fw</code>): المنفذ 22 مفتوح للجميع (<code>0.0.0.0/0</code>) و<b>مطبَّق على «٠ موارد»</b> — أي ليس مربوطًا بالخادم. فالجدار ليس السبب (تأكّدنا منه قبل استبعاده).</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section id="timeline">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٤</div><div><h2>التسلسل الزمنيّ — كيف وصلنا إلى هنا (بصدق)</h2></div></div>
+    <div class="timeline">
+      <div class="tl g"><div class="t">بداية الجلسة</div><h4>عمل عاديّ + تحقّق من سلامة النشر</h4>أجريتُ اتصالات SSH للقراءة (مقارنة الملفّات لإثبات أن النشر آمن).</div>
+      <div class="tl"><div class="t">أثناء التحقّق</div><h4>اتصالات SSH متكرّرة من عنوانك</h4>Claude يعمل على جهازك، فاتصالاتي خرجت من إنترنتك. تكرارها فعّل <b>fail2ban</b> الذي حظر عنواني (الأمر بدأ هنا).</div>
+      <div class="tl"><div class="t">ثم</div><h4>توقّف وصولي للخادم</h4>SSH صار timeout — ظننتُه fail2ban، فطلبتُ رفع الحظر عبر الـConsole.</div>
+      <div class="tl"><div class="t">ثم</div><h4>توقّف وصولك أنت أيضًا</h4>حساب السوبر-أدمن: «الخادم غير متاح» — هنا اتّضح أن المشكلة أكبر من حظر عنوان واحد.</div>
+      <div class="tl"><div class="t">التشخيص</div><h4>الـAPI كشف الحقيقة</h4><b>Hetzner حظرت عنوانَي الخادم (IPv4+IPv6)</b> — حظر شبكيّ يُسقِط كل الحزم، يُفسّر توقّف الوصول للجميع.</div>
+    </div>
+    <div class="note warn"><b>هل أنا السبب؟</b> اتصالاتي المتكرّرة فعّلت fail2ban (حظر عنواني)، لكن <b>حظر Hetzner لعنوان الخادم نفسه مسألة منفصلة</b> غالبًا (Hetzner تحظر للحركة الصادرة لا الواردة، وحركتك الصادرة صفر). قد يكون <b>بلاغًا قديمًا أو إنذارًا كاذبًا</b> تزامن مع جلستنا. الأكيد من بريد Hetzner.</div>
+  </div>
+</section>
+
+<!-- CAUSE -->
+<section id="cause">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٥</div><div><h2>السبب والعيوب المكتشَفة</h2></div></div>
+    <div class="card"><h3>🎯 السبب الجذريّ المؤكَّد</h3>
+      <b>Hetzner حظرت عنوانَي الخادم (IPv4 + IPv6) على مستوى شبكتها</b> (حظر «abuse»). الـAPI يُثبت الحظر لكن <b>لا يُظهر السبب الدقيق</b> — السبب في <b>بريد الإساءة من Hetzner</b> أو لوحة Abuse المنفصلة.
+    </div>
+    <div class="card"><h3>🔎 الأسباب المحتمَلة (مرتّبة بالأرجحيّة)</h3>
+      <ul class="clean">
+        <li><b>بلاغ إساءة من طرف ثالث</b> (قد يكون قديمًا/خاطئًا) — الأكثر شيوعًا مع «صادر = صفر».</li>
+        <li><b>إنذار كاذب (false positive)</b> من نظام Hetzner الآليّ.</li>
+        <li><b>مسألة فوترة/حساب</b> (تحقّق من الفواتير).</li>
+        <li><b>أقلّ ترجيحًا:</b> ردّ فعل على نمط الاتصالات الواردة المتكرّرة (لكن هذا عادةً لا يُسبّب حظر العنوان كاملًا).</li>
+      </ul>
+    </div>
+    <div class="card"><h3>⚠️ عيوب/ملاحظات جانبيّة رصدتُها (لإصلاحها لاحقًا)</h3>
+      <ul class="clean">
+        <li><b>إعادة التشغيل لم تُنفَّذ:</b> لا يوجد إجراء reboot في السجلّ — ضغطة «Reboot» ربّما لم تُسجَّل (وهي لا تُفيد هنا أصلًا).</li>
+        <li><b>جدار Hetzner Cloud مطبَّق على «٠ موارد»</b> — أي غير مربوط بالخادم، فلا حماية شبكيّة من Hetzner فعّالة (يُنصَح بربطه وتقييد منفذ SSH لاحقًا).</li>
+        <li><b>حماية الحذف/إعادة البناء مُعطَّلة</b> (<code>protection=False</code>) — يُنصَح بتفعيلها لمنع حذف عرضيّ.</li>
+        <li><b>fail2ban عدوانيّ:</b> حظر عنوانك من اتصالات متكرّرة بسيطة — يُنصَح برفع العتبة / إضافة عنوانك لقائمة موثوقة (ignoreip).</li>
+        <li><b>الوصول كلّه بعنوان IP واحد:</b> لا قناة وصول بديلة آمنة (مثل Tailscale / VPN) — وُجودها كان سيتجاوز هذا الحظر.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- FIX -->
+<section id="fix">
+  <div class="wrap">
+    <div class="sec-head"><div class="sec-num">٦</div><div><h2>الحلّ — خطوة بخطوة</h2></div></div>
+    <div class="note bad" style="font-weight:700"><b>الحلّ الوحيد الفعّال:</b> رفع حظر Hetzner عن العنوان — لا شيء آخر يعمل (fail2ban/reboot/مفتاح جديد بلا فائدة هنا).</div>
+    <ol style="font-size:1rem;line-height:2;padding-inline-start:20px">
+      <li><b>اضغط «Request unblock»</b> (الزرّ الأحمر في اللوحة) — لـIPv4 ولـIPv6.</li>
+      <li><b>افحص بريدك الإلكترونيّ</b> (المسجَّل في Hetzner) عن رسالة من <code>abuse@hetzner.com</code> بعنوان الخادم — تشرح السبب الدقيق وإجراء الرفع. <b>غالبًا يجب أن تردّ مؤكّدًا المعالجة.</b></li>
+      <li><b>إن كان إنذارًا كاذبًا</b> (والأدلّة تدعم ذلك — الصادر صفر): ردّ على البلاغ / افتح تذكرة موضّحًا «no outbound abuse — server idle, near-zero outbound traffic».</li>
+      <li><b>تحقّق من الفواتير</b> في حسابك (إن كان السبب ماليًّا).</li>
+      <li>بعد اختفاء الشريط الأحمر → <b>الوصول يعود فورًا</b> (لي ولك) وأُكمل النشر.</li>
+    </ol>
+    <div class="note ok"><b>بعد رفع الحظر — تحسينات وقائيّة موصى بها:</b> (١) أضِف عنوانك إلى <code>ignoreip</code> في fail2ban. (٢) اربط جدار Hetzner Cloud بالخادم وقيّد منفذ SSH. (٣) فعّل حماية الحذف. (٤) جهّز قناة وصول بديلة (VPN/Tailscale) لتجاوز أيّ حظر مستقبليّ. (٥) ألغِ مفتاح الـAPI المكشوف.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>تقرير حادثة حظر الخادم من Hetzner — تووا</b> · 2026-06-24 · فحص عبر Hetzner Cloud API</p>
+    <p>السبب: حظر شبكيّ من Hetzner لعنوانَي الخادم (IPv4+IPv6) · الخادم يعمل · لا إساءة صادرة (دليل) · البيانات سليمة · الحلّ: Request unblock + بريد abuse</p>
+    <p style="opacity:.7;margin-top:8px;font-size:.82rem">كل الأرقام من الـAPI مباشرةً. اللقطات: <code>hetzner-block-evidence.png</code> · <code>hetzner-firewall-evidence.png</code></p>
+  </div>
+</footer>
+
+</body>
+</html>

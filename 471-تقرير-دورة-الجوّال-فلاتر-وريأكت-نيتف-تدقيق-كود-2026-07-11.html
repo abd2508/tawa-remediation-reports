@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير دورة الجوّال (Flutter + React Native) — تدقيق كود شامل (57 عيبًا، 3 حاجزة، 0 حيّ)</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.8; margin:0; font-size:16px;}
+  .wrap{max-width:1260px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.85rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:960px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.9rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.med .num{color:var(--med)}
+  .stat .lbl{color:var(--muted); font-size:.82rem; margin-top:4px}
+  section{margin:44px 0}
+  h2.sec-title{font-size:1.5rem; border-inline-start:5px solid var(--accent); padding-inline-start:14px; margin-bottom:18px; color:#fff}
+  h2.sec-title.blocker{border-color:var(--blocker)}
+  h2.sec-title.cluster{border-color:var(--accent2); font-size:1.3rem}
+  p.lead{color:var(--muted); max-width:960px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:20px 24px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card-head{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+  .card-title{font-size:1.1rem; font-weight:700; color:#fff}
+  .tag-row{display:flex; gap:8px; flex-wrap:wrap}
+  .tag{font-size:.72rem; padding:3px 10px; border-radius:999px; font-weight:700}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.live{background:rgba(255,45,85,.12); color:#ff6b8f; border:1px solid rgba(255,45,85,.35)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  .orig{background:var(--panel2); border-radius:10px; padding:10px 16px; margin:10px 0; font-size:.9rem; color:var(--muted)}
+  .orig b{color:var(--text)}
+  .problem{background:rgba(255,45,85,.06); border:1px solid rgba(255,45,85,.25); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.92rem}
+  .problem.high{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.25)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.83rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.88rem}
+  th,td{border:1px solid var(--border); padding:9px 12px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:8px; break-inside:avoid}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)}
+  .fine-list{background:rgba(55,201,135,.05); border:1px dashed rgba(55,201,135,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+  .shallow-list{background:rgba(111,211,255,.05); border:1px dashed rgba(111,211,255,.3); border-radius:10px; padding:14px 18px; margin:14px 0; font-size:.88rem; color:var(--muted)}
+  .tag-cell{font-size:.7rem; padding:2px 8px; border-radius:999px; font-weight:700; white-space:nowrap}
+  .tag-cell.high{background:rgba(255,159,67,.15); color:var(--high); border:1px solid rgba(255,159,67,.4)}
+  .tag-cell.med{background:rgba(255,210,63,.15); color:var(--med); border:1px solid rgba(255,210,63,.4)}
+  .tag-cell.low{background:rgba(111,211,255,.15); color:var(--low); border:1px solid rgba(111,211,255,.4)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>📱 تقرير دورة الجوّال الكامل — Flutter + React Native (تدقيق كود شامل، بلا اختبار حيّ)</h1>
+  <div class="sub">تنفيذًا للتوجيه ("ابدأ دورة الجوّال، بنفس المنهجيّة"): خامسة دورات التدقيق بعد إغلاق سلسلة الويب الرباعيّة (عميل→مزوّد→سائق→عمليّات، تقارير 466-469 + تركيب 470). تغطّي هذه الدورة تطبيقي الجوّال الوحيدين في المشروع: <b>Flutter</b> (<code>mobile_app/</code> — التطبيق الفعليّ الكامل العمق، يغطّي الأدوار الأربعة) و<b>React Native/Expo</b> (<code>apps/mobile/</code> — إعادة بناء مبكرة، سطح أرقّ بكثير). 8 وكلاء تدقيق كود متوازية (6 لفلاتر بحسب عمق كل ميزة + 2 لريأكت نيتف). <b>هذه الدورة تدقيق كود بحت — بلا اختبار حيّ إطلاقًا</b>، لسبب موثَّق أدناه، وليس تقصيرًا.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-11</div>
+    <div class="badge">🚫 <b>لا اختبار حيّ:</b> نسخ APK الجاهزة لفلاتر تشير للإنتاج الحقيقيّ؛ React Native سقالة مبكّرة لا تبرّر تشغيل خادم تطوير</div>
+    <div class="badge">👥 <b>8 وكلاء تدقيق كود</b> (6 Flutter + 2 React Native) + مقارنة ثنائيّة الاتّجاه مع الباك إند وواجهة الويب المُدقَّقة سابقًا</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat"><div class="num">57</div><div class="lbl">إجمالي العيوب (تدقيق كود)</div></div>
+    <div class="stat blocker"><div class="num">3</div><div class="lbl">حاجزة (BLOCKER) — الميزة معطَّلة كليًّا</div></div>
+    <div class="stat high"><div class="num">21</div><div class="lbl">خطورة عالية (HIGH)</div></div>
+    <div class="stat med"><div class="num">24</div><div class="lbl">خطورة متوسّطة (MED)</div></div>
+    <div class="stat"><div class="num">9</div><div class="lbl">خطورة منخفضة (LOW)</div></div>
+    <div class="stat"><div class="num">0</div><div class="lbl">مؤكَّدة حيًّا — بالكامل تدقيق كود</div></div>
+  </div>
+</header>
+
+<div class="toc">
+  <ul>
+    <li><a href="#why-no-live">لماذا لا اختبار حيّ في هذه الدورة</a></li>
+    <li><a href="#headline">الاكتشاف الأكبر — انحراف العقد الأساسيّ (Contract Drift)</a></li>
+    <li><a href="#blockers">الأعطاب الحاجزة الثلاثة</a></li>
+    <li><a href="#flutter-auth">Flutter — التوثيق والدخول</a></li>
+    <li><a href="#flutter-infra">Flutter — البنية التحتيّة المشتركة</a></li>
+    <li><a href="#flutter-customer">Flutter — واجهات العميل</a></li>
+    <li><a href="#flutter-driver">Flutter — دورة حياة السائق الكاملة</a></li>
+    <li><a href="#flutter-provider-ops">Flutter — المزوّد والعمليّات</a></li>
+    <li><a href="#rn">React Native — سقالة مبكّرة</a></li>
+    <li><a href="#families">صلة بعائلات التركيب 470</a></li>
+    <li><a href="#strengths">ما يعمل جيّدًا فعلًا</a></li>
+    <li><a href="#coverage">حدود التغطية</a></li>
+    <li><a href="#roadmap">خارطة طريق الإصلاح</a></li>
+  </ul>
+</div>
+
+<section id="why-no-live">
+  <h2 class="sec-title">🚫 لماذا لا اختبار حيّ في هذه الدورة</h2>
+  <div class="shallow-list">
+    <b>Flutter:</b> نسخ APK الجاهزة الوحيدة على القرص (<code>build/app/outputs/.../*.apk</code>) هي نسخ <code>liteproduction</code>/<code>fullproduction</code> حصرًا. قراءة <code>lib/core/constants.dart</code> تؤكّد أنّ كلا البيئتين <code>staging</code> و<code>production</code> تُحلّان إلى نفس العنوان الحقيقيّ <code>https://tawanow.com/api</code> — أي خادم الإنتاج الفعليّ. تركيب أيّ من هذه النسخ على الجهاز المتّصل فعليًّا عبر adb (SM-G800F) وتشغيلها كان سيعني تفاعلًا حقيقيًّا مع بيانات إنتاج حيّة، وهو أمر غير مقبول بلا إذن تشغيليّ صريح. لا توجد أداة Flutter SDK مثبّتة محليًّا لبناء نسخة تطوير آمنة تُشير لبيئة <code>tawalocal</code>. النتيجة: اختبار Flutter الحيّ متوقّف هذه الدورة — إفصاح صريح، لا تجاهل صامت. <br><br>
+    <b>React Native:</b> التطبيق فعليًّا سقالة مبكّرة جدًّا (كل من شاشات السائق/المزوّد/العمليّات الرئيسيّة صفحة "home" واحدة من ~70-100 سطرًا فقط، بلا أيّ تدفّق استلام/تسليم/تسوية/توثيق/نزاعات/كتالوج). رغم توفّر Expo محليًّا (يمكن تشغيله عبر <code>--web</code> واختباره بـPlaywright تمامًا كما فعلنا مع الويب)، الحكم كان أنّ تكلفة إعداد خادم تطوير + تجاوز افتراضيّ <code>apiMode: mock</code> غير مبرّرة لسطح بهذه الرقّة — تدقيق الكود وحده كافٍ كسقف إثبات لهذه المرحلة.<br><br>
+    الأثر: <b>كل الأعداد أدناه CODE-AUDIT-ONLY</b> — لا وسم "مؤكَّد حيًّا" في هذا التقرير إطلاقًا، بخلاف التقارير 466-469.
+  </div>
+</section>
+
+<section id="headline">
+  <h2 class="sec-title blocker">🎯 الاكتشاف الأكبر — انحراف العقد الأساسيّ بين العميلين والباك إند</h2>
+  <p class="lead">عبر أربع دورات ويب سابقة، كانت معظم الأعطاب دقيقة نسبيًّا: صلاحيّات صوريّة، حالات enum ناقصة، ميزات باك إند بلا واجهة. هنا الصورة مختلفة جذريًّا: <b>كلا تطبيقَي الجوّال — المبنيَّين بشكل مستقلّ تمامًا عن بعضهما وعن الويب — يحتويان أخطاءً أساسيّة في أسماء الحقول/المسارات/تنسيق الحالة (snake_case مقابل camelCase) في مساحات واسعة من الكود</b>، وليست أخطاء منطق دقيقة. تسجيل حساب جديد، صندوق الإشعارات، محادثة الدعم، التقييمات، دفتر العناوين، قائمة عروض السائق — كل واحدة من هذه الميزات على Flutter معطّلة بالكامل بسبب حقل واحد أو مسار واحد خاطئ الاسم. على React Native، الطبقة الكاملة لجلب البيانات (<code>realApi</code>) لا تُترجم أسماء الحقول إطلاقًا — كل شاشة بيانات فعليّة ستُظهر قيمًا فارغة في وضع <code>real</code> (بيئتا staging والإنتاج كلتاهما تستخدمانه فعليًّا). هذا النمط يوحي بأنّ لا أحد من التطبيقين خضع لاختبار تكامل فعليّ ضدّ الباك إند الحيّ أثناء التطوير — فحص تكامل واحد بسيط كان سيكتشف هذا فورًا.</p>
+</section>
+
+<section id="blockers">
+  <h2 class="sec-title blocker">🛑 الأعطاب الحاجزة الثلاثة (BLOCKER — الميزة معطّلة كليًّا، بلا أيّ مخرج)</h2>
+
+  <div class="card blocker">
+    <div class="card-head"><div class="card-title">DR1 — قائمة عروض السائق فارغة دائمًا: لا سائق يستخدم تطبيق Flutter يمكنه رؤية أيّ عرض توصيل، أبدًا</div>
+      <div class="tag-row"><span class="tag blocker">BLOCKER</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p><code>offers_provider.dart</code> يقرأ <code>data['items']</code> من استجابة <code>GET /dispatch/offers</code> — لكنّ المسار الحقيقيّ (مؤكَّد أيضًا من اختبارات الباك إند نفسها) يُعيد <code>{"offers": [...]}</code>، لا <code>items</code> إطلاقًا. لا وسيط استجابة يُعيد تسمية المفاتيح. النتيجة: القائمة الواردة فارغة دائمًا <code>[]</code>، حلقة الاستطلاع (polling) تعمل للأبد بلا أثر مرئيّ. لا يوجد ملف اختبار لـ<code>offers_provider.dart</code> في مستودع الجوّال — هكذا مرّ هذا العطب بلا اكتشاف.</p>
+  </div>
+
+  <div class="card blocker">
+    <div class="card-head"><div class="card-title">DR2 — التسليم لا يمكن إكماله أبدًا: استدعاء "الوصول للوجهة" الإلزاميّ غير موجود في أيّ مكان</div>
+      <div class="tag-row"><span class="tag blocker">BLOCKER</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>الباك إند يمنع تقديم إثبات التسليم إلّا إذا كانت حالة الطلب <code>ARRIVED_AT_DESTINATION</code> بالضبط (409 خلاف ذلك)؛ المسار الوحيد لتلك الحالة هو <code>POST /dispatch/orders/{id}/arrive</code>. <code>delivery_screen.dart</code> لا يحتوي أيّ إشارة لهذا المسار إطلاقًا — لا زرّ، لا استدعاء تلقائيّ. حتى لو أُصلح DR1 وقُبِل عرض بطريقة ما، سيفشل تقديم إثبات التسليم بـ409 في كل مرّة، دائمًا. هذا أسوأ حتى من عطب الويب المكافئ (PU5 في تقرير 468، الذي كان مجرّد إرسال بلا إحداثيّات GPS) — هنا الاستدعاء غائب كليًّا.</p>
+  </div>
+
+  <div class="card blocker">
+    <div class="card-head"><div class="card-title">RS2/SC1 — فشل شامل في تطابق أسماء الحقول عبر كامل طبقة البيانات على React Native</div>
+      <div class="tag-row"><span class="tag blocker">BLOCKER</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>مؤكَّد بشكل مستقلّ من وكيلَين: <code>realApi</code> (خدمات) لا يُترجم أيّ حقل من snake_case (شكل الباك إند الحقيقيّ 100%، لا <code>alias_generator</code> في أيّ مكان) إلى camelCase (شكل أنواع RN بالكامل). في وضع <code>real</code> — وهو الوضع الفعليّ لكلّ من بيئتَي <code>staging</code> و<code>production</code> — كل حقل تقرأه أيّ شاشة بيانات (<code>order_state</code>، <code>total_minor</code>، <code>rating_avg</code>، <code>delivery_fee_minor</code>...) سيكون <code>undefined</code>. الكود نفسه يُقرّ بأنّ هذه الطبقة "بديل مرحلة 2" غير مكتمل — لكنّ staging مُعلَن حيًّا اليوم بنفس هذا الوضع.</p>
+  </div>
+</section>
+
+<section id="flutter-auth">
+  <h2 class="sec-title">🔐 Flutter — التوثيق والدخول (8 عيوب)</h2>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">AU1 — تسجيل الحساب معطَّل كليًّا لكل الأدوار: حقل <code>confirm_password</code> الإلزاميّ غير مُرسَل</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p><code>register_screen.dart</code> لا يرسل <code>confirm_password</code> إطلاقًا؛ الباك إند (<code>registration_router.py</code>) يتطلّبه حقلًا إلزاميًّا بلا قيمة افتراضيّة — كل محاولة تسجيل من الجوّال، لأيّ دور، تفشل بـ422 قبل وصول أيّ منطق فعليّ. واجهة الويب ترسله بشكل صحيح.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">AU2 — حتى لو أُصلح AU1، اختلاف حالة الأحرف في قيمة الدور سيمنع التسجيل أيضًا</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>الجوّال يرسل <code>'CUSTOMER'/'DRIVER'/'PROVIDER_ADMIN'</code> (أحرف كبيرة)؛ الباك إند يتطلّب حصرًا <code>"customer"/"provider"/"driver"/"staff"</code> (أحرف صغيرة)، بلا أيّ تطبيع. فقط <code>'staff'</code> يتطابق صدفة.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">AU3 — تفعيل المصادقة الثنائيّة (TOTP) من إعدادات الجوّال يُقفل الحساب نهائيًّا من الدخول عبر الجوّال، بلا أيّ مسار استرجاع داخل التطبيق</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>شاشة إعداد TOTP موصولة بالكامل (تفعيل ناجح)، لكن لا استدعاء لـ<code>/auth/totp/verify</code> في أيّ مكان بكود الجوّال — عند طلب الدخول لاحقًا مع <code>requires_totp:true</code>، الكود ببساطة يرمي استثناءً يطلب من المستخدم "الدخول عبر الويب بدلًا من ذلك". مستخدم يُفعّل الميزة من هاتفه يفقد القدرة على الدخول من هاتفه بلا أيّ طريقة استرجاع داخل التطبيق.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>AU4</td><td><span class="tag-cell med">MED</span></td><td>أرقام هاتف تجريبيّة حقيقيّة المظهر + عبارة "رمز التحقق لكل الحسابات: 123456" مكتوبة بشكل ثابت في شاشة الدخول الأولى بلا أيّ حماية وضع تطوير — الباك إند يؤكّد أن هذا الرمز يجب أن يكون فارغًا في أيّ بيئة حقيقيّة، فالعبارة كاذبة فعليًّا في أيّ نشر حقيقيّ.</td></tr>
+    <tr><td>AU5</td><td><span class="tag-cell med">MED</span></td><td>اعتماديّة المصادقة الحيويّة (local_auth) غير موصولة إطلاقًا (0% — صفر مرجع في كامل الكود) — وزن حزمة بلا أيّ ميزة فعليّة.</td></tr>
+    <tr><td>AU6</td><td><span class="tag-cell low">LOW</span></td><td>تسجيل المزوّد يُصنِّف كل عمل تجاريّ جديد "مطعم" صامتًا — منتقي المكان يحصل على النوع الحقيقيّ لكن شاشة التسجيل لا ترسل <code>provider_type</code> إطلاقًا.</td></tr>
+    <tr><td>AU7</td><td><span class="tag-cell med">MED</span> (مدمج مع CB7)</td><td>لا مدخل لحذف الحساب الذاتيّ في تطبيق Flutter بأكمله (صفر نتائج بحث) — يمتدّ نمط الحذف العابر للأدوار (عميل #16/مزوّد D3/سائق PR2 على الويب) إلى الجوّال أيضًا، هنا كغياب كامل لا كخلل.</td></tr>
+    <tr><td>AU8</td><td><span class="tag-cell low">LOW</span></td><td>الجوّال لا يرسل ترويسة <code>X-Client-Platform</code> إطلاقًا، فتُقيَّم كل طلباته تحت فرع الويب الأضعف في بوّابة تحقّق الجهاز (حاليًّا بلا أثر فعليّ لأن البوّابة معطَّلة أصلًا).</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم: أسماء حقول OTP طلب/تحقّق مطابقة تمامًا للباك إند (يستخدم <code>login_identifier</code> الصحيح، لا الخطأ القديم "phone") · أسماء حقول إعادة تعيين كلمة المرور مطابقة تمامًا · حفظ التوكن قبل التنقّل خالٍ من السباق · التوجيه بعد الدخول حسب الدور صحيح للأدوار الأربعة كلّها · التخزين الآمن يطابق ادّعاءات SECURITY.md بدقّة (التوكنات في flutter_secure_storage فقط) · فشل قراءة التخزين الآمن (تدوير Keystore) يُعامَل بلطف كخروج تسجيل، لا انهيار · توقيع العقد الإلكترونيّ عند الانضمام يمنع التوقيع بلا تحميل صورة الهويّة أولًا.</div>
+</section>
+
+<section id="flutter-infra">
+  <h2 class="sec-title">⚙️ Flutter — البنية التحتيّة المشتركة (8 عيوب)</h2>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">M1/CB1 (مؤكَّد من وكيلين مستقلّين) — صندوق الإشعارات معطَّل كليًّا: مسار غير موجود + مفتاح غلاف خاطئ + أسماء حقول خاطئة</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>يستدعي <code>GET /notifications/me</code> — هذا المسار غير موجود إطلاقًا (الحقيقيّ <code>GET /notifications</code>)؛ الاستجابة الحقيقيّة <code>{"notifications":[...],"count":n}</code> بينما الكود يقرأ <code>data['items']</code>؛ حتى لو أُصلح الاثنان، الحقول الحقيقيّة <code>title_key/body_key/template_vars</code> (مفاتيح ترجمة تحتاج حلًّا) بينما الكود يقرأ <code>title/body/event/reference_id</code> — لا وجود لها إطلاقًا. صندوق الإشعارات يعرض خطأ عربيّ صريح (وليس فقط "لا إشعارات") في كل مرّة يُفتح فيها.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">M2 — فشل تجديد التوكن لا يصل أبدًا لحالة التطبيق: "دخول شبحيّ" بلا جلسة فعليّة</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>عند فشل تجديد التوكن نهائيًّا، يُمسَح التخزين لكن لا إشعار يصل لـ<code>AuthProvider</code> المنفصل — يبقى المستخدم على شاشات "مسجّل دخوله" بجلسة ميتة فعليًّا، بلا مسار للعودة لتسجيل الدخول سوى إغلاق التطبيق وإعادة فتحه يدويًّا.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">M3 — يرث نفس عطب فقدان رمز الخطأ الذي وُجد على الويب (تقرير 467، E3)، على أكثر من 70 موضع غير مُصلَح</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>لا معالج استثناء عام لـ<code>HTTPException</code> في الباك إند — أيّ <code>raise HTTPException(...)</code> خام يُعيد <code>{"detail":"..."}</code> بلا رمز في المستوى الأعلى؛ الجوّال يتوقّع الرمز في المستوى الأعلى فيسقط دائمًا لرسالة عامّة. 71 موضع خام في <code>order_router.py</code> وحده — يمسّ مسارات الدفع والطلب مباشرة (تنازع نشط، "ليس طلبك" أثناء تسليم).</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">M4 — عند فشل GPS، الموقع يُستبدَل صامتًا بإحداثيّات ثابتة (مركز طرابلس)، بلا أيّ إشارة، وتُستخدَم لإثبات تسليم/تحصيل نقد/توفّر سائق حقيقيّة</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>أيّ فشل (GPS مغلق، رفض إذن، مهلة) يُعيد نفس الشكل تمامًا كموقع حقيقيّ، بلا علامة تمييز. سائق بلا GPS يُفعِّل "متاح" أو يُقدِّم إثبات تسليم — يُسجَّل موقع مُلفَّق دون أيّ خطأ ظاهر، خطر حقيقيّ على سلامة التوزيع وتسوية النزاعات.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>M5</td><td><span class="tag-cell med">MED</span></td><td>ذاكرة التخزين المؤقّت للطلبات/المزوّدين دون اتّصال كود ميّت كليًّا — صفر نقطة استدعاء لأيّ من دوالها في طبقة الميزات، لا قدرة عرض دون اتّصال فعليّة رغم وجود البنية التحتيّة كاملة.</td></tr>
+    <tr><td>M6</td><td><span class="tag-cell med">MED</span> (مدمج مع CA1)</td><td>خريطة تسميات حالة الطلب مجموعة فرعيّة ثابتة من enum الباك إند الحقيقيّ — 10 حالات حقيقيّة تظهر كنصّ إنجليزيّ خام (AWAITING_DRIVER، PARTIALLY_UNAVAILABLE_SUBSTITUTION_OFFERED، DISPUTED...). يؤكّد عائلة "انحراف enum" (و) من التركيب 470 على Flutter، من وكيلين مستقلّين.</td></tr>
+    <tr><td>M7</td><td><span class="tag-cell med">MED</span> (يؤكّده CB8)</td><td>لا آليّة تبديل لغة إطلاقًا — اللغة ثابتة برمجيًّا رغم دعم ar/en/fr وواجهة برمجيّة كاملة لتفضيل اللغة في الباك إند. غير مكسور حاليًّا (الميزة لم تُبنَ) لكنّه يهيّئ نفس عطب "يبدو أنّه عمل لكن لم يعمل" إن أُضيف منتقي لغة لاحقًا بلا تحديث القيمة الثابتة.</td></tr>
+    <tr><td>M8</td><td><span class="tag-cell low">LOW</span></td><td>عرض الإشعار الفوريّ (FCM) يقرأ حقل <code>notification</code> الجاهز فقط، بلا منطق مشترك مع مخطّط صندوق التطبيق الداخليّ (title_key/body_key) — إشعار بلا هذا الحقل لا يظهر شيئًا.</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم: Idempotency-Key مُدار بإحكام (مفتاح تلقائيّ احتياطيّ + مفاتيح ثابتة على عمليّات الدفع/التسليم/قبول العرض) · قفل تزامن يمنع تجديد توكن متوازٍ · التخزين الآمن يطابق SECURITY.md فعليًّا · صندوق العمليّات دون اتّصال (Outbox) للسائق سليم (منطق احتفاظ/إسقاط صحيح، تفريغ تلقائيّ عند عودة الاتّصال) · إعادة المحاولة محدودة بشكل صحيح لفئات الفشل الآمنة · لا تحقّق صلاحيّات صوريّ على مستوى العميل إطلاقًا (الجوّال قائم على الدور فقط) — فلا سطح مماثل لعطب "منح/سحب الصلاحيّات الصوريّ" الذي وُجد على الويب ليكون خاملًا هنا.</div>
+</section>
+
+<section id="flutter-customer">
+  <h2 class="sec-title">🛒 Flutter — واجهات العميل (16 عيبًا عبر مساري التصفّح والحساب)</h2>
+  <p class="lead"><b>مسار التصفّح→الدفع→التتبّع:</b></p>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">CA2 (الأخطر في هذا القسم) — عرض البديل عند نفاد صنف يُيتّم الطلب أبديًّا على الجوّال أيضًا</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>الباك إند يوفّر مسار استجابة العميل الحقيقيّ للبديل، وهو المخرج الوحيد من حالة <code>PARTIALLY_UNAVAILABLE_SUBSTITUTION_OFFERED</code> — لكن لا واجهة على الجوّال إطلاقًا (صفر نتائج بحث لـ"SUBSTITUTION" في كامل الكود)، وحتى <code>get_allowed_actions()</code> نفسها تُعيد قائمة فارغة لهذه الحالة. يؤكّد كون عطب المزوّد الأخطر (Q1 في تقرير 467) يُيتّم الطلبات على الجوّال أيضًا، بلا أيّ مخرج على أيّ عميل.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">CA3 — لا سلّة متعدّدة المزوّدين على Flutter؛ فقدان بيانات فعليّ لا مجرّد غياب واجهة</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>إضافة صنف من مزوّد مختلف تمسح السلّة الحاليّة صامتًا، بلا أيّ حوار تأكيد (موثَّق كـ"مقصود" في تعليق كود). أسوأ من غياب واجهة الويب المكافئة — هنا فقدان بيانات نشط.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">CA4 — شاشة تفاصيل المزوّد لا تجلب بيانات المزوّد نفسه إطلاقًا</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>الاستدعاء الشبكيّ الوحيد في الملف بأكمله هو قائمة الكتالوج — لا توفّر، لا سعر توصيل حيّ، لا تقييم، لا حتى اسم المزوّد نفسه (عنوان الشاشة نصّ عامّ ثابت). أسوأ من نتائج "حقول محذوفة" على الويب — هنا الترويسة كاملة غائبة معماريًّا.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>CA1</td><td><span class="tag-cell med">MED</span> (مدمج مع M6)</td><td>شارة حالة الطلب تُسرّب 10 حالات كنصّ خام — انظر M6 أعلاه.</td></tr>
+    <tr><td>CA5</td><td><span class="tag-cell med">MED</span></td><td>قائمة التصفّح تُسقط سعر التوصيل/الحدّ الأدنى للسعر/شارة الرعاية؛ المسافة (distance_km) غير متاحة معماريًّا عبر المسار الذي يستخدمه الجوّال أصلًا (فقط مسارات أخرى لا يستدعيها).</td></tr>
+    <tr><td>CA6</td><td><span class="tag-cell med">MED</span></td><td>دبّوس الموقع الحيّ عند الدفع لا يُرسَل أبدًا (لا واجهة خريطة/دبّوس) — تطابق تامّ مع عطب الويب #24.</td></tr>
+    <tr><td>CA8</td><td><span class="tag-cell high">HIGH — اكتشاف جديد يمسّ الويب أيضًا</span></td><td>حالتا <code>SCHEDULED</code> و<code>OFFER_EXPIRED_REASSIGN</code> ضمن الحالات القابلة للإلغاء فعليًّا في الباك إند، لكن <code>get_allowed_actions()</code> لا تُعيد أبدًا صلاحيّة الإلغاء لهما — فحص شبكة الويب أيضًا لم يجد أيّ معالجة مخصّصة لهما. عميل جدول طلبًا لوقت لاحق، أو سائقه تخلّى عنه قبل الاستلام، لا يرى زرّ إلغاء على أيّ عميل (جوّال أو ويب). عطب على مستوى سجلّ الإجراءات في الباك إند فاتته دورات الويب الأربع، ولم يظهر إلّا بتدقيق الجوّال مقابل نفس الحقيقة الخلفيّة.</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم (تصفّح/دفع): حارس منع الإرسال المزدوج قويّ (مفتاح Idempotency ثابت + قفل زرّ الإرسال) · قائمة طرق الدفع مطابقة للنطاق النشط فعليًّا · بانرا "لا سائق"/"رفض المزوّد" مبنيّان جيّدًا بإجراءات حقيقيّة · لوحة المحادثة مقيّدة بشكل صحيح على نافذة الحالات النشطة.</div>
+
+  <p class="lead" style="margin-top:28px"><b>مسار الحساب/ما بعد الطلب:</b></p>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">CB2 — محادثة الدعم معطَّلة كليًّا: التاريخ لا يُحمَّل، الإرسال يفشل دائمًا، لا مدخل لبدء محادثة إطلاقًا</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>قراءة الرسائل تتوقّع مفتاح غلاف خاطئ (فارغة دائمًا)؛ الإرسال يرسل <code>content</code> بينما الباك إند يتطلّب <code>body</code> (422 دائمًا)؛ لا شاشة تستدعي إنشاء جلسة دعم إطلاقًا — الميزة غير قابلة للوصول في الاستخدام الطبيعيّ كليًّا.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">CB3 — تقييم الطلب معطَّل كليًّا: ثلاث اختلافات حقول إلزاميّة مستقلّة تضمن فشل كل محاولة</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p><code>target_type</code> بأحرف صغيرة (الباك إند يتطلّب كبيرة)، لا <code>target_id</code> يُرسَل إطلاقًا، و<code>rating</code> بدل <code>stars</code> الإلزاميّ. لا مسار نجاح واحد عبر شاشة التقييم بأكملها.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">CB4 — مدخل تقييم ثانٍ منفصل (من سجلّ الطلبات) يستخدم المخطّط الصحيح لكنّه ينهار على قراءة حقل غير موجود، والحوار يُغلَق قبل الانهيار فيبدو التقييم ناجحًا وهو لم يُرسَل إطلاقًا</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>يحاول قراءة <code>providerId</code> من نموذج لا يملك هذا الحقل — استثناء غير مُمسَك، لكن الحوار أُغلق قبله فتبدو الواجهة وكأنّ التقييم أُرسل بنجاح. إذا أُصلح أحد المدخلَين لاحقًا، سيتصادمان على نفس قيد التفرّد فيُظهر الآخر خطأ "مُقيَّم مسبقًا" على تقييم لم يحدث فعليًّا — نفس عائلة عطب الويب #26.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">CB5 — دفتر العناوين يستخدم أسماء حقول غير موجودة في مخطّط الباك إند إطلاقًا؛ نصّ العنوان يُهمَل صامتًا ولا يُرسَل أيّ دبّوس جغرافيّ أبدًا</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>الإنشاء يرسل <code>address_line/city</code>؛ الحقول الحقيقيّة <code>text_hint/lat/lng/tag/notes/phone</code> — الحقول الزائدة تُسقَط صامتًا بواسطة Pydantic، فنصّ العنوان المكتوب يُفقَد كليًّا، ولا إحداثيّات تُرسَل أبدًا (لا واجهة خريطة/دبّوس). كل عنوان محفوظ من الجوّال بلا دبّوس جغرافيّ يقلّل دقّة توجيه السائق.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>CB6</td><td><span class="tag-cell med">MED</span></td><td>شاشة المحفظة بلا سجلّ معاملات/تحويلات إطلاقًا — فجوة كاملة، لا مجرّد خلل عرض حالة كما في الويب.</td></tr>
+    <tr><td>CB7</td><td><span class="tag-cell med">MED</span> (مدمج مع AU7)</td><td>لا مدخل حذف حساب — انظر AU7 أعلاه.</td></tr>
+    <tr><td>CB8</td><td>—</td><td>لا منتقي لغة إطلاقًا — مدمج مع M7 أعلاه.</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم (حساب): سجلّ الطلبات وقائمة العناوين يحلّلان غلاف الاستجابة الصحيح (فقط أسماء الحقول الداخليّة خاطئة) · منطق تقسيم فقاعة المحادثة (دعم) مبنيّ على مقارنة الدور، أسلم منطقيًّا من عطب الويب #13 — لكنّه معطَّل بسبب اختلاف مفاتيح أخرى · تدفّق شحن المحفظة عبر OTP متّسق داخليًّا.</div>
+</section>
+
+<section id="flutter-driver">
+  <h2 class="sec-title blocker">🚗 Flutter — دورة حياة السائق الكاملة (9 عيوب، تشمل حاجزين اثنين)</h2>
+  <p class="lead">راجع <a href="#blockers">القسم الحاجز أعلاه</a> لـDR1 وDR2. الاكتشافات المتبقّية من نفس الوكيل:</p>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">DR3 — لا مسار تنقّل من "قبول العرض" لشاشة الاستلام؛ كل مسارات الاسترجاع النظريّة الثلاثة كود ميّت</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>معالج القبول لا يستدعي أيّ تنقّل. الروابط العميقة (FCM، رابط عالميّ، قائمة إشعارات داخل التطبيق) جميعها كود ميّت فعليًّا — لا تُستدعى من أيّ مكان، والتنقّل السفليّ للسائق 3 تبويبات فقط (رئيسيّة/أرباح/ملفّ)، لا جرس إشعارات.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>DR4</td><td><span class="tag-cell med">MED</span></td><td>فشل استطلاع العروض يُبتلَع صامتًا وبشكل دائم — 403 (سائق محظور) يبدو مطابقًا تمامًا لـ"لا عروض بعد."</td></tr>
+    <tr><td>DR5</td><td><span class="tag-cell med">MED</span></td><td>أنواع إثبات التسليم تجميليّة فقط — رمز QR لا يتطلّب فعليًّا رمزًا حقيقيًّا؛ صورة "عند الباب" تُقبَل ولا تُخزَّن أبدًا في الباك إند.</td></tr>
+    <tr><td>DR6</td><td><span class="tag-cell med">MED</span></td><td>خطر ازدواج الاحتساب الماليّ (عائلة E1/E2 من التركيب 470) مؤكَّد حاضرًا، وشاشة التسوية لا تضيف أيّ سياق أو تحذير حول هذا التداخل المعروف.</td></tr>
+    <tr><td>DR7</td><td><span class="tag-cell med">MED</span></td><td>سجلّ/ملخّص الأرباح يُخفي الغرامات والتسويات (يؤكّد E2) — سائق غُرِّم بسبب تخلٍّ لا يرى أثرًا لذلك في أيّ مكان بالتطبيق.</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم: بطاقة حدّ النقد تطابق منطق أولويّة الباك إند تمامًا · معالجة قرار العرض تستخرج رموز HTTP الحقيقيّة بدقّة وتُميّز 404/422/409 برسائل عربيّة صحيحة · Idempotency-Key مستقرّة ومُعاد استخدامها بشكل صحيح، مُصفّفة في قائمة انتظار دون اتّصال · عطب انقسام لوحة المركبة (نظير PR1) غير قابل للتكرار — لا حقل تعديل هويّة مركبة على الجوّال إطلاقًا · رابط مشاركة الرحلة الميّت (نظير H1) غير قابل للتكرار — الميزة غير موجودة كليًّا على الجوّال.</div>
+
+  <div class="insight warn">
+    <h4>ملاحظة settlement_screen.dart (تُغذّي الدورة القادمة)</h4>
+    <p>سليمة ميكانيكيًّا لِما تفعله — أسماء حقول مطابقة تمامًا للباك إند، رمز QR + رمز احتياطيّ نصّيّ، استطلاع كل 4 ثوانٍ. ثغرة كامنة واحدة: إعادة الجلب الكاملة لقائمة المعاملات غير المُرقَّمة صفحيًّا مع بحث محليّ بالمعرّف — لو رُقِّمت هذه النقطة مستقبلًا، معاملة نشطة قد "تخرج" من الصفحة المعروضة بلا أيّ خطأ ظاهر. الشاشة بلا أيّ رؤية لخطر تداخل الدفعة اليوميّة (DR6) — أهمّ نقطة تُنقَل مباشرة لدورة موظّفي التسوية القادمة.</p>
+  </div>
+</section>
+
+<section id="flutter-provider-ops">
+  <h2 class="sec-title">🏪 Flutter — المزوّد والعمليّات (11 عيبًا)</h2>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">PO1 — قائمة انتظار طلبات المزوّد تجلب كامل تاريخ الطلبات، بلا حدّ ولا فلتر حالة، كل 10 ثوانٍ</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>لا معامل استعلام حالة إطلاقًا — الباك إند بلا حدّ SQL أيضًا عند غياب الفلتر. أسوأ من نتيجة الويب المكافئة (P6 في تقرير 467، التي كانت محصورة بحالة واحدة فقط) — هنا كل الحالات، بلا حدّ، باستطلاع مستمرّ.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">PO2 — زرّ القبول مقيَّد خطأً بمدير المنشأة فقط؛ الباك إند يسمح فعليًّا بمنح الصلاحيّة للموظّفين</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>تعليق في الكود نفسه يزعم خطأً أنّ القبول مقيَّد بالمالك فقط على الباك إند — صحيح للرفض فقط. القبول فعليًّا صلاحيّة قابلة للمنح (<code>provider_order:accept</code>) — نفس فئة عطب الويب Q2. الجوّال لا يجلب صلاحيّات الحساب الفعليّة إطلاقًا (صفر نتائج بحث).</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">PO3 — قائمة وثائق التوثيق (KYC) لا تُعرَض أبدًا بسبب مفتاح استجابة خاطئ</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>يقرأ <code>data['documents']</code>؛ الباك إند يُعيد <code>{"items":[...],"total":...}</code> — القائمة فارغة دائمًا بصرف النظر عن عدد الوثائق المرفوعة أو حالتها.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>PO4</td><td><span class="tag-cell med">MED</span></td><td>أصناف الكتالوج المرفوضة لا تُظهر سبب الرفض أو حتى حالة "مرفوض" — تُعرض كمسوّدة رماديّة عاديّة. نفس عائلة عطب الويب S7.</td></tr>
+    <tr><td>PO5</td><td><span class="tag-cell med">MED</span></td><td>زرّا الدفتر ووثائق KYC يُعرضان للموظّفين بلا شرط، رغم كون كلا المسارَين مقيَّدَين بالمالك حصرًا خلف الكواليس — فشل عامّ بلا توضيح أنّه مسألة صلاحيّات.</td></tr>
+    <tr><td>PO6</td><td><span class="tag-cell med">MED</span></td><td>نفس فجوة "403 عامّ" تتكرّر عبر كل إجراء كتابة في تبويب العمليّات لحسابَي FINANCE_AGENT/COMPLIANCE_AGENT — كل الأزرار تظهر مفعَّلة بلا أيّ وعي بالدور المطلوب فعليًّا.</td></tr>
+    <tr><td>PO7</td><td><span class="tag-cell low">LOW</span></td><td>سبب الإلغاء لا يُقرأ إطلاقًا رغم أن الباك إند يرسله فعليًّا (بعد إصلاح موازٍ لعطب الويب P7) — بيانات متاحة تُهمَل صامتًا.</td></tr>
+    <tr><td>PO8</td><td><span class="tag-cell low">LOW</span></td><td>شاشة شكاوى العمليّات تقرأ القائمة بطريقة هشّة (أوّل قيمة في الخريطة بدل المفتاح الاسميّ) — تعمل حاليًّا صدفةً فقط.</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم: إنشاء/تعديل الصنف مقيَّد بشكل صحيح بالمالك فقط (يطابق قيد الباك إند الحقيقيّ الذي لا يسمح بمنح هذه الصلاحيّة للموظّفين) · "جاهز للاستلام" غير مقيَّد بشكل صحيح (الباك إند فعليًّا يسمح بمنحها للموظّفين) · تحليل قوائم الكتالوج ولوحات إطلاق البوّابة يطابق أشكال الباك إند تمامًا. ملاحظات نطاق (لا عيوب مسجّلة، إشارة صريحة فقط): لا واجهة إبلاغ عن نفاد صنف على مستوى العنصر إطلاقًا (فعطب الويب Q1 الأخطر لا يمكن حتى إثارته من الجوّال) · لا شاشة سجلّ/أرشيف طلبات مزوّد منفصلة · عمولة الاستلام الذاتيّ النقديّ المستحقّة على المزوّد غائبة من الباك إند نفسه، لا من الجوّال فقط.</div>
+</section>
+
+<section id="rn">
+  <h2 class="sec-title">⚛️ React Native — سقالة مبكّرة (11 عيبًا)</h2>
+  <div class="insight warn">
+    <h4>ملاحظة نضج بنيويّة (بند واحد، لا عشرات البطاقات)</h4>
+    <p>هذا التطبيق سقالة أرقّ بكثير من فلاتر أو الويب: شاشات السائق/المزوّد/العمليّات الرئيسيّة كل واحدة صفحة "home" وحيدة (~70-100 سطر)، وأزرار الإجراء الأساسيّة فيها معطّلة فعليًّا (<code>onPress={() =&gt; undefined}</code> على "قبول"/"جاهز")؛ لا شاشات استلام/تسوية/توثيق/تنازع/إدارة كتالوج إطلاقًا. هذا يُذكَر كحقيقة نطاق واحدة، لا يُحسَب كعشرات اكتشافات "ميزة ناقصة".</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><div class="card-title">RS1 — فك تغليف الخطأ لا يبحث داخل <code>detail</code> إطلاقًا؛ كل رسائل خطأ الباك إند المُعدّة بعناية تُفقَد</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>الباك إند يُغلِّف كل استثناء كـ<code>{"detail":{"code":...,"message_ar":...}}</code>؛ الكود يقرأ <code>body.code</code> مباشرة، فتكون دائمًا <code>undefined</code>. نفس فئة عطب الويب E3 (تقرير 467)، مؤكَّدة الآن بشكل مستقلّ في React Native بتطبيق مختلف تمامًا.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">SC2 — العناوين لا تُزامَن مع الباك إند إطلاقًا؛ الدفع يرسل معرّف عنوان لم يره الخادم قطّ</div>
+      <div class="tag-row"><span class="tag high">HIGH</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>مخزن محليّ بحت (zustand) يولّد معرّفات جهاز محليّة، لا يستدعي أيّ واجهة برمجيّة إطلاقًا — واجهة <code>TowaApi</code> بلا أيّ دالّة عناوين رغم CRUD كامل في الباك إند. الدفع يرسل هذا المعرّف المزيّف كـ<code>address_id</code> حقيقيّ.</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title">SC3/RS3 (مؤكَّد من وكيلين) — enum حالة الطلب المُخترَع في RN لا يطابق enum الباك إند الحقيقيّ حتى لو أُصلح BLOCKER الحقول أعلاه</div>
+      <div class="tag-row"><span class="tag med">MED (كامن خلف BLOCKER أعلاه)</span><span class="tag audit">CODE-AUDIT-ONLY</span></div></div>
+    <p>11 حالة مُعرَّفة فقط من ~28 حقيقيّة، و<b>3 من الـ11 نفسها أسماء خاطئة</b> لا تحدث في الباك إند إطلاقًا (<code>ACCEPTED</code> بدل <code>ACCEPTED_BY_PROVIDER</code>، <code>EN_ROUTE_TO_CUSTOMER</code> بدل <code>EN_ROUTE</code>، <code>CANCELLED_BY_PROVIDER</code> بدل <code>REJECTED_BY_PROVIDER</code>). مُقنَّع حاليًّا لأنّ RS2/SC1 يُفشل الحقل أصلًا — مُسجَّل الآن حتى لا يظهر "جديدًا" بعد إصلاح ذلك.</p>
+  </div>
+
+  <table>
+    <tr><th>#</th><th>الخطورة</th><th>الوصف</th></tr>
+    <tr><td>SC4</td><td><span class="tag-cell med">MED</span></td><td>لا حارس تنقّل حسب الدور إطلاقًا — فقط إعادة توجيه لمرّة واحدة عند الإقلاع؛ لا شيء يمنع الوصول لواجهة دور آخر عبر رابط عميق أو تنقّل مباشر (الباك إند على الأرجح يرفض النداءات الفعليّة، لكن لا حماية جانب العميل إطلاقًا).</td></tr>
+    <tr><td>SC5</td><td><span class="tag-cell med">MED</span></td><td>شاشة الحساب في الوضع الحقيقيّ لا تستطيع أبدًا عرض الاسم/الهاتف — القيم ثابتة فارغة عند الدخول، لا استدعاء لجلب بيانات المستخدم إطلاقًا.</td></tr>
+    <tr><td>SC6</td><td><span class="tag-cell med">MED</span></td><td>لا حقل كود خصم/كوبون عند الدفع إطلاقًا، رغم دعم الباك إند الصريح له.</td></tr>
+    <tr><td>RS4</td><td><span class="tag-cell med">MED</span></td><td>عنوان بيئة التطوير المحليّة لا يتوافق فعليًّا مع حزمة docker-compose الخاصّة بالمشروع نفسها (المنفذ غير منشور للمضيف) — إعداد غير متوافق صامتًا مع الإعداد المحليّ الموثَّق للمشروع.</td></tr>
+    <tr><td>RS5</td><td><span class="tag-cell med">MED</span></td><td>تبديل اللغة يُترجم النصّ فعليًّا لكن اتّجاه التخطيط (RTL) يبقى ثابتًا بصرف النظر عن اللغة المختارة — واجهة معكوسة ومربكة عند التبديل للإنجليزيّة.</td></tr>
+    <tr><td>SC7</td><td><span class="tag-cell low">LOW</span></td><td>لا مدخل حذف حساب — يمتدّ نفس النمط العابر للأدوار إلى RN أيضًا.</td></tr>
+    <tr><td>SC8</td><td><span class="tag-cell low">LOW</span></td><td><code>distance_km</code>/سعر التوصيل الحيّ/التوفّر غائبة من نوع البيانات نفسه، لا العرض فقط.</td></tr>
+    <tr><td>SC9</td><td><span class="tag-cell low">LOW</span></td><td>بثّ SSE بلا إعادة اتّصال بتوكن مُجدَّد — يعتمد كليًّا على الاستطلاع الاحتياطيّ كل 12 ثانية.</td></tr>
+    <tr><td>RS6</td><td><span class="tag-cell low">LOW</span></td><td>لا معالج عامّ لإبطال الجلسة — يُشفى ذاتيًّا عند إعادة فتح التطبيق، حالة معلَّقة ضمن الجلسة نفسها فقط لا التصاق دخول دائم.</td></tr>
+  </table>
+
+  <div class="fine-list">مؤكَّد سليم: تراجع/استعادة حقيقيّان دون اتّصال (NetInfo + صندوق عمليّات مُعاد تشغيله فعليًّا بمفتاح تفرّد، لا مجرّد بانر) · حارس إرسال مزدوج قويّ (مفتاح ثابت + تعطيل الزرّ) · اسم حقل <code>login_identifier</code> صحيح (النمط الذي أخطأت فيه دورات سابقة، RN أصابه هنا) · تتبّع الطلب مُزوَّد بـSSE + استطلاع احتياطيّ صحيحين معًا · تجديد التوكن يُميّز بشكل صحيح 429 المؤقّت عن 401/403 الفعليّ · التسعير يبقى بالكامل من سلطة الخادم (العميل لا يرسل مجاميع محسوبة) · التخزين الآمن (expo-secure-store) للتوكنات فعليًّا مُستخدَم، لا مجرّد اعتماديّة مُثبَّتة بلا استخدام.</div>
+</section>
+
+<section id="families">
+  <h2 class="sec-title cluster">🧬 صلة بعائلات التركيب 470</h2>
+  <p class="lead">عبرت عدّة عائلات من التركيب الرباعيّ (470) إلى الجوّال بنفس الجذر، وبعضها لا ينطبق على الجوّال لأنّ الميزة المسبِّبة غير موجودة هناك أصلًا:</p>
+  <table>
+    <tr><th>العائلة (من 470)</th><th>الحالة على الجوّال</th></tr>
+    <tr><td>انحراف enum الحالة</td><td>✅ مؤكَّدة على Flutter (M6/CA1) وRN (SC3/RS3) — كلا التطبيقَين يعيدان نفس الجذر بشكل مستقلّ.</td></tr>
+    <tr><td>السبب المحدَّد لا يصل للمستخدم</td><td>✅ مؤكَّدة (PO4 رفض كتالوج، PO7 سبب إلغاء) — نفس النمط، مصدر بيانات مختلف.</td></tr>
+    <tr><td>حذف الحساب الذاتيّ</td><td>✅ مؤكَّدة كغياب كامل على كلا تطبيقَي الجوّال (AU7/CB7، SC7) — يمتدّ العائلة من 3 أدوار ويب إلى دورتَي جوّال كاملتَين.</td></tr>
+    <tr><td>صلاحيّات منح/سحب صوريّة</td><td>✅ مؤكَّدة على Flutter (PO2، PO5، PO6 — نفس جذر Q2/S1-S3 على الويب) — لا سطح مماثل على مستوى العميل نفسه (M-agent) لأنّ الجوّال لا يحاول تحقّق صلاحيّات دقيقًا من الأساس.</td></tr>
+    <tr><td>قدرة كاملة في الباك إند بلا واجهة</td><td>✅ مؤكَّدة وأوسع (CA2 substitution، CB6 محفظة، SC6 كوبون) — الفجوة أكبر حجمًا على الجوّال منها على الويب في أغلب الحالات.</td></tr>
+    <tr><td>ازدواج حجز السائق</td><td>➖ غير قابل للاختبار مباشرة (بلا اختبار حيّ)، لكن DR1/DR2/DR3 يجعلان المسألة موضعيّة أصلًا — لا سائق Flutter يصل لمرحلة قبول عرض حقيقيّة بعد.</td></tr>
+    <tr><td>ازدواج الاحتساب الماليّ</td><td>✅ مؤكَّدة حاضرة (DR6)، الجوّال لا يضيف أيّ تخفيف أو تحذير جديد.</td></tr>
+    <tr><td>مسلسِل القائمة يُسقط حقل التفصيل</td><td>✅ نسخة جديدة أوسع بكثير: هذه الدورة كشفت أن المشكلة الحقيقيّة على الجوّال ليست "حقل واحد يُسقَط" بل غالبًا "المسلسِل بأكمله غير مطابَق" (انظر عائلة انحراف العقد أدناه، وهي أوسع من هذه العائلة الأصليّة).</td></tr>
+  </table>
+</section>
+
+<section id="strengths">
+  <h2 class="sec-title">✅ ما يعمل جيّدًا فعلًا</h2>
+  <div class="fine-list">
+    <b>انضباط Idempotency-Key متّسق عبر كلا التطبيقَين:</b> مفاتيح ثابتة لكل عمليّة، مُعاد استخدامها بشكل صحيح عبر إعادة المحاولة، مُدمَجة بشكل حقيقيّ مع صناديق عمليّات دون اتّصال تُعيد التشغيل بأمان عند عودة الاتّصال — على Flutter (Outbox) وRN (outbox.ts) كليهما.<br>
+    <b>تجديد التوكن المُقفَل (mutex) صحيح في كلا التطبيقَين</b> — يمنع سباق تجديد متوازٍ، ويُميّز بشكل صحيح 429 المؤقّت عن 401/403 الفعليّ.<br>
+    <b>التخزين الآمن للتوكنات حقيقيّ فعليًّا في كلا التطبيقَين</b> (flutter_secure_storage وexpo-secure-store) — ليس مجرّد اعتماديّة مُثبَّتة بلا استخدام.<br>
+    <b>GPS الحقيقيّ يُرسَل فعليًّا مع إثبات التسليم/تحصيل النقد على Flutter</b> (رغم أنّ DR2 يجعل هذا المسار غير قابل للوصول حاليًّا) — التصميم الأساسيّ سليم.<br>
+    <b>التسعير مُترَك بالكامل لسلطة الخادم في كلا التطبيقَين</b> — لا حساب مجاميع من العميل يُرسَل للباك إند، تصميم آمن وصحيح.<br>
+    <b>SSE + استطلاع احتياطيّ مزدوج في RN لتتبّع الطلب</b> — يطابق النمط الذي وُصف كنقطة قوّة في التركيب 470.
+  </div>
+</section>
+
+<section id="coverage">
+  <h2 class="sec-title">📏 حدود التغطية — بصراحة</h2>
+  <div class="shallow-list">
+    <b>صفر اختبار حيّ في هذه الدورة</b> — كل الأعداد أعلاه CODE-AUDIT-ONLY، للأسباب الموثَّقة في القسم الأوّل (نسخ APK تُشير للإنتاج، وRN سقالة لا تبرّر إعداد خادم تطوير).<br>
+    <b>لا يوجد Flutter SDK مثبّت محليًّا</b> — لم يُتحقَّق من قابليّة البناء الفعليّة (compile) لأيّ من الاكتشافات، فقط من صحّة الكود المصدريّ كما هو مكتوب.<br>
+    <b>لا سيناريو تفاعل مركّب بين الجوّال والباك إند اختُبِر فعليًّا</b> — كل اكتشاف هو قراءة كود ثنائيّة الاتّجاه (جوّال↔باك إند)، وليس تتبّع تنفيذ حيّ. الثقة عالية جدًّا في الاكتشافات ذات المطابقة الحرفيّة لأسماء الحقول/المسارات (DR1، M1/CB1، RS2/SC1...) لأنّها استُخرجت من مقارنة نصّيّة مباشرة للكود الفعليّ على الجانبَين، لا من استدلال سلوكيّ.<br>
+    <b>لم تُفحص أدلّة/سياسات iOS الأصليّة</b> (مجلّد <code>ios/</code> في Flutter) — التركيز كان على كود Dart/TS المشترك بين المنصّات، لا الإعدادات الأصليّة الخاصّة بنظام تشغيل واحد.
+  </div>
+</section>
+
+<section id="roadmap">
+  <h2 class="sec-title">🗺️ خارطة طريق مقترحة للإصلاح (بالأولويّة)</h2>
+  <table>
+    <tr><th>الأولويّة</th><th>الإصلاح</th><th>لماذا الآن</th></tr>
+    <tr><td><b>P0</b></td><td>إصلاح DR1 (offers -&gt; items) وDR2 (استدعاء /arrive المفقود) في Flutter — الدفعة الأولى.</td><td>السائق على Flutter غير قادر اليوم على أداء وظيفته الأساسيّة إطلاقًا، بلا أيّ مخرج.</td></tr>
+    <tr><td><b>P0</b></td><td>بناء طبقة تحويل snake_case↔camelCase شاملة في RN (`realApi`) قبل أيّ استخدام حقيقيّ لـ<code>apiMode:'real'</code> في staging/production.</td><td>staging مُعلَن حيًّا اليوم بهذا الوضع المعطَّل بالكامل.</td></tr>
+    <tr><td><b>P0</b></td><td>إصلاح AU1 (confirm_password) وAU2 (حالة الأحرف) في تسجيل Flutter.</td><td>لا مستخدم جديد يمكنه إنشاء حساب من التطبيق إطلاقًا.</td></tr>
+    <tr><td><b>P1</b></td><td>إصلاح صندوق الإشعارات (M1/CB1)، محادثة الدعم (CB2)، والتقييمات (CB3/CB4) على Flutter — مطابقة أسماء المسارات/الحقول الحقيقيّة.</td><td>ثلاث ميزات أساسيّة بعد-الطلب معطَّلة كليًّا، ليست حافّة نادرة.</td></tr>
+    <tr><td><b>P1</b></td><td>إصلاح دفتر العناوين (CB5 على Flutter، SC2 على RN) لإرسال/قراءة الحقول الصحيحة، وإضافة التقاط إحداثيّات فعليّ.</td><td>يمسّ دقّة التوصيل الفعليّة لكل طلب.</td></tr>
+    <tr><td><b>P1</b></td><td>إضافة CANCEL_OWN لحالتَي SCHEDULED وOFFER_EXPIRED_REASSIGN في <code>get_allowed_actions()</code> على مستوى الباك إند.</td><td>اكتشاف جديد يمسّ كل عميل (جوّال وويب معًا)، إصلاح باك إند واحد يحلّه على الجميع.</td></tr>
+    <tr><td><b>P2</b></td><td>معالج استثناء عامّ لـ<code>HTTPException</code> في الباك إند يضمن دائمًا حقل <code>code</code> في المستوى الأعلى (يحلّ M3 وRS1 معًا من مصدر واحد).</td><td>يمسّ عشرات نقاط الرفع عبر كل من Flutter وRN دفعة واحدة.</td></tr>
+    <tr><td><b>P2</b></td><td>استبدال M4 (سقوط GPS الصامت لمركز طرابلس) بإشارة خطأ صريحة تمنع الإجراء أو تُعلِّمه بوضوح كـ"موقع تقريبيّ".</td><td>خطر سلامة/نزاعات حقيقيّ على تحصيل النقد وإثبات التسليم.</td></tr>
+  </table>
+</section>
+
+<footer>
+  تقرير 471 — دورة الجوّال (Flutter + React Native)، تدقيق كود بحت · تووا (Tawa) Libya Delivery Platform · 2026-07-11 · التقرير التالي في السلسلة: دورة موظّفي التسوية (SettlementAgent).
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تدقيق التدقيق — فحص 15 تقريراً مقابل الكود الحقيقي</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0;
+    --code-bg:#f1f2f7;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+      --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+      --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+      --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff;
+      --code-bg:#0f1018;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12131a; --card:#1b1d29; --text:#eef0f6; --sub:#a2a7ba; --border:#2c2f3e;
+    --green:#3ddc97; --green-bg:#0f2c22; --red:#ff6b6b; --red-bg:#3a1717;
+    --amber:#f0b429; --amber-bg:#3a2c0c; --blue:#7aa2f7; --blue-bg:#131c33;
+    --gray:#9aa0b4; --gray-bg:#23252f; --accent:#9a86ff; --code-bg:#0f1018;
+  }
+  :root[data-theme="light"]{
+    --bg:#f6f7fb; --card:#ffffff; --text:#1a1d29; --sub:#5b6072; --border:#e3e6ee;
+    --green:#0f9960; --green-bg:#e8f8f1; --red:#d64545; --red-bg:#fdeceb;
+    --amber:#c9880a; --amber-bg:#fdf3e0; --blue:#2563eb; --blue-bg:#eaf1fd;
+    --gray:#6b7280; --gray-bg:#eef0f3; --accent:#5b3df0; --code-bg:#f1f2f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Segoe UI","Tahoma","Geeza Pro","Noto Naskh Arabic",sans-serif;
+    line-height:1.75; margin:0; padding:0; font-size:16px;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:28px 20px 90px;}
+  header.hero{
+    background:linear-gradient(135deg,var(--accent),#2563eb);
+    color:#fff; border-radius:18px; padding:34px 28px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+  }
+  header.hero h1{margin:0 0 10px; font-size:1.7rem; line-height:1.5;}
+  header.hero p{margin:0; opacity:.95; font-size:1.02rem;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:10px; margin-top:18px;}
+  .meta-chip{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); padding:6px 14px; border-radius:999px; font-size:.85rem;}
+
+  h2{font-size:1.35rem; margin:44px 0 14px; padding-bottom:10px; border-bottom:2px solid var(--border); display:flex; align-items:center; gap:10px;}
+  h3{font-size:1.1rem; margin:26px 0 10px;}
+  .lead{color:var(--sub); font-size:1rem; margin-bottom:18px;}
+
+  .card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:20px 22px; margin-bottom:16px; box-shadow:0 2px 10px rgba(0,0,0,.03);}
+
+  .verdict-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin:20px 0;}
+  .stat{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; text-align:center;}
+  .stat .num{font-size:2.1rem; font-weight:800;}
+  .stat .lbl{color:var(--sub); font-size:.88rem; margin-top:4px;}
+  .stat.confirmed .num{color:var(--green);}
+  .stat.refuted .num{color:var(--red);}
+  .stat.mischar .num{color:var(--amber);}
+  .stat.stale .num{color:var(--gray);}
+
+  .bars{margin:22px 0;}
+  .bar-row{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+  .bar-label{width:190px; flex-shrink:0; font-size:.92rem; color:var(--sub);}
+  .bar-track{flex:1; background:var(--gray-bg); border-radius:8px; height:26px; overflow:hidden; position:relative;}
+  .bar-fill{height:100%; border-radius:8px; display:flex; align-items:center; padding-inline-start:10px; color:#fff; font-size:.82rem; font-weight:700; white-space:nowrap;}
+  .bar-fill.confirmed{background:var(--green);}
+  .bar-fill.refuted{background:var(--red);}
+  .bar-fill.mischar{background:var(--amber);}
+  .bar-fill.stale{background:var(--gray);}
+  .bar-fill.unverif{background:var(--blue);}
+
+  table{width:100%; border-collapse:collapse; font-size:.92rem;}
+  .tbl-wrap{overflow-x:auto; border-radius:12px; border:1px solid var(--border);}
+  th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--border); vertical-align:top;}
+  th{background:var(--code-bg); font-size:.85rem; color:var(--sub); position:sticky; top:0;}
+  tr:last-child td{border-bottom:none;}
+  code{background:var(--code-bg); padding:2px 6px; border-radius:6px; font-size:.85em; direction:ltr; display:inline-block; unicode-bidi:embed;}
+  pre{background:var(--code-bg); padding:14px; border-radius:10px; overflow-x:auto; direction:ltr; text-align:left; font-size:.83rem; border:1px solid var(--border);}
+
+  .badge{display:inline-block; padding:3px 11px; border-radius:999px; font-size:.78rem; font-weight:700; white-space:nowrap;}
+  .badge.confirmed{background:var(--green-bg); color:var(--green);}
+  .badge.refuted{background:var(--red-bg); color:var(--red);}
+  .badge.mischar{background:var(--amber-bg); color:var(--amber);}
+  .badge.stale{background:var(--gray-bg); color:var(--gray);}
+  .badge.unverif{background:var(--blue-bg); color:var(--blue);}
+  .badge.high{background:var(--red-bg); color:var(--red);}
+  .badge.med{background:var(--amber-bg); color:var(--amber);}
+  .badge.low{background:var(--gray-bg); color:var(--gray);}
+  .badge.pos{background:var(--green-bg); color:var(--green);}
+
+  .simple{background:var(--blue-bg); border-inline-start:4px solid var(--blue); border-radius:10px; padding:12px 16px; margin:10px 0; font-size:.94rem;}
+  .simple b{color:var(--blue);}
+  .finding{border:1px solid var(--border); border-radius:14px; padding:18px 20px; margin-bottom:14px; background:var(--card);}
+  .finding-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:8px;}
+  .finding-title{font-weight:700; font-size:1.02rem;}
+  .finding-file{color:var(--sub); font-size:.85rem; margin-top:4px;}
+  .badges{display:flex; gap:6px; flex-wrap:wrap;}
+
+  .flow{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:18px 0; font-size:.88rem;}
+  .flow .box{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:10px 14px; text-align:center; flex:1; min-width:120px;}
+  .flow .box.bad{border-color:var(--red); background:var(--red-bg); color:var(--red); font-weight:700;}
+  .flow .box.ok{border-color:var(--green); background:var(--green-bg); color:var(--green); font-weight:700;}
+  .flow .arrow{color:var(--sub); font-size:1.3rem;}
+
+  .report-card{border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:12px; background:var(--card);}
+  .report-card .rtitle{font-weight:700; margin-bottom:6px;}
+  .rel-meter{height:8px; border-radius:4px; background:var(--gray-bg); overflow:hidden; margin:8px 0;}
+  .rel-fill{height:100%; border-radius:4px;}
+
+  .toc{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px;}
+  .toc a{color:var(--accent); text-decoration:none; font-size:.94rem;}
+  .toc li{margin-bottom:6px;}
+
+  footer{text-align:center; color:var(--sub); font-size:.85rem; margin-top:50px; padding-top:20px; border-top:1px solid var(--border);}
+  .num-pill{display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-size:.78rem; font-weight:700; flex-shrink:0;}
+  ul.clean{padding-inline-start:20px;}
+  ul.clean li{margin-bottom:6px;}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:720px){.two-col{grid-template-columns:1fr;} .bar-label{width:120px; font-size:.8rem;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🔬 تقرير تدقيق التدقيق<br>فحص مجهري لـ 15 تقريراً مقابل الكود الحقيقي والمنصة الحيّة</h1>
+  <p>هل التقارير الخمسة عشر التي كُتبت عن منصة توّا (Tawa) في 13–14 يوليو 2026 صحيحة؟ هذا تقرير مستقل فحص كل ادعاء رئيسي فيها — لا بالقراءة فقط، بل بتشغيل الكود فعليًا واختبار المنصة الحيّة، ومقارنة النتائج حرفًا بحرف.</p>
+  <div class="meta-row">
+    <span class="meta-chip">📅 تاريخ الفحص: 14 يوليو 2026</span>
+    <span class="meta-chip">📁 15 تقريراً مصدرياً</span>
+    <span class="meta-chip">🧪 اختبار حي + قراءة كود + 3 وكلاء تحقق مستقلين</span>
+    <span class="meta-chip">🌿 الفرع: fix/464-full-remediation-2026-07-10</span>
+  </div>
+</header>
+
+<div class="card toc">
+  <b>محتويات التقرير</b>
+  <ol class="toc" style="list-style:none; padding:0; margin-top:10px; columns:2;">
+    <li><a href="#summary">١. الخلاصة بجملة واحدة</a></li>
+    <li><a href="#method">٢. كيف فحصنا؟ المنهجية</a></li>
+    <li><a href="#numbers">٣. الأرقام الإجمالية</a></li>
+    <li><a href="#reports">٤. تقييم كل تقرير من الخمسة عشر</a></li>
+    <li><a href="#real">٥. الأعطال الحقيقية المؤكدة (29)</a></li>
+    <li><a href="#false">٦. الادعاءات الخاطئة المرفوضة</a></li>
+    <li><a href="#mischar">٧. ادعاءات صحيحة الأرقام لكن مضلّلة الإطار</a></li>
+    <li><a href="#stale">٨. ادعاءات كانت صحيحة وأصبحت قديمة</a></li>
+    <li><a href="#unverif">٩. ما تعذّر التحقق منه</a></li>
+    <li><a href="#recommend">١٠. ماذا نفعل الآن؟</a></li>
+  </ol>
+</div>
+
+<h2 id="summary">١. الخلاصة بجملة واحدة</h2>
+<div class="simple" style="font-size:1.05rem;">
+  <b>معظم التقارير الخمسة عشر تعتمد على اختبار حقيقي فعلاً تم تنفيذه ضد المنصة الشغالة</b> — وجدنا آلاف الطلبات المسجلة فعليًا في ملفات مؤقتة، وأدوات اختبار حقيقية في المشروع. لكن عند فحص كل ادعاء رئيسي بأنفسنا (كوداً وتشغيلاً حيًا)، اكتشفنا أن التقارير <b>تخلط بدقة متفاوتة بين ثلاث فئات</b>: (1) أعطال حقيقية مؤكدة 100% ما زالت في الكود اليوم، (2) ادعاء واحد خطير جداً <b>خاطئ تمامًا</b> (زُعم أن 30 نقطة نهاية في لوحة العمليات بلا حماية، والحقيقة أنها كلها محمية)، و(3) عدة أرقام صحيحة لكن بتفسير مضلّل (خصوصًا حول تحويل الأموال بين المستخدمين). القسم الأهم في هذا التقرير هو رقم ٦: <b>لا تصدّق الادعاء الأمني عن 30 نقطة نهاية غير محمية — هو خطأ مثبت</b>.
+</div>
+
+<div class="verdict-grid">
+  <div class="stat confirmed"><div class="num">29</div><div class="lbl">✅ عطل حقيقي مؤكّد بالكود + الاختبار الحي</div></div>
+  <div class="stat refuted"><div class="num">8</div><div class="lbl">❌ ادعاء مرفوض / خاطئ تمامًا</div></div>
+  <div class="stat mischar"><div class="num">2</div><div class="lbl">⚠️ رقم صحيح، تفسير مضلّل</div></div>
+  <div class="stat stale"><div class="num">3</div><div class="lbl">🕒 كان صحيحاً، أصبح قديماً</div></div>
+</div>
+
+<h2 id="method">٢. كيف فحصنا؟ المنهجية</h2>
+<p class="lead">لم نكتفِ بقراءة التقارير الخمسة عشر — قرأناها كاملة، ثم تحققنا من كل ادعاء رئيسي بأربع طرق مستقلة:</p>
+
+<div class="flow">
+  <div class="box">📖 قراءة التقارير الـ15 كاملة<br><span style="color:var(--sub); font-size:.8rem;">~200,000 حرف نص</span></div>
+  <div class="arrow">←</div>
+  <div class="box">🔍 استخراج كل ادعاء قابل للتحقق<br><span style="color:var(--sub); font-size:.8rem;">أرقام، أسماء ملفات، أسطر كود</span></div>
+  <div class="arrow">←</div>
+  <div class="box">🧪 اختبار حي على المنصة الشغالة<br><span style="color:var(--sub); font-size:.8rem;">نفس الخادم http://127.0.0.1:8080</span></div>
+  <div class="arrow">←</div>
+  <div class="box">👨‍💻 قراءة الكود المصدري سطراً بسطر<br><span style="color:var(--sub); font-size:.8rem;">لإيجاد السبب الجذري</span></div>
+  <div class="arrow">←</div>
+  <div class="box ok">🤖 3 وكلاء تحقق مستقلين بالتوازي<br><span style="font-size:.8rem;">للتغطية الكاملة</span></div>
+</div>
+
+<div class="card">
+  <p><b>بلغة بسيطة:</b> تخيّل أن شخصاً قال لك "الباب الخلفي للبيت غير مقفل". بدل أن نصدّق كلامه أو نكذّبه، ذهبنا إلى البيت فعليًا، جرّبنا فتح الباب بأيدينا، ونظرنا إلى آلية القفل نفسها. لكل ادعاء في هذا التقرير، فعلنا هذا بالضبط: أرسلنا طلبات حقيقية (curl) إلى الخادم الشغّال فعليًا على هذا الجهاز، وقرأنا الكود الذي يستقبل تلك الطلبات، لنتأكد أن ما قيل يطابق ما يحدث فعلاً.</p>
+  <p>استخدمنا أيضاً <b>3 وكلاء ذكاء اصطناعي مستقلين يعملون بالتوازي</b> (كل واحد لا يرى عمل الآخر) لتغطية أكبر عدد من الادعاءات في وقت معقول، بنفس منهجية "جرّب ثم اقرأ الكود". النتائج المعروضة هنا هي فقط ما ثبت أو نُفي بدليل مباشر — لا تخمين.</p>
+</div>
+
+<h2 id="numbers">٣. الأرقام الإجمالية</h2>
+<div class="bars">
+  <div class="bar-row">
+    <div class="bar-label">أعطال حقيقية مؤكّدة</div>
+    <div class="bar-track"><div class="bar-fill confirmed" style="width:69%">29</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">ادعاءات مرفوضة/خاطئة</div>
+    <div class="bar-track"><div class="bar-fill refuted" style="width:19%">8</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">رقم صحيح، إطار مضلّل</div>
+    <div class="bar-track"><div class="bar-fill mischar" style="width:5%">2</div></div>
+  </div>
+  <div class="bar-row">
+    <div class="bar-label">كان صحيحاً، أصبح قديماً</div>
+    <div class="bar-track"><div class="bar-fill stale" style="width:7%">3</div></div>
+  </div>
+</div>
+<p class="simple"><b>ملاحظة أرقام:</b> "757 أو 1458 أو 15000 سيناريو" المذكورة في التقارير الأصلية ليست 15,000 اختبار فريد مختلف — وجدنا ملفات الأدلة الفعلية (16 ملف JSONL في <code>/tmp/</code>، بإجمالي 8,766 سطر طلب حقيقي مسجّل). التقارير اللاحقة (5700 ثم 8200 ثم 15000) في الغالب <b>تعيد تجميع وتكرار نفس فئات الاختبار السابقة</b> مع تنويعات إضافية، وليست كلها سيناريوهات جديدة تمامًا. الاختبار الفعلي حقيقي، لكن "15,000" رقم تراكمي/تسويقي أكثر من كونه عدد حالات فريدة صافية.</p>
+
+<h2 id="reports">٤. تقييم كل تقرير من الخمسة عشر</h2>
+<p class="lead">مستوى الموثوقية لكل تقرير على حدة — بناءً على نسبة الادعاءات المؤكدة إلى الادعاءات الخاطئة فيه:</p>
+
+<div class="report-card">
+  <div class="rtitle">1. تقرير التدقيق المجهري متعدد الوكلاء (13 يوليو)</div>
+  <div class="rel-meter"><div class="rel-fill" style="width:92%; background:var(--green);"></div></div>
+  <span class="badge confirmed">موثوقية عالية جداً</span>
+  <p>الأدق بين التقارير الخمسة عشر. يميّز بوضوح بين "حقيقة مؤكدة" و"استنتاج" و"افتراض" و"غير متحقق منه" — وهو أسلوب علمي سليم. كل نتائجه الحرجة (F-01 إلى F-30 تقريباً) تأكدت بالفحص المستقل. كتب بصدق أن علم <code>wallet_peer_transfer</code> صحيح وموثّق رسمياً، بخلاف تقارير لاحقة أساءت فهم نفس النقطة.</p>
+</div>
+
+<div class="report-card">
+  <div class="rtitle">2. تقرير النواقص وما تمّ فعليًّا بدقّة (13 يوليو)</div>
+  <div class="rel-meter"><div class="rel-fill" style="width:90%; background:var(--green);"></div></div>
+  <span class="badge confirmed">موثوقية عالية — لكن انتبه للتاريخ</span>
+  <p>تقرير صادق جداً وقت كتابته (يقول بوضوح: لا نشر، الجوّال لم يُلمس). المشكلة الوحيدة: <b>الزمن تجاوزه</b> — منذ كتابته حدثت ~30 كوميت (commit) جديدة تمس تطبيق الجوّال (React Native) بُنيت من الصفر تقريباً. من يقرأ هذا التقرير اليوم دون معرفة تاريخه سيظن أن الجوّال ما زال معطلاً بالكامل، وهذا لم يعد دقيقاً.</p>
+</div>
+
+<div class="report-card">
+  <div class="rtitle">3–11. تقارير السيناريوهات (757 حتى 15000+ سيناريو، 14 يوليو)</div>
+  <div class="rel-meter"><div class="rel-fill" style="width:68%; background:var(--amber);"></div></div>
+  <span class="badge mischar">موثوقية متوسطة</span>
+  <p>الاختبار الأساسي حقيقي (أدلة موجودة في <code>/tmp/tawa_*.jsonl</code>)، والنتائج المتكررة عبر كل هذه التقارير (البحث بغير العربية معطل، خطأ 500 في استرجاع كلمة المرور) <b>صحيحة في جوهرها</b> رغم خطأ بسيط متكرر في اسم المسار بالضبط (التفصيل في القسم ٥). لكن ابتداءً من التقرير السابع تقريباً (3000+ سيناريو)، ظهر خطأ تحليلي متكرر حول <code>wallet_peer_transfer</code> صُنّف "حرِج" رغم أنه تغيير مصرَّح به وموثّق. كما وُجد خطأ حسابي داخلي (38+154 لا يساوي 155) واستمر يتكرر دون تصحيح عبر عدة تقارير لاحقة، وادعاء غير دقيق حول عدد وثائق KYC المطلوبة.</p>
+</div>
+
+<div class="report-card">
+  <div class="rtitle">12–14. تقارير تدقيق لوحة التحكم (14 يوليو)</div>
+  <div class="rel-meter"><div class="rel-fill" style="width:55%; background:var(--red);"></div></div>
+  <span class="badge refuted">موثوقية منخفضة على الجانب الأمني تحديداً</span>
+  <p>هذه التقارير الثلاثة تحتوي على أفضل الاكتشافات التقنية الدقيقة في كامل المجموعة (خطأ <code>limit=-1</code>، كلمة المرور الظاهرة بنص صريح، خطأ <code>export/complaints</code>) — <b>كلها تأكدت حرفياً</b>. لكنها أيضاً تحتوي على أخطر ادعاء أمني في كل التقارير الخمسة عشر، وهو <b>خاطئ تماماً</b>: "30 نقطة نهاية بلا حماية مصادقة". فحصنا الثلاثين نقطة حية بأنفسنا بلا أي رمز دخول — كلها رفضت الطلب برمز 401 (غير مصرّح). هذا يخفض موثوقية الجانب الأمني في هذه التقارير الثلاثة تحديداً، رغم دقة باقي محتواها الهيكلي والوظيفي.</p>
+</div>
+
+<h2 id="real">٥. الأعطال الحقيقية المؤكّدة (29 عطلاً)</h2>
+<p class="lead">هذه أعطال حقيقية موجودة في الكود <b>اليوم</b> (14 يوليو 2026) — تأكدنا منها بتشغيل الطلب فعليًا على الخادم الحي وقراءة الكود المسؤول. رُتبت من الأخطر إلى الأقل خطورة.</p>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">1</span> البحث لا يعمل إلا بالعربية — أي عميل يكتب إنجليزي أو فرنسي لا يجد شيئاً</div>
+    <div class="badges"><span class="badge high">حرج</span><span class="badge confirmed">مؤكّد 100%</span></div>
+  </div>
+  <div class="finding-file"><code>backend/app/core/search_service.py</code> — السطور ~213–221</div>
+  <p class="simple"><b>بلغة بسيطة:</b> كل صنف في الكتالوج له اسم بثلاث لغات (عربي، إنجليزي، فرنسي) مخزّن في قاعدة البيانات. لكن محرك البحث ينظر فقط إلى النسخة العربية من الاسم، ويتجاهل النسختين الأخريين تماماً — حتى لو كانت الكلمة الإنجليزية موجودة فعلاً في قاعدة البيانات.</p>
+  <div class="flow">
+    <div class="box ok">بحث "شاورما"<br>→ ar field</div><div class="arrow">✓</div><div class="box ok">نتيجة موجودة</div>
+    <div class="arrow">|</div>
+    <div class="box">بحث "shawarma"<br>→ ar field فقط</div><div class="arrow">✗</div><div class="box bad">0 نتيجة رغم وجود الصنف</div>
+  </div>
+  <p><b>تحقّقنا مباشرة:</b> صنف حقيقي اسمه بالإنجليزية "Test Shawarma" موجود في قاعدة البيانات. البحث بـ<code>شاورما</code> يُرجعه فوراً. البحث بـ<code>shawarma</code> يُرجع <b>صفر نتائج</b> رغم أن الكلمة نفسها موجودة حرفياً في حقل الاسم الإنجليزي لنفس الصنف.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">2</span> نسيان كلمة المرور يعطي خطأ خادم 500 — لكن في المسار الخطأ الذي ذكرته كل التقارير</div>
+    <div class="badges"><span class="badge high">حرج</span><span class="badge confirmed">مؤكّد + تصحيح</span></div>
+  </div>
+  <div class="finding-file"><code>backend/app/modules/identity/registration_router.py</code> — دالة <code>password_reset_request</code></div>
+  <p class="simple"><b>تصحيح مهم:</b> كل التقارير الخمسة عشر (بلا استثناء) قالت إن الخطأ في <code>/auth/password-reset/confirm</code> (خطوة "تأكيد" كلمة المرور الجديدة). اختبرنا هذا المسار بعشرات الطرق المختلفة ولم نحصل على خطأ 500 ولو مرة واحدة. العطل الحقيقي في مسار مختلف تماماً: <code>/auth/password-reset/request</code> (خطوة "طلب" استرجاع كلمة المرور، أي الخطوة الأولى قبل التأكيد).</p>
+  <p><b>السبب الجذري:</b> عندما يطلب المستخدم رمز التحقق (OTP) عدة مرات متتالية بسرعة، يفعّل النظام حداً أمنياً (rate limit) صحيحاً في تصميمه — لكن الكود الذي يستقبل هذا الحد في مسار "طلب استرجاع كلمة المرور" تحديداً <b>نسي أن يتعامل مع هذا الحد بشكل نظيف</b>، فينهار الخادم بخطأ 500 بدل أن يقول للمستخدم بأدب "انتظر قليلاً". المسار المماثل في تسجيل الدخول العادي (<code>auth_router.py</code>) يتعامل مع نفس الحالة بشكل صحيح — لكن هذا التعامل الصحيح لم يُنسخ إلى مسار استرجاع كلمة المرور.</p>
+  <p><b>أعدنا إنتاج العطل حياً:</b> أرسلنا طلب استرجاع كلمة مرور 4 مرات متتالية لنفس الرقم خلال ثوانٍ — الطلبان الأول والثاني والثالث نجحا (200)، والرابع فما بعده فشل بخطأ خادم داخلي 500. مؤكد تماماً، فقط باسم مسار مختلف عمّا ذكرته التقارير.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">3</span> ثغرة أمنية حقيقية: يمكن لطلب جديد أن يستلم رد شخص آخر قبل أي تحقق من الهوية</div>
+    <div class="badges"><span class="badge high">حرج جداً</span><span class="badge confirmed">مؤكّد بقراءة الكود</span></div>
+  </div>
+  <div class="finding-file"><code>backend/app/core/idempotency_middleware.py</code></div>
+  <p class="simple"><b>بلغة بسيطة:</b> عند إرسال طلب دفع أو حجز، يرسل التطبيق "مفتاحاً" فريداً معه لمنع تكراره لو أُرسل مرتين بالخطأ (مثلاً بسبب ضغط الزر مرتين). المشكلة: هذا المفتاح <b>ليس مربوطاً بهوية المستخدم أو نوع الطلب</b> — فقط بالمفتاح نفسه. والأخطر: النظام يتحقق من هذا المفتاح <b>قبل</b> أن يتحقق من هوية المستخدم (تسجيل الدخول) أصلاً.</p>
+  <div class="flow">
+    <div class="box">طلب جديد بمفتاح K</div><div class="arrow">←</div>
+    <div class="box bad">البحث عن K في الذاكرة المؤقتة</div><div class="arrow">←</div>
+    <div class="box bad">وُجد! إرجاع الرد القديم فوراً</div>
+    <div class="arrow">✗</div>
+    <div class="box" style="color:var(--sub);">فحص الهوية (لم يُشغَّل أصلاً)</div>
+  </div>
+  <p>إن عرف أي شخص أو خمّن نفس المفتاح المستخدم من قبل، فقد يستلم رد طلب آخر (ربما لشخص آخر) دون تسجيل دخول إطلاقاً. تأكدنا من ثلاث مشاكل مترابطة في نفس الملف:</p>
+  <ul class="clean">
+    <li><b>لا ربط بهوية المستخدم أو المسار:</b> المفتاح في الذاكرة هو <code>idempotency:المفتاح</code> فقط، بلا اسم مستخدم أو اسم الصفحة.</li>
+    <li><b>تنفيذ العملية مرتين:</b> لو فشل حفظ الرد في الذاكرة المؤقتة بعد تنفيذ العملية فعلاً، يعيد الكود تنفيذ العملية من جديد (وقد يعني هذا خصم مبلغ مرتين في عمليات مالية).</li>
+    <li><b>لا قفل عند التزامن:</b> لو وصل طلبان في نفس اللحظة بنفس المفتاح، كلاهما قد يُنفَّذ معاً لأن لا آلية "قفل" تمنع التنفيذ المزدوج.</li>
+  </ul>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">4</span> كلمة المرور الجديدة تظهر بنص واضح على الشاشة في لوحة التحكم</div>
+    <div class="badges"><span class="badge high">حرج — خصوصية</span><span class="badge confirmed">مؤكّد — نفس السطر بالضبط</span></div>
+  </div>
+  <div class="finding-file"><code>web/src/components/ops/UserExtraDetails.tsx</code> — السطر 184</div>
+  <p class="simple"><b>بلغة بسيطة:</b> عندما يعيد موظف العمليات ضبط كلمة مرور مستخدم، حقل إدخال كلمة المرور الجديدة مضبوط ليعرض الحروف بشكل عادي (مثل حقل الاسم) بدل أن يعرضها كنقاط سوداء مخفية. أي شخص ينظر إلى شاشة الموظف في تلك اللحظة يرى كلمة المرور الجديدة كاملة.</p>
+  <pre>&lt;input
+  type="text"      ← يجب أن تكون "password"
+  placeholder="كلمة مرور جديدة (8+)"
+  ... /&gt;</pre>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">5</span> 5 نقاط نهاية إدارية تنهار بخطأ 500 عند إدخال رقم صفحة سالب</div>
+    <div class="badges"><span class="badge high">عالٍ</span><span class="badge confirmed">مؤكّد حياً</span></div>
+  </div>
+  <div class="finding-file"><code>control_panel_router.py</code>، <code>finance_router.py</code>، <code>operations_router.py</code></div>
+  <p class="simple"><b>بلغة بسيطة:</b> عند طلب قائمة مستخدمين بعدد "‎-1"، بدل أن يرفض النظام الرقم غير المنطقي، يمرّره مباشرة إلى قاعدة البيانات التي تنهار لأنها لا تفهم "أعطني عدداً سالباً من الصفوف".</p>
+  <p><b>تحقّقنا حياً بحساب عمليات حقيقي:</b> <code>GET /operations/users/search?limit=-1</code>، <code>/control-panel/users?limit=-1</code>، <code>/customers?limit=-1</code>، <code>/providers?limit=-1</code>، <code>/drivers?limit=-1</code> — الخمسة كلها أعادت خطأ خادم 500 فوراً. السبب: قيمة الحد الأقصى للطلب مضبوطة بحد أعلى (200) لكن بلا حد أدنى (0) في تعريف الكود.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">6</span> تصدير الشكاوى إلى ملف Excel/CSV ينهار إن لم تحدد "الحالة" بالضبط</div>
+    <div class="badges"><span class="badge med">متوسط–عالٍ</span><span class="badge confirmed">مؤكّد + السبب الدقيق</span></div>
+  </div>
+  <div class="finding-file"><code>operations_router.py</code> — دالة <code>export_complaints_csv</code></div>
+  <p class="simple"><b>بلغة بسيطة:</b> زر "تصدير كل الشكاوى" (بلا تحديد فلتر) ينهار بخطأ 500، بينما "تصدير الشكاوى المفتوحة فقط" يعمل تماماً. السبب تقني دقيق: طريقة كتابة استعلام قاعدة البيانات لا تفهم معنى "لا يوجد فلتر" (القيمة الفارغة/None) بشكل صحيح.</p>
+  <p><b>تحقّقنا حياً:</b> <code>GET /operations/export/complaints</code> (بلا فلتر) → 500. <code>GET /operations/export/complaints?state=OPEN</code> (بفلتر) → 200 وملف CSV سليم.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">7</span> ترقيم الصفحات في قائمة التسويات المالية غير موجود أصلاً</div>
+    <div class="badges"><span class="badge high">عالٍ — مالي</span><span class="badge confirmed">مؤكّد حياً</span></div>
+  </div>
+  <div class="finding-file"><code>backend/app/modules/finance/settlement_router.py</code> — السطر 64</div>
+  <p class="simple"><b>بلغة بسيطة:</b> لوحة التحكم بها أزرار "الصفحة التالية" لعرض المزيد من التسويات المالية. لكن الخادم لا يفهم فكرة "رقم الصفحة" أصلاً — الكود لا يحتوي حتى على معامل باسم "page". النتيجة: مهما ضغطت "الصفحة التالية"، يعيد لك الخادم نفس أول 50 عملية تسوية دائماً.</p>
+  <p><b>تحقّقنا حياً:</b> طلبنا صفحة 1 ثم 2 ثم 3 من <code>/finance/settlements</code> — الثلاثة أعادت بالضبط نفس الـ50 سجلاً (تطابق تام في أول وآخر معرّف). هذا يعني أن أي موظف مالية لا يستطيع الوصول إلى أكثر من أحدث 50 تسوية عبر هذه الشاشة إطلاقاً، مهما كان عددها الحقيقي أكبر.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">8</span> إحداثيات غير منطقية (NaN) تُقبل في البحث عن المتاجر بدل أن تُرفض</div>
+    <div class="badges"><span class="badge med">متوسط</span><span class="badge confirmed">مؤكّد + السبب الدقيق</span></div>
+  </div>
+  <div class="finding-file"><code>backend/app/modules/providers/provider_router.py</code> — السطور 171–172</div>
+  <p class="simple"><b>بلغة بسيطة:</b> إحداثيات الموقع (خط الطول والعرض) يجب أن تكون أرقاماً حقيقية. لكن الكود يقبل أيضاً القيمة الخاصة "NaN" (تعني "ليس رقماً" في البرمجة) دون رفضها، فيعيد نتائج عشوائية بدل رسالة خطأ واضحة.</p>
+  <p><b>تحقّقنا حياً:</b> <code>GET /providers/search?lat=NaN&lng=NaN</code> → 200 مع بيانات متاجر حقيقية، بدل 422 (خطأ تحقق متوقع).</p>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">9</span> فجوة ضخمة بين "العقد المُوثَّق" للواجهة البرمجية والواقع الفعلي</div>
+    <div class="badges"><span class="badge med">متوسط — ثقة الأدوات</span><span class="badge confirmed">مؤكّد بالعدّ المباشر</span></div>
+  </div>
+  <div class="finding-file"><code>contracts/openapi.yaml</code> مقابل مخطط الخادم الفعلي</div>
+  <p class="simple"><b>بلغة بسيطة:</b> يوجد "دليل رسمي" (عقد OpenAPI) يصف واجهة الخادم البرمجية لتوليد أنواع البيانات (TypeScript) تلقائياً وللتحقق من التوافق. لكن هذا الدليل يصف أقل من خُمس الواجهة الحقيقية.</p>
+  <div class="two-col">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2rem; font-weight:800; color:var(--amber);">110 / 127</div>
+      <div style="color:var(--sub); font-size:.85rem;">مسار / عملية — في الدليل الموثّق</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2rem; font-weight:800; color:var(--green);">531 / 601</div>
+      <div style="color:var(--sub); font-size:.85rem;">مسار / عملية — في الخادم الحي فعلياً (عددناها بأنفسنا)</div>
+    </div>
+  </div>
+  <p>أي أداة تعتمد على "الدليل الرسمي" (توليد الأنواع، فحص التوافق) تعمل على أقل من 20% من واجهة الخادم الحقيقية — أي أنها تعطي ثقة زائفة بأن كل شيء متوافق بينما 80% من الواجهة غير مفحوصة إطلاقاً.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title"><span class="num-pill">10</span> نظامان متوازيان لتسليم/تسلّم الورديات في لوحة العمليات</div>
+    <div class="badges"><span class="badge med">متوسط</span><span class="badge confirmed">مؤكّد — جداول منفصلة فعلاً</span></div>
+  </div>
+  <div class="finding-file"><code>operations_router.py</code> (جدول OpsShiftHandoff) و<code>ops_handoff_router.py</code> (جدول OpsHandoff)</div>
+  <p class="simple"><b>بلغة بسيطة:</b> يوجد نظامان مختلفان تماماً (جدولا بيانات منفصلان، ومسارا رابط منفصلان) لتسجيل "تسليم الوردية" بين الموظفين — نظام قديم ونظام جديد، لكن لم يُحذف القديم عند بناء الجديد. موظف قد يستخدم أحدهما بينما يبحث موظف آخر في الآخر ولا يجد شيئاً.</p>
+</div>
+
+<h3>أعطال حقيقية إضافية مؤكّدة (بإيجاز)</h3>
+<div class="tbl-wrap">
+<table>
+<tr><th>#</th><th>العطل</th><th>الشرح المبسّط</th><th>الموقع</th><th>الخطورة</th></tr>
+<tr><td>11</td><td>استرداد كامل مدفوع بالنقاط فقط قد ينهار</td><td>مسار نادر جداً (استرداد كامل دُفع بالكامل بنقاط الولاء) يستخدم متغيراً قبل أن يُنشأ، فقد يعطي خطأ خادم بدل إتمام الاسترداد</td><td><code>refund_router.py</code></td><td class="badge med">متوسط</td></tr>
+<tr><td>12</td><td>فشل تعديل العمولة بعد استرداد/نزاع يُبتلع بصمت</td><td>لو تم استرداد المال بنجاح لكن تحديث "عمولة المنصة" المرتبطة فشل، يُسجَّل الخطأ في السجل فقط ولا يُبلَّغ أحد — يحتاج مطابقة يدوية لاحقاً</td><td><code>refund_router.py</code>, <code>chargeback_router.py</code></td><td class="badge med">متوسط</td></tr>
+<tr><td>13</td><td>قائمة الانتظار غير المتصلة بالويب غير مربوطة بهوية المستخدم</td><td>عملية أُجّلت لأن الإنترنت انقطع لا تحمل اسم صاحبها؛ لو دخل شخص آخر من نفس الجهاز قد تُنفَّذ باسمه، ولو انتهت الجلسة تُحذف العملية بدل أن تُحفظ لإعادة المحاولة</td><td><code>web/src/offline/outbox.ts</code></td><td class="badge med">متوسط</td></tr>
+<tr><td>14</td><td>ملفا حالة المشروع الرئيسيان فارغان تماماً (كلها أصفار) وأداة الفحص تقول "سليم"</td><td>ملفا التوثيق المركزي للمشروع تالفان بالكامل (كل البايتات فارغة)، لكن أداة الفحص الآلي تتحقق فقط من "وجود" الملف لا من "صحة محتواه"، فتعلن نجاحاً كاذباً</td><td><code>PROJECT_STATE.md</code>, <code>APP_TAWA_PROFILE.md</code></td><td class="badge med">متوسط — حوكمة</td></tr>
+<tr><td>15</td><td>بيئة الاختبار الآلي (CI) لا تثبّت نفس نسخ المكتبات التي تُنشر فعلياً</td><td>صورة الإنتاج تستخدم نسخاً مثبّتة ومؤمّنة (lock file)، لكن بيئة الاختبار الآلي تستخدم نطاقات نسخ مرنة — فقد تنجح الاختبارات بنسخة مختلفة عمّا سيُنشر فعلياً. كما لا توجد بوابات اختبار للجوّال أو الترحيلات أو تغطية الكود</td><td><code>Dockerfile</code> مقابل CI config</td><td class="badge med">متوسط</td></tr>
+<tr><td>16</td><td>28 عملية تسوية "عالقة" بمبلغ 897 ديناراً تقريباً، غير محلولة</td><td>أموال محفظة عالقة في طلبات مرفوضة أو حتى مُسلَّمة فعلاً (12 منها لطلبات مكتملة التسليم)، ولم تُحل بعد</td><td>واجهة المطابقة المالية (reconciliation)</td><td class="badge high">عالٍ — مالي</td></tr>
+<tr><td>17</td><td>حدود معدل الطلبات (Rate Limit) لا تطابق ما هو موثّق رسمياً</td><td>إنشاء الطلبات مسموح 20 مرة/دقيقة في الكود مقابل 10 كل 10 دقائق في الوثيقة الرسمية؛ الشكاوى 10/دقيقة مقابل 5/ساعة موثّقة؛ الحد العام 180/دقيقة مقابل 60/دقيقة موثّقة</td><td><code>rate_limiter.py</code> مقابل <code>contracts/rate_limits.yaml</code></td><td class="badge med">متوسط</td></tr>
+<tr><td>18</td><td>تطبيق الجوّال (React Native) لا يستقبل التحديثات اللحظية للطلب</td><td>التطبيق ينتظر نوع إشعار عام اسمه "message"، بينما الخادم يرسل أنواعاً محددة مثل "تغيّر حالة الطلب" — فلا يتطابقان أبداً، ويعتمد التطبيق صمتاً على إعادة السؤال الدوري بدل التحديث الفوري</td><td><code>apps/mobile/.../orderStream.ts</code></td><td class="badge med">متوسط</td></tr>
+<tr><td>19</td><td>تسجيل إشعارات الجوّال (Push) يفشل بسبب حالة الأحرف</td><td>التطبيق يرسل "IOS"/"ANDROID" بأحرف كبيرة، والخادم يتوقعها صغيرة — فيُرفض التسجيل بصمت ولا تصل الإشعارات</td><td>خدمة تسجيل الإشعارات في التطبيق</td><td class="badge med">متوسط</td></tr>
+<tr><td>20</td><td>مكوّن برمجي (CascadeAffectedField) موجود لكن غير مستخدم في أي شاشة حقيقية</td><td>كود ميت — مكتوب لكن غير موصول</td><td><code>web/src</code></td><td class="badge low">منخفض</td></tr>
+<tr><td>21</td><td>مكتبة برمجية مثبَّتة (class-variance-authority) لكن غير مستخدمة إطلاقاً</td><td>وزن إضافي بلا فائدة</td><td><code>web/package.json</code></td><td class="badge low">منخفض</td></tr>
+<tr><td>22</td><td>بيانات دخول افتراضية لتخزين الملفات (MinIO) مكتوبة كنسخة احتياطية في الكود</td><td>لو فشل تحميل الإعداد الحقيقي، يستخدم النظام قيمة افتراضية معروفة (minioadmin) بدل الفشل الآمن</td><td>ملفات إعداد التخزين + <code>docker-compose.yml</code></td><td class="badge med">متوسط — أمان</td></tr>
+<tr><td>23</td><td>سكربت النشر يمكنه مسح كل أحجام التخزين (volumes) في Docker على الخادم</td><td>أمر خطير جداً إن نُفّذ في السياق الخطأ — يمحو بيانات كل الحاويات على تلك الآلة، لا حاوية هذا المشروع فقط</td><td><code>deploy/deploy_to_staging.sh</code></td><td class="badge high">عالٍ — نشر</td></tr>
+<tr><td>24</td><td>عدة سكربتات تعطّل التحقق الأمني من هوية الخادم عند الاتصال عبر SSH</td><td><code>StrictHostKeyChecking=no</code> يفتح الباب نظرياً لهجوم "الوسيط" (man-in-the-middle) عند الاتصال بخوادم النشر</td><td>عدة سكربتات نشر/اختبار</td><td class="badge med">متوسط — أمان</td></tr>
+<tr><td>25</td><td>صورة خدمة الطرق (osrm) في بيئة staging غير مثبّتة على نسخة محددة</td><td>استخدام "أحدث نسخة" (latest) بدل رقم نسخة ثابت قد يجلب تغييرات غير متوقعة عند إعادة البناء (بيئة الإنتاج الأساسية مثبّتة بشكل صحيح على نسخة محددة، هذه فقط في overlay الـ staging)</td><td><code>docker-compose.staging.yml</code></td><td class="badge low">منخفض</td></tr>
+<tr><td>26</td><td>صفحتان في لوحة العمليات تظهران فارغتين تماماً بدل رسالة خطأ</td><td>لوحة المالية وصفحة العروض الترويجية المعلّقة: عند عدم وجود بيانات أو خطأ تحميل غير متوقع، الصفحة تعرض فراغاً تاماً دون أي توضيح للمستخدم</td><td><code>OpsFinanceDashboard.tsx:153</code>, <code>OpsPromotions.tsx:44-45</code></td><td class="badge med">متوسط — تجربة استخدام</td></tr>
+<tr><td>27</td><td>حوالي نصف صفحات لوحة العمليات المفحوصة تحتوي نصوصاً عربية مكتوبة مباشرة</td><td>لا تستخدم نظام الترجمة، فتبديل لغة الواجهة لا يترجمها — عيّنة عشوائية من 5 صفحات: صفحتان بلا أي نظام ترجمة إطلاقاً</td><td>صفحات متعددة في <code>web/src/pages/operations/</code></td><td class="badge low">منخفض</td></tr>
+</table>
+</div>
+
+<h3 style="margin-top:34px;">✅ إيجابيات مؤكَّدة (أشياء تعمل فعلاً بشكل صحيح)</h3>
+<div class="card">
+  <ul class="clean">
+    <li><span class="badge pos">مؤكّد</span> <b>الدفتر المحاسبي المزدوج متوازن فعلاً:</b> تحققنا مباشرة من قاعدة البيانات — مجموع المدين = مجموع الدائن (10,290,080 مليم = 10,290,080 مليم) في اللحظة الحالية.</li>
+    <li><span class="badge pos">مؤكّد</span> <b>الفصل بين الأدوار يعمل:</b> محاولة الوصول إلى بيانات دور آخر (مثلاً مزوّد يحاول الوصول لبيانات عمليات) تُرفض بـ403 كما هو متوقع.</li>
+    <li><span class="badge pos">مؤكّد</span> <b>جميع نقاط النهاية المحمية في لوحة العمليات تتطلب فعلاً تسجيل دخول صحيحاً</b> — راجع القسم التالي لتفاصيل الادعاء المرفوض حول هذه النقطة تحديداً.</li>
+  </ul>
+</div>
+
+<h2 id="false">٦. الادعاءات الخاطئة المرفوضة تماماً</h2>
+<p class="lead">هذه ادعاءات وردت في التقارير الأصلية وثبت بالفحص المباشر أنها <b>غير صحيحة</b>. الأهم بينها بفارق كبير هو الأول.</p>
+
+<div class="finding" style="border:2px solid var(--red);">
+  <div class="finding-head">
+    <div class="finding-title">🚨 الادعاء الأخطر في كل التقارير الخمسة عشر: "30 نقطة نهاية في لوحة العمليات بلا أي حماية مصادقة"</div>
+    <div class="badges"><span class="badge refuted">مرفوض تماماً</span></div>
+  </div>
+  <p><b>ماذا قالت التقارير (12، 13، 14):</b> أن 30 نقطة نهاية حساسة (بيانات الاحتيال، الوثائق، التحويلات المالية، التسويات) "تعيد 200 حتى بدون رمز JWT" — وصُنِّف هذا كأولوية قصوى (🔥🔥🔥) في كل تقرير ذكره.</p>
+  <p><b>ما وجدناه فعلياً:</b> اختبرنا <b>الثلاثين نقطة نهاية بالضبط</b>، بنفس الأسماء المذكورة حرفياً في التقارير، <b>بلا أي رمز دخول إطلاقاً</b> (بلا Authorization header). النتيجة: <b>الثلاثون جميعها أعادت 401 (غير مصرَّح)</b> — أي أنها محمية تماماً كما يجب. تأكدنا أيضاً من الكود المصدري لعينة منها ووجدنا حارس صلاحيات صريحاً وسليماً (<code>Depends(require_role(...))</code>) على كل واحدة.</p>
+  <div class="flow">
+    <div class="box bad">ما قالته التقارير:<br>30 نقطة → 200 (بلا حماية)</div>
+    <div class="arrow">≠</div>
+    <div class="box ok">ما وجدناه فعلياً:<br>30 نقطة → 401 (محمية بالكامل)</div>
+  </div>
+  <p><b>كيف حدث هذا الخطأ برأينا؟</b> وجدنا في ملفات الأدلة الخام (<code>/tmp/tawa_daily_5k.jsonl</code>) أن هذه النقاط بالذات اختُبرت فعلاً — لكن <b>باستخدام رمز دخول صحيح لموظف عمليات</b> (مُعلَّم في السجلات بـ<code>"r":"ops"</code>) وحصلت على 200 بشكل متوقع تماماً ومشروع. يبدو أن هذا التصنيف اختلط لاحقاً عند تلخيص وصياغة تقرير "لوحة التحكم" النهائي، فقُرئ "200 لأن الموظف مسجّل دخوله بشكل صحيح" على أنه "200 دون أي تسجيل دخول" — وهذا فرق جوهري بين "الحماية تعمل بشكل صحيح" و"لا توجد حماية إطلاقاً".</p>
+  <p style="color:var(--red); font-weight:700;">⚠️ لا تتخذ أي إجراء طارئ بناءً على هذا الادعاء تحديداً — فهو غير صحيح. النظام الأمني لهذه النقاط سليم.</p>
+</div>
+
+<h3>ادعاءات أخرى مرفوضة</h3>
+<div class="tbl-wrap">
+<table>
+<tr><th>الادعاء</th><th>لماذا هو خاطئ</th></tr>
+<tr>
+  <td>"155 طلباً عالقاً بلا سائق (38 + 154)، ويوجد سائقان نشطان فقط"</td>
+  <td>الحساب الداخلي في التقرير نفسه خاطئ رياضياً (38+154 = 192 وليس 155). فحصنا قاعدة البيانات مباشرة: العدد الحقيقي للطلبات العالقة 192 طلباً (لا توجد حالة اسمها "AWAITING" أصلاً)، وعدد السائقين بحالة "نشط" هو 46 سائقاً وليس 2.</td>
+</tr>
+<tr>
+  <td>"المزوّد يحتاج 3 وثائق KYC منها MANAGER_ID؛ السائق يحتاج 7 وثائق"</td>
+  <td>لا يوجد نوع وثيقة اسمه MANAGER_ID في النظام إطلاقاً. الوثائق الفعلية المطلوبة للمزوّد الغذائي 3 وثائق لكن مختلفة (سجل تجاري، رخصة تأسيس، شهادة صحية). السائق يحتاج 3 وثائق مطلوبة فعلياً (هوية، رخصة قيادة، استمارة مركبة) — الرقم "7" هو قائمة كل أنواع الوثائق "المقبولة" إجمالاً في النظام، وليس "المطلوبة" لتفعيل الحساب.</td>
+</tr>
+<tr>
+  <td>"Redis (ذاكرة التخزين المؤقت) مكشوفة للعامة على 0.0.0.0"</td>
+  <td>فحصنا ملف إعداد الحاويات مباشرة: Redis لا يحتوي على أي منفذ مفتوح للخارج إطلاقاً — يعمل داخلياً فقط بين الحاويات.</td>
+</tr>
+<tr>
+  <td>"ملف .env (يحتوي أسراراً) مرفوع على Git بالخطأ"</td>
+  <td>فحصنا قائمة الملفات المرفوعة فعلياً على Git: لا يوجد أي ملف <code>.env</code> بينها — فقط ملف <code>.env.example</code> (نموذج فارغ من القيم الحساسة، وهذا هو الصحيح).</td>
+</tr>
+</table>
+</div>
+
+<h2 id="mischar">٧. ادعاءات صحيحة الأرقام لكن مضلّلة الإطار</h2>
+<p class="lead">هذه ادعاءات أرقامها صحيحة تماماً بعد التحقق، لكن الطريقة التي قُدّمت بها توحي بشيء أخطر مما هو عليه فعلاً.</p>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title">"تحويل الأموال بين المستخدمين (wallet_peer_transfer) مفعّل رغم أن العقد يقول false"</div>
+    <div class="badges"><span class="badge mischar">مضلّل</span></div>
+  </div>
+  <p><b>الرقم صحيح:</b> هذه الميزة فعلاً مفعّلة (true) في النظام الحي حالياً.</p>
+  <p><b>لكن التفسير خاطئ:</b> فتحنا ملف العقد نفسه (<code>contracts/feature_flags.yaml</code>) ووجدناه يقول <b>حرفياً</b>: <code>wallet_peer_transfer: true  # UNSEALED 2026-06-19 (owner operator-override)</code> — أي أن العقد نفسه يقول "true"، بقرار صريح وموثّق من صاحب المشروع بتاريخ 19 يونيو 2026، وبصمة الملف الأمنية (hash) الرسمية تطابق هذا التغيير المعتمد تماماً. هذا ليس خرقاً لقاعدة أمان — إنه تغيير مصرَّح به موثّق بالكامل. أول تقرير في المجموعة (تقرير 13 يوليو) فهم هذا بشكل صحيح تماماً وقال ذلك بوضوح؛ التقارير اللاحقة (بدءاً من تقرير "3000 سيناريو") أعادت تصنيف نفس الشيء كـ"اكتشاف حرج جديد" دون التحقق من سياقه، رغم أنه ليس جديداً ولا مخالفاً لأي شيء.</p>
+</div>
+
+<div class="finding">
+  <div class="finding-head">
+    <div class="finding-title">"10 نزاعات مالية مفتوحة بدون تجميد الأموال (freeze_level=NONE) — أموال غير محمية"</div>
+    <div class="badges"><span class="badge mischar">مضلّل</span></div>
+  </div>
+  <p><b>الرقم صحيح:</b> فعلاً توجد 10 نزاعات مفتوحة حالياً بقيمة 49,000 مليم، وكلها بحالة "بلا تجميد".</p>
+  <p><b>لكن هذا هو التصميم المقصود، لا عطلاً:</b> قرأنا الكود المسؤول (<code>chargeback_router.py</code>) بالكامل ووجدنا أن "بلا تجميد" هي القيمة الافتراضية <b>عمداً</b> عند فتح أي نزاع، وأن تجميد الأموال إجراء يدوي يقرره موظف العمليات لكل حالة على حدة حسب خطورتها — وليس تلقائياً لكل نزاع. كما تأكّدنا أن آلية التجميد نفسها تعمل فعلياً وتُطبَّق بشكل صحيح متى فعّلها الموظف. فالادعاء بأن "الأموال غير محمية بشكل افتراضي" صحيح رقمياً، لكن تأطيره كـ"خطر مالي" يتجاهل أن هذا سلوك مصمَّم عمداً على أن يكون قراراً بشرياً لكل حالة.</p>
+</div>
+
+<h2 id="stale">٨. ادعاءات كانت صحيحة تماماً — وأصبحت قديمة الآن</h2>
+<p class="lead">هذه ادعاءات كانت دقيقة 100% في اللحظة التي كُتبت فيها (13 يوليو)، لكن حدث تطوير حقيقي في الكود بعدها غيّر الواقع.</p>
+<div class="tbl-wrap">
+<table>
+<tr><th>الادعاء الأصلي</th><th>لماذا أصبح قديماً</th></tr>
+<tr>
+  <td>"تطبيق الجوّال (React Native) لم يُلمس إطلاقاً — 0 من 66 عيباً أُصلح"</td>
+  <td>كان صحيحاً تماماً في 13 يوليو. لكن منذ ذلك الحين حدثت ~30 عملية تطوير (commits) مخصصة لتطبيق الجوّال، بُنيت خلالها شاشات كاملة من الصفر (السائق، المزوّد، إعدادات العميل، البحث، وغيرها). القول اليوم إن "الجوّال لم يُلمس" لم يعد دقيقاً.</td>
+</tr>
+<tr>
+  <td>"تطبيق الجوّال يرسل نوع رمز تحقق (OTP) غير معروف للخادم، فيفشل تسجيل دخول كل عميل وسائق بخطأ 422"</td>
+  <td>أُصلح هذا العيب تحديداً بتحديث برمجي بعنوان صريح "إصلاح حرج: تسجيل دخول العميل/السائق بـ OTP كان يرسل غرضاً غير صالح، ويعطي خطأ 422 في كل محاولة حقيقية" — تأكدنا من محتوى هذا الإصلاح مباشرة.</td>
+</tr>
+<tr>
+  <td>"مسارات تطبيق الجوّال الحقيقية (وليست الوهمية للاختبار) لا تطابق مسارات الخادم — 404 عند التشغيل الحقيقي"</td>
+  <td>أُصلحت المسارات المذكورة تحديداً بتحديثين برمجيين لاحقين (تصحيح المسارات + إضافة طبقة تحويل تنسيق البيانات). ملاحظة: جزئية واحدة (اسم حقل "item_id" مقابل "catalog_item_id") لم تُعاد فحصها بعد بشكل قاطع.</td>
+</tr>
+</table>
+</div>
+
+<h2 id="unverif">٩. ما تعذّر التحقق منه بثقة كافية</h2>
+<div class="card">
+  <ul class="clean">
+    <li>هل يستمر نظام الصلاحيات في العمل بشكل آمن تحديداً عند انقطاع خدمة Redis (سيناريو عطل نادر ومتخصص)؟ — لم نجد دليلاً كافياً لا لتأكيده ولا لنفيه.</li>
+    <li>سباق النقر المزدوج في شاشة قبول عروض السائق على تطبيق الجوّال — على الأرجح غير ذي موضوع الآن لأن شاشات السائق أُعيد بناؤها بالكامل حديثاً، لكن لم تُفحص النسخة الجديدة تحديداً لهذه النقطة بعد.</li>
+    <li>تطابق دقيق كامل بين قواعد التنقل في واجهة لوحة العمليات وقواعد الصلاحيات في الخادم لكل مسار على حدة — فحصنا عينة، ووجدنا أن الحماية الفعلية في الخادم سليمة دائماً (وهذا الأهم أمنياً)، لكن لم نراجع كل تناقض واجهة محتمل واحداً تلو الآخر.</li>
+  </ul>
+</div>
+
+<h2 id="recommend">١٠. ماذا نفعل الآن؟ توصيات مرتّبة بالأولوية</h2>
+<div class="card">
+  <ol class="clean">
+    <li><b>عاجل — أمان:</b> إصلاح ثغرة "استرجاع الرد قبل التحقق من الهوية" في نظام منع التكرار (<code>idempotency_middleware.py</code>) — ربط المفتاح بهوية المستخدم والمسار، ومنع إرجاع أي رد قبل التحقق من الهوية، وإضافة قفل ذرّي يمنع التنفيذ المزدوج.</li>
+    <li><b>عاجل — خصوصية:</b> تغيير حقل كلمة المرور في <code>UserExtraDetails.tsx:184</code> من <code>type="text"</code> إلى <code>type="password"</code> — تعديل سطر واحد.</li>
+    <li><b>عاجل — تجربة عملاء:</b> إصلاح البحث ليشمل الاسم الإنجليزي والفرنسي أيضاً، لا العربي فقط، في <code>search_service.py</code>.</li>
+    <li><b>عاجل:</b> إصلاح مسار <code>/auth/password-reset/request</code> ليتعامل مع حد المعدل بأدب (رسالة واضحة) بدل الانهيار بخطأ 500 — بنفس الطريقة المستخدمة أصلاً في مسار تسجيل الدخول العادي.</li>
+    <li><b>هام:</b> إضافة حد أدنى (<code>ge=0</code>) لمعامل "limit" في نقاط النهاية الخمس التي تنهار مع قيم سالبة.</li>
+    <li><b>هام:</b> بناء ترقيم صفحات حقيقي لقائمة التسويات المالية (لا يوجد حالياً إطلاقاً).</li>
+    <li><b>هام:</b> حل استثناءات التسوية العالقة الـ28 (897 دينار تقريباً)، ومراجعة سكربت النشر الذي قد يمسح كل أحجام Docker.</li>
+    <li><b>لاحقاً — حوكمة:</b> استعادة ملفَي حالة المشروع التالفين، وجعل أداة الفحص الآلي ترفض الملفات الفارغة بدل الموافقة عليها بصمت.</li>
+    <li><b>عند كتابة أي تقرير مستقبلي مشابه:</b> تحقق من اسم المسار بدقة حرفية قبل نشره (خطأ "confirm" مقابل "request" تكرر في 10 تقارير كاملة)، وتحقق دائماً من القيمة الفعلية في ملف العقد قبل الحكم على أنها "مخالفة" — القيمة قد تكون صحيحة ومقصودة بينما التوقع الافتراضي لديك مختلف.</li>
+  </ol>
+</div>
+
+<footer>
+  تقرير تدقيق مستقل — قراءة الكود + اختبار حي على المنصة الشغّالة + ثلاثة وكلاء تحقق مستقلين بالتوازي · لم يُعدَّل أي كود مصدري أثناء هذا الفحص · 14 يوليو 2026
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,556 @@
+<meta charset="utf-8">
+<title>تقرير 500 — كل ما جرى بعد تقرير التدقيق</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 72ch; color: var(--ink); }
+  p.lead { font-size: 1.08rem; color: var(--ink-muted); max-width: 62ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.87em; }
+  b { color: var(--ink); }
+
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 52px 20px 40px; border-radius: 0 0 28px 28px;
+  }
+  header.hero .inner { max-width: 1000px; margin: 0 auto; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.3);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 2.1rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 22ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.88); max-width: 62ch; font-size: 1.06rem; }
+  .hero-stats { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 26px; }
+  .hero-stats .s .n { font-size: 1.7rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.8rem; color: rgba(255,255,255,0.75); }
+
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+  nav.toc a { font-size: 0.82rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 14px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+
+  section { margin: 52px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.45rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 1rem; color: var(--ink-muted); max-width: 70ch; margin-bottom: 24px; }
+
+  .plain {
+    background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius);
+    padding: 16px 20px; margin: 18px 0; display: flex; gap: 12px; align-items: flex-start;
+  }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.95rem; max-width: 62ch; }
+  .plain b { color: var(--accent-deep); }
+
+  .analogy { background: var(--accent-2-tint); border: 1px dashed var(--accent-2); border-radius: var(--radius); padding: 16px 20px; margin: 18px 0; }
+  .analogy .k { font-size: 0.76rem; font-weight: 800; color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .analogy p { margin: 0; font-size: 0.92rem; color: var(--ink); max-width: 62ch; }
+
+  /* timeline */
+  .timeline { position: relative; padding-inline-start: 34px; }
+  .timeline::before { content: ""; position: absolute; inset-inline-start: 13px; top: 6px; bottom: 6px; width: 2px; background: var(--border); }
+  .t-step { position: relative; padding-bottom: 26px; }
+  .t-step:last-child { padding-bottom: 0; }
+  .t-step::before { content: ""; position: absolute; inset-inline-start: -34px; top: 2px; width: 24px; height: 24px; border-radius: 50%; background: var(--ok-bg); border: 2px solid var(--ok-ink); }
+  .t-step::after { content: "✓"; position: absolute; inset-inline-start: -28px; top: 5px; font-size: 0.75rem; color: var(--ok-ink); font-weight: 800; }
+  .t-step .th { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+  .t-step .td { font-size: 0.86rem; color: var(--ink-muted); }
+  .t-step .td code { font-size: 0.85em; }
+
+  /* pipeline diagram */
+  .pipeline { display: flex; align-items: stretch; gap: 0; overflow-x: auto; padding: 8px 4px 16px; }
+  .pl-stage { flex: 0 0 auto; min-width: 118px; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px; }
+  .pl-node { width: 52px; height: 52px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; background: var(--surface); border: 2px solid var(--ok-border); box-shadow: var(--shadow); color: var(--ok-ink); margin-bottom: 8px; }
+  .pl-stage .t { font-size: 0.8rem; font-weight: 700; color: var(--ink); }
+  .pl-stage .d { font-size: 0.7rem; color: var(--ink-faint); margin-top: 2px; }
+  .pl-arrow { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; width: 26px; margin-top: -26px; }
+  .pl-arrow svg { width: 22px; height: 12px; }
+  .pl-arrow path { stroke: var(--ok-border); stroke-width: 2.5; fill: none; }
+
+  /* feature cards */
+  .feature { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); padding: 24px 26px; margin-bottom: 18px; }
+  .feature .fhead { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+  .feature .fnum { font-family: var(--font-display); font-weight: 800; font-size: 0.76rem; background: var(--accent-tint); color: var(--accent-deep); border-radius: 999px; padding: 3px 12px; }
+  .feature h3 { font-size: 1.1rem; margin: 0; }
+  .feature .simple-answer { color: var(--ink-muted); font-size: 0.95rem; margin: 10px 0 14px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  @media (max-width: 640px) { .compare { grid-template-columns: 1fr; } }
+  .compare .box { border-radius: 10px; padding: 14px 16px; border: 1px solid; }
+  .compare .before { background: var(--crit-bg); border-color: var(--crit-border); }
+  .compare .after { background: var(--ok-bg); border-color: var(--ok-border); }
+  .compare .box .k { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; margin-bottom: 6px; }
+  .compare .before .k { color: var(--crit-ink); }
+  .compare .after .k { color: var(--ok-ink); }
+  .compare .box p { margin: 0; font-size: 0.9rem; color: var(--ink); max-width: none; }
+
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+
+  ul.simple-list { margin: 10px 0; padding-inline-start: 22px; }
+  ul.simple-list li { margin-bottom: 8px; color: var(--ink-muted); font-size: 0.92rem; }
+  ul.simple-list li b { color: var(--ink); }
+
+  /* detective board for the investigation section */
+  .board { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px; margin: 16px 0; }
+  .board-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+  .board-row:last-child { border-bottom: none; }
+  .board-row .icon { font-size: 1.2rem; margin-top: 2px; }
+  .board-row .txt b { display: block; font-size: 0.92rem; margin-bottom: 2px; }
+  .board-row .txt span { font-size: 0.85rem; color: var(--ink-muted); }
+
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); margin: 14px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 560px; }
+  thead th { text-align: right; font-family: var(--font-display); font-weight: 700; background: var(--surface-2); color: var(--ink-muted); font-size: 0.73rem; letter-spacing: 0.03em; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.mono { font-family: var(--font-mono); font-size: 0.83rem; white-space: nowrap; }
+
+  .targets-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .target-card { background: var(--surface); border: 2px solid var(--ok-border); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); text-align: center; }
+  .target-card .icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .target-card .name { font-weight: 800; font-size: 0.88rem; margin-bottom: 6px; }
+
+  .round-block { border-inline-start: 3px solid var(--accent); padding-inline-start: 18px; margin-bottom: 24px; }
+  .round-block h4 { font-size: 0.98rem; margin: 0 0 10px; }
+
+  hr.div { border: none; border-top: 1px dashed var(--border); margin: 44px 0; }
+  footer { margin-top: 70px; padding: 24px 0; border-top: 1px solid var(--border); font-size: 0.82rem; color: var(--ink-faint); text-align: center; }
+  a { color: var(--accent-deep); }
+</style>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="inner">
+      <span class="kicker">🟢 تقرير 500 — متابعة ما بعد التدقيق</span>
+      <h1>كل ما جرى منذ تقرير التدقيق المستقلّ</h1>
+      <p class="lead">
+        بعد التدقيق المستقلّ (تقرير 499)، طلبتَ إغلاق النقطتَين المتبقّيتَين، ثم توسّعنا في السؤال:
+        "هل هناك عمل آخر من جلسات سابقة يحتاج مراجعة؟" — فاكتشفنا كمّية كبيرة من العمل الجاهز والمُختبَر
+        لكن غير المحفوظ، راجعناه بدقّة، ونشرناه بالكامل حتى الموقع الحيّ. هذا تقرير شامل لكل خطوة.
+      </p>
+      <div class="hero-stats">
+        <div class="s"><div class="n">7</div><div class="l">التزامات Git جديدة</div></div>
+        <div class="s"><div class="n">~2,240</div><div class="l">سطر كود رُوجع والتُزم به</div></div>
+        <div class="s"><div class="n">3</div><div class="l">جولات نشر كاملة على الموقع الحيّ</div></div>
+        <div class="s"><div class="n">0</div><div class="l">مشكلة أمان ماليّ اكتُشفت</div></div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc">
+    <a href="#summary">الخلاصة بلغة بسيطة</a>
+    <a href="#gaps">إغلاق فجوتَي التدقيق</a>
+    <a href="#discovery">القصة الكبرى — العمل المكتشَف</a>
+    <a href="#whatfixed">ماذا يُصلح هذا العمل؟</a>
+    <a href="#investigation">التحقيق الإضافي — عمل جلسات أخرى</a>
+    <a href="#ledgerfix">إصلاح تسمية حساب المحاسبة</a>
+    <a href="#deploy">جولات النشر الثلاث</a>
+    <a href="#backup">النسخة الاحتياطية والتحقّق النهائي</a>
+    <a href="#conclusion">الخلاصة</a>
+  </nav>
+
+  <section id="summary">
+    <div class="section-eyebrow">📋 البداية من هنا</div>
+    <h2>الخلاصة بلغة بسيطة</h2>
+    <div class="plain">
+      <div class="ic">💡</div>
+      <p>
+        بعد أن أنهيت تدقيق كل الميزات السبع (التقرير السابق)، طلبتَ إغلاق نقطتَين متبقّيتَين. أثناء العمل على
+        إحداهما اكتشفنا أنّ <b>جلسة عمل أخرى منفصلة كانت قد أنهت عملها فعليًّا</b> — أنجزت وأتقنت واختبرت كمّية
+        كبيرة من الإصلاحات المهمّة (منها إصلاح ماليّ خطير)، لكنّها لم تحفظها نهائيًّا في نظام إدارة الكود لأنّها
+        كانت تتّبع قاعدة قديمة تمنع الحفظ التلقائيّ. راجعنا كل سطر من عملها بعناية شديدة، أعدنا اختبار كل شيء
+        بأنفسنا من الصفر، ثم حفظناه ونشرناه بالكامل. بعدها، بحثنا عمدًا عن أيّ عمل آخر منسيّ من جلسات أقدم،
+        فوجدنا إصلاحًا ماليًّا واحدًا حقيقيًّا استحضرناه واختبرناه ونشرناه أيضًا. كل شيء الآن على الموقع الحيّ.
+      </p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="gaps">
+    <div class="section-eyebrow">✅ الخطوة الأولى</div>
+    <h2>إغلاق فجوتَي التدقيق</h2>
+    <p class="intro">التقرير السابق ترك نقطتَين مفتوحتَين. هذا ما حدث لكل واحدة منهما.</p>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الفجوة 1</span><h3>إشعار السائق يصل قبل تأكيد الطلب فعليًّا</h3></div>
+      <p class="simple-answer">
+        كانت هذه المشكلة مؤجَّلة لأنّ الملفّ المعنيّ كان لا يزال قيد تعديل من جلسة أخرى. بدأنا بمراقبة الملفّ
+        تلقائيًّا كل 90 ثانية لنعرف اللحظة التي يصبح فيها متاحًا للتعديل.
+      </p>
+      <div class="compare">
+        <div class="box before"><div class="k">قبل</div><p>الإشعار يُرسَل للسائق <b>قبل</b> أن يتأكّد النظام أنّ الطلب حُفظ فعليًّا في قاعدة البيانات.</p></div>
+        <div class="box after"><div class="k">بعد</div><p>الإشعار يُرسَل <b>فقط بعد</b> التأكّد أنّ الطلب حُفظ بنجاح — باستخدام آلية "أخبرني عند الحفظ" داخل قاعدة البيانات نفسها.</p></div>
+      </div>
+      <div class="analogy">
+        <div class="k">تخيّل الأمر هكذا</div>
+        <p>سابقًا: البريد يُرسَل للسائق فور كتابة الرسالة، حتى لو لم تُختَم بعد بختم البريد الرسميّ. الآن: يُرسَل فقط بعد الختم — لا مجال لأن يصل بريد "غير رسميّ".</p>
+      </div>
+      <span class="pill ok">✓ أُصلحت واختُبرت ونُشرت</span>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">الفجوة 2</span><h3>مراجعة Codex الآليّة لميزة عمولة مندوب التسوية</h3></div>
+      <p class="simple-answer">
+        أداة المراجعة الآليّة لن تعود قبل 22 يوليو. جدولنا مهمّة مؤقّتة تعمل تلقائيًّا في ذلك التاريخ لتشغيل
+        المراجعة فور توفّرها، دون الحاجة لتذكيرنا يدويًّا (بشرط بقاء الجلسة مفتوحة حتى ذلك الحين).
+      </p>
+      <span class="pill info">⏳ مجدولة تلقائيًّا — 22 يوليو 2026</span>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="discovery">
+    <div class="section-eyebrow">🔍 الاكتشاف الكبير</div>
+    <h2>القصة الكبرى — كيف وجدنا عملًا كاملًا لم يُحفَظ؟</h2>
+    <p class="intro">أثناء العمل على الفجوة الأولى، أخبرتَنا أنّ الجلسة الأخرى "انتهت وتوقّفت". هذا ما فعلناه للتأكّد من عدم فقدان أيّ شيء.</p>
+
+    <div class="board">
+      <div class="board-row"><div class="icon">🔎</div><div class="txt"><b>الخطوة 1 — التحقّق أوّلًا</b><span>لم نفترض أنّ "انتهت الجلسة" تعني أنّ عملها محفوظ. فحصنا فعليًّا: هل الملفّات لا تزال غير محفوظة؟ النتيجة: نعم، 18 ملفًّا لا يزال بلا حفظ.</span></div></div>
+      <div class="board-row"><div class="icon">📖</div><div class="txt"><b>الخطوة 2 — قراءة التقارير الخاصّة بتلك الجلسة</b><span>وجدنا تقريرَين مكتوبَين من الجلسة نفسها يوثّقان بالتفصيل كل ما أنجزته، ويؤكّدان أنّها اختبرت كل شيء بدقّة قبل التوقّف — لكنّها لم "تحفظ" (commit) لأنّها كانت تتّبع قاعدة قديمة تمنع الحفظ التلقائيّ دون إذن صريح.</span></div></div>
+      <div class="board-row"><div class="icon">✔️</div><div class="txt"><b>الخطوة 3 — تحقّق مستقلّ، لا ثقة عمياء</b><span>لم نكتفِ بتصديق ما قالته التقارير. أعدنا تشغيل كل الاختبارات بأنفسنا من الصفر، وفحصنا سطرًا سطرًا أكبر التعديلات المشكوك في مصدرها.</span></div></div>
+      <div class="board-row"><div class="icon">🧩</div><div class="txt"><b>الخطوة 4 — حلّ لغز ملفّ متشابك</b><span>ملفّ واحد (لوحة تحكّم العمليّات) كان يحتوي على مزيج غامض من التعديلات — احتجنا لفحصه بعناية فائقة لفصل التعديل الحقيقيّ عن مجرّد إعادة تنسيق تلقائيّة للكود (تفاصيل في القسم التالي).</span></div></div>
+      <div class="board-row"><div class="icon">💾</div><div class="txt"><b>الخطوة 5 — الحفظ، ثم النشر</b><span>بعد التحقّق الكامل، حفظنا العمل في 4 التزامات منفصلة ومرتّبة، ونشرناها على المواقع الأربعة كلّها.</span></div></div>
+    </div>
+
+    <h3 style="margin-top:28px;font-size:1.05rem">لغز "لوحة تحكّم العمليّات" — كيف حُلّ؟</h3>
+    <div class="analogy">
+      <div class="k">تخيّل الأمر هكذا</div>
+      <p>
+        تخيّل مستندًا طويلًا جدًّا (أكثر من 800 سطر تغيير) — معظمه مجرّد إعادة ترتيب للفقرات (تنسيق شكليّ، لا يغيّر
+        المعنى) قام به برنامج تلقائيّ مختلف عن البرنامج المعتمَد في المشروع، وسط هذا الركام توجد فقرتان حقيقيّتان
+        جديدتان فعليًّا (نحو 90 سطرًا فقط) تحمل معنى وقيمة حقيقيّة. المهمّة: إيجاد الفقرتَين الحقيقيّتَين وسط
+        الضجيج، والتأكّد أنّه لا يوجد "طرف ثالث" مجهول أضاف شيئًا لم نلاحظه.
+      </p>
+    </div>
+    <p style="color:var(--ink-muted);font-size:0.92rem">
+      فحصنا كل قطعة تغيير أكبر من 10 أسطر على حدة، وأثبتنا (بتشغيل أداة التنسيق الرسميّة للمشروع على النسخة
+      الأصليّة النظيفة) أنّ الشكل الغريب جاء من أداة تنسيق أجنبيّة، لا من محتوى مجهول. النتيجة: فقرتان حقيقيّتان
+      فقط، وكلتاهما موثَّقتان وموثوقتان.
+    </p>
+
+    <div class="plain" style="margin-top:20px">
+      <div class="ic">🛡️</div>
+      <p>
+        <b>لحظة أمان مهمّة:</b> حاولنا في مرحلة من الفحص حذف نسخة الملفّ غير المحفوظة لإعادة كتابتها من الصفر
+        بشكل أنظف — فأوقفنا نظام الأمان الداخليّ هذا الإجراء تلقائيًّا، لأنّه كان سيحذف عملًا حقيقيًّا طلبتَ
+        صراحة مراجعته والحفاظ عليه. كانت رسالة إيقاف صحيحة تمامًا، فغيّرنا الأسلوب: عدّلنا الملفّ الموجود مباشرة
+        بدل حذفه وإعادة كتابته.
+      </p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="whatfixed">
+    <div class="section-eyebrow">🧩 التفاصيل</div>
+    <h2>ماذا يُصلح هذا العمل المكتشَف فعليًّا؟</h2>
+    <p class="intro">قسمان: إصلاحات في الخادم (Backend) وإصلاحات في تطبيق الجوّال.</p>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">خادم 1</span><h3>الدفع بالمحفظة بالكامل كان يتحوّل خطأً إلى "نقدًا"</h3></div>
+      <p class="simple-answer">
+        عندما يدفع العميل 100% من قيمة الطلب من محفظته الإلكترونيّة (بلا أيّ نقد)، كان النظام يتعامل مع الطلب
+        وكأنّه دفع نقديّ بالكامل — بلا أيّ حجز فعليّ من المحفظة! أخطر اكتشاف في هذه الدفعة. أُصلح بتصحيح الشرط
+        البرمجيّ الذي كان يتطلّب وجود دفعتَين (محفظة + نقد) خطأً، بدل قبول محفظة وحدها.
+      </p>
+      <span class="pill crit">أخطر إصلاح ماليّ</span>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">خادم 2</span><h3>طلبات "بلا نقد مطلوب" كانت تتعطّل تمامًا</h3></div>
+      <p class="simple-answer">
+        بعض الطلبات المقسَّمة الدفع لا تحتاج أيّ نقد فعليّ من السائق، لكنّ النظام كان يطلب من السائق تسجيل تحصيل
+        نقديّ إلزاميًّا على أيّ حال — فيعلق السائق تمامًا ولا يستطيع تسليم الطلب. أُصلح بجعل هذا الشرط يظهر فقط
+        عندما يكون هناك مبلغ نقديّ حقيقيّ مستحقّ.
+      </p>
+      <span class="pill crit">إصلاح جمود تشغيليّ</span>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">خادم 3</span><h3>موظّف مُعلَّق كان يستمرّ في الدخول كأنّ شيئًا لم يحدث</h3></div>
+      <p class="simple-answer">
+        عند تعليق حساب سائق أو مزوّد، كان بإمكانه (نظريًّا) البقاء داخل التطبيق عبر آليّة "تجديد الجلسة"
+        التلقائيّة، لأنّ هذه الآليّة لم تكن تتحقّق من الحالة الحقيقيّة للحساب في كل مرّة — كانت تفترض دائمًا أنّ
+        الحساب "نشط". أُصلحت لتتحقّق من الحالة الفعليّة في قاعدة البيانات في كل مرّة يُجدَّد فيها الدخول.
+      </p>
+      <span class="pill crit">إصلاح أمنيّ</span>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">خادم 4</span><h3>رقمان مختلفان لنفس المفهوم: "إيراد اليوم"</h3></div>
+      <p class="simple-answer">
+        كانت هناك طريقتان مختلفتان لحساب "مبيعات اليوم" في مكانَين مختلفَين من لوحة العمليّات — يُعطيان رقمَين
+        مختلفَين لنفس المفهوم! أُصلح بتوحيدهما في مكان واحد. اكتشاف جانبيّ أثناء الإصلاح: طريقة حساب "اليوم" في
+        قاعدة بيانات الاختبار كانت معطوبة تمامًا (تُرجع دائمًا صفرًا) — أُصلحت أيضًا رغم أنّها لم تؤثّر على الموقع الحيّ.
+      </p>
+      <span class="pill warn">توحيد بيانات + إصلاح جانبيّ</span>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">جوّال 1</span><h3>إشعارات السائق الفوريّة كانت معطَّلة تمامًا</h3></div>
+      <p class="simple-answer">
+        نظام "إعادة الاتّصال التلقائيّ" في تطبيق الجوّال، عند انقطاع الاتّصال، كان مضبوطًا بقيمة تُلغي إعادة
+        المحاولة نهائيًّا — أيّ انقطاع بسيط للإنترنت كان يعني توقّف إشعارات الطلبات الجديدة للسائق حتى يُغلق
+        التطبيق ويُعيد فتحه يدويًّا.
+      </p>
+      <span class="pill crit">إصلاح حرج</span>
+    </div>
+
+    <div class="feature">
+      <div class="fhead"><span class="fnum">جوّال 2</span><h3>تسريب بيانات بين حسابين على نفس الجهاز</h3></div>
+      <p class="simple-answer">
+        عندما يستخدم أكثر من شخص نفس الجهاز (تسجيل خروج ودخول بحساب آخر)، كانت الطلبات المحفوظة محليًّا (بلا
+        إنترنت) يمكن أن "تُعاد" باسم المستخدم الجديد رغم أنّها تخصّ المستخدم السابق. أُصلح بربط كل طلب محفوظ
+        محليًّا بهويّة صاحبه الأصليّ، ورفض إعادة أيّ طلب لا يخصّ المستخدم الحاليّ.
+      </p>
+      <span class="pill crit">إصلاح خصوصيّة</span>
+    </div>
+
+    <div class="plain">
+      <div class="ic">📋</div>
+      <p>هذه أبرز 6 إصلاحات فقط. القائمة الكاملة تضمّ أيضًا: مؤقّت حضور السائق، عدم ازدواجيّة معاملات التسوية، احترام إعدادات إشعارات الدفع، وإصلاحات أصغر أخرى — كلّها موثَّقة بالتفصيل في رسائل الحفظ (commits) نفسها.</p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="investigation">
+    <div class="section-eyebrow">🕵️</div>
+    <h2>التحقيق الإضافي — هل هناك عمل آخر من جلسات أقدم؟</h2>
+    <p class="intro">بعد إنجاز الاكتشاف الكبير أعلاه، سألتَ سؤالًا أوسع: هل توجد أشياء أخرى منسيّة؟ هذا ما فحصناه.</p>
+
+    <div class="board">
+      <div class="board-row">
+        <div class="icon">📦</div>
+        <div class="txt"><b>3 نسخ "مؤجَّلة" (Git Stash)</b><span>فحصناها الثلاث — تبيّن أنّ كل واحدة منها إمّا مطبَّقة بالفعل في الكود الحاليّ، أو مكرَّرة لعمل أُنجز في مكان آخر بالفعل. <b>لا حاجة لأيّ إجراء.</b></span></div>
+      </div>
+      <div class="board-row">
+        <div class="icon">🌿</div>
+        <div class="txt"><b>5 فروع عمل محليّة أخرى (Git Branches)</b><span>فحصنا كل فرع: اثنان كانا مطابقَين تمامًا لعملنا الحاليّ (لا شيء جديد)، وفرعان يحتويان على نسخة سابقة من إصلاح واجهة استعادة التسوية — تبيّن أنّه <b>موجود بالفعل ومُحسَّن أكثر</b> في نسختنا. وفرع واحد يحتوي إصلاحًا ماليًّا حقيقيًّا جديدًا (التفاصيل في القسم التالي).</span></div>
+      </div>
+      <div class="board-row">
+        <div class="icon">🌳</div>
+        <div class="txt"><b>الفرع الرئيسيّ (master)</b><span>بدا "متقدّمًا" بآلاف الأسطر، لكن تبيّن أنّ هذا مجرّد أثر طبيعيّ لكون فرعنا قد تطوّر لمسافة كبيرة منذ آخر مزامنة — لا محتوى حقيقيّ مفقود.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="ledgerfix">
+    <div class="section-eyebrow">💰 الاكتشاف الثاني</div>
+    <h2>إصلاح تسمية حساب المحاسبة</h2>
+    <p class="intro">الشيء الحقيقيّ الوحيد الذي وجدناه في هذا التحقيق الإضافي — إصلاح ماليّ صحيح ومُختبَر جيّدًا، لكنّه لم يصل لفرعنا قط.</p>
+
+    <div class="analogy">
+      <div class="k">تخيّل الأمر هكذا</div>
+      <p>
+        تخيّل دفترَي حسابات منفصلَين في الشركة: "مستحقّات المطاعم" و"مستحقّات السائقين". كان النظام يسجّل تسويات
+        السائقين الماليّة عن طريق الخطأ في دفتر "مستحقّات المطاعم" بدل دفترهم الخاصّ — المبلغ صحيح والحساب متوازن
+        تمامًا، لكن التصنيف في التقارير الماليّة كان خاطئًا: تظهر مستحقّات السائقين وكأنّها مستحقّات مطاعم.
+      </p>
+    </div>
+
+    <div class="compare">
+      <div class="box before"><div class="k">قبل الإصلاح</div><p>كل تسوية ماليّة لسائق تُسجَّل تحت حساب باسم "مستحقّ_للمطعم_{رقم السائق}" — تصنيف خاطئ في التقارير.</p></div>
+      <div class="box after"><div class="k">بعد الإصلاح</div><p>تسوية السائق تُسجَّل تحت حساب باسم "مستحقّ_للسائق_{رقم السائق}" الصحيح — تصنيف دقيق من الآن فصاعدًا.</p></div>
+    </div>
+
+    <p style="color:var(--ink-muted);font-size:0.92rem">
+      الإصلاح يشمل أيضًا أداة "تصحيح تلقائيّة" لأيّ بيانات قديمة سُجِّلت خطأً قبل هذا الإصلاح — لكن كما سيتّضح في
+      القسم الأخير، تبيّن أنّ الموقع الحيّ لم يكن لديه أصلًا أيّ بيانات قديمة تحتاج تصحيحًا.
+    </p>
+    <span class="pill ok">✓ رُوجع، اختُبر (4 اختبارات جديدة + 257 اختبار مرتبط)، ونُشر</span>
+  </section>
+
+  <hr class="div">
+
+  <section id="deploy">
+    <div class="section-eyebrow">🚀</div>
+    <h2>جولات النشر الثلاث</h2>
+    <p class="intro">كل مجموعة إصلاحات مرّت بنفس المسار الآمن — بناء، اختبار، ثم نشر على المواقع الأربعة واحدًا تلو الآخر.</p>
+
+    <div class="pipeline">
+      <div class="pl-stage"><div class="pl-node">📦</div><div class="t">GitHub</div><div class="d">حفظ الكود</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🧫</div><div class="t">test 1</div><div class="d">تجربة أولى</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node">🧫</div><div class="t">test .194</div><div class="d">تجربة ثانية</div></div>
+      <div class="pl-arrow"><svg viewBox="0 0 22 12"><path d="M2 6 H20 M15 2 L20 6 L15 10"/></svg></div>
+      <div class="pl-stage"><div class="pl-node" style="background:var(--accent);border-color:var(--accent-deep);color:#fff;">🌐</div><div class="t">الموقع الحيّ</div><div class="d">tawanow.com</div></div>
+    </div>
+
+    <div class="round-block">
+      <h4>🔵 الجولة الأولى — العمل المكتشَف (5 التزامات)</h4>
+      <p class="faint">إصلاحات الخادم والجوّال + إصلاحنا الخاصّ لإشعار السائق الفوريّ.</p>
+      <div class="targets-grid">
+        <div class="target-card"><div class="icon">📦</div><div class="name">GitHub</div><span class="pill ok">✓</span></div>
+        <div class="target-card"><div class="icon">🧫</div><div class="name">test 1</div><span class="pill ok">✓ صحّيّ</span></div>
+        <div class="target-card"><div class="icon">🧫</div><div class="name">test .194</div><span class="pill ok">✓ صحّيّ</span></div>
+        <div class="target-card"><div class="icon">🌐</div><div class="name">الموقع الحيّ</div><span class="pill ok">✓ صحّيّ بإذنك</span></div>
+      </div>
+    </div>
+
+    <div class="round-block">
+      <h4>🟡 الجولة الثانية — توثيق فقط (بلا كود)</h4>
+      <p class="faint">حفظنا 3 ملفّات تقارير كانت موصوفة لكن غير محفوظة، لإكمال السجلّ التاريخيّ للمشروع.</p>
+      <div class="targets-grid">
+        <div class="target-card"><div class="icon">📦</div><div class="name">GitHub فقط</div><span class="pill neutral">توثيق، لا يحتاج نشرًا</span></div>
+      </div>
+    </div>
+
+    <div class="round-block">
+      <h4>🟢 الجولة الثالثة — إصلاح حساب المحاسبة</h4>
+      <p class="faint">استحضار الإصلاح الماليّ من فرعه المنفصل، اختباره من جديد، ونشره.</p>
+      <div class="targets-grid">
+        <div class="target-card"><div class="icon">📦</div><div class="name">GitHub</div><span class="pill ok">✓</span></div>
+        <div class="target-card"><div class="icon">🧫</div><div class="name">test 1</div><span class="pill ok">✓ صحّيّ</span></div>
+        <div class="target-card"><div class="icon">🧫</div><div class="name">test .194</div><span class="pill ok">✓ صحّيّ</span></div>
+        <div class="target-card"><div class="icon">🌐</div><div class="name">الموقع الحيّ</div><span class="pill ok">✓ صحّيّ بإذنك</span></div>
+      </div>
+    </div>
+
+    <div class="plain" style="border-color:var(--warn-border);background:var(--warn-bg)">
+      <div class="ic">⚠️</div>
+      <p style="color:var(--warn-ink)">
+        <b>احتياط تكرّر في الجولتَين الأولى والثالثة:</b> في وقت النشر، كانت هناك تعديلات أخرى غير محفوظة من جلسة
+        عمل مختلفة لا تزال جارية على نفس المشروع. الطريقة المعتادة للنشر كانت ستأخذ "كل ما هو موجود حاليًّا"،
+        فاستخدمنا بدلًا من ذلك نسخة معزولة تحتوي فقط على الكود المحفوظ رسميًّا والمُختبَر، لضمان ألّا يصل أيّ كود
+        غير جاهز لعملائكم الحقيقيّين.
+      </p>
+    </div>
+
+    <h3 style="margin-top:24px;font-size:1rem">نتائج الفحص الحيّ على الموقع الفعليّ (كلتا الجولتين)</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>ما فُحص</th><th>النتيجة</th></tr></thead>
+        <tbody>
+          <tr><td>الصفحة الرئيسيّة</td><td><span class="pill ok">200 — تعمل</span></td></tr>
+          <tr><td>خدمة فحص صحّة الخادم</td><td><span class="pill ok">200 — تعمل</span></td></tr>
+          <tr><td>خدمة الجاهزية الكاملة</td><td><span class="pill ok">200 — تعمل</span></td></tr>
+          <tr><td>مطابقة محتوى الملفّات الحسّاسة حرفًا بحرف بين الجهاز المحليّ والموقع الحيّ</td><td><span class="pill ok">مطابقة تامّة</span></td></tr>
+          <tr><td>بصمة ملفّات الأمان الماليّ (FIN-COR)</td><td><span class="pill ok">ثابتة بلا تغيير</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="backup">
+    <div class="section-eyebrow">💾</div>
+    <h2>النسخة الاحتياطيّة والتحقّق النهائيّ</h2>
+    <p class="intro">قبل تطبيق أداة "التصحيح التلقائيّ" على بيانات الموقع الحيّ، طلبتَ نسخة احتياطيّة أوّلًا.</p>
+
+    <div class="timeline">
+      <div class="t-step">
+        <div class="th">تشغيل النسخة الاحتياطيّة يدويًّا وفوريًّا</div>
+        <div class="td">نسخة كاملة وطازجة لقاعدة البيانات الحيّة (14.6 ميغابايت)، نجحت بالكامل، منفصلة عن النسخة اليوميّة التلقائيّة الموجودة أصلًا.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">تشغيل تجريبيّ آمن أوّلًا (Dry-Run)</div>
+        <div class="td">شغّلنا أداة التصحيح في وضع "عرض فقط، بلا كتابة" لنرى ماذا كانت ستفعل قبل تنفيذها فعليًّا. النتيجة: صفر صفوف تحتاج تصحيحًا.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">التنفيذ الفعليّ للتأكيد</div>
+        <div class="td">شغّلناها مرّة أخرى بوضع التنفيذ الفعليّ، فأكّدت نفس النتيجة: صفر تغييرات — الموقع الحيّ لم يكن لديه أصلًا أيّ بيانات قديمة خاطئة التصنيف لتصحيحها.</div>
+      </div>
+      <div class="t-step">
+        <div class="th">تحقّق نهائيّ من سلامة كل شيء</div>
+        <div class="td">بصمة ملفّات الأمان الماليّ لم تتغيّر، والخادم لا يزال يعمل بصحّة جيّدة بعد كل هذه العمليّات.</div>
+      </div>
+    </div>
+
+    <div class="plain">
+      <div class="ic">✅</div>
+      <p><b>لماذا كانت النتيجة صفرًا؟</b> لأنّ هذه الميزة الماليّة (تسويات السائقين) لم تُستخدَم بعد فعليًّا على بيانات حقيقيّة على الموقع الحيّ — المنصّة لا تزال في مرحلة التجربة الداخليّة فقط. الإصلاح الآن مطبَّق وجاهز، بحيث إذا بدأ استخدام هذه الميزة مستقبلًا، ستُسجَّل البيانات بشكل صحيح من اليوم الأوّل.</p>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <section id="conclusion">
+    <div class="section-eyebrow">🏁</div>
+    <h2>الخلاصة</h2>
+    <ul class="simple-list">
+      <li><b>فجوتا التدقيق:</b> إحداهما أُغلقت بالكامل، والأخرى مجدولة تلقائيًّا لـ22 يوليو.</li>
+      <li><b>العمل المكتشَف من الجلسة المنتهية:</b> رُوجع بدقّة شديدة، أُعيد اختباره بالكامل من الصفر، وحُفظ في 4 التزامات منظَّمة، ونُشر على المواقع الأربعة.</li>
+      <li><b>التحقيق الإضافيّ:</b> وجد إصلاحًا ماليًّا حقيقيًّا واحدًا فقط (بين كل ما فُحص)، واستُحضر واختُبر ونُشر أيضًا.</li>
+      <li><b>الأمان الماليّ:</b> لم يتأثّر ولو مرّة واحدة عبر كل هذه العمليّات — تحقّقنا منه بعد كل خطوة.</li>
+      <li><b>المتبقّي الوحيد:</b> مراجعة Codex الآليّة لميزة عمولة مندوب التسوية، مجدولة تلقائيًّا لـ22 يوليو.</li>
+    </ul>
+  </section>
+
+  <footer>
+    تووا (Tawa) — تقرير رقم 500 · 2026-07-16 · الفرع <code>fix/464-full-remediation-2026-07-10</code> · آخر التزام منشور <code>2bc7399</code>
+  </footer>
+
+</div>

@@ -1,0 +1,304 @@
+<title>559 — فحص عميق: كيف يعمل Tawa Trade وكيف يرتبط بمنصة توا</title>
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74;
+  --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c;
+  --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0;
+  --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  direction:rtl;line-height:1.7;max-width:980px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:72ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.86em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.82em}
+a{color:var(--accent2)}
+
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.85em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:130px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.6em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.78em}
+
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+.callout.good{border-inline-start:5px solid var(--good)}
+.callout.bad{border-inline-start:5px solid var(--bad)}
+
+section{margin:44px 0}
+section > h2{font-size:1.4em;padding-bottom:10px;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:10px}
+section > h2 .n{font-family:var(--mono);color:var(--sub);font-size:.7em}
+
+.chip{display:inline-block;font-size:.72em;font-weight:700;padding:2px 9px;border-radius:999px;margin-inline-end:5px;white-space:nowrap}
+.chip.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.chip.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.chip.good{background:color-mix(in srgb,var(--good) 16%,transparent);color:var(--good)}
+.chip.info{background:color-mix(in srgb,var(--info) 16%,transparent);color:var(--info)}
+.chip.corr{background:color-mix(in srgb,var(--corr) 16%,transparent);color:var(--corr)}
+
+.finding{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:16px 0}
+.finding h3{margin:0 0 6px;font-size:1.08em;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.finding .meta-row{color:var(--sub);font-size:.85em;margin-bottom:10px}
+.finding .files{font-family:var(--mono);font-size:.8em;color:var(--sub);direction:ltr;text-align:left}
+
+.correction-box{background:color-mix(in srgb,var(--corr) 7%,var(--panel));border:1px dashed var(--corr);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.correction-box b{color:var(--corr)}
+.decision-box{background:color-mix(in srgb,var(--warn) 8%,var(--panel));border:1px solid var(--warn);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.decision-box b{color:var(--warn)}
+.solved-box{background:color-mix(in srgb,var(--good) 8%,var(--panel));border:1px solid var(--good);
+  border-radius:8px;padding:10px 14px;margin:10px 0;font-size:.93em}
+.solved-box b{color:var(--good)}
+
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.88em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--line);font-weight:700}
+tr:nth-child(even) td{background:color-mix(in srgb,var(--line) 35%,transparent)}
+
+/* diagrams */
+.venn{display:flex;align-items:center;justify-content:center;gap:0;margin:24px 0;flex-wrap:wrap}
+.venn .circle{width:220px;height:220px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:20px;font-size:.85em;border:2px solid var(--line)}
+.venn .c1{background:color-mix(in srgb,var(--info) 12%,var(--panel));border-color:var(--info);margin-inline-end:-55px;z-index:1}
+.venn .c2{background:color-mix(in srgb,var(--accent) 12%,var(--panel));border-color:var(--accent);margin-inline-start:-55px;z-index:1}
+.venn .overlap-label{position:relative;z-index:2;background:var(--panel);border:2px solid var(--corr);border-radius:10px;
+  padding:8px 12px;font-size:.78em;font-weight:800;color:var(--corr);margin:0 -70px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+
+.flow{display:flex;flex-wrap:wrap;gap:0;align-items:stretch;margin:20px 0}
+.flow .step{flex:1;min-width:140px;background:var(--panel);border:2px solid var(--line);border-radius:10px;
+  padding:14px 12px;text-align:center;font-size:.85em;position:relative}
+.flow .step b{display:block;font-size:1.1em;margin-bottom:4px}
+.flow .step.good{border-color:var(--good)}
+.flow .step.bad{border-color:var(--bad)}
+.flow .arrow{display:flex;align-items:center;justify-content:center;font-size:1.4em;color:var(--sub);padding:0 6px}
+
+.stack{display:flex;flex-direction:column;gap:8px;margin:20px 0}
+.stack .layer{background:var(--panel);border:2px solid var(--line);border-radius:10px;padding:12px 18px;font-size:.9em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.stack .layer.shared{border-color:var(--good);background:color-mix(in srgb,var(--good) 6%,var(--panel))}
+.stack .layer.trade-only{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,var(--panel))}
+.stack .layer .tag{font-size:.75em;font-weight:700;padding:2px 10px;border-radius:999px}
+.stack .layer.shared .tag{background:color-mix(in srgb,var(--good) 20%,transparent);color:var(--good)}
+.stack .layer.trade-only .tag{background:color-mix(in srgb,var(--accent) 20%,transparent);color:var(--accent)}
+
+.target-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
+.target-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.target-card h4{margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.target-card .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.target-card .dot.live{background:var(--info)}
+.target-card ul{margin:6px 0 0;padding-inline-start:18px;font-size:.85em;color:var(--sub)}
+
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+</style>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 559 · فحص عميق حيّ · يبني على تقارير 550-554 ويحدِّثها بأدلّة من الكود الحيّ اليوم</div>
+  <h1>Tawa Trade: كيف يعمل، وكيف يرتبط بمنصّة توا الأساسيّة — بدقّة الكود الحيّ</h1>
+  <div class="meta">
+    فحص مزدوج ومستقلّ: (أ) استخلاص من 3 تقارير سابقة موثَّقة عن Trade، (ب) تحقّق حيّ مستقلّ بقراءة الكود الفعلي اليوم وتشغيل استعلامات مباشرة على قواعد البيانات الحيّة الثلاث · 2026-07-25
+  </div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>مدمج</b><span>Trade جزء من نفس التطبيق، لا تطبيق منفصل</span></div>
+  <div class="stat"><b>نفس السجل الماليّ</b><span>يستخدم نفس محرّك المحاسبة الذي تستخدمه توا بالضبط</span></div>
+  <div class="stat"><b>1</b><span>خطر حقيقي مكتشَف: يختلط بأرقام توا الماليّة الإجماليّة بصمت</span></div>
+  <div class="stat"><b>0</b><span>بيانات تجارة حقيقيّة موجودة الآن على أي بيئة — الخطر كامن لا واقع بعد</span></div>
+  <div class="stat"><b>منشور فعليًّا</b><span>على الموقع الحقيقي tawanow.com، وليس مجرّد كود جاهز</span></div>
+</div>
+
+<div class="callout method">
+  <b>منهجيّة هذا التقرير:</b> جرى فحصان مستقلّان بالتوازي ثم قورنا النتائج: فحص أوّل قرأ التقارير الخمسة السابقة عن Trade (550 حتى 554) لاستخلاص كل ما كان معروفًا ومُخطَّطًا له، وفحص ثانٍ مستقلّ تمامًا قرأ الكود الحيّ اليوم من الصفر (بلا الرجوع للتقارير القديمة إطلاقًا) للتأكّد من أن ما كُتب سابقًا ما زال صحيحًا الآن. ثم أُضيف تحقّق ثالث: استعلامات SQL مباشرة على قواعد بيانات المواقع الثلاثة الحيّة (test1، test، Production) للتأكّد ممّا إذا كان Trade "منشورًا فقط" أم "يُستخدَم فعليًّا ببيانات حقيقيّة".
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li>الخلاصة بلغة بسيطة</li>
+    <li>ما هو Tawa Trade؟</li>
+    <li>ما المشترك بينهما، وما المنفصل؟ (رسم توضيحي)</li>
+    <li>النقطة الأهمّ: هل يؤثّر أحدهما على الآخر ماليًّا؟</li>
+    <li>هل الواجهة الأماميّة مرتبطة ببعضها؟</li>
+    <li>الخطر الحقيقي المكتشَف اليوم</li>
+    <li>هل Trade "منشور فقط" أم "يُستخدَم فعليًّا"؟</li>
+    <li>ما تغيَّر منذ آخر تقرير (554، قبل يومين)</li>
+    <li>الخلاصة والتوصية</li>
+  </ol>
+</div>
+
+<section id="simple">
+  <h2><span class="n">§1</span> الخلاصة بلغة بسيطة</h2>
+  <p>
+    <b>Tawa Trade</b> ليس موقعًا أو تطبيقًا منفصلًا — إنّه قسم إضافي داخل نفس منصّة توا نفسها، مبنيّ لخدمة تجارة جديدة كليًّا: بدل أن يشتري عميل عاديّ وجبة من مطعم، هنا "مزوّد" (مطعم أو متجر مسجَّل في توا) يشتري بضاعة بالجملة من "مورّد" (مصنع أو تاجر جملة) عبر النظام. المزوّدون موجودون بالفعل في توا، لكن المورّدين كيان جديد كليًّا لا يملك تسجيل دخول خاصًّا به — موظّفو العمليّات (OPS) هم من يسجّلون كل قرار للمورّد نيابة عنه، لأن التنسيق معه يتمّ اليوم بالهاتف والورق خارج التطبيق.
+  </p>
+  <p>
+    <b>الإجابة المباشرة عن سؤالك:</b> نعم، Trade مرتبط بمنصّة توا بإحكام في كل شيء يهمّ: نفس تسجيل الدخول، نفس نظام الصلاحيّات، نفس قائمة التنقّل في لوحة العمليّات، ونفس السجلّ الماليّ (دفتر الأستاذ) الذي تُبنى عليه كل تقارير الأرباح والخسائر في توا. لا يوجد "نظامان منفصلان" — هو نظام واحد بقسمين.
+  </p>
+  <p>
+    <b>لكن هذا الارتباط له ثمن اكتشفناه اليوم:</b> بسبب استخدام نفس السجلّ الماليّ بالضبط، فإن أي خطأ في حساب فاتورة أو عمولة داخل Trade سينعكس مباشرة على الأرقام الإجماليّة التي تراها الإدارة في تقرير الأرباح والخسائر العام لتوا كلّها — بلا أي فصل واضح بينهما في تلك الشاشة. هذا ليس خطأً حدث بالفعل (لا توجد أي بيانات تجارة حقيقيّة حتى الآن على أي موقع)، لكنّه خطر حقيقي كامن إن بدأ استخدام Trade فعليًّا دون إصلاح هذه النقطة أوّلًا.
+  </p>
+  <div class="callout good">
+    <b>الخبر الجيّد:</b> الخطر اليوم <u>نظري بحت</u> — تحقّقنا مباشرة من قواعد البيانات الثلاث (test1، test، Production) ولا توجد فيها أي بيانات Trade حقيقيّة إطلاقًا (صفر مورّدين، صفر طلبات شراء، صفر فواتير). النظام جاهز ويعمل، لكن لم يستخدمه أحد فعليًّا بعد — أي أن هذا وقت مثاليّ لإصلاح الخطر قبل أن يصبح واقعًا.
+  </div>
+</section>
+
+<section id="what-is-trade">
+  <h2><span class="n">§2</span> ما هو Tawa Trade؟</h2>
+  <p>نظام تجارة جملة (B2B) مبنيّ فوق منصّة توا القائمة، بدورة عمل من 6 خطوات:</p>
+  <div class="flow">
+    <div class="step"><b>1</b>OPS يسجّل مورّدًا وكتالوج بضاعته</div>
+    <div class="arrow">←</div>
+    <div class="step"><b>2</b>مزوّد يتصفّح الكتالوج ويحجز بضاعة</div>
+    <div class="arrow">←</div>
+    <div class="step"><b>3</b>يُصدَر أمر شراء</div>
+    <div class="arrow">←</div>
+    <div class="step"><b>4</b>OPS يسجّل الشحنة عند وصولها</div>
+    <div class="arrow">←</div>
+    <div class="step good"><b>5أ</b>تطابق ✓ → فاتورة + قيد ماليّ</div>
+    <div class="arrow">←</div>
+    <div class="step bad"><b>5ب</b>خلل ✗ → قضيّة تُفتح، لا قيد ماليّ</div>
+  </div>
+  <p>الكيانات الأساسيّة: <code>TradeSupplier</code> (المورّد)، <code>TradeProduct</code>، <code>TradeReservation</code>، <code>TradePurchaseOrder</code>، <code>TradeShipment</code>، <code>TradeGoodsReceipt</code>، <code>TradeInvoice</code>، إضافةً لجدول عام لتتبّع القضايا <code>WorkItem</code>.</p>
+</section>
+
+<section id="shared-vs-separate">
+  <h2><span class="n">§3</span> ما المشترك بينهما، وما المنفصل؟</h2>
+  <p>هذا رسم يوضّح كل طبقة من طبقات النظام، وهل Trade تشاركها مع باقي توا أم تملك نسخة خاصّة بها:</p>
+
+  <div class="stack">
+    <div class="layer shared"><span>تسجيل الدخول + التحقّق من الهويّة (JWT)</span><span class="tag">مشترك 100%</span></div>
+    <div class="layer shared"><span>نظام الصلاحيّات (منح/سحب صلاحيّة لكل موظّف)</span><span class="tag">مشترك — نفس المحرّك، صلاحيّات Trade جديدة فقط</span></div>
+    <div class="layer trade-only"><span>جداول قاعدة البيانات (الموردون، أوامر الشراء، الفواتير...)</span><span class="tag">خاصّة بـTrade بالكامل</span></div>
+    <div class="layer shared"><span><b>السجلّ الماليّ (دفتر الأستاذ) — القيود المحاسبيّة</b></span><span class="tag">مشترك 100% — نفس الجداول بالضبط</span></div>
+    <div class="layer shared"><span>الإشعارات، سجلّ التدقيق، تخزين الملفّات، النشر الفوري (SSE)</span><span class="tag">مشترك</span></div>
+    <div class="layer trade-only"><span>محفظة العميل الفرديّة (Wallet)</span><span class="tag">Trade لا يستخدمها إطلاقًا</span></div>
+    <div class="layer trade-only"><span>نظام الطلبات ونظام السائقين (Order / Driver)</span><span class="tag">Trade لا يلمسهما إطلاقًا — لا صلة أساسًا</span></div>
+    <div class="layer shared"><span>لوحة تنقّل العمليّات (Nav) — نفس القائمة الجانبيّة</span><span class="tag">مشترك — Trade قسم عاشر فيها فقط</span></div>
+  </div>
+
+  <div class="venn">
+    <div class="circle c1">منصّة توا الأساسيّة<br><small>(توصيل، محافظ، سائقون)</small></div>
+    <div class="overlap-label">السجلّ الماليّ<br>المشترك</div>
+    <div class="circle c2">Tawa Trade<br><small>(موردون، أوامر شراء)</small></div>
+  </div>
+  <p style="text-align:center;color:var(--sub);font-size:.85em">التقاطع في المنتصف هو بالضبط مصدر الخطر الموضَّح في §4 — كل شيء آخر تقريبًا منفصل بوضوح.</p>
+</section>
+
+<section id="financial">
+  <h2><span class="n">§4</span> النقطة الأهمّ: هل يؤثّر أحدهما على الآخر ماليًّا؟</h2>
+  <p><b>نعم، عبر مسار واحد محدَّد بدقّة: السجلّ الماليّ المشترك.</b></p>
+  <p>عندما تُطابَق شحنة وارِدة مع أمر الشراء بنجاح، يُسجَّل قيد محاسبي حقيقي في نفس نظام المحاسبة الذي تُبنى عليه محافظ توا وعمولات المزوّدين:</p>
+  <pre>DR  TRADE_BUYER_RECEIVABLE_{المزوّد}   4500
+CR  TRADE_SUPPLIER_PAYABLE_{المورّد}   4050
+CR  TRADE_REVENUE (عمولة توا)           450</pre>
+  <p>هذا مبنيّ عمدًا وبإذن تشغيليّ صريح — <b>وليس خطأً</b>. الفكرة الصحيحة هي: بدل بناء نظام محاسبة موازٍ من الصفر لـTrade (خطر أكبر بكثير)، أُعيد استخدام نظام المحاسبة المُختبَر والموثوق في توا، مع إضافة بادئة <code>TRADE_</code> لأسماء الحسابات لتمييزها.</p>
+
+  <div class="finding">
+    <h3>ملاحظة مهمّة: توثيق قديم متناقض داخل الكود نفسه</h3>
+    <p>وجد الفحص الحيّ أن أعلى ملفّ <code>trade.py</code> (الذي يحدّد جداول Trade) لا يزال يحتوي تعليقًا قديمًا يقول إن "تسجيل القيود المحاسبيّة مؤجَّل عمدًا، لا يُسجَّل أي قيد أبدًا" — وهذا <b>لم يعد صحيحًا</b>. توثيق أحدث داخل نفس الملفّ (عند تعريف <code>TradeInvoice</code>) يؤكّد أن التسجيل الفعلي مُنفَّذ وحيّ بإذن تشغيليّ. أي شخص يقرأ فقط أعلى الملفّ سيصل لاستنتاج خاطئ. يُنصَح بتحديث ذلك التعليق القديم لتفادي التباس مستقبلي — أمر تنظيمي بسيط، لا عيب وظيفي.</p>
+  </div>
+</section>
+
+<section id="frontend">
+  <h2><span class="n">§5</span> هل الواجهة الأماميّة مرتبطة ببعضها؟</h2>
+  <p><b>نعم بوضوح — Trade ليس تطبيقًا منفصلًا في الواجهة أيضًا.</b> صفحات Trade (نظرة عامّة، الموردون، أوامر الشراء، الفواتير، القضايا) مسجَّلة في <b>نفس</b> جدول التوجيه (routing) الذي تستخدمه كل صفحات لوحة العمليّات الأخرى، وتظهر كقسم عاشر عاديّ في نفس القائمة الجانبيّة — لا نافذة منبثقة منفصلة ولا رابط خارجي.</p>
+  <div class="flow">
+    <div class="step good"><b>✓</b>تسجيل الدخول: مشترك</div>
+    <div class="arrow">←</div>
+    <div class="step good"><b>✓</b>جدول التوجيه: نفس الجدول</div>
+    <div class="arrow">←</div>
+    <div class="step good"><b>✓</b>القائمة الجانبيّة: نفس القائمة</div>
+    <div class="arrow">←</div>
+    <div class="step good"><b>✓</b>حماية الصلاحيّات: نفس الآليّة</div>
+  </div>
+  <div class="decision-box"><b>ملاحظة صغيرة موروثة (ليست خاصّة بـTrade):</b> ظهور رابط Trade في القائمة الجانبيّة مبنيّ على دور الموظّف العامّ، لا على الصلاحيّة الدقيقة الممنوحة له فعليًّا — قد يرى موظّف الرابط قبل أن يُمنَح صلاحيّة الوصول الفعليّة، فيصطدم برفض عند الضغط. هذه فجوة معروفة سابقًا في نظام لوحة العمليّات كلّها (ليست جديدة ولا خاصّة بـTrade)، والحماية الحقيقيّة (رفض الوصول الفعلي) تعمل بشكل صحيح من جهة الخادم دائمًا.</div>
+</section>
+
+<section id="risk">
+  <h2><span class="n">§6</span> الخطر الحقيقي المكتشَف اليوم</h2>
+  <div class="finding">
+    <h3>اختلاط أرقام Trade الماليّة بأرقام توا الإجماليّة بصمت <span class="chip warn">خطر هيكلي، لا عيب حادث بعد</span></h3>
+    <p>تقارير الأرباح والخسائر، وميزان المراجعة، والميزانيّة العموميّة في توا (التي يستخدمها فريق الإدارة والماليّة) تجمع كل القيود المحاسبيّة حسب نوع الحساب (إيراد/أصل/التزام) <b>بلا أي استثناء لحسابات Trade</b>. هذا يعني أن أي مبلغ يُسجَّل تحت <code>TRADE_REVENUE</code> سيُجمَع تلقائيًّا مع <code>PLATFORM_REVENUE</code> (إيراد التوصيل العادي) في رقم "الإيراد الإجمالي" الواحد الذي تراه الإدارة — بلا سطر منفصل يوضّح "هذا من التوصيل، وهذا من Trade".</p>
+    <div class="correction-box"><b>لماذا هذا خطر حقيقي:</b> لو حدث خطأ برمجي يومًا ما في حساب عمولة Trade (مثلًا نسبة خاطئة، أو حساب مضاعف)، فسيظهر الخطأ كتشوّه في "ربحيّة توا الإجماليّة" التي تعتمد عليها القرارات الإداريّة — دون أن يكون واضحًا للفريق الماليّ أن المصدر هو Trade تحديدًا، لا خدمة التوصيل الأساسيّة. القيود نفسها قابلة للتمييز تقنيًّا (لها بادئة <code>TRADE_</code> واضحة)، لكن لا توجد شاشة أو تقرير جاهز اليوم يفصلها تلقائيًّا عن الباقي.</div>
+    <div class="decision-box"><b>الإصلاح المقترَح (قرار هندسي بسيط، لا يحتاج إعادة بناء):</b> إضافة استثناء لحسابات <code>TRADE_%</code> في استعلامات تقارير الأرباح والميزانيّة، أو — الأفضل — بناء تقرير Trade مخصَّص منفصل (على نمط تقرير "إكراميّات السائقين" الموجود بالفعل والذي يفلتر بنفس الطريقة). هذا عمل من نصف يوم إلى يوم، غير عاجل لأنّه لا توجد بيانات حقيقيّة بعد، لكن يُنصَح بإنجازه <b>قبل</b> أي استخدام تجاري حقيقي أوّل، لا بعده.</div>
+  </div>
+</section>
+
+<section id="live-status">
+  <h2><span class="n">§7</span> هل Trade "منشور فقط" أم "يُستخدَم فعليًّا"؟</h2>
+  <p>تحقّقنا مباشرة من قواعد البيانات الحيّة الثلاث بالاستعلام الفعلي (لا افتراض):</p>
+  <div class="target-grid">
+    <div class="target-card">
+      <h4><span class="dot live"></span> Production — tawanow.com</h4>
+      <ul>
+        <li>الكود منشور وحيّ فعليًّا — الروابط تعمل، الصلاحيّات تعمل</li>
+        <li>الموردون: <b>0</b> · أوامر الشراء: <b>0</b> · الفواتير: <b>0</b></li>
+        <li>لا قيود محاسبيّة لـTrade مسجَّلة إطلاقًا حتى الآن</li>
+      </ul>
+    </div>
+    <div class="target-card">
+      <h4><span class="dot live"></span> test1</h4>
+      <ul><li>الموردون: <b>0</b> · أوامر الشراء: <b>0</b> · الفواتير: <b>0</b></li>
+      <li>بيانات التجربة الحيّة السابقة (تقرير 554) نُظِّفت كما كان مخطَّطًا</li></ul>
+    </div>
+    <div class="target-card">
+      <h4><span class="dot live"></span> test (.194)</h4>
+      <ul><li>الموردون: <b>0</b> · أوامر الشراء: <b>0</b> · الفواتير: <b>0</b></li></ul>
+    </div>
+  </div>
+  <div class="callout good">
+    <b>الخلاصة:</b> Trade "جاهز ومنشور تقنيًّا" في كل مكان، لكن "لم يُستخدَم تجاريًّا" في أي مكان بعد. لا يوجد مورّد حقيقي واحد مسجَّل، ولا صفقة واحدة تمّت. هذا يعني أن التقرير 554 (الذي قال "جاهز للتجربة، غير جاهز للإنتاج") لم يُخالَف عمليًّا رغم أن الكود وصل الآن فعليًّا لموقع الإنتاج — لأن أحدًا لم يبدأ استخدامه هناك بعد.
+  </div>
+</section>
+
+<section id="whats-changed">
+  <h2><span class="n">§8</span> ما تغيَّر منذ آخر تقرير (554، قبل يومين)</h2>
+  <table>
+    <tr><th>النقطة</th><th>ما قاله تقرير 554 (قبل يومين)</th><th>الوضع الفعلي اليوم (مُتحقَّق منه)</th></tr>
+    <tr><td>النشر على Production</td><td>لم يحدث بعد — فقط test1</td><td><span class="chip warn">تغيَّر</span> — تمّ النشر فعليًّا على Production بإذن تشغيليّ صريح (يظهر في سجلّ Git) منذ ذلك التقرير</td></tr>
+    <tr><td>استخدام حقيقي</td><td>لا مورّدين حقيقيّين بعد</td><td><span class="chip good">لم يتغيَّر</span> — ما زال صفر بيانات حقيقيّة على كل بيئة</td></tr>
+    <tr><td>ربط السجلّ الماليّ</td><td>مؤكَّد من الكود، يعمل بشكل صحيح</td><td><span class="chip good">مؤكَّد مجدَّدًا</span> — نفس الآليّة بالضبط، تعمل كما هو موثَّق</td></tr>
+    <tr><td>اختلاط الأرقام في التقارير الإجماليّة</td><td>لم يُذكَر صراحة كخطر منفصل</td><td><span class="chip bad">اكتشاف جديد</span> — خطر حقيقي، غير مُصلَح بعد، مفصَّل في §6</td></tr>
+  </table>
+</section>
+
+<section id="conclusion">
+  <h2><span class="n">§9</span> الخلاصة والتوصية</h2>
+  <p><b>الإجابة المباشرة على سؤالك الأصلي:</b></p>
+  <ul>
+    <li><b>كيف يعمل Trade؟</b> قسم تجارة جملة كامل داخل توا نفسها، بدورة عمل من 6 خطوات من تسجيل المورّد حتى الفاتورة.</li>
+    <li><b>كيف يرتبط بمنصّة توا؟</b> مرتبط بإحكام في كل شيء تقريبًا (تسجيل الدخول، الصلاحيّات، القائمة، السجلّ الماليّ) — إلا في جداول قاعدة البيانات الخاصّة به ونظام المحفظة/الطلبات/السائقين الذي لا يلمسه إطلاقًا.</li>
+    <li><b>هل يظهر أثر بعضهما على بعض؟</b> نعم، عبر مسار واحد محدَّد: السجلّ الماليّ المشترك — وهذا يخلق خطرًا حقيقيًّا لكن كامنًا (اختلاط الأرقام في التقارير الإجماليّة، §6)، لم يتسبَّب في أي مشكلة فعليّة بعد لأن لا بيانات حقيقيّة موجودة.</li>
+    <li><b>هل الواجهة الأماميّة مرتبطة ببعضها؟</b> نعم بالكامل — نفس التطبيق، نفس التوجيه، نفس القائمة الجانبيّة.</li>
+  </ul>
+  <div class="callout warn">
+    <b>التوصية الوحيدة:</b> إصلاح فصل تقارير Trade الماليّة عن الأرقام الإجماليّة (§6) قبل أي أوّل استخدام تجاري حقيقي — نصف يوم إلى يوم عمل، غير عاجل الآن لعدم وجود بيانات حقيقيّة، لكن يجب أن يُنجَز قبل أن يتغيَّر ذلك.
+  </div>
+</section>
+
+<footer>
+  تقرير 559 · فحص مزدوج مستقلّ (استخلاص تقارير سابقة + تحقّق حيّ مستقلّ من الكود) + تحقّق ثالث باستعلامات SQL مباشرة على 3 قواعد بيانات حيّة · لا تعديل كود في هذا التقرير — فحص وتوثيق فقط · 2026-07-25
+</footer>

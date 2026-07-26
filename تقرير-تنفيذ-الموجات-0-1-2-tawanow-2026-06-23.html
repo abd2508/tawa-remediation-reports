@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير تنفيذ الموجات 0/1/2 — tawanow 2026-06-23</title>
+<style>
+  :root{
+    --green:#1b7f4f;--green-d:#0f5c38;--amber:#9a6b00;--red:#b3261e;--blue:#1558b0;--purple:#6b3fa0;
+    --bg:#f5f7f6;--card:#fff;--ink:#17241e;--muted:#5b6b63;--line:#dde6e1;
+    --ok:#e8f5ee;--okl:#9fd6b7;--warn:#fdf4e3;--warnl:#e9cd8f;--bad:#fdecea;--badl:#f0b3ad;--blbg:#e7eefb;--bll:#b9cdf0;--pur:#f1eafa;--purl:#cdb6ea;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;line-height:1.82}
+  .wrap{max-width:1220px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,#0f5c38,#1b7f4f);color:#fff;border-radius:18px;padding:34px;box-shadow:0 10px 30px rgba(15,92,56,.25)}
+  header.hero h1{margin:0 0 8px;font-size:22px;line-height:1.5}
+  header.hero p{margin:4px 0;opacity:.95;font-size:13px}
+  .meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+  .meta span{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:6px 12px;font-size:12px}
+  h2{margin:34px 0 13px;font-size:20px;color:var(--green-d);border-right:6px solid var(--green);padding:9px 14px 9px 0;background:linear-gradient(90deg,#eef6f1,transparent)}
+  h3{margin:18px 0 8px;font-size:15.5px;color:var(--green-d)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:13px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12.2px;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#eef6f1;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fbfdfc}
+  .ok{background:var(--ok)!important}.warn{background:var(--warn)!important}.bad{background:var(--bad)!important}.bl{background:var(--blbg)!important}
+  code{background:#eef2ef;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-family:"Cascadia Code",Consolas,monospace;font-size:11px;direction:ltr;display:inline-block}
+  pre{background:#10241b;color:#d7ffe9;border-radius:12px;padding:13px;overflow:auto;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11px;line-height:1.55}
+  pre .r{color:#ff9a8c}pre .g{color:#7fffb0}pre .y{color:#ffd479}pre .c{color:#7fb89a}
+  .diag{background:#0e1f18;border-radius:12px;padding:16px;color:#d7ffe9;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:11.1px;line-height:1.65;overflow:auto;white-space:pre}
+  .diag .y{color:#ffd479}.diag .r{color:#ff9a8c}.diag .g{color:#7fffb0}.diag .b{color:#8cc6ff}.diag .m{color:#d9a8ff}.diag .c{color:#7fb89a}.diag .w{color:#fff}
+  .simple{background:#eef6ff;border:1px solid var(--bll);border-radius:10px;padding:10px 13px;margin:9px 0;font-size:12.6px}
+  .simple b{color:var(--blue)}
+  .danger{background:var(--bad);border:1px solid var(--badl);border-radius:10px;padding:10px 13px;margin:9px 0;font-size:12.5px}
+  .danger b{color:var(--red)}
+  .good{background:#f3fbf6;border:1px solid var(--okl);border-radius:10px;padding:10px 13px;margin:9px 0;font-size:12.5px}
+  .good b{color:var(--green-d)}
+  .note{font-size:11.6px;color:var(--muted)}
+  .dash{display:flex;flex-wrap:wrap;gap:9px;margin:8px 0}
+  .kpi{flex:1 1 140px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .kpi.g{background:var(--ok);border-color:var(--okl)}.kpi.a{background:var(--warn);border-color:var(--warnl)}.kpi.b{background:var(--blbg);border-color:var(--bll)}
+  .kpi .n{font-size:15px;font-weight:800;color:var(--green-d)}.kpi.a .n{color:var(--amber)}.kpi.b .n{color:var(--blue)}
+  .kpi .l{font-size:10.5px;color:var(--muted)}
+  .toc{columns:2;font-size:13px;gap:24px}@media(max-width:760px){.toc{columns:1}}
+  .toc a{color:var(--blue);text-decoration:none;display:block;padding:2px 0}
+  .st{font-size:9.5px;font-weight:800;padding:1px 7px;border-radius:5px;white-space:nowrap}
+  .s-done{background:var(--ok);color:var(--green-d)}.s-defer{background:var(--warn);color:var(--amber)}.s-block{background:var(--bad);color:var(--red)}
+  .footer{margin:30px 0 8px;text-align:center;color:var(--muted);font-size:11.6px}
+  ul{margin:5px 0;padding-right:20px}li{margin:3px 0;font-size:12.4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>تقرير التنفيذ — الموجات 0 + 1 + 2 (إصلاحات وتحسينات واجهة العميل)</h1>
+  <p>تنفيذ الخطّة المنقّحة بالتسلسل الكامل · مُختبَر ومنشور ومُتحقَّق على الإنتاج (tawanow.com) · 2026-06-23</p>
+  <p>ما تمّ · ما لم يتمّ (ولماذا) · بدقّة عالية + رسوم</p>
+  <div class="meta">
+    <span>✅ موجة 0 (MFA) + موجة 1 (5 إصلاحات) + موجة 2 (تحسينات آمنة)</span>
+    <span>🟠 موجة 3 لم تُنفَّذ (محظورة — تتطلّب إذنك)</span>
+    <span>✅ typecheck 0 · Vitest 1273(+flakes) · build OK · منشور</span>
+    <span>🔒 FIN-COR + nginx لم تُمَسّ · 6/6 صحّيّة</span>
+  </div>
+</header>
+
+<!-- 0 -->
+<h2>٠) لوحة النتائج</h2>
+<div class="dash">
+  <div class="kpi b"><div class="n">✅ موجة 0</div><div class="l">MFA مُعطَّل (admin/admin يعمل)</div></div>
+  <div class="kpi g"><div class="n">✅ موجة 1</div><div class="l">5 إصلاحات + 1 جديد (Enter)</div></div>
+  <div class="kpi g"><div class="n">✅ موجة 2</div><div class="l">3 تحسينات آمنة</div></div>
+  <div class="kpi a"><div class="n">🟠 موجة 3</div><div class="l">لم تُنفَّذ (محظورة)</div></div>
+  <div class="kpi g"><div class="n">منشور</div><div class="l">الإنتاج · 6/6 صحّيّة · 0 أخطاء</div></div>
+</div>
+
+<!-- 1 -->
+<h2>١) ما تمّ تنفيذه — موجة 0 (MFA)</h2>
+<div class="card">
+  <table>
+    <tr><th>الخطوة</th><th>التنفيذ</th><th>التحقّق الحيّ</th></tr>
+    <tr class="ok"><td>تعطيل TOTP الأدمين</td><td><code>POST /control-panel/users/{id}/disable-totp</code> (بتوكن SUPER)</td><td><code>admin.totp_enabled</code> = فارغ (false) في DB ✓</td></tr>
+    <tr class="ok"><td>إفراغ العلَم</td><td><code>MFA_REQUIRED_ROLES=""</code> + إعادة إنشاء backend</td><td>في الحاوية = <code>""</code> ✓</td></tr>
+    <tr class="ok"><td>النتيجة</td><td>—</td><td><b>admin/admin → توكن كامل فوراً</b> (بلا requires_totp) ✓</td></tr>
+  </table>
+  <div class="good"><b>إعادة التفعيل لاحقاً:</b> اضبط <code>MFA_REQUIRED_ROLES</code> + <code>MFA_REPORT_ONLY=true</code> → سجّل TOTP → <code>false</code>. كل شيء جاهز.</div>
+</div>
+
+<!-- 2 -->
+<h2>٢) ما تمّ تنفيذه — موجة 1 (الأخطاء الخمسة)</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>الملفّ:السطر</th><th>الحالة</th></tr>
+    <tr class="ok"><td>1-أ</td><td>المزوّد: <code>type="button"</code> على تبويبات + زرّ GPS + ARIA (role=tab/aria-selected/aria-label)</td><td><code>LocationPicker.tsx:405,211</code></td><td><span class="st s-done">✅ تمّ</span></td></tr>
+    <tr class="ok"><td>1-أ2</td><td><b>السائق (جديد):</b> حارس Enter في النموذج (<code>blockImplicitEnterSubmit</code>) — يُصلح «إغلاق الشاشة» بـEnter</td><td><code>RegistrationPage.tsx:232,483</code></td><td><span class="st s-done">✅ تمّ</span></td></tr>
+    <tr class="ok"><td>1-ب</td><td>الهاتف: إزالة <code>.slice(-4)</code> → الرقم كاملاً (الحارس <code>&&</code> باقٍ)</td><td><code>HomePage.tsx:251</code></td><td><span class="st s-done">✅ تمّ</span></td></tr>
+    <tr class="ok"><td>1-ج</td><td>الشريط: حدّ عمر (<code>scheduled_for</code> لـSCHEDULED) + إخفاء العالق + أزرار تابع/إلغاء(<code>order:cancel_own</code>)/شكوى + <code>invalidateQueries</code> + التقاط 409</td><td><code>HomePage.tsx:141-260</code></td><td><span class="st s-done">✅ تمّ</span></td></tr>
+    <tr class="ok"><td>1-د</td><td>العنوان: مكوّن <code>AddressSelector</code> (select + زر «🗺️ من الخريطة» دائم → modal فيه <code>LocationPicker</code> + إنشاء + <code>invalidateSize</code> + prepend + فرض إحداثيات + تسمية احتياطيّة) موصّل في Errand+Checkout</td><td>جديد <code>AddressSelector.tsx</code> + الصفحتان</td><td><span class="st s-done">✅ تمّ</span></td></tr>
+    <tr class="ok"><td>1-أ+</td><td>PlacePicker: <code>type="button"</code> (نظافة)</td><td><code>PlacePicker.tsx:52,56,59,81</code></td><td><span class="st s-done">✅ تمّ</span></td></tr>
+  </table>
+  <div class="diag"><span class="b">رسم: مسار إصلاح التسجيل (المزوّد + السائق):</span>
+  <span class="g">المزوّد</span>: ضغط تبويب الخريطة  →  <span class="r">كان: type=submit → إرسال → إغلاق</span>
+                                  →  <span class="g">الآن: type="button" → لا إرسال → الخريطة تُفتَح</span>
+  <span class="g">السائق</span>: Enter في حقل  →  <span class="r">كان: إرسال ضمنيّ → إغلاق</span>
+                              →  <span class="g">الآن: حارس onKeyDown يمنع Enter → لا إغلاق</span>
+  زرّ الإرسال الوحيد :1028 (type="submit") يبقى المسار الوحيد للتسجيل</div>
+  <div class="diag"><span class="b">رسم: شريط الطلب الجديد:</span>
+  طلب نشِط حديث  →  [📦 تابع طلبك]  [تابع ←]  [إلغاء*]  [شكوى]
+                     *الإلغاء يظهر فقط إن allowed_actions ∋ "order:cancel_own"
+  طلب عالق >48س  →  مُخفيّ (حدّ العمر) · طلب مجدول بعيد → ظاهر (scheduled_for)
+  بعد الإلغاء → invalidateQueries(["customer-active-orders"]) → الشريط يتحدّث</div>
+</div>
+
+<!-- 3 -->
+<h2>٣) ما تمّ تنفيذه — موجة 2 (تحسينات آمنة من البحث)</h2>
+<div class="card">
+  <table>
+    <tr><th>التحسين</th><th>الملفّ</th><th>القيمة (بساطة)</th><th>الحالة</th></tr>
+    <tr class="ok"><td><b>إصلاح عيب reverse-geocode</b> (كان يملأ العنوان حين فارغ فقط → عنوان قديم عند إعادة التثبيت)</td><td><code>LocationPicker.tsx:128</code></td><td>إعادة تثبيت الدبّوس تُحدّث العنوان الذي سيراه السائق</td><td><span class="st s-done">✅ تمّ</span></td></tr>
+    <tr class="ok"><td><b>علامة قابلة للسحب</b> (draggable + dragend يعيد استخدام onMapClick)</td><td><code>LocationPicker.tsx:248</code></td><td>ضبط دقيق لباب البيت (لا أرقام شوارع بليبيا)</td><td><span class="st s-done">✅ تمّ</span></td></tr>
+    <tr class="ok"><td><b>افتراضيّ ذكيّ</b> (localStorage آخر عنوان مُختار) — يُصلح «العنوان القديم»</td><td><code>Checkout+Errand</code></td><td>يفضّل آخر عنوان استخدمتَه لا الأحدث إنشاءً</td><td><span class="st s-done">✅ تمّ</span></td></tr>
+  </table>
+</div>
+
+<!-- 4 -->
+<h2>٤) ما لم يتمّ تنفيذه — ولماذا (بصراحة)</h2>
+<div class="card">
+  <h3>أ · موجة 2 — بنود اختياريّة/مُخفَّضة (مؤجَّلة بقرار التدقيق)</h3>
+  <table>
+    <tr><th>البند</th><th>سبب التأجيل</th></tr>
+    <tr class="warn"><td>عرض Plus Code في الواجهة</td><td>الخلفيّة تُنفّذها أصلاً (<code>plus_code.py</code>) — يبقى مكان العرض (الطلب/السائق) قرار تصميم صغير</td></tr>
+    <tr class="warn"><td>بحث-أثناء-الكتابة (debounce)</td><td><b>فخّ 401:</b> <code>/geo/geocode</code> مُصادَق وLocationPicker يُستخدَم قبل الدخول (التسجيل) → يحتاج فتح النقطة أو قصرها على المُصادَق (موجة 3)</td></tr>
+    <tr class="warn"><td>libphonenumber-js · Radix</td><td>تبعيّات جديدة (~30-40KB · تحوّل-نمط) — قيمة منخفضة مقابل الكلفة؛ مؤجَّلة</td></tr>
+    <tr class="warn"><td>SSE visibilitychange</td><td><b>مُلغى:</b> ازدواج مع EventSource + استطلاعَين موجودَين</td></tr>
+    <tr class="warn"><td>خطوة «تأكيد الموقع» · skeleton/optimistic · عتبة 50م</td><td>تحسينات أكبر/أوسع — مؤجَّلة لدفعة لاحقة</td></tr>
+  </table>
+  <h3>ب · موجة 3 — كلّها لم تُنفَّذ (مناطق محظورة، تتطلّب إذنك الصريح)</h3>
+  <table>
+    <tr><th>البند</th><th>لماذا محظور</th></tr>
+    <tr class="bad"><td>كتابة <code>last_used_at</code> + <code>is_default</code></td><td><code>backend/app/modules</code> + migration (is_default عمود جديد + قاعدة تفرّد)</td></tr>
+    <tr class="bad"><td>مصفوفة الأفعال · <code>deadline_at</code>+reaper · SSE Redis Streams · حلّ COD</td><td><code>backend/app/modules</code> + migration · عَرَض: أفعال matrix بلا نقاط = أزرار ميّتة</td></tr>
+    <tr class="bad"><td>Photon typeahead · توحيد MFA + رموز استرداد</td><td><code>docker-compose.yml</code> (حاوية) + خلفيّة + config</td></tr>
+  </table>
+  <h3>ج · بنود واجهيّة صغيرة</h3>
+  <ul>
+    <li><b>مفاتيح i18n الثلاثيّة</b> لنصوص الشريط الجديدة: أُبقيت بنمط <code>defaultValue</code> المضمّن (كما <code>home.resume_order</code> الموجود أصلاً → يمرّ اختبار التماثل، يعرض العربيّة). ترجمة en/fr الكاملة = متابعة صغيرة.</li>
+    <li><b>ربط زرّ الشكوى</b> ينتقل لصفحة الطلب (حيث نموذج الشكوى) — deep-link مباشر لقسم الشكوى متابعة صغيرة.</li>
+  </ul>
+</div>
+
+<!-- 5 -->
+<h2>٥) التحقّق + النشر</h2>
+<table>
+  <tr><th>الفحص</th><th>النتيجة</th></tr>
+  <tr class="ok"><td>typecheck (tsc)</td><td>✅ 0 أخطاء</td></tr>
+  <tr class="ok"><td>Vitest</td><td>✅ 1273 + 2 flakes حِمل موثّقة (ControlPanelDrivers · OrderTrackingPage — <b>ملفّان لم أُعدّلهما، يمرّان منفردَين 38/38</b>)</td></tr>
+  <tr class="ok"><td>الملفّات المتأثّرة</td><td>✅ LocationPicker/PlacePicker/Checkout/Home/Registration 43/43</td></tr>
+  <tr class="ok"><td>lint (ملفّاتي)</td><td>✅ 0 أخطاء · خطأ U+FEFF الوحيد في <code>i18n-parity.test.ts</code> <b>سابق، ملفّ لم أُعدّله</b></td></tr>
+  <tr class="ok"><td>build</td><td>✅ نجح · sw.js مُولَّد · precache 40</td></tr>
+  <tr class="ok"><td><b>النشر على الإنتاج</b></td><td>✅ web صحّيّ · «من الخريطة» + حارس Enter في JS · <code>/</code>=200 · <code>/api</code>=200</td></tr>
+  <tr class="ok"><td>السلامة</td><td>✅ 6/6 صحّيّة · 0 أخطاء backend · FIN-COR ثابت · <b>nginx لم يُمَسّ</b> (938310a0) · لا migration</td></tr>
+  <tr class="ok"><td>MFA</td><td>✅ مُطفأ (admin/admin → توكن كامل)</td></tr>
+</table>
+
+<!-- 6 -->
+<h2>٦) ملفّات غُيِّرت</h2>
+<div class="card">
+  <div class="diag">جديد:    web/src/components/<span class="g">AddressSelector.tsx</span>
+معدَّل:  LocationPicker.tsx · PlacePicker.tsx · HomePage.tsx · CheckoutPage.tsx
+        ErrandPage.tsx · RegistrationPage.tsx
+خلفيّة:  (موجة 0) قاعدة البيانات admin.totp_enabled=false · compose MFA_REQUIRED_ROLES=""</div>
+</div>
+
+<div class="footer">
+  نُفِّذت الموجات 0+1+2 بالتسلسل الكامل · مُختبَرة (typecheck 0 · Vitest 1273+flakes · build) ومنشورة ومُتحقَّقة على الإنتاج · موجة 3 (محظورة) لم تُنفَّذ بانتظار إذنك · FIN-COR + nginx لم تُمَسّ · لا migration · 6/6 صحّيّة · 0 أخطاء · 2026-06-23
+</div>
+
+</div>
+</body>
+</html>

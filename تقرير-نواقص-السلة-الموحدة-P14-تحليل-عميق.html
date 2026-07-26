@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير: نواقص السلة الموحّدة P14 — تحليل عميق ومحاكاة شاملة</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: #0f1117;
+    color: #e2e8f0;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .hero {
+    background: linear-gradient(135deg, #1a1f2e 0%, #0f1117 60%);
+    border-bottom: 2px solid #2563eb;
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+  }
+  .hero h1 { font-size: 1.9rem; color: #60a5fa; margin-bottom: 0.4rem; }
+  .hero p { color: #94a3b8; font-size: 0.95rem; }
+  .badge {
+    display: inline-block;
+    background: #1e40af;
+    color: #bfdbfe;
+    border-radius: 999px;
+    padding: 0.2rem 0.85rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin: 0.3rem 0.2rem;
+  }
+  .badge.red { background: #7f1d1d; color: #fecaca; }
+  .badge.orange { background: #78350f; color: #fed7aa; }
+  .badge.green { background: #14532d; color: #bbf7d0; }
+  .badge.gray { background: #1e293b; color: #94a3b8; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  h2 { font-size: 1.35rem; color: #93c5fd; margin: 2.2rem 0 0.8rem; padding-bottom: 0.4rem; border-bottom: 1px solid #1e3a5f; }
+  h3 { font-size: 1.05rem; color: #e2e8f0; margin: 1.4rem 0 0.5rem; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .stat-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+  }
+  .stat-num { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+  .stat-num.crit { color: #f87171; }
+  .stat-num.sig  { color: #fb923c; }
+  .stat-num.min  { color: #facc15; }
+  .stat-num.ok   { color: #4ade80; }
+  .stat-label { font-size: 0.82rem; color: #94a3b8; margin-top: 0.4rem; }
+
+  /* Diagram boxes */
+  .diagram {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.2rem 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.82rem;
+    color: #c9d1d9;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.5;
+  }
+
+  /* Gap cards */
+  .gap-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    margin: 1rem 0;
+    overflow: hidden;
+  }
+  .gap-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.85rem 1.2rem;
+    background: #162032;
+    border-bottom: 1px solid #334155;
+    flex-wrap: wrap;
+  }
+  .gap-id {
+    font-family: monospace;
+    font-weight: 800;
+    font-size: 0.88rem;
+    padding: 0.15rem 0.55rem;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .gap-id.crit { background: #7f1d1d; color: #fca5a5; }
+  .gap-id.sig  { background: #78350f; color: #fdba74; }
+  .gap-id.min  { background: #422006; color: #fde68a; }
+  .gap-title { font-weight: 700; font-size: 0.98rem; color: #e2e8f0; flex: 1; }
+  .gap-body { padding: 1rem 1.2rem; }
+  .gap-section { margin-bottom: 0.8rem; }
+  .gap-section-title { font-size: 0.78rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+  .gap-body p { font-size: 0.9rem; color: #cbd5e1; margin-bottom: 0.4rem; }
+
+  .code-inline {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.82em;
+    padding: 0.1em 0.4em;
+    color: #79c0ff;
+  }
+
+  .scenario-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.88rem;
+  }
+  .scenario-table th {
+    background: #1e3a5f;
+    color: #93c5fd;
+    padding: 0.6rem 0.8rem;
+    text-align: right;
+    font-weight: 700;
+  }
+  .scenario-table td {
+    background: #1e293b;
+    padding: 0.55rem 0.8rem;
+    border-bottom: 1px solid #334155;
+    color: #cbd5e1;
+    vertical-align: top;
+  }
+  .scenario-table tr:hover td { background: #243348; }
+  .pass { color: #4ade80; font-weight: 700; }
+  .fail { color: #f87171; font-weight: 700; }
+  .warn { color: #fbbf24; font-weight: 700; }
+
+  .flow-box {
+    background: #0d1117;
+    border: 1px solid #1e3a5f;
+    border-radius: 10px;
+    padding: 1.2rem;
+    margin: 1rem 0;
+  }
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.35rem 0;
+    flex-wrap: wrap;
+  }
+  .flow-step {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-radius: 6px;
+    padding: 0.25rem 0.65rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .flow-step.ok   { background: #14532d; color: #4ade80; }
+  .flow-step.fail { background: #7f1d1d; color: #f87171; }
+  .flow-step.warn { background: #78350f; color: #fb923c; }
+  .flow-arrow { color: #475569; font-size: 1.1rem; }
+
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(to right, #1e40af, transparent);
+    margin: 2.5rem 0;
+  }
+
+  .toc {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .toc h3 { color: #60a5fa; margin: 0 0 0.7rem; font-size: 0.95rem; }
+  .toc a { color: #93c5fd; text-decoration: none; font-size: 0.88rem; display: block; padding: 0.2rem 0; }
+  .toc a:hover { color: #60a5fa; text-decoration: underline; }
+  .toc-group { margin-bottom: 0.5rem; }
+  .toc-group-title { font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 0.2rem; }
+
+  .solution-box {
+    background: #0d2010;
+    border: 1px solid #14532d;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    margin-top: 0.6rem;
+  }
+  .solution-box p { color: #bbf7d0; font-size: 0.88rem; }
+  .solution-label { font-size: 0.75rem; font-weight: 700; color: #4ade80; text-transform: uppercase; margin-bottom: 0.3rem; }
+
+  .priority-matrix {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.2rem 0;
+  }
+  .matrix-cell {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 1rem;
+  }
+  .matrix-cell h4 { font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .matrix-cell.crit { border-color: #7f1d1d; }
+  .matrix-cell.sig  { border-color: #78350f; }
+  .matrix-cell ul { padding-right: 1.2rem; }
+  .matrix-cell li { font-size: 0.85rem; color: #94a3b8; margin-bottom: 0.25rem; }
+
+  @media (max-width: 700px) {
+    .hero h1 { font-size: 1.4rem; }
+    .priority-matrix { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🛒 تقرير نواقص السلة الموحّدة P14</h1>
+  <p>تحليل عميق · محاكاة شاملة لكل السيناريوهات · 19 نقصاً موثّقاً بالجذر والمكان والحل</p>
+  <div style="margin-top:1rem">
+    <span class="badge red">6 حرجة</span>
+    <span class="badge orange">7 مهمة</span>
+    <span class="badge" style="background:#422006;color:#fde68a">6 ثانوية</span>
+    <span class="badge green">الخلفية: مكتملة 100%</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SUMMARY STATS -->
+  <div class="summary-grid">
+    <div class="stat-box">
+      <div class="stat-num crit">6</div>
+      <div class="stat-label">نقص حرج — يكسر الميزة</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num sig">7</div>
+      <div class="stat-label">نقص مهم — تجربة رديئة</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num min">6</div>
+      <div class="stat-label">نقص ثانوي — مستوى تشطيب</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num ok">5</div>
+      <div class="stat-label">API خلفية جاهزة لكن الواجهة لم تربطها</div>
+    </div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h3>📋 فهرس التقرير</h3>
+    <div class="toc-group">
+      <div class="toc-group-title">🗺️ خريطة النظام</div>
+      <a href="#map">كيف تعمل السلة الموحّدة — الرسم التوضيحي الكامل</a>
+      <a href="#api-gap">فجوة الـ API: ما أنجزته الخلفية مقابل ما ربطته الواجهة</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">🔴 النواقص الحرجة</div>
+      <a href="#g-crit-1">G-CRIT-1: صفحة نجاح الدفع الموحّد — مفقودة تماماً</a>
+      <a href="#g-crit-2">G-CRIT-2: أكواد الأخطاء الحرجة لم تُعالَج في group checkout</a>
+      <a href="#g-crit-3">G-CRIT-3: لا يوجد دعم للمحفظة في الدفع الموحّد</a>
+      <a href="#g-crit-4">G-CRIT-4: لا توجد صفحة تتبّع المجموعة</a>
+      <a href="#g-crit-5">G-CRIT-5: لا توجد واجهة لإلغاء متجر أو صنف من السلة بعد الدفع</a>
+      <a href="#g-crit-6">G-CRIT-6: أسماء المتاجر لا تُحمَّل — يظهر "متجر 1" فقط</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">🟠 النواقص المهمة</div>
+      <a href="#g-sig-1">G-SIG-1: واجهة اختيار العنوان متراجعة</a>
+      <a href="#g-sig-2">G-SIG-2: لا يُتحقّق من الحدّ الأدنى للطلب قبل الإرسال</a>
+      <a href="#g-sig-3">G-SIG-3: لا توجد ملاحظات توصيل لكل متجر</a>
+      <a href="#g-sig-4">G-SIG-4: واجهة TypeScript SubOrderRequest ناقصة الحقول</a>
+      <a href="#g-sig-5">G-SIG-5: سجل الطلبات لا يعرف مفهوم المجموعة</a>
+      <a href="#g-sig-6">G-SIG-6: لا يوجد فحص لتعليق المنطقة</a>
+      <a href="#g-sig-7">G-SIG-7: مفتاح Idempotency في CheckoutPage يستخدم Date.now()</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">🟡 النواقص الثانوية</div>
+      <a href="#g-min">G-MIN-1 إلى G-MIN-6: التفاصيل الثانوية</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-group-title">📊 المحاكاة</div>
+      <a href="#sim">جدول محاكاة 20 سيناريو: ماذا يحدث الآن؟</a>
+      <a href="#roadmap">خارطة الطريق المقترحة</a>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ MAP ══════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <h2 id="map">🗺️ كيف تعمل السلة الموحّدة — من الجذر</h2>
+
+  <p style="color:#94a3b8;margin-bottom:1rem">هذا الرسم يوضّح الرحلة الكاملة من وضع صنف في السلة حتى الدفع — الأجزاء الخضراء تعمل، الأجزاء الحمراء ناقصة.</p>
+
+  <div class="diagram">
+  ┌─────────────────────────────────────────────────────────────────────────────────┐
+  │                          رحلة السلة الموحّدة — P14                            │
+  └─────────────────────────────────────────────────────────────────────────────────┘
+
+  الزبون يتصفّح متجر A                    الزبون يتصفّح متجر B
+        │                                          │
+        ▼                                          ▼
+  CartContext.add(A, item)              CartContext.add(B, item)
+        │                                          │
+        │  يحدث تلقائياً: basket A يُحجَز         │
+        │  وتُفتح basket B نشطة                   │
+        ▼                                          ▼
+  state.parked = { A: {...} }           state.providerId = B
+  state.items  = { B_items }            state.items = { B_items }
+
+        ▼ ────────── يضغط "ادفع الكل دفعة واحدة" ────────────────────
+                              │
+                              ▼ [✅ يعمل]
+                     /checkout-group
+                     CartGroupCheckoutPage
+                              │
+                     getAllBaskets() → [snapshot A, snapshot B]
+                              │
+                     ┌────────┴──────────────┐
+                     │  ❓ تحميل أسماء المتاجر   │  ← G-CRIT-6 ناقص
+                     │  ❓ تحقق من الحد الأدنى  │  ← G-SIG-2 ناقص
+                     │  ✅ تحميل العناوين       │
+                     │  ✅ تحميل الاقتباس        │
+                     └────────┬──────────────┘
+                              │
+                     ┌────────▼──────────────┐
+                     │  اختيار العنوان        │  ← G-SIG-1: select بسيط بدل AddressSelector
+                     │  طريقة الدفع           │  ← G-CRIT-3: نقداً فقط (لا محفظة)
+                     │  ملاحظات التوصيل       │  ← G-SIG-3: غائبة تماماً
+                     └────────┬──────────────┘
+                              │
+                              ▼ [✅ يعمل]
+               POST /carts/checkout-group
+               {
+                 idempotency_key: UUID,
+                 sub_orders: [
+                   { provider_id: A, payment_method: "CASH", items: [...] },
+                   { provider_id: B, payment_method: "CASH", items: [...] }
+                 ]
+               }
+                              │
+              ┌───────────────┴────────────────────────────────────────────┐
+              │                                                            │
+              ▼ نجاح (201)                                      ▼ خطأ (422)
+   cart.clearAll()                                  ┌───────────────────────────┐
+   navigate("/orders")  ← G-CRIT-1: لا شاشة نجاح   │ OTP_REQUIRED_FOR_COD      │ ← G-CRIT-2
+                                                    │ TERMS_NOT_ACCEPTED        │   لا يُعالَج
+                                                    │ OUTSTANDING_DEBT          │
+                                                    │ WALLET_INSUFFICIENT_FUNDS │
+                                                    └───────────────────────────┘
+
+  ────────────── بعد الدفع ──────────────────────────────────────────────────────────
+
+  يريد الزبون إلغاء متجر من السلة          يريد الزبون تتبّع طلباته كمجموعة
+              │                                        │
+              ▼                                        ▼
+  POST /carts/orders/{id}/cancel             GET /carts/groups/{group_id}
+         ← G-CRIT-5: لا واجهة                    ← G-CRIT-4: لا صفحة تتبّع مجموعة
+  </div>
+
+  <!-- ══════════════════════════════════════════ API GAP ══════════════════════════════════════════ -->
+  <h2 id="api-gap">📡 فجوة الـ API: الخلفية مكتملة — الواجهة ربطت 2 من 5</h2>
+
+  <table class="scenario-table">
+    <thead>
+      <tr>
+        <th>API الخلفية (جاهزة منذ ab03)</th>
+        <th>الواجهة الأمامية</th>
+        <th>الحالة</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code class="code-inline">POST /carts/quote</code></td>
+        <td><code class="code-inline">cartsApi.quote()</code> ← CartGroupCheckoutPage</td>
+        <td><span class="pass">✅ مربوط</span></td>
+      </tr>
+      <tr>
+        <td><code class="code-inline">POST /carts/checkout-group</code></td>
+        <td><code class="code-inline">cartsApi.checkoutGroup()</code> ← CartGroupCheckoutPage</td>
+        <td><span class="pass">✅ مربوط</span></td>
+      </tr>
+      <tr>
+        <td><code class="code-inline">GET /carts/groups/{group_id}</code></td>
+        <td><code class="code-inline">cartsApi.getGroup()</code> معرَّفة لكن <strong>لا أحد يستدعيها</strong></td>
+        <td><span class="fail">❌ غير مربوط</span></td>
+      </tr>
+      <tr>
+        <td><code class="code-inline">POST /carts/orders/{id}/cancel</code></td>
+        <td>لا يوجد في <code class="code-inline">carts.ts</code> ولا في أي صفحة</td>
+        <td><span class="fail">❌ غير مربوط</span></td>
+      </tr>
+      <tr>
+        <td><code class="code-inline">POST /carts/orders/{id}/items/{item}/cancel</code></td>
+        <td>لا يوجد في <code class="code-inline">carts.ts</code> ولا في أي صفحة</td>
+        <td><span class="fail">❌ غير مربوط</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ══════════════════════════════════════════ CRITICAL GAPS ══════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <h2>🔴 النواقص الحرجة (تكسر الميزة)</h2>
+
+  <!-- G-CRIT-1 -->
+  <div class="gap-card" id="g-crit-1">
+    <div class="gap-header">
+      <span class="gap-id crit">G-CRIT-1</span>
+      <span class="gap-title">صفحة نجاح الدفع الموحّد — مفقودة تماماً</span>
+      <span class="badge red">حرج</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة بلغة بسيطة</div>
+        <p>بعد دفع الزبون بنجاح لعدة متاجر دفعة واحدة، الصفحة تنتقل مباشرة لسجل الطلبات <strong>بدون أي تأكيد</strong>. الزبون لا يرى: "طلبك اكتمل، جهّز 45 دينار نقداً للسائق".</p>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">📍 المكان في الكود</div>
+        <p>السطر 114 في <code class="code-inline">CartGroupCheckoutPage.tsx</code>:</p>
+        <div class="diagram" style="white-space:pre-wrap">// الكود الحالي — ينقل مباشرة بدون تأكيد:
+await cartsApi.checkoutGroup(idemKeyRef.current, sub_orders);
+cart.clearAll?.();
+localStorage.setItem("tawa_last_address_id", selectedAddressId);
+navigate("/orders");   ← ❌ يختفي بدون إظهار أي تفاصيل للزبون</div>
+        <p style="margin-top:0.6rem">CheckoutPage (الدفع الفردي) في المقابل تعرض:</p>
+        <div class="diagram" style="white-space:pre-wrap">// CheckoutPage.tsx السطر 340-447 — شاشة نجاح كاملة:
+if (orderId) {
+  return (
+    ✅ تم الطلب! #ABC12345
+    🔐 رمز التسليم: 4821   ← يُعطى للسائق
+    💵 جهّز: 47.500 د.ل    ← مبلغ نقدي
+    [تتبع الطلب] [الرئيسية]
+  )
+}</div>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">⚡ السيناريو الذي يُظهر المشكلة</div>
+        <div class="flow-box">
+          <div class="flow-row">
+            <span class="flow-step ok">الزبون يدفع: متجرين</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step ok">API: 201 Created</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step fail">ينقل إلى /orders</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step fail">لا يرى: "جهّز 85 دينار للسائق"</span>
+          </div>
+          <div class="flow-row" style="margin-top:0.5rem">
+            <span class="flow-step warn">نتيجة: السائق يأتي، الزبون لا يعرف المبلغ</span>
+          </div>
+        </div>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل المقترح</div>
+        <p>بعد نجاح الـ API، اعرض state محلية بدلاً من navigate فوراً: مجموعة بطاقات بها (<strong>رقم كل طلب + رمز التسليم + المبلغ النقدي</strong>) ثم زر "تتبع الطلبات". استخدم <code class="code-inline">result.orders[]</code> من الاستجابة (كل sub-order فيها total_minor + delivery_fee_minor).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-CRIT-2 -->
+  <div class="gap-card" id="g-crit-2">
+    <div class="gap-header">
+      <span class="gap-id crit">G-CRIT-2</span>
+      <span class="gap-title">أكواد الأخطاء الحرجة لم تُعالَج في الدفع الموحّد</span>
+      <span class="badge red">حرج</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة بلغة بسيطة</div>
+        <p>عندما ترفض الخلفية الطلب لسبب قابل للحل (مثل: احتاج رمز OTP، أو يجب قبول الشروط، أو لديه دين مستحق)، صفحة الدفع الجماعي تعرض رسالة خطأ خام باللغة الإنجليزية بدون أي زر للتصرف.</p>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">📊 مقارنة: كيف تعالج CheckoutPage هذه الأخطاء</div>
+        <table class="scenario-table">
+          <thead>
+            <tr>
+              <th>كود الخطأ من الخلفية</th>
+              <th>CheckoutPage (دفع فردي)</th>
+              <th>CartGroupCheckoutPage (دفع موحّد)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code class="code-inline">OTP_REQUIRED_FOR_COD</code></td>
+              <td><span class="pass">✅ يفتح خطوة OTP تفاعلية</span></td>
+              <td><span class="fail">❌ رسالة خطأ خام — الزبون عالق</span></td>
+            </tr>
+            <tr>
+              <td><code class="code-inline">TERMS_NOT_ACCEPTED</code></td>
+              <td><span class="pass">✅ يعرض زر "أوافق وأكمل"</span></td>
+              <td><span class="fail">❌ رسالة خطأ بدون زر</span></td>
+            </tr>
+            <tr>
+              <td><code class="code-inline">OUTSTANDING_DEBT</code></td>
+              <td><span class="pass">✅ يعرض "ادفع رسم عدم الحضور"</span></td>
+              <td><span class="fail">❌ رسالة خطأ بدون زر</span></td>
+            </tr>
+            <tr>
+              <td><code class="code-inline">WALLET_STEP_UP_REQUIRED</code></td>
+              <td><span class="pass">✅ يبدأ تأكيد المحفظة</span></td>
+              <td><span class="fail">❌ رسالة خطأ بدون تصرف</span></td>
+            </tr>
+            <tr>
+              <td><code class="code-inline">WALLET_INSUFFICIENT_FUNDS</code></td>
+              <td><span class="pass">✅ يوجّه لتغيير طريقة الدفع</span></td>
+              <td><span class="fail">❌ لا يظهر أصلاً (CASH دائماً)</span></td>
+            </tr>
+            <tr>
+              <td><code class="code-inline">COD_BLOCKED_HIGH_RISK</code></td>
+              <td><span class="pass">✅ رسالة توجيهية واضحة</span></td>
+              <td><span class="fail">❌ رسالة خطأ تقنية</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">📍 المكان في الكود</div>
+        <p><code class="code-inline">CartGroupCheckoutPage.tsx</code> السطور 118-131 — يُعالَج <code class="code-inline">failed_index</code> فقط، كل الأكواد الأخرى تذهب إلى <code class="code-inline">setErrorMsg(e.message_ar)</code> وانتهى الأمر.</p>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل المقترح</div>
+        <p>نسخ منطق معالجة الأخطاء من <code class="code-inline">CheckoutPage.tsx</code> السطور 679-727 وتكييفه هنا. OTP يحتاج تعديل بسيط (لا provider واحد — نرسل الـ OTP ثم نُعيد الإرسال بنفس sub_orders).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-CRIT-3 -->
+  <div class="gap-card" id="g-crit-3">
+    <div class="gap-header">
+      <span class="gap-id crit">G-CRIT-3</span>
+      <span class="gap-title">لا يوجد دعم للمحفظة في الدفع الموحّد — نقداً فقط</span>
+      <span class="badge red">حرج</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة بلغة بسيطة</div>
+        <p>الزبون الذي يملك رصيداً في المحفظة ويريد الدفع منها لن يستطيع استخدام الدفع الجماعي. رغم أن الخلفية تدعم WALLET للمجموعات، الواجهة تُجبر الكل على النقد.</p>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">📍 الجذر التقني</div>
+        <div class="diagram" style="white-space:pre-wrap">// CartGroupCheckoutPage.tsx السطر 96 — مُقيَّد برمجياً:
+const sub_orders = allBaskets.map((b) => ({
+  provider_id: b.providerId,
+  payment_method: "CASH",   ← ❌ مُضمَّن ثابت، لا خيار للمستخدم
+  recipient_mode: "delivery_to_address",
+  address_id: selectedAddressId,
+  ...
+}));
+
+// الخلفية تدعم WALLET (carts/service.py السطر 74):
+_GROUP_PAYMENT = {"CASH", "WALLET"}  ← ✅ كلاهما مدعوم</div>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">⚡ السيناريو المتأثر</div>
+        <p>زبون رصيد محفظته 200 دينار، إجمالي السلة 80 دينار ← يُجبَر على الدفع نقداً بينما لديه رصيد كافٍ.</p>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل المقترح</div>
+        <p>إضافة <code class="code-inline">[paymentMethod, setPaymentMethod]</code> state، جلب الرصيد مثل CheckoutPage (<code class="code-inline">paymentsApi.getWallet()</code>)، عرض خيار CASH/WALLET مثل CheckoutPage، تمرير المتغير بدلاً من <code class="code-inline">"CASH"</code> الثابت.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-CRIT-4 -->
+  <div class="gap-card" id="g-crit-4">
+    <div class="gap-header">
+      <span class="gap-id crit">G-CRIT-4</span>
+      <span class="gap-title">لا توجد صفحة تتبّع المجموعة — group_id يختفي</span>
+      <span class="badge red">حرج</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة بلغة بسيطة</div>
+        <p>بعد الدفع، الزبون يرى قائمة الطلبات المنفصلة في سجل الطلبات — لا يعرف أن "طلب متجر A" و"طلب متجر B" كانا من نفس سلة الدفع الواحدة. وإذا أراد تتبّعهم معاً لا يستطيع.</p>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">📍 الكود المعرَّف لكن غير المستخدَم</div>
+        <div class="diagram" style="white-space:pre-wrap">// carts.ts السطر 66 — معرَّفة لكن لا أحد يستدعيها:
+getGroup: (group_id: string) =>
+  apiClient.get&lt;CartGroupResult&gt;(`/carts/groups/${group_id}`),
+
+// لا يوجد route في router.tsx للمجموعة:
+// /group/:groupId  ← مفقود
+// OrderHistoryPage.tsx ← لا يعرف group_id أصلاً</div>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">📊 ماذا ترجع الخلفية ولم تعرضه الواجهة</div>
+        <div class="diagram" style="white-space:pre-wrap">GET /carts/groups/{group_id} يُعيد:
+{
+  group_id: "uuid",
+  state: "PLACED | PARTIALLY_FULFILLED | COMPLETED | CANCELLED",
+  total_minor: 85000,
+  delivery_total_minor: 8000,
+  orders: [
+    { order_id: "...", provider_id: "...", order_state: "AWAITING_ACCEPTANCE",
+      total_minor: 42000, delivery_fee_minor: 4000 },
+    { order_id: "...", provider_id: "...", order_state: "AWAITING_ACCEPTANCE",
+      total_minor: 43000, delivery_fee_minor: 4000 }
+  ]
+}
+// كل هذا المعلومات غير معروضة للزبون</div>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل المقترح</div>
+        <p>إنشاء صفحة <code class="code-inline">/group/:groupId</code> تستدعي <code class="code-inline">cartsApi.getGroup()</code> وتعرض بطاقات المتاجر مع حالة كل منها. في سجل الطلبات، الطلبات التي لها <code class="code-inline">group_id</code> يمكن تجميعها بصرياً.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-CRIT-5 -->
+  <div class="gap-card" id="g-crit-5">
+    <div class="gap-header">
+      <span class="gap-id crit">G-CRIT-5</span>
+      <span class="gap-title">لا واجهة لإلغاء متجر أو صنف من السلة بعد الدفع</span>
+      <span class="badge red">حرج</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة بلغة بسيطة</div>
+        <p>الزبون دفع لثلاثة متاجر، ثم أراد إلغاء واحد منهم فقط (مثلاً المتجر أعلمه بانقطاع الكهرباء). الخلفية تدعم هذا تماماً — لكن الواجهة لا تُظهر أي زر "إلغاء المتجر" أو "حذف صنف".</p>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">📡 الـ API الجاهزة تماماً</div>
+        <div class="diagram" style="white-space:pre-wrap">POST /carts/orders/{order_id}/cancel
+  → يلغي متجراً بأكمله ويُعيد رصيد المحفظة كاملاً
+  ← { order_id, order_state: "CANCELLED" }
+
+POST /carts/orders/{order_id}/items/{item_id}/cancel
+  → يلغي صنفاً واحداً ويُعيد قيمته فقط من المحفظة
+  ← { order_id, order_state, total_minor }
+
+// carts.ts ← كلاهما مفقود من عميل الـ API</div>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">⚡ سيناريوهات بدون هذه الميزة</div>
+        <div class="flow-box">
+          <div class="flow-row">
+            <span class="flow-step warn">متجر يُبلّغ بانقطاع</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step fail">لا زر إلغاء</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step fail">الزبون يتصل بالدعم</span>
+          </div>
+          <div class="flow-row">
+            <span class="flow-step warn">إضافة صنف بالخطأ</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step fail">لا حذف صنف</span>
+            <span class="flow-arrow">→</span>
+            <span class="flow-step fail">يدفع مبلغاً خاطئاً</span>
+          </div>
+        </div>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل المقترح</div>
+        <p>إضافة <code class="code-inline">cancelSubOrder</code> و <code class="code-inline">cancelItem</code> لـ <code class="code-inline">carts.ts</code>، ثم عرض زر "إلغاء هذا المتجر" في صفحة تتبع المجموعة (G-CRIT-4) وزر "حذف صنف" في OrderTrackingPage عندما الطلب ينتمي لمجموعة وفي حالة AWAITING_PROVIDER_ACCEPTANCE.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-CRIT-6 -->
+  <div class="gap-card" id="g-crit-6">
+    <div class="gap-header">
+      <span class="gap-id crit">G-CRIT-6</span>
+      <span class="gap-title">أسماء المتاجر لا تُحمَّل — يظهر "متجر 1" و"متجر 2" فقط</span>
+      <span class="badge red">حرج</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة بلغة بسيطة</div>
+        <p>صفحة الدفع الموحّد تُظهر "متجر 1" و"متجر 2" بدلاً من "مطبخ أبو علي" و"البقالة الأخضر". الزبون لا يعرف أي سلة تتبع أي متجر.</p>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">📍 الجذر التقني</div>
+        <div class="diagram" style="white-space:pre-wrap">// CartGroupCheckoutPage.tsx السطر 172:
+{t("cart.group_basket_label", { defaultValue: "متجر {{n}}", n: i + 1 })}
+// يستخدم الرقم فقط — لا يوجد استدعاء providersApi.get(b.providerId)
+
+// CheckoutPage.tsx السطر 166-173: يحمّل اسم المتجر بشكل صحيح:
+providersApi.get(providerId).then(({ data }) => {
+  setProviderName(data.name ?? "");
+  ...
+})</div>
+      </div>
+      <div class="gap-section">
+        <div class="gap-section-title">⚡ السيناريو المتأثر</div>
+        <p>زبون لديه 3 سلال: مطعم + صيدلية + بقالة. الصفحة تُظهر "متجر 1، متجر 2، متجر 3" — لا يعرف أيّها أيّها.</p>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل المقترح</div>
+        <p>على mount أو بعد تحديد <code class="code-inline">allBaskets</code>: استدعاء <code class="code-inline">providersApi.get(pid)</code> لكل provider مرة واحدة بالتوازي، حفظ النتائج في <code class="code-inline">useState&lt;Record&lt;string, string&gt;&gt;({})</code>، استخدامها في عرض البطاقة.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ SIGNIFICANT GAPS ══════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <h2>🟠 النواقص المهمة (تجربة رديئة)</h2>
+
+  <!-- G-SIG-1 -->
+  <div class="gap-card" id="g-sig-1">
+    <div class="gap-header">
+      <span class="gap-id sig">G-SIG-1</span>
+      <span class="gap-title">واجهة اختيار العنوان متراجعة — select بسيط بدلاً من AddressSelector</span>
+      <span class="badge orange">مهم</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة</div>
+        <p>CartGroupCheckoutPage تستخدم <code class="code-inline">&lt;select&gt;</code> عادياً. CheckoutPage تستخدم <code class="code-inline">&lt;AddressSelector requireCoords /&gt;</code> التي تدعم إضافة عنوان جديد inline. إذا لم يكن للزبون عناوين محفوظة، في الدفع الجماعي يرى فقط "لا توجد عناوين — إضافة عنوان" بزر ينقله بعيداً عن الصفحة وقد يخسر الجلسة.</p>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل</div>
+        <p>استبدال <code class="code-inline">&lt;select&gt;</code> بـ <code class="code-inline">&lt;AddressSelector ... onCreated={...} requireCoords /&gt;</code> مع تحديث <code class="code-inline">addresses</code> state عند إضافة عنوان جديد.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-SIG-2 -->
+  <div class="gap-card" id="g-sig-2">
+    <div class="gap-header">
+      <span class="gap-id sig">G-SIG-2</span>
+      <span class="gap-title">لا يُتحقّق من الحدّ الأدنى للطلب لكل متجر قبل الإرسال</span>
+      <span class="badge orange">مهم</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة</div>
+        <p>إذا متجر A يشترط 20 دينار حدٍّ أدنى والسلة فيها 12 دينار فقط، الزبون يضغط "تأكيد" ويرسل للخلفية → الخلفية ترفض 422 → رسالة خطأ تقنية. CheckoutPage تعرض التحذير <strong>مسبقاً</strong> وتُعطّل الزر.</p>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل</div>
+        <p>في useEffect عند تحميل provider names (G-CRIT-6)، أحضر <code class="code-inline">minimum_order_minor</code> أيضاً. إذا أي سلة أقل من الحد → اعرض تحذيراً أصفر في بطاقة المتجر وعطّل زر التأكيد.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-SIG-3 -->
+  <div class="gap-card" id="g-sig-3">
+    <div class="gap-header">
+      <span class="gap-id sig">G-SIG-3</span>
+      <span class="gap-title">لا توجد ملاحظات توصيل لكل متجر</span>
+      <span class="badge orange">مهم</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة</div>
+        <p>الزبون يريد قول "اطرق الباب" لسائق متجر A، و"اتصل قبل الوصول" لسائق متجر B. الدفع الجماعي لا يتيح ذلك. CheckoutPage تتيح ملاحظات + 7 زرّ سريع (chips).</p>
+        <p>الخلفية تدعم <code class="code-inline">delivery_notes_for_driver</code> لكل sub_order في <code class="code-inline">OrderCreateRequest</code>، والـ SubOrderRequest في carts.ts يحتوي الحقل — لكن الواجهة لا تسأل عنه.</p>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل</div>
+        <p>إضافة <code class="code-inline">Record&lt;string, string&gt;</code> state للملاحظات، عرض حقل textarea صغير بجانب كل بطاقة متجر مع أزرار (chips)، تمريره عند البناء في <code class="code-inline">sub_orders</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-SIG-4 -->
+  <div class="gap-card" id="g-sig-4">
+    <div class="gap-header">
+      <span class="gap-id sig">G-SIG-4</span>
+      <span class="gap-title">واجهة TypeScript SubOrderRequest ناقصة حقول مهمة</span>
+      <span class="badge orange">مهم</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة</div>
+        <p>الـ interface في <code class="code-inline">carts.ts</code> لا تعكس كل الحقول التي تقبلها الخلفية في <code class="code-inline">OrderCreateRequest</code>. المطوّر القادم قد يحتاج هذه الحقول ولن يجدها في TypeScript.</p>
+        <table class="scenario-table" style="margin-top:0.7rem">
+          <thead><tr><th>الحقل</th><th>في OrderCreateRequest (خلفية)</th><th>في SubOrderRequest (TS)</th></tr></thead>
+          <tbody>
+            <tr><td><code class="code-inline">fulfillment_type</code></td><td><span class="pass">✅</span></td><td><span class="fail">❌ مفقود</span></td></tr>
+            <tr><td><code class="code-inline">tenders</code> (دفع مقسّم)</td><td><span class="pass">✅</span></td><td><span class="fail">❌ مفقود</span></td></tr>
+            <tr><td><code class="code-inline">tip_minor</code></td><td><span class="pass">✅</span></td><td><span class="fail">❌ مفقود</span></td></tr>
+            <tr><td><code class="code-inline">promo_code</code></td><td><span class="pass">✅</span></td><td><span class="fail">❌ مفقود</span></td></tr>
+            <tr><td><code class="code-inline">otp_action_token</code></td><td><span class="pass">✅</span></td><td><span class="fail">❌ مفقود</span></td></tr>
+            <tr><td><code class="code-inline">scheduled_for</code></td><td><span class="pass">✅</span></td><td><span class="fail">❌ مفقود</span></td></tr>
+            <tr><td><code class="code-inline">recipient_name/phone</code></td><td><span class="pass">✅</span></td><td><span class="fail">❌ مفقود</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل</div>
+        <p>تحديث <code class="code-inline">SubOrderRequest</code> interface في <code class="code-inline">carts.ts</code> لتطابق <code class="code-inline">OrderCreateRequest</code> الخلفية بالكامل. كل الحقول الجديدة اجعلها optional (<code class="code-inline">?</code>).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-SIG-5 -->
+  <div class="gap-card" id="g-sig-5">
+    <div class="gap-header">
+      <span class="gap-id sig">G-SIG-5</span>
+      <span class="gap-title">سجل الطلبات لا يعرف مفهوم المجموعة</span>
+      <span class="badge orange">مهم</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة</div>
+        <p>الزبون الذي دفع لثلاثة متاجر معاً يرى في سجل الطلبات ثلاثة طلبات منفصلة — لا يعرف أنها كانت من دفعة واحدة. كل طلب له <code class="code-inline">group_id</code> في الخلفية لكن OrderHistoryPage لا تقرأه ولا تعرضه.</p>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل</div>
+        <p>في OrderHistoryPage: عند تحميل الطلبات، جمّع الطلبات التي لها نفس <code class="code-inline">group_id</code> تحت عنوان "سلة موحّدة". أضف <code class="code-inline">group_id?</code> إلى واجهة TypeScript للطلب وتأكد من أن API يُعيده.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-SIG-6 -->
+  <div class="gap-card" id="g-sig-6">
+    <div class="gap-header">
+      <span class="gap-id sig">G-SIG-6</span>
+      <span class="gap-title">لا يوجد فحص لتعليق المنطقة</span>
+      <span class="badge orange">مهم</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة</div>
+        <p>CheckoutPage يستخدم <code class="code-inline">&lt;ZoneSuspendedBanner lat lng /&gt;</code> ليُحذّر الزبون إذا منطقته معلّقة قبل الدفع. CartGroupCheckoutPage لا يفعل ذلك.</p>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل</div>
+        <p>إضافة <code class="code-inline">ZoneSuspendedBanner</code> في CartGroupCheckoutPage مثل CheckoutPage بالضبط.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- G-SIG-7 -->
+  <div class="gap-card" id="g-sig-7">
+    <div class="gap-header">
+      <span class="gap-id sig">G-SIG-7</span>
+      <span class="gap-title">مفتاح Idempotency في CheckoutPage يستخدم Date.now() — غير آمن</span>
+      <span class="badge orange">مهم</span>
+    </div>
+    <div class="gap-body">
+      <div class="gap-section">
+        <div class="gap-section-title">🔍 المشكلة</div>
+        <p>CheckoutPage (الدفع الفردي) السطر 611 يُولّد المفتاح هكذا:</p>
+        <div class="diagram" style="white-space:pre-wrap">const key = `order-${providerId}-${Date.now()}`;
+// إذا ضغط الزبون الزر مرتين سريعاً → مفتاحان مختلفان → طلبان مزدوجان!</div>
+        <p style="margin-top:0.5rem">CartGroupCheckoutPage يفعل الصواب:</p>
+        <div class="diagram" style="white-space:pre-wrap">const idemKeyRef = useRef&lt;string&gt;(genUUID());
+// مُولَّد مرة عند mount، يتغير فقط بعد خطأ</div>
+      </div>
+      <div class="solution-box">
+        <div class="solution-label">✅ الحل</div>
+        <p>في CheckoutPage: استبدال <code class="code-inline">Date.now()</code> بنمط <code class="code-inline">useRef(genUUID())</code> المستخدَم في CartGroupCheckoutPage، مع إعادة التوليد فقط عند الخطأ.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ MINOR GAPS ══════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <h2 id="g-min">🟡 النواقص الثانوية (مستوى تشطيب)</h2>
+
+  <div class="gap-card">
+    <div class="gap-header">
+      <span class="gap-id min">G-MIN-1</span>
+      <span class="gap-title">مفتاح localStorage لا يزال "toowa_cart" (الاسم القديم)</span>
+      <span class="badge" style="background:#422006;color:#fde68a">ثانوي</span>
+    </div>
+    <div class="gap-body">
+      <p><code class="code-inline">CartContext.tsx</code> السطر 22: <code class="code-inline">const CART_STORAGE_KEY = "toowa_cart"</code> — "toowa" هجاء قديم للعلامة التجارية. المستخدمون الذين أنشأوا حسابات باسم "tawa" سيجدون السلة فارغة. لا يُسبب خطأً لكنه غير متناسق.</p>
+    </div>
+  </div>
+
+  <div class="gap-card">
+    <div class="gap-header">
+      <span class="gap-id min">G-MIN-2</span>
+      <span class="gap-title">لا دعم لـ SELF_PICKUP في الدفع الجماعي</span>
+      <span class="badge" style="background:#422006;color:#fde68a">ثانوي</span>
+    </div>
+    <div class="gap-body">
+      <p>recipient_mode مُضمَّن كـ <code class="code-inline">"delivery_to_address"</code> دائماً. إذا الزبون يريد استلام ذاتي من جميع المتاجر، لا يستطيع استخدام الدفع الجماعي. نادر الحدوث لكن ناقص من المنطق.</p>
+    </div>
+  </div>
+
+  <div class="gap-card">
+    <div class="gap-header">
+      <span class="gap-id min">G-MIN-3</span>
+      <span class="gap-title">لا دعم للجدولة (schedule_for) في الدفع الجماعي</span>
+      <span class="badge" style="background:#422006;color:#fde68a">ثانوي</span>
+    </div>
+    <div class="gap-body">
+      <p>CheckoutPage يدعم "جدولة لوقت لاحق" (Wave 5). CartGroupCheckoutPage لا يمرر <code class="code-inline">scheduled_for</code> للخلفية.</p>
+    </div>
+  </div>
+
+  <div class="gap-card">
+    <div class="gap-header">
+      <span class="gap-id min">G-MIN-4</span>
+      <span class="gap-title">لا كود خصم (promo_code) لكل متجر في الدفع الجماعي</span>
+      <span class="badge" style="background:#422006;color:#fde68a">ثانوي</span>
+    </div>
+    <div class="gap-body">
+      <p>CheckoutPage له حقل كود الخصم. CartGroupCheckoutPage لا يتيح الكودات. الخلفية تدعمه لكل sub_order.</p>
+    </div>
+  </div>
+
+  <div class="gap-card">
+    <div class="gap-header">
+      <span class="gap-id min">G-MIN-5</span>
+      <span class="gap-title">لا إكرامية (tip) لكل سائق في الدفع الجماعي</span>
+      <span class="badge" style="background:#422006;color:#fde68a">ثانوي</span>
+    </div>
+    <div class="gap-body">
+      <p>CheckoutPage يتيح إكرامية للسائق (B1). CartGroupCheckoutPage لا يُرسل <code class="code-inline">tip_minor</code>. سيُحرم سائقو الدفع الجماعي من الإكراميات دائماً.</p>
+    </div>
+  </div>
+
+  <div class="gap-card">
+    <div class="gap-header">
+      <span class="gap-id min">G-MIN-6</span>
+      <span class="gap-title">لا تفويض مستلم (delegate recipient) لكل متجر</span>
+      <span class="badge" style="background:#422006;color:#fde68a">ثانوي</span>
+    </div>
+    <div class="gap-body">
+      <p>CheckoutPage يتيح "المستلم شخص آخر؟" مع اسم وهاتف. CartGroupCheckoutPage لا يدعمه. السيناريو: الزبون يرسل هدايا من متاجر متعددة لشخص واحد.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ SIMULATION ══════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <h2 id="sim">📊 محاكاة 20 سيناريو — ماذا يحدث الآن؟</h2>
+
+  <p style="color:#94a3b8;margin-bottom:1rem">كل سيناريو اختُبر بمحاكاة التدفق الكامل من الخلفية للواجهة.</p>
+
+  <table class="scenario-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>السيناريو</th>
+        <th>النتيجة الحالية</th>
+        <th>المتوقع</th>
+        <th>الحكم</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>S-01</td>
+        <td>دفع ناجح لمتجرين بالنقد</td>
+        <td>ينتقل لـ /orders مباشرة</td>
+        <td>شاشة نجاح مع المبالغ</td>
+        <td><span class="fail">❌ ناقص</span></td>
+      </tr>
+      <tr>
+        <td>S-02</td>
+        <td>دفع ناجح لثلاثة متاجر</td>
+        <td>ينتقل لـ /orders — لا تأكيد</td>
+        <td>3 بطاقات بالمبالغ</td>
+        <td><span class="fail">❌ ناقص</span></td>
+      </tr>
+      <tr>
+        <td>S-03</td>
+        <td>سلتان + متجر واحد أقل من الحد الأدنى</td>
+        <td>يُرسَل → 422 من الخلفية → رسالة تقنية</td>
+        <td>تحذير مسبق قبل الإرسال</td>
+        <td><span class="fail">❌ G-SIG-2</span></td>
+      </tr>
+      <tr>
+        <td>S-04</td>
+        <td>طلب عالي القيمة يحتاج OTP</td>
+        <td>422 OTP_REQUIRED_FOR_COD → رسالة خطأ خام</td>
+        <td>خطوة OTP تفاعلية</td>
+        <td><span class="fail">❌ G-CRIT-2</span></td>
+      </tr>
+      <tr>
+        <td>S-05</td>
+        <td>زبون لم يوافق على الشروط بعد</td>
+        <td>422 TERMS_NOT_ACCEPTED → رسالة خطأ خام</td>
+        <td>زر "أوافق وأكمل"</td>
+        <td><span class="fail">❌ G-CRIT-2</span></td>
+      </tr>
+      <tr>
+        <td>S-06</td>
+        <td>زبون لديه دين مستحق</td>
+        <td>422 OUTSTANDING_DEBT → رسالة خطأ خام</td>
+        <td>زر "ادفع الدين وأكمل"</td>
+        <td><span class="fail">❌ G-CRIT-2</span></td>
+      </tr>
+      <tr>
+        <td>S-07</td>
+        <td>الزبون يريد الدفع بالمحفظة</td>
+        <td>لا يُتاح — CASH فقط مُعروض</td>
+        <td>خيار WALLET/CASH</td>
+        <td><span class="fail">❌ G-CRIT-3</span></td>
+      </tr>
+      <tr>
+        <td>S-08</td>
+        <td>زبون يريد تتبع طلباته الجماعية معاً</td>
+        <td>يرى طلبات منفصلة في /orders</td>
+        <td>صفحة /group/:id</td>
+        <td><span class="fail">❌ G-CRIT-4</span></td>
+      </tr>
+      <tr>
+        <td>S-09</td>
+        <td>زبون يريد إلغاء متجر بعد الدفع</td>
+        <td>لا زر إلغاء في أي مكان</td>
+        <td>زر "إلغاء هذا المتجر"</td>
+        <td><span class="fail">❌ G-CRIT-5</span></td>
+      </tr>
+      <tr>
+        <td>S-10</td>
+        <td>زبون لا يعرف أي سلة لأي متجر</td>
+        <td>"متجر 1، متجر 2" بدون أسماء</td>
+        <td>اسم كل متجر واضح</td>
+        <td><span class="fail">❌ G-CRIT-6</span></td>
+      </tr>
+      <tr>
+        <td>S-11</td>
+        <td>زبون ليس لديه عنوان محفوظ</td>
+        <td>رسالة "لا عناوين" + زر يُخرجه من الصفحة</td>
+        <td>AddressSelector يتيح إضافة inline</td>
+        <td><span class="fail">❌ G-SIG-1</span></td>
+      </tr>
+      <tr>
+        <td>S-12</td>
+        <td>زبون يريد ملاحظات مختلفة لكل سائق</td>
+        <td>لا حقل ملاحظات في الصفحة</td>
+        <td>حقل لكل متجر</td>
+        <td><span class="fail">❌ G-SIG-3</span></td>
+      </tr>
+      <tr>
+        <td>S-13</td>
+        <td>شبكة بطيئة — ضغط زر مرتين</td>
+        <td>CartGroupCheckoutPage: UUID ثابت → idempotent آمن</td>
+        <td>طلب واحد</td>
+        <td><span class="pass">✅ آمن</span></td>
+      </tr>
+      <tr>
+        <td>S-14</td>
+        <td>CheckoutPage — ضغط مرتين سريع</td>
+        <td>Date.now() → مفتاحان مختلفان → طلبان!</td>
+        <td>طلب واحد</td>
+        <td><span class="fail">❌ G-SIG-7</span></td>
+      </tr>
+      <tr>
+        <td>S-15</td>
+        <td>منطقة التوصيل معلّقة</td>
+        <td>CartGroupCheckoutPage: لا تحذير مسبق</td>
+        <td>ZoneSuspendedBanner</td>
+        <td><span class="fail">❌ G-SIG-6</span></td>
+      </tr>
+      <tr>
+        <td>S-16</td>
+        <td>سلة A تفشل والسلة B تنجح</td>
+        <td>الخلفية تُلغي الكل atomically → 422 failed_index</td>
+        <td>تُبرز المتجر الفاشل</td>
+        <td><span class="warn">⚠️ جزئي</span></td>
+      </tr>
+      <tr>
+        <td>S-17</td>
+        <td>نفس الـ idempotency key مرتين متزامنتين</td>
+        <td>الخلفية: IntegrityError → تُعيد المجموعة الأولى</td>
+        <td>لا ازدواج</td>
+        <td><span class="pass">✅ آمن (خلفية)</span></td>
+      </tr>
+      <tr>
+        <td>S-18</td>
+        <td>زبون يريد جدولة متاجر متعددة لوقت لاحق</td>
+        <td>لا خيار جدولة في الدفع الجماعي</td>
+        <td>scheduled_for لكل sub_order</td>
+        <td><span class="fail">❌ G-MIN-3</span></td>
+      </tr>
+      <tr>
+        <td>S-19</td>
+        <td>زبون يريد إعطاء إكرامية لسائق معين</td>
+        <td>لا حقل tip في الدفع الجماعي</td>
+        <td>tip_minor لكل sub_order</td>
+        <td><span class="fail">❌ G-MIN-5</span></td>
+      </tr>
+      <tr>
+        <td>S-20</td>
+        <td>دفع ناجح + الكاش كافٍ عند الزبون</td>
+        <td>ينتقل لـ /orders بصمت</td>
+        <td>"جهّز 85 دينار نقداً"</td>
+        <td><span class="fail">❌ G-CRIT-1</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="summary-grid" style="margin-top:1.5rem">
+    <div class="stat-box">
+      <div class="stat-num crit">3</div>
+      <div class="stat-label">✅ سيناريوهات تعمل بشكل صحيح</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num warn">1</div>
+      <div class="stat-label">⚠️ جزئي (failedIndex يُعرض لكن بدون توجيه)</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num crit">16</div>
+      <div class="stat-label">❌ سيناريوهات تفشل أو ناقصة</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════ ROADMAP ══════════════════════════════════════════ -->
+  <div class="section-divider"></div>
+  <h2 id="roadmap">🗓️ خارطة الطريق المقترحة</h2>
+
+  <p style="color:#94a3b8;margin-bottom:1.2rem">مرتّبة حسب الأهمية والاعتماديات — الموجة الأولى تكسر أقل شيء.</p>
+
+  <div class="priority-matrix">
+    <div class="matrix-cell crit">
+      <h4 style="color:#f87171">🔴 موجة 1 — حرجة (يجب أولاً)</h4>
+      <ul>
+        <li>G-CRIT-6: أسماء المتاجر (providersApi.get)</li>
+        <li>G-CRIT-1: شاشة النجاح (COD amounts + handoff codes)</li>
+        <li>G-CRIT-2: معالجة أكواد الأخطاء (OTP, terms, debt)</li>
+        <li>G-SIG-2: تحقق من الحد الأدنى (يبني على G-CRIT-6)</li>
+      </ul>
+    </div>
+    <div class="matrix-cell sig">
+      <h4 style="color:#fb923c">🟠 موجة 2 — مهمة</h4>
+      <ul>
+        <li>G-CRIT-3: دعم المحفظة (walletBalanceMinor + payment toggle)</li>
+        <li>G-SIG-4: تحديث SubOrderRequest TypeScript</li>
+        <li>G-SIG-1: استبدال select بـ AddressSelector</li>
+        <li>G-SIG-7: إصلاح idempotency في CheckoutPage</li>
+      </ul>
+    </div>
+    <div class="matrix-cell" style="border-color:#78350f">
+      <h4 style="color:#fb923c">🟠 موجة 3 — مهمة أيضاً</h4>
+      <ul>
+        <li>G-CRIT-4: صفحة تتبع المجموعة (/group/:id)</li>
+        <li>G-CRIT-5: إلغاء متجر/صنف (carts.ts + UI)</li>
+        <li>G-SIG-5: تجميع الطلبات في OrderHistoryPage</li>
+        <li>G-SIG-3: ملاحظات توصيل لكل متجر</li>
+        <li>G-SIG-6: ZoneSuspendedBanner</li>
+      </ul>
+    </div>
+    <div class="matrix-cell" style="border-color:#422006">
+      <h4 style="color:#fde68a">🟡 موجة 4 — تشطيب</h4>
+      <ul>
+        <li>G-MIN-1: تغيير storage key إلى tawa_cart</li>
+        <li>G-MIN-3: جدولة في الدفع الجماعي</li>
+        <li>G-MIN-4: كود خصم لكل متجر</li>
+        <li>G-MIN-5: إكرامية لكل سائق</li>
+        <li>G-MIN-2: دعم SELF_PICKUP</li>
+        <li>G-MIN-6: تفويض مستلم</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- FINAL DIAGRAM -->
+  <div class="section-divider"></div>
+  <h2>🏗️ رسم: المكونات المكتملة مقابل الناقصة</h2>
+
+  <div class="diagram">
+  ┌────────────────────── الخلفية (COMPLETE ✅) ──────────────────────────────┐
+  │  POST /carts/quote             → اقتباس التوصيل لكل متجر             ✅  │
+  │  POST /carts/checkout-group    → دفع ذري لمتاجر متعددة               ✅  │
+  │  GET  /carts/groups/{id}       → تتبع المجموعة                       ✅  │
+  │  POST /carts/orders/{id}/cancel           → إلغاء متجر               ✅  │
+  │  POST /carts/orders/{id}/items/{id}/cancel → إلغاء صنف              ✅  │
+  └───────────────────────────────────────────────────────────────────────────┘
+                                    ↕
+  ┌────────────────────── الواجهة (PARTIAL ⚠️) ───────────────────────────────┐
+  │  carts.ts API client:                                                     │
+  │    cartsApi.quote()         ✅ يُستخدم                                   │
+  │    cartsApi.checkoutGroup() ✅ يُستخدم                                   │
+  │    cartsApi.getGroup()      ❌ معرَّف لكن لا أحد يستدعيه               │
+  │    cancelSubOrder()         ❌ مفقود من carts.ts                         │
+  │    cancelItem()             ❌ مفقود من carts.ts                         │
+  │                                                                           │
+  │  CartGroupCheckoutPage:                                                   │
+  │    ✅ عرض السلال             ❌ بدون أسماء المتاجر (G-CRIT-6)            │
+  │    ✅ اقتباس التوصيل         ❌ نقداً فقط (G-CRIT-3)                    │
+  │    ✅ إرسال الطلب            ❌ بدون شاشة نجاح (G-CRIT-1)               │
+  │    ✅ تبرز المتجر الفاشل     ❌ لا OTP/terms/debt handling (G-CRIT-2)   │
+  │                              ❌ لا ملاحظات توصيل (G-SIG-3)             │
+  │                              ❌ select بسيط بدل AddressSelector (G-SIG-1)│
+  │                                                                           │
+  │  OrderHistoryPage:            ❌ لا تعرف group_id (G-SIG-5)             │
+  │  OrderTrackingPage:           ❌ لا زر إلغاء متجر (G-CRIT-5)           │
+  └───────────────────────────────────────────────────────────────────────────┘
+  </div>
+
+  <!-- FOOTER -->
+  <div class="section-divider"></div>
+  <div style="text-align:center;color:#475569;font-size:0.82rem;padding:1rem 0">
+    تقرير مُولَّد بتحليل عميق للكود · منصة توا · P14 السلة الموحّدة<br>
+    الخلفية: مكتملة 100% (ab03) · الواجهة: مربوطة 40% · المقيّد: 60% ينتظر
+  </div>
+
+</div>
+</body>
+</html>

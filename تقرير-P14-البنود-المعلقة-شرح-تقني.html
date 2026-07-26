@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شرح البنود المعلقة — Stage-2 والمؤشر متعدد الأجهزة</title>
+<style>
+  :root {
+    --bg: #0B0F1A;
+    --surface: #131929;
+    --surface2: #1a2438;
+    --surface3: #0f1d2e;
+    --border: #1E2D47;
+    --text: #BEC8DC;
+    --text-dim: #7A8BA0;
+    --accent: #4A9EFF;
+    --accent2: #6AB8FF;
+    --good: #34C77A;
+    --warn: #E8A825;
+    --crit: #FF5C5C;
+    --info: #8B7CF6;
+    --purple: #C084FC;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    font-size: 15px; line-height: 1.7;
+    display: flex; min-height: 100vh;
+  }
+
+  nav {
+    width: 252px; min-width: 252px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    position: sticky; top: 0;
+    height: 100vh; overflow-y: auto;
+    padding: 24px 0; order: 2;
+  }
+  nav h3 { font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text-dim); padding: 0 20px 8px; margin-top: 16px; }
+  nav a { display: block; padding: 7px 20px; color: var(--text-dim);
+    text-decoration: none; font-size: 13px;
+    border-right: 3px solid transparent; transition: color .15s, border-color .15s; }
+  nav a:hover, nav a.active { color: var(--accent); border-right-color: var(--accent);
+    background: rgba(74,158,255,.06); }
+  nav .logo { padding: 0 20px 20px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  nav .logo-title { font-size: 15px; font-weight: 700; color: var(--accent); }
+  nav .logo-sub { font-size: 11px; color: var(--text-dim); }
+
+  main { flex: 1; padding: 48px 64px; max-width: 940px; order: 1; }
+  h1 { font-size: 28px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 8px; }
+  h2 { font-size: 21px; font-weight: 700; color: #fff; margin-top: 52px; margin-bottom: 16px;
+       padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  h3 { font-size: 16px; font-weight: 600; color: var(--accent2); margin-top: 28px; margin-bottom: 10px; }
+  h4 { font-size: 13.5px; font-weight: 600; color: var(--text); margin-top: 16px; margin-bottom: 6px; }
+  p { margin-bottom: 12px; }
+
+  .hero-meta { display: flex; gap: 14px; flex-wrap: wrap; margin: 18px 0 38px; }
+  .hero-chip { background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 5px 13px; font-size: 12.5px; }
+  .hero-chip span { color: var(--accent); font-weight: 600; }
+
+  .chip { display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 4px; padding: 3px 9px; font-size: 11.5px; font-weight: 600;
+    letter-spacing: .04em; }
+  .chip-ok   { background: rgba(52,199,122,.15); color: var(--good);   border: 1px solid rgba(52,199,122,.3); }
+  .chip-warn { background: rgba(232,168,37,.15); color: var(--warn);   border: 1px solid rgba(232,168,37,.3); }
+  .chip-crit { background: rgba(255,92,92,.15);  color: var(--crit);   border: 1px solid rgba(255,92,92,.3);  }
+  .chip-info { background: rgba(139,124,246,.15);color: var(--info);   border: 1px solid rgba(139,124,246,.3);}
+  .chip-dim  { background: rgba(122,139,160,.1); color: var(--text-dim); border: 1px solid var(--border); }
+
+  .card { background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 16px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 18px; text-align: center; }
+  .stat-num { font-size: 34px; font-weight: 800; line-height: 1; }
+  .stat-num.ok  { color: var(--good); }
+  .stat-num.acc { color: var(--accent); }
+  .stat-num.warn { color: var(--warn); }
+  .stat-label { font-size: 11.5px; color: var(--text-dim); margin-top: 4px; letter-spacing: .06em; }
+
+  .tbl-wrap { overflow-x: auto; margin: 16px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--surface2); color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: .07em; font-size: 10.5px;
+    padding: 10px 14px; text-align: right; }
+  td { padding: 10px 14px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: rgba(74,158,255,.03); }
+  .row-ok td { background: rgba(52,199,122,.03); }
+  .row-warn td { background: rgba(232,168,37,.03); }
+  .row-block td { background: rgba(255,92,92,.03); }
+
+  pre { background: #0a0e18; border: 1px solid var(--border); border-radius: 6px;
+    padding: 15px 17px; overflow-x: auto; font-size: 12px; line-height: 1.6;
+    font-family: 'Cascadia Code','Fira Code','Consolas',monospace; margin: 10px 0; }
+  code { font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+    background: rgba(74,158,255,.1); color: var(--accent2);
+    padding: 1px 5px; border-radius: 3px; font-size: 12.5px; }
+  code.ok { background: rgba(52,199,122,.1); color: var(--good); }
+  code.miss { background: rgba(255,92,92,.1); color: var(--crit); }
+
+  .diagram-wrap { background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 22px; margin: 18px 0; overflow-x: auto; }
+  .diagram-wrap svg { max-width: 100%; display: block; margin: 0 auto; }
+
+  .alert { border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 13.5px; }
+  .alert-ok   { background: rgba(52,199,122,.1);  border: 1px solid rgba(52,199,122,.3);  }
+  .alert-warn { background: rgba(232,168,37,.1);  border: 1px solid rgba(232,168,37,.3);  }
+  .alert-info { background: rgba(139,124,246,.1); border: 1px solid rgba(139,124,246,.3); }
+  .alert-crit { background: rgba(255,92,92,.1);   border: 1px solid rgba(255,92,92,.3);   }
+
+  .file-row { display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .file-row:last-child { border-bottom: none; }
+  .file-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+
+  .mig-chain {
+    display: flex; flex-direction: column; gap: 0; position: relative;
+    padding-right: 16px; margin: 16px 0;
+  }
+  .mig-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 8px 0 8px 0; position: relative;
+  }
+  .mig-item::before {
+    content: ''; position: absolute; right: -16px; top: 0; bottom: 0;
+    width: 2px; background: var(--border);
+  }
+  .mig-item:last-child::before { bottom: 50%; }
+  .mig-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 6px;
+    position: relative; z-index: 1; border: 2px solid var(--bg);
+  }
+  .mig-dot::before {
+    content: ''; position: absolute; right: calc(100% + 11px); top: 3px;
+    width: 11px; height: 2px; background: var(--border);
+  }
+  .mig-label { font-weight: 700; font-size: 12px; color: var(--accent2); }
+  .mig-desc  { font-size: 12.5px; color: var(--text-dim); margin-top: 1px; }
+  .mig-feature { font-size: 11.5px; color: var(--text); }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  .scope-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  .scope-card { background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px; }
+  .scope-card.blocked { border-color: rgba(255,92,92,.4); }
+  .scope-card.ok { border-color: rgba(52,199,122,.4); }
+  .scope-card .sc-title { font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+
+  @media (max-width: 860px) {
+    body { flex-direction: column; }
+    nav { width: 100%; height: auto; position: static; order: 1; }
+    main { padding: 24px 18px; order: 2; }
+    .two-col { grid-template-columns: 1fr; }
+    .scope-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">
+    <div class="logo-title">توا — بنود معلقة</div>
+    <div class="logo-sub">شرح تقني من الجذور</div>
+  </div>
+  <h3>نظرة عامة</h3>
+  <a href="#overview">الحالة الراهنة</a>
+  <h3>البند الأول</h3>
+  <a href="#stage2-what">ما هو Stage-2؟</a>
+  <a href="#stage2-chain">سلسلة الترحيل aa01–aa15</a>
+  <a href="#stage2-risk">الخطر قبل وبعد</a>
+  <a href="#stage2-steps">خطوات التنفيذ</a>
+  <h3>البند الثاني</h3>
+  <a href="#multidev-gap">الفجوة الحالية</a>
+  <a href="#multidev-chain">سلسلة التغييرات</a>
+  <a href="#multidev-files">الملفات والكود</a>
+  <a href="#multidev-why">لماذا محظور الآن؟</a>
+  <h3>الخلاصة</h3>
+  <a href="#compare">مقارنة البندين</a>
+  <a href="#operator">قرار المشغّل</a>
+</nav>
+
+<main>
+
+  <h1>البنود المعلقة — شرح تقني كامل</h1>
+  <div class="hero-meta">
+    <div class="hero-chip">التاريخ: <span>6 يوليو 2026</span></div>
+    <div class="hero-chip">رأس الـ repo: <span>ab20_staff_evaluation</span></div>
+    <div class="hero-chip">Kali DB head: <span>ab20 ✅</span></div>
+    <div class="hero-chip">الترحيلات الكلية: <span>94 ملف</span></div>
+  </div>
+
+  <!-- ═══ OVERVIEW ═══ -->
+  <h2 id="overview">الحالة الراهنة — ما الذي نتكلم عنه؟</h2>
+
+  <p style="color:var(--text-dim)">
+    التقرير السابق أشار إلى بندين "معلقَين" يحتاجان موافقة المشغّل.
+    هذا التقرير يشرحهما من الجذور: لماذا يوجدان، ما الخطر إذا لم يُنفَّذا، وبالضبط ماذا يتطلب كل منهما.
+  </p>
+
+  <div class="two-col">
+    <div class="stat-card">
+      <div class="stat-num warn">1</div>
+      <div class="stat-label">Stage-2 DB migrations — إعادة بناء صورة DB</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num warn">2</div>
+      <div class="stat-label">مؤشر مجموعة متعدد الأجهزة — backend + frontend</div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>البند</th><th>الأولوية</th><th>المستفيد</th><th>الحجم</th><th>الحاجز</th></tr>
+      <tr class="row-warn">
+        <td><strong>Stage-2 DB migrations</strong></td>
+        <td><span class="chip chip-warn">متوسط</span></td>
+        <td>عمليات DevOps</td>
+        <td>إعادة بناء image واحدة</td>
+        <td>موافقة مشغّل + وقت توقف مخطط</td>
+      </tr>
+      <tr class="row-warn">
+        <td><strong>مؤشر مجموعة متعدد الأجهزة</strong></td>
+        <td><span class="chip chip-info">تحسين UX</span></td>
+        <td>العميل (جميع الأجهزة)</td>
+        <td>4 ملفات (2 backend محظور + 2 frontend)</td>
+        <td>يمسّ المنطقة المحظورة backend/app/modules/</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- STAGE-2                            -->
+  <!-- ═══════════════════════════════════ -->
+  <h2 id="stage2-what">البند الأول — Stage-2 DB migrations: ما المقصود؟</h2>
+
+  <h3>المشكلة في كلمتين</h3>
+  <p style="color:var(--text-dim)">
+    صورة Docker لقاعدة البيانات تحمل في داخلها مخططاً قديماً (<code>z1a2b3c4d5e6</code>).
+    كل ترحيل جديد يُطبَّق <strong>فوق</strong> هذه الصورة بعد تشغيلها — ليس بداخلها.
+    لو أعدنا إنشاء الـ container من الصفر، سيبدأ من المخطط القديم ويحتاج alembic لإعادة تطبيق
+    <strong>94 ترحيلاً</strong> قبل أن يكون جاهزاً.
+  </p>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 720 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a1" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#4A9EFF"/></marker>
+        <marker id="a2" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#34C77A"/></marker>
+        <marker id="a3" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#E8A825"/></marker>
+      </defs>
+
+      <!-- CURRENT STATE -->
+      <text x="30" y="22" fill="#7A8BA0" font-size="10" font-weight="600" letter-spacing=".08em">الوضع الراهن</text>
+      <rect x="30" y="30" width="110" height="44" rx="6" fill="#0f1d2e" stroke="#1E2D47"/>
+      <text x="85" y="50" fill="#BEC8DC" font-size="10" text-anchor="middle" font-weight="700">Docker image</text>
+      <text x="85" y="64" fill="#E8A825" font-size="9" text-anchor="middle">z1a2b3c4d5e6</text>
+      <path d="M140 52 L165 52" stroke="#4A9EFF" stroke-width="1.5" marker-end="url(#a1)"/>
+      <rect x="165" y="30" width="105" height="44" rx="6" fill="#0f1d2e" stroke="#4A9EFF"/>
+      <text x="217" y="50" fill="#BEC8DC" font-size="10" text-anchor="middle" font-weight="700">container يعمل</text>
+      <text x="217" y="64" fill="#4A9EFF" font-size="9" text-anchor="middle">z1a2b3c4d5e6</text>
+      <path d="M270 52 L295 52" stroke="#E8A825" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#a3)"/>
+      <rect x="295" y="30" width="130" height="44" rx="6" fill="#1a1529" stroke="#E8A825"/>
+      <text x="360" y="48" fill="#BEC8DC" font-size="10" text-anchor="middle" font-weight="700">alembic upgrade head</text>
+      <text x="360" y="62" fill="#E8A825" font-size="9" text-anchor="middle">يطبّق 94 ترحيلاً عند كل إعادة</text>
+      <path d="M425 52 L450 52" stroke="#34C77A" stroke-width="1.5" marker-end="url(#a2)"/>
+      <rect x="450" y="30" width="110" height="44" rx="6" fill="#0f2018" stroke="#34C77A"/>
+      <text x="505" y="50" fill="#BEC8DC" font-size="10" text-anchor="middle" font-weight="700">DB جاهزة</text>
+      <text x="505" y="64" fill="#34C77A" font-size="9" text-anchor="middle">ab20 ✅</text>
+
+      <!-- WARNING: rebuild risk -->
+      <rect x="450" y="88" width="245" height="36" rx="5" fill="rgba(232,168,37,.08)" stroke="rgba(232,168,37,.3)"/>
+      <text x="455" y="104" fill="#E8A825" font-size="10">⚠ عند docker compose down -v</text>
+      <text x="455" y="118" fill="#7A8BA0" font-size="9">البيانات تُحذف + يلزم alembic من جديد</text>
+
+      <!-- STAGE-2 STATE -->
+      <text x="30" y="158" fill="#7A8BA0" font-size="10" font-weight="600" letter-spacing=".08em">بعد Stage-2</text>
+      <rect x="30" y="165" width="110" height="28" rx="6" fill="#0f2018" stroke="#34C77A"/>
+      <text x="85" y="183" fill="#34C77A" font-size="10" text-anchor="middle" font-weight="700">Docker image v2</text>
+      <path d="M140 179 L165 179" stroke="#34C77A" stroke-width="1.5" marker-end="url(#a2)"/>
+      <rect x="165" y="165" width="110" height="28" rx="6" fill="#0f2018" stroke="#34C77A"/>
+      <text x="220" y="179" fill="#34C77A" font-size="10" text-anchor="middle">تبدأ من ab20</text>
+      <text x="390" y="183" fill="#7A8BA0" font-size="10">→ لا حاجة لـ alembic عند إعادة البناء</text>
+    </svg>
+  </div>
+
+  <h2 id="stage2-chain">سلسلة الترحيل aa01 ← aa15 — ماذا يفعل كل منها؟</h2>
+
+  <p style="color:var(--text-dim)">
+    هذه الترحيلات الخمسة عشر هي أول سلسلة تمتد من القاعدة القديمة. كل منها يضيف
+    جدولاً أو عموداً أو فهرساً مرتبطاً بميزة حقيقية.
+  </p>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>#</th><th>اسم الترحيل</th><th>ماذا يضيف؟</th><th>الميزة المرتبطة</th></tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa01</code></td>
+        <td>cash_handover_agent</td>
+        <td>عمود <code>agent_id</code> + FK في <code>cash_handovers</code></td>
+        <td>وكيل التسليم النقدي</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa02</code></td>
+        <td>user_fks</td>
+        <td>FK على <code>employees.user_id</code> و<code>manual_journals.posted_by</code></td>
+        <td>تكامل مرجعي للبيانات المالية</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa03</code></td>
+        <td>accounting_periods</td>
+        <td>جدول <code>accounting_periods</code> كامل (OPEN/CLOSED)</td>
+        <td>الفترات المحاسبية + قفل الدفاتر</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa04</code></td>
+        <td>cash_exceptions</td>
+        <td>جدول <code>cash_exceptions</code> (الاستثناءات النقدية)</td>
+        <td>معالجة حالات النقص/الزيادة النقدية</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa05</code></td>
+        <td>order_fulfillment_type</td>
+        <td>عمودان على <code>orders</code>: <code>fulfillment_type</code> + <code>scheduled_for</code></td>
+        <td>التوصيل / الاستلام الذاتي / الجدولة</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa06</code></td>
+        <td>customer_debts</td>
+        <td>جدول <code>customer_debts</code> (ديون العميل)</td>
+        <td>تتبع الديون المعلقة للعملاء</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa07</code></td>
+        <td>perf_compound_indexes</td>
+        <td>3 فهارس مركبة: orders + drivers + dispatch_offers</td>
+        <td>تحسين الأداء (استعلامات الحالة)</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa08</code></td>
+        <td>arabic_normalize_harakat</td>
+        <td>دالة PostgreSQL لتطبيع الحركات + إعادة فهرسة</td>
+        <td>البحث العربي بدون تشكيل</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa09</code></td>
+        <td>catalog_approval</td>
+        <td>4 أعمدة على <code>catalog_items</code>: submitted/reviewed/rejected</td>
+        <td>سير عمل موافقة قائمة المنتجات</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa10</code></td>
+        <td>settlement_cash_unique</td>
+        <td>unique index على <code>settlements.order_id</code> + <code>cash_collections.order_id</code></td>
+        <td>منع التسوية المزدوجة</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa11</code></td>
+        <td>complaint_provider_response</td>
+        <td>عمودان على <code>complaints</code>: ردّ المزود + وقته</td>
+        <td>إمكانية ردّ المزود على الشكاوى</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa12</code></td>
+        <td>promotions</td>
+        <td>جدول <code>promotions</code> كامل (نسبة/مبلغ/صلاحية)</td>
+        <td>نظام العروض والخصومات</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa13</code></td>
+        <td>master_catalog</td>
+        <td>جدول <code>master_catalog_items</code> (كتالوج مركزي)</td>
+        <td>مزامنة المنتجات من مصدر مركزي</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa14</code></td>
+        <td>master_places</td>
+        <td>جدول <code>master_places</code> (الأماكن الرسمية)</td>
+        <td>بيانات الأماكن الليبية الرسمية</td>
+      </tr>
+      <tr class="row-ok">
+        <td><code style="font-size:11px">aa15</code></td>
+        <td>order_messages</td>
+        <td>جدول <code>order_messages</code> + فهرس</td>
+        <td>المحادثة بين العميل والسائق</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="alert alert-info">
+    💡 <strong>ملاحظة:</strong> هذه الترحيلات الخمسة عشر هي فقط أول سلسلة.
+    السلسلة الكاملة تمتد حتى <code>ab20</code> (94 ملفاً إجمالاً). كلها مطبّقة على الـ DB الحي.
+    فقط الـ Docker image لم يُحدَّث ليعكس هذا.
+  </div>
+
+  <h2 id="stage2-risk">الخطر قبل وبعد Stage-2</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>الحدث</th><th>قبل Stage-2</th><th>بعد Stage-2</th></tr>
+      <tr>
+        <td><code>docker compose up</code> (container يعمل بالفعل)</td>
+        <td><span class="chip chip-ok">✅ طبيعي</span> — البيانات موجودة على الـ volume</td>
+        <td><span class="chip chip-ok">✅ طبيعي</span> — نفس السلوك</td>
+      </tr>
+      <tr class="row-warn">
+        <td><code>docker compose down -v</code> ثم <code>up</code></td>
+        <td><span class="chip chip-warn">⚠ يبدأ من z1a2b3c4d5e6</span> — يحتاج <code>alembic upgrade head</code></td>
+        <td><span class="chip chip-ok">✅ يبدأ من ab20</span> — جاهز فوراً</td>
+      </tr>
+      <tr class="row-warn">
+        <td>نقل الخوادم / استعادة من نسخة احتياطية</td>
+        <td><span class="chip chip-warn">⚠ يحتاج خطوة alembic يدوية</span></td>
+        <td><span class="chip chip-ok">✅ الصورة تتضمن الكل</span></td>
+      </tr>
+      <tr class="row-block">
+        <td>CI/CD بيئة جديدة نظيفة</td>
+        <td><span class="chip chip-crit">✗ ينكسر</span> إن لم تُشغَّل alembic أولاً</td>
+        <td><span class="chip chip-ok">✅ يعمل تلقائياً</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <h2 id="stage2-steps">خطوات التنفيذ (للمشغّل)</h2>
+
+  <div class="card">
+    <h4>المتطلب الأساسي</h4>
+    <p style="font-size:13.5px;color:var(--text-dim)">
+      وقت توقف مخطط (planned maintenance window) لإعادة بناء صورة postgres مع dump حالي.
+      مدة متوقعة: 15–30 دقيقة.
+    </p>
+  </div>
+
+  <div class="card">
+    <h4>الخطوات (مُعطاة للمشغّل كمرجع — ليست أوامر جاهزة للتنفيذ)</h4>
+    <ol style="padding-right:20px;line-height:2.2;color:var(--text-dim);font-size:13.5px">
+      <li><strong style="color:var(--text)">pg_dump</strong> — احتياطي كامل من الـ volume الحالي</li>
+      <li><strong style="color:var(--text)">pg_dumpall --schema-only</strong> — استخراج المخطط الحالي (ab20)</li>
+      <li>إنشاء <strong style="color:var(--text)">Dockerfile.postgres-v2</strong> يبني على postgres:15-alpine ويضيف init.sql بالمخطط الحالي</li>
+      <li><strong style="color:var(--text)">docker buildx build</strong> لصورة postgres جديدة مع tag v2</li>
+      <li>تحديث <code>docker-compose.yml</code> للإشارة للصورة الجديدة (تغيير محظور — يحتاج صلاحية)</li>
+      <li>اختبار على بيئة تطوير أولاً: <code>docker compose down -v && docker compose up</code></li>
+      <li>نشر على staging بنافذة صيانة مجدولة</li>
+    </ol>
+  </div>
+
+  <div class="alert alert-warn">
+    ⚠ <strong>docker-compose.yml محظور التعديل</strong> بدون إذن مشغّل صريح.
+    الخطوة 5 تحديداً تتطلب تعديل هذا الملف — لذلك يظل هذا البند "معلقاً" حتى الإذن.
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- MULTI-DEVICE                       -->
+  <!-- ═══════════════════════════════════ -->
+  <h2 id="multidev-gap">البند الثاني — مؤشر المجموعة متعدد الأجهزة</h2>
+
+  <h3>لماذا يوجد القيد الحالي؟</h3>
+
+  <p style="color:var(--text-dim)">
+    مؤشر "🛒 مجموعة" الذي أضفناه في P14-8 يعتمد على <code>localStorage</code> الخاص بالمتصفح.
+    localStorage مرتبط بالجهاز والمتصفح — لا يُشارَك مع جهاز آخر.
+    الحل الصحيح هو أن يُعيد الـ backend عمود <code>group_id</code> ضمن API الطلبات.
+  </p>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 720 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="b1" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#4A9EFF"/></marker>
+        <marker id="b2" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#34C77A"/></marker>
+        <marker id="b3" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L7,3 z" fill="#FF5C5C"/></marker>
+      </defs>
+
+      <!-- NOW label -->
+      <text x="20" y="18" fill="#7A8BA0" font-size="10" font-weight="600" letter-spacing=".1em">الآن — localStorage</text>
+      <!-- Phone A -->
+      <rect x="20" y="28" width="90" height="50" rx="6" fill="#131929" stroke="#4A9EFF"/>
+      <text x="65" y="50" fill="#BEC8DC" font-size="10" text-anchor="middle" font-weight="700">📱 جهاز A</text>
+      <text x="65" y="64" fill="#34C77A" font-size="9" text-anchor="middle">🛒 يرى المجموعة</text>
+      <!-- Phone B -->
+      <rect x="130" y="28" width="90" height="50" rx="6" fill="#131929" stroke="#E8A825"/>
+      <text x="175" y="50" fill="#BEC8DC" font-size="10" text-anchor="middle" font-weight="700">📱 جهاز B</text>
+      <text x="175" y="64" fill="#FF5C5C" font-size="9" text-anchor="middle">✗ لا يرى المجموعة</text>
+      <!-- localStorage explanation -->
+      <rect x="20" y="86" width="200" height="28" rx="5" fill="rgba(232,168,37,.08)" stroke="rgba(232,168,37,.3)"/>
+      <text x="30" y="100" fill="#E8A825" font-size="9.5">tawa_group_map موجود فقط في جهاز A</text>
+      <text x="30" y="112" fill="#7A8BA0" font-size="9">لا يُزامَن مع جهاز B</text>
+
+      <!-- AFTER label -->
+      <text x="350" y="18" fill="#7A8BA0" font-size="10" font-weight="600" letter-spacing=".1em">بعد التحديث — backend API</text>
+      <!-- DB column -->
+      <rect x="350" y="28" width="120" height="50" rx="6" fill="#0f2018" stroke="#34C77A"/>
+      <text x="410" y="50" fill="#BEC8DC" font-size="10" text-anchor="middle" font-weight="700">orders.group_id</text>
+      <text x="410" y="64" fill="#34C77A" font-size="9" text-anchor="middle">موجود في DB ✅</text>
+      <!-- API -->
+      <path d="M470 53 L520 53" stroke="#34C77A" stroke-width="1.5" marker-end="url(#b2)"/>
+      <rect x="520" y="35" width="100" height="36" rx="6" fill="#131929" stroke="#34C77A"/>
+      <text x="570" y="52" fill="#34C77A" font-size="10" text-anchor="middle" font-weight="700">GET /orders</text>
+      <text x="570" y="65" fill="#34C77A" font-size="9" text-anchor="middle">يُعيد group_id</text>
+      <!-- Both phones happy -->
+      <path d="M620 53 L650 30" stroke="#34C77A" stroke-width="1.5" marker-end="url(#b2)"/>
+      <path d="M620 53 L650 76" stroke="#34C77A" stroke-width="1.5" marker-end="url(#b2)"/>
+      <rect x="650" y="18" width="60" height="28" rx="5" fill="#0f2018" stroke="#34C77A"/>
+      <text x="680" y="36" fill="#34C77A" font-size="9" text-anchor="middle">📱 A ✅</text>
+      <rect x="650" y="62" width="60" height="28" rx="5" fill="#0f2018" stroke="#34C77A"/>
+      <text x="680" y="80" fill="#34C77A" font-size="9" text-anchor="middle">📱 B ✅</text>
+
+      <!-- DB column note -->
+      <rect x="350" y="125" width="380" height="50" rx="6" fill="rgba(139,124,246,.07)" stroke="rgba(139,124,246,.3)"/>
+      <text x="360" y="147" fill="#8B7CF6" font-size="10" font-weight="600">الجيد: عمود group_id موجود بالفعل في جدول orders</text>
+      <text x="360" y="163" fill="#7A8BA0" font-size="9.5">أُضيف في ترحيل ab03_cart_groups (السطر: op.add_column("orders", Column("group_id",...)))</text>
+      <text x="360" y="177" fill="#7A8BA0" font-size="9.5">والنموذج يحتوي: group_id: Mapped[Optional[str]] (order.py:116)</text>
+
+      <!-- Gap explanation -->
+      <rect x="20" y="138" width="310" height="50" rx="6" fill="rgba(255,92,92,.07)" stroke="rgba(255,92,92,.3)"/>
+      <text x="30" y="158" fill="#FF5C5C" font-size="10" font-weight="600">الفجوة: البيانات موجودة في DB لكن لا تصل للـ frontend</text>
+      <text x="30" y="173" fill="#7A8BA0" font-size="9.5">OrderSummary schema لا يحمل group_id → لا يُعاد في API → لا يصل</text>
+    </svg>
+  </div>
+
+  <h2 id="multidev-chain">التسلسل الكامل للفجوة — 4 طبقات</h2>
+
+  <div class="card" style="border-right:4px solid var(--crit)">
+    <h4 style="color:var(--crit);margin-top:0">الطبقة 1: قاعدة البيانات ✅ (موجود)</h4>
+    <pre>-- جدول orders يحتوي على:
+group_id VARCHAR(36) NULL   -- أُضيف في ab03_cart_groups
+INDEX: idx_orders_group_id ON orders(group_id)
+
+-- جدول order_groups:
+id, customer_id, payment_method, total_minor, state, ...</pre>
+    <p style="font-size:13px;color:var(--good)">✅ لا يحتاج أي تغيير في DB — العمود موجود منذ ترحيل ab03.</p>
+  </div>
+
+  <div class="card" style="border-right:4px solid var(--crit)">
+    <h4 style="color:var(--crit);margin-top:0">الطبقة 2: نموذج SQLAlchemy ✅ (موجود)</h4>
+    <pre># backend/app/models/order.py : السطر 116
+group_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)</pre>
+    <p style="font-size:13px;color:var(--good)">✅ النموذج يحمل العمود — لا تغيير مطلوب.</p>
+  </div>
+
+  <div class="card" style="border-right:4px solid var(--crit)">
+    <h4 style="color:var(--crit);margin-top:0">الطبقة 3: OrderSummary Schema ✗ (غير موجود) — محظور</h4>
+    <pre># backend/app/modules/orders/schemas.py
+# الملف الحالي لا يحتوي group_id في OrderSummary
+class OrderSummary(BaseModel):
+    id: str
+    order_state: str
+    ...
+    # ← group_id غائب هنا ✗
+
+# التغيير المطلوب:
+    group_id: Optional[str] = None  # ← إضافة هذا السطر</pre>
+    <p style="font-size:13px;color:var(--crit)">
+      ✗ هذا الملف في <code>backend/app/modules/</code> — <strong>المنطقة المحظورة</strong>.
+      يحتاج إذن مشغّل صريح.
+    </p>
+  </div>
+
+  <div class="card" style="border-right:4px solid var(--crit)">
+    <h4 style="color:var(--crit);margin-top:0">الطبقة 4: OrderSummary Constructor ✗ (غير موجود) — محظور</h4>
+    <pre># backend/app/modules/orders/order_router.py : السطر ~85
+def _build_order_summary(order, ...):
+    return OrderSummary(
+        id=order.id,
+        order_state=order.order_state,
+        ...
+        # ← group_id لا يُمرَّر هنا ✗
+
+        # التغيير المطلوب:
+        group_id=getattr(order, "group_id", None),  # ← إضافة هذا السطر
+    )</pre>
+    <p style="font-size:13px;color:var(--crit)">
+      ✗ نفس الملف في <code>backend/app/modules/</code> — <strong>محظور</strong>.
+    </p>
+  </div>
+
+  <h2 id="multidev-files">الملفات المطلوب تعديلها (4 ملفات)</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>الملف</th><th>التغيير</th><th>الحجم</th><th>الحالة</th></tr>
+      <tr class="row-block">
+        <td><code>backend/app/modules/orders/schemas.py</code></td>
+        <td>إضافة <code>group_id: Optional[str] = None</code> لـ OrderSummary</td>
+        <td>سطر واحد</td>
+        <td><span class="chip chip-crit">محظور</span></td>
+      </tr>
+      <tr class="row-block">
+        <td><code>backend/app/modules/orders/order_router.py</code></td>
+        <td>إضافة <code>group_id=getattr(order, "group_id", None)</code></td>
+        <td>سطر واحد</td>
+        <td><span class="chip chip-crit">محظور</span></td>
+      </tr>
+      <tr class="row-warn">
+        <td><code>web/src/api/types.ts</code></td>
+        <td>إضافة <code>group_id?: string | null</code> لـ OrderSummary interface</td>
+        <td>سطر واحد</td>
+        <td><span class="chip chip-ok">مسموح</span></td>
+      </tr>
+      <tr class="row-warn">
+        <td><code>web/src/pages/customer/OrderHistoryPage.tsx</code></td>
+        <td>استبدال <code>groupByOrderId[order.id]</code> بـ <code>order.group_id</code></td>
+        <td>تغيير بسيط</td>
+        <td><span class="chip chip-ok">مسموح</span></td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="alert alert-info">
+    💡 <strong>الحجم الحقيقي للتغيير: 4 أسطر فقط</strong> — اثنان في backend (محظوران) واثنان في frontend (مسموحان).
+    الصعوبة ليست حجمه، بل أنه يمسّ منطقة محظورة.
+  </div>
+
+  <h3>التفاصيل الكاملة للكود المطلوب</h3>
+
+  <div class="card">
+    <h4>ملف 1 + 2: backend (محظور — يحتاج إذن)</h4>
+    <pre># schemas.py — إضافة سطر واحد بعد cancel_reason
+cancel_reason: Optional[str] = None
+<span style="color:#34C77A">group_id: Optional[str] = None   # ← جديد: ربط الطلب بمجموعة السلة</span>
+
+# order_router.py — إضافة سطر واحد في _build_order_summary
+        cancel_reason=getattr(order, "cancel_reason", None),
+<span style="color:#34C77A">        group_id=getattr(order, "group_id", None),              # ← جديد</span>
+    ).model_dump()</pre>
+  </div>
+
+  <div class="card">
+    <h4>ملف 3: web/src/api/types.ts (مسموح)</h4>
+    <pre>  cancel_reason?: string | null;
+<span style="color:#34C77A">  group_id?: string | null;  // ← جديد: ربط الطلب بمجموعة السلة (P14 multi-device)</span></pre>
+  </div>
+
+  <div class="card">
+    <h4>ملف 4: web/src/pages/customer/OrderHistoryPage.tsx (مسموح)</h4>
+    <pre>// قبل: localStorage reverse-map
+const groupByOrderId = useMemo(() => { /* localStorage logic */ }, []);
+{groupByOrderId[order.id] && (
+  &lt;button onClick={() => navigateToGroup(groupByOrderId[order.id])}&gt;
+    🛒 مجموعة
+  &lt;/button&gt;
+)}
+
+<span style="color:#34C77A">// بعد: نستخدم مباشرة من API response
+{order.group_id && (
+  &lt;button onClick={() => navigate(`/order-group/${order.group_id}`)}&gt;
+    🛒 مجموعة
+  &lt;/button&gt;
+)}
+// ← useMemo و navigateToGroup يُحذفان → كود أنظف</span></pre>
+  </div>
+
+  <h2 id="multidev-why">لماذا هذا محظور الآن؟</h2>
+
+  <div class="scope-grid">
+    <div class="scope-card blocked">
+      <div class="sc-title" style="color:var(--crit)">✗ المنطقة المحظورة</div>
+      <code style="font-size:11px">backend/app/modules/</code>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:8px;margin-bottom:0">
+        هذه المنطقة تحتوي منطق العمل الأساسي، الـ routes، والـ schemas.
+        أي تغيير فيها يمسّ الـ API الحي وله خطر كسر endpoints أو تسريب بيانات.
+        قاعدة الحظر تحمي من التغييرات العرضية في طلبات frontend-only.
+      </p>
+    </div>
+    <div class="scope-card ok">
+      <div class="sc-title" style="color:var(--good)">✅ المنطقة المسموحة</div>
+      <code style="font-size:11px">web/src/</code>
+      <p style="font-size:13px;color:var(--text-dim);margin-top:8px;margin-bottom:0">
+        الكود الموجود في web/src هو frontend-only.
+        تعديله لا يؤثر على الـ API أو قاعدة البيانات.
+        يمكن تعديله في أي وقت دون إذن خاص.
+      </p>
+    </div>
+  </div>
+
+  <div class="alert alert-ok">
+    ✅ <strong>الجانب الإيجابي:</strong> الأجزاء الأصعب (DB column + SQLAlchemy model) موجودة بالفعل.
+    الباقي هو فقط تمريرها عبر الطبقات — مجرد 4 أسطر عند الإذن.
+  </div>
+
+  <!-- ═══════════════════════════════════ -->
+  <!-- COMPARE + OPERATOR                 -->
+  <!-- ═══════════════════════════════════ -->
+  <h2 id="compare">مقارنة البندين — جانباً إلى جانب</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>المعيار</th><th>Stage-2 DB migrations</th><th>مؤشر متعدد الأجهزة</th></tr>
+      <tr>
+        <td>هل المنصة تعمل بدونه؟</td>
+        <td><span class="chip chip-ok">✅ نعم</span> — النظام يعمل كاملاً</td>
+        <td><span class="chip chip-ok">✅ نعم</span> — المؤشر يعمل على نفس الجهاز</td>
+      </tr>
+      <tr>
+        <td>خطر عدم التنفيذ</td>
+        <td>محدود — يظهر فقط عند إعادة بناء كاملة</td>
+        <td>منخفض — UX محدود (جهاز واحد فقط)</td>
+      </tr>
+      <tr>
+        <td>حجم التغيير</td>
+        <td>بناء صورة Docker جديدة</td>
+        <td>4 أسطر في 4 ملفات</td>
+      </tr>
+      <tr>
+        <td>الملفات المحظورة</td>
+        <td><code>docker-compose.yml</code></td>
+        <td><code>backend/app/modules/orders/*.py</code></td>
+      </tr>
+      <tr>
+        <td>وقت التنفيذ</td>
+        <td>15–30 دقيقة</td>
+        <td>30 دقيقة كود + اختبار</td>
+      </tr>
+      <tr>
+        <td>الأثر على المستخدم</td>
+        <td>صفر — infrastructure فقط</td>
+        <td>يرى المجموعة من أي جهاز</td>
+      </tr>
+      <tr>
+        <td>الأولوية المقترحة</td>
+        <td><span class="chip chip-warn">متوسطة</span> — قبل Stage-3 deploy</td>
+        <td><span class="chip chip-info">منخفضة</span> — عند طلب توسعة UX</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2 id="operator">قرار المشغّل — ماذا يحتاج؟</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>البند</th><th>ما يحتاجه المشغّل لتفعيله</th><th>ما ينفّذه المطوّر بعد الإذن</th></tr>
+      <tr>
+        <td><strong>Stage-2 DB</strong></td>
+        <td>
+          — تحديد نافذة صيانة مخططة<br>
+          — إذن تعديل <code>docker-compose.yml</code><br>
+          — إذن بناء وتوزيع صورة postgres جديدة
+        </td>
+        <td>
+          1. pg_dump من الـ volume الحالي<br>
+          2. بناء Dockerfile.postgres-v2<br>
+          3. اختبار على staging<br>
+          4. نشر مع نافذة الصيانة
+        </td>
+      </tr>
+      <tr>
+        <td><strong>مؤشر متعدد الأجهزة</strong></td>
+        <td>
+          — إذن تعديل <code>backend/app/modules/orders/schemas.py</code><br>
+          — إذن تعديل <code>backend/app/modules/orders/order_router.py</code>
+        </td>
+        <td>
+          1. إضافة <code>group_id</code> لـ OrderSummary schema<br>
+          2. تمريره في <code>_build_order_summary</code><br>
+          3. تحديث frontend types + component<br>
+          4. اختبار + نشر
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="alert alert-warn">
+    ⚠ <strong>هذا التقرير شرحٌ فقط.</strong>
+    لا يُنفَّذ أي بند من هذين البندين بدون إذن مشغّل صريح ومكتوب في هذه المحادثة.
+  </div>
+
+  <hr>
+  <p style="color:var(--text-dim);font-size:13px;text-align:center;padding-bottom:32px">
+    شرح البنود المعلقة — منصة توا للتوصيل في ليبيا<br>
+    6 يوليو 2026 · رأس الـ repo: ab20 · Kali DB: ab20 (head)
+  </p>
+
+</main>
+
+<script>
+const sections = document.querySelectorAll('h2[id]');
+const links = document.querySelectorAll('nav a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+  });
+}, { threshold: 0.25 });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

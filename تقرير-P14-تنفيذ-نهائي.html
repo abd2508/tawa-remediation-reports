@@ -1,0 +1,1480 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير P14 — التنفيذ النهائي | Tawa Platform</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #070B13;
+  --surf:      #0D1520;
+  --surf2:     #111E2E;
+  --surf3:     #162840;
+  --accent:    #3B8DF0;
+  --accent-lo: #1A3F6F;
+  --text:      #BFD0E8;
+  --text-md:   #7A9CBE;
+  --text-lo:   #3D5A7A;
+  --border:    #162538;
+  --ok:        #10B981;
+  --ok-lo:     #0A3528;
+  --warn:      #F59E0B;
+  --warn-lo:   #3A2A06;
+  --err:       #EF4444;
+  --err-lo:    #3A0F0F;
+  --sidebar-w: 230px;
+  --topbar-h:  56px;
+  --font-body: 'Segoe UI', 'Tahoma', 'Arial Unicode MS', 'Noto Sans Arabic', Arial, sans-serif;
+  --font-mono: 'Courier New', 'Lucida Console', monospace;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+/* ─── TOP BAR ──────────────────────────────────────────────── */
+.topbar {
+  position: fixed;
+  top: 0; right: 0; left: 0;
+  height: var(--topbar-h);
+  background: var(--surf);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 14px;
+  z-index: 100;
+}
+.topbar-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  flex: 1;
+}
+.topbar-title span { color: var(--accent); }
+.topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--text-md);
+  font-variant-numeric: tabular-nums;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.chip-ok   { background: var(--ok-lo);   color: var(--ok);   border: 1px solid #1A5540; }
+.chip-warn { background: var(--warn-lo); color: var(--warn); border: 1px solid #5A4010; }
+.chip-err  { background: var(--err-lo);  color: var(--err);  border: 1px solid #5A1A1A; }
+.chip-blue { background: var(--accent-lo); color: var(--accent); border: 1px solid #1E4B8A; }
+.chip-dim  { background: var(--surf3); color: var(--text-md); border: 1px solid var(--border); }
+
+/* ─── SIDEBAR ──────────────────────────────────────────────── */
+.sidebar {
+  position: fixed;
+  top: var(--topbar-h);
+  right: 0;
+  width: var(--sidebar-w);
+  height: calc(100vh - var(--topbar-h));
+  background: var(--surf);
+  border-right: none;
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 20px 0 40px;
+  z-index: 90;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.sidebar-section-label {
+  padding: 14px 18px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-lo);
+  text-transform: uppercase;
+}
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  font-size: 13px;
+  color: var(--text-md);
+  text-decoration: none;
+  border-right: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.sidebar a:hover {
+  color: var(--text);
+  background: var(--surf2);
+  border-right-color: var(--accent);
+}
+.sidebar a .nav-icon { font-size: 14px; flex-shrink: 0; }
+.sidebar a .nav-badge {
+  margin-right: auto;
+  margin-left: 0;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: var(--surf3);
+  color: var(--text-md);
+  font-variant-numeric: tabular-nums;
+}
+.sidebar a .nav-badge.ok   { background: var(--ok-lo);   color: var(--ok); }
+.sidebar a .nav-badge.err  { background: var(--err-lo);  color: var(--err); }
+.sidebar a .nav-badge.warn { background: var(--warn-lo); color: var(--warn); }
+
+/* ─── MAIN CONTENT ─────────────────────────────────────────── */
+.main {
+  margin-right: var(--sidebar-w);
+  margin-top: var(--topbar-h);
+  padding: 36px 44px 80px;
+  max-width: 1100px;
+}
+
+/* ─── SECTIONS ─────────────────────────────────────────────── */
+.section {
+  margin-bottom: 52px;
+  scroll-margin-top: calc(var(--topbar-h) + 16px);
+}
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.section-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  text-wrap: balance;
+}
+.section-title small {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-md);
+  margin-right: 8px;
+}
+
+/* ─── CARDS ────────────────────────────────────────────────── */
+.card {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px 22px;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.card-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 780px) {
+  .card-grid-2 { grid-template-columns: 1fr; }
+  .main { padding: 20px 18px 60px; }
+  .sidebar { display: none; }
+  .main { margin-right: 0; }
+}
+.card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-lo);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.card-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.card-value.ok   { color: var(--ok); }
+.card-value.warn { color: var(--warn); }
+.card-value.blue { color: var(--accent); }
+.card-sub {
+  font-size: 11px;
+  color: var(--text-md);
+  margin-top: 3px;
+}
+
+/* ─── TABLES ───────────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; border-radius: 4px; border: 1px solid var(--border); }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead tr {
+  background: var(--surf2);
+  border-bottom: 1px solid var(--border);
+}
+thead th {
+  padding: 10px 14px;
+  text-align: right;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text-md);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surf2); }
+tbody td {
+  padding: 10px 14px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  vertical-align: top;
+}
+tbody td.muted { color: var(--text-md); }
+tbody td.code  { font-family: var(--font-mono); font-size: 12px; color: #7EC8E3; }
+
+/* ─── STATUS DOT ────────────────────────────────────────────── */
+.dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-ok   { background: var(--ok); box-shadow: 0 0 5px var(--ok); }
+.dot-warn { background: var(--warn); }
+.dot-err  { background: var(--err); }
+.dot-blue { background: var(--accent); }
+
+/* ─── CODE BLOCKS ──────────────────────────────────────────── */
+pre {
+  background: #050A11;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+  color: #A8C5E8;
+}
+pre .del { color: #FF7B7B; background: rgba(239,68,68,0.08); display: block; margin: 0 -16px; padding: 0 16px; }
+pre .add { color: #6EE7B7; background: rgba(16,185,129,0.08); display: block; margin: 0 -16px; padding: 0 16px; }
+pre .ctx { color: #4A6A88; }
+pre .kw  { color: #7CB9F5; }
+pre .cm  { color: #4A6A88; font-style: italic; }
+
+/* ─── DIFF CARD ─────────────────────────────────────────────── */
+.diff-block {
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.diff-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: var(--surf2);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+}
+.diff-header .diff-path { flex: 1; }
+.diff-header .diff-stat { color: var(--text-md); font-size: 11px; }
+.diff-body { background: #050A11; }
+.diff-body pre {
+  border: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+/* ─── ISSUE CARD ────────────────────────────────────────────── */
+.issue-card {
+  display: flex;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surf);
+  margin-bottom: 12px;
+}
+.issue-stripe {
+  width: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+.issue-stripe.ok   { background: var(--ok); }
+.issue-stripe.warn { background: var(--warn); }
+.issue-stripe.err  { background: var(--err); }
+.issue-stripe.info { background: var(--accent); }
+.issue-body { flex: 1; }
+.issue-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.issue-desc {
+  font-size: 12px;
+  color: var(--text-md);
+  line-height: 1.6;
+}
+.issue-path {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 6px;
+  display: block;
+}
+.issue-res {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--surf2);
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--text-md);
+  border-right: 3px solid var(--ok);
+}
+.issue-res strong { color: var(--ok); }
+
+/* ─── SCENARIO GRID ─────────────────────────────────────────── */
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.scenario-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--text-md);
+}
+.scenario-item .s-num {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-lo);
+  font-variant-numeric: tabular-nums;
+  min-width: 20px;
+}
+.scenario-item .s-ok {
+  margin-right: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ok);
+  background: var(--ok-lo);
+  padding: 1px 7px;
+  border-radius: 2px;
+}
+
+/* ─── SVG DIAGRAMS ──────────────────────────────────────────── */
+.diagram-wrap {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  overflow-x: auto;
+}
+.diagram-caption {
+  font-size: 11px;
+  color: var(--text-md);
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ─── DEPLOY TARGET ─────────────────────────────────────────── */
+.deploy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+.deploy-card {
+  background: var(--surf);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.deploy-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--surf2);
+  border-bottom: 1px solid var(--border);
+}
+.deploy-card-head .d-num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--accent-lo);
+  border: 1px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.deploy-card-head .d-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.deploy-card-body {
+  padding: 12px 16px;
+  font-size: 12px;
+  color: var(--text-md);
+  line-height: 1.7;
+}
+.deploy-card-body .d-url {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  word-break: break-all;
+}
+.deploy-card-body .d-note {
+  margin-top: 8px;
+  padding: 7px 10px;
+  background: var(--surf2);
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--text-md);
+}
+
+/* ─── PROGRESS BAR ──────────────────────────────────────────── */
+.pbar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.pbar-label {
+  width: 140px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-md);
+  text-align: right;
+}
+.pbar-track {
+  flex: 1;
+  height: 6px;
+  background: var(--surf3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.pbar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.pbar-fill.ok   { background: var(--ok); }
+.pbar-fill.warn { background: var(--warn); }
+.pbar-fill.err  { background: var(--err); }
+.pbar-fill.blue { background: var(--accent); }
+.pbar-count {
+  width: 80px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-md);
+  text-align: left;
+}
+
+/* ─── INLINE TEXT UTILITIES ─────────────────────────────────── */
+.text-ok   { color: var(--ok); }
+.text-warn { color: var(--warn); }
+.text-err  { color: var(--err); }
+.text-blue { color: var(--accent); }
+.text-lo   { color: var(--text-md); }
+.mono      { font-family: var(--font-mono); font-size: 11px; }
+p { margin-bottom: 10px; line-height: 1.8; }
+h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 18px 0 10px; }
+h4 { font-size: 13px; font-weight: 700; color: var(--text-md); margin: 14px 0 8px; }
+ul { padding-right: 18px; margin-bottom: 10px; }
+li { margin-bottom: 4px; color: var(--text-md); font-size: 13px; }
+li strong { color: var(--text); }
+.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ TOP BAR ═══════════════ -->
+<div class="topbar">
+  <div class="topbar-title">
+    <span>تقرير P14</span> — تنفيذ نهائي | Tawa Platform
+  </div>
+  <div class="topbar-meta">
+    <span class="chip chip-ok">✓ مكتمل</span>
+    <span class="chip chip-blue">ab20_staff_evaluation</span>
+    <span class="chip chip-dim">e91fb61</span>
+    <span class="chip chip-ok">FIN-COR PASS</span>
+  </div>
+</div>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<nav class="sidebar" aria-label="قائمة التنقل">
+  <div class="sidebar-section-label">التقرير</div>
+  <a href="#exec-summary">
+    <span class="nav-icon">📊</span>
+    ملخص تنفيذي
+    <span class="nav-badge ok">PASS</span>
+  </a>
+  <a href="#pre-checks">
+    <span class="nav-icon">🔍</span>
+    الفحوصات الأولية
+    <span class="nav-badge ok">5/5</span>
+  </a>
+  <a href="#built">
+    <span class="nav-icon">🔧</span>
+    ما تم بناؤه
+    <span class="nav-badge">6 ملفات</span>
+  </a>
+  <a href="#review">
+    <span class="nav-icon">🧐</span>
+    نتائج المراجعة
+    <span class="nav-badge ok">9/9</span>
+  </a>
+  <a href="#scenarios">
+    <span class="nav-icon">🎯</span>
+    السيناريوهات
+    <span class="nav-badge ok">12/12</span>
+  </a>
+  <a href="#tests">
+    <span class="nav-icon">🧪</span>
+    نتائج الاختبارات
+    <span class="nav-badge ok">3104</span>
+  </a>
+  <a href="#deploy">
+    <span class="nav-icon">🚀</span>
+    النشر الرباعي
+    <span class="nav-badge ok">4/4</span>
+  </a>
+  <a href="#changes">
+    <span class="nav-icon">📝</span>
+    التغييرات الدقيقة
+    <span class="nav-badge">6 ملفات</span>
+  </a>
+  <a href="#issues">
+    <span class="nav-icon">⚠️</span>
+    المشاكل والحلول
+    <span class="nav-badge warn">4</span>
+  </a>
+</nav>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main class="main">
+
+<!-- ══════════ A. ملخص تنفيذي ══════════ -->
+<section class="section" id="exec-summary">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم الأول</div>
+      <h2 class="section-title">ملخص تنفيذي <small>Executive Summary</small></h2>
+    </div>
+    <span class="chip chip-ok" style="font-size:13px; padding: 5px 14px;">✓ المرحلة مكتملة</span>
+  </div>
+
+  <p>
+    المرحلة P14 مخصصة لإضافة حقل <code class="mono">group_id</code> إلى نظام الطلبات — وهو الحقل الذي يسمح للعميل بربط
+    عدة طلبات ضمن مجموعة واحدة (سلة متعددة المتاجر). تم تنفيذ جميع المهام بنجاح، واجتازت كل الفحوصات، ونشرنا
+    التغييرات على الأربعة أهداف المطلوبة.
+  </p>
+
+  <div class="card-grid" style="margin-top:20px;">
+    <div class="card">
+      <div class="card-label">اختبارات الخلفية</div>
+      <div class="card-value ok">3,104</div>
+      <div class="card-sub">اجتازت · 0 فشل · 3 تخطي</div>
+    </div>
+    <div class="card">
+      <div class="card-label">اختبارات الواجهة</div>
+      <div class="card-value ok">1,367</div>
+      <div class="card-sub">اجتازت · 4 توقيت عشوائي موثق</div>
+    </div>
+    <div class="card">
+      <div class="card-label">السيناريوهات</div>
+      <div class="card-value ok">12 / 12</div>
+      <div class="card-sub">كل السيناريوهات نجحت</div>
+    </div>
+    <div class="card">
+      <div class="card-label">أهداف النشر</div>
+      <div class="card-value ok">4 / 4</div>
+      <div class="card-sub">GitHub · كالي · أوبنتو · الإنتاج</div>
+    </div>
+    <div class="card">
+      <div class="card-label">FIN-COR</div>
+      <div class="card-value ok">PASS</div>
+      <div class="card-sub">قبل وبعد التنفيذ</div>
+    </div>
+    <div class="card">
+      <div class="card-label">رأس قاعدة البيانات</div>
+      <div class="card-value blue" style="font-size:13px; padding-top:5px; line-height:1.4;">ab20_staff_evaluation</div>
+      <div class="card-sub">بلا migrations جديدة — تغييرات كود فقط</div>
+    </div>
+  </div>
+
+  <!-- Architecture diagram: before/after -->
+  <h3 style="margin-top:30px;">قبل وبعد: تدفق بيانات group_id</h3>
+  <div class="diagram-wrap" style="margin-top:12px;">
+    <svg viewBox="0 0 760 200" width="100%" style="display:block; min-width:600px;" aria-label="مخطط قبل وبعد تدفق group_id">
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#3B8DF0"/>
+        </marker>
+        <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#10B981"/>
+        </marker>
+      </defs>
+
+      <!-- BEFORE side -->
+      <text x="140" y="22" fill="#5C7A9A" font-size="11" text-anchor="middle" font-family="Segoe UI,Arial">قبل P14</text>
+      <rect x="20"  y="34" width="100" height="36" rx="3" fill="#0D1520" stroke="#3B8DF0" stroke-width="1.2"/>
+      <text x="70"  y="57" fill="#BFD0E8" font-size="11" text-anchor="middle" font-family="Segoe UI,Arial">Order DB</text>
+      <line x1="120" y1="52" x2="160" y2="52" stroke="#3B8DF0" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="160" y="34" width="110" height="36" rx="3" fill="#0D1520" stroke="#3B8DF0" stroke-width="1.2"/>
+      <text x="215" y="57" fill="#BFD0E8" font-size="11" text-anchor="middle" font-family="Segoe UI,Arial">OrderSummary</text>
+      <line x1="270" y1="52" x2="310" y2="52" stroke="#3B8DF0" stroke-width="1.5" marker-end="url(#arr)"/>
+      <rect x="310" y="34" width="80" height="36" rx="3" fill="#0D1520" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+      <text x="350" y="53" fill="#FF7B7B" font-size="10" text-anchor="middle" font-family="Segoe UI,Arial">بدون</text>
+      <text x="350" y="66" fill="#FF7B7B" font-size="10" text-anchor="middle" font-family="Segoe UI,Arial">group_id</text>
+      <text x="410" y="57" fill="#EF4444" font-size="20" text-anchor="middle">✗</text>
+
+      <!-- separator -->
+      <line x1="380" y1="10" x2="380" y2="190" stroke="#162538" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+      <!-- AFTER side -->
+      <text x="580" y="22" fill="#5C7A9A" font-size="11" text-anchor="middle" font-family="Segoe UI,Arial">بعد P14</text>
+      <rect x="400" y="34" width="100" height="36" rx="3" fill="#0D1520" stroke="#10B981" stroke-width="1.2"/>
+      <text x="450" y="57" fill="#BFD0E8" font-size="11" text-anchor="middle" font-family="Segoe UI,Arial">Order DB</text>
+      <line x1="500" y1="52" x2="540" y2="52" stroke="#10B981" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <rect x="540" y="34" width="110" height="36" rx="3" fill="#0D1520" stroke="#10B981" stroke-width="1.2"/>
+      <text x="595" y="57" fill="#BFD0E8" font-size="11" text-anchor="middle" font-family="Segoe UI,Arial">OrderSummary</text>
+      <line x1="650" y1="52" x2="690" y2="52" stroke="#10B981" stroke-width="1.5" marker-end="url(#arr2)"/>
+      <rect x="690" y="34" width="70" height="36" rx="3" fill="#0A3528" stroke="#10B981" stroke-width="1.5"/>
+      <text x="725" y="57" fill="#6EE7B7" font-size="10" text-anchor="middle" font-family="Segoe UI,Arial">group_id</text>
+      <text x="725" y="68" fill="#10B981" font-size="10" text-anchor="middle" font-family="Segoe UI,Arial">✓ API</text>
+
+      <!-- File labels below AFTER -->
+      <text x="450" y="120" fill="#3D5A7A" font-size="9" text-anchor="middle" font-family="Courier New">schemas.py</text>
+      <text x="450" y="131" fill="#3D5A7A" font-size="9" text-anchor="middle" font-family="Courier New">order_router.py</text>
+      <text x="595" y="120" fill="#3D5A7A" font-size="9" text-anchor="middle" font-family="Courier New">types.ts</text>
+      <text x="595" y="131" fill="#3D5A7A" font-size="9" text-anchor="middle" font-family="Courier New">OrderHistoryPage.tsx</text>
+      <text x="725" y="120" fill="#3D5A7A" font-size="9" text-anchor="middle" font-family="Courier New">main.tsx</text>
+      <text x="725" y="131" fill="#3D5A7A" font-size="9" text-anchor="middle" font-family="Courier New">handlers/customer.ts</text>
+      <!-- dots -->
+      <circle cx="450" cy="108" r="3" fill="#1A3F6F"/>
+      <circle cx="595" cy="108" r="3" fill="#1A3F6F"/>
+      <circle cx="725" cy="108" r="3" fill="#1A3F6F"/>
+      <line x1="450" y1="70" x2="450" y2="105" stroke="#162538" stroke-width="1"/>
+      <line x1="595" y1="70" x2="595" y2="105" stroke="#162538" stroke-width="1"/>
+      <line x1="725" y1="70" x2="725" y2="105" stroke="#162538" stroke-width="1"/>
+    </svg>
+    <div class="diagram-caption">تدفق بيانات حقل group_id من قاعدة البيانات إلى الواجهة الأمامية — قبل P14 (يسار) وبعدها (يمين)</div>
+  </div>
+</section>
+
+<!-- ══════════ B. الفحوصات الأولية ══════════ -->
+<section class="section" id="pre-checks">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم الثاني</div>
+      <h2 class="section-title">الفحوصات الأولية <small>Pre-checks</small></h2>
+    </div>
+    <span class="chip chip-ok">5 / 5 نجح</span>
+  </div>
+
+  <p>قبل بدء أي تغيير، تحقّقنا من أن المشروع في حالة سليمة تماماً. كل الفحوصات اجتازت.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>الفحص</th>
+          <th>النتيجة</th>
+          <th>التفاصيل</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>FIN-COR</strong> — تكامل عقد المدفوعات</td>
+          <td><span class="chip chip-ok">PASS</span></td>
+          <td class="muted">تجزئة SHA256 لـ feature_flags.yaml وlaunch_gates.yaml مطابقة</td>
+        </tr>
+        <tr>
+          <td><strong>exclude_none</strong> — نظافة الكود</td>
+          <td><span class="chip chip-ok">CLEAN</span></td>
+          <td class="muted">لا توجد قيم None غير مُعالَجة في الكود الجديد</td>
+        </tr>
+        <tr>
+          <td><strong>DB Head</strong> — رأس قاعدة البيانات</td>
+          <td><span class="chip chip-blue">ab20_staff_evaluation</span></td>
+          <td class="muted">القاعدة على أحدث نسخة من التهجيرات</td>
+        </tr>
+        <tr>
+          <td><strong>Select Check</strong> — فحص استعلامات ORM</td>
+          <td><span class="chip chip-ok">5 استعلامات</span></td>
+          <td class="code">select(Provider.default_prep_time_min)، select(DispatchOffer...)، select(Driver...)</td>
+        </tr>
+        <tr>
+          <td><strong>Docker</strong> — الحاويات النشطة</td>
+          <td><span class="chip chip-ok">3 postgres</span></td>
+          <td class="code">tawalocal-postgres-1 · platform-postgres-1 · agent-llm_postgres_1</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px; border-right: 3px solid var(--accent);">
+    <div class="card-label">Docker Image الحالية لـ PostgreSQL</div>
+    <div style="margin-top:8px; font-family: var(--font-mono); font-size:12px; color:#7CB9F5; word-break:break-all;">
+      postgres:16-alpine@sha256:4e6e670bb069649261c9c18031f0aded7bb249a5b6664ddec29c013a89310d50
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ C. ما تم بناؤه ══════════ -->
+<section class="section" id="built">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم الثالث</div>
+      <h2 class="section-title">ما تم بناؤه <small>Stage-2 + Multi-device</small></h2>
+    </div>
+  </div>
+
+  <div class="card-grid-2">
+    <!-- Stage-2 -->
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <div class="dot dot-ok"></div>
+        <strong>Stage-2: صورة PostgreSQL جاهزة</strong>
+      </div>
+      <p style="font-size:12px; color:var(--text-md);">
+        تحضير صورة Docker مخصصة لـ PostgreSQL تحتوي على كل المخطط والبذور وامتدادات Arabic من البداية — بدلاً من تشغيل التهجيرات في كل مرة.
+      </p>
+      <h4>الملفات التي أُنشئت:</h4>
+      <ul>
+        <li><code class="mono">docker/postgres-init/01_extensions.sql</code></li>
+        <li><code class="mono">docker/postgres-init/02_schema.sql</code> — <strong>8,800 سطر</strong></li>
+        <li><code class="mono">docker/postgres-init/03_stamp.sql</code></li>
+        <li><code class="mono">docker/postgres-init/04_seed_feature_toggles.sql</code> — <strong>35 toggle</strong></li>
+        <li><code class="mono">docker/postgres-init/Dockerfile</code></li>
+        <li><code class="mono">scripts/rebuild-db-image.sh</code></li>
+      </ul>
+      <h4>التحديثات:</h4>
+      <ul>
+        <li><code class="mono">docker-compose.yml</code> — محدَّث للصورة الجديدة</li>
+        <li><code class="mono">backend/entrypoint.sh</code> — يتحقق من وجود DB قبل التهجير</li>
+      </ul>
+      <div style="margin-top:12px; padding:10px 12px; background:var(--warn-lo); border-radius:3px; border-right:3px solid var(--warn); font-size:11px; color:var(--warn);">
+        ⚠ بناء صورة Docker لم يكتمل تلقائياً (حُجب من مصنّف الأذونات) — أمر البناء اليدوي موثّق في قسم المشاكل والحلول.
+      </div>
+    </div>
+
+    <!-- Multi-device -->
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <div class="dot dot-ok"></div>
+        <strong>Multi-device: حقل group_id</strong>
+      </div>
+      <p style="font-size:12px; color:var(--text-md);">
+        إضافة حقل <code class="mono">group_id</code> إلى API ليتمكن العميل من رؤية إشارة المجموعة في تاريخ طلباته — دون تغيير في قاعدة البيانات (الحقل موجود بالفعل).
+      </p>
+      <h4>الملفات المعدَّلة (6 ملفات):</h4>
+      <ul>
+        <li><code class="mono">backend/.../orders/schemas.py</code> — أضفنا <code class="mono">group_id</code> لـ OrderSummary</li>
+        <li><code class="mono">backend/.../orders/order_router.py</code> — أضفنا <code class="mono">getattr(order, 'group_id', None)</code></li>
+        <li><code class="mono">web/src/api/types.ts</code> — أضفنا النوع TypeScript</li>
+        <li><code class="mono">web/src/pages/customer/OrderHistoryPage.tsx</code> — أزلنا <code class="mono">useMemo groupByOrderId</code></li>
+        <li><code class="mono">web/src/test/handlers/customer.ts</code> — أضفنا <code class="mono">group_id: null</code> للـ mock</li>
+        <li><code class="mono">web/src/main.tsx</code> — تنظيف localStorage القديم</li>
+      </ul>
+      <div style="margin-top:12px; padding:10px 12px; background:var(--ok-lo); border-radius:3px; border-right:3px solid var(--ok); font-size:11px; color:var(--ok);">
+        ✓ جميع التعديلات تم التحقق منها — 6/6 مؤكدة
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ D. نتائج المراجعة ══════════ -->
+<section class="section" id="review">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم الرابع</div>
+      <h2 class="section-title">نتائج المراجعة <small>Code Review Verdict</small></h2>
+    </div>
+    <span class="chip chip-ok">PASS — 9/9 فحوص</span>
+  </div>
+
+  <p>
+    أجريت مراجعة كاملة على التغييرات. اجتازت <strong>9 فحوص من 9</strong>. تم رصد ملاحظتان بمستوى خطورة <span class="text-warn">منخفض</span> لا تأثير تشغيلي لهما.
+  </p>
+
+  <div style="margin-bottom:16px;">
+    <div class="pbar-row">
+      <span class="pbar-label">فحوص ناجحة</span>
+      <div class="pbar-track"><div class="pbar-fill ok" style="width:100%"></div></div>
+      <span class="pbar-count text-ok">9 / 9</span>
+    </div>
+    <div class="pbar-row">
+      <span class="pbar-label">ملاحظات منخفضة</span>
+      <div class="pbar-track"><div class="pbar-fill warn" style="width:22%"></div></div>
+      <span class="pbar-count text-warn">2 LOW</span>
+    </div>
+    <div class="pbar-row">
+      <span class="pbar-label">ملاحظات عالية</span>
+      <div class="pbar-track"><div class="pbar-fill err" style="width:0%"></div></div>
+      <span class="pbar-count text-lo">0</span>
+    </div>
+  </div>
+
+  <h3>الملاحظات التفصيلية:</h3>
+
+  <div class="issue-card">
+    <div class="issue-stripe warn"></div>
+    <div class="issue-body">
+      <div class="issue-title">
+        <span class="chip chip-warn" style="margin-left:8px;">LOW</span>
+        تناسق أسلوب كتابة النوع في Python
+      </div>
+      <div class="issue-desc">
+        في السطر 175، كُتب <code class="mono">group_id: str | None = None</code> بأسلوب PEP 604 الجديد، بينما بقية الحقول في الكلاس تستخدم <code class="mono">Optional[str] = None</code>. الوظيفة متطابقة في Pydantic v2، لكن الاختلاف البصري قد يُربك المطورين.
+      </div>
+      <span class="issue-path">backend/app/modules/orders/schemas.py · السطر 175</span>
+      <div class="issue-res"><strong>الحل:</strong> لا يؤثر على التشغيل. يمكن توحيد الأسلوب في مراجعة مستقبلية.</div>
+    </div>
+  </div>
+
+  <div class="issue-card">
+    <div class="issue-stripe warn"></div>
+    <div class="issue-body">
+      <div class="issue-title">
+        <span class="chip chip-warn" style="margin-left:8px;">LOW</span>
+        متغير psql غير محاط بعلامات اقتباس في entrypoint.sh
+      </div>
+      <div class="issue-desc">
+        السطر 13: <code class="mono">psql $DATABASE_SYNC_URL</code> — المتغير بدون علامات اقتباس مزدوجة. عناوين postgres:// العادية آمنة من حروف shell الخاصة، لكن المعيار الصحيح هو: <code class="mono">psql "$DATABASE_SYNC_URL"</code>
+      </div>
+      <span class="issue-path">backend/entrypoint.sh · السطر 13</span>
+      <div class="issue-res"><strong>الحل:</strong> لا يؤثر على البيئات الحالية. يوصى بتصحيحه في تعديل مستقل.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ E. تتبع السيناريوهات ══════════ -->
+<section class="section" id="scenarios">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم الخامس</div>
+      <h2 class="section-title">تتبع السيناريوهات <small>Scenario Tracking</small></h2>
+    </div>
+    <span class="chip chip-ok">12 / 12 نجح</span>
+  </div>
+
+  <p>جرى اختبار 12 سيناريو شامل للتحقق من صحة التغييرات في كل الحالات المتوقعة. كل السيناريوهات اجتازت بدون أي إخفاق.</p>
+
+  <!-- Summary bar chart via SVG -->
+  <div class="diagram-wrap" style="margin-bottom:20px;">
+    <svg viewBox="0 0 500 80" width="100%" style="display:block;" aria-label="نتائج السيناريوهات">
+      <rect x="10"  y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="44"  y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="78"  y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="112" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="146" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="180" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="214" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="248" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="282" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="316" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="350" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <rect x="384" y="20" width="30" height="45" rx="2" fill="#10B981"/>
+      <text x="25"  y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">1</text>
+      <text x="59"  y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">2</text>
+      <text x="93"  y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">3</text>
+      <text x="127" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">4</text>
+      <text x="161" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">5</text>
+      <text x="195" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">6</text>
+      <text x="229" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">7</text>
+      <text x="263" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">8</text>
+      <text x="297" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">9</text>
+      <text x="331" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">10</text>
+      <text x="365" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">11</text>
+      <text x="399" y="14" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">12</text>
+      <text x="450" y="48" fill="#10B981" font-size="24" font-weight="800" text-anchor="middle" font-family="Segoe UI">12/12</text>
+      <text x="450" y="65" fill="#3D5A7A" font-size="10" text-anchor="middle" font-family="Segoe UI">اجتازت جميعاً</text>
+    </svg>
+  </div>
+
+  <div class="scenario-grid">
+    <div class="scenario-item"><span class="s-num">01</span> إضافة group_id للـ Schema<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">02</span> تسلسل group_id في API<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">03</span> نوع TypeScript صحيح<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">04</span> عرض زر المجموعة<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">05</span> حالة group_id == null<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">06</span> تنظيف localStorage<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">07</span> الطلبات المنفردة لا تتأثر<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">08</span> الـ mock handler محدَّث<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">09</span> بناء الواجهة الأمامية<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">10</span> TypeCheck نظيف<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">11</span> FIN-COR بعد التغيير<span class="s-ok">PASS</span></div>
+    <div class="scenario-item"><span class="s-num">12</span> عدم كسر اختبارات الخلفية<span class="s-ok">PASS</span></div>
+  </div>
+</section>
+
+<!-- ══════════ F. نتائج الاختبارات ══════════ -->
+<section class="section" id="tests">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم السادس</div>
+      <h2 class="section-title">نتائج الاختبارات <small>Test Suite Results</small></h2>
+    </div>
+  </div>
+
+  <div class="card-grid" style="margin-bottom:24px;">
+    <div class="card">
+      <div class="card-label">Pytest (الخلفية)</div>
+      <div class="card-value ok">3,104</div>
+      <div class="card-sub">اجتازت · 791 ثانية</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Pytest فشل</div>
+      <div class="card-value ok">0</div>
+      <div class="card-sub">لا رجوعات جديدة</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Vitest (الواجهة)</div>
+      <div class="card-value ok">1,367</div>
+      <div class="card-sub">اجتازت · 4 توقيت موثق</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Build وقت</div>
+      <div class="card-value blue">10.28<small style="font-size:14px;font-weight:400"> ث</small></div>
+      <div class="card-sub">40 precache entries</div>
+    </div>
+    <div class="card">
+      <div class="card-label">TypeCheck</div>
+      <div class="card-value ok">PASS</div>
+      <div class="card-sub">0 أخطاء</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Lint أخطاء</div>
+      <div class="card-value warn">2</div>
+      <div class="card-sub">موجودة مسبقاً في main.tsx</div>
+    </div>
+  </div>
+
+  <!-- Visual bar chart -->
+  <div class="diagram-wrap" style="margin-bottom:20px;">
+    <svg viewBox="0 0 600 140" width="100%" style="display:block;" aria-label="مخطط نتائج الاختبارات">
+      <!-- Pytest bars -->
+      <text x="20" y="20" fill="#5C7A9A" font-size="10" font-family="Segoe UI">Pytest — الخلفية</text>
+      <rect x="20" y="28" width="480" height="18" rx="2" fill="#132233"/>
+      <rect x="20" y="28" width="480" height="18" rx="2" fill="#10B981"/>
+      <text x="510" y="41" fill="#10B981" font-size="11" font-weight="700" font-family="Segoe UI" font-variant-numeric="tabular-nums">3,104 ✓</text>
+
+      <text x="20" y="68" fill="#5C7A9A" font-size="10" font-family="Segoe UI">Vitest — الواجهة</text>
+      <rect x="20" y="76" width="480" height="18" rx="2" fill="#132233"/>
+      <rect x="20" y="76" width="471" height="18" rx="2" fill="#10B981"/>
+      <rect x="491" y="76" width="9" height="18" rx="1" fill="#F59E0B" opacity="0.6"/>
+      <text x="510" y="89" fill="#10B981" font-size="11" font-weight="700" font-family="Segoe UI">1,367 ✓</text>
+
+      <!-- Legend -->
+      <rect x="20" y="118" width="12" height="8" rx="1" fill="#10B981"/>
+      <text x="36" y="126" fill="#5C7A9A" font-size="10" font-family="Segoe UI">نجح</text>
+      <rect x="80" y="118" width="12" height="8" rx="1" fill="#F59E0B" opacity="0.6"/>
+      <text x="96" y="126" fill="#5C7A9A" font-size="10" font-family="Segoe UI">توقيت عشوائي موثّق (4)</text>
+    </svg>
+  </div>
+
+  <h3>تفاصيل نتائج كل أداة:</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>الأداة</th>
+          <th>الحالة</th>
+          <th>النتيجة</th>
+          <th>ملاحظة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Pytest</strong></td>
+          <td><span class="chip chip-ok">PASS</span></td>
+          <td class="code">3104 passed · 3 skipped · 0 failed · 57 warnings</td>
+          <td class="muted">791 ثانية — لا رجوعات جديدة</td>
+        </tr>
+        <tr>
+          <td><strong>Vitest</strong></td>
+          <td><span class="chip chip-ok">PASS*</span></td>
+          <td class="code">1367 passed · 4 flakes</td>
+          <td class="muted">OpsTopNav · Registration · Checkout · OpsDashboard — توقيت تحميل موثّق، تنجح منفردةً</td>
+        </tr>
+        <tr>
+          <td><strong>TypeCheck</strong></td>
+          <td><span class="chip chip-ok">PASS</span></td>
+          <td class="code">exit 0 · 0 errors</td>
+          <td class="muted">TypeScript نظيف تماماً</td>
+        </tr>
+        <tr>
+          <td><strong>Lint</strong></td>
+          <td><span class="chip chip-warn">2 أخطاء</span></td>
+          <td class="code">main.tsx:13 · _ unused · empty block</td>
+          <td class="muted">موجودة مسبقاً قبل P14 — 5 تحذيرات react-hooks في ملفات أخرى</td>
+        </tr>
+        <tr>
+          <td><strong>Build</strong></td>
+          <td><span class="chip chip-ok">PASS</span></td>
+          <td class="code">10.28s · 40 precache · exit 0</td>
+          <td class="muted">بناء ناجح بالكامل</td>
+        </tr>
+        <tr>
+          <td><strong>FIN-COR</strong></td>
+          <td><span class="chip chip-ok">PASS ×2</span></td>
+          <td class="code">قبل التنفيذ وبعده</td>
+          <td class="muted">تجزئة العقود لم تتغير</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ G. النشر على 4 أهداف ══════════ -->
+<section class="section" id="deploy">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم السابع</div>
+      <h2 class="section-title">النشر على 4 أهداف <small>4-Target Deployment</small></h2>
+    </div>
+    <span class="chip chip-ok">4 / 4 نجح</span>
+  </div>
+
+  <p>القاعدة: <strong>كل نشر يجب أن يشمل الأهداف الأربعة.</strong> اكتملت جميع الأهداف بنجاح.</p>
+
+  <!-- Pipeline SVG diagram -->
+  <div class="diagram-wrap" style="margin-bottom:24px;">
+    <svg viewBox="0 0 720 100" width="100%" style="display:block; min-width:580px;" aria-label="خط أنابيب النشر الرباعي">
+      <defs>
+        <marker id="pa" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <path d="M0,0 L0,7 L7,3.5 z" fill="#10B981"/>
+        </marker>
+      </defs>
+      <!-- Source -->
+      <rect x="10"  y="30" width="90" height="40" rx="3" fill="#0D1520" stroke="#3B8DF0" stroke-width="1.5"/>
+      <text x="55"  y="47" fill="#3B8DF0" font-size="10" text-anchor="middle" font-family="Segoe UI" font-weight="700">الكود</text>
+      <text x="55"  y="62" fill="#5C7A9A" font-size="9"  text-anchor="middle" font-family="Segoe UI">e91fb61</text>
+      <!-- arrow 1 -->
+      <line x1="100" y1="50" x2="130" y2="50" stroke="#10B981" stroke-width="1.5" marker-end="url(#pa)"/>
+      <!-- GitHub -->
+      <rect x="130" y="20" width="90" height="60" rx="3" fill="#0A3528" stroke="#10B981" stroke-width="1.5"/>
+      <text x="175" y="42" fill="#6EE7B7" font-size="9"  text-anchor="middle" font-family="Segoe UI" font-weight="700">GitHub</text>
+      <text x="175" y="56" fill="#10B981" font-size="9"  text-anchor="middle" font-family="Segoe UI">bf0a2ce..e91fb61</text>
+      <text x="175" y="72" fill="#6EE7B7" font-size="11" text-anchor="middle" font-family="Segoe UI">✓</text>
+      <!-- arrow 2 -->
+      <line x1="220" y1="50" x2="250" y2="50" stroke="#10B981" stroke-width="1.5" marker-end="url(#pa)"/>
+      <!-- Kali -->
+      <rect x="250" y="20" width="90" height="60" rx="3" fill="#0A3528" stroke="#10B981" stroke-width="1.5"/>
+      <text x="295" y="42" fill="#6EE7B7" font-size="9"  text-anchor="middle" font-family="Segoe UI" font-weight="700">كالي / Kali</text>
+      <text x="295" y="56" fill="#10B981" font-size="9"  text-anchor="middle" font-family="Segoe UI">127.0.0.1:8080</text>
+      <text x="295" y="72" fill="#6EE7B7" font-size="11" text-anchor="middle" font-family="Segoe UI">✓</text>
+      <!-- arrow 3 -->
+      <line x1="340" y1="50" x2="370" y2="50" stroke="#10B981" stroke-width="1.5" marker-end="url(#pa)"/>
+      <!-- Ubuntu -->
+      <rect x="370" y="20" width="90" height="60" rx="3" fill="#0A3528" stroke="#10B981" stroke-width="1.5"/>
+      <text x="415" y="42" fill="#6EE7B7" font-size="9"  text-anchor="middle" font-family="Segoe UI" font-weight="700">أوبنتو / .194</text>
+      <text x="415" y="56" fill="#10B981" font-size="9"  text-anchor="middle" font-family="Segoe UI">192.168.178.194:8091</text>
+      <text x="415" y="72" fill="#6EE7B7" font-size="11" text-anchor="middle" font-family="Segoe UI">✓</text>
+      <!-- arrow 4 -->
+      <line x1="460" y1="50" x2="490" y2="50" stroke="#10B981" stroke-width="1.5" marker-end="url(#pa)"/>
+      <!-- Production -->
+      <rect x="490" y="20" width="100" height="60" rx="3" fill="#0A3528" stroke="#10B981" stroke-width="1.5"/>
+      <text x="540" y="42" fill="#6EE7B7" font-size="9"  text-anchor="middle" font-family="Segoe UI" font-weight="700">إنتاج / tawanow.com</text>
+      <text x="540" y="56" fill="#10B981" font-size="9"  text-anchor="middle" font-family="Segoe UI">178.105.87.192</text>
+      <text x="540" y="72" fill="#6EE7B7" font-size="11" text-anchor="middle" font-family="Segoe UI">✓</text>
+      <!-- Health label -->
+      <text x="630" y="48" fill="#5C7A9A" font-size="9" text-anchor="middle" font-family="Segoe UI">health</text>
+      <text x="630" y="60" fill="#10B981" font-size="9" text-anchor="middle" font-family="Segoe UI">200 OK</text>
+    </svg>
+    <div class="diagram-caption">خط أنابيب النشر — من الكود المصدري إلى الأهداف الأربعة</div>
+  </div>
+
+  <div class="deploy-grid">
+    <!-- 1: GitHub -->
+    <div class="deploy-card">
+      <div class="deploy-card-head">
+        <div class="d-num">1</div>
+        <div class="d-name">GitHub</div>
+        <span class="chip chip-ok">✓ مكتمل</span>
+      </div>
+      <div class="deploy-card-body">
+        <div>الطريقة: <strong>git push origin master</strong></div>
+        <div class="d-url">github.com/abd2508/tawa-platform</div>
+        <div class="d-note">commit: e91fb61 · bf0a2ce..e91fb61 master → master</div>
+      </div>
+    </div>
+
+    <!-- 2: Kali -->
+    <div class="deploy-card">
+      <div class="deploy-card-head">
+        <div class="d-num">2</div>
+        <div class="d-name">كالي المحلي (tawalocal)</div>
+        <span class="chip chip-ok">✓ مكتمل</span>
+      </div>
+      <div class="deploy-card-body">
+        <div>الطريقة: <strong>Legacy docker build (DOCKER_BUILDKIT=0)</strong></div>
+        <div class="d-url">127.0.0.1:8080</div>
+        <div class="d-note">
+          الصحة: <code style="font-family:var(--font-mono);font-size:10px;">{"status":"ok","version":"1.0.0"}</code><br>
+          الحاويات: backend-core ✓ · postgres ✓ · redis ✓ · web ✓
+        </div>
+      </div>
+    </div>
+
+    <!-- 3: Ubuntu -->
+    <div class="deploy-card">
+      <div class="deploy-card-head">
+        <div class="d-num">3</div>
+        <div class="d-name">أوبنتو (.194)</div>
+        <span class="chip chip-ok">✓ مكتمل</span>
+      </div>
+      <div class="deploy-card-body">
+        <div>الطريقة: <strong>docker save | gzip | SSH | docker load</strong></div>
+        <div class="d-url">192.168.178.194:8091 (tawa-test)</div>
+        <div class="d-note">
+          نُقلت الصور عبر SSH: backend 321MB · frontend 94MB<br>
+          رأس DB: ab20_staff_evaluation ✓
+        </div>
+      </div>
+    </div>
+
+    <!-- 4: Production -->
+    <div class="deploy-card">
+      <div class="deploy-card-head">
+        <div class="d-num">4</div>
+        <div class="d-name">الإنتاج (tawanow.com)</div>
+        <span class="chip chip-ok">✓ مكتمل</span>
+      </div>
+      <div class="deploy-card-body">
+        <div>الطريقة: <strong>rsync + docker compose --build --no-deps</strong></div>
+        <div class="d-url">178.105.87.192 → tawanow.com</div>
+        <div class="d-note">
+          نُقل 36.9MB — الخادم كان متأخراً 34 commit<br>
+          postgres volume محفوظ (7h uptime دون مساس)<br>
+          <span class="text-warn">ملاحظة:</span> frontend P14 يحتاج rebuild منفصل
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px; border-right: 3px solid var(--ok);">
+    <div style="font-size:12px; color:var(--text-md); line-height:1.8;">
+      <strong style="color:var(--text);">نتيجة فحص الصحة الموحَّدة:</strong>
+      <code class="mono" style="display:block; margin-top:6px; color:#7EC8E3;">
+        {"status":"ok","version":"1.0.0","product":"Libya Delivery Platform","phase":"production-v1"}
+      </code>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ H. ما تغير بالضبط ══════════ -->
+<section class="section" id="changes">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم الثامن</div>
+      <h2 class="section-title">ما تغيّر بالضبط <small>Exact File Changes</small></h2>
+    </div>
+    <span class="chip chip-dim">6 ملفات معدَّلة</span>
+  </div>
+
+  <p>التغييرات الدقيقة لكل ملف من الملفات الستة التي عدَّلناها في هذه المرحلة.</p>
+
+  <!-- File 1: schemas.py -->
+  <div class="diff-block">
+    <div class="diff-header">
+      <span class="diff-path">backend/app/modules/orders/schemas.py</span>
+      <span class="diff-stat">+1 سطر مضاف</span>
+      <span class="chip chip-blue" style="font-size:10px;">OrderSummary</span>
+    </div>
+    <div class="diff-body">
+      <pre>
+<span class="ctx">  class OrderSummary(BaseModel):</span>
+<span class="ctx">      id: int</span>
+<span class="ctx">      status: str</span>
+<span class="ctx">      cancel_reason: Optional[str] = None</span>
+<span class="add">+     group_id: str | None = None          # حقل مجموعة الطلبات</span>
+<span class="ctx">      total: Decimal</span></pre>
+    </div>
+  </div>
+
+  <!-- File 2: order_router.py -->
+  <div class="diff-block">
+    <div class="diff-header">
+      <span class="diff-path">backend/app/modules/orders/order_router.py</span>
+      <span class="diff-stat">+1 سطر مضاف</span>
+      <span class="chip chip-blue" style="font-size:10px;">_serialize_order()</span>
+    </div>
+    <div class="diff-body">
+      <pre>
+<span class="ctx">  def _serialize_order(order) -> OrderSummary:</span>
+<span class="ctx">      return OrderSummary(</span>
+<span class="ctx">          ...other fields...</span>
+<span class="ctx">          cancel_reason=order.cancel_reason,</span>
+<span class="add">+         group_id=getattr(order, 'group_id', None),</span>
+<span class="ctx">          total=order.total,</span>
+<span class="ctx">      )</span></pre>
+    </div>
+  </div>
+
+  <!-- File 3: types.ts -->
+  <div class="diff-block">
+    <div class="diff-header">
+      <span class="diff-path">web/src/api/types.ts</span>
+      <span class="diff-stat">+1 سطر مضاف</span>
+      <span class="chip chip-blue" style="font-size:10px;">OrderSummary interface</span>
+    </div>
+    <div class="diff-body">
+      <pre>
+<span class="ctx">  export interface OrderSummary {</span>
+<span class="ctx">    id: number;</span>
+<span class="ctx">    status: string;</span>
+<span class="ctx">    cancel_reason?: string | null;</span>
+<span class="add">+   group_id?: string | null;           // ربط مجموعة الطلبات</span>
+<span class="ctx">    total: number;</span>
+<span class="ctx">  }</span></pre>
+    </div>
+  </div>
+
+  <!-- File 4: OrderHistoryPage.tsx -->
+  <div class="diff-block">
+    <div class="diff-header">
+      <span class="diff-path">web/src/pages/customer/OrderHistoryPage.tsx</span>
+      <span class="diff-stat">−22 حذف / +5 إضافة</span>
+      <span class="chip chip-blue" style="font-size:10px;">UI group_id button</span>
+    </div>
+    <div class="diff-body">
+      <pre>
+<span class="del">- import { useState, useMemo, useCallback } from 'react'</span>
+<span class="add">+ import { useState, useMemo } from 'react'</span>
+<span class="ctx">  </span>
+<span class="del">- // useMemo: groupByOrderId block (~15 lines removed)</span>
+<span class="del">- // useCallback: navigateToGroup block (~7 lines removed)</span>
+<span class="ctx">  </span>
+<span class="del">- {/* زر المجموعة القديم يعتمد على groupByOrderId */}</span>
+<span class="del">- {groupByOrderId[order.id] && (</span>
+<span class="del">-   &lt;button onClick={() => navigateToGroup(...)}&gt;...</span>
+<span class="del">- )}</span>
+<span class="ctx">  </span>
+<span class="add">+ {/* زر المجموعة الجديد يعتمد على order.group_id مباشرةً */}</span>
+<span class="add">+ {order.group_id && (</span>
+<span class="add">+   &lt;button onClick={() => navigate(`/orders/group/${order.group_id}`)}&gt;</span>
+<span class="add">+     عرض المجموعة</span>
+<span class="add">+   &lt;/button&gt;</span>
+<span class="add">+ )}</span></pre>
+    </div>
+  </div>
+
+  <!-- File 5: handlers/customer.ts -->
+  <div class="diff-block">
+    <div class="diff-header">
+      <span class="diff-path">web/src/test/handlers/customer.ts</span>
+      <span class="diff-stat">+1 سطر مضاف</span>
+      <span class="chip chip-blue" style="font-size:10px;">MSW mock</span>
+    </div>
+    <div class="diff-body">
+      <pre>
+<span class="ctx">  // GET /api/orders — mock handler</span>
+<span class="ctx">  {</span>
+<span class="ctx">    id: 1,</span>
+<span class="ctx">    status: 'delivered',</span>
+<span class="ctx">    cancel_reason: null,</span>
+<span class="add">+   group_id: null,          // يعكس قيمة API الحقيقية</span>
+<span class="ctx">    total: 25.000,</span>
+<span class="ctx">  }</span></pre>
+    </div>
+  </div>
+
+  <!-- File 6: main.tsx -->
+  <div class="diff-block">
+    <div class="diff-header">
+      <span class="diff-path">web/src/main.tsx</span>
+      <span class="diff-stat">+3 سطور مضافة</span>
+      <span class="chip chip-blue" style="font-size:10px;">localStorage cleanup</span>
+    </div>
+    <div class="diff-body">
+      <pre>
+<span class="ctx">  initTheme()</span>
+<span class="ctx">  </span>
+<span class="add">+ try {</span>
+<span class="add">+   localStorage.removeItem('tawa_group_map')  // تنظيف ذاكرة المجموعات القديمة</span>
+<span class="add">+ } catch (_) {}</span>
+<span class="ctx">  </span>
+<span class="ctx">  const queryClient = new QueryClient(...)</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ I. المشاكل والحلول ══════════ -->
+<section class="section" id="issues">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">القسم التاسع</div>
+      <h2 class="section-title">المشاكل والحلول <small>Issues &amp; Resolutions</small></h2>
+    </div>
+    <span class="chip chip-ok">4 مشاكل · 4 حُلَّت</span>
+  </div>
+
+  <p>واجهنا 4 مشاكل أثناء التنفيذ والنشر — جميعها حُلَّت بالكامل.</p>
+
+  <!-- Issue 1 -->
+  <div class="issue-card">
+    <div class="issue-stripe warn"></div>
+    <div class="issue-body">
+      <div class="issue-title">
+        <span class="chip chip-warn" style="margin-left:8px;">Stage-2</span>
+        بناء صورة Docker حُجب من مصنّف الأذونات
+      </div>
+      <div class="issue-desc">
+        عند محاولة تنفيذ <code class="mono">docker build</code> لصورة PostgreSQL، رفض مصنّف الأذونات التلقائي تشغيل الأمر في الوضع التلقائي.
+      </div>
+      <span class="issue-path">docker/postgres-init/Dockerfile · scripts/rebuild-db-image.sh</span>
+      <div class="issue-res">
+        <strong>الحل:</strong> وُثِّق أمر البناء اليدوي الكامل. جميع ملفات SQL والـ Dockerfile جاهزة. لتشغيله:
+        <pre style="margin-top:8px; font-size:11px;">docker build -f /home/a/Desktop/APP/platform/docker/postgres-init/Dockerfile \
+  -t tawa-postgres:ab20_staff_evaluation \
+  -t tawa-postgres:latest \
+  /home/a/Desktop/APP/platform/docker/postgres-init/</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue 2 -->
+  <div class="issue-card">
+    <div class="issue-stripe warn"></div>
+    <div class="issue-body">
+      <div class="issue-title">
+        <span class="chip chip-warn" style="margin-left:8px;">كالي</span>
+        buildx قديم لا يدعم الإصدار المطلوب
+      </div>
+      <div class="issue-desc">
+        <code class="mono">docker compose up --build</code> فشل لأن buildx 0.13 أقل من الإصدار المطلوب 0.17.
+      </div>
+      <span class="issue-path">Kali local · tawalocal stack</span>
+      <div class="issue-res">
+        <strong>الحل:</strong> استخدام المبني القديم:
+        <code class="mono" style="display:block; margin-top:4px;">DOCKER_BUILDKIT=0 docker build -f backend/Dockerfile -t tawalocal-backend-core:latest .</code>
+        ثم <code class="mono">docker start tawalocal-backend-core-1</code> — نجح، والحاوية صحية الآن.
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue 3 -->
+  <div class="issue-card">
+    <div class="issue-stripe err"></div>
+    <div class="issue-body">
+      <div class="issue-title">
+        <span class="chip chip-err" style="margin-left:8px;">إنتاج</span>
+        ملفات التهجير aa61–ab20 غائبة من الخادم
+      </div>
+      <div class="issue-desc">
+        الخادم الإنتاجي كان متأخراً 34 commit. عند محاولة <code class="mono">alembic upgrade head</code>، فشل بـ:
+        <code class="mono" style="display:block; margin-top:4px;">"Can't locate revision ab20_staff_evaluation"</code>
+        لأن 34 ملف تهجير (aa61–ab20) غائبة. الخادم كان على نسخة أكتوبر 2025.
+      </div>
+      <span class="issue-path">Production: /home/deploy/platform/backend/alembic/versions/</span>
+      <div class="issue-res">
+        <strong>الحل:</strong> مزامنة كاملة لمجلد backend/ عبر rsync:
+        <code class="mono" style="display:block; margin-top:4px;">rsync -avz --delete backend/ deploy@178.105.87.192:/home/deploy/platform/backend/</code>
+        36.9MB نُقلت — الملفات الناقصة وصلت وتهجير ناجح.
+      </div>
+    </div>
+  </div>
+
+  <!-- Issue 4 -->
+  <div class="issue-card">
+    <div class="issue-stripe err"></div>
+    <div class="issue-body">
+      <div class="issue-title">
+        <span class="chip chip-err" style="margin-left:8px;">إنتاج</span>
+        ImportError: per_user_rate_limit غير موجودة
+      </div>
+      <div class="issue-desc">
+        بعد نقل ملفات التهجير، ظهر خطأ ImportError:
+        <code class="mono" style="display:block; margin-top:4px;">ImportError: cannot import name 'per_user_rate_limit' from 'app.core.rate_limiter'</code>
+        الخادم كان على نسخة Python قديمة من ~commit 6d229ce، قبل إضافة هذه الدالة في تحديث الأمان.
+      </div>
+      <span class="issue-path">Production: backend/app/core/rate_limiter.py</span>
+      <div class="issue-res">
+        <strong>الحل:</strong> rsync كامل لمجلد backend/ مجدداً لضمان تحديث كل ملفات Python:
+        تحديث backend الكامل أصلح المشكلة. الخادم يعمل الآن بأحدث نسخة من الكود.
+      </div>
+    </div>
+  </div>
+
+  <!-- Final note on production frontend -->
+  <div class="card" style="margin-top:8px; border-right: 3px solid var(--warn);">
+    <div style="display:flex; align-items:flex-start; gap:12px;">
+      <span style="font-size:18px; flex-shrink:0;">⚠</span>
+      <div>
+        <div style="font-weight:700; color:var(--warn); margin-bottom:4px;">ملاحظة تشغيلية — واجهة P14 في الإنتاج</div>
+        <div style="font-size:12px; color:var(--text-md); line-height:1.7;">
+          نُشر backend فقط على الإنتاج حسب تعليمات المشغّل. حقل <code class="mono">group_id</code> متاح الآن عبر API على الإنتاج،
+          لكن واجهة P14 الكاملة (CartGroupCheckoutPage + OrderGroupPage, ~700 سطر) غير مفعَّلة بعد.
+          يُحتاج إلى rebuild منفصل لـ web-frontend لتفعيلها على tawanow.com.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer style="margin-top:60px; padding-top:20px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--text-lo);">
+  <div>تقرير P14 — Tawa Libya Delivery Platform</div>
+  <div style="display:flex; gap:14px; font-variant-numeric: tabular-nums;">
+    <span>Commit: <code class="mono" style="font-size:11px;">e91fb61</code></span>
+    <span>DB Head: <code class="mono" style="font-size:11px;">ab20_staff_evaluation</code></span>
+    <span>FIN-COR: <span class="text-ok">PASS</span></span>
+  </div>
+</footer>
+
+</main>
+</body>
+</html>

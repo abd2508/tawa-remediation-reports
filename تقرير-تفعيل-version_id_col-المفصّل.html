@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقرير المفصّل — تفعيل version_id_col (قفل تفاؤليّ لآلة حالات الطلب)</title>
+<style>
+  :root{
+    --green:#1f7a4d; --green-d:#14532d; --amber:#b45309; --gray:#64748b;
+    --bg:#f5f8f6; --card:#fff; --border:#dbe5df; --ink:#16201c; --muted:#566860;
+    --ok:#15803d; --okbg:#e7f6ec; --warnbg:#fef4e4; --err:#b91c1c; --errbg:#fdeceb;
+    --code-bg:#0f1c17; --code-ink:#e6f3ec;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:0;line-height:1.85;font-size:15px}
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 20px 80px}
+  header.hd{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff;border-radius:18px;padding:30px 30px;box-shadow:0 10px 30px rgba(20,83,45,.20)}
+  header.hd h1{margin:0 0 8px;font-size:25px;line-height:1.45}
+  header.hd .sub{opacity:.93;font-size:15.5px}
+  .pill{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:4px 14px;font-size:12.5px;margin:9px 5px 0 0}
+  nav.toc{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 22px;margin:18px 0}
+  nav.toc strong{color:var(--green-d);display:block;margin-bottom:8px}
+  nav.toc ol{margin:0;padding-inline-start:22px;columns:2;font-size:14px}
+  nav.toc a{color:var(--green);text-decoration:none} nav.toc a:hover{text-decoration:underline}
+  section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin:18px 0;box-shadow:0 2px 9px rgba(20,83,45,.05)}
+  h2{color:var(--green-d);font-size:20px;margin:2px 0 16px;padding-bottom:10px;border-bottom:2px solid #e9f2ec}
+  h3{color:var(--green);font-size:16.5px;margin:20px 0 9px}
+  p{margin:9px 0}
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13.8px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:right;vertical-align:top}
+  th{background:#edf5f0;color:var(--green-d);font-weight:700}
+  tr:nth-child(even) td{background:#fafcfb}
+  code,.mono{font-family:"SF Mono",Consolas,monospace;background:#eaf0ed;color:#0f2a1e;padding:1.5px 6px;border-radius:5px;font-size:12.8px;direction:ltr;display:inline-block}
+  pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:15px 17px;overflow:auto;font-family:"SF Mono",Consolas,monospace;font-size:12.5px;line-height:1.7;direction:ltr;text-align:left;margin:11px 0}
+  pre .c{color:#7fa890} pre .k{color:#7fb0ff} pre .s{color:#9ee6a8} pre .del{color:#e06c75} pre .add{color:#9ee6a8}
+  .ok{color:var(--ok);font-weight:700} .err{color:var(--err);font-weight:700}
+  .badge-ok{background:var(--okbg);color:var(--ok);border:1px solid #bfe6cb;border-radius:999px;padding:2px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+  ul.clean{margin:8px 0;padding-inline-start:22px} ul.clean li{margin:6px 0}
+  .kv{display:grid;grid-template-columns:230px 1fr;gap:7px 16px;font-size:14px;margin:9px 0}
+  .kv .k{color:var(--muted)}
+  .note{background:var(--warnbg);border:1px solid #f4d9a8;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .seal{background:var(--okbg);border:1px solid #bfe6cb;border-radius:10px;padding:13px 16px;font-size:13.6px;margin:13px 0}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;margin:10px 0}
+  .flow span{background:#edf5f0;border:1px solid var(--border);border-radius:8px;padding:6px 11px}
+  .flow .arr{background:none;border:none;color:var(--green);font-weight:800}
+  .foot{color:var(--muted);font-size:12.5px;text-align:center;margin-top:28px;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hd">
+  <h1>التقرير المفصّل — تفعيل <code>version_id_col</code><br>قفل تفاؤليّ لآلة حالات الطلب (إصلاح FINDING-2)</h1>
+  <div class="sub">حماية كلّ انتقالات الطلب من التزامن بتغيير واحد نظيف — بلا قفل تشاؤميّ، بلا migration</div>
+  <div>
+    <span class="pill">قفل تفاؤليّ</span>
+    <span class="pill">FIN-COR PASS · NEW=0</span>
+    <span class="pill">بلا migration / بلا تغيير مبلغ</span>
+    <span class="pill">منشور + تحقّق حيّ</span>
+    <span class="pill">2026-06-12</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>محتويات التقرير</strong>
+  <ol>
+    <li><a href="#s1">الخلاصة</a></li>
+    <li><a href="#s2">العيب المُعالَج (FINDING-2)</a></li>
+    <li><a href="#s3">كيف يعمل القفل التفاؤليّ</a></li>
+    <li><a href="#s4">الخطوات الأربع بالكود</a></li>
+    <li><a href="#s5">تطويق نطاق الأثر (blast radius)</a></li>
+    <li><a href="#s6">البوّابة والنشر والتحقّق الحيّ</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1">
+  <h2>① الخلاصة</h2>
+  <p>
+    بإذنك «فعّل version_id_col» — أصلحتُ <strong>FINDING-2</strong> (تزامن آلة حالات الطلب) جذريًّا بتفعيل
+    <strong>القفل التفاؤليّ</strong> الذي قصده المطوّرون أصلًا بعمود <code>version</code> لكنّهم لم يُفعّلوه. الآن أيّ انتقالين
+    متزامنين على نفس الطلب: واحد ينجح، والآخر يحصل على <strong>409 نظيف</strong> (يُعيد القراءة والمحاولة) — بدل تباعد حالة الطلب عن آثارها الجانبيّة.
+  </p>
+  <div class="kv">
+    <div class="k">طبيعة الإصلاح</div><div>قفل تفاؤليّ على مستوى النموذج (تغيير واحد) يحمي كلّ المُستدعين دفعةً واحدة</div>
+    <div class="k">بلا قفل تشاؤميّ</div><div>لا حاجة لقفل كلّ مُستدعٍ يدويًّا — <code>version_id_col</code> يكفي</div>
+    <div class="k">الترحيل / المال</div><div>بلا migration (عمود version قائم) · بلا تغيير مبلغ · <span class="ok">FIN-COR PASS</span></div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="s2">
+  <h2>② العيب المُعالَج — FINDING-2 (من تدقيق آلة الحالات)</h2>
+  <p>
+    <code>apply_order_transition</code> كان يقرأ <code>from_state</code> ← يتحقّق ← يضبط <code>order_state</code> (check-then-act)
+    <strong>بلا قفل</strong>؛ وعمود <code>Order.version</code> موجود لكن <strong>بلا <code>version_id_col</code></strong> فهو عدّاد زخرفيّ؛
+    والمُستدعون غير متّسقين (بعضهم يقفل، أكثرهم لا). ⇒ انتقالان متزامنان (إلغاء + قبول) قد يمرّان معًا ⇒ تباعد الحالة عن آثارها.
+  </p>
+</section>
+
+<!-- 3 -->
+<section id="s3">
+  <h2>③ كيف يعمل القفل التفاؤليّ</h2>
+  <div class="flow">
+    <span>تحميل الطلب (version=5)</span><span class="arr">←</span>
+    <span>تعديل order_state</span><span class="arr">←</span>
+    <span>flush → <code>UPDATE … SET version=6 WHERE id=… AND version=5</code></span><span class="arr">←</span>
+    <span>0 صفوف؟ ⇒ <strong>StaleDataError</strong> ⇒ 409</span>
+  </div>
+  <p>إذا عدّل خيطٌ آخر الطلب بين التحميل والكتابة، تصير version=6 فعليًّا، فشرط <code>WHERE version=5</code> لا يطابق ⇒ تُرفَض الكتابة الثانية (لا تطمس الأولى). SQLAlchemy يدير الزيادة تلقائيًّا.</p>
+</section>
+
+<!-- 4 -->
+<section id="s4">
+  <h2>④ الخطوات الأربع بالكود</h2>
+  <h3>1 — تفعيل القفل على نموذج Order</h3>
+  <pre>version: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+<span class="add">__mapper_args__ = {"version_id_col": version}</span></pre>
+
+  <h3>2 — إزالة 3 زيادات يدويّة (لتجنّب double-increment)</h3>
+  <pre><span class="del">- if bump_version and hasattr(order, "version"): order.version += 1   # state_transitions:182</span>
+<span class="del">- if hasattr(order, "version") and ...: order.version += 1            # driver_emergency_router:191</span>
+<span class="del">- if hasattr(order, "version") and ...: order.version += 1            # operations_router:665</span>
+<span class="c"># الثلاثة تعدّل order_state أيضًا ⇒ الزيادة تلقائيّة الآن عبر version_id_col</span></pre>
+
+  <h3>3 — مُعالِج عامّ StaleDataError → 409</h3>
+  <pre><span class="k">@app.exception_handler</span>(StaleDataError)
+<span class="k">async def</span> stale_data_handler(request, exc):
+    <span class="k">return</span> JSONResponse(status_code=<span class="s">409</span>, content=make_error(
+        code=ErrorCodes.CONFLICT, retryable=True,
+        message_ar=<span class="s">"تم تعديل الطلب من جهة أخرى في الوقت نفسه، يرجى إعادة المحاولة"</span>, …))</pre>
+
+  <h3>4 — تأكيد fail-open للحلقات الخلفيّة</h3>
+  <p>حلقات (release/escalation/abandonment) تلتقط <code>Exception</code> مزدوجًا ⇒ StaleDataError يُلتقَط ويُسجَّل وتُكمل الدورة (تُعيد الطلب المُتعارَض في الدورة التالية، لا تنهار).</p>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <h2>⑤ تطويق نطاق الأثر (blast radius)</h2>
+  <table>
+    <tr><th>الخطر المحتمل</th><th>المعالجة</th></tr>
+    <tr><td>طلبات المستخدم (إلغاء/قبول) تتعارض</td><td>StaleDataError ⇒ <span class="badge-ok">409 retryable</span> (واضح، يُعيد المحاولة) بدل 500</td></tr>
+    <tr><td>الوظائف الخلفيّة تتعارض مع تعديل مستخدم</td><td>تُلتقَط بـ<code>except Exception</code> ⇒ fail-open (تتخطّى، تُعيد الدورة)</td></tr>
+    <tr><td>زيادة version مزدوجة</td><td>أُزيلت الزيادات اليدويّة الثلاث ⇒ SQLAlchemy يدير الزيادة وحده</td></tr>
+    <tr><td>كسر اختبار قائم</td><td>الحزمة الكاملة <span class="ok">NEW=0</span> (الاختبارات أحاديّة المعاملة لا تثير تعارضًا)</td></tr>
+  </table>
+</section>
+
+<!-- 6 -->
+<section id="s6">
+  <h2>⑥ البوّابة والنشر والتحقّق الحيّ</h2>
+  <table>
+    <tr><th>الفحص</th><th>النتيجة</th></tr>
+    <tr><td>إعداد المُخطِّط (mapper) صالح</td><td><code>version_id_col = orders.version</code></td></tr>
+    <tr><td>اختبارات الطلب/الانتقال/دورة الحياة</td><td><span class="badge-ok">153 ناجح</span></td></tr>
+    <tr><td>FIN-COR · الحزمة الكاملة</td><td><span class="badge-ok">PASS</span> · 2205 ناجح · أساس 29/حاليّ 29 · <span class="ok">NEW=0</span></td></tr>
+    <tr><td>النشر</td><td><code>deploy_be_gated.sh</code> — backend-core صحّية</td></tr>
+    <tr><td><strong>تحقّق حيّ على الإنتاج</strong></td><td><code>version_id_col=orders.version</code> فعّال · مُعالِج 409 <strong>مُسجَّل</strong> · <strong>0 زيادة يدويّة متبقّية</strong> · تفعيل الفحص المحلّيّ باقٍ</td></tr>
+  </table>
+  <div class="seal">
+    ✅ آلة حالات الطلب صارت محميّة من التزامن على كلّ الانتقالات بقفل تفاؤليّ نظيف. الاختبارات الكاملة بلا تراجع،
+    والمخاطر الطرفيّة مُطوّقة (409 للمستخدم · fail-open للخلفيّة). بلا migration/commit · رأس المستودع aa29.
+  </div>
+  <div class="note">
+    <strong>اكتمال تدقيق الجلسة (المنطق + المال):</strong> النقد (1 إصلاح قفل) · المحفظة (3 أقفال حجز) · التسوية/الاسترداد/chargeback (سليم) ·
+    آلة حالات الطلب (version_id_col). كلّها منشورة ومتحقَّقة · FIN-COR PASS طوال.
+  </div>
+</section>
+
+<div class="foot">
+  تووا — منصّة التوصيل الليبيّة · تقرير تفعيل version_id_col (قفل تفاؤليّ لآلة حالات الطلب) · 2026-06-12<br>
+  FINDING-2 أُصلح جذريًّا · بلا migration/commit · FIN-COR PASS · NEW=0 · رأس المستودع aa29
+</div>
+
+</div>
+</body>
+</html>

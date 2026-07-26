@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الخطة الجذرية لربط تجميع الطلبات (order_batching) | تووا | 2026-06-15</title>
+<style>
+  :root{--g:#0f7b3f;--g2:#13a155;--bg:#f3f6f4;--card:#fff;--ink:#16201c;--mut:#5d6b64;--line:#dde6e0;
+        --red:#c0392b;--amber:#b9770e;--blue:#1f6feb;--term:#0c1f15;--termtx:#c9f7da;--purple:#6b3fa0}
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);margin:0;line-height:1.85}
+  .wrap{max-width:1140px;margin:0 auto;padding:26px 20px 90px}
+  header{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border-radius:20px;padding:34px 30px;box-shadow:0 10px 30px rgba(15,123,63,.25)}
+  header h1{margin:0 0 10px;font-size:25px;line-height:1.45}
+  header .sub{opacity:.96;font-size:15px}
+  header .meta{margin-top:15px;font-size:12.5px;opacity:.92;border-top:1px solid rgba(255,255,255,.25);padding-top:12px;line-height:1.7}
+  h2{color:var(--g);border-right:6px solid var(--g);padding:6px 14px 6px 0;margin:40px 0 14px;font-size:21px}
+  h3{color:var(--term);margin:20px 0 8px;font-size:16.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:22px 24px;margin:15px 0;box-shadow:0 2px 12px rgba(0,0,0,.045)}
+  code{background:#eef3ef;border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;direction:ltr;display:inline-block}
+  pre{background:var(--term);color:var(--termtx);border-radius:10px;padding:13px 15px;overflow:auto;direction:ltr;text-align:left;font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;line-height:1.6;white-space:pre;margin:8px 0}
+  pre .c{color:#6b8a78}pre .k{color:#ffd479}pre .ok{color:#7CFC9A}
+  table{width:100%;border-collapse:collapse;margin:11px 0;font-size:13.4px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:#e9f4ee;color:var(--term);font-weight:700}
+  tr:nth-child(even) td{background:#fafdfb}
+  .pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;white-space:nowrap}
+  .ok{background:#e3f6ea;color:var(--g)}.warn{background:#fdf2dd;color:var(--amber)}.bad{background:#fce6e3;color:var(--red)}.rec{background:#e4eefe;color:var(--blue)}
+  .callout{border-right:5px solid;border-radius:11px;padding:14px 18px;margin:13px 0}
+  .callout.red{border-color:var(--red);background:#fdeeec}.callout.amber{border-color:var(--amber);background:#fdf6e7}.callout.green{border-color:var(--g);background:#ecf7f0}.callout.blue{border-color:var(--blue);background:#edf3fe}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:7px;justify-content:center;margin:12px 0}
+  .node{border:1.5px solid var(--line);border-radius:10px;padding:8px 11px;font-size:12.5px;text-align:center;direction:ltr;background:#eef3ef;min-width:96px}
+  .node.new{background:#e4eefe;border-color:#a9c5f0}.node.ok{background:#e3f6ea;border-color:#a9dcbd}
+  .arrow{color:var(--g);font-size:19px;font-weight:700}
+  .sim{background:#f7faf8;border:1px dashed #b9d2c4;border-radius:10px;padding:12px 15px;margin:11px 0}
+  .sim .t{font-weight:800;color:var(--g);font-size:13px;margin-bottom:5px}
+  .wave{border:1px solid var(--line);border-radius:13px;margin:12px 0;overflow:hidden}
+  .wave .h{padding:11px 18px;font-weight:800;color:#fff;font-size:15px}.wave .bd{padding:14px 18px}
+  .p1 .h{background:var(--g)}.p2 .h{background:var(--blue)}.p3 .h{background:var(--purple)}.p4 .h{background:var(--amber)}
+  .stepn{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--g);color:#fff;text-align:center;font-weight:700;font-size:12px;line-height:22px;margin-left:6px}
+  .small{font-size:12.5px;color:var(--mut)}ul{margin:7px 0}li{margin:4px 0}
+  footer{margin-top:42px;text-align:center;color:var(--mut);font-size:12.5px;border-top:1px solid var(--line);padding-top:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>🧮 الخطة الجذرية لربط تجميع الطلبات (order_batching) بالإرسال الحيّ</h1>
+  <div class="sub">منصّة تووا (Tawa) — تصميم ربط الخوارزميّة المبنيّة بمسار الإسناد الحيّ + المحاكاة الذهنيّة + المخاطر + تصميم اختبار الحِمل</div>
+  <div class="meta">
+    التاريخ: 2026-06-15 · الحالة: <b>خطّة للمراجعة — لم يُبنَ شيء</b> · المنطقة: <b>أعلى مخاطرة (قلب الإسناد)</b> · بلا commit حتى الإذن<br>
+    المنهج (كالموجة أ): تتبّع الكود الحيّ → تصميم الحقن → قرارات المخطّط → محاكاة ذهنيّة → استخراج مخاطر → تصميم اختبار الحِمل → طرح مُمَرحَل خلف العلَم.
+  </div>
+</header>
+
+<h2>0 · نتيجة التحقّق (الأساس)</h2>
+<div class="card">
+  <div class="callout amber">
+    <b>التحقّق كشف:</b> الخوارزميّة <code>compute_batch</code> (+<code>compute_batch_optimized</code> VROOM) <b>مبنيّة ومُختبَرة</b> (مرحلة 446)، لكنّها <b>غير موصولة بالإرسال الحيّ إطلاقًا</b>: العلَم <code>order_batching_enabled</code> (config:129) لا يُفحَص في أيّ مسار حيّ، ولا مستدعٍ لها في <code>dispatch_service</code>/<code>auto_dispatch</code>/الموجّهات. ⇒ <b>لا يمكن التفعيل ولا اختبار الحِمل قبل بناء الربط.</b>
+  </div>
+  <h3>التدفّق الحيّ الحاليّ (مُتتبَّع)</h3>
+  <div class="flow">
+    <div class="node">طلب READY</div><span class="arrow">→</span>
+    <div class="node">auto_dispatch_for_order<br>(444)</div><span class="arrow">→</span>
+    <div class="node">find_nearest_available_driver<br>(GEOSEARCH, 292)</div><span class="arrow">→</span>
+    <div class="node">create_offer(<b>order_id واحد</b>)<br>(157، فحص حدّ النقد)</div><span class="arrow">→</span>
+    <div class="node">respond_to_offer<br>(قبول/رفض، 469)</div>
+  </div>
+  <p class="small"><b>قيد جوهريّ:</b> <code>DispatchOffer.order_id</code> <b>مفرد NOT NULL</b> (dispatch.py:152) — العرض يربط طلبًا واحدًا. لا دعم بنيويّ للدفعة.</p>
+</div>
+
+<h2>1 · القرار التصميميّ الأكبر — تمثيل الدفعة</h2>
+<div class="card">
+  <table>
+    <tr><th>الخيار</th><th>الوصف</th><th>الأثر</th><th>الحكم</th></tr>
+    <tr>
+      <td><b>أ — batch_id على العرض</b></td>
+      <td>عمود <code>batch_id</code> قابل للـnull على <code>DispatchOffer</code>؛ N عرض (واحد/طلب) تتشارك batch_id؛ القبول/الرفض ذرّيّ للمجموعة. <code>order_id</code> يبقى مفردًا.</td>
+      <td><b>أدنى</b> — كلّ مستهلكي order_id يعملون بلا تغيير؛ migration عمود واحد + تعديل auto_dispatch/respond_to_offer</td>
+      <td><span class="pill rec">موصى به</span></td>
+    </tr>
+    <tr>
+      <td>ب — order_ids مصفوفة على العرض</td>
+      <td>عرض واحد يحمل عدّة طلبات</td>
+      <td>أكبر — يكسر كلّ قراءات order_id المفرد + respond_to_offer</td>
+      <td><span class="pill warn">مرفوض الآن</span></td>
+    </tr>
+    <tr>
+      <td>ج — جدول DispatchBatch</td>
+      <td>كيان batch منفصل ↔ offers</td>
+      <td>أنظف تطبيعًا، أكثر كودًا/migration</td>
+      <td><span class="pill warn">مبالَغ الآن</span></td>
+    </tr>
+  </table>
+  <p class="small"><b>التوصية: الخيار أ</b> (batch_id) — أقلّ مساسًا بقلب الإسناد. migration: <code>+ batch_id String نdel index</code>.</p>
+</div>
+
+<h2>2 · القرار الثاني — نطاق الدفعة (مزوّد واحد أم عدّة)</h2>
+<div class="card">
+  <div class="callout red">
+    <b>🧠 مخاطرة كشفتها المحاكاة:</b> <code>compute_batch</code> يرتّب المرشّحين بمسافة <b>التسليم</b> فقط — <b>لا يقيّد المزوّد</b>. فدفعة قد تضمّ طلبات من <b>مزوّدين مختلفين</b> ⇒ السائق يستلم من عدّة متاجر (multi-pickup) — تعقيد كبير (مسار استلام متعدّد، عُهدة، توقيت تحضير لكلّ مزوّد).
+  </div>
+  <table>
+    <tr><th>النطاق</th><th>الوصف</th><th>المخاطرة</th><th>الحكم</th></tr>
+    <tr><td><b>مزوّد واحد</b></td><td>دفعة = طلبات READY من <b>نفس المزوّد</b> فقط (استلام واحد، تسليمات متعدّدة)</td><td>منخفضة — استلام واحد، أبسط عُهدة</td><td><span class="pill rec">المرحلة الأولى</span></td></tr>
+    <tr><td>عدّة مزوّدين</td><td>طلبات من متاجر متجاورة (استلام متعدّد)</td><td>عالية — مسار/عُهدة/توقيت معقّد</td><td><span class="pill warn">مرحلة لاحقة</span></td></tr>
+  </table>
+  <p class="small">⇒ المرحلة 1: قيّد المرشّحين بـ<code>provider_id == anchor.provider_id</code> (تعديل بسيط على جمع المرشّحين قبل compute_batch).</p>
+</div>
+
+<h2>3 · القرار الثالث — توقيت التجميع</h2>
+<div class="card">
+  <table>
+    <tr><th>النهج</th><th>الوصف</th><th>المقايضة</th></tr>
+    <tr><td><b>انتهازيّ (لا انتظار)</b></td><td>عند إسناد طلب، جمّع ما هو READY بالفعل عند المزوّد الآن</td><td><span class="pill ok">بلا كمون إضافيّ</span> · دفعات أصغر</td></tr>
+    <tr><td>نافذة مؤجَّلة</td><td>انتظر ~30-60ث لتجميع طلبات أكثر قبل الإسناد</td><td>دفعات أكبر · <span class="pill warn">+كمون للعميل</span> · حلقة/قفل جديد</td></tr>
+  </table>
+  <p class="small"><b>التوصية: انتهازيّ أولًا</b> (أبسط، بلا كمون، بلا حلقة جديدة)؛ النافذة المؤجَّلة تحسين لاحق إن أظهر الحِمل قيمتها.</p>
+</div>
+
+<h2>4 · تصميم الربط (المرحلة 1 — مزوّد واحد، انتهازيّ، خلف العلَم)</h2>
+<div class="card">
+  <div class="flow">
+    <div class="node">طلب READY</div><span class="arrow">→</span>
+    <div class="node">auto_dispatch_for_order</div><span class="arrow">→</span>
+    <div class="node">find_nearest_driver</div><span class="arrow">→</span>
+    <div class="node new">إن العلَم ON:<br>اجمع READY لنفس المزوّد<br>+ compute_batch(حدّ نقد السائق المتبقّي)</div><span class="arrow">→</span>
+    <div class="node new">create_offer ×N<br>بـbatch_id مشترك</div><span class="arrow">→</span>
+    <div class="node new">respond_to_offer<br>(قبول ذرّيّ للـbatch)</div>
+  </div>
+  <pre><span class="c"># auto_dispatch_for_order — بعد إيجاد السائق، خلف العلَم:</span>
+if settings.order_batching_enabled:
+    remaining = resolve_cash_limit_minor(driver) - driver.cash_outstanding_minor
+    candidates = [READY COD orders, provider_id == anchor.provider_id, near drop-off]
+    batch_ids = compute_batch(anchor, candidates,
+                  driver_cash_remaining_minor=remaining,
+                  max_distance_km=settings.order_batching_max_distance_km,
+                  max_orders=settings.order_batching_max_orders)
+    <span class="k">batch_id = uuid()</span> if len(batch_ids) > 1 else None
+    for oid in batch_ids:
+        create_offer(order_id=oid, driver_id=driver.id, batch_id=batch_id, ...)  <span class="c"># قفل صفّ/idempotency</span>
+else:
+    create_offer(order_id=anchor, driver_id=driver.id, ...)   <span class="c"># المسار الحاليّ، بلا تغيير</span></pre>
+  <p class="small"><b>الملفّات المتأثّرة:</b> <code>models/dispatch.py</code> (+batch_id، migration) · <code>dispatch_service</code> (auto_dispatch_for_order + create_offer توقيع batch_id + respond_to_offer قبول ذرّيّ) · جمع المرشّحين (استعلام READY/نفس-المزوّد) · واجهة السائق (عرض الدفعة) · العلَم (env، نمط reversible).</p>
+</div>
+
+<h2>5 · المحاكاة الذهنيّة — المخاطر المستخرَجة</h2>
+<div class="card">
+  <div class="sim"><div class="t">🧠 سباق التجميع المزدوج</div>طلبان READY متزامنان، حلقتا auto_dispatch تجمّعان نفس المرشّح ⇒ إسناد مزدوج. <b>العلاج:</b> قفل صفّ (with_for_update) على المرشّحين + فحص «بلا عرض ACCEPTED/PENDING قائم» قبل الإضافة (create_offer يفحص أصلًا — يُعمَّم للدفعة).</div>
+  <div class="sim"><div class="t">🧠 إلغاء طلب داخل الدفعة</div>عميل يلغي طلبًا بعد عرض الدفعة ⇒ دفعة جزئيّة. <b>العلاج:</b> الإلغاء يحرّر عرض ذلك الطلب فقط؛ بقيّة الدفعة سليمة؛ السائق يرى التحديث.</div>
+  <div class="sim"><div class="t">🧠 حدّ النقد عبر الدفعة</div>compute_batch يحترم النقد المتبقّي وقت التجميع، لكنّ cash_outstanding يتغيّر مع التحصيل. <b>العلاج:</b> الحدّ مُطبَّق وقت العرض (محافظ)؛ create_offer يعيد فحص الحدّ لكلّ طلب (دفاع-في-عمق).</div>
+  <div class="sim"><div class="t">🧠 رفض الدفعة</div>السائق يرفض ⇒ إعادة إسناد كلّ طلب فرديًّا (المسار الحاليّ) — لا تُحتجَز الطلبات.</div>
+  <div class="sim"><div class="t">🧠 العُهدة/التحضير</div>مزوّد واحد ⇒ استلام واحد، تحضير واحد ⇒ بسيط (لهذا المرحلة 1 مزوّد-واحد).</div>
+</div>
+
+<h2>6 · تصميم اختبار الحِمل</h2>
+<div class="card">
+  <ul>
+    <li><b>السيناريو:</b> عنقود من N طلبات READY متزامنة (نفس المزوّد، تسليمات متقاربة) + M سائقين، عبر <code>deploy/sim_network.py</code> موسَّعًا (دفعة طلبات متزامنة).</li>
+    <li><b>القياسات:</b> تكوين الدفعة (عدد الطلبات/دفعة) · كمون الإسناد · التزام حدّ النقد (لا تجاوز) · لا إسناد مزدوج · الإنتاجيّة (طلبات/رحلة سائق).</li>
+    <li><b>المقارنة:</b> العلَم ON مقابل OFF (نفس الحِمل) ⇒ قياس مكسب الإنتاجيّة مقابل أيّ كمون/تعقيد.</li>
+    <li><b>بوّابات النجاح:</b> 0 إسناد مزدوج · 0 تجاوز حدّ نقد · الإنتاجيّة ON > OFF بدون إخفاقات دورة حياة · p95 إسناد مقبول.</li>
+  </ul>
+</div>
+
+<h2>7 · الطرح المُمَرحَل</h2>
+<div class="wave p1"><div class="h">المرحلة 1 — البناء خلف العلَم (مزوّد واحد، انتهازيّ)</div><div class="bd">
+  <span class="stepn">1</span> migration batch_id · <span class="stepn">2</span> auto_dispatch + create_offer(batch_id) + جمع المرشّحين · <span class="stepn">3</span> respond_to_offer قبول ذرّيّ · <span class="stepn">4</span> اختبارات (تكوين/سباق/إلغاء/حدّ نقد) · بوّابة. <b>العلَم OFF ⇒ صفر تغيير حيّ.</b></div></div>
+<div class="wave p2"><div class="h">المرحلة 2 — اختبار الحِمل (محليّ)</div><div class="bd">تشغيل سيناريو الحِمل ON/OFF + قياس البوّابات أعلاه. ضبط max_distance/max_orders.</div></div>
+<div class="wave p3"><div class="h">المرحلة 3 — التفعيل التدريجيّ + الواجهة</div><div class="bd">واجهة السائق للدفعة · تفعيل العلَم (apply_toggles) + مراقبة · تراجع فوريّ بالعلَم.</div></div>
+<div class="wave p4"><div class="h">المرحلة 4 — لاحقًا (اختياريّ)</div><div class="bd">نافذة مؤجَّلة · تعدّد المزوّدين (multi-pickup) · VROOM (compute_batch_optimized، حيّ).</div></div>
+
+<h2>8 · قرارات للمالك</h2>
+<div class="card">
+  <table>
+    <tr><th>#</th><th>القرار</th><th>التوصية</th></tr>
+    <tr><td>1</td><td>تمثيل الدفعة</td><td><span class="pill rec">batch_id على العرض (migration عمود واحد)</span></td></tr>
+    <tr><td>2</td><td>نطاق الدفعة</td><td><span class="pill rec">مزوّد واحد أولًا</span> (تعدّد لاحقًا)</td></tr>
+    <tr><td>3</td><td>توقيت التجميع</td><td><span class="pill rec">انتهازيّ</span> (نافذة مؤجَّلة لاحقًا)</td></tr>
+    <tr><td>4</td><td>migration على قلب الإسناد</td><td>batch_id قابل للـnull، عكسيّ؛ العلَم OFF ⇒ سلوك حيّ محفوظ حتى التفعيل</td></tr>
+  </table>
+</div>
+
+<div class="callout blue">
+  <b>الخلاصة:</b> الربط تغييرٌ في <b>أخطر مسار</b> (الإسناد) + يتطلّب <b>migration</b> (أوّل migration منذ aa37). صُمِّم بأدنى مساس (batch_id، مزوّد-واحد، انتهازيّ، خلف علَم OFF)، مع محاكاة المخاطر وعلاجها وتصميم اختبار حِمل بمعايير نجاح. <b>هذه خطّة للمراجعة — لم يُبنَ شيء. أعطِ الإشارة لبناء المرحلة 1 خلف العلَم (يحتاج إذن migration صريحًا).</b>
+</div>
+
+<footer>
+  منصّة تووا (Tawa) · الخطة الجذرية لربط order_batching · 2026-06-15 · خطّة للمراجعة — لا بناء · FIN-COR مختوم
+</footer>
+
+</div>
+</body>
+</html>

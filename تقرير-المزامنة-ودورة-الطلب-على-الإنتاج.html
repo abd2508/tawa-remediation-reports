@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تقرير: مزامنة السيرفرات + دورة طلب كاملة على الإنتاج — تووا</title>
+<style>
+  :root{
+    --green:#0e7a4f; --green-d:#0a5c3b; --amber:#f59e0b; --bg:#eef2f4; --card:#fff;
+    --ink:#16242f; --muted:#64758a; --line:#dde6ec; --ok:#16a34a; --bad:#dc2626; --blue:#2563eb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,system-ui,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.85}
+  .wrap{max-width:1000px;margin:0 auto;padding:1.2rem}
+  header.hero{background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;border-radius:20px;padding:2rem 1.6rem;text-align:center;box-shadow:0 10px 30px rgba(14,122,79,.25)}
+  header.hero .logo{font-size:2.6rem}
+  header.hero h1{margin:.3rem 0;font-size:1.7rem}
+  header.hero p{margin:.2rem 0;opacity:.95;font-size:1rem}
+  .stamp{display:inline-block;margin-top:.8rem;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);padding:.35rem 1rem;border-radius:999px;font-size:.85rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.3rem 1.4rem;margin:1.1rem 0;box-shadow:0 4px 14px rgba(0,0,0,.04)}
+  h2{color:var(--green-d);font-size:1.3rem;margin:.2rem 0 .9rem;display:flex;align-items:center;gap:.5rem;border-bottom:2px solid var(--line);padding-bottom:.5rem}
+  h2 .n{background:var(--green);color:#fff;width:1.9rem;height:1.9rem;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;flex:none}
+  h3{color:var(--green-d);font-size:1.05rem;margin:1rem 0 .4rem}
+  p{margin:.5rem 0}
+  .lead{font-size:1.05rem;color:#33424f}
+  .note{background:#fff7e6;border:1px solid #ffe2a8;border-radius:10px;color:#7a5b13;padding:.7rem 1rem;margin:.7rem 0}
+  .good{background:#e9f9ef;border:1px solid #b6e6c8;border-radius:10px;color:#11633f;padding:.7rem 1rem;margin:.7rem 0}
+  .tip{background:#eef4ff;border:1px solid #c5d8ff;border-radius:10px;color:#1e3a8a;padding:.7rem 1rem;margin:.7rem 0}
+  table{width:100%;border-collapse:collapse;margin:.7rem 0;font-size:.93rem;background:#fff;border-radius:10px;overflow:hidden}
+  th,td{border:1px solid var(--line);padding:.55rem .7rem;text-align:right}
+  th{background:#f3f7f9;color:var(--green-d)}
+  .pill{display:inline-block;padding:.1rem .6rem;border-radius:999px;font-size:.8rem;font-weight:700}
+  .pill.ok{background:#dcfce7;color:#166534}
+  .pill.no{background:#fee2e2;color:#991b1b}
+  code{background:#f1f5f8;border:1px solid #e0e8ee;border-radius:6px;padding:.05rem .35rem;font-size:.85em;direction:ltr;display:inline-block}
+  /* server grid */
+  .servers{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin:1rem 0}
+  .srv{border:2px solid var(--green);border-radius:14px;padding:.9rem .6rem;text-align:center;background:#f8fffb}
+  .srv .ic{font-size:1.7rem}
+  .srv .nm{font-weight:800;color:var(--green-d);margin-top:.2rem}
+  .srv .dom{direction:ltr;font-size:.78rem;color:var(--muted);word-break:break-all}
+  .srv .ok{margin-top:.4rem;color:var(--ok);font-weight:700;font-size:.85rem}
+  /* lifecycle flow */
+  .flow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:stretch;margin:1rem 0}
+  .step{flex:1 1 150px;min-width:140px;background:#f8fffb;border:1px solid #cdeadd;border-right:5px solid var(--green);border-radius:10px;padding:.6rem .7rem;position:relative}
+  .step .who{font-size:.75rem;color:#fff;background:var(--green);display:inline-block;padding:.05rem .5rem;border-radius:999px;margin-bottom:.25rem}
+  .step .who.c{background:#7c3aed}.step .who.p{background:#0891b2}.step .who.d{background:#ea580c}.step .who.o{background:#475569}
+  .step .t{font-weight:700;font-size:.92rem}
+  .step .s{direction:ltr;font-size:.72rem;color:var(--muted)}
+  .arrowdown{text-align:center;color:var(--green);font-size:1.3rem;line-height:1}
+  /* money bar */
+  .money{display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--line);font-weight:700;color:#fff;text-align:center;margin:.8rem 0}
+  .money div{padding:.7rem .3rem;font-size:.9rem}
+  .m1{background:var(--green);flex:50}
+  .m2{background:var(--blue);flex:32.25}
+  .m3{background:var(--amber);flex:6;color:#3a2600}
+  .legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-top:.3rem}
+  .legend span{display:flex;align-items:center;gap:.35rem}
+  .dot{width:.8rem;height:.8rem;border-radius:3px;display:inline-block}
+  .timeline{list-style:none;padding:0;margin:.5rem 0}
+  .timeline li{position:relative;padding:.4rem 1.4rem .4rem 0;border-right:2px solid var(--green);margin-right:.5rem}
+  .timeline li::before{content:"";position:absolute;right:-7px;top:.8rem;width:12px;height:12px;background:var(--green);border-radius:50%}
+  footer{text-align:center;color:var(--muted);font-size:.85rem;padding:1.5rem 0}
+  .big{font-size:1.5rem;font-weight:800;color:var(--green-d)}
+  @media(max-width:680px){.servers{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="logo">🚚</div>
+  <h1>تووا — تقرير المزامنة ودورة الطلب على الإنتاج</h1>
+  <p>ماذا فعلنا، خطوة بخطوة، بلغة بسيطة وبرسوم توضيحية</p>
+  <div class="stamp">📅 الثلاثاء 30 يونيو 2026 · الموقع: tawanow.com</div>
+</header>
+
+<div class="card">
+  <p class="lead">باختصار شديد: عندنا <b>أربعة أماكن</b> يعمل فيها التطبيق (السيرفر الرئيسي + سيرفرَي اختبار + مستودع الكود على GitHub). تأكّدنا أنها <b>كلها متطابقة تماماً</b> مع الكود الموجود على جهازك (المرجع)، ثم أصلحنا عطلاً صغيراً منع تحديث الموقع الرئيسي، وأخيراً <b>جرّبنا طلباً حقيقياً كاملاً على الموقع الرئيسي</b> من لحظة الطلب حتى التسليم — ونجح. ✅</p>
+</div>
+
+<!-- 1 -->
+<div class="card">
+  <h2><span class="n">1</span> المقارنة الأولى: الموقع الرئيسي مقابل الكود على جهازك</h2>
+  <p>قارنّا ما يعمل فعلاً على الموقع الرئيسي بما هو موجود في الكود المحلي على جهازك. النتيجة:</p>
+  <table>
+    <tr><th>الجزء</th><th>الموقع الرئيسي (قبل)</th><th>النتيجة</th></tr>
+    <tr><td>الخادم الخلفي (Backend) — كل المميزات الجديدة</td><td>محدّث بالكامل</td><td><span class="pill ok">لا نقص</span></td></tr>
+    <tr><td>الواجهة الأمامية (شكل الموقع للمستخدم)</td><td>نسخة أقدم بـ 6 أيام</td><td><span class="pill no">ناقص</span></td></tr>
+  </table>
+  <div class="tip">💡 <b>بكلمات بسيطة:</b> «الخادم الخلفي» هو المطبخ الذي يطبخ الطلبات (يعمل ممتاز)، و«الواجهة الأمامية» هي القائمة والشاشة التي يراها الزبون. كانت الشاشة قديمة قليلاً وتنقصها قطعتان جديدتان (عرض الصور المحميّة + نوافذ التأكيد).</div>
+</div>
+
+<!-- 2 -->
+<div class="card">
+  <h2><span class="n">2</span> العُطل الذي ظهر أثناء النشر — وكيف أصلحناه</h2>
+  <p>عندما حاولنا تحديث الموقع الرئيسي، <b>فشل البناء</b> لأن قطعة برمجية مطلوبة كانت مفقودة من قائمة المكوّنات (اسمها <code>@simplewebauthn/browser</code> — وهي خاصّة بتسجيل الدخول البصمي/مفاتيح المرور). فُقدت سابقاً بسبب <b>تلف القرص</b> الذي حصل يوم 29 يونيو.</p>
+  <div class="good">✅ <b>الحل:</b> أضفنا القطعة الناقصة، وتأكّدنا أن البناء يكتمل على جهازك أولاً، ثم نشرنا. <b>الموقع لم يتوقف ولا لحظة</b> — لأن النسخة القديمة بقيت تعمل حتى نجح البناء الجديد.</div>
+  <div class="note">🔁 <b>تشبيه:</b> مثل وصفة طبخ ينقصها مكوّن — لا يمكن إكمال الطبق. أضفنا المكوّن، جرّبنا الوصفة في المطبخ الجانبي، وعندما نجحت قدّمناها للزبائن.</div>
+</div>
+
+<!-- 3 -->
+<div class="card">
+  <h2><span class="n">3</span> المزامنة على الأماكن الأربعة كلها</h2>
+  <p>القاعدة عندنا: أي تحديث يجب أن يصل إلى <b>الأماكن الأربعة</b>. جعلناها كلها مطابقة للكود المحلي:</p>
+  <div class="servers">
+    <div class="srv"><div class="ic">🌍</div><div class="nm">الرئيسي</div><div class="dom">tawanow.com</div><div class="ok">✔ محدّث</div></div>
+    <div class="srv"><div class="ic">🧪</div><div class="nm">اختبار 1</div><div class="dom">test1.tawanow.com</div><div class="ok">✔ محدّث</div></div>
+    <div class="srv"><div class="ic">🧪</div><div class="nm">اختبار 2</div><div class="dom">test2.tawanow.com</div><div class="ok">✔ محدّث</div></div>
+    <div class="srv"><div class="ic">📦</div><div class="nm">GitHub</div><div class="dom">مستودع الكود</div><div class="ok">✔ محدّث</div></div>
+  </div>
+  <p>أضفنا أيضاً إصلاح القطعة الناقصة إلى GitHub، وأدرجنا الملفات المحلية المتبقية (إعدادات + صور اختبار + ملف مرجعي) بعد التأكد أنها <b>لا تحتوي أي أسرار</b>.</p>
+</div>
+
+<!-- 4 -->
+<div class="card">
+  <h2><span class="n">4</span> كيف تأكّدنا أنها «متطابقة تماماً»؟ بالبصمة الرقمية</h2>
+  <p>لم نكتفِ بالأسماء. أخذنا <b>بصمة رقمية (SHA256)</b> للمحتوى الفعلي من كل مكان وقارنّاها — كأنها بصمة إصبع لكل ملف: إن تطابقت البصمة فالمحتوى متطابق حرفاً بحرف.</p>
+  <table>
+    <tr><th>البصمة</th><th>المرجع المحلي</th><th>الرئيسي</th><th>اختبار 1</th><th>اختبار 2</th></tr>
+    <tr><td>الواجهة <code>index.html</code></td><td>1331250921…</td><td>✔</td><td>✔</td><td>✔</td></tr>
+    <tr><td>ملف الواجهة الرئيسي <code>main.js</code></td><td>0c4f4684…</td><td>✔</td><td>✔</td><td>✔</td></tr>
+    <tr><td>كود الخادم الخلفي <code>backend/app</code></td><td>faf4c784…</td><td>✔</td><td>✔</td><td>✔</td></tr>
+    <tr><td>قاعدة البيانات (إصدار الترحيل)</td><td>ab01</td><td>✔</td><td>✔</td><td>✔</td></tr>
+  </table>
+  <div class="good">✅ كل البصمات متطابقة → الأماكن الأربعة نسخة طبق الأصل من جهازك.</div>
+</div>
+
+<!-- 5 -->
+<div class="card">
+  <h2><span class="n">5</span> التجربة الكبرى: دورة طلب كاملة على الموقع الرئيسي</h2>
+  <p>لنتأكد أن كل شيء يعمل فعلاً، أنشأنا <b>طلباً حقيقياً</b> على الموقع الرئيسي ومشّيناه عبر <b>كل المراحل</b> بأربعة أدوار: الزبون 🟣، المتجر 🔵، السائق 🟠، وغرفة العمليات ⚫.</p>
+
+  <div class="flow">
+    <div class="step"><span class="who c">الزبون</span><div class="t">١) إنشاء الطلب</div><div class="s">CASH · دفع عند الاستلام</div></div>
+    <div class="step"><span class="who p">المتجر</span><div class="t">٢) قبول الطلب</div></div>
+    <div class="step"><span class="who p">المتجر</span><div class="t">٣) بدء التحضير</div></div>
+  </div>
+  <div class="arrowdown">▼</div>
+  <div class="flow">
+    <div class="step"><span class="who p">المتجر</span><div class="t">٤) الطلب جاهز</div></div>
+    <div class="step"><span class="who o">العمليات</span><div class="t">٥) إرسال عرض للسائق</div></div>
+    <div class="step"><span class="who d">السائق</span><div class="t">٦) قبول العرض</div></div>
+  </div>
+  <div class="arrowdown">▼</div>
+  <div class="flow">
+    <div class="step"><span class="who d">السائق</span><div class="t">٧) تأكيد الاستلام</div></div>
+    <div class="step"><span class="who p">المتجر</span><div class="t">٨) التحقق من رمز الاستلام</div></div>
+    <div class="step"><span class="who d">السائق</span><div class="t">٩) في الطريق ووصل</div></div>
+  </div>
+  <div class="arrowdown">▼</div>
+  <div class="flow">
+    <div class="step"><span class="who d">السائق</span><div class="t">١٠) تحصيل النقود</div><div class="s">53.250 د.ل</div></div>
+    <div class="step"><span class="who d">السائق</span><div class="t">١١) تأكيد رمز التسليم + الإثبات</div></div>
+    <div class="step" style="border-right-color:#16a34a;background:#e9f9ef"><span class="who" style="background:#16a34a">تم</span><div class="t">✅ تم التسليم</div><div class="s">DELIVERED</div></div>
+  </div>
+  <div class="good">🎉 وصل الطلب إلى حالة <b>«تم التسليم» (DELIVERED)</b> على الموقع الرئيسي — كل خطوة نجحت.</div>
+</div>
+
+<!-- 6 -->
+<div class="card">
+  <h2><span class="n">6</span> الحساب المالي — كل قرش في مكانه</h2>
+  <p>المبلغ المُحصّل من الزبون = <span class="big">53.250 د.ل</span>. وهو مكوَّن من ثلاثة أجزاء، وسُجِّل بنظام <b>القيد المزدوج</b> (لكل مبلغ مصدر ووجهة، فيتوازن الحساب تماماً):</p>
+  <div class="money">
+    <div class="m1">البضاعة<br>50.000</div>
+    <div class="m2">رسم التوصيل<br>3.225</div>
+    <div class="m3">الفكّة<br>0.025</div>
+  </div>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--green)"></span> ثمن البضاعة للمتجر = 50.000</span>
+    <span><span class="dot" style="background:var(--blue)"></span> رسم التوصيل للمنصّة = 3.225</span>
+    <span><span class="dot" style="background:var(--amber)"></span> تقريب الفكّة لأقرب 250 درهم = 0.025</span>
+  </div>
+  <table>
+    <tr><th>الطرف</th><th>مدين (خرج)</th><th>دائن (دخل)</th><th>المعنى</th></tr>
+    <tr><td>عهدة السائق النقدية</td><td>53.250</td><td>—</td><td>النقد الذي قبضه السائق</td></tr>
+    <tr><td>حساب البضاعة</td><td>—</td><td>50.000</td><td>للمتجر</td></tr>
+    <tr><td>إيراد المنصّة (توصيل)</td><td>—</td><td>3.225</td><td>رسم التوصيل</td></tr>
+    <tr><td>إيراد المنصّة (تقريب)</td><td>—</td><td>0.025</td><td>فرق الفكّة</td></tr>
+    <tr style="font-weight:800;background:#f3f7f9"><td>المجموع</td><td>53.250</td><td>53.250</td><td>✅ متوازن</td></tr>
+  </table>
+  <div class="tip">💡 <b>لماذا الفكّة؟</b> أصغر عملة متداولة عملياً في ليبيا ربع دينار (250 درهم)، فيُقرّب المبلغ النقدي لأقرب 250 درهم حتى يسهل دفعه وإعطاء الباقي. هنا: 50.000 + 3.225 = 53.225 → قُرِّب إلى 53.250.</div>
+</div>
+
+<!-- 7 -->
+<div class="card">
+  <h2><span class="n">7</span> ضوابط الأمان التي رفضت العمل حتى استوفينا الشروط — وهذا جيّد!</h2>
+  <p>أثناء التجربة، أوقفنا النظام عدة مرات وطلب شروطاً قبل المتابعة. هذا دليل على أن <b>الحماية تعمل بشكل صحيح</b>، وليست عيوباً:</p>
+  <table>
+    <tr><th>المرحلة</th><th>ما اشترطه النظام (وكان محقّاً)</th></tr>
+    <tr><td>اعتماد المتجر</td><td>وثائق رسمية معتمدة (رخصة منشأة + شهادة صحية + هوية المدير)</td></tr>
+    <tr><td>اعتماد السائق</td><td>نوع المركبة + المدينة + هوية معتمدة</td></tr>
+    <tr><td>الطلب نقداً (COD)</td><td>أن يكون رقم هاتف الزبون موثّقاً</td></tr>
+    <tr><td>قبول المتجر/السائق للطلبات</td><td>توقيع عقد الانضمام إلكترونياً أولاً</td></tr>
+    <tr><td>إثبات التسليم</td><td>التحقق من رمز التسليم لدى الزبون قبل تأكيد التسليم</td></tr>
+  </table>
+  <div class="good">✅ كل هذه الضوابط أعادت رفضاً صحيحاً، ثم سمحت بالمتابعة بعد استيفاء الشرط — أي أنها <b>تحمي المنصّة فعلاً</b>.</div>
+</div>
+
+<!-- 8 -->
+<div class="card">
+  <h2><span class="n">8</span> التنظيف والخلاصة</h2>
+  <p>بعد نجاح التجربة، <b>نظّفنا بيانات الاختبار</b>: حُذفت حسابات الاختبار (زبون/متجر/سائق) منطقياً، وبقي الطلب «تم التسليم» محفوظاً للحفاظ على سلامة الدفاتر المالية. لم نلمس أي حساب حقيقي، ولم نُفعّل أي إعداد محظور (المدفوعات الإلكترونية بقيت مغلقة — هذه التجربة كانت دفعاً نقدياً فقط).</p>
+  <ul class="timeline">
+    <li>قارنّا الرئيسي بالتست ثم بالكود المحلي ← اكتشفنا أن الواجهة أقدم.</li>
+    <li>أصلحنا القطعة الناقصة ونشرنا الواجهة على الرئيسي دون انقطاع.</li>
+    <li>زامنّا الأماكن الأربعة وأثبتنا التطابق بالبصمة الرقمية.</li>
+    <li>شغّلنا دورة طلب كاملة على الرئيسي حتى «تم التسليم».</li>
+    <li>تأكّدنا أن الحساب المالي متوازن، ونظّفنا بيانات الاختبار.</li>
+  </ul>
+  <div class="good big" style="text-align:center">النتيجة النهائية: كل شيء يعمل، والموقع الرئيسي جاهز ومطابق للكود المحلي. ✅</div>
+</div>
+
+<footer>
+  تقرير تووا · 30 يونيو 2026 · أُعِدّ بلغة مبسّطة للجميع · جميع الأرقام موثّقة من تشغيل فعلي على tawanow.com
+</footer>
+
+</div>
+</body>
+</html>

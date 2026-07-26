@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تقرير عميق — المسارات الفرعية والحالات الحرجة والاحتمالات</title>
+<style>
+  :root{
+    --green:#0a7d3c; --green-d:#075c2b; --amber:#b8860b; --amber-bg:#fff7e6;
+    --red:#b4232a; --red-d:#7d1418; --red-bg:#fdecec; --blue:#1565c0; --blue-bg:#e8f1fb;
+    --purple:#6a1b9a; --teal:#00695c; --teal-bg:#e0f2f1;
+    --ink:#1b2430; --mut:#5b6573; --line:#e2e6ea; --bg:#f4f6f8; --card:#fff;
+    --ok:#0a7d3c; --ok-bg:#e7f5ec; --ink2:#0f1924;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI","Noto Naskh Arabic",Tahoma,sans-serif;margin:0;background:var(--bg);color:var(--ink);line-height:1.8;font-size:15.5px}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px}
+  header.hero{background:linear-gradient(135deg,var(--red-d),#3a0d10);color:#fff;border-radius:18px;padding:38px 32px;margin-bottom:24px;box-shadow:0 8px 26px rgba(125,20,24,.3)}
+  header.hero h1{margin:0 0 8px;font-size:31px}
+  header.hero .sub{opacity:.95;font-size:16.5px;max-width:820px}
+  header.hero .meta{margin-top:14px;font-size:13px;opacity:.9;border-top:1px solid rgba(255,255,255,.25);padding-top:12px}
+  h2{color:var(--red-d);border-bottom:3px solid var(--red);padding-bottom:8px;margin-top:44px;font-size:23px}
+  h3{color:var(--ink);margin-top:28px;font-size:19px;border-right:5px solid var(--red);padding-right:10px}
+  h4{color:var(--red-d);margin:16px 0 6px;font-size:16.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin:16px 0;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+  .note{border-radius:12px;padding:13px 17px;margin:13px 0;font-size:14.5px}
+  .note.info{background:var(--blue-bg);border-right:5px solid var(--blue)}
+  .note.warn{background:var(--amber-bg);border-right:5px solid var(--amber)}
+  .note.risk{background:var(--red-bg);border-right:5px solid var(--red)}
+  .note.ok{background:var(--ok-bg);border-right:5px solid var(--ok)}
+  .note.key{background:var(--teal-bg);border-right:5px solid var(--teal)}
+  table{width:100%;border-collapse:collapse;margin:13px 0;font-size:13.5px;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+  th{background:var(--red-d);color:#fff;font-weight:600}
+  tr:nth-child(even) td{background:#fafbfc}
+  code{background:#eef2f5;border:1px solid #dde3e8;border-radius:5px;padding:1px 6px;font-size:12.5px;direction:ltr;display:inline-block;color:#0d47a1}
+  .pill{display:inline-block;border-radius:14px;padding:2px 9px;font-size:11.5px;font-weight:700;color:#fff}
+  .pill.err{background:var(--red)} .pill.race{background:var(--purple)} .pill.guard{background:var(--green)}
+  .pill.edge{background:var(--amber)} .pill.line{background:#455a64;direction:ltr}
+  ul.clean{padding-right:20px} ul.clean li{margin:6px 0}
+  .toc{columns:2;column-gap:24px}
+  .toc a{display:block;color:var(--red-d);text-decoration:none;padding:4px 0;font-size:14.5px;border-bottom:1px dashed var(--line)}
+  .toc a:hover{color:var(--amber)}
+  .codebox{background:var(--ink2);color:#cdd9e5;border-radius:11px;padding:14px 16px;margin:12px 0;font-family:"Consolas","Courier New",monospace;direction:ltr;font-size:12.8px;overflow-x:auto;line-height:1.55}
+  .codebox .k{color:#c792ea} .codebox .s{color:#c3e88d} .codebox .c{color:#637777} .codebox .e{color:#ff8a80} .codebox .n{color:#82aaff}
+  .seq{counter-reset:s;margin:14px 0}
+  .seq .row{display:flex;gap:12px;align-items:flex-start;margin:8px 0}
+  .seq .row::before{counter-increment:s;content:counter(s);flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--red-d);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .seq .row .b{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;flex:1;font-size:14px}
+  .branch{border-right:3px solid var(--amber);background:#fffdf7;border-radius:0 10px 10px 0;padding:8px 14px;margin:8px 0 8px 0}
+  footer{margin-top:46px;text-align:center;color:var(--mut);font-size:13px;border-top:1px solid var(--line);padding-top:18px}
+  .tag{font-size:11px;color:var(--mut);background:#eef2f5;border-radius:5px;padding:1px 6px;direction:ltr;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>🔬 التقرير العميق — المسارات الفرعية، الحالات الحرجة، والاحتمالات</h1>
+  <div class="sub">تتبّع سطر-بسطر للفروع الفعلية، حالات السباق (race conditions)، حماية التكرار (idempotency)، ترتيب الحُرّاس، ومسارات الفشل الجزئي — مستخرَجة من قراءة الكود الحيّ مباشرة.</div>
+  <div class="meta">ملحق تعميقي للمراحل الخمس · المصدر: قراءة فعلية لـ<code>order_service.py (1700 سطر)</code> · <code>dispatch_service.py</code> · <code>wallet_service.py</code> · <code>idempotency.py</code> · <code>auth_router.py</code></div>
+</header>
+
+<div class="card">
+  <h3 style="margin-top:4px">📘 لماذا هذا الملف؟</h3>
+  <p>التقارير الخمسة السابقة رسمت <b>الخريطة العريضة</b>. هذا الملف ينزل إلى <b>الأعماق</b>: ماذا يحدث فعلاً عندما <b>يتزامن طلبان</b>، أو <b>تنقطع الشبكة فتتكرّر العملية</b>، أو <b>يحاول سائقان قبول نفس العرض</b>، أو <b>يُعاد إرسال الطلب نفسه بمفتاح مختلف</b>؟ كل بند هنا مُثبَت برقم سطر فعلي ورمز خطأ حقيقي.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+    <span class="pill race">سباق تزامن</span>
+    <span class="pill err">رمز خطأ</span>
+    <span class="pill guard">حارس</span>
+    <span class="pill edge">حالة حافة</span>
+    <span class="pill line">رقم سطر</span>
+  </div>
+</div>
+
+<h2 id="toc">🗂️ الفهرس</h2>
+<div class="card toc">
+  <a href="#order-guards">① ترتيب الحُرّاس الـ16 في إنشاء الطلب</a>
+  <a href="#idem">② حماية التكرار — 3 طبقات وحالاتها الحافّة</a>
+  <a href="#offer-race">③ سباق قبول العرض (سائقان، نفس العرض)</a>
+  <a href="#cash-race">④ تحصيل النقد — حارسان للتكرار + المطابقة الدقيقة</a>
+  <a href="#wallet-race">⑤ سباق المحفظة (إنفاق مزدوج، رصيد سالب)</a>
+  <a href="#promo-race">⑥ سباق العروض الترويجية (تجاوز سقف الاستخدام)</a>
+  <a href="#partial">⑦ الفشل الجزئي والتعافي (fail-open)</a>
+  <a href="#cancel">⑧ مسارات الإلغاء الدقيقة ومن يملكها</a>
+  <a href="#auth-edge">⑨ حالات حافة المصادقة (OTP، TOTP، الخمول)</a>
+  <a href="#deadends">⑩ مسارات آلة الحالة المسدودة ومخارجها</a>
+  <a href="#matrix">⑪ مصفوفة «ماذا لو» الشاملة</a>
+  <a href="#gaps">⑫ فجوات/مخاطر حقيقية مرصودة للتحقّق</a>
+</div>
+
+<!-- 1 -->
+<h2 id="order-guards">① ترتيب الحُرّاس الـ16 في إنشاء الطلب</h2>
+<p>دالة <code>create_order</code> (1700 سطر) ليست خطاً واحداً — هي <b>سلسلة بوّابات مرتّبة بعناية</b>، وترتيبها مقصود لأسباب أمنية ومالية. أي خلل في الترتيب = ثغرة. هذا الترتيب الفعلي:</p>
+<table>
+  <tr><th>#</th><th>الحارس</th><th>السطر</th><th>رمز الفشل</th><th>لماذا هذا الترتيب؟</th></tr>
+  <tr><td>1</td><td>توصيل بلا عنوان؟</td><td><span class="pill line">390</span></td><td><code>MISSING_DELIVERY_ADDRESS</code></td><td>قبل أي عمل — نداء API مباشر قد يتجاوز الواجهة</td></tr>
+  <tr><td>2</td><td>فحص التكرار (idempotency)</td><td><span class="pill line">406</span></td><td>يُعيد الطلب الموجود</td><td><b>مبكّر جداً</b> — لئلا يُستهلك رمز OTP/المحفظة مرتين عند إعادة الإرسال</td></tr>
+  <tr><td>3</td><td>مأمورية (errand): مُفعّلة؟ محفظة؟ وصف؟ محتوى محظور؟ ميزانية؟ عنوان؟ هدف صالح؟</td><td><span class="pill line">425–468</span></td><td>7 رموز مختلفة</td><td>المأمورية لها قواعدها الخاصة (محتوى محظور: كحول/سلاح…)</td></tr>
+  <tr><td>4</td><td>أصناف موجودة (غير المأمورية)</td><td><span class="pill line">469</span></td><td><code>ORDER_REQUIRES_ITEMS</code></td><td>—</td></tr>
+  <tr><td>5</td><td>المزوّد متاح؟ (status+active_now+is_accepting_orders)</td><td><span class="pill line">482</span></td><td><code>PROVIDER_OFFLINE</code></td><td><b>C1:</b> أُضيف <code>is_accepting_orders</code> لأن طلباً عبر رابط معروف كان يمرّ والمتجر مغلق</td></tr>
+  <tr><td>6</td><td>المزوّد «قابل للتشغيل» (مالكه ليس PENDING)</td><td><span class="pill line">501</span></td><td><code>PROVIDER_OFFLINE</code></td><td><b>D2:</b> متجر ACTIVE لكن مالكه غير معتمد → الطلب يعلق للأبد. يُرفض مبكراً</td></tr>
+  <tr><td>7</td><td>ساعات العمل</td><td><span class="pill line">~516</span></td><td><code>PROVIDER_CLOSED</code></td><td>fail-open: بلا ساعات = 24/7؛ الطلبات المجدولة معفاة</td></tr>
+  <tr><td>8</td><td>منطقة موقوفة</td><td><span class="pill line">536</span></td><td><code>ZONE_SUSPENDED</code></td><td>—</td></tr>
+  <tr><td>9</td><td>تحقّق الأصناف والخيارات (متاح؟ مجموعة مطلوبة؟ عدد الخيارات؟)</td><td><span class="pill line">571–623</span></td><td>عدة رسائل</td><td>—</td></tr>
+  <tr><td>10</td><td>دين عدم حضور مفتوح</td><td><span class="pill line">726</span></td><td><code>OUTSTANDING_DEBT</code></td><td>يمنع العميل المدين من طلب جديد</td></tr>
+  <tr><td>11</td><td>قبول الشروط (click-wrap)</td><td><span class="pill line">744</span></td><td><code>TERMS_NOT_ACCEPTED</code></td><td>—</td></tr>
+  <tr><td>12</td><td>جهة اتصال موثّقة لـCOD</td><td><span class="pill line">758</span></td><td><code>COD_REQUIRES_VERIFIED_CONTACT</code></td><td>—</td></tr>
+  <tr><td>13</td><td>مخاطرة عالية (trust &lt; حدّ) + نقد + توصيل</td><td><span class="pill line">776</span></td><td><code>COD_BLOCKED_HIGH_RISK</code></td><td>—</td></tr>
+  <tr><td>14</td><td>تقييم احتيال نقدي = HIGH</td><td><span class="pill line">805</span></td><td><code>COD_FRAUD_HIGH_RISK</code></td><td>—</td></tr>
+  <tr><td>15</td><td>نقدي عالي القيمة أو مخاطرة متوسطة → OTP</td><td><span class="pill line">819</span></td><td><code>OTP_REQUIRED_FOR_COD</code></td><td>رمز الفعل يُستهلَك (single-use) بعد فحص التكرار → لا يُحرق مرتين</td></tr>
+  <tr><td>16</td><td>محفظة عالية القيمة → wallet step-up</td><td><span class="pill line">852</span></td><td><code>WALLET_STEP_UP_REQUIRED</code></td><td>الرمز single-use؛ موضعه بعد فحص التكرار عمداً (SIM-A2-1)</td></tr>
+</table>
+<div class="note key">🔑 <b>الذكاء المعماري هنا:</b> فحص التكرار <b>قبل</b> استهلاك أي رمز أحادي الاستخدام (OTP/wallet). لو كان بعده، لكان إعادة الإرسال (شبكة سيّئة) يحرق الرمز ويرفض الطلب الثاني خطأً. التعليق في الكود يسمّي هذا صراحةً: <span class="tag">SIM-A2-1</span> و<span class="tag">single-use token is never double-consumed</span>.</div>
+<div class="note warn">⚠️ <b>حالة حافّة دقيقة (سطر 923):</b> حساب الطفل (تابع لعائلة) <b>لا يستطيع الدفع نقداً</b> → <code>"Child accounts cannot use cash payment"</code>. هذا مسار فرعي لم يظهر في التقرير العريض.</div>
+
+<!-- 2 -->
+<h2 id="idem">② حماية التكرار — 3 طبقات وحالاتها الحافّة</h2>
+<div class="card">
+  <p>«مفتاح التكرار» (Idempotency-Key) ليس مجرد فحص بسيط. هناك <b>بصمة للطلب</b> (request hash) تُقارَن، وثلاثة احتمالات:</p>
+  <table>
+    <tr><th>الحالة</th><th>النتيجة</th><th>السطر</th></tr>
+    <tr><td>نفس المفتاح + نفس البصمة</td><td>يُعيد الطلب الموجود (200) — لا إنشاء مكرّر</td><td><span class="pill line">check:75</span></td></tr>
+    <tr><td>نفس المفتاح + <b>بصمة مختلفة</b></td><td><span class="pill err">ConflictError</span> — «أعدت استخدام مفتاح لطلب مختلف»</td><td><span class="pill line">check:76</span></td></tr>
+    <tr><td>مفتاح جديد</td><td>إنشاء طلب جديد</td><td>—</td></tr>
+  </table>
+  <div class="note info">💡 <b>ما الذي يدخل في البصمة؟</b> المزوّد + الأصناف + طريقة الدفع + العنوان + نوع التسليم + <b>وقت الجدولة</b>. الملاحظات النصّية <b>لا</b> تدخل (نصّ حرّ، ليست هوية الطلب).</div>
+  <div class="note risk">🔎 <b>سجلّ خطأ سابق مذكور في الكود (سطر 31–38):</b> كان وقت الجدولة غير مُضمَّن في البصمة، فطلبان مختلفان (الآن مقابل مجدول) كانا «ينهاران» لنفس البصمة → الطلب الثاني يُعيد الأول صامتاً بدل إنشائه. <b>أُصلِح</b> بإضافة <code>scheduled_for</code>. هذا مثال على «احتمال غير مباشر» كان فعلاً قائماً.</div>
+</div>
+
+<!-- 3 -->
+<h2 id="offer-race">③ سباق قبول العرض — سائقان، نفس العرض، نفس اللحظة</h2>
+<p>هذا أخطر سباق في التوزيع: لو وصل العرض لسائقين (أو ضغط السائق مرتين)، كيف نمنع تعيين سائقين لطلب واحد؟</p>
+<div class="seq">
+  <div class="row"><div class="b">السائق يضغط «قبول» → <code>respond_to_offer</code> (سطر 644)</div></div>
+  <div class="row"><div class="b"><b>قفل صف العرض</b> <code>with_for_update()</code> (سطر 655) — على PostgreSQL يمنع قراءتين متزامنتين؛ على SQLite بلا أثر (اختبار فقط)</div></div>
+  <div class="row"><div class="b">فحص الملكية: العرض لهذا السائق؟ وإلا <span class="pill err">403</span> (سطر 669)</div></div>
+  <div class="row"><div class="b">إعادة قبول؟ إن كان <code>state=="ACCEPTED"</code> أصلاً → يُعيد نفس العرض (200) — <b>لا 409</b> (سطر 683)</div></div>
+  <div class="row"><div class="b">السباق: إن لم يعد <code>"SENT"</code> → <span class="pill err">OfferAlreadyTakenError</span> (سطر 686)</div></div>
+  <div class="row"><div class="b">المهلة: إن انتهت <code>expires_at</code> → الحالة <code>"EXPIRED"</code> + رفض (سطر 696)</div></div>
+  <div class="row"><div class="b">قبول: <code>state="ACCEPTED"</code> + <b>زيادة lock_version</b> + ختم الوقت (سطر 701–704)</div></div>
+  <div class="row"><div class="b">انتقال الطلب → <code>DRIVER_ASSIGNED</code> + لقطة أجر السائق</div></div>
+</div>
+<div class="note key">🔑 <b>ثلاث طبقات حماية متراكبة:</b> (1) قفل الصف يمنع المرور المتزامن للفحص، (2) فحص <code>state=="SENT"</code> يرفض المتأخّر، (3) <code>lock_version</code> (تفاؤلي) يحمي من تعديل قديم. والذكاء: إعادة القبول من <b>نفس</b> السائق (نقرة مزدوجة/شبكة) فكرة مختلفة عن قبول سائق <b>آخر</b> — الأولى تُعاد بهدوء، الثانية تُرفض.</div>
+<div class="note warn">⚠️ <b>تعافٍ ذكي من حالة شاذّة (سطر 748–763):</b> لو قُبِل عرض لكن الطلب في حالة «ما قبل التوزيع» (لا يفترض أن يوجد عرض أصلاً) → بدل أن «يعلق» الطلب صامتاً، يُسجَّل خطأ ويُرجع 409. أي «العرض ما كان يجب أن يُخلق». هذا اصطياد لفئة أخطاء D-1.</div>
+<div class="note info">💡 <b>لقطة الأجر لا توقف القبول (سطر 734–737):</b> لو فشل حساب أجر السائق، القبول يستمرّ لكن يُسجَّل الخطأ (كان صامتاً → أجر ناقص). مثال على «fail-open مع رصد».</div>
+
+<!-- 4 -->
+<h2 id="cash-race">④ تحصيل النقد — حارسان للتكرار + مطابقة دقيقة للقرش</h2>
+<div class="card">
+  <p><code>record_cash_collection</code> (سطر 1764) أكثر مكان حسّاس مالياً. الفروع الفعلية بالترتيب:</p>
+  <table>
+    <tr><th>الفحص</th><th>الفشل</th><th>المنطق الدقيق</th></tr>
+    <tr><td>المبلغ &gt; 0 و LYD</td><td>ValidationError</td><td>—</td></tr>
+    <tr><td>تكرار نفس العملية (<code>local_operation_id</code>)</td><td><span class="pill err">CashCollectionReplayError</span></td><td>يمنع <b>نفس</b> الطلب مرتين</td></tr>
+    <tr><td><b>تحصيل واحد لكل طلب</b> (A6)</td><td><span class="pill err">CashCollectionReplayError</span></td><td>يمنع طلباً ثانياً <b>بمعرّف عملية مختلف</b> — وإلا تُحصَّل البضاعة مرتين ويُسجَّل الدفتر مرتين</td></tr>
+    <tr><td>نزاع مالي مجمّد (OPEN + freeze≠NONE)</td><td><span class="pill err">409</span></td><td><b>MED-03:</b> لا تحصيل على طلب مجمّد</td></tr>
+    <tr><td>طريقة الدفع = CASH</td><td>ValidationError</td><td>—</td></tr>
+    <tr><td><b>المبلغ يطابق بالضبط</b></td><td>ValidationError</td><td><code>amount == round_cash_total(total+fee) + tip</code></td></tr>
+    <tr><td>عرض مقبول لهذا السائق</td><td>403</td><td>السائق المخوّل فقط</td></tr>
+  </table>
+  <div class="note key">🔑 <b>المطابقة الدقيقة للقرش (سطر ~1840):</b> الإجمالي المتوقّع = <b>تقريب(البضاعة+الرسم) + الإكرامية</b>. الإكرامية تُضاف <b>فوق</b> المبلغ المقرّب ولا تُقرّب (لأنها إكرامية لا فكّة)، و<b>السائق يحتفظ بها</b> — مستثناة من العهدة ولا تُسجَّل في دفتر المنصة. هذا مستوى دقّة يصعب رؤيته في القراءة العريضة.</div>
+  <div class="note warn">⚠️ <b>احتمال غير مباشر مُغلَق:</b> لولا حارس «تحصيل واحد لكل طلب»، لكان بإمكان سائق (أو خطأ شبكة بمعرّف جديد) أن يُحصّل ويُسجّل الدفتر مرتين → بضاعة محصّلة مزدوجاً. الحارس الأول (نفس العملية) لا يكفي وحده.</div>
+</div>
+
+<!-- 5 -->
+<h2 id="wallet-race">⑤ سباق المحفظة — إنفاق مزدوج ورصيد سالب</h2>
+<div class="card">
+  <p>ثلاث دوال محفظة كلها تستخدم <b>قفل الصف</b> قبل القراءة-التعديل-الكتابة:</p>
+  <div class="codebox">
+<span class="c"># reserve_wallet (سطر 280) — حجز لطلب محفظة</span><br>
+<span class="c"># 1) إزالة التكرار على order_id <span class="e">و</span> idempotency_key معاً قبل أي تعديل رصيد</span><br>
+<span class="k">if</span> existing <span class="k">is not None</span>: <span class="k">return</span> existing  <span class="c"># CC-2/ND-T10</span><br>
+<span class="c"># 2) قفل صف المحفظة (FOR UPDATE على PG)</span><br>
+<span class="n">select</span>(WalletAccount).<span class="n">with_for_update</span>()  <span class="c"># C-7</span><br>
+<span class="k">if</span> wallet.balance_minor &lt; amount_minor: <span class="k">raise</span> <span class="e">InsufficientBalanceError</span><br>
+wallet.balance_minor -= amount_minor  <span class="c"># خصم آمن</span>
+  </div>
+  <table>
+    <tr><th>السيناريو</th><th>الدفاع</th><th>النتيجة</th></tr>
+    <tr><td>طلبا محفظة متزامنان لنفس الرصيد</td><td>قفل الصف (سطر 253/131/34)</td><td>الثاني ينتظر، فيرى الرصيد المخصوم → يُرفض إن لم يكفِ</td></tr>
+    <tr><td>إعادة إرسال نفس الحجز</td><td>إزالة تكرار على المفتاح (سطر 14–22)</td><td>يُعيد الحجز الموجود — لا خصم ثانٍ</td></tr>
+    <tr><td>إعادة استخدام مفتاح لطلب آخر</td><td>الفحص قبل أي تعديل</td><td>يُعيد الصف الموجود بدل <b>IntegrityError→500</b></td></tr>
+    <tr><td>محاولة رصيد سالب</td><td>قيد قاعدة البيانات <code>balance ≥ 0</code> + الفحص</td><td>مستحيل</td></tr>
+  </table>
+  <div class="note info">💡 <b>تفصيل دقيق:</b> دالة <code>apply_debit</code> (سطر 124) للديون <b>لا تكتب في الدفتر</b> (خصم مقفول فقط)، بينما <code>spend_from_wallet</code> (سطر 247) تكتب قيداً. سبب الفصل: تحصيل الدين يحتاج خصماً لا يلائم قيد «محفظة→مستحق طلب». مستوى تمييز دقيق.</div>
+</div>
+
+<!-- 6 -->
+<h2 id="promo-race">⑥ سباق العروض الترويجية — تجاوز سقف الاستخدام</h2>
+<div class="card">
+  <p>المشكلة: عرض محدود بـ100 استخدام، و101 عميل يطلبون في نفس اللحظة. القراءة الأولى للأهلية «لقطة قديمة». الحل الفعلي (سطر 1206–1221):</p>
+  <div class="codebox">
+<span class="c"># تحديث مشروط ذرّي: زِد العداد فقط إن لم يُبلغ الحدّ بعد</span><br>
+<span class="n">UPDATE</span> Promotion <span class="k">SET</span> used_count = used_count + 1<br>
+<span class="k">WHERE</span> id = ? <span class="k">AND</span> (usage_limit <span class="k">IS NULL</span> <span class="k">OR</span> used_count &lt; usage_limit)<br>
+<span class="c"># لو rowcount == 0 → السقف اكتُمل للتو</span><br>
+<span class="k">if</span> _promo_res.rowcount == 0: <span class="k">raise</span> <span class="e">PROMOTION_EXHAUSTED</span> <span class="c"># الطلب كله يتراجع</span>
+  </div>
+  <div class="note key">🔑 <b>الذكاء:</b> لا يُعتمد على القراءة المسبقة (لقطة قديمة)، بل على <b>التحديث المشروط الذرّي</b> الذي تضمنه قاعدة البيانات. إن لمست العملية 0 صفوف، فالسقف اكتُمل، ويتراجع الطلب كاملاً ليعيد العميل المحاولة بلا العرض. التعليق يسمّيه <span class="tag">Audit#12</span>.</div>
+</div>
+
+<!-- 7 -->
+<h2 id="partial">⑦ الفشل الجزئي والتعافي (fail-open)</h2>
+<table>
+  <tr><th>الموضع</th><th>لو فشل…</th><th>السلوك</th></tr>
+  <tr><td>القبول التلقائي للطلب (سطر 1243)</td><td>أي فشل</td><td>يبقى الطلب في AWAITING للقبول اليدوي — لا ضرر</td></tr>
+  <tr><td>لقطة أجر السائق (سطر 734)</td><td>فشل الحساب</td><td>القبول يستمرّ + يُسجَّل الخطأ</td></tr>
+  <tr><td>ختم آخر عنوان استُخدم (سطر 943)</td><td>فشل</td><td>لا يوقف إنشاء الطلب أبداً</td></tr>
+  <tr><td>ساعات العمل (is_currently_open)</td><td>JSON تالف/فارغ</td><td>يُعتبر مفتوحاً (fail-open) — لا يحجب متاجر بلا ساعات</td></tr>
+  <tr><td>GEOSEARCH للتوزيع</td><td>Redis معطّل</td><td>سقوط للمسح الكامل + haversine — نفس النتيجة</td></tr>
+  <tr><td>FCM/الإشعارات</td><td>غير مُعدّ</td><td>لا يوقف التوزيع — يُسجَّل فقط</td></tr>
+</table>
+<div class="note info">💡 <b>الفلسفة:</b> الأنظمة «المساعدة» (إشعار، لقطة، تسريع) <b>تفشل بصمت دون كسر المسار الأساسي</b>؛ والأنظمة «الحرجة» (مال، حالة، صلاحية) <b>تفشل بصوت وتوقف العملية</b>. هذا تمييز ناضج لا يظهر إلا بقراءة الكود.</div>
+
+<!-- 8 -->
+<h2 id="cancel">⑧ مسارات الإلغاء الدقيقة ومن يملكها</h2>
+<div class="card">
+  <p><code>cancel_order</code> (سطر 1354) ليس زراً واحداً — صلاحياته تتغيّر حسب الحالة:</p>
+  <table>
+    <tr><th>الحالة</th><th>من يستطيع الإلغاء</th><th>المنطق (السطر)</th></tr>
+    <tr><td>قبل وصول السائق (حالات قابلة للإلغاء)</td><td>العميل · OPS · SUPER</td><td>سطر 24</td></tr>
+    <tr><td><code>DRIVER_AT_PROVIDER</code> (السائق وصل)</td><td><b>العمليات فقط</b> (لا العميل)</td><td>سطر 30 — «B-0»</td></tr>
+    <tr><td>عميل يُلغي طلب عميل آخر</td><td>ممنوع</td><td>سطر 19 — <code>OrderForbiddenError</code></td></tr>
+  </table>
+  <div class="note key">🔑 <b>عند الإلغاء بدفع محفظة:</b> يُستدعى <code>release_reservation</code> (سطر 51) → يعود الرصيد كاملاً. وإن كانت عمولة سُجِّلت (في حالات لاحقة) → <code>reverse_commission_for_order</code> يعكسها. الإلغاء ليس مجرد تغيير حالة، بل سلسلة آثار مالية.</div>
+  <div class="note warn">⚠️ <b>سبب منع العميل بعد وصول السائق:</b> لو ألغى العميل والسائق واقف عند المتجر، تنشأ خسارة (وقت السائق + احتمال تحضير البضاعة). لذا يُحوَّل القرار للعمليات التي تقدّر الموقف. منطق تجاري ناضج مدفون في سطر واحد.</div>
+</div>
+
+<!-- 9 -->
+<h2 id="auth-edge">⑨ حالات حافة المصادقة</h2>
+<table>
+  <tr><th>الحالة</th><th>السلوك</th><th>السطر</th></tr>
+  <tr><td>طلب OTP متكرر بسرعة</td><td><span class="pill err">OTP_RATE_LIMITED</span></td><td>176/231/286</td></tr>
+  <tr><td>OTP لرقم غير مسجّل (استعادة كلمة المرور)</td><td>صامت (لا يكشف وجود الرقم)</td><td>—</td></tr>
+  <tr><td>TOTP خاطئ</td><td>422 «invalid TOTP code»</td><td>838/863/914</td></tr>
+  <tr><td>pre_auth_token خاطئ (تحقّق ثنائي قبل الدخول)</td><td>401</td><td>902</td></tr>
+  <tr><td>جلسة منتهية بالخمول</td><td>«Session expired due to inactivity» 401</td><td>630</td></tr>
+  <tr><td>«حالة احتياطية» للـOTP (fallback)</td><td><code>/otp/fallback-state</code></td><td>729 — للشبكات الضعيفة</td></tr>
+</table>
+<div class="note info">💡 <b>«حالة احتياطية لـOTP»</b> مصمَّمة لليبيا (شبكات متقطّعة): تتيح حالة بديلة عند تعذّر التسليم الطبيعي. مسار فرعي كامل لم يظهر في التقرير العريض.</div>
+
+<!-- 10 -->
+<h2 id="deadends">⑩ مسارات آلة الحالة المسدودة ومخارجها</h2>
+<p>«الاحتمالات الأخرى» الأخطر: حالات كانت تُسبِّب طلباً عالقاً للأبد، وكيف عولجت:</p>
+<table>
+  <tr><th>الحالة المسدودة سابقاً</th><th>الإصلاح</th><th>المخرج الآن</th></tr>
+  <tr><td>السائق علِق عند المتجر (المتجر لا يمسح)</td><td>B5 (Phase 404)</td><td><code>DRIVER_AT_PROVIDER → CANCELLED_BY_CUSTOMER</code> (OPS)</td></tr>
+  <tr><td>جاهز لكن لا عرض أُرسل أبداً</td><td>W2</td><td><code>READY → NO_DRIVER_ESCALATION</code> → إعادة توزيع أو إلغاء</td></tr>
+  <tr><td>EN_ROUTE والعميل لا يدفع</td><td>Phase 437 (AUDIT-2)</td><td><code>→ DELIVERY_FAILED</code> + قيود عدم الحضور</td></tr>
+  <tr><td>RETURN_INITIATED / DISPUTED بلا مخرج</td><td>B2</td><td><code>→ RETURNED / DISPUTE_RESOLVED</code></td></tr>
+  <tr><td>عرض منتهٍ بلا إعادة تعيين</td><td>—</td><td><code>OFFER_EXPIRED_REASSIGN → AWAITING_DRIVER</code></td></tr>
+  <tr><td>دفع جزئي عند الباب</td><td>ج-3</td><td><code>→ DELIVERED</code> + دين بالفرق</td></tr>
+</table>
+<div class="note key">🔑 <b>المبدأ المُثبَت:</b> كل حالة في آلة الحالة لها <b>مخرج معرّف</b> — لا «حفرة سوداء» يعلق فيها الطلب بلا قرار. كل سطر في الجدول أعلاه كان ثغرة «طلب عالق» فعلية أُغلِقت.</div>
+
+<!-- 11 -->
+<h2 id="matrix">⑪ مصفوفة «ماذا لو» الشاملة</h2>
+<table>
+  <tr><th>ماذا لو…</th><th>الاحتمال غير المباشر</th><th>الدفاع الفعلي</th></tr>
+  <tr><td>انقطعت شبكة العميل بعد الإرسال فأعاد</td><td>طلب مكرّر + خصم مزدوج</td><td>idempotency (بصمة + مفتاح) → يُعيد نفس الطلب</td></tr>
+  <tr><td>ضغط السائق «قبول» مرتين</td><td>تعيين مزدوج</td><td>إعادة قبول تُعاد بهدوء (200)</td></tr>
+  <tr><td>سائقان قبلا نفس العرض</td><td>سائقان لطلب واحد</td><td>قفل صف + state==SENT + lock_version</td></tr>
+  <tr><td>عميلان استخدما عرضاً عند آخر استخدام</td><td>تجاوز السقف</td><td>UPDATE مشروط ذرّي → PROMOTION_EXHAUSTED</td></tr>
+  <tr><td>سائق حصّل النقد مرتين بمعرّف مختلف</td><td>تحصيل مزدوج + دفتر مزدوج</td><td>حارس «تحصيل واحد لكل طلب»</td></tr>
+  <tr><td>طلبا محفظة لنفس الرصيد معاً</td><td>سحب زائد (overdraw)</td><td>قفل صف المحفظة + قيد ≥0</td></tr>
+  <tr><td>نداء API مباشر يتجاوز الواجهة</td><td>طلب بلا عنوان/متجر مغلق</td><td>كل حُرّاس الواجهة مكرّرة في الخادم</td></tr>
+  <tr><td>متجر ACTIVE لكن مالكه غير معتمد</td><td>طلب يعلق للأبد</td><td>provider_owner_blocked → PROVIDER_OFFLINE</td></tr>
+  <tr><td>إعادة استخدام مفتاح تكرار لطلب مختلف</td><td>500 أو خصم خاطئ</td><td>ConflictError + dedupe قبل أي تعديل</td></tr>
+  <tr><td>رمز OTP/محفظة يُحرق عند إعادة الإرسال</td><td>رفض خاطئ للطلب الثاني</td><td>فحص التكرار قبل استهلاك الرمز</td></tr>
+  <tr><td>تحصيل نقد على طلب متنازَع عليه</td><td>مال يتحرّك أثناء نزاع</td><td>حارس التجميد 409</td></tr>
+  <tr><td>JSON ساعات عمل تالف</td><td>حجب متاجر سليمة</td><td>fail-open → يُعتبر مفتوحاً</td></tr>
+</table>
+
+<!-- 12 -->
+<h2 id="gaps">⑫ فجوات/مخاطر حقيقية مرصودة (للتحقّق، ليست أحكاماً)</h2>
+<div class="note risk">🔎 <b>نقاط تستحق تدقيقاً مركّزاً (من قراءة الكود الفعلي):</b>
+<ul class="clean">
+<li><b>SQLite مقابل PostgreSQL:</b> أقفال الصفوف (<code>with_for_update</code>) <b>بلا أثر على SQLite</b> (بيئة الاختبار). فالحماية من السباق حقيقية فقط على PostgreSQL (الإنتاج). يجب أن يبقى الإنتاج PG حصراً، وأن تُختبر السيناريوهات المتزامنة على PG لا SQLite.</li>
+<li><b>تعدّد المسارات المالية المتفرّعة:</b> create_order يولّد قيوداً عبر reserve/commit، والتحصيل النقدي عبر مسار آخر، والمأمورية تعيد استخدام مسار المحفظة. أي مسار جديد يجب أن يمرّ بنفس فحص توازن الدفتر.</li>
+<li><b>fail-open للإشعارات/الأجر:</b> ممتاز لعدم كسر المسار، لكنه يعني أن فشلاً صامتاً (أجر، إشعار) قد يتراكم دون أن يلاحظه أحد ما لم تُراقَب سجلّات <code>exception</code> فعلاً.</li>
+<li><b>اعتماد على قيمة <code>trust_score</code> الافتراضية (50):</b> عميل بلا سجل = LOW risk افتراضياً. سياسة معقولة لكن تستحق مراجعة دورية مع بيانات حقيقية.</li>
+<li><b>الإكرامية نقداً يحتفظ بها السائق ولا تُسجَّل في الدفتر:</b> صحيح محاسبياً (ليست مال المنصة)، لكنه يعني أن الإكرامية خارج رقابة الدفتر تماماً — مقصود، لكن يُوثَّق.</li>
+</ul></div>
+<div class="note ok">✅ <b>الحكم الناضج:</b> النواة تُظهر <b>وعياً عالياً بالتزامن وإعادة الإرسال والفشل الجزئي</b> — أقفال صفوف، فحوص حالة مزدوجة، تحديثات ذرّية مشروطة، فحص تكرار قبل استهلاك الرموز، ومخارج لكل حالة. هذه ليست شيفرة سطحية؛ كل حارس يحمل وسماً لخطأ تاريخي أُغلِق (C1, D2, A6, MED-03, SIM-A2-1, CC-2, Audit#12…)، ما يدل على تطوّر دفاعي تراكمي.</div>
+
+<footer>
+  التقرير العميق — المسارات الفرعية والحالات الحرجة · منصة تووا/Tawa<br>
+  أُعِدّ بقراءة سطر-بسطر للكود الحيّ · ملحق تعميقي للمراحل الخمس · كل سطر مُثبَت برقم سطر ورمز خطأ فعلي
+</footer>
+
+</div>
+</body>
+</html>

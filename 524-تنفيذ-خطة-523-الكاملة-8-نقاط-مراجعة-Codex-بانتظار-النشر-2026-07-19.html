@@ -1,0 +1,416 @@
+<meta charset="utf-8">
+<title>تنفيذ خطّة 523 الكاملة (8 نقاط) + مراجعة Codex + بانتظار إذن النشر — تقرير 524</title>
+<style>
+  @font-face { font-family: "TawaMono"; src: local("Cascadia Code"), local("Consolas"); }
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: "TawaMono", ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px 100px; }
+  ::selection { background: var(--accent-tint); }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 84ch; color: var(--ink); }
+  p.lead { font-size: 1.06rem; color: var(--ink-muted); max-width: 70ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.86em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🧭"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1080px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.9rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 44ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 76ch; font-size: 1.04rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.5rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.74rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; }
+  nav.toc a { font-size: 0.78rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 50px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 0.98rem; color: var(--ink-muted); max-width: 82ch; margin-bottom: 20px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.94rem; max-width: 72ch; }
+  .plain b { color: var(--accent-deep); }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.94rem; max-width: 74ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.94rem; max-width: 74ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .info-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .info-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .info-box p { margin: 0; color: var(--info-ink); font-size: 0.94rem; max-width: 74ch; }
+  .info-box b { color: var(--info-ink); }
+  .subhead { font-size: 0.78rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.04em; margin: 18px 0 8px; display: flex; align-items: center; gap: 6px; }
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+  ol.steps { margin: 10px 0; padding-inline-start: 22px; }
+  ol.steps li { margin-bottom: 9px; color: var(--ink); font-size: 0.92rem; }
+  ol.steps li b { color: var(--accent-deep); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 18px; }
+  .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 26px; box-shadow: var(--shadow); margin-bottom: 22px; }
+  .item-card .item-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .item-card .item-num { font-family: var(--font-display); font-weight: 800; font-size: 0.82rem; color: #fff; background: var(--accent); border-radius: 8px; padding: 3px 10px; }
+  .item-card h3 { font-size: 1.12rem; margin: 0; }
+  .item-card .files { font-size: 0.78rem; color: var(--ink-faint); margin: 4px 0 14px; }
+  pre { background: #0d1611; color: #d7e6da; border-radius: 10px; padding: 14px 16px; overflow-x: auto; font-size: 0.82rem; direction: ltr; text-align: left; margin: 10px 0 16px; border: 1px solid #1d3324; }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.88rem; }
+  table th, table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; }
+  table th { background: var(--surface-2); font-weight: 700; color: var(--ink-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  table td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .table-wrap { overflow-x: auto; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+  .deploy-flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 20px 0; }
+  .deploy-node { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); padding: 16px 18px; min-width: 150px; text-align: center; box-shadow: var(--shadow); }
+  .deploy-node.done { border-color: var(--ok-border); background: var(--ok-bg); }
+  .deploy-node.pending { border-color: var(--warn-border); background: var(--warn-bg); }
+  .deploy-node .dn-ic { font-size: 1.6rem; }
+  .deploy-node .dn-t { font-weight: 800; font-size: 0.92rem; margin: 6px 0 2px; }
+  .deploy-node .dn-s { font-size: 0.74rem; color: var(--ink-muted); }
+  .deploy-arrow { font-size: 1.4rem; color: var(--ink-faint); padding: 0 10px; }
+  .codex-card { border-inline-start: 4px solid var(--crit-ink); }
+  .codex-card.p2 { border-inline-start-color: var(--warn-ink); }
+  .codex-card.p3 { border-inline-start-color: var(--info-ink); }
+  .codex-card.reject { border-inline-start-color: var(--ink-faint); }
+  footer { text-align: center; padding: 40px 0 10px; color: var(--ink-faint); font-size: 0.8rem; }
+  .checklist { list-style: none; margin: 10px 0; padding: 0; }
+  .checklist li { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; font-size: 0.92rem; }
+  .checklist li::before { content: "✅"; flex-shrink: 0; }
+  .deferlist { list-style: none; margin: 10px 0; padding: 0; }
+  .deferlist li { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; font-size: 0.92rem; }
+  .deferlist li::before { content: "⏸️"; flex-shrink: 0; }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">📄 تقرير 524 · 2026-07-19</span>
+    <h1>تنفيذ خطّة 523 الكاملة (8 نقاط جذريّة) + مراجعة Codex مستقلّة + مراجعة شخصيّة — بانتظار إذن النشر</h1>
+    <p class="lead">تنفيذ متسلسل دقيق لكل نقطة من خطّة التدقيق العدائي العميق (تقرير 523)، من الأخفّ خطرًا إلى الأخطر (نقطة مزامنة توقيت السائق مع جاهزيّة الطلب أخيرًا وبحذر شديد)، تلاه اختبار شامل مرّتين، مراجعة كود مستقلّة عبر Codex CLI، تحقّق شخصي من كل ملاحظة قبل تصديقها، إصلاح ما ثبتت صحّته، رفع إلى GitHub. <b>النشر على test1 وtest/.194 والإنتاج لم يبدأ بعد — بانتظار مراجعتك أنت شخصيًّا أوّلًا</b>، بناءً على طلبك الصريح.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">8/8</div><div class="l">نقاط الخطّة منفَّذة</div></div>
+      <div class="s"><div class="n">9</div><div class="l">ملاحظة Codex رُوجِعَت يدويًّا</div></div>
+      <div class="s"><div class="n">5</div><div class="l">منها حقيقيّة ومُصلَحة</div></div>
+      <div class="s"><div class="n">3822+1720</div><div class="l">اختبارًا ناجحًا (خلفي+واجهة)</div></div>
+      <div class="s"><div class="n">1/4</div><div class="l">مواضع نشر مكتملة (GitHub فقط)</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#exec">الملخّص التنفيذي</a>
+  <a href="#method">المنهجيّة</a>
+  <a href="#items">النقاط الثماني</a>
+  <a href="#codex">مراجعة Codex</a>
+  <a href="#tests">الاختبارات</a>
+  <a href="#deferred">ما أُجِّل عمدًا</a>
+  <a href="#deploy">حالة النشر</a>
+  <a href="#tech">تقنيات حديثة</a>
+  <a href="#status">الخلاصة</a>
+</nav>
+
+<section id="exec">
+  <span class="section-eyebrow">🧭 البداية</span>
+  <h2>الملخّص التنفيذي — بلغة بسيطة</h2>
+  <p class="intro">تقرير 523 كان مراجعة عدائيّة صارمة جدًّا لخطّة تنفيذ (تقرير 522) شملت 8 نقاط في منصّة تووا: من إصلاحات واجهة صغيرة (رأس لوحة العمليّات) إلى إعادة تصميم جزئي لكيفيّة إسناد السائقين للطلبات. طلبتَ تنفيذها كاملة، بالتسلسل، دون توقّف، مع صلاحيّات كاملة حتى في المناطق المحظورة عادةً — وهو ما حدث هنا.</p>
+  <div class="plain">
+    <div class="ic">💡</div>
+    <p><b>الترتيب لم يكن اعتباطيًّا:</b> بدأنا بالأخفّ خطرًا (رأس لوحة العمليّات) وانتهينا بالأخطر (مزامنة توقيت السائق مع جاهزيّة الطعام) — لأنّ الأخيرة تلمس آلة حالة الطلب نفسها وتحمل خطر احتيال حقيقيًّا لو نُفِّذت بلا حذر. لهذا السبب بالذات طُلِب إذنك الصريح مرّتين أثناء التنفيذ: مرّة قبل تخفيف فحص تطابق الدفع (نقطة 5)، ومرّة قبل تنفيذ نقطة مزامنة التوقيت بالكامل (نقطة 1) — كلتاهما مُنِحَت.</p>
+  </div>
+  <div class="warn-box">
+    <div class="ic">⏸️</div>
+    <p><b>الفرق عن التقارير السابقة (519، 520):</b> تلك التقارير انتهت بنشر مكتمل على المواضع الأربعة. هذا التقرير <b>لا يدّعي ذلك</b> — عندما وصلنا لخطوة النشر، سألتُك صراحة، وطلبتَ الانتظار لمراجعتك الشخصيّة أوّلًا. لهذا نُشِر الكود إلى GitHub فقط (وهو الموضع الآمن لعرضه لك)، بينما test1 وtest/.194 والإنتاج ما زالت تعمل بالنسخة القديمة (alembic <code>ab43</code>) بانتظار قرارك.</p>
+  </div>
+</section>
+
+<section id="method">
+  <span class="section-eyebrow">⚙️ الطريقة</span>
+  <h2>المنهجيّة — بالتسلسل، مع نقاط تحقّق بشريّة عند الخطر الحقيقي</h2>
+  <ol class="steps">
+    <li><b>1. القراءة قبل الكتابة:</b> كل نقطة نُفِّذت بعد قراءة الكود الفعلي الحيّ أوّلًا (لا افتراض)، وبعد استخراج نصّ خطّة 522/523 الأصلي برمجيًّا من ملفّات HTML (وليس اعتمادًا على الذاكرة).</li>
+    <li><b>2. التنفيذ نقطة بنقطة:</b> كل نقطة اختبار خاص بها فور إنجازها + تشغيل حزمة اختبارات أوسع ذات صلة، قبل الانتقال للنقطة التالية.</li>
+    <li><b>3. توقّفان للإذن الصريح:</b> عند تخفيف فحص تطابق مبلغ الدفع (نقطة 5، يمسّ الطلب الفردي والجماعي معًا)، وعند تنفيذ نقطة مزامنة التوقيت كاملة (نقطة 1، الأخطر في كل التقرير) — كلاهما عُرِض بتفصيل دقيق وانتظر ردًّا صريحًا قبل المتابعة.</li>
+    <li><b>4. اختباران شاملان:</b> حزمة الاختبار الخلفيّة (pytest) والواجهة (vitest) كاملتين، مرّتين — مرّة بعد إتمام كل النقاط الثماني، ومرّة أخرى بعد إصلاحات Codex.</li>
+    <li><b>5. الرفع (Push):</b> التزام واحد شامل لكل النقاط الثماني، مباشرة على <code>master</code> (لا تفريع — القاعدة الحاليّة للمشروع لا تستخدم فروعًا)، مع استبعاد صريح لملفّات جلسة عمل سابقة غير مرتبطة موجودة في الشجرة (تقارير <code>app_report/*</code> قديمة، سكربتات <code>ops_test_*.sh</code>، <code>web/q</code>) — لم تُلمَس ولم تُحذَف، فقط لم تُضَف لهذا الالتزام.</li>
+    <li><b>6. مراجعة Codex المستقلّة:</b> <code>codex exec --sandbox read-only</code> (نجح بعد تعطّل أوّل محاولة بصلاحيّات أوسع — نمط الطرفيّة نفسه الذي طلبتَه). كل ملاحظة من الملاحظات التسع رُوجِعَت شخصيًّا بقراءة الكود الفعلي وتتبّع سيناريو تعارض زمنيّ ملموس قبل قبولها أو رفضها — لم يُصدَّق أي ادّعاء أعمى.</li>
+    <li><b>7. إصلاح + التزام ثانٍ + رفع:</b> خمس ملاحظات حقيقيّة أُصلِحَت، بكل منها اختبار جديد يثبت أنّ العلّة كانت موجودة والإصلاح يحلّها، ثمّ التزام ورفع ثانٍ.</li>
+    <li><b>8. توقّف قبل النشر:</b> عُرِض عليك وضع الاختبارات والمراجعة، وطلبتَ صراحة الانتظار لمراجعتك — التزمنا بذلك، وهذا التقرير نفسه هو أداة تلك المراجعة.</li>
+  </ol>
+</section>
+
+<section id="items">
+  <span class="section-eyebrow">🛠️ التنفيذ</span>
+  <h2>النقاط الثماني — من الأخفّ للأخطر</h2>
+  <p class="intro">الترقيم أدناه هو نفس ترقيم خطّة 522 الأصليّة (وليس إعادة ترقيم) — لهذا التسلسل هنا (المُنفَّذ فعليًّا من الأخفّ للأخطر) يظهر كـ4 ثمّ 3 ثمّ 8 ثمّ 7 ثمّ 2 ثمّ 6 ثمّ 5 ثمّ 1.</p>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">نقطة 4</span><h3>اسم/دور موظّف العمليّات في رأس اللوحة + إصلاح تمرير الصفحة</h3></div>
+    <div class="files">backend: auth_router.py · web: Layout.tsx، auth.ts، global.css</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> رأس لوحة تحكّم موظّفي العمليّات كان يعرض فقط أيقونة عامّة بدل اسم الموظّف الفعلي ودوره — وأحيانًا كان الصفحة تتمرّر بشكل غير متوقَّع على شاشات معيّنة.</p></div>
+    <p><b>تفصيل تقني:</b> أُضيف حقلا <code>full_name</code>/<code>display_name</code> لاستجابة <code>GET /auth/me</code> — لكن فقط لأدوار العمليّات المحدَّدة صراحة (قائمة مغلقة <code>_OPS_ROLES_FOR_ME</code>)، بحيث لا يُعرَّض اسم عميل عادي بلا داعٍ عبر هذا المسار. مشكلة الصفحة حُلَّت بـ<code>useLayoutEffect</code> (وليس <code>useEffect</code> العادي) لتفادي "ومضة" لحظيّة قبل الرسم، مع <code>height: 100vh; height: 100dvh;</code> (تصريحان متتاليان — الثاني يتجاوز الأوّل على المتصفّحات الحديثة فقط، ويُتجاهَل بأمان على الأقدم).</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">نقطة 3</span><h3>تخصيص قائمة تغليف الطلب حسب نوع المتجر</h3></div>
+    <div class="files">backend: packaging_policy.py (جديد)، provider_service.py، provider_router.py · web: ProviderPreparation.tsx</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> متجر يبيع مشروبات أو بقالة (لا طهي فيه) كان يُطالَب بنفس قائمة تحقّق التغليف الكاملة (فصل المشروبات، فصل الساخن عن البارد...) التي يحتاجها مطعم فعليّ — خطوات لا معنى لها لمتجر بلا مطبخ.</p></div>
+    <p><b>تفصيل تقني وعيب حرج اكتُشِف قبل الشحن:</b> الخطّة الأصليّة اقترحت فقط إخفاء الحقول غير اللازمة من الواجهة — لكن حقل الحالة الداخلي (<code>checklist</code>) كان سيبقى مُهيَّأً بـ<code>false</code> لكل الحقول، بما فيها المخفيّة، والدالّة التي تُقرِّر تفعيل زرّ "جاهز للاستلام" تتحقّق من <b>كل</b> المفاتيح (وليس فقط المعروضة). لو نُفِّذت الخطّة حرفيًّا، كان زرّ "جاهز" سيبقى <b>معطَّلًا للأبد</b> لأيّ متجر بلا مطبخ — عيب أخطر ممّا كانت الخطّة الأصليّة تحاول حلّه. الإصلاح: بذر الحقول غير المطلوبة كـ<code>true</code> منذ لحظة الإنشاء، بدل الاعتماد على إخفائها فقط.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">نقطة 8</span><h3>وضوح صفحة "صلاحيّاتي" — تمييز الصلاحيّات الحسّاسة عن الأساسيّة</h3></div>
+    <div class="files">backend: account_permission_service.py، account_permissions_router.py · web: MyPermissions.tsx (إعادة كتابة)</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> موظّف متجر عادي كان يرى في صفحة "صلاحيّاتي" رموزًا خام غير مفهومة (مثل <code>driver:manage_availability</code>) بدل شرح عربي واضح، ولم يكن هناك تمييز بصري بين صلاحيّة أساسيّة يملكها كل موظّف تلقائيًّا وصلاحيّة حسّاسة مقصورة على المالك فقط.</p></div>
+    <p><b>تفصيل تقني:</b> العلامة الوحيدة المتاحة سابقًا (<code>is_grantable</code>) كانت متطابقة لكلا النوعين (صلاحيّة المالك الحصريّة، والصلاحيّة الأساسيّة الثابتة) — لا يمكن التمييز بينهما بهذا الحقل وحده. أُضيف حقل <code>category</code> منفصل. أثناء تقوية اختبار موجود (تشديد التحقّق من "وصف حقيقي وليس الرمز نفسه")، اكتُشِف أنّ العلّة أوسع بكثير ممّا خُطِّط له أصلًا: <b>33 رمز صلاحيّة إضافي</b> غير مُدرَج في الكتالوج عبر كل الأدوار (وليس فقط الرموز الثمانية الأصليّة المستهدَفة)، ما كان يُظهِرها كنصّ خام لأي موظّف يملكها. أُضيفت كلّها مع فئتها الصحيحة، وتحقّقنا برمجيًّا من صفر رمز متبقٍّ خارج الكتالوج.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">نقطة 7</span><h3>تسعير الإعلانات المموَّلة من القاعدة + حظر متجر من الإعلانات (النطاق الآمن)</h3></div>
+    <div class="files">backend: ads_service.py، ops_ads_router.py، provider_ads_router.py، ab45 (هجرة) · web: OpsAdsModeration.tsx</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> سعر اليوم الواحد للإعلان المموَّل كان رقمًا ثابتًا في الكود نفسه — لتغييره كان يلزم نشر تحديث كامل للخادم. الآن يُغيَّر من لوحة العمليّات مباشرة. أُضيف أيضًا زرّ لحظر متجر مسيء من شراء إعلانات دون حظر باقي حسابه.</p></div>
+    <p><b>عيب حقيقي اكتُشِف ومُنِع قبل الشحن:</b> نقطة "عرض سعر" (<code>quote</code>) ونقطة "إنشاء حملة" (<code>create</code>) كانتا ستقرآن السعر من مصدرين مختلفين لو نُفِّذت الخطّة كما كُتِبَت — احتمال انحراف صامت بينهما (السعر المعروض للمستخدم ≠ السعر المُطبَّق فعليًّا عند الدفع). أُصلِح بجعل كلتا النقطتين تقرآن من نفس الدالّة المصدريّة الوحيدة.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">نقطة 2</span><h3>تعبئة البلديّات الليبيّة الناقصة (تراجع مقصود عن الطبقة الإداريّة الوسطى)</h3></div>
+    <div class="files">backend: ab46 (هجرة)، operations_router.py</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> من أصل 141 بلديّة ليبيّة حقيقيّة، 77 لم تكن موجودة في قاعدة البيانات إطلاقًا منذ هجرة قديمة (عيب "aa16")، فكانت تظهر بصمت كـ"غير مُصنَّفة" في شاشة العمليّات دون أن يعرف أحد أنّها ناقصة أصلًا لا أنّها فقط غير مصنَّفة.</p></div>
+    <p><b>تفصيل تقني:</b> هجرة aa16 القديمة ادّعت في تعليقها الخاصّ أنّها "متكرّرة الاستدعاء بأمان" (idempotent) — لكن الفحص المباشر أثبت أنّها إدراج خام بلا أي حارس، كانت ستتحطّم بخطأ تكرار مفتاح لو أُعيد تشغيلها على جدول ممتلئ. الهجرة الجديدة (ab46) حقيقيّة التكرار الآمن فعلًا (تُقارِن الموجود أوّلًا)، والقائمة الكاملة (141 بلديّة) استُخرِجَت <b>برمجيًّا</b> من نفس ملفّ بيانات الواجهة (وليس نسخًا يدويًّا — محاولة نسخ يدويّة أولى ضُبِطت خاطئة وأُلغِيَت قبل أي تنفيذ). <b>تراجع مقصود:</b> الطبقة الإداريّة الوسطى ("المدينة" بين البلديّة والمنطقة) لم تُنفَّذ — لأنّه لا توجد سلطة إداريّة ليبيّة رسميّة فوق مستوى البلديّة حاليًّا (تحقّقنا من موقع وزارة الحكم المحلّي مباشرة)، فهذا قرار عمل يخصّك أنت لا قرارًا تقنيًّا.</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">نقطة 6</span><h3>حدّ تكرار + سجلّ تدقيق حقيقي لتعديل الهويّة (الاسم/الهاتف/البريد)</h3></div>
+    <div class="files">backend: identity_change_log_service.py (جديد)، ab47 (هجرة)، operations_router.py، customer_router.py، email_router.py · web: OpsNameChangeRequests.tsx (تبويب جديد)</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> تغيير اسم/هاتف/بريد المزوّد أو السائق يمرّ عبر طابور موافقة العمليّات — لكن لم يكن هناك حدّ حقيقي لعدد مرّات الطلب شهريًّا، ولا سجلّ تدقيق حقيقي يعرض القيم الفعليّة (قبل/بعد) لكل تغيير طرأ على أي حساب، عبر كل الأدوار الثلاثة.</p></div>
+    <p><b>عيب أمنيّ حقيقي اكتُشِف ومُصلَح:</b> عند موافقة العمليّات على طلب تغيير هاتف/بريد <b>المزوّد</b> تحديدًا، كانت نقطة التطبيق المشتركة (المُقترَحة في الخطّة) ستُسجِّل معرّف <b>المتجر</b> (Provider.id) في سجلّ التدقيق بدل معرّف <b>حساب المستخدم الحقيقي</b> (Provider.owner_user_id) — وهما نوعان مختلفان كليًّا من المعرّفات. لو نُفِّذ حرفيًّا، كان يمكن أن يفشل بخطأ قيد قاعدة بيانات (يُعطِّل موافقات المزوّدين فعليًّا) أو، إن لم يفشل، يُفسِد عدّاد الحدّ بصمت. أُصلِح بحلّ المعرّف الصحيح الفعلي لكل حالة من الحالات الأربع قبل التسجيل. <b>ثغرة تحايل أُغلِقَت:</b> نقطة تحقّق البريد العامّة (<code>/email/send-otp</code>) كانت متاحة لأي دور — مزوّد أو سائق يمكنه تغيير بريده الحساس عبرها مباشرة، متجاوزًا طابور الموافقة كليًّا. أُغلِقَت لهذين الدورَين تحديدًا (حتى لو أُطفِئ علم الموافقة الإلزاميّة العامّ لاحقًا لأسباب أخرى — قرارك الصريح).</p>
+    <p><b>قرارات سياسة اتُّخِذَت بموافقتك الصريحة:</b> مدّة احتفاظ 24 شهرًا للقيم الحقيقيّة في السجلّ قبل التعتيم عليها تلقائيًّا (توافُق GDPR)، فصل صريح لحقول الهاتف/البريد الحسّاسة عن العلم العامّ، ونافذة متحرّكة 30 يومًا (لا شهر تقويمي) لحدّ "مرّتين شهريًّا".</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">نقطة 5</span><h3>الدفع المقسّم للطلب الجماعي + تخفيف فحص تطابق المبلغ (بإذنك الصريح)</h3></div>
+    <div class="files">backend: order_service.py، tender_engine.py (استُخدِمَت) · web: carts.ts (دالّة توزيع جديدة)، CartGroupCheckoutPage.tsx</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> السلّة الموحَّدة (طلب من عدّة متاجر بدفعة واحدة) لم تكن تدعم الدفع المقسَّم (جزء نقاط + جزء محفظة + الباقي نقدًا) رغم أنّ الخادم يدعمه فعليًّا للطلب الفردي منذ فترة — الفجوة كانت في الواجهة فقط.</p></div>
+    <p><b>عيب حسابي حرج مُنِع قبل الشحن:</b> صياغة "دالّة التوزيع" في الخطّة الأصليّة كانت غامضة بما يكفي لتقبل قراءتين مختلفتين كليًّا — إحداهما (الصحيحة) عدّاد تراكميّ واحد يتناقص عبر كل الطلبات الفرعيّة بالتتابع، والأخرى (خاطئة) حدّ مستقلّ لكل طلب فرعيّ على حدة. القراءة الخاطئة كانت ستُنتِج طلب نقاط أكبر من رصيد العميل الحقيقي بالكامل (مثال ملموس: عميل يملك 80 وحدة نقاط، القراءة الخاطئة تسمح لكل طلب فرعيّ إضافي بطلب حتى 80 وحدة مجدَّدًا). كُتِبَت الدالّة الصحيحة صراحة مع اختبارين رقميّين مُحكَمين يثبتان أيّ قراءة صحيحة.</p>
+    <p><b>تعديل بإذنك الصريح على مسار دفع حيّ:</b> الفحص الصارم القديم (يرفض الطلب كاملًا إن لم يتطابق مجموع الدفعات مع الإجمالي تمامًا حتى مليم واحد) كان سيرفض طلبات جماعيّة عاديّة كثيرة — لأنّ رسوم التوصيل في الطلب الجماعي تقديريّة أكثر من المعتاد، وأي انحراف بسيط بين لحظة حساب العميل ولحظة التنفيذ يعني رفضًا كاملًا. بعد موافقتك الصريحة (يمسّ الطلب الفردي أيضًا، لا الجماعي فقط)، استُبدِل بمنطق "الكاش يمتصّ المتبقّي" (موجود مسبقًا وجاهزًا في محرّك التخصيص لكنه لم يكن مفعَّلًا في مسار الإنشاء الحيّ).</p>
+  </div>
+
+  <div class="item-card">
+    <div class="item-head"><span class="item-num">نقطة 1</span><h3>توازن البحث عن سائق + مزامنة توقيت وصوله مع جاهزيّة الطلب (الأخطر — بحذر شديد)</h3></div>
+    <div class="files">backend: dispatch_service.py، pre_ready_dispatch_service.py (جديد)، driver_abandonment_service.py، provider_router.py، delivery_handoff_router.py، operations_router.py، order_service.py، location_router.py، ab48 (هجرة) · web: ProviderPreparation.tsx</div>
+    <div class="plain"><div class="ic">👤</div><p><b>بلغة بسيطة:</b> حتى الآن، البحث عن سائق يبدأ فقط بعد أن يصبح الطعام جاهزًا فعليًّا — أي أنّ السائق يبدأ رحلته ولحظة وصوله للمطعم منفصلة كليًّا عن لحظة جاهزيّة الطعام، فينتظر أحدهما الآخر غالبًا. الميزة الجديدة (معطَّلة افتراضيًّا) تسمح بإسناد سائق <b>أثناء</b> التحضير، بحيث يصل تقريبًا لحظة جاهزيّة الطعام — لا الطلب نفسه يتغيّر حالته (يبقى "قيد التحضير")، فقط السائق يبدأ التنقّل مبكرًا.</p></div>
+
+  <div class="subhead">أ. المرحلة الأولى — التوازن (بلا تغيير توقيت)</div>
+  <p>ربط محرّك تسجيل موجود مسبقًا لكن غير مستخدَم (يوازن بين قرب السائق، موثوقيّته، وضع نقده، وعدالة توزيع الطلبات) — معطَّل افتراضيًّا (علم <code>dispatch_scoring_enabled</code>)، لضمان عدم كسر الاختبار القائم "الأقرب يفوز دائمًا". أُضيف أيضًا حدّ أقصى قابل للتهيئة لنصف قطر البحث الاحتياطي (50 كم افتراضيًّا)، وبطاقة عرض لطلب "لا يوجد سائق" في شاشة المزوّد (كانت غائبة كليًّا)، ونقطة نهاية جديدة للعمليّات تعرض كل العروض الجارية حاليًّا.</p>
+
+  <div class="subhead">ب. المرحلة الخامسة — مزامنة التوقيت الحقيقيّة</div>
+  <div class="crit-box">
+    <div class="ic">🚨</div>
+    <p><b>4 عيوب حرجة اكتشفتها المراجعة العدائيّة قبل أن يُكتَب أي سطر كود لهذه النقطة:</b> (1) نافذة احتيال جديدة فعليًّا — قبول عرض مبكّر أثناء التحضير كان سيسمح لسائق ملتزَم مسبقًا بمحاولة تجاوز التحقّق من رمز التسليم قبل الوصول فعليًّا؛ (2) موضعا ربط خاطئان كليًّا في الخطّة الأصليّة (كانا سيفشلان من اليوم الأوّل لو نُفِّذا حرفيًّا)؛ (3) خطر إتلاف دائم لطلب حقيقي إن انفصل تعديل قبول العرض عن تعديل حالة الطلب في التزامَين منفصلَين؛ (4) 3 مستهلكين مخفيّين (+ قائمة رابعة مكرَّرة في خريطة الأسطول) لدالّة "السائق المشغول" لم تكن الخطّة الأصليّة قد رصدتهم كلّهم.</p>
+  </div>
+  <p><b>التصحيحات المطبَّقة (بعد موافقتك الصريحة على تنفيذ المرحلة كاملة):</b></p>
+  <ul class="checklist">
+    <li>نقل نقطة الترقية إلى الملفّ الصحيح الفعلي (<code>provider_router.py</code>)، لا الخاطئ المُقترَح أصلًا.</li>
+    <li>تعديل واحد ذرّي: قبول عرض مبكّر لا يحاول أبدًا نقل حالة الطلب (يبقى "قيد التحضير") — لا يوجد لحظة فشل تترك عرضًا "مقبولًا" عالقًا للأبد.</li>
+    <li>قيد صريح جديد على تحقّق تسليم الطلب: يشترط أن يكون الطلب "مُسنَدًا لسائق" فما بعد — يغلق نافذة الاحتيال بغضّ النظر عمّا إذا فُعِّلت الدردشة المبكّرة لاحقًا أم لا (لم تُفعَّل هنا أصلًا — قرار أمان مقصود، مشروح أدناه).</li>
+    <li>دالّة "السائق المشغول" المركزيّة (مصدر وحيد يغذّي 3 مستهلكين) + قائمة خريطة الأسطول الرابعة، كلّها عُدِّلت معًا في نفس التغيير.</li>
+    <li>رصد تخلّي السائق مُدَّد ليغطّي فترة الانتظار أثناء التحضير (كانت غائبة كليًّا)، مع إصلاح توقيت الاحتساب بحيث لا يُعاقَب سائق بريء فقط لأنّ التحضير تأخّر بعد ترقيته.</li>
+    <li>مسار "رفض البديل" (عندما يرفض العميل بديلًا لصنف نافد) يُحرِّر الآن أي عرض ملتزَم به دون معاقبة السائق — كان يتركه عالقًا للأبد.</li>
+  </ul>
+
+  <div class="warn-box">
+    <div class="ic">⏸️</div>
+    <p><b>تراجع مقصود عن جزء من الخطّة الأصليّة (قرار أمان، وليس نسيانًا):</b> الخطّة الأصليّة (522) طلبت أيضًا تفعيل دردشة السائق-العميل أثناء التحضير. لم يُنفَّذ هذا الجزء عمدًا — لأنّ بالضبط هذه الميزة هي ما يفتح نافذة الاحتيال التي حذّرت منها المراجعة العدائيّة (سائق يحصل على رمز التسليم عبر الدردشة قبل وصوله فعليًّا). قيمة مزامنة التوقيت لا تحتاج الدردشة المبكّرة إطلاقًا لتعمل — فتُرِكَت الميزة الأساسيّة (مزامنة التوقيت) دون فتح الباب الذي يخلق الخطر.</p>
+  </div>
+  </div>
+</section>
+
+<section id="codex">
+  <span class="section-eyebrow">🕵️ خطّ دفاع ثانٍ</span>
+  <h2>مراجعة Codex المستقلّة — 9 ملاحظة، 5 حقيقيّة، تحقّق شخصي من كل واحدة</h2>
+  <p class="intro">وفق طلبك: استُخدِم Codex CLI للمراجعة (<code>codex exec --sandbox read-only</code> — المحاولة الأولى بصلاحيّات أوسع رُفِضَت تلقائيًّا من مصنِّف الأمان في بيئة العمل، فاستُخدِم وضع القراءة فقط بدلًا منها بنجاح). لكل ملاحظة: قراءة الكود الفعلي شخصيًّا وتتبّع سيناريو تعارض ملموس، لا تصديق أعمى لادّعاء الأداة.</p>
+
+  <div class="item-card codex-card">
+    <div class="item-head"><span class="pill crit">حرج · مُصلَح</span><h3>سباق حقيقي بين قبول عرض مبكّر وترقية الطلب</h3></div>
+    <p>قراءة غير مقفَلة لصفّ الطلب أثناء قبول العرض المبكّر كانت تتعارض زمنيًّا مع تحقّق الترقية المنفصل في معاملة أخرى — في سيناريو نادر لكنه حقيقي، يمكن أن ينتهي الطلب بحالة "جاهز للاستلام" مع عرض "مقبول" عالق بلا أي آليّة تلتقطه لاحقًا. أُصلِح بقراءة مقفَلة (قفل صفّي) تُجبِر قاعدة البيانات على تسلسل المعاملتين على نفس صفّ الطلب.</p>
+  </div>
+  <div class="item-card codex-card p2">
+    <div class="item-head"><span class="pill warn">عالٍ · مُصلَح</span><h3>حلقة المسح الدوري قد تُحمِّل سائقًا واحدًا أكثر من طاقته</h3></div>
+    <p>حلقة البحث الجديدة عن طلبات "قيد التحضير" الجاهزة للمزامنة كانت يمكن أن تختار نفس السائق الأقرب لعدّة طلبات مختلفة في تشغيلة واحدة (الحدّ الأقصى للطلبات المتزامنة يُتحقَّق منه فقط عند القبول الفعلي، لا عند الإرسال). أُصلِح بتتبّع السائقين المُرسَل لهم بالفعل ضمن نفس التشغيلة، وتخطّيهم.</p>
+  </div>
+  <div class="item-card codex-card p2">
+    <div class="item-head"><span class="pill warn">عالٍ · مُصلَح</span><h3>نافذة رصد التخلّي كانت لتُعاقِب سائقًا ملتزمًا مبكرًا وبريئًا</h3></div>
+    <p>نافذة رصد التخلّي أثناء التحضير كانت تستخدم 15 دقيقة ثابتة من لحظة القبول — بينما سائق التزم مبكرًا جدًّا (والطعام لن يجهز إلا بعد وقت أطول) قد يُعاقَب فقط لأنّ "وقت القبول" أصبح قديمًا، رغم أنّه يتقدّم بشكل طبيعي تمامًا. أُصلِح بجعل النافذة نسبيّة للحظة الجاهزيّة المتوقَّعة للطلب نفسه (بدء التحضير + مدّة التحضير الافتراضيّة للمتجر)، لا لحظة القبول.</p>
+  </div>
+  <div class="item-card codex-card p2">
+    <div class="item-head"><span class="pill warn">عالٍ · مُصلَح</span><h3>حساب يحمل دورَين يمكنه تجاوز حظر تغيير البريد</h3></div>
+    <p>حظر تغيير بريد المزوّد/السائق الذاتيّ كان يتحقّق فقط من الدور المُصرَّح به في رمز الدخول الحالي (JWT) — شخص يملك (على نفس الحساب الفعلي) دورًا كعميل ودورًا كسائق معًا كان بإمكانه الدخول بدور "عميل" وتجاوز الحظر تمامًا، رغم أنّ البريد حقل مشترك على مستوى الحساب لا الدور. أُصلِح بفحص كل الأدوار الفعّالة الفعليّة للحساب، لا الدور المُدَّعى في الرمز الحالي فقط.</p>
+  </div>
+  <div class="item-card codex-card p3">
+    <div class="item-head"><span class="pill info">متوسّط · مُصلَح</span><h3>تحديث سعر الإعلانات المتزامن قد يترك سعرَين نشطَين</h3></div>
+    <p>نقطة تحديث سعر الإعلانات (حصريّة لأعلى دور إداريّ) لم تكن تقفل الصفّ النشط الحالي — تحديثان متزامنان نادران جدًّا (يتطلّبان إداريَّين اثنَين يضغطان الزرّ في نفس اللحظة تقريبًا) كانا يمكن أن يتركا صفَّين نشطَين معًا. أُصلِح بقفل نفس النمط المستخدَم فعليًّا في كل مكان آخر بالمشروع لهذا النوع من العمليّات.</p>
+  </div>
+  <div class="item-card codex-card reject">
+    <div class="item-head"><span class="pill neutral">4 ملاحظات — سلوك مقصود أو قيد موثَّق مسبقًا، لا إصلاح</span></div>
+    <p>(1) قبول انحراف واسع في تركيبة الدفع (نقاط/محفظة/نقد) — هذا بالضبط التصميم الذي وافقتَ عليه صراحة (النقد يمتصّ المتبقّي)، وكل حدّ فعلي (الرصيد الحقيقي، سقف النقاط) يبقى محمّيًّا بفحوصات منفصلة. (2) نصف قطر البحث الاحتياطي "ليس حدًّا صارمًا فعليًّا" عند غياب أي سائق ضمنه — هذا بالضبط السلوك المطلوب في الخطّة الأصليّة (تفضيل، لا رفض جديد لطلب). (3) تحقّق تسليم الطلب لا يتحقّق من قرب موقع السائق فعليًّا من العميل — قيد موجود مسبقًا في التصميم الأصلي للنظام قبل هذه الجلسة بالكامل، خارج نطاق هذه النقطة تحديدًا. (4) هجرة تعبئة البلديّات: مسار التراجع (downgrade) قد يحذف صفوفًا غير مُنشَأة بهذه الهجرة تحديدًا في حالة نادرة جدًّا — موثَّق صراحة داخل تعليق الهجرة نفسها كمقايضة مقبولة (مسار تراجع نادر التنفيذ أصلًا).</p>
+  </div>
+</section>
+
+<section id="tests">
+  <span class="section-eyebrow">🧪 الاختبار</span>
+  <h2>حزم الاختبار — صفر انحدار في كل مرحلة</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>المرحلة</th><th>الحزمة</th><th>النتيجة</th><th>انحدار</th></tr></thead>
+    <tbody>
+      <tr><td>بعد النقاط الثماني</td><td class="mono">pytest (خلفي)</td><td class="num">3821 ناجح / 4 مُتخطّى</td><td><span class="pill ok">صفر</span></td></tr>
+      <tr><td>بعد النقاط الثماني</td><td class="mono">vitest (واجهة)</td><td class="num">1720 ناجح (219 ملفًّا)</td><td><span class="pill ok">صفر</span></td></tr>
+      <tr><td>بعد إصلاحات Codex</td><td class="mono">pytest (خلفي)</td><td class="num">3822 ناجح / 4 مُتخطّى</td><td><span class="pill ok">صفر</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>15 ملفّ اختبار جديد مخصَّص لهذه الجلسة (بادئة <code>test_r523_*</code>)، تغطّي كل نقطة على حدة بالإضافة لسيناريوهات محدَّدة لكل عيب حرج اكتُشِف قبل الشحن (مثال: اختباران رقميّان مُحكَمان يثبتان أيّ قراءة صحيحة لدالّة توزيع الدفع الجماعي). فشل واحد ظاهري (<code>Layout.test.tsx</code>) تكرَّر مرّتين أثناء التشغيل الكامل تحت ضغط معالجة عالٍ — تحقَّقتُ أنّه ينجح فورًا (أقلّ من ثانيتين) عند تشغيله منفردًا، مطابقًا نمط تذبذب موثَّق مسبقًا في ذاكرة المشروع، وليس انحدارًا حقيقيًّا.</p>
+</section>
+
+<section id="deferred">
+  <span class="section-eyebrow">⏸️ نطاق مقصود</span>
+  <h2>ما أُجِّل عمدًا (موثَّق، بلا أثر حيّ)</h2>
+  <p class="intro">كل بند هنا مُعطَّل افتراضيًّا أو مؤجَّل لقرار عمل يخصّك أنت، وليس نسيانًا أو نقصًا في التنفيذ.</p>
+  <ul class="deferlist">
+    <li><b>الطبقة الإداريّة الوسطى للجغرافيا (نقطة 2):</b> لا سلطة إداريّة ليبيّة رسميّة فوق البلديّة حاليًّا — يحتاج قرار عمل منك، لا حلًّا تقنيًّا.</li>
+    <li><b>توزيع فئات الإشعارات (نقطة 7):</b> جزء أوسع من الخطّة الأصليّة، خارج النطاق الآمن المُنفَّذ هنا.</li>
+    <li><b>دردشة السائق-العميل أثناء التحضير (نقطة 1):</b> هذا بالضبط ما يفتح نافذة الاحتيال التي حذّرت منها المراجعة العدائيّة — قيمة مزامنة التوقيت لا تحتاجها، فلم تُفعَّل.</li>
+    <li><b>تفعيل شاشة الرحلة على تطبيق السائق الجوّال أثناء التحضير (نقطة 1):</b> الميزة كلّها معطَّلة افتراضيًّا (<code>pre_ready_dispatch_enabled=False</code>) فلا أثر حيّ حاليًّا؛ تطبيق الجوّال (React Native) لم يُلمَس في هذه الجلسة إطلاقًا.</li>
+  </ul>
+</section>
+
+<section id="deploy">
+  <span class="section-eyebrow">🚀 حالة النشر</span>
+  <h2>موضع واحد من أربعة — بانتظار مراجعتك</h2>
+  <p class="intro">القاعدة الإلزاميّة للمشروع: أي تحديث لا يُعتبَر "منشورًا" حتى يصل للمواضع الأربعة كلّها. هنا توقّفنا عمدًا بعد الموضع الأوّل بناءً على طلبك الصريح.</p>
+
+  <div class="deploy-flow">
+    <div class="deploy-node done"><div class="dn-ic">🐙</div><div class="dn-t">GitHub</div><div class="dn-s">master · 7f0057b</div></div>
+    <div class="deploy-arrow">←</div>
+    <div class="deploy-node pending"><div class="dn-ic">💻</div><div class="dn-t">test1 (Kali)</div><div class="dn-s">بانتظار مراجعتك</div></div>
+    <div class="deploy-arrow">←</div>
+    <div class="deploy-node pending"><div class="dn-ic">🖥️</div><div class="dn-t">test/.194</div><div class="dn-s">بانتظار مراجعتك</div></div>
+    <div class="deploy-arrow">←</div>
+    <div class="deploy-node pending"><div class="dn-ic">🌐</div><div class="dn-t">الإنتاج (tawanow.com)</div><div class="dn-s">بانتظار إذن منفصل لاحقًا</div></div>
+  </div>
+
+  <div class="info-box">
+    <div class="ic">🔐</div>
+    <p><b>ما ينتظر البدء فور موافقتك:</b> إعادة بناء حاويتَي <code>backend-core</code> (وربّما <code>web-frontend</code> إن وُجِدت تغييرات واجهة ذات صلة)، تشغيل 5 هجرات alembic جديدة (<code>ab44</code> إلى <code>ab48</code>) تلقائيًّا عبر <code>depends_on</code>، فحص صحّي داخلي وخارجي لـ<code>test1</code>، ثمّ نفس الخطوات على <code>test/.194</code> عبر <code>docker save</code>/<code>scp</code>/<code>docker load</code> (لا مستودع git على ذاك الخادم). الإنتاج (Hetzner) يبقى موقوفًا حتى إذنك الصريح المنفصل تحديدًا لتلك الخطوة، مع نسخة احتياطيّة طازجة إلزاميّة أوّلًا حسب قاعدة المشروع الثابتة.</p>
+  </div>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>الموضع</th><th>alembic الحاليّ</th><th>الحالة</th></tr></thead>
+    <tbody>
+      <tr><td>GitHub</td><td>—</td><td><span class="pill ok">مرفوع + محدَّث</span></td></tr>
+      <tr><td>test1 (Kali)</td><td class="mono">ab43 (قديم)</td><td><span class="pill warn">بانتظار مراجعتك</span></td></tr>
+      <tr><td>test/.194</td><td class="mono">ab43 (قديم)</td><td><span class="pill warn">بانتظار مراجعتك</span></td></tr>
+      <tr><td>الإنتاج (tawanow.com)</td><td class="mono">ab43 (قديم)</td><td><span class="pill warn">بانتظار مراجعتك + إذن منفصل</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="tech">
+  <span class="section-eyebrow">🌐 تقنيات حديثة</span>
+  <h2>تقنيات وأنماط عالميّة مُطبَّقة في هذا العمل</h2>
+  <ul class="checklist">
+    <li><b>مزامنة إسناد السائق مع جاهزيّة الطلب:</b> نفس الفكرة التي تحلّها DoorDash بنموذج تعلّم آلي لتقدير وقت جاهزيّة الطعام — هنا بمقاربة أبسط (مدّة تحضير متعلَّمة تلقائيًّا بالفعل موجودة مسبقًا) لكن بنفس الهدف: تقليل وقت انتظار السائق ووقت انتظار الطعام معًا.</li>
+    <li><b>محرّك تسجيل مرجّح (ETA + موثوقيّة + عدالة):</b> نفس المبدأ الذي تستخدمه Uber/Lyft لتخصيص السائقين، بدل "الأقرب دائمًا يفوز" الساذج.</li>
+    <li><b>وحدات قياس ارتفاع العرض الديناميكيّة (<code>dvh</code>):</b> بدل الاعتماد فقط على <code>vh</code> التقليديّة التي تُخطئ على المتصفّحات المتنقّلة الحديثة عند إخفاء/إظهار شريط العنوان.</li>
+    <li><b>نموذج الصلاحيّات ثلاثيّ الحالة (مسموح صراحةً / ممنوع صراحةً / افتراضيّ):</b> نفس مبدأ AWS IAM في التمييز بين "غير ممنوح" و"ممنوح لكنه أساسيّ ثابت" و"ممنوح كحصريّ للمالك".</li>
+    <li><b>مراجعة كود مستقلّة بالذكاء الاصطناعي (Codex CLI) كخطّ دفاع ثانٍ:</b> عين مستقلّة اكتشفت 5 مشاكل حقيقيّة إضافيّة (أخطرها سباق زمني حقيقي) لم تظهر في الاختبارات الآليّة أو المراجعة الذاتيّة الأولى — تحقّق شخصي دقيق من كل ملاحظة قبل التصديق عليها أو رفضها.</li>
+  </ul>
+</section>
+
+<section id="status">
+  <span class="section-eyebrow">✅ الخلاصة</span>
+  <h2>الحالة النهائية</h2>
+  <div class="plain">
+    <div class="ic">🎯</div>
+    <p><b>كل نقطة من النقاط الثماني مُنفَّذة ومُختبَرة، بما فيها الأخطر (مزامنة توقيت السائق) بعد موافقتك الصريحة المزدوجة وكل التصحيحات التي فرضتها المراجعة العدائيّة. مراجعة Codex المستقلّة اكتشفت 5 مشاكل حقيقيّة إضافيّة — أخطرها سباق زمني حقيقي كان سيترك طلبًا عالقًا بلا إنقاذ في حالات نادرة — وكلّها أُصلِحَت ومُختبَرة. الكود مرفوع على GitHub. النشر على test1 وtest/.194 والإنتاج متوقّف عمدًا بانتظار مراجعتك الشخصيّة، بناءً على طلبك الصريح.</b></p>
+  </div>
+</section>
+
+</div>
+
+<footer>تقرير 524 · تووا (Tawa) — منصّة التوصيل الليبيّة · 2026-07-19</footer>

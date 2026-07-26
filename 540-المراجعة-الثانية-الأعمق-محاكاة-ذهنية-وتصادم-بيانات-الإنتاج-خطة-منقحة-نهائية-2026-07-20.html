@@ -1,0 +1,609 @@
+<meta charset="utf-8">
+<title>تقرير 540 — المراجعة الثانية الأعمق: محاكاة ذهنية، تصادم بيانات الإنتاج، والخطة المنقَّحة النهائية</title>
+<style>
+  :root {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --purple-bg: #eee6f7; --purple-ink: #6b3fa0; --purple-border: #d7c2ec;
+    --shadow: 0 1px 2px rgba(20,40,25,0.06), 0 10px 28px -14px rgba(20,40,25,0.22);
+    --radius: 12px;
+    --font-display: "Segoe UI", "Dubai", "Tahoma", "Arial", sans-serif;
+    --font-body: "Segoe UI", "Tahoma", "Arial", sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+      --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+      --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+      --accent-2: #e0b563; --accent-2-tint: #2e2716;
+      --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+      --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+      --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+      --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+      --purple-bg: #2a1f38; --purple-ink: #cba8ec; --purple-border: #453163;
+      --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 10px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1611; --surface: #131f17; --surface-2: #182a1f; --surface-3: #1d3324;
+    --ink: #e9f2ea; --ink-muted: #a7bcac; --ink-faint: #6f8577; --border: #24392c;
+    --accent: #3ecb75; --accent-deep: #6fe39a; --accent-tint: #17301f;
+    --accent-2: #e0b563; --accent-2-tint: #2e2716;
+    --ok-bg: #163524; --ok-ink: #6fe39a; --ok-border: #245239;
+    --warn-bg: #372c12; --warn-ink: #e8b64a; --warn-border: #5b4a1c;
+    --crit-bg: #3a1a16; --crit-ink: #f19488; --crit-border: #5c2a22;
+    --info-bg: #172a3a; --info-ink: #8ec1f2; --info-border: #274763;
+    --purple-bg: #2a1f38; --purple-ink: #cba8ec; --purple-border: #453163;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f8f4; --surface: #ffffff; --surface-2: #eef3ec; --surface-3: #e4ede1;
+    --ink: #16241c; --ink-muted: #55655a; --ink-faint: #8a978c; --border: #d8e2d4;
+    --accent: #146c34; --accent-deep: #0b4a23; --accent-tint: #e3f0e6;
+    --accent-2: #b8862f; --accent-2-tint: #faf1de;
+    --ok-bg: #e4f4e8; --ok-ink: #1f7a3a; --ok-border: #b7ddc2;
+    --warn-bg: #fbf0dc; --warn-ink: #8a5a06; --warn-border: #eccf94;
+    --crit-bg: #fbe4e1; --crit-ink: #a02a1f; --crit-border: #f0b8b0;
+    --info-bg: #e3edf8; --info-ink: #1f5590; --info-border: #b9d3ee;
+    --purple-bg: #eee6f7; --purple-ink: #6b3fa0; --purple-border: #d7c2ec;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-body); direction: rtl; line-height: 1.75; font-size: 16px; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px 100px; }
+  h1, h2, h3, h4 { font-family: var(--font-display); text-wrap: balance; color: var(--ink); }
+  p { margin: 0 0 14px; max-width: 90ch; color: var(--ink); }
+  p.lead { font-size: 1.04rem; color: var(--ink-muted); max-width: 76ch; }
+  .muted { color: var(--ink-muted); }
+  .faint { color: var(--ink-faint); font-size: 0.86rem; }
+  code, .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 0.85em; direction: ltr; unicode-bidi: isolate; display: inline-block; }
+  b { color: var(--ink); }
+  header.hero {
+    background: linear-gradient(160deg, var(--accent-deep), var(--accent) 65%);
+    color: #fff; margin: 0 -20px 40px; padding: 60px 20px 44px; border-radius: 0 0 30px 30px;
+    position: relative; overflow: hidden;
+  }
+  header.hero::after {
+    content: "🧬"; position: absolute; left: -10px; top: -50px; font-size: 12rem; font-weight: 900;
+    opacity: 0.08; line-height: 1;
+  }
+  header.hero .inner { max-width: 1080px; margin: 0 auto; position: relative; }
+  header.hero .kicker {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700;
+    background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32);
+    padding: 5px 14px; border-radius: 999px; letter-spacing: 0.02em; margin-bottom: 18px;
+  }
+  header.hero h1 { font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0 0 10px; max-width: 62ch; }
+  header.hero p.lead { color: rgba(255,255,255,0.9); max-width: 84ch; font-size: 1.0rem; }
+  .hero-stats { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 28px; }
+  .hero-stats .s .n { font-size: 1.25rem; font-weight: 800; font-family: var(--font-display); }
+  .hero-stats .s .l { font-size: 0.7rem; color: rgba(255,255,255,0.78); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 42px; position: sticky; top: 0; background: var(--bg); z-index: 5; padding: 10px 0; }
+  nav.toc a { font-size: 0.74rem; text-decoration: none; color: var(--ink-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; }
+  nav.toc a:hover { color: var(--accent-deep); border-color: var(--accent); }
+  section { margin: 50px 0; }
+  .section-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 700; color: var(--accent-deep); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  section h2 { font-size: 1.22rem; font-weight: 800; margin-bottom: 6px; }
+  section > p.intro { font-size: 0.94rem; color: var(--ink-muted); max-width: 88ch; margin-bottom: 20px; }
+  .plain { background: var(--accent-tint); border: 1px solid var(--ok-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .plain .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .plain p { margin: 0; color: var(--accent-deep); font-size: 0.92rem; max-width: 78ch; }
+  .plain b { color: var(--accent-deep); }
+  .warn-box { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .warn-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .warn-box p { margin: 0; color: var(--warn-ink); font-size: 0.92rem; max-width: 82ch; }
+  .warn-box b { color: var(--warn-ink); }
+  .crit-box { background: var(--crit-bg); border: 1px solid var(--crit-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .crit-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .crit-box p { margin: 0; color: var(--crit-ink); font-size: 0.92rem; max-width: 82ch; }
+  .crit-box b { color: var(--crit-ink); }
+  .info-box { background: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .info-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .info-box p { margin: 0; color: var(--info-ink); font-size: 0.92rem; max-width: 82ch; }
+  .info-box b { color: var(--info-ink); }
+  .purple-box { background: var(--purple-bg); border: 1px solid var(--purple-border); border-radius: var(--radius); padding: 16px 20px; margin: 14px 0; display: flex; gap: 12px; align-items: flex-start; }
+  .purple-box .ic { font-size: 1.3rem; line-height: 1; margin-top: 2px; }
+  .purple-box p { margin: 0; color: var(--purple-ink); font-size: 0.92rem; max-width: 82ch; }
+  .purple-box b { color: var(--purple-ink); }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.71rem; font-weight: 700; border-radius: 999px; padding: 3px 11px; border: 1px solid transparent; white-space: nowrap; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok-ink); border-color: var(--ok-border); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn-ink); border-color: var(--warn-border); }
+  .pill.crit { background: var(--crit-bg); color: var(--crit-ink); border-color: var(--crit-border); }
+  .pill.info { background: var(--info-bg); color: var(--info-ink); border-color: var(--info-border); }
+  .pill.gold { background: var(--accent-2-tint); color: var(--accent-2); border-color: var(--accent-2); }
+  .pill.purple { background: var(--purple-bg); color: var(--purple-ink); border-color: var(--purple-border); }
+  .pill.neutral { background: var(--surface-2); color: var(--ink-muted); border-color: var(--border); }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.84rem; }
+  table th, table td { border: 1px solid var(--border); padding: 8px 12px; text-align: right; vertical-align: top; }
+  table th { background: var(--surface-2); font-weight: 700; color: var(--ink-muted); font-size: 0.73rem; text-transform: uppercase; letter-spacing: 0.03em; }
+  .table-wrap { overflow-x: auto; }
+  table.compact td, table.compact th { padding: 6px 10px; font-size: 0.78rem; }
+
+  .item-card { border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); background: var(--surface); padding: 18px 20px; margin-bottom: 14px; }
+  .item-card .i-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .item-card .i-id { font-family: var(--font-mono); font-weight: 800; font-size: 0.82rem; background: var(--surface-2); border-radius: 6px; padding: 2px 8px; }
+  .item-card .i-title { font-weight: 800; font-size: 0.93rem; }
+  .item-card .i-effort { margin-inline-start: auto; font-size: 0.72rem; }
+  .item-card .i-body { font-size: 0.85rem; color: var(--ink-muted); }
+  .item-card .i-fix { margin-top: 8px; font-size: 0.82rem; background: var(--ok-bg); color: var(--ok-ink); border: 1px solid var(--ok-border); border-radius: 8px; padding: 8px 12px; }
+  .item-card .i-note { margin-top: 6px; font-size: 0.78rem; background: var(--info-bg); color: var(--info-ink); border-radius: 6px; padding: 6px 10px; }
+  .item-card .i-warn { margin-top: 6px; font-size: 0.78rem; background: var(--warn-bg); color: var(--warn-ink); border-radius: 6px; padding: 6px 10px; }
+  .item-card .i-crit { margin-top: 6px; font-size: 0.78rem; background: var(--crit-bg); color: var(--crit-ink); border-radius: 6px; padding: 8px 12px; font-weight: 700; }
+  .sim-block { margin-top: 10px; background: var(--surface-2); border-radius: 8px; padding: 10px 14px; }
+  .sim-block .sim-h { font-size: 0.71rem; font-weight: 800; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+  .sim-block p { font-size: 0.82rem; margin: 0; color: var(--ink); }
+
+  .phase-band { border-radius: var(--radius); padding: 4px 0; margin: 30px 0 14px; }
+  .phase-title { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .phase-title .p-badge { font-weight: 800; font-size: 0.8rem; padding: 4px 14px; border-radius: 999px; }
+  .phase-title.p0 .p-badge { background: var(--crit-bg); color: var(--crit-ink); border: 1px solid var(--crit-border); }
+  .phase-title.p1 .p-badge { background: var(--warn-bg); color: var(--warn-ink); border: 1px solid var(--warn-border); }
+  .phase-title.p2 .p-badge { background: var(--info-bg); color: var(--info-ink); border: 1px solid var(--info-border); }
+  .phase-title.p3 .p-badge { background: var(--accent-2-tint); color: var(--accent-2); border: 1px solid var(--accent-2); }
+  .phase-title.p4 .p-badge { background: var(--purple-bg); color: var(--purple-ink); border: 1px solid var(--purple-border); }
+  .phase-title.pbig .p-badge { background: var(--crit-bg); color: var(--crit-ink); border: 1px solid var(--crit-border); }
+  .phase-title h3 { font-size: 1.05rem; font-weight: 800; margin: 0; }
+  .phase-desc { font-size: 0.88rem; color: var(--ink-muted); max-width: 90ch; margin: 0 0 16px; }
+
+  .domain-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 20px 0; }
+  @media (max-width: 1000px) { .domain-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .domain-grid { grid-template-columns: 1fr; } }
+  .domain-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; box-shadow: var(--shadow); text-align: center; }
+  .domain-card .d-n { font-size: 1.15rem; font-weight: 800; color: var(--accent-deep); }
+  .domain-card .d-l { font-size: 0.72rem; color: var(--ink-muted); margin-top: 4px; }
+
+  .research-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 18px 0; }
+  @media (max-width: 900px) { .research-grid { grid-template-columns: 1fr; } }
+  .research-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+  .research-card h4 { font-size: 0.9rem; margin: 0 0 6px; }
+  .research-card p { font-size: 0.83rem; color: var(--ink-muted); margin: 0 0 8px; }
+  .research-card .r-src { font-size: 0.7rem; color: var(--ink-faint); }
+
+  footer { text-align: center; padding: 40px 0 10px; color: var(--ink-faint); font-size: 0.8rem; }
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="inner">
+    <span class="kicker">🧬 تقرير 540 · المراجعة الثانية الأعمق · محاكاة ذهنية دقيقة · 2026-07-20</span>
+    <h1>ماذا سيحدث فعلًا أثناء البناء؟ محاكاة ذهنية كاملة لكل نقطة من الـ85، تصادم بيانات الإنتاج، و28 عيبًا من الدرجة الثانية</h1>
+    <p class="lead">هذا ليس تلخيصًا لتقرير 539 — إنّه مراجعة عدائية ثانية أعمق بكثير: 7 فرق تتبّع أُعيد تكليفها لتُحاكي ذهنيًّا كل إصلاح لحظة بناءه ونشره، تتتبّع كل مستدعٍ حقيقيّ، تفحص تصادمه مع بيانات الإنتاج الحيّة، وتكتشف العيوب التي يُدخِلها الإصلاح نفسه بعد دمجه. النتيجة: 11 إعادة تحديد نطاق جوهريّة (بعضها يُصغِّر الجهد، بعضها يُكبِّره)، 28 عيبًا من الدرجة الثانية موثَّقًا بدليل كود مباشر، و8 أعمال كبيرة أُفرِدَت بمراحل خاصّة بها بعد أن تبيَّن أنّها أخطر أو أوسع ممّا قُدِّر أوّلًا.</p>
+    <div class="hero-stats">
+      <div class="s"><div class="n">85/85</div><div class="l">نتيجة أُعيد فحصها عدائيًّا، لا نقطة أُهمِلَت مهما صغُرت</div></div>
+      <div class="s"><div class="n">7</div><div class="l">فرق محاكاة ذهنية مستقلّة + تحليل تصادم عبر-الفرق شخصيًّا</div></div>
+      <div class="s"><div class="n">28</div><div class="l">عيبًا من الدرجة الثانية اكتُشِف بدليل كود مباشر</div></div>
+      <div class="s"><div class="n">11</div><div class="l">إعادة تحديد نطاق جوهريّة (تكبير أو تصغير الجهد بدليل)</div></div>
+      <div class="s"><div class="n">8</div><div class="l">أعمال كبيرة أُفرِدَت الآن بمراحل خاصّة بها</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#method">المنهجية</a>
+  <a href="#techniques">5 تقنيات أمان معيارية</a>
+  <a href="#corrections">تصحيحات جوهرية</a>
+  <a href="#collisions">تحليل التصادم بين الأخطاء</a>
+  <a href="#p0">المرحلة صفر</a>
+  <a href="#p1">المرحلة 1</a>
+  <a href="#p2">المرحلة 2</a>
+  <a href="#big">الأعمال الكبيرة المعزولة</a>
+  <a href="#p3">المرحلة 3</a>
+  <a href="#p4">المرحلة 4</a>
+  <a href="#table">الجدول النهائي</a>
+</nav>
+
+<section id="method">
+  <span class="section-eyebrow">🔬 المنهجية</span>
+  <h2>الفرق بين الجولة الأولى والثانية: من «ما الإصلاح الصحيح؟» إلى «ماذا سيحدث فعلًا لحظة تنفيذه؟»</h2>
+  <p class="intro">الجولة الأولى (تقرير 539) صمَّمت الإصلاح الصحيح لكل نتيجة. هذه الجولة لا تُعيد تصميم شيء — بل تأخذ كل تصميم من الجولة الأولى وتُشغِّله ذهنيًّا خطوة بخطوة: من يستدعي هذا الكود فعليًّا اليوم؟ هل بيانات الإنتاج الحالية تخالف القيد الجديد؟ ماذا يحدث لطلب قيد التنفيذ لحظة النشر؟ وما العيب الجديد الذي لم يكن موجودًا قبل هذا الإصلاح، والذي سيوجد بسببه فقط؟ هذا بالضبط تمرين «المحاكاة الذهنية» الذي طُلِب.</p>
+  <div class="plain"><div class="ic">🎯</div><p>هذه منصّة <b>حيّة وتخدم مستخدمين حقيقيّين الآن</b>. لذلك التركيز الأكبر في هذه الجولة على نقطة واحدة تحديدًا: <b>تصادم الإصلاح مع بيانات موجودة فعلًا في قاعدة البيانات</b> — قيد فريد جديد قد يفشل عند التطبيق إن وُجِدَت بيانات مخالفة له الآن، وليس مجرّد احتمال نظريّ.</p></div>
+</section>
+
+<section id="techniques">
+  <span class="section-eyebrow">🛡️ خمس تقنيات أمان معيارية تتكرّر عبر الخطة كلّها</span>
+  <h2>بدل اختراع حلّ جديد لكل عيب، هذه الخمس تُغطّي 90% من مخاطر النشر المكتشَفة</h2>
+  <p class="intro">فرق المحاكاة اكتشفت نفس نمط الخطر بأشكال مختلفة عبر عشرات النقاط. بدل توثيق تخفيف مخصّص لكل واحدة، هذه خمس تقنيات معيارية (2026) يُشار إليها بالاسم في كل بطاقة أدناه.</p>
+  <div class="research-grid">
+    <div class="research-card"><h4>🔀 توسيع-ثمّ-تضييق (Expand-Contract)</h4><p>لأيّ قيد/عمود جديد على جدول فيه بيانات حيّة: أضِف القيد بوضع <code>NOT VALID</code> أوّلاً (فوريّ، بلا مسح كامل للجدول)، ثمّ <code>VALIDATE CONSTRAINT</code> منفصلة (قفل أخفّ، القراءة/الكتابة تستمرّان بلا انقطاع). يُستخدَم لكلّ قيد فريد جديد في هذه الخطّة (D-01، D-19).</p><div class="r-src">Prisma Data Guide · tim-wellhausen.de</div></div>
+    <div class="research-card"><h4>👁️ وضع الظلّ / تسجيل فقط قبل الإنفاذ (Shadow / Log-Only)</h4><p>تشغيل الفحص الجديد بالتوازي مع القديم، تسجيل ما كان سيُرفَض دون رفضه فعليًّا، لفترة مراقبة حقيقيّة، ثمّ التحويل للإنفاذ الفعليّ فقط بعد أن يصبح السجلّ نظيفًا. يُستخدَم في حملة الصلاحيّات الكبرى (D-09+D-56) ولإصلاح SSRF (D-44).</p><div class="r-src">LaunchDarkly · WDAC Deployment Guide</div></div>
+    <div class="research-card"><h4>🔌 مفتاح إيقاف فوريّ (Kill Switch)</h4><p>كل مسار كود جديد وحسّاس يُغلَّف بعَلَم ميزة يمكن إطفاؤه فورًا بلا إعادة نشر. يُستخدَم لمسارات OTP الذريّة الجديدة (D-04-D-07) ولتفعيل صندوق الإشعارات (D-61).</p><div class="r-src">Featureflow · digitalapplied.com</div></div>
+    <div class="research-card"><h4>⏳ استرجاع بعد ركود (Staleness Reclaim)</h4><p>أيّ صفّ «قيد المعالجة» محجوز ذريًّا يحتاج عتبة زمنيّة تسمح باسترجاعه إن عَلِق (تعطّل الخادم أثناء الحجز). بدونها، الحجز الذريّ نفسه يتحوّل لقفل دائم. اكتشاف جديد هذه الجولة لـD-32/D-33.</p><div class="r-src">lpalmieri.com · backendbytes.com</div></div>
+    <div class="research-card"><h4>⚠️➡️🚫 تحذير-ثمّ-إنفاذ على مرحلتين (Warn-Then-Enforce)</h4><p>أيّ فحص إقلاع صارم جديد يُشحَن أوّلاً كتحذير فقط (كما يفعل <code>ADMIN_IP_ALLOWLIST_REQUIRED</code> الموجود بالفعل في <code>config.py</code>) لدورة نشر واحدة، ثمّ يتحوّل لفشل إقلاع حقيقيّ فقط بعد تأكيد نظافة البيئة الفعليّة. حاسم لـD-59/D-60/D-61.</p><div class="r-src">نمط موجود بالفعل في هذا المشروع، يُعاد استخدامه لا يُخترَع</div></div>
+  </div>
+</section>
+
+<section id="corrections">
+  <span class="section-eyebrow">🔧 11 تصحيحًا جوهريًّا على تقييم الجولة الأولى</span>
+  <h2>المحاكاة الذهنية غيّرت الحجم الحقيقيّ لأحد عشر نقطة — بعضها أكبر، بعضها أصغر</h2>
+  <div class="table-wrap">
+  <table class="compact">
+    <tr><th>النتيجة</th><th>الجولة الأولى قالت</th><th>المحاكاة الذهنية وجدت</th></tr>
+    <tr><td><b>D-06+D-07</b></td><td>يمسّان ملفَّين (auth_router.py، registration_router.py)</td><td>يمسّان <b>4 ملفّات</b> — <code>wallet_security_router.py</code> و<code>driver_phone_change_router.py</code> يستدعيان <code>verify_otp()</code> أيضًا بلا فحص purpose إطلاقًا اليوم؛ يجب تمديد enum الغرض ليشملهما وإلّا فالإصلاح يكسر التزامنهما.</td></tr>
+    <tr><td><b>D-08</b></td><td>إصلاح خلفيّ فقط (FIX·S)</td><td>خلفيّ <b>+ واجهة أماميّة منسَّقة في نفس PR</b> — <code>web/src/api/types.ts</code> يُعرِّف <code>refresh_token</code> كحقل إلزاميّ؛ حذفه من الاستجابة بلا تحديث النوع يكسر البناء (TypeScript) أو ينتج <code>"undefined"</code> صامتة.</td></tr>
+    <tr><td><b>D-32+D-33</b></td><td>مساعد حجز ذريّ (UPSERT) بسيط، FIX·M</td><td>تصميم UPSERT الساذج <b>لا يعمل فعليًّا</b> في بنية هذا المشروع (فحص وإنشاء داخل نفس الجلسة غير المُثبَّتة، commit واحد بعد 1084 سطرًا) — يحتاج جلسة منفصلة قصيرة العمر + عتبة استرجاع ركود جديدة كليًّا. الجهد الحقيقيّ أعلى.</td></tr>
+    <tr><td><b>D-42</b></td><td>BUILD·M، تعيين SKU إلزاميّ مباشرة</td><td><b>100% من مزوّدي POS الحاليّين</b> بلا أيّ تعيين SKU (العمود غير موجود إطلاقًا في المخطّط) — رفض فوريّ يكسر كل تكامل حيّ فورًا. يحتاج تدرّجًا ثلاثيّ الخطوات (توسيع→تحذير→إنفاذ)، الجهد الحقيقيّ <b>L لا M</b>.</td></tr>
+    <tr><td><b>D-45</b></td><td>BUILD·L، تشفير مغلّف عبر KMS سحابيّ</td><td>لا بنية خزنة أسرار موجودة أصلًا — <code>cryptography</code> مثبَّتة بالفعل (تبعيّة انتقاليّة)، و<code>config.py</code> يملك بالفعل اتفاقيّة تدوير-بتراكب لمفتاح JWT (<code>secret_key</code>/<code>secret_key_legacy</code>). إعادة استخدام هذه الاتفاقيّة بـFernet أرخص وأنسب فعليًّا من KMS جديد.</td></tr>
+    <tr><td><b>D-54+D-55</b></td><td>BUILD·M، يعتمد على نقطة نهاية جديدة من حملة D-09</td><td>نقطة النهاية <b>موجودة بالفعل</b> (<code>GET /me/permissions</code>، تُرجِع الصلاحيّات الفعليّة الكاملة) — هذا الآن <b>FIX·S/M أماميّ خالص</b>، لا اعتماديّة على حملة D-09 إطلاقًا. يتحرّك للمرحلة صفر.</td></tr>
+    <tr><td><b>D-56</b></td><td>FIX·M، إزالة وراثة ADMIN</td><td>الوراثة <b>حيلة توافقيّة متعمَّدة</b> موثَّقة في تعليق الكود نفسه — تُبقي 120 نقطة نهاية <code>OPERATIONS_AGENT</code> + 10 <code>FINANCE_AGENT</code> تعمل بلا كتابة صريحة. إزالتها بلا تعبئة صريحة مسبقة تُسقِط أغلب سطح OPS فورًا. حجمها يوازي D-09 — تُدمَج معه في حملة واحدة.</td></tr>
+    <tr><td><b>D-59+D-60+D-61</b></td><td>FIX·S، توسيع دالّة موجودة فقط</td><td>خطر حقيقيّ بإسقاط إقلاع الإنتاج إن كانت القيم الفعليّة اليوم فارغة (لا يمكن التحقّق من المستودع وحده). يحتاج <b>نمط تحذير-ثمّ-إنفاذ على إصدارين</b>، بإعادة استخدام نفس اتفاقيّة <code>ADMIN_IP_ALLOWLIST_REQUIRED</code> الموجودة فعلًا في نفس الدالّة.</td></tr>
+    <tr><td><b>D-78</b></td><td>BUILD·L، مسار Postgres في CI</td><td>مجموعة الاختبار الافتراضيّة (~3800+ اختبار) SQLite بالكامل اليوم — تبديل الافتراضيّ يفتح موجة أعطال محتملة غير مرتبطة بهذه الخطّة إطلاقًا. <b>يحتاج مرحلة استقرار خاصّة به منفصلة</b>، لا يُنتظَر لإثبات بقيّة الإصلاحات — كل إصلاح تزامن يحصل على اختبار Postgres مستهدَف يدويًّا بدلاً من ذلك في الأثناء.</td></tr>
+    <tr><td><b>D-80</b></td><td>MEDIUM، «نصوص صلبة متبقّية»</td><td><code>i18n:status</code> يفشل <b>اليوم فعليًّا</b> بـ910 مفتاحًا عربيًّا مفقودًا (+898 إنجليزيّ +898 فرنسيّ) — مقموع فقط بـ<code>continue-on-error</code>. قلب البوّابة الآن يُسقِط كل PR فورًا، لا تراكمًا صغيرًا كما بدا.</td></tr>
+    <tr><td><b>D-83</b></td><td>PROCESS-CONFIG، «يحتاج طقس إعادة معايرة»</td><td>تتبّع دقيق للآليّة: <code>EXPECTED_HASHES</code> قيمة صريحة مكتوبة داخل <code>_ai_tools/bin/contract_flag_hash_check.py</code> نفسه — وهذا السكربت أوّل خطوة في CI وفي كل نشر (test1/.194/الإنتاج). تعديل <code>last_updated</code> بلا تحديث هذه القيمة <b>في نفس الالتزام بالضبط</b> يُسقِط كل نشر لاحق فورًا، وليس مجرّد «طقس إداريّ».</td></tr>
+  </table>
+  </div>
+</section>
+
+<section id="collisions">
+  <span class="section-eyebrow">💥 تحليل التصادم بين الأخطاء — لا فريق واحد يراه بمفرده</span>
+  <h2>حين يلمس إصلاحان نفس الملفّ أو نفس الجدول في نفس النافذة الزمنية</h2>
+  <p class="intro">هذا القسم لم يُكلَّف به أيّ فريق — إنّه التركيب الذي يتطلّب رؤية كل الفرق السبعة معًا. هنا التصادمات الحقيقيّة المكتشَفة.</p>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">تصادم 1</span><span class="i-title">D-09 + D-56 ليسا نقطتين — إنّهما حملة واحدة بمدخلين</span></div>
+  <div class="i-body">D-09 (ترحيل حرّاس require_role، 84 ملفًّا) وD-56 (إزالة وراثة ADMIN، ~130 نقطة نهاية) كلاهما يُغيّران <b>ما يعني «مصرَّح» لنفس المستخدمين على نفس نقاط النهاية</b>. تنفيذهما بمعزل يعني قياس/تصحيح نفس السطح مرّتين بمنطقين مختلفين. <b>القرار: حملة واحدة اسمها «اتّساق الصلاحيّات»</b>، بمرحلة ظلّ واحدة تُسجِّل نتيجة كلا الفحصين (القديم والجديد) لكل طلب، تُنبِّه عند أيّ خلاف، ثمّ تحوّل الإنفاذ ملفًّا-ملفًّا فقط بعد نظافة السجلّ.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">تصادم 2</span><span class="i-title">مساعد الحجز الذريّ المشترك (بنية 2 من تقرير 539) يحتاج تصميمَين لا تصميمًا واحدًا</span></div>
+  <div class="i-body">فريق التسوية اكتشف أنّ نمط UPSERT الساذج لا يعمل لـD-32/D-33 (معاملة طويلة، commit واحد في النهاية) — يحتاج جلسة منفصلة + استرجاع ركود. لكن D-41 (POS) عمليّة أقصر بطبيعتها. <b>القرار: المساعد المشترك يحتاج واجهتين</b> — «حجز طويل الأمد» (جلسة منفصلة + TTL ركود، لـD-32/D-33) و«حجز قصير» (UPSERT بسيط داخل نفس المعاملة، لـD-41) — لا تصميم واحد يناسب الاثنين.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">تصادم 3</span><span class="i-title">D-11 يجب أن يبتلع D-12+D-13+D-14 — نفس الدالّة، لا تُعاد كتابتها مرّتين</span></div>
+  <div class="i-body"><code>create_ops_account</code> هي الدالّة المستهدَفة لكلٍّ من D-11 (تدفّق الدعوة) وD-12/13/14 (الذريّة والتدقيق). تنفيذ D-12/13/14 أوّلاً ثمّ إعادة كتابة نفس الدالّة لاحقًا من أجل D-11 عمل مزدوج وخطر دمج غير ضروريّ. <b>القرار: يُصمَّم D-11 من البداية ليشمل الذريّة الكاملة (بنية Governed) والتدقيق الإلزاميّ في نفس المعاملة</b> — تُنفَّذ مرّة واحدة بعد إذن التشغيل الصريح.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">تصادم 4</span><span class="i-title">إعادة-التحقّق-عند-التنفيذ خاصيّة مشتركة عبر 3 عناقيد مختلفة، لا خاصّة بـD-46 وحدها</span></div>
+  <div class="i-body">فريق POS اكتشفها لـD-46 (الاحتفاظ)، وفريق التسوية اكتشف نمطًا مطابقًا تمامًا موجودًا بالفعل في مسار حذف الحساب (<code>account_deletion_cron.py</code> يُعيد فحص الأهليّة قبل التنفيذ). D-49 (سير عمل الخصوصيّة) يواجه نفس الفجوة بالضبط. <b>القرار: جدول «Governed Action» المشترك (بنية 1 من تقرير 539) يحمل خطّاف إعادة-تحقّق اختياريًّا كحقل أساسيّ من التصميم من اليوم الأوّل</b>، لا إضافة لاحقة — ثلاثة مستهلكين مستقلّين احتاجوه بشكل مستقلّ، إشارة قويّة أنّه جزء من العقد لا استثناء.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">تصادم 5</span><span class="i-title">D-61 (تفعيل صندوق الإشعارات) يجب ألّا يسبق ترحيل outbox_relay إلى ARQ ضمن D-62</span></div>
+  <div class="i-body">اكتشاف فريق الإعدادات: مسار الإرسال داخل <code>outbox_relay.py</code> خامل اليوم فقط لأنّ <code>notifications_outbox_enabled=False</code>. إن فُعِّل هذا العلَم قبل ترحيل الحلقة المسؤولة إلى عامل ARQ منفصل، فحمل الإرسال يهبط داخل عمليّة API نفسها وينافس معالجة الطلبات. <b>القرار: ترحيل هذه الحلقة تحديدًا يجب أن يسبق أو يرافق تفعيل D-61 في نفس دورة النشر، لا بعدها.</b></div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">تصادم 6</span><span class="i-title">لا شيء يُنتظَر لـD-78 — إصلاحات التزامن تحتاج اختبارات Postgres مستهدَفة يدويًّا الآن، لا مسار CI كامل لاحقًا</span></div>
+  <div class="i-body">D-78 (تبديل افتراضيّ مجموعة الاختبار بالكامل إلى Postgres) أصبح مسارًا مستقلًّا ضخمًا (خطر موجة أعطال غير مرتبطة عبر 3800+ اختبار). لو انتظرت إصلاحات D-01/D-19/D-23/D-28/D-32/D-33/D-42/D-43 اكتمال D-78 لإثبات نفسها، تتجمّد كل الخطّة خلف مسار استقرار طويل. <b>القرار: كل إصلاح تزامن يحصل على اختبار تكامل Postgres صغير مخصَّص له فقط (docker Postgres مؤقّت في CI لتلك الوظيفة تحديدًا)، مستقلّ عن تبديل الافتراضيّ الشامل الذي يبقى مسارًا موازيًا منفصلاً.</b></div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">تصادم 7</span><span class="i-title">D-42 وD-44 وD-45 الثلاثة يمسّان نفس مزوّدي POS الحقيقيّين في نفس النافذة — يجب تدريج لحظة الإنفاذ لا لحظة الشحن</span></div>
+  <div class="i-body">كل الإصلاحات الثلاثة (تعيين SKU، عميل آمن من SSRF، تشفير الأسرار) يمكن <b>شحنها</b> معًا بأمان لأنّها جميعًا تدخل بأوضاع توسيع/ظلّ/قراءة-مزدوجة غير كاسرة. لكن لحظات <b>الإنفاذ الفعليّ</b> (رفض SKU غامض، حظر SSRF) يجب أن تُفصَل زمنيًّا — إن كسرت جميعًا معًا تكامل شريك حيّ واحد، يستحيل عزل أيّها المسبِّب.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">تصادم 8</span><span class="i-title">D-45 وD-59/60/61 يعدّلان نفس الملفّ config.py في نفس النافذة الزمنية تقريبًا</span></div>
+  <div class="i-body">ليس تعارضًا منطقيًّا، لكن كلاهما يضيف حقول Settings جديدة لنفس الملفّ — يُنصَح بتنسيق النشر (نفس دورة العمل أو تنسيق دمج صريح) لتفادي تعارضات دمج غير ضروريّة على نفس النموذج.</div></div>
+</section>
+
+<section id="p0">
+<div class="phase-band">
+  <div class="phase-title p0"><span class="p-badge">المرحلة صفر</span><h3>إصلاحات فوريّة — بعد المحاكاة، مع خطوة تحقّق ما قبل النشر لكل واحدة تحتاجها</h3></div>
+  <p class="phase-desc">نفس نطاق تقرير 539 تقريبًا، لكن كل نقطة الآن تحمل بالضبط ما يجب التحقّق منه في بيانات الإنتاج قبل الشحن، إن وُجِد.</p>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-01</span><span class="i-title">قيد فريد جزئيّ + ذاتيّ الشفاء</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">تعليق الكود الحاليّ نفسه (R-360-01) يوثّق أنّ تكرار ACTIVE قد حدث فعلاً من قبل — إشارة تصادم بيانات حقيقيّة لا افتراضيّة.</div>
+  <div class="sim-block"><div class="sim-h">🧪 المحاكاة الذهنية</div><p>قبل الهجرة: <code>SELECT platform, count(*) FROM app_versions WHERE is_active GROUP BY platform HAVING count(*)&gt;1</code>. الهجرة نفسها تُعطِّل كل الصفوف الزائدة النشطة (تُبقي الأحدث فقط) <b>ثمّ</b> تُضيف الفهرس — لا تفترض نظافة البيانات، تُصلِحها ذاتيًّا داخل نفس الهجرة. الفهرس نفسه <code>CREATE UNIQUE INDEX CONCURRENTLY</code> (غير معاملاتيّ) لتفادي قفل الجدول كاملاً.</p></div>
+  <div class="i-warn">⚠️ منطق «إعادة المحاولة مرّة عند IntegrityError» يجب أن يُعيد تشغيل تسلسل التعطيل+الإدراج كاملاً، لا الإدراج فقط — وإلّا فالمحاولة الثانية تفشل بنفس الطريقة بالضبط.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-02, D-03+D-67</span><span class="i-title">تصحيحات بلا تغيير عن تقرير 539</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">لم تكشف المحاكاة أيّ خطر جديد؛ التصميم الأصليّ يصمد كما هو.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-08</span><span class="i-title">حذف refresh_token — الآن PR منسَّق خلفيّ+أماميّ</span><span class="pill ok">FIX · S (منسَّق)</span></div>
+  <div class="i-body"><code>web/src/api/types.ts</code> يُعرِّف <code>refresh_token</code> إلزاميًّا؛ <code>AuthContext.login()</code> و<code>LoginPage.tsx</code> يعتمدان عليه كوسيط إلزاميّ. حذفه من استجابة الويب بلا تحديث هذا العقد يكسر البناء أو ينتج قيمة "undefined" صامتة.</div>
+  <div class="i-fix">✅ نفس الـPR: اجعل الحقل اختياريًّا في النوع + الوسيط الثاني اختياريًّا. تعليقات الكود الحاليّة («نسخة قديمة في localStorage») تؤكّد القيمة لم تعد مطلوبة فعليًّا من جهة العميل أصلاً.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-15+D-16</span><span class="i-title">مؤكَّد بلا مخاطر إضافية — قفل الاستهداف الذاتيّ موجود بالفعل</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">التحقّق أثبت أنّ <code>promote_ops_account</code> يرفض استهداف الفاعل لنفسه صراحة (403) — سيناريو «قفل الذات» المخشيّ في المحاكاة <b>غير ممكن حدوثه أصلاً</b>. تعليق دالّة <code>revoke_all_sessions</code> نفسه («لا آليّة أضيق موجودة») مؤكَّد أنّه <b>خاطئ/قديم</b> — يستحقّ تصحيحًا توثيقيًّا بجانب الإصلاح.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-19</span><span class="i-title">قيد فريد على reference — يحتاج فحص تكرار مسبقًا</span><span class="pill ok">FIX · S</span></div>
+  <div class="sim-block"><div class="sim-h">🧪 المحاكاة الذهنية</div><p>الفحص الحاليّ سباقيّ (قراءة-ثمّ-إدراج بلا قفل) — هذا بالتحديد يعني تكرارات حقيقيّة محتملة في الإنتاج الآن. قبل الهجرة: <code>SELECT reference, count(*) FROM manual_journal WHERE reference IS NOT NULL GROUP BY reference HAVING count(*)&gt;1</code>. أيّ تكرار موجود لا يُحذَف (قيود ماليّة حقيقيّة) بل يُعاد تسميته بلاحقة تمييز، ثمّ يُطبَّق القيد كـ<code>NOT VALID</code> فورًا و<code>VALIDATE CONSTRAINT</code> منفصلة لاحقًا.</p></div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-22</span><span class="i-title">Hash كامل 64 حرفًا — إضافة عمود schema_version يحمل معنى إضافيًّا</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">لا خطر ارتداديّ على السلسلة نفسها (event_hash غير متأثّر). عمود schema_version (مخطَّط أصلاً لـD-21) يُستخدَم أيضًا هنا للتمييز بين قيم 64-حرفًا القديمة (المحسوبة بطريقة مختلفة) والجديدة، لا مجرّد الطول.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-25</span><span class="i-title">عكس عمولة الاسترداد الآمن</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد آمن بالتتبّع المباشر: نمط <code>ReconciliationException</code> يعمل عبر SAVEPOINT (<code>begin_nested</code>) — عند الفشل، المعاملة الخارجيّة (الاسترداد نفسه) لا تُسقَط، فقط مسار العكس يتراجع؛ الاستجابة للعميل تبقى نجاحًا طبيعيًّا والقيد الماليّ يتحوّل لبند متابعة، لا خطأ صامت.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-26</span><span class="i-title">تضييق حالات الاعتماد الثاني</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">لا مسار برمجيّ آخر وُجِد يعتمد على السلوك الحاليّ (لا نقطة نهاية تصحيح/تعديل بعد التنفيذ في هذا الملفّ). لكن هذه نتيجة سلبيّة لا ضمانًا — إن وُجِدت عمليّة يدويّة غير موثَّقة تعتمد على إعادة استدعاء هذه النقطة بعد التنفيذ، فالتضييق سيكسرها بصمت. <b>يُشحَن بتحذير+مقياس لدورة نشر واحدة قبل التضييق الصارم</b>، تأمينًا رخيصًا ضدّ عمل بشريّ غير مُوثَّق.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-28</span><span class="i-title">قفل صفّ الطلب + حدّ تراكميّ للنزاعات</span><span class="pill ok">FIX · S-M</span></div>
+  <div class="i-body">فُحِص تسلسل الأقفال الفعليّ مباشرة: <code>file_chargeback_case</code> اليوم لا يقفل Order إطلاقًا؛ <code>update_chargeback_state</code> يقفل ChargebackCase فقط لا Order — لا دورة تعليق (deadlock) بين الاثنين بترتيبهما الحاليّ. الحاجة الوحيدة: تأكيد أنّ <code>reverse_commission_for_order</code> (خارج نطاق هذا العنقود) لا يقفل Order بترتيب معاكس قبل التنفيذ.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-30</span><span class="i-title">أقفال الصفّ على انتقالات النزاع الماليّ المتبقّية</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — إضافة أقفال صرفة (<code>SELECT...FOR UPDATE</code>) بلا منطق جديد، بنفس نمط قفل موجود بالفعل 150 سطرًا في نفس الملفّ؛ بلا خطر تعليق مكتشَف.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-39</span><span class="i-title">نصّ واجهة رصيد المحفظة — «معلَّق» بدل «أُضيف»</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — تغيير نصّ عرض فقط. الملاحظة الوحيدة: إن احتاج جلب معرّف الطلب/الحالة نقطة نهاية جديدة، يجب نشر الخلفيّ أوّلاً قبل الواجهة التي تستدعيه، لا العكس.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-40</span><span class="i-title">حدّ المحفظة من سياسة الخادم لا ثابت مكرَّر</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — نفس ملاحظة الترتيب: نقطة نهاية سياسة الحدود يجب أن تكون حيّة قبل بناء الواجهة التي تعتمد عليها، وإلّا يفشل أوّل تحميل للصفحة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-51</span><span class="i-title">تدقيق مُلزِم قبل عرض PII</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — إصلاح معزول تمامًا، لا صلة له بقرار D-50 التشغيليّ، بلا مخاطر نشر جديدة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-58</span><span class="i-title">فشل قراءة DB لا يسقط إلى YAML صامتًا</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — تصميم 539 يصمد، لا خطر نشر جديد اكتُشِف.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-63</span><span class="i-title">إيقاف منظَّم — gather بدل cancel متفرّق</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — يُنفَّذ بالتوازي مع ترحيل D-62 التدريجيّ، كل مهمّة تُرحَّل تختفي من قائمة الإلغاء طبيعيًّا.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-64</span><span class="i-title">تحصين alembic current==head الذاتيّ</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد خامل حاليًّا فعليًّا — خدمة migrate تضمن التطبيق دائمًا في طوبولوجيا النشر الحاليّة؛ التحصين دفاعيّ فقط، لا يُصلِح خللاً مستغَلًّا اليوم.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-65</span><span class="i-title">قاطع دارة محلّيّ لمسارات الحساسة</span><span class="pill ok">FIX · M</span></div>
+  <div class="i-body">قصور حقيقيّ مقبول ومُوثَّق صراحةً: العدّاد داخل الذاكرة لكلّ نسخة (per-instance) — غير مشكلة اليوم لأنّ الطوبولوجيا الحاليّة نسخة واحدة لكلّ بيئة، لكن يجب توثيقه صراحةً في تعليق الكود كقيد معروف قبل أيّ توسّع أفقيّ مستقبليّ، لا حلّه الآن (بنية موزَّعة الآن هندسة استباقيّة غير مبرَّرة).</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-66</span><span class="i-title">عدّاد بايتات متدفّق لحدّ حجم الطلب</span><span class="pill ok">FIX · M</span></div>
+  <div class="i-body">مؤكَّد بلا انحدار أداء حقيقيّ — العدّاد O(1) لكل جزء، وnginx <code>client_max_body_size</code> يبقى الحاجز الفعليّ لأيّ حال على الرفوعات الكبيرة المشروعة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-67</span><span class="i-title">قصر ثقة الوكيل على CIDR صريح</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — يُشحَن مع D-03 (نفس المحلِّل الموثوق للوكيل بالضبط)، لا مخاطر مستقلّة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-68</span><span class="i-title">Retry-After بصيغة max لا min</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — تصميم 539 يصمد، لا خطر نشر جديد.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-69</span><span class="i-title">معرّف جهاز عشوائيّ آمن تشفيريًّا</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — تصميم 539 يصمد، لا خطر نشر جديد.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-70</span><span class="i-title">تشفير تخزين KV المحلّيّ</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد أرخص ممّا يبدو — نقطة تبديل (seam) جاهزة أصلاً في تعليق الكود لاستبدال المحوّل بواحد مشفَّر (MMKV)، ليست تصميمًا جديدًا.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-77</span><span class="i-title">Assert على محتوى ترجمة الاختبار لا الحالة فقط</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — تعديل معزول على سكربت اختبار مستقلّ، بلا مستهلكين آخرين، بلا مخاطر إضافيّة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-81</span><span class="i-title">ملاحظات الإصدار حسب اللغة</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — مكوّن واجهة معزول، لا مستهلكين آخرين له، بلا مخاطر نشر جديدة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-84</span><span class="i-title">حدود تاريخ حصريّة بالمنطقة الزمنيّة المحليّة</span><span class="pill ok">FIX · S</span></div>
+  <div class="i-body">مؤكَّد — دالّة معزولة في notification_router.py، لا مستهلكين آخرين وُجِدوا لنفس الدالّة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-85</span><span class="i-title">فهرس order_id بدل المسح الكامل</span><span class="pill ok">FIX · M</span></div>
+  <div class="i-body">أسوأ ممّا وُصِف أصلاً (مسح كامل بلا أيّ شرط WHERE، لا مجرّد N+1) — تفصيل إضافيّ هذه الجولة: يجب استخدام <code>CREATE INDEX CONCURRENTLY</code> تحديدًا على جدول IncidentRecord، لا فهرسًا حاجبًا عاديًّا يقفل الكتابة أثناء البناء.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-54</span><span class="i-title">حدود صلاحيّة الواجهة — منقولة من المرحلة 2</span><span class="pill ok">FIX · S/M (كانت BUILD)</span></div>
+  <div class="i-body">تصحيح جوهريّ: نقطة النهاية <code>GET /me/permissions</code> (<code>account_permissions_router.py</code>) موجودة وتعمل بالفعل، تُرجِع القائمة الفعليّة الكاملة للصلاحيّات — هذا إصلاح أماميّ خالص الآن (تحديث <code>ProtectedRoute.tsx</code> لاستهلاكها بدل مقارنة نصّ الدور)، لا اعتماديّة على حملة D-09+D-56 إطلاقًا.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-55</span><span class="i-title">فشل مغلَق للمسارات غير المعروفة — منقولة من المرحلة 2</span><span class="pill ok">FIX · S/M (كانت BUILD)</span></div>
+  <div class="i-body">نفس التصحيح: يستهلك نقطة النهاية الموجودة فعلًا في <code>opsAccess.ts</code>، مع بيان مسارات-صلاحيّات مولَّد تلقائيًّا — لا يحتاج انتظار حملة الصلاحيّات الكبرى.</div></div>
+</div>
+</section>
+
+<section id="p1">
+<div class="phase-band">
+  <div class="phase-title p1"><span class="p-badge">المرحلة 1</span><h3>البنية التحتيّة — مُعاد تصميمها بعد اكتشاف عيوب في التصميم الأصليّ نفسه</h3></div>
+  <p class="phase-desc">هذه المرحلة نفسها تغيّرت أكثر من أيّ مرحلة أخرى بعد المحاكاة — تصميمان من الأربعة تبيَّن أنّهما لن يعملا كما كُتِبا أوّلاً.</p>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">بنية مُعاد تصميمها</span><span class="i-title">مساعد الحجز الذريّ — الآن بواجهتين، لا واحدة</span><span class="pill info">BUILD · L (كانت M)</span></div>
+  <div class="i-crit">🔴 التصميم الأصليّ (UPSERT بسيط) لن يعمل لـD-32/D-33: الفحص والإنشاء يقعان داخل نفس الجلسة غير المُثبَّتة، بفارق 1084 سطرًا وcommit واحد في النهاية — الحجز «الذريّ» يبقى غير مرئيّ لبقيّة الطلبات حتّى تلك اللحظة، فلا يمنع شيئًا فعليًّا.</div>
+  <div class="i-fix">✅ التصميم المُصحَّح: (1) واجهة «حجز طويل» لـD-32/D-33 — إدراج الحجز في جلسة/اتّصال منفصل يُثبَّت فورًا، مع عتبة استرجاع ركود (2-5 دقائق) للصفوف العالقة في PROCESSING، ومعالج استثناء في الموجّه يُحدِّث الحالة لـFAILED بجلسة منفصلة عند أيّ خطأ لاحق. (2) واجهة «حجز قصير» لـD-41 (POS) — UPSERT بسيط داخل نفس المعاملة القصيرة، يعمل كما صُمِّم أصلاً.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">بنية مُعاد تصميمها</span><span class="i-title">جدول Governed Action — خطّاف إعادة-تحقّق-عند-التنفيذ الآن جزء من العقد الأساسيّ</span><span class="pill info">BUILD · L</span></div>
+  <div class="i-body">اكتُشِف مستقلًّا من ثلاثة عناقيد مختلفة (D-46 الاحتفاظ، D-49 الخصوصيّة، ونمط موجود بالفعل في cron حذف الحساب) — أيّ عمل زمنه بين الموافقة والتنفيذ يحتاج إعادة فحص أهليّة حيّة عند التنفيذ الفعليّ، لا الثقة العمياء باللقطة المجمَّدة. يُضاف كحقل تصميم أساسيّ، لا كإصلاح لاحق مخصَّص لكلّ مستهلك على حدة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">بنية</span><span class="i-title">وضع الظلّ لحملة الصلاحيّات — يُبنى هنا، يُستهلَك في المرحلة الكبرى</span><span class="pill info">BUILD · M</span></div>
+  <div class="i-body">آليّة تسجّل نتيجة الفحص القديم والجديد جنبًا إلى جنب لكل طلب على أيّ مسار قيد الترحيل، دون التأثير على النتيجة الفعليّة، مع تنبيه عند أيّ خلاف. هذه هي البنية التي تجعل حملة D-09+D-56 آمنة للتنفيذ التدريجيّ.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">مسار مستقلّ</span><span class="i-title">اختبارات Postgres مستهدَفة لكل إصلاح تزامن — لا انتظار D-78</span><span class="pill info">BUILD · M</span></div>
+  <div class="i-body">حاوية Postgres مؤقّتة في CI مخصَّصة لاختبار كل نقطة تزامن فرديًّا (D-01، D-19، D-23، D-28، D-32/33، D-42/43) فور جاهزيّتها — مستقلّة تمامًا عن مسار D-78 الأكبر (تبديل الافتراضيّ الشامل لكامل مجموعة الاختبار)، الذي يبقى مسارًا موازيًا منفصلاً في مرحلته الخاصّة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-21</span><span class="i-title">Hash قانونيّ شامل — مع تصحيح عيب معروف مسبقًا في المشروع</span><span class="pill info">BUILD · M</span></div>
+  <div class="i-crit">🔴 عيب مكتشَف بالمحاكاة: <code>created_at</code> افتراضه من قاعدة البيانات (<code>func.now()</code>)، لا يُملأ في كائن Python قبل التجزئة. إن أُضيف للـhash القانونيّ بلا تعيين صريح في Python أوّلاً (تمامًا كما أُصلِح <code>id</code> سابقًا لنفس السبب)، فكل hash جديد سيُحسَب على <code>created_at=None</code> بينما الصفّ المخزَّن يحمل وقتًا حقيقيًّا — يجعل 100% من الأحداث الجديدة غير قابلة للتحقّق فعليًّا.</div>
+  <div class="i-fix">✅ تعيين <code>record.created_at</code> صراحة في Python قبل استدعاء <code>_chain_link</code>، بنفس نمط إصلاح <code>id</code> السابق تمامًا.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-57</span><span class="i-title">توحيد المحلِّل — يحتاج فحص فروقات مسبقًا، غير قابل للتحقّق من الكود وحده</span><span class="pill info">BUILD · M</span></div>
+  <div class="i-body">لا يمكن معرفة هل قيمة أيّ من الـ23 علَمًا في قاعدة بيانات الإنتاج تخالف افتراضيّ YAML اليوم من الكود وحده. <b>خطوة إلزاميّة قبل الترحيل</b>: استعلام فروقات للقراءة فقط (YAML مقابل قيم DB الفعليّة) يُشغَّل على الإنتاج قبل تحويل أيّ من الـ23 موقعًا، وأيّ خلاف يُعامَل كقرار go/no-go لكلّ علَم على حدة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-59+D-60+D-61</span><span class="i-title">تحذير-ثمّ-إنفاذ على إصدارين — لا شحن مباشر للفشل الصارم</span><span class="pill ok">FIX · S+S (إصدارين)</span></div>
+  <div class="i-crit">🔴 هذا هو أعلى نقطة خطر إفشال إقلاع في كامل الخطّة: إن كانت البيئة الفعليّة اليوم تحمل بالفعل الفجوات التي يصفها الاكتشاف (mfa_required_roles فارغة، إلخ) — وهذا هو افتراض الاكتشاف نفسه — فالفشل الصارم المباشر يُسقِط إقلاع الإنتاج القادم فورًا.</div>
+  <div class="i-fix">✅ إعادة استخدام نمط <code>ADMIN_IP_ALLOWLIST_REQUIRED</code> الموجود بالفعل حرفيًّا في نفس الدالّة: فحوصات جديدة تصدر تحذيرًا فقط خلف علَم اختياريّ افتراضيّه معطَّل، إصدار نشر واحد لرصد الفجوات الحقيقيّة وإصلاح <code>.env</code>، ثمّ تفعيل الإنفاذ الصارم في إصدار لاحق منفصل.</div></div>
+</div>
+</section>
+
+<section id="p2">
+<div class="phase-band">
+  <div class="phase-title p2"><span class="p-badge">المرحلة 2</span><h3>إصلاحات مجاليّة — مبنيّة على البنية المُعاد تصميمها</h3></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-06 + D-07</span><span class="i-title">سجلّ OTP ذريّ — الآن يمسّ 4 ملفّات، لا اثنَين</span><span class="pill info">BUILD · M+ (نطاق أوسع)</span></div>
+  <div class="i-crit">🔴 <code>wallet_security_router.py</code> (خطوتان) و<code>driver_phone_change_router.py</code> يستدعيان <code>verify_otp()</code> بلا تمرير أو فحص أيّ purpose اليوم إطلاقًا. جعل purpose إلزاميًّا في التوقيع (كما يقترح الإصلاح) سيكسر تجميع/عمل هذين الموقعَين فورًا ما لم يُحدَّثا في نفس التغيير.</div>
+  <div class="i-fix">✅ توسيع enum الغرض ليشمل <code>WALLET_STEPUP</code> و<code>PHONE_CHANGE</code> صراحة، وتحديث المواقع الأربعة معًا في نفس الالتزام. مغلَّف بمفتاح إيقاف فوريّ يسمح بتعطيل المسار الذريّ الجديد لحظيًّا لو ظهرت مشكلة أداء تحت حمل عالٍ.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-42</span><span class="i-title">تعيين SKU — تدرّج ثلاثيّ الخطوات إلزاميّ، لا قطع فوريّ</span><span class="pill info">BUILD · L (كانت M)</span></div>
+  <div class="i-crit">🔴 لا عمود <code>external_sku</code> موجود إطلاقًا في المخطّط الحاليّ — 100% من مزوّدي POS الحيّين اليوم بلا أيّ تعيين، لأنّ الحقل غير موجود بعد. رفض فوريّ عند الشحن يكسر كل تحديث سعر حيّ فورًا لكل شريك.</div>
+  <div class="i-fix">✅ توسيع (عمود قابل للفراغ + تعبئة بأفضل جهد تلقائيّة للأصناف أحاديّة النسخة) → تحذير (تسجيل الحالات الغامضة مع استمرار السلوك الحاليّ، لوحة عمليّات تعرض عدد المزوّدين غير المُعيَّنين) → إنفاذ (الرفض الفعليّ فقط بعد أن تُظهر اللوحة صفرًا).</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-45</span><span class="i-title">تشفير أسرار POS — Fernet + اتفاقيّة التدوير الموجودة، قراءة مزدوجة أثناء الانتقال</span><span class="pill info">BUILD · M (كانت L)</span></div>
+  <div class="i-body">5 مواقع فقط تلمس القيمة الخام (أضيق ممّا افتُرِض): قراءتان (توقيع/تحقّق HMAC)، كتابتان (تدوير/إنشاء)، وملفّ اختبار واحد.</div>
+  <div class="i-crit">🔴 عيب مكتشَف: تعبئة جزئيّة (backfill) قد تتعطّل في المنتصف — بعض الصفوف مشفَّرة، بعضها خام. مسار القراءة يجب أن يحاول فكّ التشفير أوّلاً، ويقع احتياطيًّا لمعاملة القيمة كنصّ خام قديم عند الفشل، حتّى تأكيد اكتمال التعبئة 100% بعلامة صريحة.</div>
+  <div class="i-fix">✅ نفس اتفاقيّة <code>secret_key</code>/<code>secret_key_legacy</code> الموجودة في <code>config.py</code> — إعادة استخدام، لا اختراع.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-32 + D-33 + D-41</span><span class="i-title">إعادة تصميم Idempotency — واجهتان من البنية المشتركة الجديدة</span><span class="pill info">BUILD · L</span></div>
+  <div class="i-body">يستهلكان التصميم المُصحَّح من المرحلة 1 مباشرة — «الحجز الطويل» لطلبات الطلبات، «الحجز القصير» لأحداث POS.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-34 إلى D-37</span><span class="i-title">فشل-مغلَق موحَّد — مع تمييز «محظور» عن «غير معروف مؤقّتًا»</span><span class="pill ok">FIX · M</span></div>
+  <div class="i-body">حسابات قيد حذف معلَّق حاليًّا قد تُعاد تقييمها بالفحوصات الأشدّ عند تنفيذ cron لاحقًا — لا مسار إلغاء/إشعار موجود اليوم لهذه الحالة. <b>مطلوب إضافته</b>: مسار عمليّة معلَّقة تفشل الفحص الجديد يُلغى تلقائيًّا مع إشعار للمستخدم، لا يعلَق أو يفشل صامتًا.</div>
+  <div class="i-warn">⚠️ الفشل-المغلَق الشامل يعني أنّ عطلاً عابرًا في قاعدة البيانات على <b>أيّ</b> من الفحوصات الآن الأكثر عددًا يوقف كل عمليّات الحذف منصّة-عريضة. يجب تمييز <code>BLOCKED</code> (التزام ماليّ حقيقيّ) عن <code>UNKNOWN_RETRY_LATER</code> (خطأ استعلام عابر) — تمييز لا وجود له في التصميم الحاليّ.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-38</span><span class="i-title">إعادة كتابة statement — يحتاج فحص finance_router.py قبل إغلاق النطاق</span><span class="pill warn">FIX/BUILD · M (يحتاج تأكيدًا إضافيًّا)</span></div>
+  <div class="i-body">8 ملفّات أخرى تقرأ الجداول الخام مباشرة لأغراض مختلفة (فحوصات رصيد حيّة، لا تقارير تاريخيّة) — لا تحتاج كلّها لإعادة الكتابة. لكن <code>finance_router.py</code> تحديدًا <b>لم يُتحقَّق منه بعد</b> — إن كان يعرض تقرير محفظة إداريًّا من نفس الاتحاد الثلاثيّ القديم، فإصلاح المسار الاستهلاكيّ وحده يُعيد إنتاج نفس نمط «طبقة مُصلَحة، طبقة قديمة» الذي يتمحور حوله التدقيق كلّه، بين شاشة العميل والشاشة الماليّة بدلاً من العميل والخلفيّ.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-27</span><span class="i-title">فصل صلاحيّة تقديم/مراجعة نزاع الدفع</span><span class="pill info">BUILD · M</span></div>
+  <div class="i-body">مؤكَّد — لا مخاطر بيانات أو تزامن مستقلّة اكتُشِفت؛ يعتمد فعليًّا على حملة اتّساق الصلاحيّات (D-09+D-56) لتوفير حرّاس filer/reviewer منفصلين — لا يُشحَن قبل جاهزيّة تلك البنية، تغيير فحص أدوار صرف لا مخطّط بيانات جديد.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-44</span><span class="i-title">عميل آمن من SSRF — وضع ظلّ أوّلاً، لأنّ عناوين POS الحيّة الحاليّة غير معروفة من الكود</span><span class="pill info">BUILD · M</span></div>
+  <div class="i-body">استعلام تدقيقيّ (<code>SELECT target_url FROM pos_outbound_subscriptions WHERE enabled</code>) مطلوب قبل التفعيل. المسار الجديد يُشحَن أوّلاً بوضع تسجيل-فقط (يسجّل ما كان سيُحظَر دون حظره)، لدورة نشر واحدة، ثمّ التحويل للإنفاذ.</div></div>
+</div>
+</section>
+
+<section id="big">
+  <span class="section-eyebrow">🏔️ الأعمال الكبيرة المعزولة — 8 مسارات، كل واحد بمرحلته الخاصّة</span>
+  <h2>هذه ليست إصلاحات تُبنى، إنّها حملات تُدار</h2>
+  <p class="intro">بعد المحاكاة، هذه الثمانية أثبتت أنّها أكبر من أن تُبنى كبند واحد ضمن مرحلة عامّة — لكلّ منها اعتماديّات وتسلسل داخليّ خاصّ.</p>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">حملة كبرى 1</span><span class="i-title">اتّساق الصلاحيّات — D-09 (84 ملفًّا) + D-56 (~130 نقطة نهاية)، حملة واحدة موحَّدة</span><span class="pill crit">XL</span></div>
+  <div class="i-body">التسلسل الداخليّ: (1) بناء وضع الظلّ (المرحلة 1) → (2) تفعيله على كل الـ84+130 نقطة معًا، تسجيل فقط → (3) مراقبة السجلّ لفترة حقيقيّة، تصحيح أيّ خلاف مكتشَف (منح صريح مفقود) → (4) تحويل الإنفاذ ملفًّا-ملفًّا وفق الأولويّة: الماليّ/الدفعات/لوحة التحكّم أوّلاً، <code>operations_router.py</code> (110+120 نقطة) أخيرًا لأنّه الأكبر حجمًا. قاعدة تدقيق ساكنة تمنع أيّ <code>require_role</code> جديدًا طوال مدّة الحملة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">حملة كبرى 2</span><span class="i-title">D-11 — تدفّق IAM بدعوة، يبتلع D-12/13/14</span><span class="pill crit">L</span></div>
+  <div class="i-body">🔒 يحتاج إذن تشغيل منفصلاً صريحًا قبل البدء. يُعاد تصميم <code>create_ops_account</code> مرّة واحدة تشمل: تدفّق الدعوة + TOTP الإلزاميّ + الذريّة الكاملة (بنية Governed) + التدقيق في نفس المعاملة — لا تُنفَّذ الذريّة بمعزل ثمّ يُعاد بناء نفس الدالّة لاحقًا.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">حملة كبرى 3</span><span class="i-title">D-17 — تركيب حالة التعليق، مزامنة 3 أنظمة</span><span class="pill crit">M-L</span></div>
+  <div class="i-body"><code>OperationalProfile.is_suspended</code>، <code>User.status</code>، ومفتاح حظر جلسة Redis منفصل — ثلاثتها يجب أن تبقى متزامنة اليوم، وأيّ جدول <code>suspension_events</code> جديد يحتاج تعبئة ارتداديّة (backfill) لكل حساب معلَّق حاليًّا بسجلّ LEGACY، وإلّا فالتحويل للحساب الفعليّ الجديد يُلغي تعليق حسابات حقيقيّة صامتًا لحظة القطع.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">حملة كبرى 4</span><span class="i-title">D-23 — تقسيم سلسلة التدقيق، لحظة قطع معزولة</span><span class="pill crit">M</span></div>
+  <div class="i-body">🔴 خطر اكتُشِف: أيّ معاملة بدأت قبل النشر وتُنهي بعده (نشر متدرّج) قد تكتب على السلسلة القديمة الموحَّدة بينما نسخ جديدة تكتب على سلاسل مقسَّمة — يكسر قابليّة التحقّق صامتًا عند الحدّ الزمنيّ بلا أيّ خطأ ظاهر. <b>يجب ألّا يُشحَن في نفس نافذة نشر أيّ إصلاح آخر عالي حجم الكتابة</b>، ويحتاج لحظة قطع متزامنة صريحة (نافذة كتابة واحدة).</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">حملة كبرى 5</span><span class="i-title">D-24 — إرساء Merkle/WORM خارجيّ</span><span class="pill crit">L</span></div>
+  <div class="i-body">يعتمد على اكتمال D-23 أوّلاً (لا معنى لتعريف «دفعة» فترة زمنيّة قبل استقرار مخطّط التقسيم).</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">حملة كبرى 6</span><span class="i-title">D-29 — حلّ النزاع الماليّ بأثر حقيقيّ على Ledger</span><span class="pill crit">L</span></div>
+  <div class="i-body">أكبر بناء منطق ماليّ في الخطّة كلّها. يُشحَن بعد استقرار D-25/D-26 (نفس أدوات LedgerService/رصيد المحفظة) لاختبار الأدوات الأساسيّة على سطح أصغر أوّلاً.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">حملة كبرى 7</span><span class="i-title">D-62 — عامل ARQ مخصّص، ترحيل تدريجيّ حسب TTL القفل لا الحجم فقط</span><span class="pill crit">XL</span></div>
+  <div class="i-body">اكتشاف مهمّ: كل الحلقات العشرين تستخدم بالفعل قفل Redis <code>SETNX</code> بمهلة — تصميم آمن للتزامن متعدّد العمليّات من الأساس، ما يجعل الترحيل التدريجيّ أقلّ خطرًا من المتوقَّع (لا تنفيذ مزدوج ممكن هيكليًّا). الترتيب الصحيح: الحلقات منخفضة التردّد أوّلاً (تقارير الأداء)، الحلقات الحرجة للتوصيل (انتهاء العروض، الالتقاط العالق، الإرسال قبل الجاهزيّة — كلّها بمهلة قفل ~55 ثانية) أخيرًا وبحذر شديد، لأنّ خطأ في جدولة ARQ هناك يُنتِج تأخّرًا حقيقيًّا يراه المستخدم بسرعة. يجب ترحيل <code>outbox_relay_loop</code> بالتزامن مع أو قبل تفعيل D-61 (تصادم 5 أعلاه).</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">حملة كبرى 8</span><span class="i-title">D-78 — تبديل افتراضيّ Postgres الشامل لكامل مجموعة الاختبار</span><span class="pill crit">L</span></div>
+  <div class="i-body">مسار موازٍ مستقلّ (تصادم 6 أعلاه) — يبدأ بوضع تقرير فقط لحصر فروقات SQLite/Postgres غير المرتبطة بهذه الخطّة قبل أن يصبح بوّابة حاجبة.</div></div>
+</section>
+
+<section id="p3">
+<div class="phase-band">
+  <div class="phase-title p3"><span class="p-badge">المرحلة 3</span><h3>CI والرصد — كل بند الآن يحمل خطوة تحقّق قبل التفعيل الحاجب</h3></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-71</span><span class="i-title">CI الجوّال — يفشل من اليوم الأوّل، لكن الإصلاح تافه</span><span class="pill info">BUILD · S</span></div>
+  <div class="i-body"><code>typecheck</code> يفشل <b>فعليًّا اليوم</b> (نوعان مفقودان لـ<code>Buffer</code>، ينقصه <code>@types/node</code>) — سطر واحد في tsconfig + تبعيّة واحدة، تُدمَج في نفس PR الذي يضيف المهمّة. lint وtest ناجحان بالفعل، يمكن أن يكونا حاجبَين فورًا.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-72</span><span class="i-title">Playwright — يحتاج فلترة مسارات جديدة كليًّا على هذا المستودع</span><span class="pill info">BUILD · M</span></div>
+  <div class="i-body">لا توجد فلترة <code>paths:</code> في <code>ci.yml</code> على أيّ من الـ11 مهمّة الحاليّة — إضافة هذه المهمّة بلا فلترة تُبطئ <b>كل</b> PR ولو كان تعديلاً خلفيًّا بحتًا. يحتاج نمط <code>paths-filter</code> جديدًا لهذا المستودع تحديدًا (لا نسخًا لموجود).</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-73</span><span class="i-title">حماية الفرع — تدقيق PRs المفتوحة أوّلاً</span><span class="pill gold">PROCESS</span></div>
+  <div class="i-body">تفعيلها فورًا قد يُعلِّق أيّ PR مفتوح حاليًّا بفحص أحمر غير مرتبط لم يكن حاجبًا من قبل — تدقيق حالة الفحوصات لكل PR مفتوح، وتفعيلها في نافذة هادئة الحركة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-78 (تفعيل تدريجيّ)</span><span class="i-title">مرحلة استقرار خاصّة — وضع تقرير أوّلاً</span><span class="pill info">BUILD · L</span></div>
+  <div class="i-body">تشغيل المجموعة كاملة ضدّ Postgres بوضع تقرير غير حاجب أوّلاً لحصر أيّ فشل ناتج عن فروق ضمنيّة بين SQLite وPostgres (تحويل أنواع، قيود خارجيّة غير مفروضة) لا علاقة له بهذه الخطّة، قبل تحويلها لبوّابة فعليّة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-80</span><span class="i-title">بوّابة i18n — 910 مفتاحًا عربيًّا مفقودًا فعليًّا اليوم</span><span class="pill warn">FIX · L (أكبر من المُقدَّر)</span></div>
+  <div class="i-crit">🔴 <code>i18n:status</code> يفشل بالفعل اليوم (910 مفقودًا بالعربيّة، 898 بكلّ من الإنجليزيّة والفرنسيّة) — مقموع فقط بـ<code>continue-on-error</code>. قلب البوّابة الآن يُسقِط كل PR منصّة-عريضة فورًا، لا تراكمًا صغيرًا كما بدا في تقرير 539.</div>
+  <div class="i-fix">✅ شرط القلب: <code>i18n:status</code> يُخرِج 0 محلّيًّا فعليًّا أوّلاً، لا موعد تقويميّ ثابت.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-74</span><span class="i-title">إغلاق دَين العقد المتوارَث — متابعة مُدارة لا PR واحد</span><span class="pill gold">PROCESS · تتبّع</span></div>
+  <div class="i-body">مؤكَّد مباشرة من تعليقات CI: 501 مسارًا غير موثَّق، 91 استدعاء واجهة بلا هدف خلفيّ مطابق. الـratchets غير-ارتداديّة فعليًّا (تمنع دَينًا جديدًا) لكنّها لا تُغلِق الدَين الموروث وحدها — يحتاج سجلّ متابعة بعدد متناقص كهدف كلّ إصدار، لا انتظار إغلاقه دفعة واحدة.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-75</span><span class="i-title">إعادة كتابة ops_test_report.sh بتأكيدات حقيقيّة</span><span class="pill ok">FIX · M</span></div>
+  <div class="i-body">مؤكَّد — سكربت مستقلّ غير مستدعًى من أيّ كود آخر، إعادة كتابة تأكيداته لا تكسر شيئًا سوى كشف فشل كان مخفيًّا.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-76</span><span class="i-title">إعادة كتابة ops_test_v2.sh — إثبات عدم الانعكاس/التسرّب</span><span class="pill ok">FIX · M</span></div>
+  <div class="i-body">مؤكَّد — نفس ملاحظة D-75؛ يُسلسَل مع مسار D-78 (Postgres) لأنّ تأكيدات التزامن الجديدة لا معنى حقيقيًّا لها على SQLite.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-82</span><span class="i-title">تعيين ملاّك بوّابات الإطلاق</span><span class="pill gold">PROCESS-CONFIG</span></div>
+  <div class="i-body">مؤكَّد — إجراء إداريّ صرف على <code>contracts/launch_gates.yaml</code> (كل بوّابة owner: TBD اليوم)، بلا أيّ كود أو خطر نشر.</div></div>
+
+  <div class="item-card"><div class="i-head"><span class="i-id">D-83</span><span class="i-title">FIN-COR — آليّة دقيقة: تعديل بلا تحديث EXPECTED_HASHES يُسقِط كل نشر لاحق فورًا</span><span class="pill gold">PROCESS-CONFIG · حرِج التسلسل</span></div>
+  <div class="i-crit">🔴 <code>_ai_tools/bin/contract_flag_hash_check.py</code> يحمل القيمة المتوقَّعة كثابت صريح، وهو أوّل خطوة في CI وفي كل نشر (test1/.194/الإنتاج). تعديل <code>last_updated</code> وحده، بلا تحديث هذا الثابت <b>في نفس الالتزام بالضبط</b>، يُسقِط CI فورًا وكل نشر لاحق حتّى يُتتبَّع السبب.</div>
+  <div class="i-fix">✅ التحديثان يجب أن يهبطا في التزام ذرّيّ واحد، مع تشغيل <code>python3 _ai_tools/bin/contract_flag_hash_check.py</code> محلّيًّا وتأكيد PASS <b>قبل</b> الدفع — لا أبدًا في التزامَين منفصلَين أو بين شخصين.</div></div>
+</div>
+</section>
+
+<section id="p4">
+<div class="phase-band">
+  <div class="phase-title p4"><span class="p-badge">المرحلة 4</span><h3>Control Plane — بلا تغيير جوهريّ عن تقرير 539</h3></div>
+  <p class="phase-desc">لم تكشف المحاكاة مخاطر جديدة في هذه المرحلة تحديدًا لأنّها لم تبدأ بعد — أيّ عمل بالضبط في هذا النطاق يحتاج جولة محاكاة خاصّة به عند الاقتراب من التنفيذ الفعليّ.</p>
+  <div class="plain"><div class="ic">ℹ️</div><p>D-52 (ورشة إعادة تشغيل DLQ كاملة)، D-53 (محرّك حالة موحَّد)، ومكوّنات Control Plane الستّة من تقرير 539 تبقى كما هي — أُجِّلت عمدًا حتّى تثبت المراحل 1-3 الأنماط الأساسيّة (وضع الظلّ، Governed Action، الحجز الذريّ) في الإنتاج فعليًّا.</p></div>
+</div>
+</section>
+
+<section id="table">
+  <span class="section-eyebrow">📋 الجدول النهائي المُحدَّث</span>
+  <h2>كل نقطة، تصنيفها بعد المحاكاة، وموقعها في الخطّة المنقَّحة</h2>
+  <div class="table-wrap">
+  <table class="compact">
+    <tr><th>#</th><th>التصنيف بعد المحاكاة</th><th>الجهد المُحدَّث</th><th>المرحلة/الحملة</th><th>ملاحظة الجولة الثانية — لكل نقطة على حدة</th></tr>
+    <tr><td>D-01</td><td>FIX</td><td>S</td><td>0</td><td>تصادم بيانات مؤكَّد فعليًّا (تعليق R-360-01 يوثّقه) — هجرة ذاتيّة الشفاء + فهرس CONCURRENTLY</td></tr>
+    <tr><td>D-02</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — تصميم 539 يصمد، لا خطر نشر جديد</td></tr>
+    <tr><td>D-03</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — تصميم 539 يصمد، يُشحَن مع D-67 (نفس المحلِّل)</td></tr>
+    <tr><td>D-04</td><td>BUILD</td><td>M</td><td>1</td><td>مؤكَّد — مفتاح إيقاف فوريّ يُغلِّف مسار الإرسال الجديد</td></tr>
+    <tr><td>D-05</td><td>BUILD</td><td>M</td><td>1</td><td>مؤكَّد — نفس مفتاح الإيقاف يغطّي هذا المسار، لا بناء منفصل</td></tr>
+    <tr><td>D-06</td><td>BUILD</td><td><b>M+ (أوسع)</b></td><td>2</td><td>يمسّ <code>wallet_security_router.py</code> وdriver_phone_change_router.py أيضًا — enum الغرض يجب أن يمتدّ ليشملهما</td></tr>
+    <tr><td>D-07</td><td>BUILD</td><td>M+</td><td>2</td><td>سجلّ واحد ذريّ يخدم D-06 وD-07 معًا — نفس التوسّع لـ4 ملفّات</td></tr>
+    <tr><td>D-08</td><td>FIX</td><td>S (منسَّق)</td><td>0</td><td>يحتاج تنسيقًا خلفيًّا+أماميًّا في PR واحد — <code>web/src/api/types.ts</code> يُعرِّف الحقل إلزاميًّا اليوم</td></tr>
+    <tr><td>D-09</td><td>BUILD</td><td>XL</td><td><b>حملة كبرى 1 (مع D-56)</b></td><td>84 ملفًّا مؤكَّدة — مدمج مع D-56 في حملة واحدة الآن</td></tr>
+    <tr><td>D-10</td><td>FIX</td><td>S</td><td>1</td><td>مؤكَّد — يعيد استخدام نمط fail-closed نفسه المستخدَم لـD-15، لا بنية جديدة</td></tr>
+    <tr><td>D-11</td><td>BUILD 🔒</td><td>L</td><td><b>حملة كبرى 2</b></td><td>يبتلع D-12/13/14 في إعادة تصميم موحَّد لتفادي إعادة كتابة create_ops_account مرّتَين</td></tr>
+    <tr><td>D-12</td><td>FIX</td><td>مدمج في حملة 2</td><td>حملة كبرى 2</td><td>لم يعد بندًا مستقلاًّ — ذريّة الحساب+الصلاحيّات تُبنى ضمن إعادة تصميم D-11 نفسها</td></tr>
+    <tr><td>D-13</td><td>FIX</td><td>مدمج في حملة 2</td><td>حملة كبرى 2</td><td>رفض القائمة كاملة عند صلاحيّة غير صالحة — جزء من نفس إعادة التصميم</td></tr>
+    <tr><td>D-14</td><td>FIX</td><td>مدمج في حملة 2</td><td>حملة كبرى 2</td><td>التدقيق داخل نفس المعاملة — جزء من نفس إعادة التصميم، لا except:pass بعد الآن</td></tr>
+    <tr><td>D-15</td><td>FIX</td><td>S</td><td>0</td><td>خطر «قفل الذات» غير ممكن أصلاً — <code>promote_ops_account</code> يرفض استهداف الفاعل لنفسه صراحةً (403) بالفعل</td></tr>
+    <tr><td>D-16</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — نقل التدقيق لنفس معاملة D-15، لا مخاطر إضافية</td></tr>
+    <tr><td>D-17</td><td>BUILD</td><td>M-L</td><td><b>حملة كبرى 3</b></td><td>مزامنة 3 أنظمة (is_suspended، User.status، مفتاح Redis) + تعبئة ارتداديّة إلزاميّة لكل حساب معلَّق حاليًّا</td></tr>
+    <tr><td>D-18</td><td>BUILD</td><td>M</td><td>2</td><td>مؤكَّد — يستهلك جدول Governed Action، لا مخاطر جديدة تتجاوز التصميم الأصليّ</td></tr>
+    <tr><td>D-19</td><td>FIX</td><td>S</td><td>0</td><td>فحص تكرار reference مسبق إلزاميّ — السباق الحاليّ قد يكون أنتج تكرارات فعليّة بالفعل</td></tr>
+    <tr><td>D-20</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — تغيير نصّ زرّ فقط، بلا أثر على أيّ مسار آخر</td></tr>
+    <tr><td>D-21</td><td>BUILD</td><td>M</td><td>1</td><td>عيب created_at مكتشَف (يُقرَأ فارغًا قبل التوليد) — يحتاج إصلاحًا مطابقًا لعيب id السابق نفسه</td></tr>
+    <tr><td>D-22</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — لا تغيير عن التصميم الأصليّ، العمود أصلًا String(64)</td></tr>
+    <tr><td>D-23</td><td>BUILD</td><td>M</td><td><b>حملة كبرى 4 (معزولة)</b></td><td>خطر قطع صامت للمعاملات العابرة لحظة النشر — لا تُشحَن مع أيّ إصلاح كثيف الكتابة آخر</td></tr>
+    <tr><td>D-24</td><td>BUILD</td><td>L</td><td><b>حملة كبرى 5</b></td><td>تعتمد على اكتمال D-23 أوّلاً — لا معنى لتعريف «الدفعة» قبل استقرار التقسيم</td></tr>
+    <tr><td>D-25</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد آمن — نمط <code>ReconciliationException</code> يعمل بـSAVEPOINT لا يُسقِط المعاملة الخارجيّة</td></tr>
+    <tr><td>D-26</td><td>FIX</td><td>S</td><td>0</td><td>لا كاسر مؤكَّد لمسار مبرمَج — لكن يُشحَن بتحذير/مقياس لدورة واحدة تحسّبًا لعمليّة يدويّة غير موثَّقة</td></tr>
+    <tr><td>D-27</td><td>BUILD</td><td>M</td><td>2</td><td>مؤكَّد — يعتمد على بنية الحرّاس من حملة D-09+D-56، لا مخاطر بيانات/تزامن مستقلّة</td></tr>
+    <tr><td>D-28</td><td>FIX</td><td>S-M</td><td>0</td><td>لا خطر تعليق (deadlock) مكتشَف بين هذا القفل وقفل update_chargeback_state الحاليّ — يحتاج تأكيدًا إضافيًّا فقط على reverse_commission_for_order</td></tr>
+    <tr><td>D-29</td><td>BUILD</td><td>L</td><td><b>حملة كبرى 6</b></td><td>أكبر بناء منطق ماليّ في الخطّة — يُشحَن بعد استقرار D-25/D-26 على نفس أدوات Ledger</td></tr>
+    <tr><td>D-30</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — قفل إضافيّ صرف، بلا منطق جديد، بلا خطر تعليق</td></tr>
+    <tr><td>D-31</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد منخفض الخطر — سكربت يدويّ وحيد المستدعي، لا فرض حيّ</td></tr>
+    <tr><td>D-32</td><td>FIX</td><td><b>L (أعلى)</b></td><td>2</td><td>تصميم UPSERT الساذج معطوب فعليًّا لبنية معاملات هذا المشروع — جلسة منفصلة قصيرة + استرجاع ركود</td></tr>
+    <tr><td>D-33</td><td>FIX</td><td>L</td><td>2</td><td>يُصلَح بنفس تصميم D-32 (واجهة الحجز الطويل)، لا منفصل</td></tr>
+    <tr><td>D-34</td><td>FIX</td><td>M</td><td>2</td><td>فشل-مغلَق حقيقيّ — يحتاج تمييز BLOCKED عن UNKNOWN_RETRY_LATER كي لا يوقف كل الحذف منصّة-عريضة على عطل عابر</td></tr>
+    <tr><td>D-35</td><td>FIX</td><td>M</td><td>2</td><td>مدمجة في نفس إعادة كتابة دالّة الأهليّة الموحَّدة — تحتاج مسار إلغاء/إشعار لحالات الحذف المعلَّق حاليًّا</td></tr>
+    <tr><td>D-36</td><td>FIX</td><td>M</td><td>2</td><td>مدمجة في نفس إعادة الكتابة — فحص الدَين/المحجوز يُضاف لنفس الدالّة</td></tr>
+    <tr><td>D-37</td><td>FIX</td><td>M</td><td>2</td><td>مدمجة في نفس إعادة الكتابة — استعلام كل المزوّدين المملوكين لا واحد فقط</td></tr>
+    <tr><td>D-38</td><td>FIX/BUILD</td><td>M</td><td>2</td><td>⚠️ نطاق غير مُغلَق نهائيًّا — <code>finance_router.py</code> لم يُتحقَّق منه بعد؛ إن كان يعرض تقريرًا من نفس الاتحاد القديم فالنطاق يتّسع لملفّ ثانٍ</td></tr>
+    <tr><td>D-39</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — تغيير نصّ واجهة فقط، ترتيب النشر خلفيّ-ثمّ-أماميّ إن احتاج نقطة نهاية جديدة</td></tr>
+    <tr><td>D-40</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — يحتاج نقطة نهاية سياسة الحدود لتُنشَر قبل بناء الواجهة التي تستدعيها</td></tr>
+    <tr><td>D-41</td><td>FIX</td><td>S</td><td>2</td><td>مؤكَّد — يستهلك واجهة الحجز القصير من البنية المشتركة، معزول تمامًا لا مستهلكين آخرين</td></tr>
+    <tr><td>D-42</td><td>BUILD</td><td><b>L (أعلى)</b></td><td>2</td><td>100% من مزوّدي POS الحيّين اليوم بلا تعيين SKU — تدرّج توسيع→تحذير→إنفاذ إلزاميّ لا قطع فوريّ</td></tr>
+    <tr><td>D-43</td><td>BUILD</td><td>M</td><td>2</td><td>يتبع D-42 حتمًا — لا معنى لقفل تفاؤليّ على هويّة نسخة غامضة</td></tr>
+    <tr><td>D-44</td><td>BUILD</td><td>M</td><td>2</td><td>وضع ظلّ (تسجيل فقط) أوّلاً إلزاميّ — عناوين POS الحيّة الفعليّة غير معروفة من الكود وحده</td></tr>
+    <tr><td>D-45</td><td>BUILD</td><td><b>M (أقلّ)</b></td><td>2</td><td>Fernet لا KMS — نطاق أضيق (5 مواقع قراءة/كتابة فقط) + قراءة مزدوجة أثناء تعبئة الانتقال</td></tr>
+    <tr><td>D-46</td><td>BUILD</td><td>L</td><td>2</td><td>إعادة-تحقّق-عند-التنفيذ إلزاميّة — عيب جديد اكتشفه الفصل نفسه بين الموافقة والتنفيذ (لم يكن موجودًا في الكود الذريّ الحاليّ)</td></tr>
+    <tr><td>D-47</td><td>FIX</td><td>M</td><td>2</td><td>مؤكَّد — استعلام مجمَّع واحد بدل N+1، بلا تغيير عن التصميم الأصليّ</td></tr>
+    <tr><td>D-48</td><td>FIX (فوريّ)</td><td>S</td><td>2</td><td>مؤكَّد — إزالة الادّعاء الكاذب فورًا، لا مستهلكين آليّين للاستجابة الحاليّة يكسرهم هذا</td></tr>
+    <tr><td>D-49</td><td>BUILD</td><td>M</td><td>2</td><td>يستهلك خطّاف إعادة-التحقّق من البنية المشتركة أيضًا — نفس نمط D-46 بالضبط</td></tr>
+    <tr><td>D-50</td><td>BUILD 🔒</td><td>L</td><td>2</td><td>مؤكَّد — يحتاج إذنًا صريحًا منفصلاً لأنّه يعكس قرارًا تشغيليًّا سابقًا موثَّقًا (2026-06-01)</td></tr>
+    <tr><td>D-51</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — إصلاح معزول تمامًا، لا يمسّ D-50 إطلاقًا</td></tr>
+    <tr><td>D-52</td><td>FIX (جزئيّ) + BUILD (كامل)</td><td>S ثمّ L</td><td>0 ثمّ 4</td><td>مؤكَّد — صفر مستدعين آليّين لهذه الدالّة (3 ملفّات اختبار فقط)، آمن للشحن الجزئيّ فورًا</td></tr>
+    <tr><td>D-53</td><td>BUILD</td><td>XL</td><td>4</td><td>مؤكَّد — نطاق P2 كما هو، بلا مسار جزئيّ رخيص يستحقّ الشحن الآن</td></tr>
+    <tr><td>D-54</td><td>FIX</td><td><b>S/M (أقلّ، منقولة)</b></td><td><b>0 (كانت 2)</b></td><td><code>GET /me/permissions</code> موجودة وتعمل بالفعل — إصلاح أماميّ خالص الآن، لا اعتماديّة على D-09</td></tr>
+    <tr><td>D-55</td><td>FIX</td><td>S/M</td><td>0</td><td>نفس التصحيح — يستهلك نقطة النهاية الموجودة، فشل مغلَق + بيان مسارات مولَّد</td></tr>
+    <tr><td>D-56</td><td>FIX</td><td>M</td><td><b>حملة كبرى 1 (مع D-09)</b></td><td>حيلة توافقيّة متعمَّدة موثَّقة في الكود — ~130 نقطة نهاية، بحجم D-09 تقريبًا لا تعديلًا صغيرًا</td></tr>
+    <tr><td>D-57</td><td>BUILD</td><td>M</td><td>1</td><td>23 موقع استدعاء فعليّ (لا 14+) — فحص فروقات YAML/DB إلزاميّ قبل الترحيل</td></tr>
+    <tr><td>D-58</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — بلا تغيير عن التصميم الأصليّ</td></tr>
+    <tr><td>D-59</td><td>FIX</td><td>S (إصدار تحذير)</td><td>1</td><td>خطر إسقاط إقلاع الإنتاج حقيقيّ — يُشحَن أوّلاً كتحذير خلف علَم اختياريّ، لا فشلاً صارمًا مباشرًا</td></tr>
+    <tr><td>D-60</td><td>FIX</td><td>S (إصدار تحذير)</td><td>1</td><td>نفس نمط D-59 بالضبط، في نفس الدالّة، نفس الإصدارَين</td></tr>
+    <tr><td>D-61</td><td>FIX</td><td>S (إصدار تحذير)</td><td>1</td><td>نفس النمط + قيد تسلسل إضافيّ: لا يُفعَّل قبل ترحيل outbox_relay_loop ضمن حملة D-62</td></tr>
+    <tr><td>D-62</td><td>BUILD</td><td>XL</td><td><b>حملة كبرى 7</b></td><td>قفل SETNX موجود بالفعل على كل الحلقات العشرين — يمنع تنفيذًا مزدوجًا هيكليًّا، أخفّ خطرًا من المتوقَّع</td></tr>
+    <tr><td>D-63</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — يُنفَّذ بالتوازي مع ترحيل D-62، بلا تغيير عن التصميم الأصليّ</td></tr>
+    <tr><td>D-64</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد خامل حاليًّا فعليًّا — خدمة migrate تضمن التطبيق دائمًا، تحصين دفاعيّ فقط</td></tr>
+    <tr><td>D-65</td><td>FIX</td><td>M</td><td>0</td><td>قصور القاطع لكل نسخة (per-instance) مقبول ومُوثَّق صراحةً في الكود — لا يُحَلّ الآن، الطوبولوجيا الحاليّة نسخة واحدة فقط</td></tr>
+    <tr><td>D-66</td><td>FIX</td><td>M</td><td>0</td><td>مؤكَّد بلا انحدار أداء حقيقيّ — nginx يبقى الحاجز الفعليّ لأيّ حال</td></tr>
+    <tr><td>D-67</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — يُشحَن مع D-03 (نفس المحلِّل بالضبط)</td></tr>
+    <tr><td>D-68</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — بلا تغيير عن التصميم الأصليّ</td></tr>
+    <tr><td>D-69</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — بلا تغيير عن التصميم الأصليّ</td></tr>
+    <tr><td>D-70</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد أرخص ممّا يبدو — نقطة تبديل جاهزة أصلاً في الكود، ليست تصميمًا جديدًا</td></tr>
+    <tr><td>D-71</td><td>BUILD</td><td>S</td><td>3</td><td>typecheck يفشل اليوم فعليًّا (@types/node مفقودة) — إصلاح تافه بنفس PR الذي يضيف المهمّة</td></tr>
+    <tr><td>D-72</td><td>BUILD</td><td>M</td><td>3</td><td>يحتاج نمط paths-filter جديدًا كليًّا على هذا المستودع (لا يوجد أيّ فلترة مسارات في ci.yml اليوم)</td></tr>
+    <tr><td>D-73</td><td>PROCESS</td><td>—</td><td>3</td><td>تدقيق حالة كل PR مفتوح حاليًّا إلزاميّ قبل التفعيل — قد يُعلِّق عملاً غير مرتبط بفحص لم يكن حاجبًا من قبل</td></tr>
+    <tr><td>D-74</td><td>PROCESS</td><td>—</td><td>3</td><td>مؤكَّد مباشرة من تعليقات CI: 501 مسارًا غير موثَّق، 91 فجوة واجهة/خلفيّة — الـratchets غير-ارتداديّة فعليًّا، لا تُغلِق الدَين الموروث وحدها</td></tr>
+    <tr><td>D-75</td><td>FIX</td><td>M</td><td>3</td><td>مؤكَّد — سكربت مستقلّ، إعادة كتابته لا تكسر أيّ مستدعٍ آخر</td></tr>
+    <tr><td>D-76</td><td>FIX</td><td>M</td><td>3</td><td>نفس التأكيد — يُسلسَل مع D-78 لأنّ تأكيدات التزامن تحتاج Postgres حقيقيًّا لتكون ذات معنى</td></tr>
+    <tr><td>D-77</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — تعديل معزول على نفس السكربت، بلا مخاطر إضافية</td></tr>
+    <tr><td>D-78</td><td>BUILD</td><td>L</td><td><b>حملة كبرى 8 (معزولة)</b></td><td>خطر موجة أعطال غير مرتبطة عبر كامل مجموعة الاختبار (3800+) — وضع تقرير أوّلاً، لا بوّابة حاجبة فورًا</td></tr>
+    <tr><td>D-79</td><td>✅ مُغلَقة هذه الجلسة</td><td>—</td><td>—</td><td>README.md صُحِّح فعليًّا — لا حاجة لأيّ عمل إضافيّ</td></tr>
+    <tr><td>D-80</td><td>FIX</td><td><b>L (أعلى)</b></td><td>3</td><td>910 مفتاحًا عربيًّا مفقودًا فعليًّا اليوم (i18n:status يفشل الآن) — شرط القلب: الأمر يُخرِج صفرًا محلّيًّا أوّلاً، لا موعد تقويميّ</td></tr>
+    <tr><td>D-81</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — مكوّن معزول، بلا مستهلكين آخرين</td></tr>
+    <tr><td>D-82</td><td>PROCESS</td><td>—</td><td>3</td><td>مؤكَّد — إجراء تعيين ملاّك إداريّ صرف، بلا كود</td></tr>
+    <tr><td>D-83</td><td>PROCESS</td><td>—</td><td>3</td><td>آليّة حرِجة مؤكَّدة بدقّة: EXPECTED_HASHES ثابت صريح في سكربت الفحص — تعديل منفصل يُسقِط كل نشر لاحق فورًا</td></tr>
+    <tr><td>D-84</td><td>FIX</td><td>S</td><td>0</td><td>مؤكَّد — مكوّن معزول، بلا مستهلكين آخرين لنفس الدالّة</td></tr>
+    <tr><td>D-85</td><td>FIX</td><td>M</td><td>0</td><td>CREATE INDEX CONCURRENTLY تحديدًا لا فهرسًا حاجبًا عاديًّا — تفصيل لم يذكره التصميم الأصليّ</td></tr>
+  </table>
+  </div>
+</section>
+
+<footer>
+  <p class="faint">تقرير 540 — المراجعة الثانية الأعمق. مبنيّ على تقرير 539 (الخريطة الأولى) + 7 فرق محاكاة ذهنية مستقلّة + تحليل تصادم شخصيّ عبر العناقيد السبعة. مرحلة تخطيط فقط — لا تنفيذ حتّى الآن، بانتظار مراجعة المستخدم.</p>
+</footer>
+
+</div>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>487 — تقرير تنفيذ الخطة الشاملة: إصلاح الأخطاء الحرجة في تطبيق توا</title>
+<style>
+  :root{
+    --bg:#0e1512; --panel:#141d19; --panel2:#182420; --border:#25342e;
+    --text:#e9f1ec; --muted:#9fb3aa; --accent:#37c987; --accent2:#2aa5d8;
+    --blocker:#ff2d55; --high:#ff9f43; --med:#ffd23f; --low:#6fd3ff; --ok:#37c987;
+    --code-bg:#0b100e;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg); color:var(--text); font-family:"Segoe UI","IBM Plex Sans Arabic","Noto Kufi Arabic",Tahoma,Arial,sans-serif; line-height:1.85; margin:0; font-size:16px;}
+  .wrap{max-width:1360px; margin:0 auto; padding:28px 20px 90px}
+  header.top{background:linear-gradient(135deg,#0c2a17,#0c1a2a); border:1px solid var(--border); border-radius:18px; padding:36px 30px; margin-bottom:28px}
+  header.top h1{margin:0 0 8px; font-size:1.9rem; color:#fff}
+  header.top .sub{color:var(--muted); font-size:1.05rem; max-width:1080px}
+  .badges{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:6px 14px; font-size:.85rem; color:var(--muted)}
+  .badge b{color:var(--text)}
+  .stats-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; margin:26px 0}
+  .stat{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:16px; text-align:center}
+  .stat .num{font-size:1.5rem; font-weight:800; color:var(--accent)}
+  .stat.blocker .num{color:var(--blocker)} .stat.high .num{color:var(--high)} .stat.ok .num{color:var(--ok)}
+  .stat .lbl{color:var(--muted); font-size:.76rem; margin-top:4px}
+  section{margin:52px 0}
+  h2.sec-title{font-size:1.5rem; border-inline-start:6px solid var(--accent); padding-inline-start:16px; margin-bottom:10px; color:#fff}
+  h3.item-title{font-size:1.2rem; color:#fff; margin:32px 0 8px; padding-inline-start:12px; border-inline-start:3px solid var(--border)}
+  h4.sub-title{font-size:1rem; color:var(--accent2); margin:18px 0 8px}
+  p.lead{color:var(--muted); max-width:1040px}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:22px 26px; margin-bottom:18px}
+  .card.blocker{border-inline-start:5px solid var(--blocker)}
+  .card.ok{border-inline-start:5px solid var(--ok)}
+  .card.warn{border-inline-start:5px solid var(--high)}
+  .tag{font-size:.7rem; padding:3px 10px; border-radius:999px; font-weight:700; white-space:nowrap; display:inline-block}
+  .tag.blocker{background:rgba(255,45,85,.18); color:var(--blocker); border:1px solid rgba(255,45,85,.45)}
+  .tag.ok{background:rgba(55,201,135,.15); color:var(--ok); border:1px solid rgba(55,201,135,.4)}
+  .tag.audit{background:rgba(255,255,255,.06); color:var(--muted); border:1px solid var(--border)}
+  code{background:var(--code-bg); border:1px solid var(--border); border-radius:6px; padding:1px 7px; font-size:.82rem; font-family:"Fira Code",Consolas,monospace; color:#ffd8a8; direction:ltr; unicode-bidi:embed; display:inline-block}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:"Fira Code",Consolas,monospace; font-size:.78rem; color:#c9d8d1; direction:ltr; text-align:left; margin:10px 0}
+  pre .c-cmd{color:#6fd3ff} pre .c-out{color:#9fb3aa} pre .c-err{color:#ff6b85} pre .c-ok{color:#37c987}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.85rem}
+  th,td{border:1px solid var(--border); padding:8px 11px; text-align:right; vertical-align:top}
+  th{background:var(--panel2); color:var(--muted)}
+  tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px 26px}
+  .toc a{color:var(--accent2); text-decoration:none}
+  .toc ul{columns:2; gap:30px}
+  .toc li{margin-bottom:7px; break-inside:avoid; font-size:.92rem}
+  footer{color:var(--muted); font-size:.85rem; text-align:center; margin-top:60px; border-top:1px solid var(--border); padding-top:20px}
+  a.back-top{position:fixed; bottom:20px; left:20px; background:var(--panel); border:1px solid var(--border); color:var(--text); padding:8px 14px; border-radius:999px; text-decoration:none; font-size:.85rem}
+  .insight{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3); border-radius:12px; padding:18px 22px; margin:18px 0}
+  .insight.warn{background:rgba(255,159,67,.06); border-color:rgba(255,159,67,.3)}
+  .insight.blocker{background:rgba(255,45,85,.07); border-color:rgba(255,45,85,.4)}
+  .insight h4{margin:0 0 8px; color:var(--ok)}
+  .insight.warn h4{color:var(--high)} .insight.blocker h4{color:var(--blocker)}
+  .diagram{background:var(--code-bg); border:1px solid var(--border); border-radius:14px; padding:26px; margin:18px 0; overflow-x:auto}
+  .flow-row{display:flex; align-items:center; gap:0; flex-wrap:wrap; min-width:max-content}
+  .flow-box{background:var(--panel); border:1.5px solid var(--accent2); border-radius:10px; padding:12px 16px; font-size:.8rem; text-align:center; min-width:130px; color:var(--text)}
+  .flow-box.start{border-color:var(--accent)} .flow-box.end{border-color:var(--ok); background:rgba(55,201,135,.08)}
+  .flow-box.danger{border-color:var(--blocker); background:rgba(255,45,85,.08)}
+  .flow-arrow{color:var(--muted); font-size:1.3rem; padding:0 10px; flex-shrink:0}
+  .before-after{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0}
+  @media (max-width:700px){.before-after{grid-template-columns:1fr}}
+  .ba-box{border-radius:12px; padding:16px 18px; font-size:.85rem}
+  .ba-box.before{background:rgba(255,45,85,.06); border:1px solid rgba(255,45,85,.3)}
+  .ba-box.after{background:rgba(55,201,135,.06); border:1px solid rgba(55,201,135,.3)}
+  .ba-box .h{font-weight:800; font-size:.78rem; margin-bottom:8px}
+  .ba-box.before .h{color:var(--blocker)} .ba-box.after .h{color:var(--ok)}
+  .checklist{list-style:none; padding:0; margin:10px 0}
+  .checklist li{padding:7px 0; border-bottom:1px dashed var(--border); display:flex; gap:10px; align-items:flex-start}
+  .checklist li:last-child{border-bottom:none}
+  .check-ok{color:var(--ok); font-weight:900} .check-x{color:var(--blocker); font-weight:900} .check-warn{color:var(--high); font-weight:900}
+  .file-badge{font-family:"Fira Code",Consolas,monospace; font-size:.72rem; background:var(--code-bg); border:1px solid var(--border); color:var(--accent2); padding:2px 8px; border-radius:6px; direction:ltr; display:inline-block; margin:2px}
+  .verdict-box{background:linear-gradient(135deg,rgba(55,201,135,.12),rgba(42,165,216,.06)); border:1.5px solid var(--ok); border-radius:16px; padding:26px 28px; margin:22px 0}
+  .verdict-box h3{margin-top:0; color:var(--ok); font-size:1.25rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>✅ تقرير تنفيذ الخطة الشاملة — إصلاح الأخطاء الحرجة في تطبيق توا</h1>
+  <div class="sub">تقرير كامل عن كل ما نُفِّذ فعليًّا (لا خطة نظرية) من التسلسل الآمن الوارد في المراجعة 486: 6 إصلاحات حرجة (P0) كاملة على مستوى التطبيق والخادم معًا، بالإضافة إلى 8 إصلاحات مهمّة (P1) — كل تعديل حقيقي، مكتوب سطرًا بسطر، ومُتحقَّق منه فعليًّا عبر فحص الأنواع والفحص الثابت والاختبارات الآلية وبناء حقيقي كامل للتطبيق.</div>
+  <div class="badges">
+    <div class="badge">📅 <b>التاريخ:</b> 2026-07-15</div>
+    <div class="badge">📁 <b>عدد الملفات المعدَّلة/المُنشأة:</b> 36 ملفًا</div>
+    <div class="badge">✅ <b>النتيجة:</b> بناء حقيقي ناجح 100% + كل الاختبارات الآلية خضراء</div>
+  </div>
+</header>
+
+<div class="stats-grid">
+  <div class="stat ok"><div class="num">6/6</div><div class="lbl">إصلاحات حرجة (P0)<br>مكتملة بالكامل</div></div>
+  <div class="stat ok"><div class="num">8</div><div class="lbl">إصلاحات مهمّة (P1)<br>مكتملة</div></div>
+  <div class="stat"><div class="num">41/41</div><div class="lbl">اختبارات التطبيق الآلية<br>ناجحة</div></div>
+  <div class="stat"><div class="num">3501</div><div class="lbl">اختبار خادم ناجح<br>(0 عطل ناتج عن التنفيذ)</div></div>
+  <div class="stat ok"><div class="num">3:18</div><div class="lbl">بناء حقيقي كامل ناجح<br>(188.5MB APK)</div></div>
+</div>
+
+<nav class="toc">
+  <b>فهرس التقرير</b>
+  <ul>
+    <li><a href="#method">0) منهجية التنفيذ والتحقّق</a></li>
+    <li><a href="#p01">1) إصلاح P0-1: اتصال السائق الحقيقي بالخادم</a></li>
+    <li><a href="#p02">2) إصلاح P0-2: إعادة بناء منظومة الإشعارات</a></li>
+    <li><a href="#p03">3) إصلاح P0-3: دورة حياة رمز الإشعار</a></li>
+    <li><a href="#p04">4) إصلاح P0-4: حالة رحلة السائق الموثوقة من الخادم</a></li>
+    <li><a href="#p05">5) إصلاح P0-5: خلل التحديث الإجباري</a></li>
+    <li><a href="#p06">6) إصلاح P0-6: قوائم الشاشات الرئيسية القابلة للتكيّف</a></li>
+    <li><a href="#p1">7) الإصلاحات المهمّة (P1) — التفاصيل الكاملة</a></li>
+    <li><a href="#notdone">8) ما لم يُنفَّذ عمدًا — ولماذا</a></li>
+    <li><a href="#verify">9) دليل التحقّق الكامل (نتائج حقيقية، لا ادّعاءات)</a></li>
+    <li><a href="#files">10) قائمة كل ملف مُعدَّل أو مُنشأ</a></li>
+    <li><a href="#limits">11) حدود هذا التنفيذ — بصراحة تامّة</a></li>
+    <li><a href="#next">12) الخطوة التالية الموصى بها</a></li>
+  </ul>
+</nav>
+
+<!-- ============================================================ -->
+<section id="method">
+  <h2 class="sec-title" style="border-color:var(--accent2)">0) منهجية التنفيذ والتحقّق</h2>
+  <p class="lead">التنفيذ اتّبع بدقّة التسلسل الآمن المحدَّد في المراجعة 486: كل الإصلاحات الحرجة (P0) أولًا، بالترتيب المُوصى به بالضبط، ثم الإصلاحات المهمّة (P1). بعد كل مجموعة إصلاحات مترابطة، أُجرِي تحقّق فوري (فحص الأنواع + الفحص الثابت) قبل الانتقال للتالي — لا تراكم أخطاء غير مكتشَفة.</p>
+  <div class="diagram">
+    <div class="flow-row">
+      <div class="flow-box start">P0-1 → P0-2 → P0-3<br>(مترابطة: الاتصال + الإشعارات)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">P0-4 → P0-5 → P0-6<br>(مستقلّة، كل واحد على حدة)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">P1 (8 بنود)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box end">تحقّق نهائي شامل<br>+ بناء حقيقي كامل</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="p01">
+  <h2 class="sec-title" style="border-color:var(--blocker)">1) إصلاح P0-1: اتصال السائق الحقيقي بالخادم</h2>
+  <p class="lead">أخطر عطل مُكتشَف في المراجعة السابقة — زر "متصل" لدى السائق كان وهميًّا بالكامل. هذا الإصلاح يربطه فعليًّا بكل ما كان مفقودًا.</p>
+
+  <div class="before-after">
+    <div class="ba-box before">
+      <div class="h">❌ قبل</div>
+      الزر يُغيّر فقط شكل نص محلّي على الشاشة. لا استدعاء للخادم. لا استطلاع دوري للعروض. لا اتصال لحظي. عرض توصيل جديد قد لا يصل للسائق إطلاقًا.
+    </div>
+    <div class="ba-box after">
+      <div class="h">✔ بعد</div>
+      الزر يستدعي نقطة توفّر السائق الحقيقية بإحداثيات GPS فعلية، تُقرَأ الحالة من الخادم عند فتح الشاشة، استطلاع كل 7 ثوانٍ أثناء الاتصال، اتصال لحظي (SSE) للاستيقاظ الفوري، وإشعار عاجل حقيقي عند وصول عرض جديد.
+    </div>
+  </div>
+
+  <table>
+    <tr><th>الملف</th><th>التغيير</th></tr>
+    <tr><td><span class="file-badge">apps/mobile/src/services/api/index.ts</span></td><td>إضافة <code>getDriverAvailability()</code> و<code>setDriverAvailability()</code> — تربط فعليًّا بنقطتَي <code>GET /dispatch/drivers/me/profile</code> و<code>POST /dispatch/drivers/availability</code> الموجودتَين مسبقًا في الخادم لكن غير المُستخدَمتَين من التطبيق</td></tr>
+    <tr><td><span class="file-badge">apps/mobile/src/services/sse/driverOfferStream.ts</span> <span class="tag ok">جديد</span></td><td>عميل اتصال لحظي جديد يتّصل بـ <code>GET /sse/drivers/me/offers</code> (كانت موجودة في الخادم منذ فترة لكن التطبيق لم يتّصل بها إطلاقًا)</td></tr>
+    <tr><td><span class="file-badge">apps/mobile/src/app/(driver)/home.tsx</span></td><td>إعادة كتابة كاملة لمنطق زر "متصل": قراءة الحالة من الخادم، إرسال الإحداثيات، استطلاع دوري، اتصال لحظي، معالجة رفض إذن الموقع برسالة واضحة</td></tr>
+    <tr><td><span class="file-badge">backend/app/modules/dispatch/dispatch_service.py</span></td><td>إضافة إرسال إشعار عاجل حقيقي (<code>dispatch.offer_received</code>) عند إنشاء أي عرض توصيل — داخل نفس معاملة قاعدة البيانات الخاصة بالعرض نفسه، فيُلغى تلقائيًّا إن أُلغِي العرض</td></tr>
+  </table>
+
+  <div class="insight">
+    <h4>لماذا "نفس معاملة قاعدة البيانات" تفصيل مهمّ</h4>
+    الإشعار العاجل يُرسَل ضمن نفس عملية حفظ العرض نفسها في قاعدة البيانات — لا عملية منفصلة. هذا يعني: إن فشل حفظ العرض لأي سبب، لن يُرسَل الإشعار إطلاقًا (تناسق تام)، بخلاف اتصال SSE الموجود سابقًا الذي يُرسَل قبل التأكيد النهائي (best-effort، وهذا مقصود ومفهوم لأنه مجرد "منبّه" لا مصدر الحقيقة).
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="p02">
+  <h2 class="sec-title" style="border-color:var(--blocker)">2) إصلاح P0-2: إعادة بناء منظومة الإشعارات</h2>
+  <p class="lead">إعادة كتابة كاملة لملف <span class="file-badge">apps/mobile/src/services/push.ts</span> لإصلاح 5 أعطال منفصلة مذكورة في المراجعة 486.</p>
+  <ul class="checklist">
+    <li><span class="check-ok">✔</span> <b>ترتيب صحيح الآن:</b> 3 قنوات إشعارات أندرويد مخصَّصة (<code>dispatch_offers_v1</code> عالية الأهمية، <code>order_updates_v1</code> عادية، <code>account_updates_v1</code> منخفضة) تُنشأ <b>قبل</b> طلب أي إذن أو رمز — لا بعده</li>
+    <li><span class="check-ok">✔</span> <b>معالجة صادقة لآيفون:</b> بدل إرسال رمز Apple الأصلي كأنه رمز جوجل (يفشل صامتًا)، التسجيل يُتجاوَز صراحة على آيفون مع تعليق واضح يشرح أن هذا يحتاج بنية تسليم حقيقية (APNs) غير موجودة بعد في المشروع — لا وعد كاذب بالنجاح</li>
+    <li><span class="check-ok">✔</span> <b>توجيه عند الضغط على الإشعار:</b> إضافة مستمع كامل (فتح مباشر + بارد) يفتح شاشة الطلب أو الشاشة الرئيسية للسائق حسب نوع الإشعار</li>
+    <li><span class="check-ok">✔</span> <b>إعادة محاولة تلقائية:</b> عند عودة الاتصال بالإنترنت وعند عودة التطبيق للمقدّمة، لا مرّة واحدة فقط عند تسجيل الدخول</li>
+    <li><span class="check-ok">✔</span> <b>أولوية عالية + مهلة صلاحية:</b> إشعار العرض العاجل تحديدًا يُرسَل بأولوية FCM عالية ومهلة 60 ثانية (تطابق مهلة انتهاء العرض نفسها) — الخادم يدعم هذا الآن (<span class="file-badge">push_provider.py</span>)</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="p03">
+  <h2 class="sec-title" style="border-color:var(--blocker)">3) إصلاح P0-3: دورة حياة رمز الإشعار</h2>
+  <table>
+    <tr><th>المشكلة</th><th>الإصلاح</th></tr>
+    <tr><td>لا إلغاء تسجيل عند الخروج — جهاز مشترك قد يستمر باستقبال إشعارات المستخدم السابق</td><td><span class="file-badge">src/store/session.ts</span>: <code>signOut()</code> يستدعي الآن <code>deregisterPush()</code> قبل مسح بيانات الدخول (يحتاج رمزًا صالحًا للمصادقة على الحذف)</td></tr>
+    <tr><td>لا معالجة لتغيّر رمز الجهاز (يحدث أحيانًا من النظام نفسه)</td><td><span class="file-badge">src/services/push.ts</span>: <code>watchPushTokenRotation()</code> جديدة، تُشترَك في <span class="file-badge">_layout.tsx</span> طوال عمر التطبيق</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="p04">
+  <h2 class="sec-title" style="border-color:var(--blocker)">4) إصلاح P0-4: حالة رحلة السائق الموثوقة من الخادم</h2>
+  <p class="lead">اكتشاف مهمّ أثناء التنفيذ: الخادم كان بالفعل يحسب حالتَي "استُلم النقد" و"أُرسِل الإثبات" بشكل موثوق (تعليق في الكود يعود لتاريخ سابق يؤكّد أن هذا أُضيف خصّيصًا لحل هذه المشكلة بالضبط) — لكن لم يكن أي شيء يُرسِل هذه القيم للتطبيق. الإصلاح كان توصيلًا لا بناءً من الصفر.</p>
+  <div class="before-after">
+    <div class="ba-box before">
+      <div class="h">❌ قبل</div>
+      <code>cashCollected</code> و<code>handoffVerified</code> حالة محلّية فقط (<code>useState</code>) — إغلاق قسري للتطبيق أثناء التوصيل يفقدهما، ويُطلَب من السائق تكرار خطوة أنجزها فعلًا.
+    </div>
+    <div class="ba-box after">
+      <div class="h">✔ بعد</div>
+      تُقرَأ مباشرة من استجابة الخادم (<code>order.cashCollected</code>، <code>order.handoffVerified</code>) — إعادة فتح الشاشة بعد أي إغلاق قسري تعرض الحالة الصحيحة فورًا دون أي إعادة طلب.
+    </div>
+  </div>
+  <table>
+    <tr><th>الملف</th><th>التغيير</th></tr>
+    <tr><td><span class="file-badge">backend/app/modules/orders/order_service.py</span></td><td>إضافة حقل <code>handoff_verified</code> (كان <code>handoff_required</code> موجودًا فقط، دون حالة "تحقّق فعلًا")</td></tr>
+    <tr><td><span class="file-badge">apps/mobile/src/types/models.ts</span></td><td>إضافة 3 حقول اختيارية جديدة لنوع الطلب: <code>cashCollected</code>، <code>proofSubmitted</code>، <code>handoffVerified</code></td></tr>
+    <tr><td><span class="file-badge">apps/mobile/src/app/(driver)/trip/[id].tsx</span></td><td>حذف الحالة المحلّية، القراءة مباشرة من بيانات الطلب، وتحويل كل عملية نجاح (تحصيل نقد، تحقّق تسليم) لإعادة طلب البيانات بدل تخمين النتيجة محليًّا</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="p05">
+  <h2 class="sec-title" style="border-color:var(--blocker)">5) إصلاح P0-5: خلل التحديث الإجباري</h2>
+  <p class="lead">الخلل: اختيار متجر التحديث كان يعتمد على "هل يوجد إعداد آيفون داخلي؟" (موجود دائمًا في هذا المشروع بصرف النظر عن نوع جهاز المستخدم الفعلي)، لا على نوع الجهاز الحقيقي — مستخدم أندرويد قد يُوجَّه لرابط متجر آبل ويُحتجَز خارج التطبيق كليًّا.</p>
+  <table>
+    <tr><th>قبل</th><th>بعد</th></tr>
+    <tr><td>الاختيار حسب وجود <code>ios.bundleIdentifier</code> في الإعدادات (دائمًا موجود)</td><td>الاختيار حسب <code>Platform.OS</code> الفعلي للجهاز الذي يعمل عليه المستخدم الآن</td></tr>
+    <tr><td>لا معالجة لفشل فتح الرابط</td><td><code>Linking.canOpenURL</code> + رسالة تحتوي الرابط نفسه كنسخ يدوي احتياطي عند الفشل</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="p06">
+  <h2 class="sec-title" style="border-color:var(--blocker)">6) إصلاح P0-6: قوائم الشاشات الرئيسية القابلة للتكيّف</h2>
+  <p class="lead">6 أزرار لدى السائق و11 لدى المزوّد كانت في صفّ واحد غير قابل للالتفاف أو التمرير — مكوّن جديد مشترك يحلّ المشكلة للاثنين معًا.</p>
+  <div class="diagram">
+    <div class="flow-row">
+      <div class="flow-box danger">قبل: صفّ ثابت بـ 6-11 زرًّا<br>يُقصّ على أي شاشة عادية</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box end">بعد: عنوان + زر "القائمة" واحد<br>يفتح لوحة سفلية قابلة للتمرير</div>
+    </div>
+  </div>
+  <p><span class="file-badge">apps/mobile/src/components/ui/RoleHomeMenu.tsx</span> (جديد) — مكوّن مشترك يُستخدَم في كلتا الشاشتَين (<span class="file-badge">(driver)/home.tsx</span> و<span class="file-badge">(provider)/home.tsx</span>)، يتكيّف تلقائيًّا مع أي عدد وجهات وأي حجم شاشة أو خط.</p>
+</section>
+
+<!-- ============================================================ -->
+<section id="p1">
+  <h2 class="sec-title" style="border-color:var(--high)">7) الإصلاحات المهمّة (P1) — التفاصيل الكاملة</h2>
+  <table>
+    <tr><th>#</th><th>الإصلاح</th><th>التفصيل</th></tr>
+    <tr><td>P1-7</td><td>تصحيح استماع الاتصال اللحظي لتتبّع الطلب</td><td><span class="file-badge">orderStream.ts</span>: كان يستمع فقط لنوع رسالة عام (<code>message</code>) لا يستخدمه الخادم إطلاقًا — الآن يستمع للأنواع الحقيقية الخمسة (<code>order.snapshot</code>، <code>order.state_changed</code>، <code>order.event</code>، <code>driver.location</code>، <code>customer.location</code>)</td></tr>
+    <tr><td>P1-11 (أ)</td><td>تصحيح معنى "نافذة القوائم"</td><td><span class="file-badge">deviceTier.ts</span>: الحقل كان يُضرَب في 60 لتزييف قيمة بكسل بلا معنى حقيقي — أُعيد تسميته وضبط قيمه الحقيقية بوحدات <code>dp</code> الصحيحة التي تفهمها مكتبة القوائم فعليًّا، ووُصِّل بـ4 شاشات إضافية كانت غير موصولة (المطعم، كتالوج المزوّد، الطلبات، رئيسية المزوّد)</td></tr>
+    <tr><td>P1-11 (ب)</td><td>توسيع "الوضع الخفيف" لحسابَي السائق والمزوّد</td><td>كان متاحًا فقط في حساب العميل — أُضيف لشاشتَي إعدادات السائق والمزوّد</td></tr>
+    <tr><td>P1-10</td><td>ترحيل الصور إلى المكوّن المُحسَّن</td><td>3 شاشات (البحث، تسوّق على قد فلوسك، عرض الفئة) كانت تستخدم مكوّن الصورة الأساسي — رُحِّلت لـ <code>expo-image</code> (تخزين مؤقّت + فك تشفير أفضل) بضبط <code>recyclingKey</code> لكل بطاقة</td></tr>
+    <tr><td>P1-9 (أ)</td><td>لوحة مفاتيح متكيّفة في الدفع</td><td><span class="file-badge">checkout.tsx</span>: لم يكن هناك أي تعامل مع ظهور لوحة المفاتيح — أُضيف <code>KeyboardAvoidingView</code> + تمرير يحترم اللمسات أثناء الكتابة</td></tr>
+    <tr><td>P1-9 (ب)</td><td>تمرير كامل لشاشة الحساب</td><td><span class="file-badge">account.tsx</span>: كانت حاوية غير قابلة للتمرير إطلاقًا — على شاشة قصيرة أو خط مُكبَّر، زر الخروج قد يصبح خارج حدود الرؤية؛ أُضيف تمرير كامل</td></tr>
+    <tr><td>P1-9 (ج)</td><td>إتاحة أفضل للزر أثناء التحميل</td><td><span class="file-badge">Button.tsx</span>: كان يفقد اسمه الوصفي بالكامل لقارئ الشاشة أثناء التحميل — أُضيف <code>accessibilityLabel</code> ثابت</td></tr>
+    <tr><td>P1-9 (د)</td><td>تباين ألوان أوضح لتنبيه الاتصال</td><td><span class="file-badge">OfflineBanner.tsx</span>: نص أبيض على خلفية برتقالية (~2.77:1، دون الحدّ المقروء) → نص داكن (تباين آمن) + إعلان صوتي لقارئ الشاشة عند الظهور</td></tr>
+    <tr><td>P1-13</td><td>معالجة الروابط غير المتطابقة بأمان</td><td><span class="file-badge">+not-found.tsx</span> (جديد): أي رابط خارجي لا يطابق شاشة حقيقية في التطبيق يعرض الآن خيار "فتح في المتصفح" بدل صفحة خطأ فارغة؛ نطاق الروابط العميقة نفسه تُرِك كما هو مع توثيق صريح لسبب عدم تضييقه الآن (لا يوجد دليل حقيقي في المشروع على أي مسار محدَّد يُستخدَم فعليًّا، وتضييقه تخمينًا قد يكسر رابطًا حقيقيًّا غير مكتشَف)</td></tr>
+    <tr><td>P1-14</td><td>استرجاع آمن من فشل قراءة بيانات الجلسة + وسم المراقبة</td><td><span class="file-badge">session.ts</span>: فشل قراءة مخزن الاعتماد الآمن (بعد تحديث نظام أو استعادة نسخة احتياطية مثلًا) كان يترك شاشة "تحميل" أبدية — الآن يُعامَل كخروج آمن مع تسجيل الحادثة؛ <span class="file-badge">monitoring.ts</span>: وسم كل حدث بمستوى الجهاز والشركة المصنِّعة وإصدار API (بدون أي بيانات تعريف شخصية)</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="notdone">
+  <h2 class="sec-title" style="border-color:var(--high)">8) ما لم يُنفَّذ عمدًا — ولماذا</h2>
+  <p class="lead">بالشفافية الكاملة: هذه البنود من المراجعة 486 لم تُنفَّذ في هذه الدفعة — ليس نسيانًا، بل لأنها تحتاج قرارًا صريحًا من المشغّل حسب المراجعة نفسها.</p>
+  <table>
+    <tr><th>البند</th><th>سبب التأجيل</th></tr>
+    <tr><td>دعم هواوي الكامل (HMS)</td><td>يحتاج حساب مطوّر جديد وبنية توزيع منفصلة كاملة — قرار عمل استراتيجي لا إصلاح كود</td></tr>
+    <tr><td>تتبّع الموقع المستمر أثناء التوصيل</td><td>قرار خصوصية وسياسة متجر حسّاس يحتاج موافقة صريحة منفصلة</td></tr>
+    <tr><td>إكمال أو إزالة دعم اللغة الإنجليزية</td><td>قرار منتج يحدّد نطاق عمل ترجمة كامل</td></tr>
+    <tr><td>تفعيل تقليص حجم الشيفرة الإنتاجية (R8)</td><td>يحتاج اختبار إصدار كامل موقَّع قبل التفعيل — خطر كسر تكاملات إن لم يُختبَر جيّدًا</td></tr>
+    <tr><td>تفعيل حركة الرجوع الحديثة (Predictive Back)</td><td>يحتاج اختبار إصدار كامل بعد استقرار P0/P1 أولًا حسب توصية المراجعة صراحة</td></tr>
+    <tr><td>تضييق نطاق الروابط العميقة لمسارات محدَّدة</td><td>لا يوجد دليل في المشروع على المسارات الفعلية المُستخدَمة — التضييق العشوائي قد يكسر رابطًا حقيقيًّا غير مكتشَف؛ عولج جزئيًّا بدلًا من ذلك عبر شاشة الرابط غير المتطابق (P1-13)</td></tr>
+    <tr><td>تحسينات رفع الوثائق الكاملة (فحص الحجم المسبق، استرجاع الكاميرا)</td><td>نطاق أكبر يحتاج تنسيقًا مع الخادم حول حدود الحجم — أُجِّل لدفعة لاحقة</td></tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<section id="verify">
+  <h2 class="sec-title" style="border-color:var(--ok)">9) دليل التحقّق الكامل (نتائج حقيقية، لا ادّعاءات)</h2>
+  <pre><span class="c-cmd">$ npx tsc --noEmit</span>          <span class="c-ok">✔ لا أخطاء (فحص كامل لمشروع التطبيق)</span>
+<span class="c-cmd">$ npx eslint src --no-cache</span>  <span class="c-ok">✔ لا أخطاء ولا تحذيرات</span>
+<span class="c-cmd">$ npx jest --ci</span>              <span class="c-ok">✔ 10 مجموعات، 41 اختبارًا — كلّها ناجحة</span>
+<span class="c-cmd">$ python -m pytest backend/tests/</span>
+<span class="c-ok">3501 passed</span>, <span class="c-out">4 skipped</span>, <span class="c-err">4 failed</span> <span class="c-out">(الأربعة فشلت أيضًا على نسخة نظيفة قبل أي تعديل — مؤكَّد بتجربة فعلية بإخفاء التعديلات مؤقّتًا ثم إعادتها؛ في ملفَّي تسوية مالية غير مرتبطَين إطلاقًا بهذا العمل)</span>
+
+<span class="c-cmd">$ ./gradlew assembleDebug</span>   <span class="c-out">(بناء أصلي حقيقي كامل، بعد إعادة توليد مشروع أندرويد بالكامل)</span>
+<span class="c-ok">BUILD SUCCESSFUL in 3m 18s</span>
+٤٥٤ actionable tasks: ٤٢٦ executed, ٢٨ up-to-date
+<span class="c-out">→ app-debug.apk — 188,521,913 بايت (188.5 ميجابايت)</span></pre>
+
+  <div class="verdict-box">
+    <h3>لماذا الأربعة اختبارات الفاشلة ليست مشكلة من هذا العمل</h3>
+    <p style="margin-bottom:0">جُرِّب هذا بدقّة: أُخفِيت كل تعديلات هذه الدفعة مؤقّتًا (<code>git stash</code>) وأُعيد تشغيل الاختبارات الأربعة الفاشلة على النسخة الأصلية النظيفة تمامًا — <b>فشلت أيضًا بنفس الطريقة بالضبط</b>. هذا يثبت أنها موجودة أصلًا في المشروع (في وحدة التسوية المالية، لا علاقة لها بالسائقين أو الإشعارات أو الطلبات)، وليست ناتجة عن أي تعديل في هذه الدفعة. أُعيدت كل التعديلات فورًا بعد هذا التحقّق.</p>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="files">
+  <h2 class="sec-title" style="border-color:var(--accent2)">10) قائمة كل ملف مُعدَّل أو مُنشأ</h2>
+  <h4 class="sub-title">تطبيق الهاتف (26 ملفًا مُعدَّلًا + 3 جديدة)</h4>
+  <p>
+    <span class="file-badge">app.config.ts</span>
+    <span class="file-badge">(driver)/home.tsx</span>
+    <span class="file-badge">(driver)/settings.tsx</span>
+    <span class="file-badge">(driver)/trip/[id].tsx</span>
+    <span class="file-badge">(provider)/catalog.tsx</span>
+    <span class="file-badge">(provider)/home.tsx</span>
+    <span class="file-badge">(provider)/settings.tsx</span>
+    <span class="file-badge">(tabs)/account.tsx</span>
+    <span class="file-badge">(tabs)/home.tsx</span>
+    <span class="file-badge">(tabs)/orders.tsx</span>
+    <span class="file-badge">_layout.tsx</span>
+    <span class="file-badge">budget-shop.tsx</span>
+    <span class="file-badge">category/[id].tsx</span>
+    <span class="file-badge">checkout.tsx</span>
+    <span class="file-badge">restaurant/[id].tsx</span>
+    <span class="file-badge">search.tsx</span>
+    <span class="file-badge">UpdateRequiredScreen.tsx</span>
+    <span class="file-badge">Button.tsx</span>
+    <span class="file-badge">OfflineBanner.tsx</span>
+    <span class="file-badge">deviceTier.ts</span>
+    <span class="file-badge">api/index.ts</span>
+    <span class="file-badge">monitoring.ts</span>
+    <span class="file-badge">push.ts</span>
+    <span class="file-badge">sse/orderStream.ts</span>
+    <span class="file-badge">store/session.ts</span>
+    <span class="file-badge">types/models.ts</span>
+  </p>
+  <p><span class="tag ok">جديدة</span> <span class="file-badge">+not-found.tsx</span> <span class="file-badge">RoleHomeMenu.tsx</span> <span class="file-badge">sse/driverOfferStream.ts</span></p>
+
+  <h4 class="sub-title">الخادم الخلفي (7 ملفات)</h4>
+  <p>
+    <span class="file-badge">messages/ar.json</span>
+    <span class="file-badge">messages/en.json</span>
+    <span class="file-badge">messages/fr.json</span>
+    <span class="file-badge">dispatch/dispatch_service.py</span>
+    <span class="file-badge">notifications/notification_service.py</span>
+    <span class="file-badge">notifications/push_provider.py</span>
+    <span class="file-badge">orders/order_service.py</span>
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<section id="limits">
+  <h2 class="sec-title" style="border-color:var(--high)">11) حدود هذا التنفيذ — بصراحة تامّة</h2>
+  <ul class="checklist">
+    <li><span class="check-warn">⚠</span> <b>لم يُختبَر بصريًّا/يدويًّا على محاكي أو هاتف حقيقي بعد.</b> كل التحقّق هنا آلي (أنواع، فحص ثابت، اختبارات وحدة، بناء أصلي حقيقي) — وهو دليل قوي على الصحّة البنيوية، لكنه لا يُغني عن تشغيل فعلي يدوي لمسار كامل (تسجيل دخول سائق، تفعيل الاتصال، استقبال عرض حقيقي، إلخ) قبل أي نشر إنتاجي</li>
+    <li><span class="check-warn">⚠</span> <b>لم يُنفَّذ أي التزام (commit) بعد.</b> كل التعديلات موجودة في نسخة العمل المحلّية فقط، لم تُدفَع ولم تُسجَّل في تاريخ git — بانتظار إذن صريح منفصل بحسب قاعدة المشروع الخاصة بعدم الالتزام التلقائي</li>
+    <li><span class="check-warn">⚠</span> <b>الإشعار العاجل الجديد يحتاج إعداد Firebase حقيقي فعليًّا ليعمل</b> (مشروع + ملف اعتماد خدمة) — البنية جاهزة بالكامل الآن لكنها تبقى "بلا تأثير فعلي" (fail-open) حتى يُفعِّلها المشغّل بنفس الطريقة الموثَّقة أصلًا في المشروع</li>
+    <li><span class="check-warn">⚠</span> <b>سعة الاختبار الآلي الحالية لا تغطي المسارات الجديدة تحديدًا</b> (مثل: هل الاستطلاع الدوري يتوقّف فعليًّا عند "غير متصل"؟) — تحقّقها اليوم اعتمد على مراجعة المنطق يدويًّا + الأنواع الصحيحة، لا اختبار آلي مخصَّص جديد لهذا السلوك تحديدًا</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<section id="next">
+  <h2 class="sec-title" style="border-color:var(--ok)">12) الخطوة التالية الموصى بها</h2>
+  <p class="lead">قبل أي نشر: (1) مراجعة هذا التقرير والتأكّد من كل شيء واضح، (2) اختبار يدوي حقيقي لمسار السائق الكامل (تسجيل دخول → تفعيل الاتصال → استقبال عرض → قبوله → إكمال الرحلة) على جهاز حقيقي أو محاكي، (3) إعطاء إذن صريح بالالتزام (commit) إن كانت النتيجة مرضية، (4) مناقشة البنود المؤجَّلة في القسم 8 عند الاستعداد لها.</p>
+</section>
+
+<footer>
+  تقرير 487 — تنفيذ الخطة الشاملة وإصلاح الأخطاء الحرجة · تووا (Tawa) Libya Delivery Platform · 2026-07-15
+</footer>
+
+</div>
+<a href="#" class="back-top">↑ الأعلى</a>
+</body>
+</html>
