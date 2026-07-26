@@ -17,6 +17,13 @@ Reports are written in **Arabic**, as self-contained HTML files (light/dark them
 right-to-left layout) — each one documents a single audit pass, remediation plan, or
 build/review/deploy execution cycle for a specific numbered phase or report series.
 
+## Table of Contents
+
+- [What's in here](#whats-in-here)
+- [Nature of this archive](#nature-of-this-archive)
+- [Downloads](#downloads)
+- [Verifying the release binaries](#verifying-the-release-binaries)
+
 ## What's in here
 
 - **Numbered report series** (`450`–`564` and others) — HTML reports covering codebase
