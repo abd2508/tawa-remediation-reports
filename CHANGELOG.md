@@ -31,7 +31,7 @@ numbered report series and `561-tawa-remediation-build-spec-v2.md`.
 | `cf4c0fc` | README: add a Contact section (GitHub account only — no external contribution model, per `LICENSE`). |
 | `27c53a9` | Add this `CHANGELOG.md`, link it from the README's Table of Contents. |
 | `f6f689f` | CHANGELOG: backfill the actual commit hash for the changelog-adding commit. |
-| *(next)* | README: fix the 8 badges — they were plain images with no destination link; wrap each in a link to its real `github.com/topics/<name>` page (license badge links to `LICENSE`). |
+| `e1c324f` | README: fix the 8 badges — they were plain images with no destination link; wrap each in a link to its real `github.com/topics/<name>` page (license badge links to `LICENSE`). |
 
 ### Verification performed
 - Fresh-clone checksum verification: all 6 release binaries match `SHA256SUMS.txt`
