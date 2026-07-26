@@ -23,6 +23,7 @@ build/review/deploy execution cycle for a specific numbered phase or report seri
 - [Nature of this archive](#nature-of-this-archive)
 - [Downloads](#downloads)
 - [Verifying the release binaries](#verifying-the-release-binaries)
+- [Contact](#contact)
 
 ## What's in here
 
@@ -71,3 +72,9 @@ Verify each download against `artifacts/SHA256SUMS.txt` after downloading — se
 cd artifacts
 sha256sum -c SHA256SUMS.txt
 ```
+
+## Contact
+
+This is a closed internal archive (see [LICENSE](LICENSE)) — external pull requests
+and issues are not being solicited. For questions about this repository's contents,
+reach the maintainer via GitHub: [@abd2508](https://github.com/abd2508).
