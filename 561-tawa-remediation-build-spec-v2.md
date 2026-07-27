@@ -490,6 +490,29 @@ D1+D2, not in original plan) — concurrent-offer cap not re-enforced at accept 
 ### F6 — Fail-closed channel-toggle read `[HIGH]`
 - Bounded single retry (50ms) then fail CLOSED (not open) on DB error reading channel-enabled
   flag. Applies to both EMAIL (`:627-641`) and WHATSAPP (`:690-706`) blocks.
+- **DONE** (batch F4/F6/E3/G-H, report 566, commit `c56117fc`). Also closed the F4×F6
+  interaction gap found by that batch's scenario/experiment agent: when EMAIL was the *only*
+  eligible channel and its toggle read genuinely failed, the old code correctly failed CLOSED
+  but never recorded an attempt, so F4's `any_attempted` stayed False and the notification was
+  marked delivered with zero retry despite nothing being sent. `_read_channel_toggle` now
+  returns `(enabled, read_failed)` and both EMAIL/WHATSAPP call sites record a failed attempt
+  when `read_failed` is True.
+
+### F10 (NEW — discovered 2026-07-27, adversarial reviewer on report 566's batch) — EMAIL
+dispatch exception safety `[MEDIUM]`, non-blocking, no ticket yet built
+- `notification_service.py`'s `_dispatch_channels` docstring says "Never raises" (a contract
+  F4/F6/`outbox_relay.py` now depend on), but unlike the WHATSAPP block, the EMAIL block has
+  no try/except around it — `_render_email_payload`'s `format_map` on a malformed operator
+  template, or the `session.get(User)` call, can still raise. Currently dormant: with
+  `notifications_outbox_enabled=False` (today's default everywhere), an EMAIL-path exception
+  propagates up through `send()`/`send_order_event()` into the calling business transaction
+  (order state change, dispatch accept) instead of being caught and recorded as a failed
+  attempt like every other channel. Fix: wrap the EMAIL branch in its own try/except mirroring
+  the WHATSAPP block (`:690-706`-era code). Must land before `notifications_outbox_enabled` is
+  ever flipped true (that flip already needs F1's own ticket first, so this doesn't block
+  anything currently live). A secondary, lower-priority reviewer note from the same pass: audit
+  whether the WHATSAPP exception path's audit-log write covers every raise site the same way
+  the EMAIL fix above should.
 
 ### F9 — POS webhook hardening `[HIGH]`, overlaps J5/J1 (SEQ-19)
 - **193:** unify ~23 raw `HTTPException(detail=...)` sites into one `PosWebhookError` envelope
