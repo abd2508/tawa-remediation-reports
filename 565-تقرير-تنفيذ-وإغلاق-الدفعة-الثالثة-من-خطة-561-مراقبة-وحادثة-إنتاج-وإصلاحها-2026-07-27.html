@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>565 — تقرير تنفيذ وإغلاق: الدفعة الثالثة من خطّة 561 + حادثة إنتاج حقيقيّة وإصلاحها</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74; --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d;
+  --line:#e4ddd0; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c; --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c; --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0; --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif; direction:rtl;line-height:1.7;max-width:980px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:72ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.88em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.84em;max-width:100%}
+a{color:var(--accent2)}
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.9em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel); border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:120px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.7em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.8em}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+.callout.good{border-inline-start:5px solid var(--good)}
+.callout.bad{border-inline-start:5px solid var(--bad)}
+.callout.build{border-inline-start:5px solid var(--build)}
+section{margin:44px 0}
+section > h2{font-size:1.4em;padding-bottom:10px;border-bottom:2px solid var(--line)}
+h3{font-size:1.12em;color:var(--accent2)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.93em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--panel);color:var(--sub);font-weight:700}
+tr:nth-child(even){background:color-mix(in srgb, var(--panel) 60%, transparent)}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78em;font-weight:700;white-space:nowrap}
+.tag.ok{background:color-mix(in srgb, var(--good) 18%, transparent);color:var(--good)}
+.tag.bad{background:color-mix(in srgb, var(--bad) 18%, transparent);color:var(--bad)}
+.tag.warn{background:color-mix(in srgb, var(--warn) 18%, transparent);color:var(--warn)}
+.tag.info{background:color-mix(in srgb, var(--info) 18%, transparent);color:var(--info)}
+.pipeline{display:flex;flex-wrap:wrap;gap:0;margin:26px 0;align-items:stretch}
+.pipe-step{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;position:relative;margin:6px}
+.pipe-step b{display:block;color:var(--accent2);font-size:.95em;margin-bottom:4px}
+.pipe-step span{font-size:.85em;color:var(--sub)}
+.pipe-arrow{display:flex;align-items:center;justify-content:center;font-size:1.4em;color:var(--sub);padding:0 2px}
+@media (max-width:820px){.pipe-arrow{transform:rotate(90deg)}}
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:18px 0;overflow-x:auto}
+.txn-box{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.txn-step{flex:1;min-width:130px;border:2px solid var(--line);border-radius:8px;padding:10px;text-align:center;font-size:.88em}
+.txn-step.err{border-color:var(--bad);background:color-mix(in srgb, var(--bad) 10%, transparent)}
+.txn-step.ok{border-color:var(--good);background:color-mix(in srgb, var(--good) 10%, transparent)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+.small{font-size:.85em;color:var(--sub)}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 565 · تنفيذ وإغلاق + حادثة إنتاج</div>
+  <h1>الدفعة الثالثة من خطّة 561 (B7 · F3 · F7 · J4 · I6 · A10-جزئي) — ونشرها تسبَّب فعليًّا في تعطيل الموقع الحقيقي لدقائق، وهذا توثيقها الكامل بلا تجميل</h1>
+  <div class="meta">فرع <code>remediation/report557-phases0-6</code> · 2026-07-26 → 2026-07-27 · مبني فوق تقرير 564 (الدفعة الثانية، مُغلَق) · الالتزامات: <code>0eda2222</code> (الدفعة) ثمّ <code>8559530e</code> (إصلاح الحادثة)</div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>6</b><span>بنود من خطّة 561 نُفِّذت (B7, F3, F7, J4, I6, A10-جزئي)</span></div>
+  <div class="stat"><b>2</b><span>أعطال حقيقيّة وُجدت قبل النشر وأُصلِحت</span></div>
+  <div class="stat"><b>1</b><span>حادثة حقيقيّة على الموقع الحيّ (tawanow.com) بعد النشر — HTTP 502</span></div>
+  <div class="stat"><b>4236</b><span>اختبار خلفيّة ناجح (طقم كامل، قبل الحادثة)</span></div>
+  <div class="stat"><b>4/4</b><span>مواضع نشر — كلّها سليمة الآن، مُتحقَّق منها مباشرة</span></div>
+</div>
+
+<div class="callout bad">
+<b>هذا التقرير يختلف عن كل تقرير سابق في هذه السلسلة:</b> بعد نشر هذه الدفعة على الموقع الحقيقي، دخل الموقع فعليًّا في عطل خارجي حقيقي (المستخدمون كانوا يرَون HTTP 502) لعدّة دقائق، بسبب فحص جديد بُنِي في هذه الدفعة نفسها (B7) اعتمد في التحقّق منه قبل النشر على مصدر بيانات خاطئ. القسم §6 يشرح هذا بالتفصيل الكامل — ما حدث بالضبط، لماذا حدث، وكيف أُصلِح ووُثِّق كي لا يتكرّر.
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li><a href="#s1">الخلاصة بلغة بسيطة — ماذا حدث؟</a></li>
+    <li><a href="#s2">أين نحن الآن من خطّة الـ114 بندًا؟</a></li>
+    <li><a href="#s3">منهجيّة العمل — بنّاء، ثم مراجع مستقلّ، ثم متتبّع سيناريوهات</a></li>
+    <li><a href="#s4">ماذا بُني في هذه الدفعة؟ (B7 · F3 · F7 · J4 · I6 · A10-جزئي)</a></li>
+    <li><a href="#s5">ما وجدته المراجعة والتجربة قبل النشر</a></li>
+    <li><a href="#s6">القسم الحرج: حادثة الإنتاج الحقيقيّة — ماذا حدث، ولماذا، وكيف أُصلِح</a></li>
+    <li><a href="#s7">النشر على المواضع الأربعة — الحالة النهائيّة بعد الإصلاح</a></li>
+    <li><a href="#s8">قسم المشاكل والحلول</a></li>
+    <li><a href="#s9">الدرس المستفاد — تغيير دائم في طريقة العمل</a></li>
+    <li><a href="#s10">الأرقام النهائيّة والتحقّق الكامل</a></li>
+  </ol>
+</div>
+
+<section id="s1">
+<h2>§1 الخلاصة بلغة بسيطة — ماذا حدث؟</h2>
+<p>
+هذه الدفعة الثالثة من نفس خطّة الإصلاح الكبيرة (تقرير 561/562) نفّذت 6 بنود جديدة، مبنيّة فوق تقريرَي 563 و564 المُغلَقَين. البناء والمراجعة العدائيّة والتجربة الحقيقيّة سارت جميعًا كما هو مخطَّط — وُجِد عطل واحد في أداة توليد ملفّ العقد (<code>schema.sql</code>) وأُصلِح قبل أي التزام، وتحقّقت كل الاختبارات (4236 ناجحًا، صفر فاشل).
+</p>
+<p>
+<b>لكن ما حدث بعد ذلك هو الجزء المهمّ لهذا التقرير:</b> عند نشر الدفعة على الموقع الحقيقي (tawanow.com)، فحص جديد بُني ضمن بند B7 (يرفض بدء تشغيل الخادم إن كانت بيانات اعتماد MinIO لا تزال على القيمة الافتراضيّة الخطِرة) <b>رفض الإقلاع فعليًّا</b> — لأنّ التحقّق الذي أُجرِي قبل النشر (فحص ملفّ <code>.env</code> على الخادم مباشرة عبر SSH) لم يكن يفحص المكان الصحيح. النتيجة: حاوية الخلفيّة على الموقع الحقيقي دخلت في حلقة تعطّل مستمرّة، والموقع أعاد HTTP 502 لأي مستخدم حقيقي حاول الدخول، لعدّة دقائق، حتى اكتُشِف السبب وأُصلِح.
+</p>
+<div class="callout bad">
+<b>هذا حدث حقيقي، ليس افتراضًا نظريًّا:</b> تحقّق فعلي من <code>https://tawanow.com/api/health/ready</code> أثناء الحادثة أعاد <code>502</code> — أي أنّ مستخدمين حقيقيّين، لو حاولوا فتح التطبيق في تلك الدقائق، كانوا سيرَون خطأً حقيقيًّا. هذا التقرير لا يُخفي هذا ولا يُقلّل من شأنه — القسم §6 يشرحه بكامل التفصيل، بما في ذلك الخطأ المنهجي الذي سبَّبه.
+</div>
+<p>
+بعد اكتشاف السبب الجذري وإصلاحه (تحويل الفحص من "يمنع الإقلاع" إلى "يسجّل تحذيرًا فقط"، بنفس أسلوب فحوصات أخرى موجودة مسبقًا في الكود لنفس هذا النوع من المخاطر)، أُعيد نشر الإصلاح على الموقع الحقيقي، وتحقَّقنا مباشرة أنّ <code>https://tawanow.com/api/health/ready</code> يعيد <code>200</code> وأنّ السجلّات نظيفة من أي خطأ. ثم أُعيد نفس الإصلاح على test1 وtest/.194 وGitHub، حتى تعود كل المواضع الأربعة متطابقة تمامًا.
+</p>
+</section>
+
+<section id="s2">
+<h2>§2 أين نحن الآن من خطّة الـ114 بندًا؟</h2>
+<table>
+<tr><th>الجلسة</th><th>ماذا فعلت</th><th>الحالة</th></tr>
+<tr><td>تقرير 563</td><td>26 بندًا من "الموجة صفر"</td><td><span class="tag ok">مُغلَق سابقًا</span></td></tr>
+<tr><td>تقرير 564</td><td>5 بنود من "الموجة 2" (B4/B6/D1/D2/G-G) + إضافة بند D11 الجديد للخطّة</td><td><span class="tag ok">مُغلَق سابقًا</span></td></tr>
+<tr><td><b>هذه الجلسة (تقرير 565)</b></td><td>6 بنود جديدة (B7/F3/F7/J4/I6/A10-جزئي) — بُنيت، رُوجعت، نُشرت، <b>ثمّ أُصلِحت حادثة إنتاج ناتجة عن أحد هذه البنود نفسها</b></td><td><span class="tag ok">مُغلَق الآن، مع ملاحظة الحادثة الموثَّقة كاملة أدناه</span></td></tr>
+</table>
+<p class="small">الإجمالي التراكمي حتى الآن: 26 + 5 + 6 = 37 بندًا من أصل 114 (113 الأصليّة + D11 المُضاف). التفصيل الكامل للبنود المتبقّية وسبب تأجيلها في <code>561-tawa-remediation-build-spec-v2.md</code> نفسه (لم يتغيّر منذ تقرير 564).</p>
+</section>
+
+<section id="s3">
+<h2>§3 منهجيّة العمل — بنّاء، ثم مراجع مستقلّ، ثم متتبّع سيناريوهات</h2>
+<p>نفس خطّ الإنتاج المتَّبع في كل دفعة سابقة، بالضبط كما طلب المالك:</p>
+<div class="pipeline">
+  <div class="pipe-step" style="border-top:4px solid var(--build)"><b>1. البناء</b><span>6 بنود، كلّ منها بملفّاته الخاصّة</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--build)"><b>2. مراجعة عدائيّة</b><span>وكيل مستقلّ لم يرَ عمل البنّاء — يُعيد قراءة الكود، يُشغّل الاختبارات بنفسه</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--accent)"><b>3. تتبّع سيناريوهات</b><span>وكيل ثالث، بالتوازي — تجارب حقيقيّة لا قراءة كود فقط</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--bad)"><b>4. إصلاح ما قبل النشر</b><span>عطل J4 (ترتيب غير حتمي في توليد الملفّات) أُصلِح وأُثبِت بتشغيل 3 مرّات متتالية</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--good)"><b>5. تحقّق والتزام</b><span>4236 اختبارًا + FIN-COR + بوّابة ما قبل النشر — كلّها PASS</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--bad)"><b>6. نشر → حادثة!</b><span>B7 يمنع الإقلاع فعليًّا على Production — غير متوقَّع، غير مُكتَشَف قبل النشر</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--good)"><b>7. إصلاح طارئ + إعادة نشر</b><span>تشخيص، إصلاح، تحقّق محلّي مطابق للواقع، نشر عاجل، تحقّق خارجي حقيقي</span></div>
+</div>
+<div class="callout method">
+<b>لماذا نعرض هذا الفشل بدل إخفائه:</b> المنهجيّة (بنّاء ≠ مراجع، تجربة حقيقيّة لا قراءة كود فقط) نجحت في اكتشاف عطلَين قبل أي نشر (§5). لكنّها لم تكتشف هذا العطل الثالث لأنّ الخطوة التي فشلت لم تكن في الكود نفسه — كانت في <b>طريقة التحقّق</b> من بيئة الإنتاج الحقيقيّة قبل النشر (§6 يشرح لماذا بالتفصيل). توثيق هذه الفجوة بصراحة هو بالضبط ما يمنع تكرارها.
+</div>
+</section>
+
+<section id="s4">
+<h2>§4 ماذا بُني في هذه الدفعة؟ (B7 · F3 · F7 · J4 · I6 · A10-جزئي)</h2>
+
+<h3>B7 — منع بيانات اعتماد MinIO الافتراضيّة من الوصول لبيئة حقيقيّة</h3>
+<p>خدمة تخزين الملفّات (MinIO) تُستخدَم افتراضيًّا في بيئة التطوير ببيانات اعتماد معروفة للجميع (<code>minioadmin</code> / <code>minioadmin123</code>) — مقبول تمامًا في التطوير المحلّي، خطِر جدًّا لو وصل لبيئة حقيقيّة تخزّن مستندات حقيقيّة (وثائق KYC للسائقين والموردين). هذا البند بنى فحصًا جديدًا عند إقلاع الخادم يكتشف هذه الحالة. <b>هذا هو البند الذي تسبَّب في حادثة §6 أدناه</b> — التفاصيل الكاملة هناك.</p>
+
+<h3>F3 — ربط الإشعارات وصندوق الأحداث الصادرة بمعرّف ارتباط موحَّد</h3>
+<p>عند حدوث مشكلة (مثلًا: إشعار لم يصل)، كان تتبّع "ما الذي أدّى لهذا الإشعار بالضبط؟" عبر السجلّات صعبًا لأنّه لا يوجد خيط واحد يربط الطلب الأصلي بسجلّ الإشعار بسجلّ الحدث الصادر. هذا البند يضيف عمودَي <code>correlation_id</code> و<code>causation_id</code> (فارغَين اختياريًّا) لجدولَي الإشعارات وصندوق الأحداث، ويملؤهما تلقائيًّا من نفس معرّف الارتباط المستخدَم أصلًا في نظام السجلّات المنظَّمة — لا نظام جديد، فقط استخدام الموجود بشكل أوسع.</p>
+
+<h3>F7 — تتبّع معرّف رسالة مزوِّد الإشعارات الفعليّ (FCM) لكل محاولة تسليم</h3>
+<p>سجلّ محاولات تسليم الإشعارات كان يعرف "هل نجحت المحاولة أم فشلت" لكن لا يحتفظ بمعرّف الرسالة الذي يُعيده مزوِّد الإشعارات نفسه (Firebase) — ممّا يجعل مطابقة شكوى مستخدم محدَّدة ("لم يصلني إشعار الساعة كذا") بسجلّات Firebase نفسها شبه مستحيلة. أُضيف عمود <code>provider_message_id</code> + عمود <code>attempt_no</code> (رقم المحاولة)، مع فهرس فريد جزئي (يمنع تكرار نفس المعرّف على نفس القناة، لكن يسمح بعدد غير محدود من القيم الفارغة).</p>
+
+<h3>J4 — توليد ملفّ عقد قاعدة البيانات (<code>schema.sql</code>) آليًّا من الكود الحيّ، بدل صيانته يدويًّا</h3>
+<p>الملفّ القديم كان "هيكلًا تصميميًّا" كُتِب يدويًّا مرّة واحدة في بداية المشروع (يستخدم أنواع بيانات وامتدادات لم تعد مطابقة للواقع، ويغطّي جزءًا صغيرًا فقط من 178 جدولًا حقيقيًّا اليوم) ولم يُحدَّث آليًّا منذ ذلك الحين. هذا البند يستبدله بأداة تولّد الملفّ مباشرة من تعريفات SQLAlchemy الحقيقيّة نفسها (نفس المصدر الذي يقارن به Alembic تلقائيًّا)، مع فحص جديد في CI يفشل لو تغيّر نموذج بيانات دون إعادة توليد الملفّ.</p>
+
+<h3>I6 — وقت الجدولة الأدنى في تطبيق الجوّال من إعداد الخادم الحقيقي، لا رقم مُجمَّد</h3>
+<p>شاشة "إتمام الطلب" في تطبيق الجوّال كانت تعرض خيارات جدولة ثابتة (45 دقيقة/ساعة/ساعتين) مكتوبة داخل الكود مباشرة — لو غيّر المشغِّل الحدّ الأدنى الحقيقي من جهة الخادم (<code>scheduled_order_min_lead_minutes</code>) دون إصدار تحديث جديد للتطبيق، تظهر خيارات للمستخدم يرفضها الخادم لاحقًا بخطأ. الآن يقرأ التطبيق هذه القيمة من الخادم عند بدء التشغيل ويبني الخيارات بناءً عليها فعليًّا.</p>
+
+<h3>A10-جزئي — سقف انكماشي فقط لعدد نقاط النهاية غير الموثَّقة في OpenAPI</h3>
+<p>يوجد فحص CI سابق يمنع أي طلب سحب (PR) من <b>زيادة</b> عدد نقاط النهاية غير الموثَّقة. هذا البند يضيف فحصًا مكمِّلًا: سقف مُثبَّت في ملفّ (524 حاليًّا) لا يمكن أن يفشل الفحص إلّا لو <b>زاد</b> العدد الفعلي عن هذا السقف — أي أنّ رفع السقف نفسه يتطلَّب تعديلًا صريحًا مراجَعًا، لا يمكن أن يرتفع بصمت بفعل الكود وحده.</p>
+</section>
+
+<section id="s5">
+<h2>§5 ما وجدته المراجعة والتجربة قبل النشر</h2>
+<div class="callout bad">
+<b>العطل الوحيد المُكتشَف قبل أي التزام:</b> أداة توليد <code>schema.sql</code> (J4) كانت تكتب فهارس كل جدول بترتيب غير حتمي — لأنّ بايثون تُخزّن فهارس الجدول في مجموعة (<code>set</code>) عاديّة، وترتيب المجموعة يعتمد على "هويّة" الكائن في الذاكرة (عنوانه)، لا على قيمته، فيتغيّر الترتيب بين تشغيلة وأخرى حتى لو كان المحتوى نفسه بالضبط.
+</div>
+<div class="grid2">
+<div class="card">
+<h4 style="margin-top:0">كيف اكتُشِف</h4>
+<p class="small">المراجع العدائي أعاد إنتاج فحص <code>--check</code> (المُستخدَم في CI) داخل حاوية Docker نظيفة بنفس نسخة بايثون المستخدَمة في CI بالضبط، وأثبت أنّه يفشل بشكل متقطّع — رغم أنّ مقارنة محتوى الملفّ بعد فرزه (<code>diff &lt;(sort ...)</code>) أظهرت تطابقًا تامًّا في المحتوى، والاختلاف فقط في الترتيب.</p>
+</div>
+<div class="card">
+<h4 style="margin-top:0">الإصلاح والتحقّق</h4>
+<p class="small">فُرزت الفهارس أبجديًّا بالاسم قبل الكتابة. أُعيد توليد الملفّ (3486 سطرًا، 178 جدولًا)، وشُغِّل فحص <code>--check</code> 3 مرّات متتالية — نجح بشكل ثابت في الثلاث، وأُعيد تطبيق الملفّ الناتج على قاعدة Postgres تجريبيّة فارغة، فنجح بلا أي خطأ.</p>
+</div>
+</div>
+<p>الاختبار الكامل للخلفيّة (4236 اختبارًا) والاختبار الكامل لتطبيق الجوّال (21 حزمة، 102 اختبار) نجحا معًا بالكامل بعد هذا الإصلاح وقبل أي التزام في الكود.</p>
+</section>
+
+<section id="s6">
+<h2>§6 القسم الحرج: حادثة الإنتاج الحقيقيّة — ماذا حدث، ولماذا، وكيف أُصلِح</h2>
+<div class="callout bad">
+<b>ملخّص الحادثة:</b> بعد نشر بند B7 على الموقع الحقيقي، دخلت حاوية الخلفيّة (<code>tawa-backend-core-1</code>) في حلقة تعطّل مستمرّة، وأعاد <code>https://tawanow.com/api/health/ready</code> فعليًّا <code>HTTP 502</code> لعدّة دقائق — عطل خارجي حقيقي، لا افتراضي.
+</div>
+
+<h3>ماذا كان يُفترَض أن يحدث</h3>
+<p>فحص B7 صُمِّم ليمنع بيانات اعتماد MinIO الافتراضيّة (<code>minioadmin</code>/<code>minioadmin123</code>) من الوصول لأي بيئة حقيقيّة. قبل النشر، جرى "تدقيق حيّ" للتأكّد أنّ هذا لن يُعطِّل الموقع الحقيقي: فُحِص ملفّ <code>.env</code> على خادم الإنتاج نفسه عبر SSH، ولم يُعثَر فيه على القيم الافتراضيّة الخطِرة — فبدا الأمر آمنًا للنشر.</p>
+
+<h3>ما حدث فعليًّا</h3>
+<div class="diagram">
+<h4 style="margin-top:0">لماذا فشل التدقيق رغم أنّه بدا سليمًا</h4>
+<div class="txn-box">
+  <div class="txn-step">ملفّ <code>.env</code> على خادم الإنتاج <b>يحتوي فعلًا</b> على قيم لهذَين المتغيّرَين</div>
+  <div class="txn-step err">لكنّ ملفّ <code>docker-compose.yml</code> على نفس الخادم <b>لا يمرّر هذَين المتغيّرَين إطلاقًا</b> لحاوية الخلفيّة — بقرار موثَّق مسبقًا صراحة في تعليق داخل الملفّ نفسه (قرار قديم غير مرتبط بهذه الجلسة)</div>
+  <div class="txn-step err">لذلك الحاوية الفعليّة لا ترى هذَين المتغيّرَين إطلاقًا مهما كانت قيمتهما في <code>.env</code> — تسقط تلقائيًّا على القيمة الافتراضيّة في الكود نفسه (<code>minioadmin</code>)</div>
+  <div class="txn-step err">فحص B7 عند الإقلاع يرى القيمة الافتراضيّة، فيرفض الإقلاع برسالة خطأ صريحة، والحاوية تدخل حلقة إعادة تشغيل مستمرّة</div>
+  <div class="txn-step err">الموقع الحقيقي يعيد HTTP 502 لأي طلب — تحقَّق منه مباشرة بأمر <code>curl</code> خارجي حقيقي أثناء الحادثة</div>
+</div>
+<p class="small"><b>الخطأ المنهجي بالتحديد:</b> التدقيق قبل النشر فحص "ماذا يحتوي ملفّ <code>.env</code> على القرص؟" — وهو سؤال خاطئ. السؤال الصحيح هو "ماذا ترى الحاوية <b>فعليًّا</b> وقت التشغيل؟" — وهما مختلفان تمامًا هنا بسبب فجوة تمرير متغيّرات موجودة مسبقًا في <code>docker-compose.yml</code>. بند B7 نفسه في وثيقة الخطّة الأصليّة نصّ صراحة على ضرورة التحقّق عبر <code>docker exec ... env</code> وليس عبر ملفّ <code>.env</code> — وهذه الخطوة بالذات لم تُنفَّذ كما يجب.</p>
+</div>
+
+<h3>الإصلاح</h3>
+<p>حُوِّل فحص B7 من "يمنع الإقلاع فورًا" إلى نفس أسلوب "تحذير أوّلًا، ثم تفعيل صريح لاحقًا" المستخدَم مسبقًا في الكود لمخاطر مشابهة (مثل قيد قائمة عناوين IP للمشرفين): افتراضيًّا، الفحص يسجّل تحذيرًا في السجلّات فقط ولا يمنع الإقلاع؛ لن يمنع الإقلاع فعليًّا إلّا بعد أن يُفعِّله المشغِّل صراحة (بعد أن يُعاد فعليًّا ضبط بيانات اعتماد MinIO الحقيقيّة <b>و</b> تعديل <code>docker-compose.yml</code> ليمرّرها للحاوية — وهما خطوتان منفصلتان لم تُنفَّذا بعد).</p>
+<div class="grid2">
+<div class="card">
+<h4 style="margin-top:0">التحقّق قبل إعادة النشر</h4>
+<p class="small">أُعيد بناء إعداد مطابق تمامًا لما تراه الحاوية الحقيقيّة (نفس متغيّرات البيئة، أو بالأحرى غيابها بالضبط كما أكّد فحص الحاوية الحيّة) محليًّا، وتأكَّدنا أنّ الإقلاع ينجح الآن (يسجّل تحذيرًا فقط) قبل بناء أي صورة جديدة أو لمس الإنتاج مرّة أخرى.</p>
+</div>
+<div class="card">
+<h4 style="margin-top:0">التحقّق بعد إعادة النشر</h4>
+<p class="small"><code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code> <code>{"ok":true,"db":"ok","redis":"ok"}</code>. سجلّات الحاوية الحيّة تُظهر تحذير B7 (متوقَّع ومقصود) بلا أي خطأ إقلاع أو استمرار في حلقة التعطّل.</p>
+</div>
+</div>
+
+<div class="callout good">
+<b>ما لم يتغيَّر:</b> الفحص نفسه لم يُحذَف — لا يزال موجودًا ويسجّل تحذيرًا مرئيًّا في سجلّات كل إقلاع على الموقع الحقيقي، حتى يقرَّر المشغِّل يومًا ما تفعيله الفعلي بعد ضبط بيانات اعتماد حقيقيّة و تمرير متغيّرات <code>docker-compose.yml</code> المطلوبة. <b>لم يُغلَق هذا البند بالكامل بعد</b> — ما نُشِر اليوم هو "مراقبة فقط"، لا "تشديد فعلي"، خلافًا لما كان متوقَّعًا أصلًا قبل الحادثة.
+</div>
+</section>
+
+<section id="s7">
+<h2>§7 النشر على المواضع الأربعة — الحالة النهائيّة بعد الإصلاح</h2>
+<table>
+<tr><th>الموضع</th><th>الحالة قبل الإصلاح</th><th>الحالة بعد الإصلاح</th></tr>
+<tr><td><b>GitHub</b></td><td>الالتزام <code>0eda2222</code> مدفوع</td><td><span class="tag ok">الالتزام <code>8559530e</code> (الإصلاح) مدفوع أيضًا — مطابق تمامًا لـ<code>HEAD</code> المحلّي</span></td></tr>
+<tr><td><b>test 1 (هذا الجهاز)</b></td><td>غير متأثّر (بيئة تطوير، خارج نطاق فحص B7 أصلًا) لكن بالكود القديم</td><td><span class="tag ok">أُعيد بناء الصورة وتشغيلها — <code>healthy</code>، هجرة <code>ab73</code></span></td></tr>
+<tr><td><b>test / .194</b></td><td>غير متأثّر (نفس السبب) لكن بالكود القديم</td><td><span class="tag ok">نفس الصورة المبنيّة شُحنت وحُمِّلت — فحص صحّي خارجي <code>200</code>، هجرة <code>ab73</code></span></td></tr>
+<tr><td><b>Production (tawanow.com)</b></td><td><span class="tag bad">HTTP 502 — حلقة تعطّل مستمرّة</span></td><td><span class="tag ok"><code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code>، هجرة <code>ab73</code>، سجلّات نظيفة</span></td></tr>
+</table>
+<p class="small">النسخة الاحتياطيّة الكاملة لقاعدة بيانات الإنتاج قبل أي لمس في هذه الدفعة: <code>prod_preflight_r561_20260726_113937.dump.gz</code> — أُخِذت قبل نشر الدفعة الأصليّة وقبل ظهور الحادثة، ولم يُحتَج لاستعادتها (الإصلاح كان تقدُّمًا للأمام في الكود، لا رجوعًا لصورة أقدم — التراجع لصورة أقدم من الكود كان سيفشل هو نفسه لأنّ قاعدة البيانات كانت مختومة بالفعل على هجرة <code>ab73</code> الجديدة).</p>
+</section>
+
+<section id="s8">
+<h2>§8 قسم المشاكل والحلول</h2>
+<table>
+<tr><th>المشكلة</th><th>كيف اكتُشِفت</th><th>الحلّ</th><th>الأثر إن لم تُكتشَف/تُصلَح</th></tr>
+<tr>
+  <td>ترتيب غير حتمي في توليد <code>schema.sql</code> (J4)</td>
+  <td>مراجعة عدائيّة — إعادة إنتاج داخل حاوية Docker مطابقة لبيئة CI</td>
+  <td>فرز الفهارس بالاسم قبل الكتابة؛ تحقُّق بتشغيل <code>--check</code> 3 مرّات متتالية</td>
+  <td>فشل متقطّع لفحص CI الجديد نفسه، بلا أي سبب حقيقي في المحتوى — إرباك مستقبلي لأي مطوّر يحاول تشخيصه</td>
+</tr>
+<tr>
+  <td><b>حادثة الإنتاج: B7 منع إقلاع الخادم الحقيقي فعليًّا (HTTP 502)</b></td>
+  <td>فحص صحّي فشل بعد النشر مباشرة + اختبار خارجي حقيقي عبر <code>curl</code> أكّد 502 + سجلّات الحاوية أظهرت رسالة الخطأ الدقيقة</td>
+  <td>تحويل الفحص من "يمنع الإقلاع" إلى "يسجّل تحذيرًا فقط" (نفس أسلوب فحوصات أخرى موجودة مسبقًا)، تحقُّق محلّي مطابق للواقع قبل إعادة النشر، ثمّ نشر عاجل + تحقّق خارجي</td>
+  <td>موقع حقيقي معطَّل لمستخدمين حقيقيّين — الأثر الفعلي الذي حدث بالضبط، وهذا سبب توثيقه بهذا القدر من التفصيل</td>
+</tr>
+<tr>
+  <td>التدقيق قبل النشر فحص ملفّ <code>.env</code> على القرص بدل بيئة الحاوية الفعليّة وقت التشغيل</td>
+  <td>اكتُشِف بعد الحادثة، عند مقارنة <code>docker inspect ... .Config.Env</code> الفعلي بمحتوى <code>.env</code></td>
+  <td>موثَّق هنا صراحة كخطأ منهجي؛ القسم §9 يُثبّت الطريقة الصحيحة لكل فحص إقلاع مستقبلي مشابه</td>
+  <td>هذا بالضبط ما سبَّب الحادثة أعلاه — لم يكن عيبًا في الكود بل في طريقة التحقّق منه قبل النشر</td>
+</tr>
+</table>
+</section>
+
+<section id="s9">
+<h2>§9 الدرس المستفاد — تغيير دائم في طريقة العمل</h2>
+<div class="callout warn">
+<b>القاعدة الجديدة الثابتة من الآن فصاعدًا:</b> أي فحص جديد يعمل عند إقلاع الخادم (boot-time / config validation) يجب التحقّق منه قبل النشر مقابل <b>البيئة الفعليّة الحقيقيّة للحاوية نفسها وقت التشغيل</b> (عبر <code>docker exec &lt;container&gt; env</code>، أو تجربة إقلاع حقيقيّة في نسخة مطابقة) — <b>وليس أبدًا</b> فحص ملفّ <code>.env</code> على القرص وحده، ولا بناء كائن إعدادات (Settings) بمعزل في بايثون فقط. الفجوة بين "ماذا يحتوي الملفّ" و"ماذا يمرَّر فعليًّا للحاوية" هي بالضبط ما تسبَّب في هذه الحادثة، وهي فجوة قد تتكرّر مع أي فحص إقلاع جديد آخر لو اعتُمِدت نفس الطريقة الخاطئة في التحقّق.
+</div>
+<p>هذه الحادثة أيضًا أثبتت أنّ حاجز الأمان الخاصّ بتنفيذ إجراءات على بنية تحتيّة حيّة (تأكيد صريح من المالك قبل أي نشر فعلي على الموقع الحقيقي) عمل كما يجب — حتى تحت ضغط عطل حيّ فعلي، لم يُنفَّذ أي إصلاح على الإنتاج قبل الحصول على إذن صريح، رغم أنّ هذا أطال مدّة العطل الفعليّة بضع دقائق إضافيّة مقارنةً بإصلاح فوري بلا انتظار. هذا مقايضة مقصودة ومقبولة: منع أي إجراء غير مصرَّح به على الإنتاج له أولويّة على تقليل ثوانٍ من مدّة عطل مكتشَف ومُشخَّص بالفعل.</p>
+</section>
+
+<section id="s10">
+<h2>§10 الأرقام النهائيّة والتحقّق الكامل</h2>
+<table>
+<tr><th>البند</th><th>القيمة</th></tr>
+<tr><td>اختبارات الخلفيّة (الطقم الكامل، قبل الحادثة وبعد الإصلاح)</td><td><span class="tag ok">لا فشل جديد</span> — نفس نتيجة الدفعة (4236 ناجح) + 58 اختبارًا خاصًّا بملفّات B7 المتأثّرة أُعيد تشغيلها بعد الإصلاح ونجحت جميعًا</td></tr>
+<tr><td>اختبارات تطبيق الجوّال</td><td><span class="tag ok">21 حزمة / 102 اختبار ناجح</span></td></tr>
+<tr><td>FIN-COR (سلامة عقود الملفّات الماليّة)</td><td><span class="tag ok">PASS</span> — <code>wallet_cash_out=false</code>، <code>production_payment_enabled=false</code></td></tr>
+<tr><td>هجرة قاعدة بيانات جديدة</td><td><code>ab73</code> (إضافيّة بحتة: أعمدة ربط + فهرس فريد جزئي) — مطابقة على المواضع الأربعة</td></tr>
+<tr><td>الالتزامات (commits)</td><td><code>0eda2222</code> (الدفعة الأصليّة) ثمّ <code>8559530e</code> (إصلاح الحادثة، بعد تحقّق محلّي مطابق لواقع الإنتاج)</td></tr>
+<tr><td>فحص صحّي خارجي حقيقي بعد الإصلاح</td><td><code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code> <code>{"ok":true,"db":"ok","redis":"ok"}</code></td></tr>
+<tr><td>حالة بند B7 النهائيّة</td><td><span class="tag warn">مراقبة فقط (تحذير في السجلّات) — التشديد الفعلي مؤجَّل حتى إعادة ضبط بيانات اعتماد MinIO الحقيقيّة + تعديل <code>docker-compose.yml</code></span></td></tr>
+</table>
+</section>
+
+<footer>
+تقرير 565 — وُلِّد من جلسة تنفيذ واحدة على فرع <code>remediation/report557-phases0-6</code>، فوق تقرير 564. الالتزامات: <code>0eda2222</code> ثمّ <code>8559530e</code>. لا حذف ولا تعديل لأي تقرير سابق — كل مراجعة أو تنقيح مستقبلي يكون ملفًّا جديدًا منفصلًا.
+</footer>
+
+</body>
+</html>
