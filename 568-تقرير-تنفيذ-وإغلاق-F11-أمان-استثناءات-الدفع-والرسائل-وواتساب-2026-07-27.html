@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>568 — تقرير تنفيذ وإغلاق: F11 (أمان استثناءات مسارات الدفع الفوري والرسائل النصّيّة وواتساب)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74; --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d;
+  --line:#e4ddd0; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c; --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c; --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0; --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif; direction:rtl;line-height:1.7;max-width:980px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:72ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.88em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.84em;max-width:100%}
+a{color:var(--accent2)}
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.9em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel); border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:120px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.7em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.8em}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+.callout.good{border-inline-start:5px solid var(--good)}
+.callout.bad{border-inline-start:5px solid var(--bad)}
+.callout.build{border-inline-start:5px solid var(--build)}
+section{margin:44px 0}
+section > h2{font-size:1.4em;padding-bottom:10px;border-bottom:2px solid var(--line)}
+h3{font-size:1.12em;color:var(--accent2)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.93em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--panel);color:var(--sub);font-weight:700}
+tr:nth-child(even){background:color-mix(in srgb, var(--panel) 60%, transparent)}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78em;font-weight:700;white-space:nowrap}
+.tag.ok{background:color-mix(in srgb, var(--good) 18%, transparent);color:var(--good)}
+.tag.bad{background:color-mix(in srgb, var(--bad) 18%, transparent);color:var(--bad)}
+.tag.warn{background:color-mix(in srgb, var(--warn) 18%, transparent);color:var(--warn)}
+.tag.info{background:color-mix(in srgb, var(--info) 18%, transparent);color:var(--info)}
+.pipeline{display:flex;flex-wrap:wrap;gap:0;margin:26px 0;align-items:stretch}
+.pipe-step{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;position:relative;margin:6px}
+.pipe-step b{display:block;color:var(--accent2);font-size:.95em;margin-bottom:4px}
+.pipe-step span{font-size:.85em;color:var(--sub)}
+.pipe-arrow{display:flex;align-items:center;justify-content:center;font-size:1.4em;color:var(--sub);padding:0 2px}
+@media (max-width:820px){.pipe-arrow{transform:rotate(90deg)}}
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:18px 0;overflow-x:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+.small{font-size:.85em;color:var(--sub)}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 568 · تنفيذ وإغلاق</div>
+  <h1>F11 — إصلاح فجوة أمان استثناءات مسارات الدفع الفوري (PUSH) والرسالة النصّيّة (SMS) وواتساب في محرّك الإشعارات</h1>
+  <div class="meta">فرع <code>remediation/report557-phases0-6</code> · 2026-07-27 · بند وحيد، متابعة مباشرة لتقرير 567 (F10) · الالتزام: <code>8159dd0e</code></div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>3</b><span>قنوات أُصلحت (PUSH · SMS · واتساب — الأخيرة اكتُشِفت أثناء المراجعة، لا في الخطّة الأصليّة)</span></div>
+  <div class="stat"><b>1</b><span>عطل في اختبار وُجد وأُصلِح قبل الالتزام (اختبار لا يختبر ما يدّعيه)</span></div>
+  <div class="stat"><b>0</b><span>تجارب Postgres جديدة — الآليّة أُثبتت فعليًّا في تقرير 567 وأُعيد استخدامها فقط</span></div>
+  <div class="stat"><b>4256</b><span>اختبار خلفيّة ناجح، صفر فاشل (+6 اختبارات جديدة عن الدفعة السابقة)</span></div>
+  <div class="stat"><b>4/4</b><span>مواضع نشر مكتملة ومتحقَّق منها خارجيًّا</span></div>
+</div>
+
+<div class="callout warn">
+<b>صراحة كاملة:</b> هذا البند لم يُبنَ من الصفر — هو استكمال مباشر لتقرير 567 (F10)، الذي عالج قناة البريد الإلكتروني فقط وترك قنوات الدفع الفوري والرسالة النصّيّة صراحةً كبند متابعة (F11) لأنّ توسيع F10 كان سيُفقِده تركيزه. الجديد هنا: (1) تطبيق نفس النمط المُثبَت على PUSH وSMS، و(2) اكتشاف أنّ قناة واتساب — رغم أنّها كانت تملك try/except من قبل — تحمل نفس عطل "علم المحاولة يتحرّك متأخّرًا جدًّا" الذي كان في أوّل نسخة من إصلاح F10، فأُصلِحت أيضًا رغم أنّها لم تكن في نطاق F11 المكتوب أصلًا. كما وجدت المراجعة العدائيّة عطلًا في أحد الاختبارات نفسها (لا في الكود) — اختبار كان سيبقى ناجحًا حتى لو حُذِف الإصلاح الذي يفترض أن يختبره.
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li><a href="#s1">الخلاصة بلغة بسيطة</a></li>
+    <li><a href="#s2">لماذا استُثنِيت هذه القنوات من تقرير 567؟</a></li>
+    <li><a href="#s3">منهجيّة العمل</a></li>
+    <li><a href="#s4">ماذا بُني؟ — الدفع الفوري (PUSH)</a></li>
+    <li><a href="#s5">ماذا بُني؟ — الرسالة النصّيّة (SMS)</a></li>
+    <li><a href="#s6">اكتشاف إضافي: قناة واتساب تحمل نفس العطل رغم امتلاكها try/except من قبل</a></li>
+    <li><a href="#s7">ما وجدته المراجعة العدائيّة: اختبار لا يختبر ما يدّعيه</a></li>
+    <li><a href="#s8">لماذا لا تجربة Postgres جديدة هذه المرّة؟</a></li>
+    <li><a href="#s9">النشر على المواضع الأربعة</a></li>
+    <li><a href="#s10">قسم المشاكل والحلول</a></li>
+    <li><a href="#s11">الأرقام النهائيّة والتحقّق الكامل</a></li>
+  </ol>
+</div>
+
+<section id="s1">
+<h2>§1 الخلاصة بلغة بسيطة</h2>
+<p>
+تقرير 567 (F10) أصلح خللًا في قناة البريد الإلكتروني: عطل في قاعدة البيانات أو في قالب البريد كان يمكن أن يُسقِط العمليّة التجاريّة الأصليّة (تسجيل دخول، تسليم طلب) كاملةً، بدل أن يُسجَّل كفشل قابل لإعادة المحاولة فحسب. نفس الخلل بالضبط كان موجودًا في قناتَي الدفع الفوري (الإشعارات التي تصل كتنبيه على الهاتف) والرسالة النصّيّة القصيرة — ولم يُصلَح وقتها عمدًا، لأنّ توسيع بند واحد ليغطّي كل قناة مشابهة في نفس الملفّ كان سيرفع مخاطر تلك المراجعة دون داعٍ.
+</p>
+<p>
+هذا التقرير يوثّق إغلاق تلك الفجوة المتبقّية. الأهمّ فيه: أثناء المراجعة العدائيّة لهذا البند، تبيّن أنّ قناة رابعة — واتساب — التي كانت تبدو "آمنة بالفعل" لأنّها تملك حماية استثناء من قبل، تحمل في الواقع نسخة أقدم وأقل أمانًا من نفس الإصلاح: الحماية موجودة، لكنّها لا تعزل الاستعلام عن قاعدة البيانات بالطريقة الصحيحة على Postgres الحقيقي، ولا تُسجِّل بعض الأعطال كمحاولات قابلة لإعادة المحاولة. أُصلِحت هذه أيضًا، رغم أنّها لم تكن مكتوبة في نطاق هذا البند أصلًا — لأنّها نفس الفئة من العطل، بنفس الحلّ الجاهز، ولم يكن هناك مبرّر لتركها.
+</p>
+</section>
+
+<section id="s2">
+<h2>§2 لماذا استُثنِيت هذه القنوات من تقرير 567؟</h2>
+<p>
+وثيقة الخطّة (<code>561-tawa-remediation-build-spec-v2.md</code>) سجَّلت F11 بوضوح أثناء إغلاق F10، مع ملاحظة حاسمة كُتِبت وقتها ومُثبَتة بتجربة حقيقيّة على Postgres: <b>لفّ الكود بـ try/except عادي وحده لا يكفي</b>. على Postgres، عطل قاعدة بيانات حقيقي يُبقي المعاملة (transaction) "معطَّلة" حتى بعد التقاط الاستثناء بلغة Python — فأي استعلام لاحق على نفس الجلسة يفشل بدوره. الحلّ الصحيح يتطلَّب "نقطة حفظ" (SAVEPOINT)، لا مجرّد try/except. هذه الملاحظة كُتِبت صراحةً في نصّ بند F11 قبل بنائه، حتى لا يُعاد ارتكاب نفس الخطأ الذي وقع في أوّل نسخة من إصلاح F10 نفسه.
+</p>
+</section>
+
+<section id="s3">
+<h2>§3 منهجيّة العمل</h2>
+<div class="pipeline">
+  <div class="pipe-step" style="border-top:4px solid var(--build)"><b>1. البناء</b><span>تطبيق نمط F10 المُصحَّح (SAVEPOINT + علم محاولة يتحرّك مبكّرًا) على PUSH وSMS</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--corr)"><b>2. مستشار مستمرّ</b><span>يتابع كل خطوة قبل الالتزام — أكّد صحّة قرارات التصميم الجوهريّة (انظر §4)</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--build)"><b>3. مراجعة عدائيّة</b><span>وكيل مستقلّ — وجد عطلًا حقيقيًّا في قناة واتساب المجاورة، وعطلًا في اختبار واحد</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--bad)"><b>4. إصلاح فوري</b><span>واتساب أُصلحت رغم كونها خارج النطاق المكتوب أصلًا، الاختبار المعيب أُعيدت كتابته</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--good)"><b>5. تحقّق كامل</b><span>4256 اختبارًا + FIN-COR + بوّابة ما قبل النشر — كلّها PASS على الحالة النهائيّة للكود</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--good)"><b>6. نشر ×4</b><span>GitHub → test1 → test/.194 → Production، تحقّق خارجي حقيقي في كل موضع</span></div>
+</div>
+</section>
+
+<section id="s4">
+<h2>§4 ماذا بُني؟ — الدفع الفوري (PUSH)</h2>
+<p>قناة PUSH مختلفة بنيويًّا عن البريد/الرسالة النصّيّة/واتساب: لا تملك قائمة أحداث مسموحة (تُحاوَل تقريبًا مع كل إشعار)، وقد يملك المستخدم عدّة أجهزة مسجَّلة يُرسَل لكل منها إشعار منفصل. هذا استلزم تصميمًا من ثلاث طبقات مستقلّة:</p>
+<table>
+<tr><th>الطبقة</th><th>السلوك عند العطل</th><th>السبب</th></tr>
+<tr><td>قراءة تفضيلات المستخدم (هل الدفع الفوري مفعَّل؟)</td><td><b>افتراض "مفعَّل"</b> (فشل آمن باتّجاه الإرسال، لا الكتم)</td><td>هذا تفضيل إزعاج شخصي، لا مفتاح إيقاف تشغيلي — كتم عرض توصيل حقيقي عن سائق بالخطأ أسوأ من إشعار غير مرغوب فيه واحد. مطابق للسلوك الافتراضي الموجود مسبقًا عند غياب صفّ التفضيلات أصلًا.</td></tr>
+<tr><td>البحث عن أجهزة المستخدم المسجَّلة</td><td><b>يُسجَّل كمحاولة فاشلة</b></td><td>بما أنّ PUSH بلا قائمة أحداث مسموحة، فهو الأكثر احتمالًا أن يكون القناة الوحيدة لإشعار ما — "لم نستطع التأكّد إن كان للمستخدم أجهزة" يجب ألّا يُعامَل بصمت كـ"لا يملك أجهزة".</td></tr>
+<tr><td>إرسال فعلي لجهاز واحد ضمن عدّة أجهزة</td><td><b>يُسجَّل فشل ذلك الجهاز فقط، الأجهزة الأخرى تُكمِل</b></td><td>عطل جهاز واحد يجب ألّا يُلغي إشعار بقيّة أجهزة نفس المستخدم — نفس ضمان المرونة الموجود أصلًا في قناة واتساب.</td></tr>
+</table>
+</section>
+
+<section id="s5">
+<h2>§5 ماذا بُني؟ — الرسالة النصّيّة (SMS)</h2>
+<p>أبسط من PUSH: قناة واحدة، قائمة أحداث مسموحة ثابتة. طُبِّق نمط تقرير 567 المُصحَّح حرفيًّا: علم "المحاولة جارية" يتحوَّل إلى صحيح فور تأكيد أنّ الحدث مؤهَّل (لا قبيل الإرسال مباشرةً)، والبحث عن رقم هاتف المستلم مُغلَّف بنقطة حفظ (SAVEPOINT) — فأي عطل بعد تلك النقطة (بحث المستلم أو الإرسال نفسه) يُسجَّل كمحاولة فاشلة قابلة لإعادة المحاولة، لا يُفقَد بصمت ولا يُسقِط المعاملة على Postgres الحقيقي.</p>
+</section>
+
+<section id="s6">
+<h2>§6 اكتشاف إضافي: قناة واتساب تحمل نفس العطل رغم امتلاكها try/except من قبل</h2>
+<div class="callout bad">
+<b>ما وجده المستشار قبل إرسال الكود للمراجعة:</b> قناة واتساب (بنيت في دفعة سابقة، Wave-3) تملك بالفعل try/except — لكن بنفس الشكل الذي ثبت خطؤه في أوّل نسخة من إصلاح F10: علم "المحاولة جارية" يتحوَّل إلى صحيح <b>قبيل الإرسال مباشرةً</b> (بعد نجاح البحث عن المستلم)، لا فور تأكيد تفعيل القناة. النتيجة: لو فشل البحث عن بيانات المستلم فعليًّا (عطل قاعدة بيانات حقيقي)، يُلتقَط الاستثناء بنجاح لكن لا يُسجَّل أي محاولة فاشلة — تمامًا نفس الفجوة التي أُصلحت في F10. كما أنّ البحث نفسه لم يكن معزولًا بنقطة حفظ (SAVEPOINT)، فعلى Postgres حقيقي كان سيُسمِّم المعاملة بنفس الآليّة المُثبَتة في تقرير 567.
+</div>
+<p><b>القرار:</b> رغم أنّ واتساب لم تكن مكتوبة ضمن نطاق F11 الأصلي (الذي ذكر PUSH وSMS فقط)، أُصلِحت هنا أيضًا — لأنّها نفس فئة العطل بالضبط، بنفس الحلّ الجاهز المُثبَت مرّتين من قبل (البريد الإلكتروني في F10، الرسالة النصّيّة في هذا التقرير)، والتكلفة كانت صغيرة جدًّا (نقل سطر واحد + إضافة سطر SAVEPOINT). تطبيق حلّ مُثبَت على نفس العطل المتكرِّر في مكان رابع لا يُعتبَر توسيعًا للنطاق — بل استكمالًا طبيعيًّا لمنع تكرار نفس الغلطة.</p>
+</section>
+
+<section id="s7">
+<h2>§7 ما وجدته المراجعة العدائيّة: اختبار لا يختبر ما يدّعيه</h2>
+<div class="callout warn">
+<b>العطل، في الاختبار لا في الكود:</b> أوّل نسخة من اختبار "فشل قراءة تفضيل الدفع الفوري يفشل بأمان (لا يكتم الإرسال)" استخدمت أسلوب اعتراض خاطئ — اعترضت دالّة <code>execute()</code> على الجلسة، بينما بحث تفضيلات العميل يستخدم فعليًّا دالّة <code>get()</code> المختلفة، التي لا تمرّ عبر <code>execute()</code> إطلاقًا. النتيجة: الاختبار كان سينجح دائمًا — حتى لو حُذِف كامل إصلاح F11 لهذا الجزء بالضبط.
+</div>
+<p><b>الإصلاح:</b> أُعيدت كتابة الاختبار ليعترض دالّة <code>get()</code> الصحيحة، ويُسجِّل جهازًا حقيقيًّا للمستخدم، ويتحقّق فعليًّا من أنّ الدفع الفوري لا يزال يُحاوَل رغم فشل قراءة التفضيل — بدل الاكتفاء بـ"لم يحدث استثناء" (وهو صحيح، لكنّه لا يُثبِت شيئًا عن السلوك الفعلي).</p>
+</section>
+
+<section id="s8">
+<h2>§8 لماذا لا تجربة Postgres جديدة هذه المرّة؟</h2>
+<p>
+منهجيّة هذه الجلسة تقتضي استخدام وكيل "متتبّع سيناريوهات" يُجري تجارب حقيقيّة على Postgres حقيقي — لكنّه لم يُستدعَ لهذا البند تحديدًا، وهذا قرار واعٍ لا إسقاط سهو: تقرير 567 (F10) أثبت بالفعل، بتجربتَين حقيقيّتَين منفصلتَين على Postgres حقيقي، أنّ (1) نقطة الحفظ (SAVEPOINT) تستعيد معاملة مسمَّمة فعليًّا، و(2) سجلّات معلَّقة سابقة في نفس الجلسة لا تُفقَد عند ارتداد نقطة الحفظ. F11 لا يُدخِل آليّة Postgres جديدة — هو يُعيد استخدام نفس الآليّة المُثبَتة حرفيًّا في مواضع إضافيّة (PUSH/SMS/واتساب) بدل موضع واحد (البريد). إعادة تشغيل نفس التجربة على نفس الآليّة لم يكن سيضيف يقينًا جديدًا، فاستُبدِلت بتعميق المراجعة العدائيّة بدلًا من ذلك.
+</p>
+</section>
+
+<section id="s9">
+<h2>§9 النشر على المواضع الأربعة</h2>
+<table>
+<tr><th>الموضع</th><th>التحقّق</th><th>الحالة</th></tr>
+<tr><td><b>GitHub</b></td><td>الالتزام <code>8159dd0e</code> مدفوع على فرع <code>remediation/report557-phases0-6</code></td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>test 1</b></td><td>إعادة بناء <code>tawalocal-backend-core:latest</code> محليًّا، إعادة إنشاء الحاويات، هجرة <code>ab75</code> (بلا تغيير)، فحص صحّي <code>HTTP 200</code></td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>test / .194</b></td><td>نقل الصورة الصحيحة (<code>tawalocal-backend-core:latest</code> — <b>لا</b> <code>tawa-test-*</code>، وهو خطأ وقع في نشر تقرير 567 وصُحِّح حينها) عبر <code>docker save | scp | docker load</code>، إعادة إنشاء <code>backend-core</code>، هجرة <code>ab75</code>، فحص صحّي <code>HTTP 200</code></td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>Production (tawanow.com)</b></td><td>عبر <code>deploy/deploy_be.sh</code>، هجرة <code>ab75</code>، <code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code>، اختبار دخول حيّ ناجح</td><td><span class="tag ok">مكتمل</span></td></tr>
+</table>
+<p class="small">بند بكود فقط، بلا هجرة قاعدة بيانات جديدة — رأس الهجرة <code>ab75</code> يبقى كما هو على المواضع الأربعة. النشر على Production جرى بعد إذن صريح من المالك ("Build F11 next" ثمّ تأكيد ضمني لنمط النشر المتَّبع طوال هذه الجلسة).</p>
+</section>
+
+<section id="s10">
+<h2>§10 قسم المشاكل والحلول</h2>
+<table>
+<tr><th>المشكلة</th><th>كيف اكتُشِفت</th><th>الحلّ</th><th>الأثر إن لم تُكتشَف</th></tr>
+<tr>
+  <td>قنوات PUSH/SMS بلا أي حماية استثناء إطلاقًا (لا try/except حتى)</td>
+  <td>مسجَّلة صراحةً كبند متابعة (F11) عند إغلاق تقرير 567، مع نصّ يذكر ضرورة SAVEPOINT لا try/except فقط</td>
+  <td>تطبيق نمط F10 المُصحَّح على كلا القناتين، بثلاث طبقات مستقلّة لـ PUSH (تفضيل، بحث أجهزة، إرسال لكل جهاز)</td>
+  <td>عطل قاعدة بيانات عابر (نفاد اتّصالات، مهلة استعلام) في أي من هذه المسارات كان سيُسقِط المعاملة التجاريّة الأصليّة كاملةً — احتمال حقيقي، لا نظري بحت</td>
+</tr>
+<tr>
+  <td>قناة واتساب تملك حماية استثناء قديمة الطراز — لا SAVEPOINT، علم المحاولة متأخّر جدًّا</td>
+  <td>مستشار مستمرّ، قبل إرسال الكود للمراجعة العدائيّة — قارن واتساب مباشرةً بنمط F10 المُصحَّح المُطبَّق للتوّ على SMS</td>
+  <td>نقل علم المحاولة إلى نقطة أبكر، تغليف بحث المستلم بنقطة حفظ — نفس النمط المُطبَّق على SMS بالضبط</td>
+  <td>عطل بحث مستلم واتساب كان سيُفقَد بصمت (لا تسجيل محاولة) وكان سيُسمِّم بقيّة المعاملة على Postgres حقيقي — كان سيبقى بلا اكتشاف حتى نُشِر واتساب فعليًّا (اليوم خامل، بلا رمز وصول WABA مُهيَّأ)</td>
+</tr>
+<tr>
+  <td>اختبار "فشل قراءة تفضيل الدفع الفوري يفشل بأمان" لا يختبر السلوك الذي يدّعيه — كان سينجح حتى لو حُذِف الإصلاح</td>
+  <td>مراجعة عدائيّة — تتبُّع دقيق للمسار الفعلي لكل استدعاء قاعدة بيانات (<code>get()</code> مقابل <code>execute()</code>) بدل الثقة بنيّة الاختبار</td>
+  <td>إعادة كتابة الاختبار ليعترض الدالّة الصحيحة (<code>get()</code>) مع جهاز حقيقي مسجَّل، ويتحقّق من نتيجة إرسال فعليّة لا من "عدم حدوث استثناء" فقط</td>
+  <td>ثقة زائفة بتغطية اختبارات لا تُغطّي فعليًّا — انحراف مستقبلي في هذا الجزء من الكود كان سيمرّ دون أن يلاحظه أحد</td>
+</tr>
+</table>
+</section>
+
+<section id="s11">
+<h2>§11 الأرقام النهائيّة والتحقّق الكامل</h2>
+<table>
+<tr><th>البند</th><th>القيمة</th></tr>
+<tr><td>اختبارات الخلفيّة (الطقم الكامل، الحالة النهائيّة للكود)</td><td>4256 ناجح / 15 مُتخطّى / <b>0 فاشل</b> (+6 اختبارات جديدة عن تقرير 567: 5 لـ PUSH/SMS + 1 لواتساب المُكتشَفة أثناء المراجعة)</td></tr>
+<tr><td>تجارب Postgres حقيقيّة جديدة لهذا البند</td><td><b>صفر — عمدًا</b>، الآليّة (SAVEPOINT + بقاء السجلّات المعلَّقة) مُثبَتة فعليًّا في تقرير 567 ومُعاد استخدامها بلا تعديل (تفصيل §8)</td></tr>
+<tr><td>FIN-COR</td><td><span class="tag ok">PASS</span></td></tr>
+<tr><td>بوّابة ما قبل النشر (<code>predeploy_gate.sh</code>)</td><td><span class="tag ok">PASSED</span> — صفر فشل جديد</td></tr>
+<tr><td>هجرات قاعدة بيانات جديدة</td><td>لا شيء — بند بكود فقط، رأس الهجرة يبقى <code>ab75</code></td></tr>
+<tr><td>رأس الهجرة على المواضع الأربعة</td><td><code>ab75</code> — متطابق تمامًا</td></tr>
+<tr><td>الالتزام</td><td><code>8159dd0e</code></td></tr>
+<tr><td>قنوات أُصلحت فعليًّا</td><td>3 (PUSH، SMS، واتساب) — الثالثة اكتُشِفت ووُسِّع النطاق لها أثناء التنفيذ، لا في الخطّة الأصليّة لـ F11</td></tr>
+<tr><td>فحص صحّي خارجي بعد النشر على Production</td><td><code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code></td></tr>
+</table>
+</section>
+
+<footer>
+تقرير 568 — وُلِّد من جلسة تنفيذ واحدة على فرع <code>remediation/report557-phases0-6</code>، فوق تقرير 567. الالتزام: <code>8159dd0e</code>. لا حذف ولا تعديل لأي تقرير سابق — كل مراجعة أو تنقيح مستقبلي يكون ملفًّا جديدًا منفصلًا.
+</footer>
+
+</body>
+</html>

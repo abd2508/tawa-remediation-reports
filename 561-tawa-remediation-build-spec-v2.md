@@ -556,6 +556,15 @@ exception safety `[LOW]`, non-blocking, no ticket yet built
   `async with self._session.begin_nested():` (the SAVEPOINT pattern, same as
   `_read_channel_toggle` and F10's EMAIL-recipient-lookup fix), not bare try/except. See
   `notification_service.py`'s EMAIL block (post-F10) for the exact pattern to copy.**
+- **DONE** (2026-07-27, commit `8159dd0e` — see report 568). Built exactly per the recipe
+  above (SAVEPOINT, not bare try/except, for every DB-read site). Scope grew by one during
+  the adversarial review: WHATSAPP (pre-existing, not in F11's original text) turned out to
+  have its own try/except already, but in the SAME shape F10's first draft got wrong for
+  EMAIL — attempt-flag flipped too late, recipient lookup not SAVEPOINT-wrapped. Folded in
+  and fixed identically rather than filed as yet another ticket, since it's the same bug
+  class with the same established fix, not new design work. No new Postgres experiment run
+  — F10's two experiments already proved the SAVEPOINT-recovery and pending-row-survival
+  mechanics; F11 reuses them unchanged in more call sites.
 
 ### F9 — POS webhook hardening `[HIGH]`, overlaps J5/J1 (SEQ-19)
 - **193:** unify ~23 raw `HTTPException(detail=...)` sites into one `PosWebhookError` envelope
