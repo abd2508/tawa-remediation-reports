@@ -513,6 +513,49 @@ dispatch exception safety `[MEDIUM]`, non-blocking, no ticket yet built
   anything currently live). A secondary, lower-priority reviewer note from the same pass: audit
   whether the WHATSAPP exception path's audit-log write covers every raise site the same way
   the EMAIL fix above should.
+- **DONE** (2026-07-27, commit `bb73a700` — see report 567). Wrapped the EMAIL branch in its own
+  try/except mirroring WHATSAPP's. Post-review correction (found independently by both the
+  standing advisor and the independent adversarial reviewer on THIS ticket's own review
+  pass): the first version of the fix set `_email_attempted` right before `send_email`
+  (mirroring WHATSAPP's `_wa_attempted` placement exactly) — but EMAIL, unlike WHATSAPP, is
+  sometimes the SOLE eligible channel (e.g. `auth.password_changed`), so a persistent
+  `_render_email_payload` bug (malformed operator template) or a recipient-lookup DB error
+  would be caught, logged, and then silently dropped with `any_attempted=False` — the exact
+  silent-delivery-with-nothing-sent class F4/F6 exist to prevent. Fixed by flipping
+  `_email_attempted` as soon as the channel is confirmed enabled, before the recipient
+  lookup, so both raise sites are retry/dead-letter-eligible. `_dispatch_channels`'s
+  docstring also softened from an unqualified "Never raises" to the actual guarantee
+  (EMAIL/WHATSAPP guarded, PUSH/SMS/lookup DB errors are not — see F11 below).
+
+### F11 (NEW — discovered 2026-07-27, filed while closing F10) — PUSH/SMS dispatch
+exception safety `[LOW]`, non-blocking, no ticket yet built
+- Same shape as F10, one tier down in severity/likelihood. `_dispatch_channels`'s PUSH block
+  (`send_push` call + the `DeviceToken` select feeding it) and SMS block (`session.get(User)`
+  + `send_sms`), plus the CUSTOMER/DRIVER preference lookups upstream of PUSH
+  (`CustomerPreferences`/`DriverPreferences`, ~lines 577-599), have no try/except — a DB
+  error in any of them still propagates out of `_dispatch_channels`, up through
+  `send()`/`send_order_event()`, into the caller's business transaction, exactly like
+  EMAIL did before F10. Not fixed as part of F10 to keep that ticket scoped to the asymmetry
+  it was actually filed for (matches this batch's own J3-deferral precedent: don't grow a
+  ticket mid-flight to cover every call site touching the same file). Fix, when built: same
+  pattern as F10/WHATSAPP — wrap each block in its own try/except, record a failed attempt
+  only once the channel is confirmed eligible (not merely "about to call the provider"),
+  matching F10's corrected `_email_attempted` placement rationale, not WHATSAPP's original
+  (narrower) one.
+- **IMPORTANT, proven empirically during F10's own build (real-Postgres
+  experiment, not code reading): try/except ALONE is NOT sufficient for the DB-read sites
+  (the `DeviceToken` select feeding PUSH, SMS's `session.get(User)`, and the
+  `CustomerPreferences`/`DriverPreferences` lookups). On Postgres, an uncaught DB error
+  inside a plain try/except still leaves the enclosing transaction aborted
+  (`InFailedSqlTransactionError`) — the Python exception is caught, but every subsequent
+  statement on that same session (including the IN_APP dedup SELECT and the final `flush()`
+  at the end of `_dispatch_channels`) then raises anyway, so the "failed attempt" never
+  actually reaches the returned `DispatchOutcome`. SQLite (the unit-test dialect) does NOT
+  abort-poison transactions, so this is invisible to the test suite alone — it only showed
+  up under a real Postgres experiment. Each of those DB-read sites must be wrapped in
+  `async with self._session.begin_nested():` (the SAVEPOINT pattern, same as
+  `_read_channel_toggle` and F10's EMAIL-recipient-lookup fix), not bare try/except. See
+  `notification_service.py`'s EMAIL block (post-F10) for the exact pattern to copy.**
 
 ### F9 — POS webhook hardening `[HIGH]`, overlaps J5/J1 (SEQ-19)
 - **193:** unify ~23 raw `HTTPException(detail=...)` sites into one `PosWebhookError` envelope

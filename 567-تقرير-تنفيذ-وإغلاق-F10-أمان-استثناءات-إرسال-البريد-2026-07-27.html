@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>567 — تقرير تنفيذ وإغلاق: F10 (أمان استثناءات مسار البريد الإلكتروني للإشعارات)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74; --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d;
+  --line:#e4ddd0; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c; --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c; --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0; --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif; direction:rtl;line-height:1.7;max-width:980px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:72ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.88em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.84em;max-width:100%}
+a{color:var(--accent2)}
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.9em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel); border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:120px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.7em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.8em}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+.callout.good{border-inline-start:5px solid var(--good)}
+.callout.bad{border-inline-start:5px solid var(--bad)}
+.callout.build{border-inline-start:5px solid var(--build)}
+section{margin:44px 0}
+section > h2{font-size:1.4em;padding-bottom:10px;border-bottom:2px solid var(--line)}
+h3{font-size:1.12em;color:var(--accent2)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.93em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--panel);color:var(--sub);font-weight:700}
+tr:nth-child(even){background:color-mix(in srgb, var(--panel) 60%, transparent)}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78em;font-weight:700;white-space:nowrap}
+.tag.ok{background:color-mix(in srgb, var(--good) 18%, transparent);color:var(--good)}
+.tag.bad{background:color-mix(in srgb, var(--bad) 18%, transparent);color:var(--bad)}
+.tag.warn{background:color-mix(in srgb, var(--warn) 18%, transparent);color:var(--warn)}
+.tag.info{background:color-mix(in srgb, var(--info) 18%, transparent);color:var(--info)}
+.pipeline{display:flex;flex-wrap:wrap;gap:0;margin:26px 0;align-items:stretch}
+.pipe-step{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;position:relative;margin:6px}
+.pipe-step b{display:block;color:var(--accent2);font-size:.95em;margin-bottom:4px}
+.pipe-step span{font-size:.85em;color:var(--sub)}
+.pipe-arrow{display:flex;align-items:center;justify-content:center;font-size:1.4em;color:var(--sub);padding:0 2px}
+@media (max-width:820px){.pipe-arrow{transform:rotate(90deg)}}
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:18px 0;overflow-x:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+.small{font-size:.85em;color:var(--sub)}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 567 · تنفيذ وإغلاق</div>
+  <h1>F10 — إصلاح فجوة أمان استثناءات مسار البريد الإلكتروني في محرّك الإشعارات</h1>
+  <div class="meta">فرع <code>remediation/report557-phases0-6</code> · 2026-07-27 · بند وحيد وُجد أثناء مراجعة تقرير 566، ثمّ بُني هنا · الالتزام: <code>bb73a700</code></div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>1</b><span>بند وحيد (F10)، لكن بثلاث جولات إصلاح متتالية قبل الإغلاق</span></div>
+  <div class="stat"><b>1</b><span>بند متابعة جديد فُتِح ووُثِّق (F11)</span></div>
+  <div class="stat"><b>3</b><span>أعطال حقيقيّة مختلفة اكتُشِفت بالتتابع (مستشار + مراجع + تجربة Postgres)</span></div>
+  <div class="stat"><b>4250</b><span>اختبار خلفيّة ناجح، صفر فاشل (على الحالة النهائيّة للكود)</span></div>
+  <div class="stat"><b>4/4</b><span>مواضع نشر مكتملة ومتحقَّق منها خارجيًّا</span></div>
+</div>
+
+<div class="callout warn">
+<b>صراحة كاملة بشأن كيف تطوَّر هذا البند:</b> F10 بدأ كإصلاح صغير جدًّا — "أضِف try/except حول مسار البريد، بنفس نمط واتساب الموجود" — وكان يمكن إغلاقه في دقائق. لكن كل إصلاح كشف عن مشكلة أعمق تحته: أوّلًا تبيّن أنّ نسخ نمط واتساب حرفيًّا يُسقِط أعطالًا حقيقيّة بصمت (§4)، ثمّ تبيّن أنّ الإصلاح الأوّل نفسه لا يكفي على Postgres حقيقي بسبب "تسميم" المعاملة (transaction poisoning) — وهذا أُثبِت بتجربة حقيقيّة على قاعدة بيانات حقيقيّة، لا بقراءة كود (§5). هذا التقرير يوثّق الثلاث جولات كاملةً، بما فيها الأثر الذي ثبت لاحقًا أنّه <b>غير حقيقي</b> (§5، الاحتياط الإضافي) — لأنّ إخفاء أنّ فرضيّة ما تبيّن خطؤها بعد التحقّق الفعلي يُفقِد القارئ فهم لماذا الكود النهائي مكتوب كما هو مكتوب.
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li><a href="#s1">الخلاصة بلغة بسيطة</a></li>
+    <li><a href="#s2">كيف وُلِد هذا البند؟</a></li>
+    <li><a href="#s3">منهجيّة العمل — بنّاء، مستشار مستمرّ، مراجع مستقلّ، تجربة Postgres حقيقيّة</a></li>
+    <li><a href="#s4">الجولة الأولى: try/except يُخفي عطلًا لكنّه يُسقِط أعطالًا أخرى بصمت</a></li>
+    <li><a href="#s5">الجولة الثانية: تسميم المعاملة على Postgres — مُثبَت بتجربة حقيقيّة</a></li>
+    <li><a href="#s6">الجولة الثالثة: هل تُفقَد سجلّات تسليم سابقة؟ — تجربة حقيقيّة ثانية</a></li>
+    <li><a href="#s7">النشر على المواضع الأربعة</a></li>
+    <li><a href="#s8">قسم المشاكل والحلول</a></li>
+    <li><a href="#s9">بند متابعة جديد: F11 (قنوات الدفع/الرسائل النصّيّة، نفس الفجوة، أولويّة أقلّ)</a></li>
+    <li><a href="#s10">الأرقام النهائيّة والتحقّق الكامل</a></li>
+  </ol>
+</div>
+
+<section id="s1">
+<h2>§1 الخلاصة بلغة بسيطة</h2>
+<p>
+عندما يفشل النظام في إرسال بريد إلكتروني (إشعار تغيير كلمة المرور، تأكيد استلام طلب، إلخ)، يجب أن يحدث أحد أمرين فقط: إمّا أن يُرسَل البريد بنجاح، أو أن يُسجَّل الفشل بوضوح ليُعاد المحاولة لاحقًا. ما اكتُشِف في مراجعة تقرير 566 (البند F10) هو أنّ الكود القديم كان يملك احتمالًا ثالثًا خفيًّا: أن يفشل الإرسال بصمت، دون أن يُسجَّل شيء، ودون أن تتوقّف العمليّة التي طلبت الإرسال أصلًا (مثل تسجيل دخول، أو تسليم طلب) — أو، في أسوأ الحالات، أن يتعطّل تسجيل الدخول أو تسليم الطلب نفسه بسبب عطل في إرسال البريد الذي كان من المفترض أن يكون جانبيًّا تمامًا.
+</p>
+<p>
+هذا التقرير يوثّق إصلاح هذه الفجوة — لكن الأهمّ فيه هو <b>كيف</b> تمّ الإصلاح: كل نسخة أوّليّة من الحلّ فحصها طرف مستقلّ (مستشار متابع باستمرار، ثمّ مراجع عدائي منفصل، ثمّ تجربة حقيقيّة على قاعدة بيانات Postgres حقيقيّة)، ووجد كل واحد منهم مشكلة حقيقيّة في النسخة السابقة لم تكن ظاهرة من قراءة الكود وحدها. النتيجة النهائيّة مختلفة جوهريًّا عن أوّل نسخة كُتِبت، وهذا الفرق هو بالضبط ما كان يجب أن يحدث.
+</p>
+</section>
+
+<section id="s2">
+<h2>§2 كيف وُلِد هذا البند؟</h2>
+<p>
+أثناء المراجعة العدائيّة لتقرير 566 (بنود F4/F6/E3/G-H)، وجد المراجع أنّ دالّة توزيع القنوات المركزيّة في محرّك الإشعارات (<code>_dispatch_channels</code>) تحمل توثيقًا صريحًا يقول "لا تَرمي استثناءً أبدًا" — وعد يعتمد عليه كل من بند F4 (منع توهُّم النجاح عند فشل كل القنوات) وبند F6 (فحص القنوات الآمن) وآليّة صندوق الأحداث الصادرة. لكن، خلافًا لمسار واتساب المجاور له في نفس الملفّ، مسار البريد الإلكتروني <b>لم يكن</b> محاطًا بأي حماية استثناء — فخطأ في قالب بريد يُعِدّه المشغِّل يدويًّا (أو عطل في استعلام جلب بيانات المستلم) كان سيُخرِج استثناءً حقيقيًّا يصعد مباشرةً عبر دالّة الإرسال ليصل إلى المعاملة التجاريّة التي استدعتها أصلًا — كتغيير حالة طلب، أو قبول عرض توصيل.
+</p>
+<p>سُجِّل هذا كبند جديد <b>F10</b> في وثيقة الخطّة، غير حاجب للنشر (خامل اليوم لأنّ آليّة صندوق الأحداث الصادرة معطَّلة افتراضيًّا في كل البيئات)، ثمّ طُلِب بناؤه في هذه الجلسة.</p>
+</section>
+
+<section id="s3">
+<h2>§3 منهجيّة العمل — بنّاء، مستشار مستمرّ، مراجع مستقلّ، تجربة Postgres حقيقيّة</h2>
+<div class="pipeline">
+  <div class="pipe-step" style="border-top:4px solid var(--build)"><b>1. البناء الأوّليّ</b><span>لفّ مسار البريد بـ try/except، بنسخ حرفي لنمط واتساب المجاور</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--corr)"><b>2. مستشار مستقلّ</b><span>يرى المحادثة كاملةً، يُستشار قبل والتزامًا كل خطوة جوهريّة — وجد الفجوة الأولى (§4)</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--build)"><b>3. مراجعة عدائيّة</b><span>وكيل مستقلّ لم يرَ عمل البنّاء — أكّد صحّة الإصلاح، لم يجد عيبًا حاجبًا</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--corr)"><b>4. مستشار — جولة ثانية</b><span>وجد فجوة أعمق: تسميم المعاملة على Postgres — طلب تجربة حقيقيّة، لا استنتاجًا</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--accent)"><b>5. تجربة Postgres حقيقيّة ×2</b><span>وكيل متتبّع سيناريوهات — أثبت المشكلة تجريبيًّا، ثمّ أثبت أنّ إصلاحًا احتياطيًّا إضافيًّا لم يكن ضروريًّا لكنّه أُبقِي كتأمين</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--good)"><b>6. تحقّق نهائي + نشر ×4</b><span>4250 اختبارًا على الحالة النهائيّة للكود (وليس نسخة سابقة) + FIN-COR + بوّابة ما قبل النشر</span></div>
+</div>
+<p class="small">فرقٌ متعمَّد عن تقرير 566: هنا وكيل "متتبّع السيناريوهات" استُدعِي مرّتين على التوالي لنفس البند (وليس مرّة واحدة بالتوازي مع المراجعة) — لأنّ كل تجربة كشفت سؤالًا تاليًا لم يكن مطروحًا قبلها. هذا اتّباع طبيعي للمنهجيّة، لا خروج عنها: التجربة الحقيقيّة هي التي تقرّر متى يكفي التحقّق، لا عدد مرات استدعائها المخطَّط له مسبقًا.</p>
+</section>
+
+<section id="s4">
+<h2>§4 الجولة الأولى: try/except يُخفي عطلًا لكنّه يُسقِط أعطالًا أخرى بصمت</h2>
+<p><b>الإصلاح الأوّل:</b> لفّ مسار البريد الإلكتروني بـ try/except يطابق تمامًا نمط مسار واتساب المجاور: علم (<code>_email_attempted</code>) يتحوّل إلى "صحيح" مباشرةً <b>قبل</b> استدعاء دالّة الإرسال الخارجيّة فقط — أي بعد أن تنجح كل خطوات التحضير (قراءة الإعداد، جلب بيانات المستلم، تجهيز نصّ البريد). أي استثناء بعد هذه النقطة يُلتقَط ويُسجَّل كمحاولة فاشلة تدخل في إعادة المحاولة.</p>
+<div class="callout bad">
+<b>ما وجده المستشار:</b> نسخ نمط واتساب هنا حرفيًّا كان خطأً، لأنّ الفرضية التي يقوم عليها نمط واتساب (أنّه لا يكون أبدًا القناة الوحيدة المؤهَّلة لإشعار ما) لا تنطبق على البريد الإلكتروني. أحداث مثل "تغيير كلمة المرور" أو "تسجيل دخول من جهاز جديد" <b>قناتها الوحيدة</b> هي البريد الإلكتروني. بهذا التصميم: لو فشل تجهيز نصّ البريد (خطأ في قالب أعدّه المشغِّل يدويًّا، مثلًا) — الاستثناء يُلتقَط بنجاح (لا عطل ظاهر)، لكن بما أنّ العلم لم يتحوّل بعد إلى "صحيح" عند تلك النقطة، لا يُسجَّل أي محاولة فاشلة على الإطلاق. النتيجة: الإشعار يُعتبَر "لا قناة له أصلًا"، لا "قناة فشلت" — فلا إعادة محاولة، ولا رسالة ميّتة، ولا أي أثر يصل لفريق العمليّات، رغم أنّ العميل لم يستلم شيئًا إطلاقًا.
+</div>
+<p><b>الإصلاح المصحَّح:</b> نُقِل تحويل العلم إلى نقطة أبكر — فور تأكيد أنّ القناة مفعَّلة، قبل جلب بيانات المستلم وقبل تجهيز نصّ البريد — بحيث يُسجَّل أي فشل بعد تلك النقطة (تجهيز النصّ أو جلب المستلم أو الإرسال نفسه) كمحاولة فاشلة حقيقيّة قابلة لإعادة المحاولة. حالة "لا بريد إلكتروني صالح للمستلم أصلًا" تبقى بلا تسجيل محاولة، لأنّها استبعاد مشروع فعلًا، لا فشل.</p>
+</section>
+
+<section id="s5">
+<h2>§5 الجولة الثانية: تسميم المعاملة على Postgres — مُثبَت بتجربة حقيقيّة</h2>
+<p>
+بعد المراجعة العدائيّة (التي أكّدت صحّة الإصلاح المصحَّح ولم تجد عيبًا حاجبًا)، طرح المستشار سؤالًا لم يخطر لأحد قبله: <b>ماذا يحدث فعليًّا على Postgres الحقيقي</b> (لا SQLite، محرّك اختبارات الوحدة) لو رمى استعلام جلب بيانات المستلم عطلًا حقيقيًّا؟
+</p>
+<div class="callout bad">
+<b>الفرضيّة، ثمّ الإثبات التجريبي:</b> على Postgres، عطل قاعدة بيانات حقيقي داخل try/except عادي <b>لا يُصلَح</b> بمجرّد التقاط الاستثناء بلغة Python — المعاملة (transaction) نفسها تبقى "معطَّلة" على مستوى قاعدة البيانات. أي استعلام لاحق على نفس الجلسة (مثل استعلام تفادي تكرار سجلّ "IN_APP"، أو عمليّة <code>flush()</code> الأخيرة في نهاية الدالّة) يفشل بدوره — فمحاولة الالتقاط والمتابعة التي يبدو أنّها نجحت في Python، تنهار فعليًّا بضع أسطر لاحقًا. SQLite، محرّك اختبارات الوحدة، لا يُظهِر هذا السلوك إطلاقًا — فكان هذا العطل غير مرئي بالكامل لطقم الاختبارات وحده.
+</div>
+<p><b>التجربة الحقيقيّة الأولى (وكيل متتبّع سيناريوهات، على قاعدة Postgres تجريبيّة حقيقيّة منفصلة):</b> استعلام حقيقي يفشل فعليًّا (<code>asyncpg.exceptions.DivisionByZeroError</code>) داخل try/except عادي — أثبتت التجربة أنّ الاستعلام <b>التالي</b> على نفس الجلسة يفشل بدوره بـ<code>InFailedSQLTransactionError</code>، بالضبط كما توقّع المستشار. ثمّ نفس التجربة بإضافة "نقطة حفظ" (SAVEPOINT، عبر <code>async with session.begin_nested():</code> — نفس النمط المستخدَم أصلًا في بند F6 من تقرير 566) حول الاستعلام الفاشل: الاستعلام التالي نجح بنظافة تامّة.</p>
+<p><b>الإصلاح:</b> جلب بيانات المستلم في مسار البريد الآن مُغلَّف بنقطة حفظ (SAVEPOINT)، بنفس نمط بند F6 تمامًا — فيرتدّ فقط ذلك الاستعلام الواحد عند فشله، ويبقى بقيّة المعاملة قابلًا للاستخدام في كل الأحوال.</p>
+</section>
+
+<section id="s6">
+<h2>§6 الجولة الثالثة: هل تُفقَد سجلّات تسليم سابقة؟ — تجربة حقيقيّة ثانية</h2>
+<p>
+سؤال أخير طرحه المستشار قبل الإغلاق: مسار الدفع الفوري (PUSH) ومسار الرسالة النصّيّة (SMS) يسبقان مسار البريد في نفس الدالّة، ويضيفان سجلّات تسليم (<code>NotificationDeliveryLog</code>) إلى الجلسة <b>دون كتابتها فورًا</b> لقاعدة البيانات (سلوك SQLAlchemy القياسي). إذا كانت هذه السجلّات "معلَّقة" فعلًا عندما تدخل نقطة الحفظ الجديدة (لأنّ استعلام جلب المستلم قد يُطلِق كتابة تلقائيّة لكل ما هو معلَّق)، وارتدّت نقطة الحفظ بسبب فشل — هل تُفقَد سجلّات الدفع والرسالة النصّيّة معها، رغم أنّ إرسالهما الفعلي قد نجح فعلًا قبل ذلك؟
+</p>
+<div class="callout good">
+<b>التجربة الحقيقيّة الثانية:</b> جدول تجريبي حقيقي على نفس قاعدة Postgres، صفّان "معلَّقان" يُحاكيان سجلّي الدفع/الرسالة النصّيّة، ثمّ دخول نقطة حفظ فشلت وارتدّت. النتيجة، مؤكَّدة بقراءة مباشرة من قاعدة البيانات بعد الالتزام: <b>الصفّان بقيا محفوظَين، لم يُفقَد شيء.</b> السبب (مؤكَّد بتتبّع الأوامر الفعليّة المُرسَلة لـ Postgres): الكتابة التلقائيّة للسجلّات المعلَّقة تحدث <b>قبل</b> إرسال أمر "SAVEPOINT" نفسه إلى قاعدة البيانات على مستوى الشبكة — فتقع خارج نطاق نقطة الحفظ أصلًا، لا داخله.
+</div>
+<p>رغم أنّ التجربة أثبتت أنّ لا خطر حقيقي هنا، أُضيفت خطوة <code>flush()</code> صريحة قبل نقطة الحفظ مباشرةً — <b>احتياطًا إضافيًّا لا إصلاحًا لعطل مُثبَت</b>، لأنّها تجعل تعليق الكود ("نقطة الحفظ ترتدّ فقط عن هذا الاستعلام") صحيحًا بشكل قاطع بدل الاعتماد على سلوك داخلي لـ SQLAlchemy قد يختلف بين إصدارات المكتبة. هذا مسجَّل بوضوح في الكود كتأمين إضافي، لا كإصلاح لخلل ملاحَظ — تمييزًا متعمَّدًا حتى لا يظنّ قارئ مستقبلي أنّ هناك عطلًا مُثبَتًا هنا.</p>
+</section>
+
+<section id="s7">
+<h2>§7 النشر على المواضع الأربعة</h2>
+<table>
+<tr><th>الموضع</th><th>التحقّق</th><th>الحالة</th></tr>
+<tr><td><b>GitHub</b></td><td>الالتزام <code>bb73a700</code> مدفوع على فرع <code>remediation/report557-phases0-6</code></td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>test 1</b></td><td>إعادة بناء الصورة محليًّا (<code>tawalocal-backend-core:latest</code>)، إعادة إنشاء الحاويات، هجرة <code>ab75</code> (بلا تغيير — البند لا يمسّ نماذج قاعدة البيانات)، فحص صحّي <code>HTTP 200</code></td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>test / .194</b></td><td>نقل الصورة عبر <code>docker save | scp | docker load</code>، إعادة إنشاء <code>backend-core</code>، هجرة <code>ab75</code>، فحص صحّي <code>HTTP 200</code></td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>Production (tawanow.com)</b></td><td>بناء الصورة + شحنها + تحميلها + إعادة إنشاء الحاويات عبر <code>deploy/deploy_be.sh</code> (نفّذه الوكيل مباشرةً هذه المرّة — لم يُحظَر من مصنِّف الأذونات، خلافًا للدفعات السابقة)، هجرة <code>ab75</code>، <code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code>، اختبار دخول حيّ ناجح</td><td><span class="tag ok">مكتمل</span></td></tr>
+</table>
+<p class="small">هذا البند لا يمسّ نماذج قاعدة البيانات ولا يضيف هجرة جديدة — رأس الهجرة <code>ab75</code> يبقى كما هو على المواضع الأربعة، وهذا مؤكَّد صراحةً لا مفترَض. النشر على Production جرى بعد إذن صريح من المالك في المحادثة ("go ahead and deploy")، بنفس نمط الأذونات المتَّبع في الدفعات السابقة من هذه الجلسة.</p>
+</section>
+
+<section id="s8">
+<h2>§8 قسم المشاكل والحلول</h2>
+<table>
+<tr><th>المشكلة</th><th>كيف اكتُشِفت</th><th>الحلّ</th><th>الأثر إن لم تُكتشَف</th></tr>
+<tr>
+  <td>مسار البريد بلا حماية استثناء إطلاقًا، خلافًا للتوثيق الصريح للدالّة</td>
+  <td>مراجعة عدائيّة على تقرير 566 (اكتشاف أصلي، سجَّل البند F10)</td>
+  <td>لفّ المسار بـ try/except، بنمط واتساب المجاور</td>
+  <td>عطل في قالب بريد يُعِدّه المشغِّل يدويًّا يُسقِط المعاملة التجاريّة كاملةً (تغيير حالة طلب، قبول عرض)</td>
+</tr>
+<tr>
+  <td>نسخ نمط واتساب حرفيًّا يُسقِط أعطال البريد الوحيد-القناة بصمت (بلا تسجيل محاولة فاشلة، بلا إعادة محاولة)</td>
+  <td>مستشار مستمرّ للمحادثة، قبل الالتزام بالإصلاح الأوّل</td>
+  <td>نقل تحويل علم "محاولة جارية" إلى نقطة أبكر — فور تأكيد تفعيل القناة، لا قبيل الإرسال مباشرةً</td>
+  <td>أحداث حسّاسة وحيدة-القناة (تغيير كلمة مرور، تنبيه أمني) تُفقَد بصمت عند أي خطأ في قالب البريد، دون أثر يصل لفريق العمليّات</td>
+</tr>
+<tr>
+  <td>try/except وحده لا يكفي على Postgres حقيقي — عطل يُسمِّم المعاملة رغم التقاط الاستثناء</td>
+  <td>مستشار، ثمّ تجربة حقيقيّة مُثبَتة على Postgres تجريبي منفصل (لا استنتاج نظري)</td>
+  <td>نقطة حفظ (SAVEPOINT) حول جلب بيانات المستلم، بنفس نمط بند F6</td>
+  <td>حتى الإصلاح الأوّل نفسه كان سيفشل عمليًّا على Production (Postgres حقيقي) رغم نجاحه الكامل في طقم اختبارات الوحدة (SQLite) — فجوة كانت ستبقى غير مرئية حتى وقوعها فعليًّا</td>
+</tr>
+</table>
+</section>
+
+<section id="s9">
+<h2>§9 بند متابعة جديد: F11 (قنوات الدفع/الرسائل النصّيّة، نفس الفجوة، أولويّة أقلّ)</h2>
+<p>
+نفس الفجوة الأصليّة (بلا حماية استثناء) موجودة أيضًا في مسار الدفع الفوري (PUSH) ومسار الرسالة النصّيّة (SMS) وفي استعلامات تفضيلات المستخدم التي تسبقهما — لم تُصلَح هنا عمدًا، حفاظًا على نطاق F10 محصورًا بالفجوة التي سُجِّل لأجلها فعلًا (نفس مبدأ تأجيل J3 في تقرير 566: لا تُوسَّع مهمّة أثناء تنفيذها لتغطّي كل موضع مشابه في نفس الملفّ).
+</p>
+<div class="callout warn">
+<b>الأهمّ في توثيق F11:</b> نصّ البند يذكر صراحةً أنّ try/except وحده <b>لا يكفي</b> — استنادًا مباشرةً لما أثبتته التجربة الحقيقيّة في §5 من هذا التقرير — بل يجب أن تُغلَّف مواضع قراءة قاعدة البيانات فيهما أيضًا بنقطة حفظ (SAVEPOINT)، لا try/except عادي فقط. هذا مسجَّل بوضوح في وثيقة الخطّة حتى لا يبني مستقبِل هذا البند نسخة تبدو مكتملة على اختبارات الوحدة (SQLite) لكنّها تحمل نفس عطل تسميم المعاملة على Postgres الحقيقي.
+</div>
+</section>
+
+<section id="s10">
+<h2>§10 الأرقام النهائيّة والتحقّق الكامل</h2>
+<table>
+<tr><th>البند</th><th>القيمة</th></tr>
+<tr><td>اختبارات الخلفيّة (الطقم الكامل، على الحالة النهائيّة للكود بعد كل الجولات)</td><td>4250 ناجح / 15 مُتخطّى / <b>0 فاشل</b> (+2 اختبارًا جديدًا مخصَّصًا لـ F10)</td></tr>
+<tr><td>مسار ارتداد نقطة الحفظ (SAVEPOINT) على عطل Postgres حقيقي</td><td><b>مُتحقَّق منه بتجربة حقيقيّة (§5)، لا باختبار وحدة مُلتزَم به</b> — SQLite لا يستطيع محاكاة تسميم المعاملة، فهذا المسار خارج تغطية طقم الاختبارات الآلي عمدًا وبحدود تقنيّة حقيقيّة، لا إهمالًا</td></tr>
+<tr><td>FIN-COR</td><td><span class="tag ok">PASS</span></td></tr>
+<tr><td>بوّابة ما قبل النشر (<code>predeploy_gate.sh</code>)</td><td><span class="tag ok">PASSED</span> — صفر فشل جديد</td></tr>
+<tr><td>هجرات قاعدة بيانات جديدة</td><td>لا شيء — بند بكود فقط، رأس الهجرة يبقى <code>ab75</code></td></tr>
+<tr><td>رأس الهجرة على المواضع الأربعة</td><td><code>ab75</code> — متطابق تمامًا</td></tr>
+<tr><td>الالتزام</td><td><code>bb73a700</code></td></tr>
+<tr><td>عدد جولات "اكتشاف مشكلة → إصلاح → إعادة تحقّق" قبل الإغلاق</td><td>3 (نمط علم المحاولة، تسميم المعاملة، سلامة السجلّات السابقة)</td></tr>
+<tr><td>فحص صحّي خارجي بعد النشر على Production</td><td><code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code></td></tr>
+</table>
+</section>
+
+<footer>
+تقرير 567 — وُلِّد من جلسة تنفيذ واحدة على فرع <code>remediation/report557-phases0-6</code>، فوق تقرير 566. الالتزام: <code>bb73a700</code>. لا حذف ولا تعديل لأي تقرير سابق — كل مراجعة أو تنقيح مستقبلي يكون ملفًّا جديدًا منفصلًا.
+</footer>
+
+</body>
+</html>
