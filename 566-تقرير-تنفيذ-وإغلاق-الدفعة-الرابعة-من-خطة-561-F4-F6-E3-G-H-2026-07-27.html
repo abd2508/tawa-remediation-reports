@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>566 — تقرير تنفيذ وإغلاق: الدفعة الرابعة من خطّة 561 (F4 · F6 · E3 · G-H)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --accent:#c2540a; --accent2:#0a6c74; --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d;
+  --line:#e4ddd0; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c; --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+}
+:root[data-theme="dark"]{ --bg:#171512; --panel:#211e1a; --ink:#ece7dd; --sub:#b3ab9c; --line:#3a352c; --accent:#e08a3e; --accent2:#3fb7c2; --bad:#e2695f; --warn:#e0a23f; --good:#4fbf78; --info:#5cb3e0; --build:#a893e0; --corr:#e069b8; }
+:root[data-theme="light"]{ --bg:#faf7f2; --panel:#fff; --ink:#20201d; --sub:#5b564d; --line:#e4ddd0; --accent:#c2540a; --accent2:#0a6c74; --bad:#b3261e; --warn:#a05a00; --good:#1a7a3c; --info:#0a6c9c; --build:#5b3fa0; --corr:#8a1c6b; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif; direction:rtl;line-height:1.7;max-width:980px;margin:0 auto;padding:0 20px 80px;font-size:16px}
+h1,h2,h3,h4{text-wrap:balance;font-weight:800}
+p{max-width:72ch}
+code,pre{font-family:var(--mono);direction:ltr;text-align:left;unicode-bidi:plaintext}
+code{background:var(--line);padding:1px 6px;border-radius:5px;font-size:.88em}
+pre{background:var(--line);padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:.84em;max-width:100%}
+a{color:var(--accent2)}
+.masthead{padding:38px 0 26px;border-bottom:3px solid var(--ink)}
+.masthead .eyebrow{color:var(--accent);font-weight:700;letter-spacing:.04em;font-size:.9em}
+.masthead h1{font-size:1.9em;margin:.25em 0}
+.masthead .meta{color:var(--sub);font-size:.92em}
+.verdict-band{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0;padding:18px;background:var(--panel); border:1px solid var(--line);border-radius:12px}
+.verdict-band .stat{flex:1;min-width:120px;text-align:center}
+.verdict-band .stat b{display:block;font-size:1.7em;font-variant-numeric:tabular-nums}
+.verdict-band .stat span{color:var(--sub);font-size:.8em}
+.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:24px 0}
+.toc h2{margin-top:0;font-size:1.05em}
+.toc ol{margin:0;padding-inline-start:22px;columns:2;column-gap:28px}
+.toc li{margin-bottom:6px;break-inside:avoid;font-size:.94em}
+.callout{border-radius:10px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);background:var(--panel)}
+.callout.method{border-inline-start:5px solid var(--info)}
+.callout.warn{border-inline-start:5px solid var(--warn)}
+.callout.good{border-inline-start:5px solid var(--good)}
+.callout.bad{border-inline-start:5px solid var(--bad)}
+.callout.build{border-inline-start:5px solid var(--build)}
+section{margin:44px 0}
+section > h2{font-size:1.4em;padding-bottom:10px;border-bottom:2px solid var(--line)}
+h3{font-size:1.12em;color:var(--accent2)}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:.93em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:right;vertical-align:top}
+th{background:var(--panel);color:var(--sub);font-weight:700}
+tr:nth-child(even){background:color-mix(in srgb, var(--panel) 60%, transparent)}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78em;font-weight:700;white-space:nowrap}
+.tag.ok{background:color-mix(in srgb, var(--good) 18%, transparent);color:var(--good)}
+.tag.bad{background:color-mix(in srgb, var(--bad) 18%, transparent);color:var(--bad)}
+.tag.warn{background:color-mix(in srgb, var(--warn) 18%, transparent);color:var(--warn)}
+.tag.info{background:color-mix(in srgb, var(--info) 18%, transparent);color:var(--info)}
+.pipeline{display:flex;flex-wrap:wrap;gap:0;margin:26px 0;align-items:stretch}
+.pipe-step{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;position:relative;margin:6px}
+.pipe-step b{display:block;color:var(--accent2);font-size:.95em;margin-bottom:4px}
+.pipe-step span{font-size:.85em;color:var(--sub)}
+.pipe-arrow{display:flex;align-items:center;justify-content:center;font-size:1.4em;color:var(--sub);padding:0 2px}
+@media (max-width:820px){.pipe-arrow{transform:rotate(90deg)}}
+.diagram{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin:18px 0;overflow-x:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:18px 0}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);color:var(--sub);font-size:.85em}
+.small{font-size:.85em;color:var(--sub)}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="eyebrow">تقرير 566 · تنفيذ وإغلاق</div>
+  <h1>الدفعة الرابعة من خطّة 561 — موثوقية الإشعارات، دفتر الأستاذ، إدارة قضايا "توا تريد"</h1>
+  <div class="meta">فرع <code>remediation/report557-phases0-6</code> · 2026-07-27 · مبني فوق تقرير 565 (الدفعة الثالثة + إصلاح حادثة الإنتاج) · الالتزام: <code>c56117fc</code></div>
+</div>
+
+<div class="verdict-band">
+  <div class="stat"><b>4</b><span>بنود جديدة نُفِّذت فعليًّا (F4, F6, E3, G-H)</span></div>
+  <div class="stat"><b>4</b><span>بنود أخرى وُجدت مُنجَزة مسبقًا (G-E, GC-1, GC-2, GC-3)</span></div>
+  <div class="stat"><b>3</b><span>أعطال حقيقيّة وُجدت (مراجع + متتبّع سيناريوهات) وأُصلِحت قبل النشر</span></div>
+  <div class="stat"><b>4248</b><span>اختبار خلفيّة ناجح، صفر فاشل</span></div>
+  <div class="stat"><b>4/4</b><span>مواضع نشر مكتملة ومتحقَّق منها خارجيًّا</span></div>
+</div>
+
+<div class="callout warn">
+<b>صراحة كاملة بشأن ما تغيَّر من الخطّة الأصليّة لهذه الدفعة:</b> بدأت هذه الجلسة بخطّة لسبعة بنود (B7¹، F3¹، F7¹، J4¹، I6¹، A10-جزئي¹ — <b>هذه الستّة نُفِّذت بالفعل في تقرير 565</b>)، ثمّ لدفعة جديدة: F4، F6، G-E، G-H، J3، J7، GC-1. أثناء التنفيذ: <b>G-E وGC-1 (وGC-2 وGC-3 معهما) تبيّن أنّها مُنجَزة بالفعل</b> من جلسة سابقة لم تُوثَّق في وثيقة الخطّة (تفصيل في §5)؛ <b>J3</b> (أقفال حلقات الخلفيّة المُحصَّنة) أُجِّل عمدًا لأنّ نطاقه الحقيقي — تعديل 27 حلقة خلفيّة منفصلة في <code>main.py</code> — أكبر من أن يُدمَج بأمان في دفعة تحتوي أصلًا على تعديلات مالية وإشعارات حسّاسة؛ <b>J7</b> (أبعاد مقاييس OTel) استُبدِل ببناء بند حرج (GC-1) بدل بند منخفض الأولويّة، لكن GC-1 تبيّن أنّه منجَز مسبقًا أيضًا، فلم يُستهلَك وقت بناء فيه فعليًّا. <b>الإجمالي الفعلي المُسلَّم في هذه الدفعة: 4 بنود جديدة + تأكيد وتوثيق 4 بنود منجَزة مسبقًا.</b>
+</div>
+
+<div class="toc">
+  <h2>الفهرس</h2>
+  <ol>
+    <li><a href="#s1">الخلاصة بلغة بسيطة</a></li>
+    <li><a href="#s2">أين نحن الآن من خطّة الـ114 بندًا؟</a></li>
+    <li><a href="#s3">منهجيّة العمل — بنّاء، مراجع مستقلّ، متتبّع سيناريوهات</a></li>
+    <li><a href="#s4">ماذا بُني فعليًّا؟ (F4 · F6 · E3 · G-H)</a></li>
+    <li><a href="#s5">اكتشاف: أربعة بنود كانت مُنجَزة بالفعل (G-E · GC-1 · GC-2 · GC-3)</a></li>
+    <li><a href="#s6">ما وجدته المراجعة العدائيّة</a></li>
+    <li><a href="#s7">ما وجده متتبّع السيناريوهات — اكتشافان حقيقيّان بتجارب فعليّة</a></li>
+    <li><a href="#s8">النشر على المواضع الأربعة</a></li>
+    <li><a href="#s9">قسم المشاكل والحلول</a></li>
+    <li><a href="#s10">ما تبقّى ولماذا لم يُنفَّذ اليوم (J3 وغيره)</a></li>
+    <li><a href="#s11">الأرقام النهائيّة والتحقّق الكامل</a></li>
+  </ol>
+</div>
+
+<section id="s1">
+<h2>§1 الخلاصة بلغة بسيطة</h2>
+<p>
+هذه الدفعة الرابعة من نفس خطّة الإصلاح الكبيرة (561/562) بنت 4 بنود جديدة حقيقيّة: <b>F4</b> (منع "توهُّم النجاح" في إعادة محاولة إرسال الإشعارات — إذا فشلت كل قنوات الإرسال الخارجيّة لإشعار ما، النظام الآن يعيد المحاولة فعليًّا بدل أن يعتبره "تمّ التسليم" بالخطأ)، <b>F6</b> (تحويل فحص "هل قناة البريد/واتساب مفعَّلة؟" من "افتراض التفعيل عند أي عطل بقاعدة البيانات" إلى "افتراض التعطيل" — أكثر أمانًا لو تعطّل المشغِّل صراحة قناة ما)، <b>E3</b> (فهرس تقريري جديد فوق سجلّات دفتر الأستاذ يسهّل تصفّح القيود المحاسبيّة مستقبلًا)، و<b>G-H</b> (حقول إدارة جديدة لقضايا "توا تريد" — تعيين موظّف مسؤول، درجة أهمّيّة، موعد نهائي، فريق — مع قفل تفاؤلي يمنع تعارض تعديلَين متزامنَين على نفس القضيّة).
+</p>
+<p>
+<b>الأهمّ:</b> اتُّبعت المنهجيّة المطلوبة بالضبط — بنّاء، ثمّ <b>مراجع عدائي مستقلّ</b> لم يرَ عمل البنّاء، وفي نفس الوقت <b>متتبّع سيناريوهات</b> منفصل يُجري تجارب حقيقيّة (لا قراءة كود فقط) على قاعدة بيانات Postgres حقيقيّة. <b>كلاهما وجد أعطالًا حقيقيّة</b> — المراجع وجد فجوة توثيق حوكمة، ومتتبّع السيناريوهات وجد عطلَين حقيقيَّين بتجارب فعليّة مُثبَتة (تفصيل كامل في §6 و§7). الثلاثة أُصلحت وأُثبتت الإصلاحات قبل أي نشر.
+</p>
+<div class="callout good">
+<b>اكتشاف جانبي مفيد:</b> أثناء التحضير لبناء 4 بنود من الخطّة (G-E، GC-1، GC-2، GC-3)، تبيّن أنّها <b>منجَزة بالفعل</b> من عمل سابق لم يُسجَّل في وثيقة الخطّة نفسها. هذا وفّر وقت بناء حقيقيًّا، واستُبدِل بتعميق مراجعة البنود الأربعة الفعليّة الجديدة بدل تشتيت الجهد. وثيقة الخطّة (<code>561-tawa-remediation-build-spec-v2.md</code>) حُدِّثت لتعكس هذا، حتى لا تُعاد هذه البنود للتقييم في جلسة مستقبليّة.
+</div>
+</section>
+
+<section id="s2">
+<h2>§2 أين نحن الآن من خطّة الـ114 بندًا؟</h2>
+<table>
+<tr><th>الجلسة</th><th>ماذا فعلت</th><th>الحالة</th></tr>
+<tr><td>تقرير 563</td><td>26 بندًا من "الموجة صفر"</td><td><span class="tag ok">مُغلَق سابقًا</span></td></tr>
+<tr><td>تقرير 564</td><td>5 بنود (B4/B6/D1/D2/G-G) + إضافة بند D11</td><td><span class="tag ok">مُغلَق سابقًا</span></td></tr>
+<tr><td>تقرير 565</td><td>6 بنود (B7/F3/F7/J4/I6/A10-جزئي) + حادثة إنتاج وإصلاحها</td><td><span class="tag ok">مُغلَق سابقًا</span></td></tr>
+<tr><td><b>هذا التقرير (566)</b></td><td>4 بنود جديدة (F4/F6/E3/G-H) + تأكيد 4 بنود منجَزة مسبقًا (G-E/GC-1/GC-2/GC-3)</td><td><span class="tag ok">مُغلَق الآن</span></td></tr>
+</table>
+<p class="small">الإجمالي التراكمي: 26 + 5 + 6 + 4 = <b>41 بندًا جديدًا نُفِّذ فعليًّا</b> عبر أربع دفعات، بالإضافة إلى 4 بنود أخرى (G-E/GC-1/2/3) مؤكَّدة منجَزة من عمل سابق غير موثَّق — أي <b>45 بندًا</b> من إجمالي 114 مؤكَّدة الحالة الآن.</p>
+</section>
+
+<section id="s3">
+<h2>§3 منهجيّة العمل — بنّاء، مراجع مستقلّ، متتبّع سيناريوهات</h2>
+<div class="pipeline">
+  <div class="pipe-step" style="border-top:4px solid var(--build)"><b>1. البناء</b><span>4 بنود، كل منها بملفّاته وهجراته الخاصّة، مع اختبارات مخصَّصة لكل واحد</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--build)"><b>2. مراجعة عدائيّة</b><span>وكيل مستقلّ لم يرَ عمل البنّاء — أعاد قراءة كل ملفّ كاملًا، شغّل الاختبارات بنفسه، اختبر الهجرات على Postgres حقيقي مستقلّ</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--accent)"><b>3. تتبّع سيناريوهات</b><span>وكيل ثالث، بالتوازي — تجارب تزامن حقيقيّة على Postgres حقيقي، لا قراءة كود</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--bad)"><b>4. إصلاح 3 أعطال</b><span>فجوة حوكمة (مراجع) + تفاعل F4×F6 + فجوة IN_PROGRESS (متتبّع السيناريوهات) — كلّها أُصلحت وأُثبتت</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--good)"><b>5. تحقّق كامل</b><span>4248 اختبارًا + FIN-COR + بوّابة ما قبل النشر — كلّها PASS</span></div>
+  <div class="pipe-arrow">←</div>
+  <div class="pipe-step" style="border-top:4px solid var(--good)"><b>6. نشر ×4</b><span>GitHub → test1 → test/.194 → Production، تحقّق خارجي حقيقي في كل موضع</span></div>
+</div>
+</section>
+
+<section id="s4">
+<h2>§4 ماذا بُني فعليًّا؟ (F4 · F6 · E3 · G-H)</h2>
+
+<h3>F4 — منع "توهُّم النجاح" عند فشل كل قنوات إرسال الإشعار</h3>
+<p>عندما يُرسَل إشعار (دفع/رسالة نصّيّة/بريد/واتساب) عبر آليّة "صندوق الأحداث الصادرة"، الكود القديم كان يعتبر أي محاولة إرسال "منتهية بنجاح" حتى لو فشلت كل القنوات الخارجيّة فعليًّا — لا إعادة محاولة، لا تنبيه، لا أثر. الآن: النتيجة الحقيقيّة لكل قناة (نجاح/فشل) تُتتبَّع، وإذا فشلت <b>كل</b> القنوات المؤهَّلة (لا توجد ولو قناة واحدة نجحت)، النظام يُعيد المحاولة فعليًّا عبر آليّة إعادة المحاولة/"الرسائل الميّتة" الموجودة أصلًا — بدل تسجيلها بصمت كـ"تم التسليم". كما أضاف <code>FOR UPDATE SKIP LOCKED</code> (قفل صفّ حقيقي على Postgres) لمنع عاملَين متزامنَين من معالجة نفس الحدث مرّتين، احتياطًا إضافيًّا فوق قفل Redis الموجود أصلًا.</p>
+
+<h3>F6 — قنوات البريد وواتساب: افتراض "معطَّل" عند عطل قاعدة بيانات، لا "مفعَّل"</h3>
+<p>فحص "هل قناة البريد الإلكتروني/واتساب مفعَّلة؟" كان — عند حدوث أي عطل في قراءة قاعدة البيانات — يفترض "نعم مفعَّلة" تلقائيًّا، بما في ذلك حالة أن يكون المشغِّل قد عطَّلها صراحة! الآن: محاولة واحدة إضافيّة (بعد 50 ميلي ثانية) قبل الاستسلام، وعند فشل الاثنتين يُفتَرض "معطَّلة" (أكثر أمانًا) بدل "مفعَّلة".</p>
+
+<h3>E3 — فهرس تقريري فوق دفتر الأستاذ (JournalHeader)</h3>
+<p>كل قيد محاسبي في دفتر الأستاذ (<code>ledger_entries</code>) يحمل معرّف "دفعة قيد" (<code>journal_id</code>) يربط أطرافه المتوازنة (مدين/دائن) معًا — لكن لا يوجد جدول واحد يسرد "كل دفعات القيود" ليتصفّحه تقرير مستقبلي دون فحص كامل الجدول. الآن جدول جديد (<code>journal_headers</code>) يحتوي صفًّا واحدًا لكل دفعة قيد، يُكتَب تلقائيًّا من نفس النقطة الوحيدة في الكود التي تُنشئ القيود أصلًا (<code>post_journal</code>) — فلا خطر نسيان نقطة إدخال أخرى — بالإضافة إلى تعبئة تاريخيّة لكل دفعات القيود الموجودة مسبقًا.</p>
+
+<h3>G-H — حقول إدارة قضايا "توا تريد" + قفل تفاؤلي</h3>
+<p>محرّك القضايا العام في "توا تريد" (يفتح قضيّة تلقائيًّا عند اختلاف فاتورة عن أمر الشراء) لم يكن يدعم تعيين موظّف مسؤول، أو درجة أهمّيّة، أو موعدًا نهائيًّا، أو فريقًا مسؤولًا — أُضيفت هذه الحقول (بدون واجهة استهلاك جديدة بعد — تجهيز فقط، بنفس أسلوب "ابنِ الوحدة أوّلًا، وصِّل المستهلكين لاحقًا" المتَّبع في هذه الجلسات). كما أُضيف رقم إصدار (<code>version</code>) يمنع تعارضًا صامتًا: لو قرأ موظّفان نفس القضيّة، ثم عدَّل أحدهما شيئًا، ثم حاول الآخر حسم القضيّة بناءً على بيانات قديمة، النظام الآن (اختياريًّا، لمن يرسل الرقم) يرفض بخطأ واضح بدل الكتابة فوق تعديل الأوّل بصمت.</p>
+</section>
+
+<section id="s5">
+<h2>§5 اكتشاف: أربعة بنود كانت مُنجَزة بالفعل (G-E · GC-1 · GC-2 · GC-3)</h2>
+<p>قبل بناء أي كود جديد لهذه البنود الأربعة، فحصنا الحالة الحيّة للكود أوّلًا (كما تقتضي المنهجيّة) — ووجدنا أنّها منجَزة بالفعل:</p>
+<table>
+<tr><th>البند</th><th>الحالة المُكتشَفة</th><th>الدليل</th></tr>
+<tr><td>G-E (خطأ عدّ الشكاوى + حقول لوحة العمليّات الناقصة)</td><td>مُصلَح بالكامل</td><td>تعليق صريح في الكود يستشهد بـ"G-E"، فلترة العدّ مطابقة لقائمة العناصر، جميع الحقول الـ15 موجودة. 126 اختبارًا ذا صلة ناجح.</td></tr>
+<tr><td>GC-1 (تجزئة تكرار السلّة الموحّدة الناقصة)</td><td>مُصلَح بالكامل</td><td>الالتزام <code>6ba22499</code> — يستدعي دالّة التجزئة الموحَّدة نفسها بدل نسخة منفصلة، بالضبط كما طلب البند.</td></tr>
+<tr><td>GC-2 (تغطية اختبارات لتعارض التجزئة)</td><td>مُصلَح بالكامل</td><td>نفس الالتزام — 5 اختبارات مخصَّصة (عنوان/دفع مُجزّأ/كود خصم/موعد جدولة) تثبت رفض إعادة استخدام نفس المفتاح ببيانات مختلفة.</td></tr>
+<tr><td>GC-3 (اختبار تزامن حقيقي لتقديم مزدوج)</td><td>مُصلَح بالكامل</td><td>نفس الالتزام — ملفّ اختبار مخصَّص، مُدرَج في قائمة اختبارات Postgres الحقيقيّة (<code>run_pg_tests.sh</code>).</td></tr>
+</table>
+<p>وثيقة الخطّة الأصليّة (<code>561-tawa-remediation-build-spec-v2.md</code>) حُدِّثت بعلامة <b>DONE</b> على كل بند من الأربعة، مع رقم الالتزام وتاريخ التأكيد — حتى لا تُعاد هذه البنود لقائمة "التالي" في جلسة مستقبليّة.</p>
+</section>
+
+<section id="s6">
+<h2>§6 ما وجدته المراجعة العدائيّة</h2>
+<div class="callout warn">
+<b>الحكم:</b> F4 وF6 وG-H — <span class="tag ok">جاهزة للنشر</span> مباشرة. E3 — <span class="tag bad">غير جاهزة كما هي</span>، عطل واحد حقيقي مؤكَّد.
+</div>
+<p><b>العطل:</b> هذا الكود يحتوي "بوّابة حوكمة" (اختبار مخصَّص، <code>test_r557_phase5_state_column_governance.py</code>) تفرض أنّ <b>كل</b> عمود "حالة/status" جديد في أي جدول يجب أن يُصنَّف صراحة: إمّا "طابور يحتاج انتباه العمليّات" أو "ليس كذلك، ولسبب مكتوب". عمود <code>journal_headers.status</code> الجديد من بند E3 لم يُصنَّف — فالاختبار فشل بتصميمه (هذا بالضبط الغرض من وجوده: إجبار قرار واعٍ عند إضافة أي عمود حالة جديد، لا تركه بلا تصنيف). الكود الفعلي (النموذج، الخدمة، الهجرة) كان سليمًا تمامًا — الفجوة فقط في سطر تسجيل واحد ناقص في ملفّ الاختبار.</p>
+<p><b>الإصلاح:</b> أُضيف <code>journal_headers.status</code> إلى قائمة "مُستثنى بسبب مكتوب"، بنفس تصنيف <code>manual_journals.status</code> الموجود مسبقًا (كلاهما "علامة تقدُّم قيد محاسبي عبر مسار ترحيل مخصَّص، ليس طابور عمليّات") — مع شرح كامل لماذا <code>journal_headers.status</code> اليوم دائمًا "POSTED" ولماذا العمود موجود أصلًا (تجهيز لتدفّق موافقة مستقبلي).</p>
+<p>كما تحقّق المراجع بتجارب مباشرة على Postgres حقيقي (منفصلة عن أي تجربة سابقة لهذه الجلسة): سلوك <code>FOR UPDATE SKIP LOCKED</code> الحقيقي في F4، سلوك نقطة الحفظ (SAVEPOINT) الحقيقي في F6 عند فشل استعلام Postgres حقيقي (لا محاكاة)، وتطبيق/تراجع الهجرتَين <code>ab74</code>/<code>ab75</code> بالكامل على قاعدة بيانات تجريبيّة منفصلة.</p>
+<div class="callout method">
+<b>ملاحظتان غير حاجبتان للنشر (مُسجَّلتان للمتابعة):</b> (1) مسار البريد الإلكتروني في <code>_dispatch_channels</code> لا يملك حماية استثناء مخصَّصة كالتي يملكها مسار واتساب — موجودة من قبل هذه الدفعة، غير مرتبطة بالتعديلات الحاليّة، لكن أصبحت أكثر أهمّيّة الآن لأنّ F4 يعتمد على وعد "لا يرمي استثناء أبدًا". (2) عند فشل إرسال واتساب باستثناء حقيقي (لا مجرّد نتيجة فشل)، يُسجَّل الفشل لأغراض إعادة المحاولة لكن دون كتابة سجلّ تسليم (<code>NotificationDeliveryLog</code>) — فجوة صغيرة في سجلّ التدقيق، لا تؤثّر على صحّة إعادة المحاولة نفسها.
+</div>
+</section>
+
+<section id="s7">
+<h2>§7 ما وجده متتبّع السيناريوهات — اكتشافان حقيقيّان بتجارب فعليّة</h2>
+<p>الوكيل الثالث أجرى 6 مجموعات تجارب حقيقيّة (تزامن فعلي عبر <code>asyncio.gather</code>، اتّصالات Postgres منفصلة، أعطال حقيقيّة لا محاكاة) وأثبت أنّ آليّات التزامن في F4 وE3 وG-H تعمل بشكل صحيح تمامًا تحت ضغط حقيقي (تفاصيل رقميّة كاملة في الجدول أدناه). لكنّه اكتشف أيضًا اكتشافَين حقيقيَّين جديدَين، غير مرتبطَين بأي تجربة طلبتها المراجعة العدائيّة:</p>
+
+<div class="grid2">
+<div class="card">
+<h4 style="margin-top:0">الاكتشاف الأوّل: تقاطع F4×F6</h4>
+<p class="small">إذا كان البريد الإلكتروني <b>القناة الوحيدة</b> المؤهَّلة لإشعار ما، وفشلت قراءة إعداد "هل البريد مفعَّل؟" فعليًّا بعطل قاعدة بيانات حقيقي (أُثبِت بمنح صلاحيّات محدودة حقيقيّة على Postgres، لا محاكاة) — F6 يفشل بأمان (يفترض "معطَّل") — لكن الكود القديم كان يتعامل مع هذا وكأنّه "لا قناة مؤهَّلة أصلًا"، فلا يُسجَّل كمحاولة فاشلة، فيُعتبَر الإشعار "تمّ تسليمه" رغم أنّ العميل لم يستلم شيئًا إطلاقًا، بلا إعادة محاولة وبلا أي تنبيه.</p>
+</div>
+<div class="card">
+<h4 style="margin-top:0">الاكتشاف الثاني: فجوة IN_PROGRESS في G-H</h4>
+<p class="small">بند G-H أضاف حالة <code>IN_PROGRESS</code> جديدة كخيار مسموح به في قاعدة البيانات (تجهيز لواجهة "تعيين قضيّة" مستقبليّة لم تُبنَ بعد). بتجربة مباشرة (تعيين قضيّة يدويًّا لهذه الحالة، محاكاةً لتلك الواجهة المستقبليّة)، تبيّن أنّ نقطتَي "حسم" و"رفض" القضيّة كانتا تقبلان فقط الحالة "مفتوحة" — أي أنّ أي قضيّة تصل لاحقًا إلى IN_PROGRESS كانت ستعلق بلا طريقة لإغلاقها، حتى تُعدَّل هاتان النقطتان.</p>
+</div>
+</div>
+
+<div class="callout good">
+<b>كلا الاكتشافَين أُصلِح فورًا</b> — قبل أي التزام في الكود: الأوّل بتمييز "فشلت قراءة الإعداد فعليًّا" عن "المشغِّل عطَّل القناة صراحة" (الأولى تُسجَّل كمحاولة فاشلة تدخل في إعادة المحاولة، الثانية تبقى "غير مؤهَّلة" كما هو مصمَّم)، والثاني بتوسيع شرط قبول الحسم/الرفض ليشمل IN_PROGRESS أيضًا، لا "مفتوحة" فقط. أُضيف اختبار مخصَّص لكل إصلاح، ونجحت الاختبارات الجديدة كاملةً.
+</div>
+
+<table>
+<tr><th>التجربة</th><th>الطريقة</th><th>النتيجة</th></tr>
+<tr><td>تزامن F4 (قفل الصفّ)</td><td>10 صفوف، عاملان حقيقيّان متزامنان (<code>asyncio.gather</code>) مع تأخير مُتعمَّد يوسّع نافذة التسابق</td><td>10/10 صفّ عولج مرّة واحدة بالضبط، صفر تكرار، صفر فقدان</td></tr>
+<tr><td>اقتصاديّات إعادة محاولة F4</td><td>عدّ استدعاءات دالّة الإرسال الحقيقيّة عبر دورة كاملة حتى "الرسائل الميّتة"</td><td>مطابق تمامًا لعدد <code>max_retry</code> المُعطى (3 أو 10)، بلا خطأ حسابي</td></tr>
+<tr><td>نقطة حفظ F6 تحت عطل Postgres حقيقي</td><td>سحب صلاحيّة قراءة حقيقيّة من جدول الإعدادات، لا محاكاة</td><td>فشل مغلَق (كما هو متوقَّع)، وبقيّة الجلسة (استعلامات أخرى) لم تتأثّر إطلاقًا</td></tr>
+<tr><td>تزامن E3 (دفتر الأستاذ)</td><td>5 عمليّات ترحيل متزامنة حقيقيّة على حسابات جديدة</td><td>صفر حسابات مكرَّرة، 4 محاولات إعادة حقيقيّة نجحت، 5/5 صفّ فهرس صحيح</td></tr>
+<tr><td>سباق القفل التفاؤلي G-H</td><td>محاولتا حسم متزامنتان حقيقيّتان على نفس القضيّة</td><td>فائز واحد بالضبط، تعارض حقيقي (409) للآخر — بما في ذلك حالة "رقم إصدار قديم" الدقيقة</td></tr>
+</table>
+</section>
+
+<section id="s8">
+<h2>§8 النشر على المواضع الأربعة</h2>
+<table>
+<tr><th>الموضع</th><th>التحقّق</th><th>الحالة</th></tr>
+<tr><td><b>GitHub</b></td><td>الالتزام <code>c56117fc</code> مدفوع، مطابق لـ<code>HEAD</code> المحلّي</td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>test 1</b></td><td>هجرة <code>ab75</code>، فحص صحّي = healthy، <code>HTTP 200</code></td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>test / .194</b></td><td>هجرة <code>ab75</code>، فحص صحّي = healthy، <code>HTTP 200</code>، سجلّات نظيفة</td><td><span class="tag ok">مكتمل</span></td></tr>
+<tr><td><b>Production (tawanow.com)</b></td><td>هجرة <code>ab75</code>، <code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code> <code>{"ok":true,"db":"ok","redis":"ok"}</code>، سجلّات نظيفة</td><td><span class="tag ok">مكتمل</span></td></tr>
+</table>
+<p class="small">هذه الدفعة، خلافًا لدفعة 565، لا تلمس منطق فحص بدء التشغيل (<code>validate_production_settings</code>) إطلاقًا — كل التعديلات في مسارات الإشعارات/دفتر الأستاذ/قضايا "توا تريد"، لا إعدادات الإقلاع. النشر على Production جرى بعد تأكيد صريح من المالك في المحادثة (بسبب حظر مصنِّف الأذونات الآلي لأي إجراء SSH مباشر على خادم حيّ، بغضّ النظر عن الموافقة داخل المحادثة — نفّذ المالك نفسه أمر النشر).</p>
+</section>
+
+<section id="s9">
+<h2>§9 قسم المشاكل والحلول</h2>
+<table>
+<tr><th>المشكلة</th><th>كيف اكتُشِفت</th><th>الحلّ</th><th>الأثر إن لم تُكتشَف</th></tr>
+<tr>
+  <td>عمود <code>journal_headers.status</code> غير مُصنَّف في بوّابة حوكمة أعمدة الحالة</td>
+  <td>مراجعة عدائيّة — تشغيل الطقم الكامل، اكتشاف فشل اختبار حوكمة موجود مسبقًا</td>
+  <td>تسجيل العمود في قائمة "مُستثنى بسبب مكتوب"، بنفس تصنيف عمود مماثل موجود</td>
+  <td>لا أثر أمني — لكن بوّابة النشر كانت سترفض هذا الالتزام (فشل اختبار حقيقي، لا تجاهل)</td>
+</tr>
+<tr>
+  <td>تقاطع F4×F6: فشل قراءة إعداد قناة وحيدة يُعامَل كـ"لا قناة مؤهَّلة" بدل "محاولة فاشلة"</td>
+  <td>متتبّع سيناريوهات — تجربة حقيقيّة بصلاحيّات Postgres محدودة فعليًّا</td>
+  <td>تمييز "فشلت القراءة" عن "عُطِّلت صراحة"؛ الأولى تُسجَّل كمحاولة فاشلة تدخل في إعادة المحاولة</td>
+  <td>إشعار حسّاس (مثل تنبيه أمني بالبريد) يُفقَد بصمت دون أي أثر أو إعادة محاولة، لكل عطل عابر في قاعدة البيانات</td>
+</tr>
+<tr>
+  <td>قضيّة "توا تريد" بحالة IN_PROGRESS المستقبليّة عالقة بلا طريقة لإغلاقها</td>
+  <td>متتبّع سيناريوهات — تجربة تعيين حالة يدويّة تحاكي واجهة مستقبليّة لم تُبنَ بعد</td>
+  <td>توسيع شرط قبول الحسم/الرفض ليشمل IN_PROGRESS، لا "مفتوحة" فقط</td>
+  <td>عطل كامن غير قابل للملاحظة اليوم (لا واجهة تصل لهذه الحالة بعد)، كان سيظهر فجأة عند بناء واجهة "تعيين قضيّة" مستقبليّة</td>
+</tr>
+</table>
+</section>
+
+<section id="s10">
+<h2>§10 ما تبقّى ولماذا لم يُنفَّذ اليوم (J3 وغيره)</h2>
+<div class="callout warn">
+<b>J3 — أقفال حلقات الخلفيّة المُحصَّنة، أُجِّل عمدًا:</b> هذا البند يتطلَّب تعديل <b>27 حلقة خلفيّة منفصلة</b> في <code>main.py</code> لإضافة آليّة قفل "مُسيَّج" (fenced lock) — بناء وحدتَين جديدتَين بالكامل (<code>sweep_lock.py</code>، <code>sweep_heartbeat.py</code>) ثمّ توصيلهما بكل واحدة من الـ27 حلقة. الخطّة الأصليّة نفسها تصفه بأنّه "آمن كمرحلة واحدة لأنّ المنصّة تعمل بنسخة واحدة لكل بيئة اليوم" — أي أنّه <b>تحصين استباقي لخطر لا يوجد اليوم</b> (لا عطل حيّ حاليًّا)، لا إصلاح عطل قائم. حجم هذا التغيير (27 موضع تعديل) أكبر بكثير من أي بند آخر في هذه الدفعة، وكان دمجه هنا سيرفع مخاطر المراجعة دون داعٍ حقيقي عاجل. مُؤجَّل لجلسة مخصَّصة له وحده.
+</div>
+<p class="small">التفصيل الكامل لكل بند متبقٍّ آخر وسبب تأجيله لا يزال في <code>561-tawa-remediation-build-spec-v2.md</code> (محدَّث الآن ليعكس أنّ G-E/GC-1/GC-2/GC-3 مُنجَزة).</p>
+</section>
+
+<section id="s11">
+<h2>§11 الأرقام النهائيّة والتحقّق الكامل</h2>
+<table>
+<tr><th>البند</th><th>القيمة</th></tr>
+<tr><td>اختبارات الخلفيّة (الطقم الكامل)</td><td>4248 ناجح / 15 مُتخطّى / <b>0 فاشل</b> (+12 اختبارًا جديدًا عن الدفعة السابقة، مطابق تمامًا لعدد الاختبارات المُضافة)</td></tr>
+<tr><td>FIN-COR</td><td><span class="tag ok">PASS</span></td></tr>
+<tr><td>بوّابة ما قبل النشر</td><td><span class="tag ok">PASSED</span> — صفر فشل جديد</td></tr>
+<tr><td>هجرات قاعدة بيانات جديدة</td><td><code>ab74</code> (جدول <code>journal_headers</code> + تعبئة تاريخيّة)، <code>ab75</code> (حقول WorkItem + قفل تفاؤلي) — كلتاهما مختبَرتان تطبيقًا وتراجعًا على Postgres حقيقي منفصل</td></tr>
+<tr><td>رأس الهجرة على المواضع الأربعة</td><td><code>ab75</code> — متطابق تمامًا</td></tr>
+<tr><td>الالتزام</td><td><code>c56117fc</code></td></tr>
+<tr><td>عدد الوكلاء المستقلّين المستخدَمين</td><td>2 (مراجع عدائي + متتبّع سيناريوهات)، بالتوازي، كلّ منهما بلا اطّلاع على عمل الآخر — كلاهما وجد عطلًا حقيقيًّا</td></tr>
+<tr><td>فحص صحّي خارجي بعد النشر على Production</td><td><code>https://tawanow.com/api/health/ready</code> ⟶ <code>200</code></td></tr>
+</table>
+</section>
+
+<footer>
+تقرير 566 — وُلِّد من جلسة تنفيذ واحدة على فرع <code>remediation/report557-phases0-6</code>، فوق تقرير 565. الالتزام: <code>c56117fc</code>. لا حذف ولا تعديل لأي تقرير سابق — كل مراجعة أو تنقيح مستقبلي يكون ملفًّا جديدًا منفصلًا.
+</footer>
+
+</body>
+</html>

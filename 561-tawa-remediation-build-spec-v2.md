@@ -542,12 +542,15 @@ D1+D2, not in original plan) — concurrent-offer cap not re-enforced at accept 
   screen, e-contract viewer) without going through the reveal-first flow breaks with 403 the
   moment this ships — **update every such entry point in the same PR, not after.**
 
-### G-E — CP complaint-count filter bug `[LOW/MEDIUM]`
+### G-E — CP complaint-count filter bug `[LOW/MEDIUM]` — **DONE** (confirmed 2026-07-27, report 566)
 - **File:** `backend/app/modules/admin/control_panel_router.py:1576`
 - Fix: derive `count_q` from the same filtered base query as the item list (currently
   `select(func.count()).select_from(Complaint)` with no `.where()`).
 - Also add the 9 missing `domains` dict entries so CP Landing's 15 requested domains match what
   the backend actually returns (currently only 6).
+- **Confirmed already fully fixed in a prior session** (both the count_q filter parity and all
+  15 domain entries, the latter with an explicit code comment citing "G-E") — found already-done
+  during report 566's triage, no new code needed. 126 related tests pass.
 
 ### G-H — WorkItem case-management fields `[MEDIUM]`
 - Additive columns: `assigned_to_user_id`, `severity`, `sla_due_at`, `team`, `version`
@@ -726,7 +729,7 @@ against `d9c5d38d` with zero drift.
   NOT_READY_ARCHITECTURAL_REDESIGN_NEEDED** — do not schedule as a hardening pass; this is
   ground-up feature design.
 
-### GC-1 — Fix under-hashed group idempotency key `[CRITICAL, blocks unseal]`
+### GC-1 — Fix under-hashed group idempotency key `[CRITICAL, blocks unseal]` — **DONE** (commit `6ba22499`, confirmed 2026-07-27, report 566)
 - **File:** `backend/app/modules/carts/service.py:146-178` (`_hash_sub_orders`)
 - **Current:** hashes only `provider_id`, `payment_method`, per-item catalog/variant/qty/modifier
   fields.
@@ -742,16 +745,21 @@ against `d9c5d38d` with zero drift.
   customer changing address/tender split and resubmitting with the same key, silently returns the
   OLD group with OLD values — no error, no signal.
 
-### GC-2 — Add group-conflict/hash-mismatch test coverage `[HIGH]`
+### GC-2 — Add group-conflict/hash-mismatch test coverage `[HIGH]` — **DONE** (commit `6ba22499`)
 - Zero tests exist for `GroupIdempotencyConflictError` or a same-key/different-value replay.
 - **SEQ-27: implement after GC-1**, so tests prove the fixed behavior. The new
   `test_promo_per_customer_limit_preview_and_actual_parity` (added this window, unrelated to
   group-checkout) is a usable *structural template* for a preview/actual-parity-style test here.
+- **Confirmed done**: `tests/test_r516_cart_foundation.py` covers
+  `test_fix6_reused_key_different_payload_conflicts` plus 4 dedicated
+  `test_gc1_{address,tenders,promo_code,scheduled_for}_change_same_key_conflicts` tests. 10/10 pass.
 
-### GC-3 — Add true-concurrency double-submit test `[MEDIUM]`
+### GC-3 — Add true-concurrency double-submit test `[MEDIUM]` — **DONE** (commit `6ba22499`)
 - `carts/router.py:186-205`'s `IntegrityError` handler (unique constraint collision) is
   comment-documented only, no automated test simulating two simultaneous requests with the same
   idempotency key.
+- **Confirmed done**: `tests/test_gc3_group_checkout_integrity_race.py` exists, is in
+  `scripts/run_pg_tests.sh`'s curated real-Postgres list, and drives genuine concurrent requests.
 
 ### GC-4 — Promo silent-fail-open in group checkout `[LOW, latent]`
 - Backend behavior (`order_service.py:1323-1327`, applies per-sub-order via
